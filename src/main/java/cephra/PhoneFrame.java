@@ -1,25 +1,31 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package cephra;
 
-/**
- *
- * @author usher
- */
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.RoundRectangle2D;
+
 public class PhoneFrame extends javax.swing.JFrame {
 
     public PhoneFrame() {
         initComponents();
-        setSize(350, 750);
+         setSize(350, 750);
         setResizable(false);
-        
+
         // Set application icon
+        setAppIcon();
+
+        // ESC closes app
+        addEscapeKeyListener();
+
+        // Allow dragging
+        makeDraggable();
+    }
+      private void setAppIcon() {
         try {
             java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
             if (iconUrl != null) {
-                java.awt.Image icon = javax.imageio.ImageIO.read(iconUrl);
+                Image icon = javax.imageio.ImageIO.read(iconUrl);
                 setIconImage(icon);
             } else {
                 System.err.println("Icon not found: cephra/Photos/lod.png");
@@ -27,39 +33,39 @@ public class PhoneFrame extends javax.swing.JFrame {
         } catch (Exception e) {
             System.err.println("Error loading icon: " + e.getMessage());
         }
-        
-        // Add ESC key listener to close the application
-        addKeyListener(new java.awt.event.KeyAdapter() {
+    }
+
+    private void addEscapeKeyListener() {
+        addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE) {
+            public void keyPressed(KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     System.exit(0);
                 }
             }
         });
         setFocusable(true);
-        
-        // Make the frame draggable
-        makeDraggable();
     }
-    
+
     private void makeDraggable() {
-        final java.awt.Point[] dragPoint = new java.awt.Point[1];
-        
-        addMouseListener(new java.awt.event.MouseAdapter() {
+        final Point[] dragPoint = {null};
+
+        addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 dragPoint[0] = e.getPoint();
             }
         });
-        
-        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+
+        addMouseMotionListener(new MouseMotionAdapter() {
             @Override
-            public void mouseDragged(java.awt.event.MouseEvent e) {
+            public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Point currentLocation = getLocation();
-                    setLocation(currentLocation.x + e.getX() - dragPoint[0].x,
-                               currentLocation.y + e.getY() - dragPoint[0].y);
+                    Point currentLocation = getLocation();
+                    setLocation(
+                        currentLocation.x + e.getX() - dragPoint[0].x,
+                        currentLocation.y + e.getY() - dragPoint[0].y
+                    );
                 }
             }
         });

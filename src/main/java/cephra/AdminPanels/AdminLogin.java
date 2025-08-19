@@ -6,10 +6,12 @@ public class AdminLogin extends javax.swing.JPanel {
 
     public AdminLogin() {
         initComponents();
+        
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         // Load a background image proactively so panel never renders white
         loadBackgroundImage();
+      
     }
 
     @SuppressWarnings("unchecked")
