@@ -2,10 +2,14 @@ package cephra.AdminPanels;
 
 public class AdminLogin extends javax.swing.JPanel {
 
+    private java.awt.Image backgroundImage;
+
     public AdminLogin() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
+        // Load a background image proactively so panel never renders white
+        loadBackgroundImage();
     }
 
     @SuppressWarnings("unchecked")
@@ -15,18 +19,18 @@ public class AdminLogin extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         try {
-            // Try different images that might exist
-            java.net.URL imageUrl = getClass().getClassLoader().getResource("cephra/Photos/bigs.png");
+            // Try different images that might exist (load from classpath root)
+            java.net.URL imageUrl = getClass().getResource("/cephra/Photos/bigs.png");
             if (imageUrl == null) {
-                imageUrl = getClass().getClassLoader().getResource("cephra/Photos/emp.png");
+                imageUrl = getClass().getResource("/cephra/Photos/emp.png");
             }
             if (imageUrl == null) {
-                imageUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
+                imageUrl = getClass().getResource("/cephra/Photos/lod.png");
             }
             if (imageUrl == null) {
-                imageUrl = getClass().getClassLoader().getResource("cephra/Photos/pho.png");
+                imageUrl = getClass().getResource("/cephra/Photos/pho.png");
             }
-            
+
             if (imageUrl != null) {
                 javax.swing.ImageIcon icon = new javax.swing.ImageIcon(imageUrl);
                 // Scale the image to fit the panel size
@@ -35,38 +39,50 @@ public class AdminLogin extends javax.swing.JPanel {
                 jLabel1.setIcon(new javax.swing.ImageIcon(scaledImg));
                 jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                 jLabel1.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
-                System.out.println("Successfully loaded image: " + imageUrl.getPath());
+                jLabel1.setPreferredSize(new java.awt.Dimension(1000, 750));
+                System.out.println("Successfully loaded image: " + imageUrl.toString());
             } else {
                 System.err.println("No images found in cephra/Photos/ directory");
-                // Set a colored background as fallback
+                // Set a colored background as fallback so panel isn't white
                 jLabel1.setBackground(java.awt.Color.BLUE);
                 jLabel1.setOpaque(true);
+                jLabel1.setPreferredSize(new java.awt.Dimension(1000, 750));
             }
         } catch (Exception e) {
             System.err.println("Error loading image: " + e.getMessage());
-            // Set a colored background as fallback
+            // Set a colored background as fallback so panel isn't white
             jLabel1.setBackground(java.awt.Color.RED);
             jLabel1.setOpaque(true);
+            jLabel1.setPreferredSize(new java.awt.Dimension(1000, 750));
         }
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+        // Use BorderLayout to ensure label fills the entire panel
+        setLayout(new java.awt.BorderLayout());
+        add(jLabel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
+
+    private void loadBackgroundImage() {
+        try {
+            java.net.URL url = getClass().getResource("/cephra/Photos/emp.png");
+            if (url == null) url = getClass().getResource("/cephra/Photos/bigs.png");
+            if (url == null) url = getClass().getResource("/cephra/Photos/lod.png");
+            if (url == null) url = getClass().getResource("/cephra/Photos/pho.png");
+            if (url != null) {
+                backgroundImage = new javax.swing.ImageIcon(url).getImage();
+            }
+        } catch (Exception ignored) {}
+    }
+
+    @Override
+    protected void paintComponent(java.awt.Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+        }
+    }
 }

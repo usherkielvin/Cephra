@@ -15,8 +15,8 @@ public class Phonelogin extends javax.swing.JPanel {
      */
     public Phonelogin() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(400, 750));
-        setSize(400, 750);
+        setPreferredSize(new java.awt.Dimension(350, 750));
+        setSize(350, 750);
     }
 
     /**
@@ -28,59 +28,52 @@ public class Phonelogin extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel2 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        regbutton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
+        setLayout(null);
+        
+        // Match Splashscreen/Register panel transparency
+        setOpaque(false);
+        setBackground(new java.awt.Color(0, 0, 0, 0));
 
-
-        try {
-            java.net.URL imageUrl2 = getClass().getClassLoader().getResource("cephra/Photos/logi.png");
-            if (imageUrl2 != null) {
-                javax.swing.ImageIcon icon2 = new javax.swing.ImageIcon(imageUrl2);
-                // Scale the image to fit the panel size
-                java.awt.Image img2 = icon2.getImage();
-                java.awt.Image scaledImg2 = img2.getScaledInstance(400, 750, java.awt.Image.SCALE_SMOOTH);
-                jLabel2.setIcon(new javax.swing.ImageIcon(scaledImg2));
-                jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-                jLabel2.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
-            } else {
-                System.err.println("Image not found: cephra/Photos/logi.png");
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading image: " + e.getMessage());
-        }
-
-        // Configure jButton2 for transition
-        jButton2.setOpaque(false);
-        jButton2.setContentAreaFilled(false);
-        jButton2.setBorderPainted(false);
-        jButton2.setFocusPainted(false);
-        jButton2.setText("");
-        jButton2.setPreferredSize(new java.awt.Dimension(400, 750));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        // Make the register button invisible but clickable (like Splashscreen)
+        regbutton.setOpaque(false);
+        regbutton.setContentAreaFilled(false);
+        regbutton.setBorderPainted(false);
+        regbutton.setFocusPainted(false);
+        regbutton.setText("");
+        regbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                regbuttonActionPerformed(evt);
             }
         });
+        add(regbutton);
+        // Position to cover intended tap area; adjust if needed
+        regbutton.setBounds(-14, -32, 400, 814);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel2)
-                .addGap(0, 0, 0)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 750, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN.png"))); // NOI18N
+        jLabel1.setPreferredSize(new java.awt.Dimension(400, 814));
+        jLabel1.setOpaque(false);
+        add(jLabel1);
+        jLabel1.setBounds(-14, -32, 400, 814);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void regbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regbuttonActionPerformed
+        // Navigate to Register panel (same approach as Splashscreen)
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.PhoneFrame) {
+                        cephra.PhoneFrame phoneFrame = (cephra.PhoneFrame) window;
+                        phoneFrame.switchPanel(new cephra.PhonePanels.Register());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_regbuttonActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
         // Add your transition logic here
@@ -89,7 +82,7 @@ public class Phonelogin extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton regbutton;
     // End of variables declaration//GEN-END:variables
 }

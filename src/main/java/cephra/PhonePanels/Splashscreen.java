@@ -32,7 +32,7 @@ public class Splashscreen extends javax.swing.JPanel {
         jButton2.setBorderPainted(false);
         jButton2.setFocusPainted(false);
         jButton2.setText(""); // Remove text
-        jButton2.setVisible(false); // Make completely invisible
+        // Keep button visible but transparent for clicking
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);

@@ -77,6 +77,7 @@ public class MainFrame extends javax.swing.JFrame {
             .addComponent(adminLoginPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        // Always run undecorated for this frame (must be before pack/visible)
         setUndecorated(true);
         pack();
     }// </editor-fold>//GEN-END:initComponents
