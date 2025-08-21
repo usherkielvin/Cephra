@@ -1,11 +1,15 @@
 package cephra;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 
 public class PhoneFrame extends javax.swing.JFrame {
+
+    private Point dragStartPoint;
 
     public PhoneFrame() {
         initComponents();
@@ -22,16 +26,9 @@ public class PhoneFrame extends javax.swing.JFrame {
         makeDraggable();
     }
       private void setAppIcon() {
-        try {
-            java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
-            if (iconUrl != null) {
-                Image icon = javax.imageio.ImageIO.read(iconUrl);
-                setIconImage(icon);
-            } else {
-                System.err.println("Icon not found: cephra/Photos/lod.png");
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading icon: " + e.getMessage());
+        java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
+        if (iconUrl != null) {
+            setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
         }
     }
 
@@ -48,31 +45,28 @@ public class PhoneFrame extends javax.swing.JFrame {
     }
 
     private void makeDraggable() {
-        final Point[] dragPoint = {null};
-
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                dragPoint[0] = e.getPoint();
+                dragStartPoint = e.getPoint();
             }
         });
 
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (dragPoint[0] != null) {
+                if (dragStartPoint != null) {
                     Point currentLocation = getLocation();
                     setLocation(
-                        currentLocation.x + e.getX() - dragPoint[0].x,
-                        currentLocation.y + e.getY() - dragPoint[0].y
+                        currentLocation.x + e.getX() - dragStartPoint.x,
+                        currentLocation.y + e.getY() - dragStartPoint.y
                     );
                 }
             }
         });
     }
     
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+   
     private void initComponents() {
 
         phonePanel = new cephra.PhonePanels.Splashscreen();

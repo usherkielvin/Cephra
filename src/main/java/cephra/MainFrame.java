@@ -1,21 +1,26 @@
 package cephra;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class MainFrame extends javax.swing.JFrame {
 
     public MainFrame() {
+        setUndecorated(true);
         initComponents();
         setSize(1000, 750);
         setResizable(false);
         setAppIcon();
         addEscapeKeyListener();
         makeDraggable();
-        setUndecorated(true);
-        
-        adminLoginPanel = new cephra.AdminPanels.AdminLogin();
     }
      private void setAppIcon() {
         java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
@@ -65,8 +70,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
-        adminLoginPanel = new cephra.AdminPanels.AdminLogin();
+        cephra.AdminPanels.Splash splashPanel = new cephra.AdminPanels.Splash();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1000, 750));
@@ -74,7 +78,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         // Use BorderLayout and add the admin panel directly
         getContentPane().setLayout(new java.awt.BorderLayout());
-        getContentPane().add(adminLoginPanel, java.awt.BorderLayout.CENTER);
+        getContentPane().add(splashPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
  public void switchPanel(JPanel newPanel) {
         getContentPane().removeAll();
@@ -86,17 +90,34 @@ public class MainFrame extends javax.swing.JFrame {
         SwingUtilities.invokeLater(() -> {
             MainFrame mainFrame = new MainFrame();
             PhoneFrame phoneFrame = new PhoneFrame();
+            TVFrame tvFrame = new TVFrame();
 
             // Position the frames
-            mainFrame.setLocation(100, 100);
-            phoneFrame.setLocation(1200, 100);
+            java.awt.Rectangle screenBounds = java.awt.GraphicsEnvironment
+                .getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice()
+                .getDefaultConfiguration()
+                .getBounds();
 
-            // Show both
+            // MainFrame at upper-right of the primary screen
+            mainFrame.setLocation(
+                screenBounds.x + screenBounds.width - mainFrame.getWidth(),
+                screenBounds.y
+            );
+
+            // Let TVFrame position itself (it defaults to top-left)
+
+            // Show main and TV first
             mainFrame.setVisible(true);
+            tvFrame.setVisible(true);
+
+            // Center PhoneFrame on primary screen and bring to front (overlap others)
+            phoneFrame.setLocationRelativeTo(null);
             phoneFrame.setVisible(true);
+            phoneFrame.toFront();
+            phoneFrame.requestFocus();
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private cephra.AdminPanels.AdminLogin adminLoginPanel;
     // End of variables declaration//GEN-END:variables
 }
