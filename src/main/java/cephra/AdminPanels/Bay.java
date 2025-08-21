@@ -2,7 +2,7 @@ package cephra.AdminPanels;
 
 import java.awt.Window;
 import javax.swing.SwingUtilities;
-import cephra.MainFrame;
+import cephra.Frames.AdminFrame;
 
 public class Bay extends javax.swing.JPanel {
 
@@ -68,36 +68,36 @@ public class Bay extends javax.swing.JPanel {
 
     private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quebuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(Bay.this);
-        if (w instanceof MainFrame) {
-            ((MainFrame) w).switchPanel(new Queue());
+        if (w instanceof AdminFrame) {
+            ((AdminFrame) w).switchPanel(new Queue());
         }
     }//GEN-LAST:event_quebuttonActionPerformed
 
     private void staffbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_staffbuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(Bay.this);
-        if (w instanceof MainFrame) {
-            ((MainFrame) w).switchPanel(new StaffRecord());
+        if (w instanceof AdminFrame) {
+            ((AdminFrame) w).switchPanel(new StaffRecord());
         }
     }//GEN-LAST:event_staffbuttonActionPerformed
 
     private void businessbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_businessbuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(Bay.this);
-        if (w instanceof MainFrame) {
-            ((MainFrame) w).switchPanel(new AdminDashboard());
+        if (w instanceof AdminFrame) {
+            ((AdminFrame) w).switchPanel(new AdminDashboard());
         }
     }//GEN-LAST:event_businessbuttonActionPerformed
 
     private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(Bay.this);
-        if (w instanceof MainFrame) {
-            ((MainFrame) w).switchPanel(new History());
+        if (w instanceof AdminFrame) {
+            ((AdminFrame) w).switchPanel(new History());
         }
     }//GEN-LAST:event_historybuttonActionPerformed
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
         Window w = SwingUtilities.getWindowAncestor(Bay.this);
-        if (w instanceof MainFrame) {
-            ((MainFrame) w).switchPanel(new loginpanel());
+        if (w instanceof AdminFrame) {
+            ((AdminFrame) w).switchPanel(new loginpanel());
         }
     }//GEN-LAST:event_exitloginActionPerformed
 

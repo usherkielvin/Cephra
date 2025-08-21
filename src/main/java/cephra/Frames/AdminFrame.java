@@ -1,19 +1,12 @@
-package cephra;
+package cephra.Frames;
 
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+public class AdminFrame extends javax.swing.JFrame {
 
-public class MainFrame extends javax.swing.JFrame {
-
-    public MainFrame() {
+    public AdminFrame() {
         setUndecorated(true);
         initComponents();
         setSize(1000, 750);
@@ -64,11 +57,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
     }
-        // </editor-fold>
     
-   
-    
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         cephra.AdminPanels.Splash splashPanel = new cephra.AdminPanels.Splash();
 
@@ -76,10 +65,9 @@ public class MainFrame extends javax.swing.JFrame {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setResizable(false);
 
-        // Use BorderLayout and add the admin panel directly
         getContentPane().setLayout(new java.awt.BorderLayout());
         getContentPane().add(splashPanel, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    }
  public void switchPanel(JPanel newPanel) {
         getContentPane().removeAll();
         getContentPane().add(newPanel, BorderLayout.CENTER);
@@ -88,36 +76,26 @@ public class MainFrame extends javax.swing.JFrame {
     } 
  public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            MainFrame mainFrame = new MainFrame();
+            AdminFrame mainFrame = new AdminFrame();
             PhoneFrame phoneFrame = new PhoneFrame();
             TVFrame tvFrame = new TVFrame();
 
-            // Position the frames
             java.awt.Rectangle screenBounds = java.awt.GraphicsEnvironment
                 .getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice()
                 .getDefaultConfiguration()
                 .getBounds();
 
-            // MainFrame at upper-right of the primary screen
             mainFrame.setLocation(
                 screenBounds.x + screenBounds.width - mainFrame.getWidth(),
                 screenBounds.y
             );
-
-            // Let TVFrame position itself (it defaults to top-left)
-
-            // Show main and TV first
             mainFrame.setVisible(true);
             tvFrame.setVisible(true);
-
-            // Center PhoneFrame on primary screen and bring to front (overlap others)
             phoneFrame.setLocationRelativeTo(null);
             phoneFrame.setVisible(true);
             phoneFrame.toFront();
             phoneFrame.requestFocus();
         });
     }
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    // End of variables declaration//GEN-END:variables
 }

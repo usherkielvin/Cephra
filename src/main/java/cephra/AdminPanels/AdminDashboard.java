@@ -19,6 +19,7 @@ public class AdminDashboard extends javax.swing.JPanel {
         });
     }
 
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         staffbutton = new javax.swing.JButton();
@@ -42,8 +43,8 @@ public class AdminDashboard extends javax.swing.JPanel {
         staffbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(AdminDashboard.this);
-                if (w instanceof cephra.MainFrame) {
-                    ((cephra.MainFrame) w).switchPanel(new cephra.AdminPanels.StaffRecord());
+                if (w instanceof cephra.Frames.AdminFrame) {
+                    ((cephra.Frames.AdminFrame) w).switchPanel(new cephra.AdminPanels.StaffRecord());
                 }
             }
         });
@@ -56,8 +57,8 @@ public class AdminDashboard extends javax.swing.JPanel {
         historybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(AdminDashboard.this);
-                if (w instanceof cephra.MainFrame) {
-                    ((cephra.MainFrame) w).switchPanel(new cephra.AdminPanels.History());
+                if (w instanceof cephra.Frames.AdminFrame) {
+                    ((cephra.Frames.AdminFrame) w).switchPanel(new cephra.AdminPanels.History());
                 }
             }
         });
@@ -70,8 +71,8 @@ public class AdminDashboard extends javax.swing.JPanel {
         Baybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(AdminDashboard.this);
-                if (w instanceof cephra.MainFrame) {
-                    ((cephra.MainFrame) w).switchPanel(new cephra.AdminPanels.Bay());
+                if (w instanceof cephra.Frames.AdminFrame) {
+                    ((cephra.Frames.AdminFrame) w).switchPanel(new cephra.AdminPanels.Bay());
                 }
             }
         });
@@ -95,8 +96,8 @@ public class AdminDashboard extends javax.swing.JPanel {
         exitlogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(AdminDashboard.this);
-                if (w instanceof cephra.MainFrame) {
-                    ((cephra.MainFrame) w).switchPanel(new cephra.AdminPanels.loginpanel());
+                if (w instanceof cephra.Frames.AdminFrame) {
+                    ((cephra.Frames.AdminFrame) w).switchPanel(new cephra.AdminPanels.loginpanel());
                 }
             }
         });
@@ -130,8 +131,8 @@ public class AdminDashboard extends javax.swing.JPanel {
 
     private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {
         java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(AdminDashboard.this);
-        if (w instanceof cephra.MainFrame) {
-            ((cephra.MainFrame) w).switchPanel(new cephra.AdminPanels.Queue());
+        if (w instanceof cephra.Frames.AdminFrame) {
+            ((cephra.Frames.AdminFrame) w).switchPanel(new cephra.AdminPanels.Queue());
         }
     }
 

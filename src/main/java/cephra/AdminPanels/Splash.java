@@ -35,8 +35,8 @@ public class Splash extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-        if (window instanceof cephra.MainFrame) {
-            cephra.MainFrame mainFrame = (cephra.MainFrame) window;
+        if (window instanceof cephra.Frames.AdminFrame) {
+            cephra.Frames.AdminFrame mainFrame = (cephra.Frames.AdminFrame) window;
             cephra.AdminPanels.loginpanel panel = new cephra.AdminPanels.loginpanel();
             mainFrame.switchPanel(panel);
             panel.focusUserField();

@@ -18,6 +18,7 @@ public class loginpanel extends javax.swing.JPanel {
     }
 
     
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         userfield = new javax.swing.JTextField();
@@ -112,8 +113,8 @@ public class loginpanel extends javax.swing.JPanel {
         String password = new String(passfield.getPassword());
         if ("admin".equals(username) && "1234".equals(password)) {
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-            if (window instanceof cephra.MainFrame) {
-                cephra.MainFrame mainFrame = (cephra.MainFrame) window;
+            if (window instanceof cephra.Frames.AdminFrame) {
+                cephra.Frames.AdminFrame mainFrame = (cephra.Frames.AdminFrame) window;
                 mainFrame.switchPanel(new cephra.AdminPanels.AdminDashboard());
             }
         } else {

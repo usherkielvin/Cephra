@@ -1,11 +1,6 @@
-package cephra;
-
-import java.awt.Point;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+package cephra.Frames;
+import java.awt.*;
+import java.awt.event.*;
 
 public class PhoneFrame extends javax.swing.JFrame {
 
@@ -15,14 +10,8 @@ public class PhoneFrame extends javax.swing.JFrame {
         initComponents();
          setSize(350, 750);
         setResizable(false);
-
-        // Set application icon
         setAppIcon();
-
-        // ESC closes app
         addEscapeKeyListener();
-
-        // Allow dragging
         makeDraggable();
     }
       private void setAppIcon() {
@@ -88,11 +77,10 @@ public class PhoneFrame extends javax.swing.JFrame {
 
         setUndecorated(true);
         
-        // Add curved edges to the frame - very large radius for maximum rounded corners
-        setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 350, 750, 120, 120));
-        
+        // Add curved edges to the frame
+        setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 350, 750, 120, 120));       
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     public void switchPanel(javax.swing.JPanel newPanel) {
         getContentPane().removeAll();
@@ -100,8 +88,5 @@ public class PhoneFrame extends javax.swing.JFrame {
         revalidate();
         repaint();
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel phonePanel;
-    // End of variables declaration//GEN-END:variables
 }

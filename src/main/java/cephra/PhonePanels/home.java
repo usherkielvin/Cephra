@@ -103,8 +103,8 @@ public class home extends javax.swing.JPanel {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.PhoneFrame) {
-                        cephra.PhoneFrame phoneFrame = (cephra.PhoneFrame) window;
+                    if (window instanceof cephra.Frames.PhoneFrame) {
+                        cephra.Frames.PhoneFrame phoneFrame = (cephra.Frames.PhoneFrame) window;
                         phoneFrame.switchPanel(new cephra.PhonePanels.Profile());
                         break;
                     }
@@ -118,8 +118,8 @@ public class home extends javax.swing.JPanel {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.PhoneFrame) {
-                        cephra.PhoneFrame phoneFrame = (cephra.PhoneFrame) window;
+                    if (window instanceof cephra.Frames.PhoneFrame) {
+                        cephra.Frames.PhoneFrame phoneFrame = (cephra.Frames.PhoneFrame) window;
                         phoneFrame.switchPanel(new cephra.PhonePanels.phonehistory());
                         break;
                     }
@@ -133,8 +133,8 @@ public class home extends javax.swing.JPanel {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.PhoneFrame) {
-                        cephra.PhoneFrame phoneFrame = (cephra.PhoneFrame) window;
+                    if (window instanceof cephra.Frames.PhoneFrame) {
+                        cephra.Frames.PhoneFrame phoneFrame = (cephra.Frames.PhoneFrame) window;
                         phoneFrame.switchPanel(new cephra.PhonePanels.serviceoffered());
                         break;
                     }
@@ -148,8 +148,8 @@ public class home extends javax.swing.JPanel {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.PhoneFrame) {
-                        cephra.PhoneFrame phoneFrame = (cephra.PhoneFrame) window;
+                    if (window instanceof cephra.Frames.PhoneFrame) {
+                        cephra.Frames.PhoneFrame phoneFrame = (cephra.Frames.PhoneFrame) window;
                         phoneFrame.switchPanel(new cephra.PhonePanels.link());
                         break;
                     }
