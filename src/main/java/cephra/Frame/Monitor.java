@@ -11,7 +11,7 @@ public class Monitor extends javax.swing.JFrame {
         addEscapeKeyListener();
         makeDraggable();
         setLocationByPlatform(false);
-        positionTopLeft();
+       // positionTopLeft();
     }
 
     private void setAppIcon() {
@@ -56,7 +56,7 @@ public class Monitor extends javax.swing.JFrame {
             }
         });
     }
-
+/*
     private void positionTopLeft() {
         java.awt.Rectangle bounds = java.awt.GraphicsEnvironment
             .getLocalGraphicsEnvironment()
@@ -64,7 +64,7 @@ public class Monitor extends javax.swing.JFrame {
             .getDefaultConfiguration()
             .getBounds();
         setLocation(bounds.x, bounds.y);
-    }
+    } */
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
