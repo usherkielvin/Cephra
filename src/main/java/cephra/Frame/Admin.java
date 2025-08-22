@@ -58,6 +58,7 @@ public class Admin extends javax.swing.JFrame {
         });
     }
     
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         cephra.Admin.Splash splashPanel = new cephra.Admin.Splash();
 
@@ -67,11 +68,15 @@ public class Admin extends javax.swing.JFrame {
 
         getContentPane().setLayout(new java.awt.BorderLayout());
         getContentPane().add(splashPanel, java.awt.BorderLayout.CENTER);
-    }
- public void switchPanel(JPanel newPanel) {
+    }// </editor-fold>//GEN-END:initComponents
+
+    public void switchPanel(JPanel newPanel) {
         getContentPane().removeAll();
         getContentPane().add(newPanel, BorderLayout.CENTER);
         revalidate();
         repaint();
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // End of variables declaration//GEN-END:variables
 }

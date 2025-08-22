@@ -3,7 +3,6 @@ package cephra.Admin;
 
 import java.awt.Window;
 import javax.swing.SwingUtilities;
-import cephra.Frame.Admin;
 
 
 public class StaffRecord extends javax.swing.JPanel {

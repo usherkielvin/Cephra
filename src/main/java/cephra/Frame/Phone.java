@@ -55,7 +55,7 @@ public class Phone extends javax.swing.JFrame {
         });
     }
     
-   
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         phonePanel = new cephra.Phone.Splashscreen();
@@ -80,7 +80,7 @@ public class Phone extends javax.swing.JFrame {
         // Add curved edges to the frame
         setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 350, 750, 120, 120));       
         pack();
-    }
+    }// </editor-fold>//GEN-END:initComponents
 
     public void switchPanel(javax.swing.JPanel newPanel) {
         getContentPane().removeAll();
@@ -88,5 +88,8 @@ public class Phone extends javax.swing.JFrame {
         revalidate();
         repaint();
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel phonePanel;
+    // End of variables declaration//GEN-END:variables
 }

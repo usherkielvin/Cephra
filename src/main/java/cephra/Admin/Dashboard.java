@@ -1,4 +1,3 @@
-
 package cephra.Admin;
 
 public class Dashboard extends javax.swing.JPanel {
