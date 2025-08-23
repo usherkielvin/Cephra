@@ -65,10 +65,10 @@ public class link extends javax.swing.JPanel {
         add(homebutton);
         homebutton.setBounds(170, 680, 50, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LINKING.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/link_gif.gif"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
         SwingUtilities.invokeLater(new Runnable() {

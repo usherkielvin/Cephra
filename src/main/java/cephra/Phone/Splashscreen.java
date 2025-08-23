@@ -47,8 +47,11 @@ public class Splashscreen extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton1 = new javax.swing.JButton();
         startbutton = new javax.swing.JButton();
         t = new javax.swing.JLabel();
+
+        jButton1.setText("jButton1");
 
         setLayout(null);
 
@@ -64,7 +67,7 @@ public class Splashscreen extends javax.swing.JPanel {
 
         t.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/de final na talaga.gif"))); // NOI18N
         add(t);
-        t.setBounds(-15, 0, 398, 750);
+        t.setBounds(0, 0, 400, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void startbuttonActionPerformed(java.awt.event.ActionEvent evt) {
@@ -84,6 +87,7 @@ public class Splashscreen extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton startbutton;
     private javax.swing.JLabel t;
     // End of variables declaration//GEN-END:variables

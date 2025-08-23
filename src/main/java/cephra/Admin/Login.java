@@ -46,11 +46,6 @@ public class Login extends javax.swing.JPanel {
         loginbutton.setFocusPainted(false);
         add(loginbutton);
         loginbutton.setBounds(565, 600, 240, 60);
-        loginbutton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loginbuttonActionPerformed(evt);
-            }
-        });
 
         passfield.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         passfield.setBorder(null);
@@ -60,13 +55,11 @@ public class Login extends javax.swing.JPanel {
             }
         });
         add(passfield);
-        passfield.setBounds(540, 440, 320, 40);
+        passfield.setBounds(540, 430, 320, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1080, 750);
-        // Keep background behind interactive components
-        setComponentZOrder(jLabel1, getComponentCount() - 1);
     }// </editor-fold>//GEN-END:initComponents
 
     private void passfieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passfieldActionPerformed
