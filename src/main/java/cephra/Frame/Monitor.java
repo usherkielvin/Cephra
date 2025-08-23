@@ -7,19 +7,12 @@ public class Monitor extends javax.swing.JFrame {
         initComponents();
         setSize(1000, 750);
         setResizable(false);
-        setAppIcon();
         addEscapeKeyListener();
         makeDraggable();
         setLocationByPlatform(false);
         positionTopLeft();
     }
 
-    private void setAppIcon() {
-        java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
-        if (iconUrl != null) {
-            setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
-        }
-    }
 
     private void addEscapeKeyListener() {
         addKeyListener(new java.awt.event.KeyAdapter() {
