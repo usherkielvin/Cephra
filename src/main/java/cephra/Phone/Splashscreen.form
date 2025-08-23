@@ -35,7 +35,7 @@
     <Component class="javax.swing.JLabel" name="t">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/cephra/Photos/GET STARTED.png"/>
+          <Image iconType="3" name="/cephra/Photos/de final na talaga.gif"/>
         </Property>
       </Properties>
       <Constraints>

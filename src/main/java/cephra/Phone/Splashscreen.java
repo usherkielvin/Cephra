@@ -44,7 +44,7 @@ public class Splashscreen extends javax.swing.JPanel {
         });
     }
    
-  
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         startbutton = new javax.swing.JButton();
@@ -62,7 +62,7 @@ public class Splashscreen extends javax.swing.JPanel {
         add(startbutton);
         startbutton.setBounds(50, 663, 270, 50);
 
-        t.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/GET STARTED.png"))); // NOI18N
+        t.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/de final na talaga.gif"))); // NOI18N
         add(t);
         t.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents

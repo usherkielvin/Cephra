@@ -46,7 +46,7 @@ public class Bay extends javax.swing.JPanel {
             }
         });
         add(staffbutton);
-        staffbutton.setBounds(500, 10, 110, 40);
+        staffbutton.setBounds(500, 20, 110, 40);
 
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);

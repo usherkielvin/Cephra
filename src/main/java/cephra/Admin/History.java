@@ -24,6 +24,7 @@ public class History extends javax.swing.JPanel {
         quebutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
+        setMaximumSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
         Baybutton.setBorder(null);
@@ -81,7 +82,7 @@ public class History extends javax.swing.JPanel {
         add(quebutton);
         quebutton.setBounds(270, 10, 100, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/DASHBOARD - HISTORY.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/adminHistory.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents

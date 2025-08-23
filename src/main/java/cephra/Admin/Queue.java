@@ -79,7 +79,7 @@ public class Queue extends javax.swing.JPanel {
         add(historybutton);
         historybutton.setBounds(430, 10, 60, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/USer POV.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/t.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents
