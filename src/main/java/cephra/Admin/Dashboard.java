@@ -22,13 +22,17 @@ public class Dashboard extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        totalsessions1 = new javax.swing.JLabel();
+        totalsessions = new javax.swing.JLabel();
+        rate1 = new javax.swing.JLabel();
+        rate = new javax.swing.JLabel();
         staffbutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         Baybutton = new javax.swing.JButton();
         datetime1 = new javax.swing.JLabel();
         quebutton = new javax.swing.JButton();
         exitlogin = new javax.swing.JButton();
-        jToggleButton1 = new javax.swing.JToggleButton();
+        toggleSwitch = new cephra.Admin.ToggleSwitch();
         datetime = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -36,6 +40,30 @@ public class Dashboard extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(1000, 750));
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
+
+        totalsessions1.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
+        totalsessions1.setForeground(new java.awt.Color(0, 0, 0));
+        totalsessions1.setText("₱6,789");
+        add(totalsessions1);
+        totalsessions1.setBounds(70, 490, 310, 120);
+
+        totalsessions.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
+        totalsessions.setForeground(new java.awt.Color(0, 0, 0));
+        totalsessions.setText("31");
+        add(totalsessions);
+        totalsessions.setBounds(130, 250, 70, 120);
+
+        rate1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        rate1.setForeground(new java.awt.Color(0, 0, 0));
+        rate1.setText("50");
+        add(rate1);
+        rate1.setBounds(580, 470, 28, 60);
+
+        rate.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        rate.setForeground(new java.awt.Color(0, 0, 0));
+        rate.setText("20");
+        add(rate);
+        rate.setBounds(580, 350, 28, 50);
 
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
@@ -97,12 +125,17 @@ public class Dashboard extends javax.swing.JPanel {
         });
         add(exitlogin);
         exitlogin.setBounds(930, 0, 70, 60);
-        add(jToggleButton1);
-        jToggleButton1.setBounds(610, 580, 30, 50);
+        add(toggleSwitch);
+        toggleSwitch.setBounds(580, 600, 60, 30);
+        toggleSwitch.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dashboardTogglePropertyChange(evt);
+            }
+        });
 
         datetime.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         datetime.setForeground(new java.awt.Color(255, 255, 255));
-        datetime.setText("10:44 AM 17 August, Sunday");
+        updateDateTime();
         add(datetime);
         datetime.setBounds(820, 40, 170, 20);
 
@@ -146,6 +179,17 @@ public class Dashboard extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_exitloginActionPerformed
 
+    private void dashboardTogglePropertyChange(java.beans.PropertyChangeEvent evt) {
+        // You can add functionality here when the dashboard toggle is switched
+        // For example, enable/disable certain features, change status, etc.
+        if (toggleSwitch.isSelected()) {
+            // Toggle is ON - add your functionality here
+            System.out.println("Dashboard toggle is ON");
+        } else {
+            // Toggle is OFF - add your functionality here
+            System.out.println("Dashboard toggle is OFF");
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
@@ -154,9 +198,13 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JToggleButton jToggleButton1;
+    private cephra.Admin.ToggleSwitch toggleSwitch;
     private javax.swing.JButton quebutton;
+    private javax.swing.JLabel rate;
+    private javax.swing.JLabel rate1;
     private javax.swing.JButton staffbutton;
+    private javax.swing.JLabel totalsessions;
+    private javax.swing.JLabel totalsessions1;
     // End of variables declaration//GEN-END:variables
 
    
