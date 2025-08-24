@@ -47,44 +47,42 @@ public class Splashscreen extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        startbutton = new javax.swing.JButton();
-        t = new javax.swing.JLabel();
+        exitlogin = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
+        setMaximumSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        startbutton.setBorderPainted(false);
-        startbutton.setContentAreaFilled(false);
-        startbutton.addActionListener(new java.awt.event.ActionListener() {
+        exitlogin.setBorder(null);
+        exitlogin.setBorderPainted(false);
+        exitlogin.setContentAreaFilled(false);
+        exitlogin.setFocusPainted(false);
+        exitlogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startbuttonActionPerformed(evt);
+                exitloginActionPerformed(evt);
             }
         });
-        add(startbutton);
-        startbutton.setBounds(50, 663, 270, 50);
+        add(exitlogin);
+        exitlogin.setBounds(60, 660, 250, 60);
 
-        t.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/de final na talaga.gif"))); // NOI18N
-        add(t);
-        t.setBounds(-15, 0, 398, 750);
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/de final na talaga.gif"))); // NOI18N
+        add(jLabel1);
+        jLabel1.setBounds(-15, 0, 398, 750);
+        // Keep background behind interactive components
+        setComponentZOrder(jLabel1, getComponentCount() - 1);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void startbuttonActionPerformed(java.awt.event.ActionEvent evt) {
-        // Navigate to Phone Login panel
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
-                        break;
-                    }
-                }
-            }
-        });
-    }
+    private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Splashscreen.this);
+        if (w instanceof cephra.Frame.Phone) {
+            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Phonelogin());
+        }
+    }//GEN-LAST:event_exitloginActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton startbutton;
-    private javax.swing.JLabel t;
+    private javax.swing.JButton exitlogin;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

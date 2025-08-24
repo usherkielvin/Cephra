@@ -15,30 +15,7 @@ public class Register extends javax.swing.JPanel {
         makeDraggable();
     }
 
-   
-  
-    private void initComponents() {
-
-        loginbutton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-
-        setLayout(null);
-
-        loginbutton.setBorderPainted(false);
-        loginbutton.setContentAreaFilled(false);
-        loginbutton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loginbuttonActionPerformed(evt);
-            }
-        });
-        add(loginbutton);
-        loginbutton.setBounds(230, 670, 80, 60);
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/REGISTER.png"))); // NOI18N
-        add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
-    }// </editor-fold>//GEN-END:initComponents
-  private void makeDraggable() {
+    private void makeDraggable() {
         final Point[] dragPoint = {null};
 
         addMouseListener(new MouseAdapter() {
@@ -64,6 +41,37 @@ public class Register extends javax.swing.JPanel {
             }
         });
     }
+
+    
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        loginbutton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+
+        setMaximumSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(350, 750));
+        setLayout(null);
+
+        loginbutton.setBorder(null);
+        loginbutton.setBorderPainted(false);
+        loginbutton.setContentAreaFilled(false);
+        loginbutton.setFocusPainted(false);
+        add(loginbutton);
+        loginbutton.setBounds(230, 670, 80, 60);
+        loginbutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginbuttonActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/REGISTER.png"))); // NOI18N
+        add(jLabel1);
+        jLabel1.setBounds(-15, 0, 398, 750);
+        // Keep background behind interactive components
+        setComponentZOrder(jLabel1, getComponentCount() - 1);
+    }// </editor-fold>//GEN-END:initComponents
+
     private void loginbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginbuttonActionPerformed
          SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -79,8 +87,6 @@ public class Register extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_loginbuttonActionPerformed
 
-
-   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
