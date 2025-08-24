@@ -64,13 +64,11 @@ public class Splashscreen extends javax.swing.JPanel {
             }
         });
         add(exitlogin);
-        exitlogin.setBounds(60, 660, 250, 60);
+        exitlogin.setBounds(60, 630, 220, 70);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/de final na talaga.gif"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/splash in2.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
-        // Keep background behind interactive components
-        setComponentZOrder(jLabel1, getComponentCount() - 1);
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
