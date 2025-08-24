@@ -1,6 +1,5 @@
 package cephra.Phone;
 
-import java.awt.Color;
 import javax.swing.SwingUtilities;
 
 public class Phonelogin extends javax.swing.JPanel {
