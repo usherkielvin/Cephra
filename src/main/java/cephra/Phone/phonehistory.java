@@ -1,4 +1,3 @@
-
 package cephra.Phone;
 
 import java.awt.Point;
@@ -7,17 +6,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
 
-
 public class phonehistory extends javax.swing.JPanel {
 
-   
     public phonehistory() {
         initComponents();
-   
         setPreferredSize(new java.awt.Dimension(400, 800));
         setSize(400, 800);
         makeDraggable();
-    }private void makeDraggable() {
+    }
+
+    private void makeDraggable() {
         final Point[] dragPoint = {null};
 
         addMouseListener(new MouseAdapter() {
@@ -43,7 +41,8 @@ public class phonehistory extends javax.swing.JPanel {
             }
         });
     }
-  
+
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         profilebutton = new javax.swing.JButton();
@@ -97,7 +96,8 @@ public class phonehistory extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HISTORY.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
-    }// </editor-fold>//GEN-END:initComponents
+    }
+    // </editor-fold>//GEN-END:initComponents
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
@@ -159,8 +159,7 @@ public class phonehistory extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
 
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
     private javax.swing.JButton charge;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;

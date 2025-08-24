@@ -8,14 +8,14 @@ import javax.swing.SwingUtilities;
 
 public class home extends javax.swing.JPanel {
 
-   
     public home() {
         initComponents();
-         setPreferredSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         makeDraggable();
     }
- private void makeDraggable() {
+
+    private void makeDraggable() {
         final Point[] dragPoint = {null};
 
         addMouseListener(new MouseAdapter() {
@@ -41,8 +41,8 @@ public class home extends javax.swing.JPanel {
             }
         });
     }
-   
-   
+
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         profilebutton = new javax.swing.JButton();
@@ -92,13 +92,10 @@ public class home extends javax.swing.JPanel {
         });
         add(linkbutton);
         linkbutton.setBounds(100, 680, 50, 40);
+    }
+    // </editor-fold>//GEN-END:initComponents
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HOME PAGE.png"))); // NOI18N
-        add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profilebuttonActionPerformed
+    private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -111,9 +108,9 @@ public class home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_profilebuttonActionPerformed
+    }
 
-    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
+    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -126,9 +123,9 @@ public class home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_historybuttonActionPerformed
+    }
 
-    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
+    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -141,10 +138,10 @@ public class home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_chargeActionPerformed
+    }
 
-    private void linkbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkbuttonActionPerformed
-       SwingUtilities.invokeLater(new Runnable() {
+    private void linkbuttonActionPerformed(java.awt.event.ActionEvent evt) {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
@@ -156,14 +153,13 @@ public class home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_linkbuttonActionPerformed
+    }
 
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
-    // End of variables declaration//GEN-END:variables
+    // </editor-fold>//GEN-END:variables
 }

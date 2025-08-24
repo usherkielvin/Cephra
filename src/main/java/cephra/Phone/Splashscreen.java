@@ -12,8 +12,6 @@ public class Splashscreen extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
-        
-        // Make the panel draggable
         makeDraggable();
     }
    
@@ -86,7 +84,7 @@ public class Splashscreen extends javax.swing.JPanel {
         });
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton startbutton;
     private javax.swing.JLabel t;

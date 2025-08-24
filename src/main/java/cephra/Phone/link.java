@@ -1,4 +1,3 @@
-
 package cephra.Phone;
 
 import javax.swing.SwingUtilities;
@@ -13,8 +12,7 @@ public class link extends javax.swing.JPanel {
         setSize(350, 750);
     }
 
-
-   
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         charge = new javax.swing.JButton();
@@ -68,7 +66,8 @@ public class link extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/link_gif.gif"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
-    }// </editor-fold>                        
+    }
+    // </editor-fold>//GEN-END:initComponents
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
@@ -131,7 +130,7 @@ public class link extends javax.swing.JPanel {
     }//GEN-LAST:event_homebuttonActionPerformed
 
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;

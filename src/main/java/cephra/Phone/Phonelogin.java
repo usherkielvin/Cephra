@@ -4,15 +4,13 @@ import javax.swing.SwingUtilities;
 
 public class Phonelogin extends javax.swing.JPanel {
 
- 
     public Phonelogin() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
     }
 
-    
-   
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         loginhome = new javax.swing.JButton();
@@ -46,10 +44,11 @@ public class Phonelogin extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
-    }// </editor-fold>//GEN-END:initComponents
+    }
+    // </editor-fold>//GEN-END:initComponents
 
     private void regbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regbuttonActionPerformed
-   SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
@@ -60,7 +59,7 @@ public class Phonelogin extends javax.swing.JPanel {
                     }
                 }
             }
-        });     
+        });
     }//GEN-LAST:event_regbuttonActionPerformed
 
     private void loginhomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginhomeActionPerformed
@@ -75,11 +74,10 @@ public class Phonelogin extends javax.swing.JPanel {
                     }
                 }
             }
-        });     
+        });
     }//GEN-LAST:event_loginhomeActionPerformed
 
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginhome;
     private javax.swing.JButton regbutton;
