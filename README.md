@@ -126,13 +126,10 @@ The application launches three interfaces simultaneously:
 
 ### Configuration
 
-You can control which interfaces are displayed by modifying the configuration flags in `Launcher.java`:
-
-```java
-private static final boolean SHOW_ADMIN = true;    // Admin panel
-private static final boolean SHOW_MONITOR = true;  // Display monitor
-private static final boolean SHOW_PHONE = true;    // Mobile interface
-```
+The application automatically launches all three interfaces:
+- Admin Panel: Right side of screen
+- Display Monitor: Top-left corner  
+- Customer Mobile: Center of screen
 
 ### Navigation
 
@@ -141,17 +138,6 @@ private static final boolean SHOW_PHONE = true;    // Mobile interface
 - **Button Navigation**: Use on-screen buttons for interface switching
 
 ## ⚙️ Configuration
-
-### Frame Visibility Control
-
-Edit `src/main/java/cephra/Launcher.java` to control which frames are visible:
-
-```java
-// Set to false to hide specific interfaces
-private static final boolean SHOW_ADMIN = true;    // Admin frame
-private static final boolean SHOW_MONITOR = true;  // Monitor frame
-private static final boolean SHOW_PHONE = true;    // Phone frame
-```
 
 ### Window Positioning
 
