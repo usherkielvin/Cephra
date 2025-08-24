@@ -84,7 +84,7 @@ public class Splashscreen extends javax.swing.JPanel {
         });
     }
 
-    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton startbutton;
     private javax.swing.JLabel t;

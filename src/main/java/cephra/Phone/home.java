@@ -71,7 +71,7 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(230, 653, 50, 100);
+        historybutton.setBounds(230, 650, 50, 100);
 
         charge.setBorderPainted(false);
         charge.setContentAreaFilled(false);
@@ -92,8 +92,11 @@ public class home extends javax.swing.JPanel {
         });
         add(linkbutton);
         linkbutton.setBounds(100, 680, 50, 40);
-    }
-    // </editor-fold>//GEN-END:initComponents
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HOME PAGE.png"))); // NOI18N
+        add(jLabel1);
+        jLabel1.setBounds(0, 0, 370, 750);
+    }// </editor-fold>//GEN-END:initComponents
 
     private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -155,11 +158,11 @@ public class home extends javax.swing.JPanel {
         });
     }
 
-    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
-    // </editor-fold>//GEN-END:variables
+    // End of variables declaration//GEN-END:variables
 }

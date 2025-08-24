@@ -43,9 +43,8 @@ public class Phonelogin extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
-    }
-    // </editor-fold>//GEN-END:initComponents
+        jLabel1.setBounds(0, 0, 370, 750);
+    }// </editor-fold>//GEN-END:initComponents
 
     private void regbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regbuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
@@ -77,7 +76,7 @@ public class Phonelogin extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_loginhomeActionPerformed
 
-    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginhome;
     private javax.swing.JButton regbutton;

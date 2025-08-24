@@ -20,6 +20,8 @@ public class link extends javax.swing.JPanel {
         profilebutton = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        linkbutton = new javax.swing.JButton();
 
         setLayout(null);
 
@@ -41,7 +43,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(230, 653, 50, 100);
+        historybutton.setBounds(230, 650, 50, 100);
 
         profilebutton.setBorderPainted(false);
         profilebutton.setContentAreaFilled(false);
@@ -63,11 +65,20 @@ public class link extends javax.swing.JPanel {
         add(homebutton);
         homebutton.setBounds(170, 680, 50, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/link_gif.gif"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LINKING.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
-    }
-    // </editor-fold>//GEN-END:initComponents
+        jLabel1.setBounds(0, 10, 380, 744);
+
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
+        add(jCheckBox1);
+        jCheckBox1.setBounds(110, 630, 19, 19);
+        add(linkbutton);
+        linkbutton.setBounds(70, 570, 230, 40);
+    }// </editor-fold>//GEN-END:initComponents
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
@@ -129,12 +140,19 @@ public class link extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_homebuttonActionPerformed
 
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        // Enable linkbutton only if checkbox is selected
+        linkbutton.setEnabled(jCheckBox1.isSelected());
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
 
-    // <editor-fold defaultstate="collapsed" desc="Variables declaration">//GEN-BEGIN:variables
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
 }
