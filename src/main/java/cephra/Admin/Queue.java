@@ -81,7 +81,7 @@ public class Queue extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/t.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-5, -6, 1000, 760);
+        jLabel1.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void businessbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_businessbuttonActionPerformed
