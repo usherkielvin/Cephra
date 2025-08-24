@@ -61,3 +61,18 @@ buildNumber.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Additional patterns to hide class files and build artifacts
+**/target/
+**/build/
+**/out/
+**/bin/
+**/classes/
+**/*.class
+**/generated/
+**/tmp/
+
+# Specifically hide class files from source directories
+src/**/*.class
+src/main/**/*.class
+src/test/**/*.class

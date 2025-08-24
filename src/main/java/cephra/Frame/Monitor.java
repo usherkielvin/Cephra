@@ -1,5 +1,13 @@
 package cephra.Frame;
 
+import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+
 public class Monitor extends javax.swing.JFrame {
 
     public Monitor() {
@@ -22,10 +30,10 @@ public class Monitor extends javax.swing.JFrame {
     }
 
     private void addEscapeKeyListener() {
-        addKeyListener(new java.awt.event.KeyAdapter() {
+        addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE) {
+            public void keyPressed(KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     System.exit(0);
                 }
             }
@@ -34,20 +42,20 @@ public class Monitor extends javax.swing.JFrame {
     }
 
     private void makeDraggable() {
-        final java.awt.Point[] dragPoint = {null};
+        final Point[] dragPoint = {null};
 
-        addMouseListener(new java.awt.event.MouseAdapter() {
+        addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 dragPoint[0] = e.getPoint();
             }
         });
 
-        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+        addMouseMotionListener(new MouseMotionAdapter() {
             @Override
-            public void mouseDragged(java.awt.event.MouseEvent e) {
+            public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Point currentLocation = getLocation();
+                    Point currentLocation = getLocation();
                     setLocation(
                         currentLocation.x + e.getX() - dragPoint[0].x,
                         currentLocation.y + e.getY() - dragPoint[0].y
@@ -81,15 +89,11 @@ public class Monitor extends javax.swing.JFrame {
         jPanel1.add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
 
-        getContentPane().setLayout(new java.awt.BorderLayout());
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(jPanel1, BorderLayout.CENTER);
 
-        pack();
+        // pack(); // Removed to prevent frame from becoming displayable before setUndecorated
     }// </editor-fold>//GEN-END:initComponents
-
-    public static void main(String args[]) {     
-        java.awt.EventQueue.invokeLater(() -> new Monitor().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

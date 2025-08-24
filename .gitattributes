@@ -1,0 +1,17 @@
+# Hide class files and build artifacts from Git status
+*.class binary
+target/ -text
+build/ -text
+out/ -text
+bin/ -text
+classes/ -text
+generated/ -text
+tmp/ -text
+
+# Mark these as binary to prevent line ending issues
+*.jar binary
+*.war binary
+*.ear binary
+*.zip binary
+*.tar.gz binary
+*.rar binary
