@@ -13,6 +13,7 @@ public class serviceoffered extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
+        setupLabelPosition(); // Set label position
         makeDraggable();
     }
 
@@ -107,10 +108,18 @@ public class serviceoffered extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/service.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        // Label position will be set in setupLabelPosition() method
         // Keep background behind interactive components
         setComponentZOrder(jLabel1, getComponentCount() - 1);
     }// </editor-fold>//GEN-END:initComponents
+
+    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
+    // Setup label position to prevent NetBeans from changing it
+    private void setupLabelPosition() {
+        if (jLabel1 != null) {
+            jLabel1.setBounds(-15, 0, 398, 750);
+        }
+    }
 
     private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {

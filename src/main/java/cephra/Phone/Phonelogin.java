@@ -18,23 +18,68 @@ public class Phonelogin extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        reghere = new javax.swing.JButton();
+        forgotpass = new javax.swing.JButton();
         pass = new javax.swing.JPasswordField();
         username = new javax.swing.JTextField();
         loginhome = new javax.swing.JButton();
-        regbutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
+                 reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+         reghere.setForeground(new java.awt.Color(0, 204, 204));
+         reghere.setText("Register here");
+         reghere.setBorder(null);
+         reghere.setBorderPainted(false);
+         reghere.setContentAreaFilled(false);
+         reghere.setFocusPainted(false);
+         reghere.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+         reghere.addMouseListener(new java.awt.event.MouseAdapter() {
+             public void mouseEntered(java.awt.event.MouseEvent evt) {
+                 reghere.setForeground(new java.awt.Color(0, 255, 255));
+                 reghere.setText("<html><u>Register here</u></html>");
+             }
+             public void mouseExited(java.awt.event.MouseEvent evt) {
+                 reghere.setForeground(new java.awt.Color(0, 204, 204));
+                 reghere.setText("Register here");
+             }
+         });
+         reghere.addActionListener(new java.awt.event.ActionListener() {
+             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                 reghereActionPerformed(evt);
+             }
+         });
+        add(reghere);
+        reghere.setBounds(190, 610, 120, 40);
+
+                 forgotpass.setForeground(new java.awt.Color(102, 102, 102));
+         forgotpass.setText("Forgot password?");
+         forgotpass.setBorder(null);
+         forgotpass.setBorderPainted(false);
+         forgotpass.setContentAreaFilled(false);
+         forgotpass.setFocusPainted(false);
+         forgotpass.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                   forgotpass.addMouseListener(new java.awt.event.MouseAdapter() {
+              public void mouseEntered(java.awt.event.MouseEvent evt) {
+                  forgotpass.setText("<html><u>Forgot password?</u></html>");
+              }
+              public void mouseExited(java.awt.event.MouseEvent evt) {
+                  forgotpass.setText("Forgot password?");
+              }
+          });
+         forgotpass.addActionListener(new java.awt.event.ActionListener() {
+             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                 forgotpassActionPerformed(evt);
+             }
+         });
+        add(forgotpass);
+        forgotpass.setBounds(200, 410, 120, 40);
+
         pass.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         pass.setBorder(null);
-        pass.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                attemptLogin();
-            }
-        });
         add(pass);
         pass.setBounds(60, 380, 240, 30);
 
@@ -59,37 +104,18 @@ public class Phonelogin extends javax.swing.JPanel {
         add(loginhome);
         loginhome.setBounds(80, 570, 220, 40);
 
-        regbutton.setBorder(null);
-        regbutton.setBorderPainted(false);
-        regbutton.setContentAreaFilled(false);
-        regbutton.setFocusPainted(false);
-        regbutton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                regbuttonActionPerformed(evt);
-            }
-        });
-        add(regbutton);
-        regbutton.setBounds(210, 620, 120, 30);
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/1.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        // Label position will be set in setupLabelPosition() method
     }// </editor-fold>//GEN-END:initComponents
 
-    private void regbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regbuttonActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Register());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_regbuttonActionPerformed
+    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
+    // Setup label position to prevent NetBeans from changing it
+    private void setupLabelPosition() {
+        if (jLabel1 != null) {
+            jLabel1.setBounds(-15, 0, 398, 750);
+        }
+    }
 
     private void loginhomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginhomeActionPerformed
         attemptLogin();
@@ -122,11 +148,42 @@ public class Phonelogin extends javax.swing.JPanel {
         pass.requestFocus();
     }//GEN-LAST:event_usernameActionPerformed
 
+    private void reghereActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reghereActionPerformed
+       SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Register());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_reghereActionPerformed
+
+    private void forgotpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forgotpassActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.ForgotPassword());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_forgotpassActionPerformed
+
     @Override
     public void addNotify() {
         super.addNotify();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                setupLabelPosition(); // Set label position
                 if (username != null) {
                     username.requestFocusInWindow();
                 }
@@ -150,10 +207,11 @@ public class Phonelogin extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton forgotpass;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginhome;
     private javax.swing.JPasswordField pass;
-    private javax.swing.JButton regbutton;
+    private javax.swing.JButton reghere;
     private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
 }
