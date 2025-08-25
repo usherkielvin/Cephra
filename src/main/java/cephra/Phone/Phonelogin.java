@@ -4,7 +4,8 @@ import java.awt.Color;
 import javax.swing.SwingUtilities;
 
 public class Phonelogin extends javax.swing.JPanel {
-
+   private int loginAttempts = 0;
+    private final int MAX_ATTEMPTS = 3;
     public Phonelogin() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
@@ -121,10 +122,20 @@ public class Phonelogin extends javax.swing.JPanel {
         attemptLogin();
     }//GEN-LAST:event_loginhomeActionPerformed
 
-    private void attemptLogin() {
+     private void attemptLogin() {
+        // Check if login attempts are exhausted
+        if (loginAttempts >= MAX_ATTEMPTS) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Too many failed login attempts. Please use the 'Forgot Password' option.", "Login Disabled", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         String usernameText = username.getText() != null ? username.getText().trim() : "";
         String password = new String(pass.getPassword());
-        if ("admin".equals(usernameText) && "1234".equals(password)) {
+
+        // Validate login using the CephraDB
+        if (cephra.CephraDB.validateLogin(usernameText, password)) {
+            // Login successful, reset attempts
+            loginAttempts = 0;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -138,7 +149,15 @@ public class Phonelogin extends javax.swing.JPanel {
                 }
             });
         } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials (demo: admin / 1234)", "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+            // Login failed, increment attempts
+            loginAttempts++;
+            int remainingAttempts = MAX_ATTEMPTS - loginAttempts;
+            if (remainingAttempts > 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials. You have " + remainingAttempts + " attempts remaining.", "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials. Too many failed attempts. The login button has been disabled.", "Login Disabled", javax.swing.JOptionPane.ERROR_MESSAGE);
+                loginhome.setEnabled(false); // Disable the login button
+            }
             pass.setText(""); // Clear password field
             username.requestFocusInWindow(); // Refocus on username field
         }

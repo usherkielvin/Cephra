@@ -231,7 +231,7 @@ public class Register extends javax.swing.JPanel {
     }//GEN-LAST:event_termsconditionActionPerformed
 
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
-        // Validate all fields are filled
+         // Validate all fields are filled
         String nameText = name.getText().trim();
         String emailText = email.getText().trim();
         String passwordText = password.getText().trim();
@@ -257,22 +257,29 @@ public class Register extends javax.swing.JPanel {
             return;
         }
 
-        // Registration successful
-        javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        // Call the database method to add the new user
+        if (cephra.CephraDB.addUser(nameText, passwordText)) {
+            // Registration successful
+            javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 
-        // Navigate to Phonelogin after OK is clicked
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
-                        break;
+            // Navigate to Phonelogin after OK is clicked
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    java.awt.Window[] windows = java.awt.Window.getWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof cephra.Frame.Phone) {
+                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                            phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                            break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            // Username already exists
+            javax.swing.JOptionPane.showMessageDialog(this, "Username already exists. Please choose a different one.", "Registration Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+            name.requestFocusInWindow();
+        }
     }//GEN-LAST:event_registerActionPerformed
 
     private void nameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameActionPerformed
