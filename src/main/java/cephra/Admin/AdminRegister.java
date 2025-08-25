@@ -3,12 +3,13 @@ package cephra.Admin;
 import java.awt.Window;
 import javax.swing.SwingUtilities;
 
-public class Register extends javax.swing.JPanel {
+public class AdminRegister extends javax.swing.JPanel {
 
-
-    public Register() {
-        initComponents();
-    }
+	public AdminRegister() {
+		initComponents();
+		setPreferredSize(new java.awt.Dimension(1000, 750));
+		setSize(1000, 750);
+	}
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -26,31 +27,14 @@ public class Register extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
         add(jTextField1);
         jTextField1.setBounds(430, 270, 250, 40);
         add(jTextField2);
         jTextField2.setBounds(720, 270, 250, 40);
         add(jTextField3);
         jTextField3.setBounds(430, 370, 250, 40);
-
-        jTextField4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField4ActionPerformed(evt);
-            }
-        });
         add(jTextField4);
         jTextField4.setBounds(430, 480, 250, 40);
-
-        jTextField5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField5ActionPerformed(evt);
-            }
-        });
         add(jTextField5);
         jTextField5.setBounds(430, 580, 250, 40);
 
@@ -81,37 +65,47 @@ public class Register extends javax.swing.JPanel {
         add(BackBTN);
         BackBTN.setBounds(945, 60, 40, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Register PANEL.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
+        
+        RegisterBTN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                registerButtonActionPerformed(evt);
+            }
+        });
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+	private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
+		String name = jTextField1.getText().trim();
+		String email = jTextField2.getText().trim();
+		String pass = jTextField3.getText().trim();
+		String confirm = jTextField4.getText().trim();
 
-    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField4ActionPerformed
+		if (name.isEmpty() || email.isEmpty() || pass.isEmpty() || confirm.isEmpty()) {
+			javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields", "Validation", javax.swing.JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		if (!pass.equals(confirm)) {
+			javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match", "Validation", javax.swing.JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		javax.swing.JOptionPane.showMessageDialog(this, "Admin registration successful", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+	}//GEN-LAST:event_registerButtonActionPerformed
 
-    private void jTextField5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField5ActionPerformed
+	private void LoginBTNActionPerformed(java.awt.event.ActionEvent evt) {
+		Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
+		if (w instanceof cephra.Frame.Admin) {
+			((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Login());
+		}
+	}
 
-    private void LoginBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginBTNActionPerformed
-        Window w = SwingUtilities.getWindowAncestor(Register.this);
-        if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Login());
-        }
-    }//GEN-LAST:event_LoginBTNActionPerformed
-
-    private void BackBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackBTNActionPerformed
-                Window w = SwingUtilities.getWindowAncestor(Register.this);
-        if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new StaffRecord());
-        }
-    }//GEN-LAST:event_BackBTNActionPerformed
-
+	private void BackBTNActionPerformed(java.awt.event.ActionEvent evt) {
+		Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
+		if (w instanceof cephra.Frame.Admin) {
+			((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.StaffRecord());
+		}
+	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BackBTN;

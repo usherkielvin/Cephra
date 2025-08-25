@@ -153,9 +153,11 @@ public class Register extends javax.swing.JPanel {
         add(loginbutton);
         loginbutton.setBounds(190, 673, 90, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/REGISTER.png"))); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Register");
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 20, 350, 40);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
