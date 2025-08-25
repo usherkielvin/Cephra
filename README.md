@@ -260,4 +260,4 @@ For support and questions:
 
 **Made with ❤️ for the EV charging community**
 
-*Last updated: December 2024*
+*Last updated: August 2025*
