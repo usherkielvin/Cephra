@@ -23,8 +23,8 @@ public class CephraDB {
         if (userDatabase == null) {
             userDatabase = new ArrayList<>();
             // Add some test users
-            userDatabase.add(new User("dizosn", "1234"));
-            userDatabase.add(new User("testuser", "password"));
+            userDatabase.add(new User("dizon", "1234"));
+            userDatabase.add(new User("testuser", "1234"));
             System.out.println("Cephra database initialized with dummy users.");
         }
     }

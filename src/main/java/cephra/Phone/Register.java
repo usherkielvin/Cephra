@@ -201,7 +201,7 @@ public class Register extends javax.swing.JPanel {
     // Ensure the background label (PNG) stays positioned correctly
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(0, -4, 370, 760);
+            jLabel1.setBounds(-15, 0, 398, 750);
         }
     }
 
@@ -307,22 +307,64 @@ public class Register extends javax.swing.JPanel {
 
     private void showTermsAndConditions() {
         String termsText = getTermsAndConditionsText();
-        
-        javax.swing.JTextArea textArea = new javax.swing.JTextArea(termsText);
-        textArea.setEditable(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setFont(new java.awt.Font("Segoe UI", 0, 12));
-        
-        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
+
+        String safeText = termsText
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+        String html = "<html><head><style>" +
+                "body{font-family:'Segoe UI',sans-serif;font-size:12px;line-height:1.5;text-align:justify;margin:0;}" +
+                ".container{padding:0 4px;}" +
+                "</style></head><body><div class='container'>" +
+                safeText.replace("\n", "<br/>") +
+                "</div></body></html>";
+
+        javax.swing.JEditorPane editorPane = new javax.swing.JEditorPane("text/html", html);
+        editorPane.setEditable(false);
+        editorPane.setOpaque(false);
+        editorPane.setFocusable(false);
+        editorPane.setHighlighter(null);
+        editorPane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+        if (editorPane.getCaret() != null) {
+            editorPane.getCaret().setVisible(false);
+            editorPane.getCaret().setSelectionVisible(false);
+        }
+
+        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(editorPane);
         scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
-        
-        javax.swing.JOptionPane.showMessageDialog(
-            this,
-            scrollPane,
-            "Terms and Conditions",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE
-        );
+        scrollPane.setBorder(null);
+        scrollPane.setWheelScrollingEnabled(true);
+        scrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        java.awt.Window owner = javax.swing.SwingUtilities.getWindowAncestor(this);
+        final javax.swing.JDialog dialog = new javax.swing.JDialog(owner, "Terms and Conditions", java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setUndecorated(true); // remove title bar and X
+        dialog.setDefaultCloseOperation(javax.swing.JDialog.DO_NOTHING_ON_CLOSE);
+
+        javax.swing.JPanel content = new javax.swing.JPanel(new java.awt.BorderLayout());
+        content.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        content.add(scrollPane, java.awt.BorderLayout.CENTER);
+
+        javax.swing.JButton ok = new javax.swing.JButton("OK");
+        ok.setFocusPainted(false);
+        ok.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dialog.dispose();
+            }
+        });
+        javax.swing.JPanel buttons = new javax.swing.JPanel();
+        buttons.add(ok);
+        content.add(buttons, java.awt.BorderLayout.SOUTH);
+
+        dialog.setContentPane(content);
+        dialog.setSize(320, 600); // fit inside 350x750 phone frame
+        if (owner != null) {
+            dialog.setLocationRelativeTo(owner); // center within phone frame
+            Point current = dialog.getLocation();
+            dialog.setLocation(current.x - 3, current.y); // shift 3px left
+        }
+        dialog.setVisible(true);
     }
 
     private String getTermsAndConditionsText() {
