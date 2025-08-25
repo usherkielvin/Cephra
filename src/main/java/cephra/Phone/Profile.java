@@ -218,4 +218,17 @@ public class Profile extends javax.swing.JPanel {
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton logout;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setupLabelPosition();
+                if (jLabel1 != null) {
+                    setComponentZOrder(jLabel1, getComponentCount() - 1);
+                }
+            }
+        });
+    }
 }

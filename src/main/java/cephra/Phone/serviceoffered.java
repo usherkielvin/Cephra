@@ -187,4 +187,14 @@ public class serviceoffered extends javax.swing.JPanel {
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setupLabelPosition();
+            }
+        });
+    }
 }
