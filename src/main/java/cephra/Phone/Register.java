@@ -89,7 +89,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(password);
-        password.setBounds(40, 450, 280, 40);
+        password.setBounds(40, 445, 280, 40);
 
         email.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         email.setBorder(null);
@@ -153,11 +153,9 @@ public class Register extends javax.swing.JPanel {
         add(loginbutton);
         loginbutton.setBounds(190, 673, 90, 40);
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Register");
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/REGISTER.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 20, 350, 40);
+        jLabel1.setBounds(0, -4, 370, 760);
     }// </editor-fold>//GEN-END:initComponents
 
     // Setup button hover effects
