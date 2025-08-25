@@ -12,8 +12,6 @@ public class Splashscreen extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
-        
-        // Make the panel draggable
         makeDraggable();
     }
    

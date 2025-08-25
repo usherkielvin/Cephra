@@ -14,7 +14,11 @@ public class Phonelogin extends javax.swing.JPanel {
         pass.setOpaque(false);
         pass.setBackground(new Color(0, 0, 0, 0));
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -106,6 +110,7 @@ public class Phonelogin extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/1.png"))); // NOI18N
         add(jLabel1);
+<<<<<<< HEAD
         // Label position will be set in setupLabelPosition() method
     }// </editor-fold>//GEN-END:initComponents
 
@@ -150,6 +155,13 @@ public class Phonelogin extends javax.swing.JPanel {
 
     private void reghereActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reghereActionPerformed
        SwingUtilities.invokeLater(new Runnable() {
+=======
+        jLabel1.setBounds(0, 0, 370, 750);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void regbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regbuttonActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
@@ -161,7 +173,11 @@ public class Phonelogin extends javax.swing.JPanel {
                 }
             }
         });
+<<<<<<< HEAD
     }//GEN-LAST:event_reghereActionPerformed
+=======
+    }//GEN-LAST:event_regbuttonActionPerformed
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
 
     private void forgotpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forgotpassActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
@@ -176,6 +192,7 @@ public class Phonelogin extends javax.swing.JPanel {
                 }
             }
         });
+<<<<<<< HEAD
     }//GEN-LAST:event_forgotpassActionPerformed
 
     @Override
@@ -204,7 +221,9 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
     }
-
+=======
+    }//GEN-LAST:event_loginhomeActionPerformed
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton forgotpass;

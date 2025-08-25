@@ -1,4 +1,3 @@
-
 package cephra.Phone;
 
 import java.awt.Point;
@@ -44,7 +43,10 @@ public class Profile extends javax.swing.JPanel {
         });
     }
 
+<<<<<<< HEAD
     
+=======
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -121,9 +123,13 @@ public class Profile extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/PROFILE.png"))); // NOI18N
         add(jLabel1);
+<<<<<<< HEAD
         // Label position will be set in setupLabelPosition() method
         // Keep background behind interactive components
         setComponentZOrder(jLabel1, getComponentCount() - 1);
+=======
+        jLabel1.setBounds(0, 0, 370, 750);
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -208,7 +214,6 @@ public class Profile extends javax.swing.JPanel {
             }
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton charge;

@@ -43,7 +43,10 @@ public class home extends javax.swing.JPanel {
         });
     }
 
+<<<<<<< HEAD
     
+=======
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -79,7 +82,11 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(historybutton);
+<<<<<<< HEAD
         historybutton.setBounds(200, 680, 50, 40);
+=======
+        historybutton.setBounds(230, 650, 50, 100);
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -107,9 +114,10 @@ public class home extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HOME PAGE-updated.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
+<<<<<<< HEAD
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
@@ -119,6 +127,9 @@ public class home extends javax.swing.JPanel {
     }
 
     private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profilebuttonActionPerformed
+=======
+    private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {
+>>>>>>> 6aa05c823c305a6123453c6c7765d4df2c34cfdd
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -131,9 +142,9 @@ public class home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_profilebuttonActionPerformed
+    }
 
-    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
+    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -146,9 +157,9 @@ public class home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_historybuttonActionPerformed
+    }
 
-    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
+    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -161,10 +172,10 @@ public class home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_chargeActionPerformed
+    }
 
-    private void linkbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkbuttonActionPerformed
-       SwingUtilities.invokeLater(new Runnable() {
+    private void linkbuttonActionPerformed(java.awt.event.ActionEvent evt) {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
@@ -176,8 +187,7 @@ public class home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_linkbuttonActionPerformed
-
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton charge;
