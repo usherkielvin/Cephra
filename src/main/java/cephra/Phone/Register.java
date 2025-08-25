@@ -361,14 +361,29 @@ public class Register extends javax.swing.JPanel {
         dialog.setSize(320, 600); // fit inside 350x750 phone frame
         if (owner != null) {
             dialog.setLocationRelativeTo(owner); // center within phone frame
-            Point current = dialog.getLocation();
+            java.awt.Point current = dialog.getLocation();
             dialog.setLocation(current.x - 3, current.y); // shift 3px left
         }
+        // Ensure the content starts at the very top
+        try {
+            editorPane.setCaretPosition(0);
+        } catch (Exception ignore) {}
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    editorPane.setCaretPosition(0);
+                } catch (Exception ignore) {}
+                javax.swing.JViewport vp = scrollPane.getViewport();
+                if (vp != null) {
+                    vp.setViewPosition(new java.awt.Point(0, 0));
+                }
+            }
+        });
         dialog.setVisible(true);
     }
 
     private String getTermsAndConditionsText() {
-        return "CEPHRA PHONE REGISTRATION - TERMS AND CONDITIONS\n" +
+        return "CEPHRA PHONE REGISTRATION\n TERMS AND CONDITIONS\n" +
                "Effective Date: " + java.time.LocalDate.now() + "\n" +
                "Version: 1.0\n\n" +
                "1. ACCEPTANCE OF TERMS\n" +
