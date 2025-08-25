@@ -12,7 +12,7 @@ public class Register extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
-        setupLabelPosition(); // Set label position
+     
         setupButtons(); // Setup button hover effects
         setupTextFields(); // Setup text field properties
         makeDraggable();
@@ -89,7 +89,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(password);
-        password.setBounds(40, 450, 280, 40);
+        password.setBounds(40, 445, 280, 40);
 
         email.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         email.setBorder(null);
@@ -155,16 +155,8 @@ public class Register extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/REGISTER.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, -4, 370, 760);
     }// </editor-fold>//GEN-END:initComponents
-
-    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
-    // Setup label position to prevent NetBeans from changing it
-    private void setupLabelPosition() {
-        if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
-        }
-    }
 
     // Setup button hover effects
     private void setupButtons() {
@@ -206,6 +198,23 @@ public class Register extends javax.swing.JPanel {
         confirmpass.setBackground(new java.awt.Color(0, 0, 0, 0));
     }
 
+    // Ensure the background label (PNG) stays positioned correctly
+    private void setupLabelPosition() {
+        if (jLabel1 != null) {
+            jLabel1.setBounds(-15, 0, 398, 750);
+        }
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setupLabelPosition();
+            }
+        });
+    }
+
     private void loginbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginbuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -229,7 +238,7 @@ public class Register extends javax.swing.JPanel {
     }//GEN-LAST:event_termsconditionActionPerformed
 
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
-        // Validate all fields are filled
+         // Validate all fields are filled
         String nameText = name.getText().trim();
         String emailText = email.getText().trim();
         String passwordText = password.getText().trim();
@@ -255,22 +264,29 @@ public class Register extends javax.swing.JPanel {
             return;
         }
 
-        // Registration successful
-        javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        // Call the database method to add the new user
+        if (cephra.CephraDB.addUser(nameText, passwordText)) {
+            // Registration successful
+            javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 
-        // Navigate to Phonelogin after OK is clicked
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
-                        break;
+            // Navigate to Phonelogin after OK is clicked
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    java.awt.Window[] windows = java.awt.Window.getWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof cephra.Frame.Phone) {
+                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                            phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                            break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            // Username already exists
+            javax.swing.JOptionPane.showMessageDialog(this, "Username already exists. Please choose a different one.", "Registration Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+            name.requestFocusInWindow();
+        }
     }//GEN-LAST:event_registerActionPerformed
 
     private void nameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameActionPerformed
@@ -291,22 +307,64 @@ public class Register extends javax.swing.JPanel {
 
     private void showTermsAndConditions() {
         String termsText = getTermsAndConditionsText();
-        
-        javax.swing.JTextArea textArea = new javax.swing.JTextArea(termsText);
-        textArea.setEditable(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setFont(new java.awt.Font("Segoe UI", 0, 12));
-        
-        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
+
+        String safeText = termsText
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+        String html = "<html><head><style>" +
+                "body{font-family:'Segoe UI',sans-serif;font-size:12px;line-height:1.5;text-align:justify;margin:0;}" +
+                ".container{padding:0 4px;}" +
+                "</style></head><body><div class='container'>" +
+                safeText.replace("\n", "<br/>") +
+                "</div></body></html>";
+
+        javax.swing.JEditorPane editorPane = new javax.swing.JEditorPane("text/html", html);
+        editorPane.setEditable(false);
+        editorPane.setOpaque(false);
+        editorPane.setFocusable(false);
+        editorPane.setHighlighter(null);
+        editorPane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+        if (editorPane.getCaret() != null) {
+            editorPane.getCaret().setVisible(false);
+            editorPane.getCaret().setSelectionVisible(false);
+        }
+
+        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(editorPane);
         scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
-        
-        javax.swing.JOptionPane.showMessageDialog(
-            this,
-            scrollPane,
-            "Terms and Conditions",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE
-        );
+        scrollPane.setBorder(null);
+        scrollPane.setWheelScrollingEnabled(true);
+        scrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        java.awt.Window owner = javax.swing.SwingUtilities.getWindowAncestor(this);
+        final javax.swing.JDialog dialog = new javax.swing.JDialog(owner, "Terms and Conditions", java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setUndecorated(true); // remove title bar and X
+        dialog.setDefaultCloseOperation(javax.swing.JDialog.DO_NOTHING_ON_CLOSE);
+
+        javax.swing.JPanel content = new javax.swing.JPanel(new java.awt.BorderLayout());
+        content.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        content.add(scrollPane, java.awt.BorderLayout.CENTER);
+
+        javax.swing.JButton ok = new javax.swing.JButton("OK");
+        ok.setFocusPainted(false);
+        ok.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dialog.dispose();
+            }
+        });
+        javax.swing.JPanel buttons = new javax.swing.JPanel();
+        buttons.add(ok);
+        content.add(buttons, java.awt.BorderLayout.SOUTH);
+
+        dialog.setContentPane(content);
+        dialog.setSize(320, 600); // fit inside 350x750 phone frame
+        if (owner != null) {
+            dialog.setLocationRelativeTo(owner); // center within phone frame
+            Point current = dialog.getLocation();
+            dialog.setLocation(current.x - 3, current.y); // shift 3px left
+        }
+        dialog.setVisible(true);
     }
 
     private String getTermsAndConditionsText() {

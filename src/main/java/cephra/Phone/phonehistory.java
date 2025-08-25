@@ -189,4 +189,18 @@ public class phonehistory extends javax.swing.JPanel {
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setupLabelPosition();
+                // Ensure background stays behind controls
+                if (jLabel1 != null) {
+                    setComponentZOrder(jLabel1, getComponentCount() - 1);
+                }
+            }
+        });
+    }
 }

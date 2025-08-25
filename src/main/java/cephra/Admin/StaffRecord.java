@@ -173,7 +173,7 @@ public class StaffRecord extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         Window w = SwingUtilities.getWindowAncestor(StaffRecord.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new Register());
+            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.AdminRegister());
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
