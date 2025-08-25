@@ -12,7 +12,7 @@ public class Register extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
-        setupLabelPosition(); // Set label position
+     
         setupButtons(); // Setup button hover effects
         setupTextFields(); // Setup text field properties
         makeDraggable();
@@ -159,14 +159,6 @@ public class Register extends javax.swing.JPanel {
         add(jLabel1);
         jLabel1.setBounds(0, 20, 350, 40);
     }// </editor-fold>//GEN-END:initComponents
-
-    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
-    // Setup label position to prevent NetBeans from changing it
-    private void setupLabelPosition() {
-        if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
-        }
-    }
 
     // Setup button hover effects
     private void setupButtons() {
