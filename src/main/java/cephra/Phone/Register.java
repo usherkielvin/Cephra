@@ -198,6 +198,23 @@ public class Register extends javax.swing.JPanel {
         confirmpass.setBackground(new java.awt.Color(0, 0, 0, 0));
     }
 
+    // Ensure the background label (PNG) stays positioned correctly
+    private void setupLabelPosition() {
+        if (jLabel1 != null) {
+            jLabel1.setBounds(0, -4, 370, 760);
+        }
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setupLabelPosition();
+            }
+        });
+    }
+
     private void loginbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginbuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
