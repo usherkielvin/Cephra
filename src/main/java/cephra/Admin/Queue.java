@@ -9,7 +9,8 @@ public class Queue extends javax.swing.JPanel {
     public Queue() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
-        setSize(1000, 750);
+        setSize(1000, 750);       
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -20,7 +21,7 @@ public class Queue extends javax.swing.JPanel {
         exitlogin = new javax.swing.JButton();
         staffbutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        MainIcon = new javax.swing.JLabel();
 
         setLayout(null);
 
@@ -79,9 +80,9 @@ public class Queue extends javax.swing.JPanel {
         add(historybutton);
         historybutton.setBounds(430, 10, 60, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/t.png"))); // NOI18N
-        add(jLabel1);
-        jLabel1.setBounds(-5, -6, 1000, 760);
+        MainIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/t.png"))); // NOI18N
+        add(MainIcon);
+        MainIcon.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void businessbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_businessbuttonActionPerformed
@@ -122,10 +123,10 @@ public class Queue extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
+    private javax.swing.JLabel MainIcon;
     private javax.swing.JButton businessbutton;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
 

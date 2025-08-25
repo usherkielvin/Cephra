@@ -7,16 +7,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
 
-
 public class serviceoffered extends javax.swing.JPanel {
 
-  
     public serviceoffered() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
+        setupLabelPosition(); // Set label position
         makeDraggable();
-    }private void makeDraggable() {
+    }
+
+    private void makeDraggable() {
         final Point[] dragPoint = {null};
 
         addMouseListener(new MouseAdapter() {
@@ -44,7 +45,7 @@ public class serviceoffered extends javax.swing.JPanel {
     }
 
     
-   
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         profilebutton = new javax.swing.JButton();
@@ -53,53 +54,70 @@ public class serviceoffered extends javax.swing.JPanel {
         homebutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setPreferredSize(new java.awt.Dimension(360, 750));
+        setMaximumSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
+        profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
         profilebutton.setContentAreaFilled(false);
+        profilebutton.setFocusPainted(false);
         profilebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 profilebuttonActionPerformed(evt);
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(290, 660, 50, 100);
+        profilebutton.setBounds(260, 670, 50, 50);
 
+        historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
+        historybutton.setFocusPainted(false);
         historybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 historybuttonActionPerformed(evt);
             }
         });
         add(historybutton);
-        historybutton.setBounds(230, 653, 50, 100);
+        historybutton.setBounds(200, 680, 50, 40);
 
+        linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
         linkbutton.setContentAreaFilled(false);
+        linkbutton.setFocusPainted(false);
         linkbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 linkbuttonActionPerformed(evt);
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(100, 680, 50, 40);
+        linkbutton.setBounds(90, 680, 50, 40);
 
+        homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
         homebutton.setContentAreaFilled(false);
+        homebutton.setFocusPainted(false);
         homebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 homebuttonActionPerformed(evt);
             }
         });
         add(homebutton);
-        homebutton.setBounds(170, 680, 50, 40);
+        homebutton.setBounds(140, 680, 50, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/service.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/SO-01.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
+
+    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
+    // Setup label position to prevent NetBeans from changing it
+    private void setupLabelPosition() {
+        if (jLabel1 != null) {
+            jLabel1.setBounds(-15, 0, 398, 750);
+        }
+    }
 
     private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {

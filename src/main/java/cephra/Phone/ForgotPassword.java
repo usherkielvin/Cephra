@@ -1,0 +1,196 @@
+
+package cephra.Phone;
+
+public class ForgotPassword extends javax.swing.JPanel {
+
+  
+    public ForgotPassword() {
+        initComponents();
+        setPreferredSize(new java.awt.Dimension(350, 750));
+        setSize(350, 750);
+        email.setOpaque(false);
+        email.setBackground(new java.awt.Color(0, 0, 0, 0));
+    }
+
+  
+    
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        contactsup = new javax.swing.JButton();
+        Back = new javax.swing.JButton();
+        resetsend = new javax.swing.JButton();
+        email = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+
+        setMaximumSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(350, 750));
+        setLayout(null);
+
+        contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        contactsup.setForeground(new java.awt.Color(0, 204, 204));
+        contactsup.setText("Contact Support");
+        contactsup.setBorder(null);
+        contactsup.setBorderPainted(false);
+        contactsup.setContentAreaFilled(false);
+        contactsup.setFocusPainted(false);
+        contactsup.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        contactsup.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                contactsup.setForeground(new java.awt.Color(0, 255, 255));
+                contactsup.setText("<html><u>Contact Support</u></html>");
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                contactsup.setForeground(new java.awt.Color(0, 204, 204));
+                contactsup.setText("Contact Support");
+            }
+        });
+        contactsup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contactsupActionPerformed(evt);
+            }
+        });
+        add(contactsup);
+        contactsup.setBounds(160, 663, 130, 30);
+
+        Back.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        Back.setForeground(new java.awt.Color(0, 204, 204));
+        Back.setText("Back");
+        Back.setBorder(null);
+        Back.setBorderPainted(false);
+        Back.setContentAreaFilled(false);
+        Back.setFocusPainted(false);
+        Back.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Back.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                Back.setForeground(new java.awt.Color(0, 255, 255));
+                Back.setText("<html><u>Back</u></html>");
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                Back.setForeground(new java.awt.Color(0, 204, 204));
+                Back.setText("Back");
+            }
+        });
+        Back.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backActionPerformed(evt);
+            }
+        });
+        add(Back);
+        Back.setBounds(120, 630, 120, 23);
+
+        resetsend.setBorder(null);
+        resetsend.setBorderPainted(false);
+        resetsend.setContentAreaFilled(false);
+        resetsend.setFocusPainted(false);
+        resetsend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetsendActionPerformed(evt);
+            }
+        });
+        add(resetsend);
+        resetsend.setBounds(50, 440, 270, 50);
+
+        email.setBorder(null);
+        email.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailActionPerformed(evt);
+            }
+        });
+        add(email);
+        email.setBounds(80, 330, 250, 30);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/forgot password.png"))); // NOI18N
+        add(jLabel1);
+        // Label position will be set in setupLabelPosition() method
+    }// </editor-fold>//GEN-END:initComponents
+
+    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
+    // Setup label position to prevent NetBeans from changing it
+    private void setupLabelPosition() {
+        if (jLabel1 != null) {
+            jLabel1.setBounds(-15, 0, 398, 750);
+        }
+    }
+
+    private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
+       
+    }//GEN-LAST:event_emailActionPerformed
+
+    private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
+        // Handle reset/send action
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Password reset link sent to your email!", 
+            "Success", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+        // Navigate to VerificationCode panel after OK is clicked
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.VerificationCode());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_resetsendActionPerformed
+
+    private void backActionPerformed(java.awt.event.ActionEvent evt) {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    private void contactsupActionPerformed(java.awt.event.ActionEvent evt) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Contact support at: support@cephra.com", "Contact Support", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setupLabelPosition(); // Set label position
+                if (email != null) {
+                    email.requestFocusInWindow();
+                }
+                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(ForgotPassword.this);
+                if (root != null && resetsend != null) {
+                    root.setDefaultButton(resetsend);
+                }
+            }
+        });
+    }
+
+    public void focusEmailField() {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (email != null) {
+                    email.requestFocusInWindow();
+                }
+            }
+        });
+    }
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Back;
+    private javax.swing.JButton contactsup;
+    private javax.swing.JTextField email;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton resetsend;
+    // End of variables declaration//GEN-END:variables
+}
