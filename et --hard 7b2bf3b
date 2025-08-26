@@ -1,0 +1,5 @@
+[33m5e26bfb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'main' of https://github.com/usherkielvin/Cephra
+[33m7b2bf3b[m Refactor code structure for improved readability and maintainability
+[33mb50cd43[m Enhance Register class by ensuring the editor pane starts at the top of the dialog and adjusting the viewport position for improved user experience. Update terms and conditions text formatting for clarity.
+[33m8faebc2[m Refactor user initialization in CephraDB and enhance UI responsiveness in Phone components by implementing addNotify method to adjust label positions dynamically.
+[33m0bf725d[m Enhance Register class by adding a method to correctly position the background label and refactoring the terms and conditions dialog to improve user experience with HTML formatting and a custom modal dialog layout.
