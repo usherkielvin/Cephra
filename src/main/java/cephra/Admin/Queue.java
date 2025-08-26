@@ -374,7 +374,12 @@ public class Queue extends javax.swing.JPanel {
             new String [] {
                 "Ticket", "Customer", "Service", "Status", "Payment", "Action"
             }
-        ));
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        });
         jScrollPane1.setViewportView(queTab);
 
         panelLists.add(jScrollPane1);

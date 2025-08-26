@@ -52,7 +52,12 @@ public class History extends javax.swing.JPanel {
             new String [] {
                 "Ticket", "Customer", "KWh", "Total", "Served By", "Date & Time", "Reference"
             }
-        ));
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         add(jScrollPane1);
