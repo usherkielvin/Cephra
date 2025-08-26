@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.AbstractCellEditor;
+import javax.swing.JOptionPane;
 import java.awt.Component;
 
 
@@ -29,6 +30,8 @@ public class Queue extends javax.swing.JPanel {
         
         // Setup Action column with an invisible button that shows text "Proceed"
         setupActionColumn();
+        // Setup Payment column for marking as paid
+        setupPaymentColumn();
         
     }
 
@@ -110,7 +113,99 @@ public class Queue extends javax.swing.JPanel {
         @Override
         public void actionPerformed(java.awt.event.ActionEvent e) {
             if (editingRow >= 0 && editingRow < queTab.getRowCount()) {
-                queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
+                Object statusVal = queTab.getValueAt(editingRow, statusColumnIndex);
+                String status = statusVal == null ? "" : String.valueOf(statusVal).trim();
+                int paymentCol = getColumnIndex("Payment");
+                if ("Pending".equalsIgnoreCase(status)) {
+                    queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
+                } else if ("Waiting".equalsIgnoreCase(status)) {
+                    queTab.setValueAt("Charging", editingRow, statusColumnIndex);
+                    if (paymentCol >= 0) {
+                        queTab.setValueAt("Pending", editingRow, paymentCol);
+                    }
+                } else if ("Charging".equalsIgnoreCase(status)) {
+                    queTab.setValueAt("Complete", editingRow, statusColumnIndex);
+                    if (paymentCol >= 0) {
+                        Object payVal = queTab.getValueAt(editingRow, paymentCol);
+                        String pay = payVal == null ? "" : String.valueOf(payVal).trim();
+                        if (pay.isEmpty()) {
+                            queTab.setValueAt("Pending", editingRow, paymentCol);
+                        }
+                    }
+                }
+            }
+            stopCellEditing();
+        }
+    }
+
+    private void setupPaymentColumn() {
+        final int paymentCol = getColumnIndex("Payment");
+        if (paymentCol < 0) return;
+
+        queTab.getColumnModel().getColumn(paymentCol).setCellRenderer(new TableCellRenderer() {
+            private final JButton btn = createFlatButton();
+            private final JLabel label = new JLabel("");
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                String v = value == null ? "" : String.valueOf(value).trim();
+                if ("Pending".equalsIgnoreCase(v)) {
+                    btn.setText("Pending");
+                    return btn;
+                }
+                label.setText(v);
+                return label;
+            }
+        });
+
+        queTab.getColumnModel().getColumn(paymentCol).setCellEditor(new PaymentEditor());
+    }
+
+    private class PaymentEditor extends AbstractCellEditor implements TableCellEditor, java.awt.event.ActionListener {
+        private final JButton btn = createFlatButton();
+        private final JLabel label = new JLabel("");
+        private int editingRow = -1;
+        private String editorValue = "";
+
+        PaymentEditor() {
+            btn.addActionListener(this);
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            editingRow = row;
+            String v = value == null ? "" : String.valueOf(value).trim();
+            editorValue = v;
+            if ("Pending".equalsIgnoreCase(v)) {
+                btn.setText("Pending");
+                return btn;
+            }
+            label.setText(v);
+            return label;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return editorValue;
+        }
+
+        @Override
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+            if (editingRow >= 0 && editingRow < queTab.getRowCount()) {
+                Object[] options = new Object[] { "Mark as Paid", "Cancel" };
+                int choice = JOptionPane.showOptionDialog(
+                    Queue.this,
+                    "Mark this payment as paid?",
+                    "Payment",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+                );
+                if (choice == 0) {
+                    editorValue = "Paid";
+                }
             }
             stopCellEditing();
         }
