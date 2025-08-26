@@ -2,6 +2,7 @@ package cephra.Phone;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.text.*; // Add this import
 
 public class Phonelogin extends javax.swing.JPanel {
    private int loginAttempts = 0;
@@ -15,7 +16,10 @@ public class Phonelogin extends javax.swing.JPanel {
         pass.setOpaque(false);
         pass.setBackground(new Color(0, 0, 0, 0));
        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
-        
+
+        // --- INTEGRATED FILTERS ---
+        ((AbstractDocument) username.getDocument()).setDocumentFilter(new InputLimitFilter(15, true));
+        ((AbstractDocument) pass.getDocument()).setDocumentFilter(new InputLimitFilter(15, false));
     }
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -260,4 +264,37 @@ public class Phonelogin extends javax.swing.JPanel {
     private javax.swing.JButton reghere;
     private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
+
+    // Add this inner class at the end of your Phonelogin class (before the last closing brace)
+    private static class InputLimitFilter extends DocumentFilter {
+        private final int max;
+        private final boolean username;
+
+        public InputLimitFilter(int max, boolean username) {
+            this.max = max;
+            this.username = username;
+        }
+
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            if (string == null) return;
+            if (username && !string.matches("[A-Za-z0-9_]*")) return;
+            if ((fb.getDocument().getLength() + string.length()) <= max) {
+                super.insertString(fb, offset, string, attr);
+            } else {
+                java.awt.Toolkit.getDefaultToolkit().beep(); // Beep on max
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            if (text == null) return;
+            if (username && !text.matches("[A-Za-z0-9_]*")) return;
+            if ((fb.getDocument().getLength() - length + text.length()) <= max) {
+                super.replace(fb, offset, length, text, attrs);
+            } else {
+                java.awt.Toolkit.getDefaultToolkit().beep(); // Beep on max
+            }
+        }
+    }
 }
