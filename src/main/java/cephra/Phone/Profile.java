@@ -165,6 +165,7 @@ public class Profile extends javax.swing.JPanel {
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                cephra.Phone.AppState.isCarLinked = false;
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {

@@ -172,7 +172,18 @@ public class QueueStatus extends javax.swing.JPanel {
         });
     }
     private void okayconditionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okayconditionActionPerformed
-        // TODO add your handling code here:
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.home());
+                        break;
+                    }
+                }
+            }
+        });
     }//GEN-LAST:event_okayconditionActionPerformed
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
