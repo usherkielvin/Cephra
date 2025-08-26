@@ -74,9 +74,9 @@ public class link extends javax.swing.JPanel {
         add(homebutton);
         homebutton.setBounds(170, 680, 50, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/link_gif.gif"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ConnectCar.gif"))); // NOI18N
         add(jLabel1);
-        // Label position will be set in setupLabelPosition() method
+        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
