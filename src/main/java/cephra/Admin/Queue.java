@@ -142,6 +142,8 @@ public class Queue extends javax.swing.JPanel {
         B7 = new javax.swing.JLabel();
         B8 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         queIcon = new javax.swing.JLabel();
         MainIcon = new javax.swing.JLabel();
 
@@ -250,7 +252,7 @@ public class Queue extends javax.swing.JPanel {
         B1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         B1.setText("EV - 001");
         ControlPanel.add(B1);
-        B1.setBounds(200, 140, 100, 40);
+        B1.setBounds(30, 70, 100, 40);
 
         B2.setBackground(new java.awt.Color(0, 147, 73));
         B2.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
@@ -258,7 +260,7 @@ public class Queue extends javax.swing.JPanel {
         B2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         B2.setText("EV - 001");
         ControlPanel.add(B2);
-        B2.setBounds(355, 140, 100, 40);
+        B2.setBounds(40, 230, 100, 40);
 
         B3.setBackground(new java.awt.Color(0, 147, 73));
         B3.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
@@ -266,7 +268,7 @@ public class Queue extends javax.swing.JPanel {
         B3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         B3.setText("EV - 001");
         ControlPanel.add(B3);
-        B3.setBounds(200, 280, 100, 40);
+        B3.setBounds(40, 390, 100, 40);
 
         B4.setBackground(new java.awt.Color(0, 147, 73));
         B4.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
@@ -274,7 +276,7 @@ public class Queue extends javax.swing.JPanel {
         B4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         B4.setText("EV - 001");
         ControlPanel.add(B4);
-        B4.setBounds(355, 280, 100, 40);
+        B4.setBounds(40, 550, 100, 40);
 
         B5.setBackground(new java.awt.Color(0, 147, 73));
         B5.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
@@ -282,7 +284,7 @@ public class Queue extends javax.swing.JPanel {
         B5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         B5.setText("EV - 001");
         ControlPanel.add(B5);
-        B5.setBounds(200, 420, 100, 40);
+        B5.setBounds(200, 70, 100, 40);
 
         B6.setBackground(new java.awt.Color(0, 147, 73));
         B6.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
@@ -290,7 +292,7 @@ public class Queue extends javax.swing.JPanel {
         B6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         B6.setText("EV - 001");
         ControlPanel.add(B6);
-        B6.setBounds(355, 420, 100, 40);
+        B6.setBounds(200, 230, 100, 40);
 
         B7.setBackground(new java.awt.Color(0, 147, 73));
         B7.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
@@ -298,7 +300,7 @@ public class Queue extends javax.swing.JPanel {
         B7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         B7.setText("EV - 001");
         ControlPanel.add(B7);
-        B7.setBounds(200, 570, 100, 40);
+        B7.setBounds(200, 390, 100, 40);
 
         B8.setBackground(new java.awt.Color(0, 147, 73));
         B8.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
@@ -306,18 +308,28 @@ public class Queue extends javax.swing.JPanel {
         B8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         B8.setText("EV - 001");
         ControlPanel.add(B8);
-        B8.setBounds(355, 570, 100, 40);
+        B8.setBounds(200, 550, 100, 40);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 147, 73));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("EV - 001");
         ControlPanel.add(jLabel1);
-        jLabel1.setBounds(610, 150, 140, 50);
+        jLabel1.setBounds(610, 130, 140, 60);
+
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        ControlPanel.add(jButton1);
+        jButton1.setBounds(330, 450, 140, 70);
+
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        ControlPanel.add(jButton2);
+        jButton2.setBounds(330, 530, 140, 60);
 
         queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ControlQe.png"))); // NOI18N
         ControlPanel.add(queIcon);
-        queIcon.setBounds(0, -80, 1010, 760);
+        queIcon.setBounds(0, -60, 1010, 740);
 
         jTabbedPane1.addTab("Queue Control", ControlPanel);
 
@@ -380,6 +392,8 @@ public class Queue extends javax.swing.JPanel {
     private javax.swing.JButton businessbutton;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
