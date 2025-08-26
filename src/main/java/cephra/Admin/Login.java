@@ -162,6 +162,10 @@ public class Login extends javax.swing.JPanel {
         });
     }
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        javax.swing.JOptionPane.showMessageDialog(this, "Please contact the administrator to reset your password.", "Forgot Password", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     private void attemptLogin() {
     String username = userfield.getText() != null ? userfield.getText().trim() : "";
     String password = new String(passfield.getPassword());
