@@ -3,6 +3,7 @@ package cephra.Admin;
 
 import java.awt.Window;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
 
 public class History extends javax.swing.JPanel {
@@ -11,6 +12,8 @@ public class History extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
+        // Register history table model so other modules can add rows
+        cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());
     }
 
  

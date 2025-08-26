@@ -242,6 +242,14 @@ public class PayPop extends javax.swing.JPanel {
     private void payonlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payonlineActionPerformed
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+                if (currentTicket != null && !currentTicket.isEmpty()) {
+                    try {
+                        cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
+                    } catch (Throwable t) {
+                        // ignore if admin not available
+                    }
+                }
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {

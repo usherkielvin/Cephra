@@ -116,6 +116,8 @@ public class Queue extends javax.swing.JPanel {
                 Object statusVal = queTab.getValueAt(editingRow, statusColumnIndex);
                 String status = statusVal == null ? "" : String.valueOf(statusVal).trim();
                 int paymentCol = getColumnIndex("Payment");
+                int ticketCol = getColumnIndex("Ticket");
+                int customerCol = getColumnIndex("Customer");
                 if ("Pending".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
                 } else if ("Waiting".equalsIgnoreCase(status)) {
@@ -126,11 +128,58 @@ public class Queue extends javax.swing.JPanel {
                         // Upon completion, payment becomes Pending
                         queTab.setValueAt("Pending", editingRow, paymentCol);
                     }
+                    // Notify phone frame to show payment popup
+                    try {
+                        java.awt.Window[] windows = java.awt.Window.getWindows();
+                        for (java.awt.Window window : windows) {
+                            if (window instanceof cephra.Frame.Phone) {
+                                ((cephra.Frame.Phone) window).switchPanel(new cephra.Phone.PayPop());
+                                break;
+                            }
+                        }
+                    } catch (Throwable t) {
+                        // ignore if phone frame not running
+                    }
+                } else if ("Complete".equalsIgnoreCase(status)) {
+                    // If paid, move to History and remove from Queue
+                    String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
+                    if ("Paid".equalsIgnoreCase(payment)) {
+                        String ticket = ticketCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, ticketCol)) : "";
+                        String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                        String servedBy = "Admin";
+                        String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        String reference = generateReference();
+
+                        Object[] historyRow = new Object[] { ticket, customer, "", "", servedBy, dateTime, reference };
+                        try {
+                            cephra.Admin.HistoryBridge.addRecord(historyRow);
+                        } catch (Throwable t) {
+                            // ignore if history not ready
+                        }
+                        ((DefaultTableModel) queTab.getModel()).removeRow(editingRow);
+                        try {
+                            cephra.Admin.QueueBridge.removeTicket(ticket);
+                        } catch (Throwable t) {
+                            // ignore if queue not ready
+                        }
+                    }
                 }
             }
             stopCellEditing();
         }
     }
+
+    private static String generateReference() {
+        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        StringBuilder sb = new StringBuilder();
+        java.util.Random r = new java.util.Random();
+        for (int i = 0; i < 8; i++) {
+            sb.append(chars.charAt(r.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+
 
     private void setupPaymentColumn() {
         final int paymentCol = getColumnIndex("Payment");
