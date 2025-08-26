@@ -1,18 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package cephra.Phone;
 
-/**
- *
- * @author usher
- */
 public class VerificationCode extends javax.swing.JPanel {
 
-    /**
-     * Creates new form VerificationCode
-     */
     public VerificationCode() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
@@ -131,6 +120,11 @@ public class VerificationCode extends javax.swing.JPanel {
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 contactsup.setForeground(new java.awt.Color(0, 204, 204));
                 contactsup.setText("Contact Support");
+            }
+        });
+        contactsup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contactsupActionPerformed(evt);
             }
         });
 
