@@ -75,7 +75,6 @@ public class Phonelogin extends javax.swing.JPanel {
         add(forgotpass);
         forgotpass.setBounds(200, 410, 120, 40);
 
-        pass.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         pass.setBorder(null);
         pass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
