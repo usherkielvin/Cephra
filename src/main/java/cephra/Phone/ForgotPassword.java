@@ -119,8 +119,11 @@ public class ForgotPassword extends javax.swing.JPanel {
     }//GEN-LAST:event_emailActionPerformed
 
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
+        String emailText = email.getText().trim();
+if (cephra.CephraDB.findUserByEmail(emailText) != null) {
+    cephra.Phone.AppSessionState.userEmailForReset = emailText; // Add this line
+    cephra.CephraDB.generateAndStoreOTP();
         
-        // Navigate to VerificationCode panel after OK is clicked
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -133,6 +136,9 @@ public class ForgotPassword extends javax.swing.JPanel {
                 }
             }
         });
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Email address not found.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_resetsendActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {

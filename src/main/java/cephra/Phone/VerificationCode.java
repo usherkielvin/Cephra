@@ -156,6 +156,10 @@ public class VerificationCode extends javax.swing.JPanel {
 
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
         // Handle verification code submission
+          String enteredOTP = email.getText();
+    String correctOTP = cephra.CephraDB.getGeneratedOTP();
+
+    if (enteredOTP.equals(correctOTP)) {
         javax.swing.JOptionPane.showMessageDialog(this, "Verification code submitted successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
         
         // Navigate to NewPassword panel after OK is clicked
@@ -171,6 +175,10 @@ public class VerificationCode extends javax.swing.JPanel {
                 }
             }
         });
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Invalid verification code. Please try again.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        email.setText(""); // Clear the text field
+    }
     }//GEN-LAST:event_resetsendActionPerformed
 
     private void resendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resendActionPerformed

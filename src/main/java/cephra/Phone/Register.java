@@ -238,55 +238,55 @@ public class Register extends javax.swing.JPanel {
     }//GEN-LAST:event_termsconditionActionPerformed
 
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
-         // Validate all fields are filled
-        String nameText = name.getText().trim();
-        String emailText = email.getText().trim();
-        String passwordText = password.getText().trim();
-        String confirmPassText = confirmpass.getText().trim();
+          // Validate all fields are filled
+    String nameText = name.getText().trim();
+    String emailText = email.getText().trim();
+    String passwordText = password.getText().trim();
+    String confirmPassText = confirmpass.getText().trim();
 
-        if (nameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty() || confirmPassText.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", javax.swing.JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    if (nameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty() || confirmPassText.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-        // Check if passwords match
-        if (!passwordText.equals(confirmPassText)) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match!", "Password Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-            password.setText("");
-            confirmpass.setText("");
-            password.requestFocusInWindow();
-            return;
-        }
+    // Check if passwords match
+    if (!passwordText.equals(confirmPassText)) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match!", "Password Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        password.setText("");
+        confirmpass.setText("");
+        password.requestFocusInWindow();
+        return;
+    }
 
-        // Check if terms and conditions are agreed to
-        if (!termscondition.isSelected()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Please agree to the Terms and Conditions before registering!", "Terms and Conditions Required", javax.swing.JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    // Check if terms and conditions are agreed to
+    if (!termscondition.isSelected()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please agree to the Terms and Conditions before registering!", "Terms and Conditions Required", javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-        // Call the database method to add the new user
-        if (cephra.CephraDB.addUser(nameText, passwordText)) {
-            // Registration successful
-            javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    // Call the database method to add the new user
+    if (cephra.CephraDB.addUser(nameText, emailText, passwordText)) {
+        // Registration successful
+        javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 
-            // Navigate to Phonelogin after OK is clicked
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    java.awt.Window[] windows = java.awt.Window.getWindows();
-                    for (java.awt.Window window : windows) {
-                        if (window instanceof cephra.Frame.Phone) {
-                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
-                            break;
-                        }
+        // Navigate to Phonelogin after OK is clicked
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                        break;
                     }
                 }
-            });
-        } else {
-            // Username already exists
-            javax.swing.JOptionPane.showMessageDialog(this, "Username already exists. Please choose a different one.", "Registration Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
-            name.requestFocusInWindow();
-        }
+            }
+        });
+    } else {
+        // Username or email already exists
+        javax.swing.JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+        name.requestFocusInWindow();
+    }
     }//GEN-LAST:event_registerActionPerformed
 
     private void nameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameActionPerformed
