@@ -245,6 +245,18 @@ public class QueueTicket extends javax.swing.JPanel {
     private void checkstatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkstatusActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                try {
+                    cephra.Admin.QueueBridge.addTicket(
+                        "FCH001",
+                        "dizon",
+                        "Fast Charging",
+                        "Pending",
+                        "",
+                        ""
+                    );
+                } catch (Throwable t) {
+                    // ignore if admin queue not ready
+                }
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {

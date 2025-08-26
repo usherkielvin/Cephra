@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.Window;
 import javax.swing.SwingUtilities;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.DefaultTableModel;
 
 
 public class Queue extends javax.swing.JPanel {
@@ -15,6 +16,9 @@ public class Queue extends javax.swing.JPanel {
         
         JTableHeader header = queTab.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
+        
+        // Register the queue table model so other modules can add rows
+        cephra.Admin.QueueBridge.registerModel((DefaultTableModel) queTab.getModel());
         
         
     }
