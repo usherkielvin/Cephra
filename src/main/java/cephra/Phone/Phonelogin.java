@@ -198,7 +198,7 @@ public class Phonelogin extends javax.swing.JPanel {
     }//GEN-LAST:event_forgotpassActionPerformed
 
     private void passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passActionPerformed
-        // TODO add your handling code here:
+      
     }//GEN-LAST:event_passActionPerformed
 
     private void SeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeActionPerformed

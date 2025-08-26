@@ -1,22 +1,8 @@
 package cephra.Admin;
 
-import java.awt.Font;
-import java.awt.Window;
-import javax.swing.SwingUtilities;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableCellEditor;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.AbstractCellEditor;
-import javax.swing.JOptionPane;
-import java.awt.Component;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.table.*;
 import cephra.Frame.Monitor;
 
 public class Queue extends javax.swing.JPanel {
@@ -32,8 +18,8 @@ private static Monitor monitorInstance;
 
     public Queue() {
         initComponents();
-    setPreferredSize(new java.awt.Dimension(1000, 750));
-    setSize(1000, 750);
+        setPreferredSize(new java.awt.Dimension(1000, 750));
+        setSize(1000, 750);       
  
     popupMenu = new JPopupMenu();
     deleteItem = new JMenuItem("Delete");
@@ -42,7 +28,7 @@ private static Monitor monitorInstance;
     // Initialize the button array with the buttons from the ControlPanel's jPanel1
     gridButtons = new JButton[] {
         jButton1, jButton2, jButton3, jButton4,
-        jButton5, jButton6, jButton7, jButton8
+        jButton5, jButton6, jButton7, jButton8, jButton9
     };
 
     // Initially make all grid buttons invisible except the first one (our "Next" button)
@@ -100,7 +86,7 @@ private static Monitor monitorInstance;
     }
     
     private void updateDisplayFrame() {
-        String[] texts = new String[8];
+        String[] texts = new String[9];
         for (int i = 0; i < gridButtons.length; i++) {
             if (i < buttonCount) {
                 texts[i] = gridButtons[i].getText();
@@ -112,6 +98,36 @@ private static Monitor monitorInstance;
         // Use the existing monitor instance
         if (monitorInstance != null) {
             monitorInstance.updateDisplay(texts);
+        }
+    }
+    
+    private void removeTicketFromGrid(JButton buttonToRemove) {
+        if (buttonCount > 0) {
+            // Find the index of this button in the grid
+            int buttonIndex = -1;
+            for (int i = 0; i < buttonCount; i++) {
+                if (gridButtons[i] == buttonToRemove) {
+                    buttonIndex = i;
+                    break;
+                }
+            }
+            
+            if (buttonIndex >= 0) {
+                // Shift all buttons after this one to the left
+                for (int i = buttonIndex; i < buttonCount - 1; i++) {
+                    gridButtons[i].setText(gridButtons[i + 1].getText());
+                }
+                
+                // Hide the last button
+                gridButtons[buttonCount - 1].setVisible(false);
+                gridButtons[buttonCount - 1].setText("");
+                
+                // Decrease the button counter
+                buttonCount--;
+                
+                // Update the display frame
+                updateDisplayFrame();
+            }
         }
     }
     
@@ -145,12 +161,12 @@ private static Monitor monitorInstance;
         }
     }
 
-private void setupActionColumn() {
-    final int actionCol = getColumnIndex("Action");
-    final int statusCol = getColumnIndex("Status");
-    if (actionCol < 0 || statusCol < 0) {
-        return;
-    }
+    private void setupActionColumn() {
+        final int actionCol = getColumnIndex("Action");
+        final int statusCol = getColumnIndex("Status");
+        if (actionCol < 0 || statusCol < 0) {
+            return;
+        }
 
         // Renderer: show Proceed on any row that has a real ticket
         queTab.getColumnModel().getColumn(actionCol).setCellRenderer(new TableCellRenderer() {
@@ -169,48 +185,126 @@ private void setupActionColumn() {
             }
         });
 
-    // Editor: clicking updates status to "Waiting"
-    queTab.getColumnModel().getColumn(actionCol).setCellEditor(new ProceedEditor(statusCol));
+    // Combined Editor: handles both status progression AND grid button updates
+    queTab.getColumnModel().getColumn(actionCol).setCellEditor(new CombinedProceedEditor(statusCol));
+}
 
-    // Add ActionListener to the button
-    queTab.getColumnModel().getColumn(actionCol).setCellEditor(new DefaultCellEditor(new JTextField()) {
+private class CombinedProceedEditor extends AbstractCellEditor implements TableCellEditor, java.awt.event.ActionListener {
+        private final JButton button = createFlatButton();
+        private int editingRow = -1;
+        private final int statusColumnIndex;
+
+    CombinedProceedEditor(int statusColumnIndex) {
+            this.statusColumnIndex = statusColumnIndex;
+            button.addActionListener(this);
+        }
+
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            JButton button = createFlatButton();
-            button.setText("Proceed");
-            button.addActionListener(e -> {
-                // Check if the row has a valid ticket before proceeding
-                Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
-                boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
-
-                if (hasTicket) {
-                    // Logic for button click
-                    if (buttonCount < 8) {
-                        // Shift the buttons to the right
-                        for (int i = buttonCount; i > 0; i--) {
-                            gridButtons[i].setText(gridButtons[i - 1].getText());
-                            gridButtons[i].setVisible(true);
-                        }
-
-                        // Place the new button at the beginning (index 0)
-                        gridButtons[0].setVisible(true);
-                        gridButtons[0].setText(String.valueOf(ticketVal));
-                        
-                        buttonCount++;
-                        
-                        // Update the monitor display immediately
-                        updateDisplayFrame();
-                    } else {
-                        JOptionPane.showMessageDialog(table, "Queue is full. Please wait for some tickets to be processed.");
-                    }
-                } else {
-                    // Optionally, show a message or feedback that the row is empty
-                    JOptionPane.showMessageDialog(table, "Cannot proceed: The row is empty.");
-                }
-            });
-            return button; // Return the button for editing
+            editingRow = row;
+            Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
+            boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
+            if (hasTicket) {
+                button.setText("Proceed");
+                return button;
+            }
+        return new JLabel("");
         }
-    });
+
+        @Override
+        public Object getCellEditorValue() {
+            return "Proceed";
+        }
+
+        @Override
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+            if (editingRow >= 0 && editingRow < queTab.getRowCount()) {
+                Object statusVal = queTab.getValueAt(editingRow, statusColumnIndex);
+                String status = statusVal == null ? "" : String.valueOf(statusVal).trim();
+                int paymentCol = getColumnIndex("Payment");
+                int ticketCol = getColumnIndex("Ticket");
+                int customerCol = getColumnIndex("Customer");
+            
+            // Get ticket value for grid button functionality
+            Object ticketVal = queTab.getValueAt(editingRow, ticketCol);
+            String ticket = ticketVal != null ? String.valueOf(ticketVal).trim() : "";
+            
+                if ("Pending".equalsIgnoreCase(status)) {
+                    queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
+                
+                // Add to grid buttons when status changes to Waiting
+                if (buttonCount < 8 && !ticket.isEmpty()) {
+                    // Shift the buttons to the right
+                    for (int i = buttonCount; i > 0; i--) {
+                        gridButtons[i].setText(gridButtons[i - 1].getText());
+                        gridButtons[i].setVisible(true);
+                    }
+                    // Place the new button at the beginning (index 0)
+                    gridButtons[0].setVisible(true);
+                    gridButtons[0].setText(ticket);
+                    buttonCount++;
+                    updateDisplayFrame();
+                }
+                
+                } else if ("Waiting".equalsIgnoreCase(status)) {
+                    queTab.setValueAt("Charging", editingRow, statusColumnIndex);
+                
+                } else if ("Charging".equalsIgnoreCase(status)) {
+                    queTab.setValueAt("Complete", editingRow, statusColumnIndex);
+                    if (paymentCol >= 0) {
+                        // Upon completion, payment becomes Pending
+                        queTab.setValueAt("Pending", editingRow, paymentCol);
+                    }
+                    // Notify phone frame to show payment popup
+                    try {
+                        java.awt.Window[] windows = java.awt.Window.getWindows();
+                        for (java.awt.Window window : windows) {
+                            if (window instanceof cephra.Frame.Phone) {
+                                ((cephra.Frame.Phone) window).switchPanel(new cephra.Phone.PayPop());
+                                break;
+                            }
+                        }
+                    } catch (Throwable t) {
+                        // ignore if phone frame not running
+                    }
+                
+                } else if ("Complete".equalsIgnoreCase(status)) {
+                    // If paid, move to History and remove from Queue
+                    String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
+                    if ("Paid".equalsIgnoreCase(payment)) {
+                    final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                    final String servedBy = "Admin";
+                    final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    final String reference = generateReference();
+                    final int rowToRemove = editingRow;
+
+                    // Use invokeLater to avoid EDT conflicts
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                        Object[] historyRow = new Object[] { ticket, customer, "", "", servedBy, dateTime, reference };
+                        try {
+                            cephra.Admin.HistoryBridge.addRecord(historyRow);
+                        } catch (Throwable t) {
+                            // ignore if history not ready
+                        }
+                            try {
+                                ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
+                            } catch (Throwable t) {
+                                // ignore if row already removed
+                            }
+                        try {
+                            cephra.Admin.QueueBridge.removeTicket(ticket);
+                        } catch (Throwable t) {
+                            // ignore if queue not ready
+                        }
+                        }
+                    });
+                    }
+                }
+            }
+            stopCellEditing();
+        }
 }
 
     private static JButton createFlatButton() {
@@ -231,104 +325,6 @@ private void setupActionColumn() {
             }
         }
         return -1;
-    }
-
-    private class ProceedEditor extends AbstractCellEditor implements TableCellEditor, java.awt.event.ActionListener {
-        private final JButton button = createFlatButton();
-        private int editingRow = -1;
-        private final int statusColumnIndex;
-        private final JLabel empty = new JLabel("");
-
-        ProceedEditor(int statusColumnIndex) {
-            this.statusColumnIndex = statusColumnIndex;
-            button.addActionListener(this);
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            editingRow = row;
-            Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
-            boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
-            if (hasTicket) {
-                button.setText("Proceed");
-                return button;
-            }
-            return empty;
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            return "Proceed";
-        }
-
-        @Override
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-            if (editingRow >= 0 && editingRow < queTab.getRowCount()) {
-                Object statusVal = queTab.getValueAt(editingRow, statusColumnIndex);
-                String status = statusVal == null ? "" : String.valueOf(statusVal).trim();
-                int paymentCol = getColumnIndex("Payment");
-                int ticketCol = getColumnIndex("Ticket");
-                int customerCol = getColumnIndex("Customer");
-                if ("Pending".equalsIgnoreCase(status)) {
-                    queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
-                } else if ("Waiting".equalsIgnoreCase(status)) {
-                    queTab.setValueAt("Charging", editingRow, statusColumnIndex);
-                } else if ("Charging".equalsIgnoreCase(status)) {
-                    queTab.setValueAt("Complete", editingRow, statusColumnIndex);
-                    if (paymentCol >= 0) {
-                        // Upon completion, payment becomes Pending
-                        queTab.setValueAt("Pending", editingRow, paymentCol);
-                    }
-                    // Notify phone frame to show payment popup
-                    try {
-                        java.awt.Window[] windows = java.awt.Window.getWindows();
-                        for (java.awt.Window window : windows) {
-                            if (window instanceof cephra.Frame.Phone) {
-                                ((cephra.Frame.Phone) window).switchPanel(new cephra.Phone.PayPop());
-                                break;
-                            }
-                        }
-                    } catch (Throwable t) {
-                        // ignore if phone frame not running
-                    }
-                } else if ("Complete".equalsIgnoreCase(status)) {
-                    // If paid, move to History and remove from Queue
-                    String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
-                    if ("Paid".equalsIgnoreCase(payment)) {
-                        final String ticket = ticketCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, ticketCol)) : "";
-                        final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                        final String servedBy = "Admin";
-                        final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                        final String reference = generateReference();
-                        final int rowToRemove = editingRow;
-
-                        // Use invokeLater to avoid EDT conflicts
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                Object[] historyRow = new Object[] { ticket, customer, "", "", servedBy, dateTime, reference };
-                                try {
-                                    cephra.Admin.HistoryBridge.addRecord(historyRow);
-                                } catch (Throwable t) {
-                                    // ignore if history not ready
-                                }
-                                try {
-                                    ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
-                                } catch (Throwable t) {
-                                    // ignore if row already removed
-                                }
-                                try {
-                                    cephra.Admin.QueueBridge.removeTicket(ticket);
-                                } catch (Throwable t) {
-                                    // ignore if queue not ready
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-            stopCellEditing();
-        }
     }
 
     private static String generateReference() {
@@ -420,7 +416,7 @@ private void setupActionColumn() {
         }
     }
 
-    
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -576,7 +572,7 @@ private void setupActionColumn() {
 
         ControlPanel.setLayout(null);
 
-        jPanel1.setLayout(new java.awt.GridLayout(4, 2, 100, 100));
+        jPanel1.setLayout(null);
 
         jButton1.setText("jButton1");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -585,6 +581,7 @@ private void setupActionColumn() {
             }
         });
         jPanel1.add(jButton1);
+        jButton1.setBounds(0, 0, 190, 95);
 
         jButton2.setText("jButton2");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -593,6 +590,7 @@ private void setupActionColumn() {
             }
         });
         jPanel1.add(jButton2);
+        jButton2.setBounds(190, 0, 190, 95);
 
         jButton3.setText("jButton3");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -601,6 +599,7 @@ private void setupActionColumn() {
             }
         });
         jPanel1.add(jButton3);
+        jButton3.setBounds(0, 95, 190, 95);
 
         jButton4.setText("jButton4");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -609,6 +608,7 @@ private void setupActionColumn() {
             }
         });
         jPanel1.add(jButton4);
+        jButton4.setBounds(190, 95, 190, 95);
 
         jButton5.setText("jButton5");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -617,6 +617,7 @@ private void setupActionColumn() {
             }
         });
         jPanel1.add(jButton5);
+        jButton5.setBounds(0, 190, 190, 95);
 
         jButton6.setText("jButton6");
         jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -625,6 +626,7 @@ private void setupActionColumn() {
             }
         });
         jPanel1.add(jButton6);
+        jButton6.setBounds(190, 190, 190, 95);
 
         jButton7.setText("jButton7");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
@@ -633,6 +635,7 @@ private void setupActionColumn() {
             }
         });
         jPanel1.add(jButton7);
+        jButton7.setBounds(0, 285, 190, 95);
 
         jButton8.setText("jButton8");
         jButton8.addActionListener(new java.awt.event.ActionListener() {
@@ -641,90 +644,10 @@ private void setupActionColumn() {
             }
         });
         jPanel1.add(jButton8);
+        jButton8.setBounds(190, 285, 190, 95);
 
         ControlPanel.add(jPanel1);
-        jPanel1.setBounds(590, 120, 350, 410);
-
-        B1.setBackground(new java.awt.Color(0, 147, 73));
-        B1.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
-        B1.setForeground(new java.awt.Color(0, 147, 73));
-        B1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        B1.setText("EV - 001");
-        ControlPanel.add(B1);
-        B1.setBounds(30, 70, 100, 40);
-
-        B2.setBackground(new java.awt.Color(0, 147, 73));
-        B2.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
-        B2.setForeground(new java.awt.Color(0, 147, 73));
-        B2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        B2.setText("EV - 001");
-        ControlPanel.add(B2);
-        B2.setBounds(40, 230, 100, 40);
-
-        B3.setBackground(new java.awt.Color(0, 147, 73));
-        B3.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
-        B3.setForeground(new java.awt.Color(0, 147, 73));
-        B3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        B3.setText("EV - 001");
-        ControlPanel.add(B3);
-        B3.setBounds(40, 390, 100, 40);
-
-        B4.setBackground(new java.awt.Color(0, 147, 73));
-        B4.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
-        B4.setForeground(new java.awt.Color(0, 147, 73));
-        B4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        B4.setText("EV - 001");
-        ControlPanel.add(B4);
-        B4.setBounds(40, 550, 100, 40);
-
-        B5.setBackground(new java.awt.Color(0, 147, 73));
-        B5.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
-        B5.setForeground(new java.awt.Color(0, 147, 73));
-        B5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        B5.setText("EV - 001");
-        ControlPanel.add(B5);
-        B5.setBounds(200, 70, 100, 40);
-
-        B6.setBackground(new java.awt.Color(0, 147, 73));
-        B6.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
-        B6.setForeground(new java.awt.Color(0, 147, 73));
-        B6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        B6.setText("EV - 001");
-        ControlPanel.add(B6);
-        B6.setBounds(200, 230, 100, 40);
-
-        B7.setBackground(new java.awt.Color(0, 147, 73));
-        B7.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
-        B7.setForeground(new java.awt.Color(0, 147, 73));
-        B7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        B7.setText("EV - 001");
-        ControlPanel.add(B7);
-        B7.setBounds(200, 390, 100, 40);
-
-        B8.setBackground(new java.awt.Color(0, 147, 73));
-        B8.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
-        B8.setForeground(new java.awt.Color(0, 147, 73));
-        B8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        B8.setText("EV - 001");
-        ControlPanel.add(B8);
-        B8.setBounds(200, 550, 100, 40);
-
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 147, 73));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("EV - 001");
-        ControlPanel.add(jLabel1);
-        jLabel1.setBounds(610, 130, 140, 60);
-
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        ControlPanel.add(jButton1);
-        jButton1.setBounds(330, 450, 140, 70);
-
-        jButton2.setBorderPainted(false);
-        jButton2.setContentAreaFilled(false);
-        ControlPanel.add(jButton2);
-        jButton2.setBounds(330, 530, 140, 60);
+        jPanel1.setBounds(350, 130, 380, 380);
 
         queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ControlQe.png"))); // NOI18N
         ControlPanel.add(queIcon);
@@ -776,167 +699,39 @@ private void setupActionColumn() {
     }//GEN-LAST:event_BaybuttonActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       if (buttonCount < 8) {
-            // Shift the buttons to the right
-            for (int i = buttonCount; i > 0; i--) {
-                gridButtons[i].setText(gridButtons[i - 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-
-            // Place the new button at the beginning (index 0)
-            gridButtons[0].setVisible(true);
-            gridButtons[0].setText(String.valueOf(buttonCount + 1));
-            
-            buttonCount++;
-            updateDisplayFrame(); // Update the clone display
-        }
-    
+        removeTicketFromGrid(jButton1);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
- if (buttonCount < 8) {
-            // Shift the buttons to the right
-            for (int i = buttonCount; i > 0; i--) {
-                gridButtons[i].setText(gridButtons[i - 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-
-            // Place the new button at the beginning (index 0)
-            gridButtons[0].setVisible(true);
-            gridButtons[0].setText(String.valueOf(buttonCount + 1));
-            
-            buttonCount++;
-            updateDisplayFrame(); // Update the clone display
-        
-}
+        removeTicketFromGrid(jButton4);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // TODO add your handling code here:
-          // TODO add your handling code here:
-        
-        
-         if (buttonCount < 8) {
-        // Shift the buttons to the right
-        for (int i = buttonCount; i > 0; i--) {
-            gridButtons[i].setText(gridButtons[i - 1].getText());
-            gridButtons[i].setVisible(true);
-        }
-
-        // Place the new button at the beginning (index 0)
-        gridButtons[0].setVisible(true);
-        gridButtons[0].setText(String.valueOf(buttonCount + 1));
-        
-        buttonCount++;
-    }
-        
-        
-        
-        
+        removeTicketFromGrid(jButton9);
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
- if (buttonCount < 8) {
-            // Shift the buttons to the right
-            for (int i = buttonCount; i > 0; i--) {
-                gridButtons[i].setText(gridButtons[i - 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-
-            // Place the new button at the beginning (index 0)
-            gridButtons[0].setVisible(true);
-            gridButtons[0].setText(String.valueOf(buttonCount + 1));
-            
-            buttonCount++;
-            updateDisplayFrame(); // Update the clone display
-        }
+        removeTicketFromGrid(jButton2);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
- if (buttonCount < 8) {
-            // Shift the buttons to the right
-            for (int i = buttonCount; i > 0; i--) {
-                gridButtons[i].setText(gridButtons[i - 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-
-            // Place the new button at the beginning (index 0)
-            gridButtons[0].setVisible(true);
-            gridButtons[0].setText(String.valueOf(buttonCount + 1));
-            
-            buttonCount++;
-            updateDisplayFrame(); // Update the clone display
-        
-}        // TODO add your handling code here:
+        removeTicketFromGrid(jButton3);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
- if (buttonCount < 8) {
-            // Shift the buttons to the right
-            for (int i = buttonCount; i > 0; i--) {
-                gridButtons[i].setText(gridButtons[i - 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-
-            // Place the new button at the beginning (index 0)
-            gridButtons[0].setVisible(true);
-            gridButtons[0].setText(String.valueOf(buttonCount + 1));
-            
-            buttonCount++;
-            updateDisplayFrame(); // Update the clone display
-        
-}        // TODO add your handling code here:
+        removeTicketFromGrid(jButton5);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
- if (buttonCount < 8) {
-            // Shift the buttons to the right
-            for (int i = buttonCount; i > 0; i--) {
-                gridButtons[i].setText(gridButtons[i - 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-
-            // Place the new button at the beginning (index 0)
-            gridButtons[0].setVisible(true);
-            gridButtons[0].setText(String.valueOf(buttonCount + 1));
-            
-            buttonCount++;
-            updateDisplayFrame(); // Update the clone display
-        }
+        removeTicketFromGrid(jButton6);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
- if (buttonCount < 8) {
-            // Shift the buttons to the right
-            for (int i = buttonCount; i > 0; i--) {
-                gridButtons[i].setText(gridButtons[i - 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-
-            // Place the new button at the beginning (index 0)
-            gridButtons[0].setVisible(true);
-            gridButtons[0].setText(String.valueOf(buttonCount + 1));
-            
-            buttonCount++;
-            updateDisplayFrame(); // Update the clone display
-        }
+        removeTicketFromGrid(jButton7);
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
- if (buttonCount < 8) {
-            // Shift the buttons to the right
-            for (int i = buttonCount; i > 0; i--) {
-                gridButtons[i].setText(gridButtons[i - 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-
-            // Place the new button at the beginning (index 0)
-            gridButtons[0].setVisible(true);
-            gridButtons[0].setText(String.valueOf(buttonCount + 1));
-            
-            buttonCount++;
-            updateDisplayFrame(); // Update the clone display
-        }
+        removeTicketFromGrid(jButton8);
     }//GEN-LAST:event_jButton8ActionPerformed
 
 
@@ -948,6 +743,7 @@ private void setupActionColumn() {
     private javax.swing.JLabel B5;
     private javax.swing.JLabel B6;
     private javax.swing.JLabel B7;
+    @SuppressWarnings("unused")
     private javax.swing.JLabel B8;
     private javax.swing.JButton Baybutton;
     private javax.swing.JPanel ControlPanel;
@@ -967,6 +763,15 @@ private void setupActionColumn() {
     private javax.swing.JLabel queIcon;
     private javax.swing.JTable queTab;
     private javax.swing.JButton staffbutton;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     // End of variables declaration//GEN-END:variables
 
 }

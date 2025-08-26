@@ -1,13 +1,8 @@
 package cephra.Frame;
 
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import javax.swing.JButton;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class Monitor extends javax.swing.JFrame {
  private JButton[] displayButtons;
