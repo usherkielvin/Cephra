@@ -74,7 +74,7 @@ public class Splashscreen extends javax.swing.JPanel {
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
         java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Splashscreen.this);
         if (w instanceof cephra.Frame.Phone) {
-            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Phonelogin());
+            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Transition());
         }
     }//GEN-LAST:event_exitloginActionPerformed
 

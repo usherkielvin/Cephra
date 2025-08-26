@@ -5,16 +5,27 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.Timer;
 
-public class Splashscreen extends javax.swing.JPanel {
+public class Transition extends javax.swing.JPanel {
    
-    public Splashscreen() {
+    public Transition() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         
         // Make the panel draggable
         makeDraggable();
+         new Timer(7000, event -> {
+                java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Transition.this);
+        if (w instanceof cephra.Frame.Phone) {
+            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Phonelogin());
+        }
+               
+             
+            }).start();
+        
+        
     }
    
     private void makeDraggable() {
@@ -31,7 +42,7 @@ public class Splashscreen extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(Splashscreen.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(Transition.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -49,6 +60,7 @@ public class Splashscreen extends javax.swing.JPanel {
 
         exitlogin = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
         setPreferredSize(new java.awt.Dimension(350, 750));
@@ -66,13 +78,17 @@ public class Splashscreen extends javax.swing.JPanel {
         add(exitlogin);
         exitlogin.setBounds(60, 630, 220, 70);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/splash in2.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Frame.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(-30, 10, 398, 750);
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Transit.gif"))); // NOI18N
+        add(jLabel2);
+        jLabel2.setBounds(0, 0, 390, 740);
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
-        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Splashscreen.this);
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Transition.this);
         if (w instanceof cephra.Frame.Phone) {
             ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Phonelogin());
         }
@@ -82,5 +98,6 @@ public class Splashscreen extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exitlogin;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 }
