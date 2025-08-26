@@ -16,6 +16,8 @@ public class QueueTicket extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+
+       // jLabel1.setText("<html>You are next after<br>current charging session</html>");
     }
 
  
@@ -29,6 +31,11 @@ public class QueueTicket extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
+        percent = new javax.swing.JLabel();
+        fc = new javax.swing.JLabel();
+        fastCharge = new javax.swing.JLabel();
+        mins1 = new javax.swing.JLabel();
+        label1 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -115,7 +122,37 @@ public class QueueTicket extends javax.swing.JPanel {
         add(profilebutton);
         profilebutton.setBounds(260, 670, 50, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/FC - PANEL 1.png"))); // NOI18N
+        percent.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        percent.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        percent.setText("18% (LOW)");
+        add(percent);
+        percent.setBounds(120, 280, 100, 40);
+
+        fc.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
+        fc.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        fc.setText("FCPOO5");
+        add(fc);
+        fc.setBounds(70, 190, 200, 40);
+
+        fastCharge.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        fastCharge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        fastCharge.setText("Fast Charging");
+        add(fastCharge);
+        fastCharge.setBounds(70, 230, 200, 30);
+
+        mins1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        mins1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        mins1.setText("5 minutes");
+        add(mins1);
+        mins1.setBounds(105, 390, 130, 40);
+
+        label1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        label1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label1.setText("<html><div style='text-align:center;'>You are next after<br>current charging session</div></html>\n");
+        add(label1);
+        label1.setBounds(95, 340, 150, 40);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ServiceFast.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -274,10 +311,15 @@ public class QueueTicket extends javax.swing.JPanel {
     private javax.swing.JButton cancelticket;
     private javax.swing.JButton charge;
     private javax.swing.JButton checkstatus;
+    private javax.swing.JLabel fastCharge;
+    private javax.swing.JLabel fc;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel label1;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JLabel mins1;
+    private javax.swing.JLabel percent;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
 }

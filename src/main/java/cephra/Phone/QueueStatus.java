@@ -28,6 +28,9 @@ public class QueueStatus extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -113,6 +116,22 @@ public class QueueStatus extends javax.swing.JPanel {
         });
         add(homebutton2);
         homebutton2.setBounds(150, 680, 40, 40);
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel2.setText("Please Proceed to");
+        add(jLabel2);
+        jLabel2.setBounds(100, 270, 150, 30);
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
+        jLabel3.setText("BAY 1291");
+        add(jLabel3);
+        jLabel3.setBounds(90, 310, 180, 50);
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("<html><div style='text-align:center;'>Your Vehicle is<br>Ready For Charging</div></html>");
+        add(jLabel4);
+        jLabel4.setBounds(100, 380, 150, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/queuestats.png"))); // NOI18N
         add(jLabel1);
@@ -264,6 +283,9 @@ public class QueueStatus extends javax.swing.JPanel {
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton okaycondition;
     private javax.swing.JButton profilebutton;
