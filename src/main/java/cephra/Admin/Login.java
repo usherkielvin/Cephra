@@ -1,7 +1,9 @@
 package cephra.Admin;
 
 import java.awt.Color;
+import java.awt.Window;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.*; // Add this import
 
 public class Login extends javax.swing.JPanel {
@@ -38,6 +40,7 @@ public class Login extends javax.swing.JPanel {
         loginbutton = new javax.swing.JButton();
         passfield = new javax.swing.JPasswordField();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -99,6 +102,16 @@ public class Login extends javax.swing.JPanel {
         });
         add(jButton1);
         jButton1.setBounds(740, 550, 200, 30);
+
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        add(jButton2);
+        jButton2.setBounds(935, 10, 50, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
@@ -168,6 +181,13 @@ public class Login extends javax.swing.JPanel {
         javax.swing.JOptionPane.showMessageDialog(this, "Please contact the administrator to reset your password.", "Forgot Password", javax.swing.JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    Window w = SwingUtilities.getWindowAncestor(Login.this);
+        if (w instanceof cephra.Frame.Admin) {
+            ((cephra.Frame.Admin) w).switchPanel(new Splash());
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     private void attemptLogin() {
     String username = userfield.getText() != null ? userfield.getText().trim() : "";
     String password = new String(passfield.getPassword());
@@ -202,6 +222,7 @@ public class Login extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginbutton;
     private javax.swing.JPasswordField passfield;

@@ -182,18 +182,19 @@ public class VerificationCode extends javax.swing.JPanel {
     }//GEN-LAST:event_resetsendActionPerformed
 
     private void resendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resendActionPerformed
-      javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.VerificationPop());
-                        break;
-                    }
+       cephra.CephraDB.generateAndStoreOTP(); // Add this line to generate a new OTP
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+            java.awt.Window[] windows = java.awt.Window.getWindows();
+            for (java.awt.Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    phoneFrame.switchPanel(new cephra.Phone.VerificationPop());
+                    break;
                 }
             }
-        });
+        }
+    });
     }//GEN-LAST:event_resendActionPerformed
 
 
