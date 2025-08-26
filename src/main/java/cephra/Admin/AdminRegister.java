@@ -5,13 +5,12 @@ import javax.swing.SwingUtilities;
 
 public class AdminRegister extends javax.swing.JPanel {
 
-	public AdminRegister() {
-		initComponents();
-		setPreferredSize(new java.awt.Dimension(1000, 750));
-		setSize(1000, 750);
-                
-                
-	}
+    public AdminRegister() {
+        initComponents();
+        setPreferredSize(new java.awt.Dimension(1000, 750));
+        setSize(1000, 750);
+        gender.setText(""); // Plain email field
+    }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -70,18 +69,19 @@ public class AdminRegister extends javax.swing.JPanel {
         add(Fullname);
         Fullname.setBounds(430, 270, 245, 38);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png")));
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
-    } // </editor-fold>//GEN-END:initComponents
+    } 
 
-    private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RegisterBTNActionPerformed
+    private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {
         String name = Fullname.getText().trim();
-        String email = username.getText().trim();
+        String usernameVal = username.getText().trim();
+        String email = gender.getText().trim();
         String password = new String(pass.getPassword()).trim();
         String confirm = new String(ConPass.getPassword()).trim();
 
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+        if (name.isEmpty() || usernameVal.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields", "Validation", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -89,26 +89,37 @@ public class AdminRegister extends javax.swing.JPanel {
             javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match", "Validation", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
         }
-        javax.swing.JOptionPane.showMessageDialog(this, "Admin registration successful", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE); 
-    } //GEN-LAST:event_RegisterBTNActionPerformed
+        // Basic email format check
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Validation", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-    private void logActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logActionPerformed
+        cephra.Admin.StaffData.addStaff(name, usernameVal, email, password);
+
+        javax.swing.JOptionPane.showMessageDialog(this, "Admin registration successful", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        Fullname.setText("");
+        username.setText("");
+        gender.setText("");
+        pass.setText("");
+        ConPass.setText("");
+    }
+
+    private void logActionPerformed(java.awt.event.ActionEvent evt) {
          Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Login());
         }
+    }
 
-    } //GEN-LAST:event_logActionPerformed
-
-    private void AdminBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AdminBTNActionPerformed
+    private void AdminBTNActionPerformed(java.awt.event.ActionEvent evt) {
        Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new StaffRecord());
         }
-    } //GEN-LAST:event_AdminBTNActionPerformed
+    }
 
-
-     // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AdminBTN;
     private javax.swing.JPasswordField ConPass;
     private javax.swing.JTextField Fullname;
@@ -118,5 +129,5 @@ public class AdminRegister extends javax.swing.JPanel {
     private javax.swing.JButton log;
     private javax.swing.JPasswordField pass;
     private javax.swing.JTextField username;
-     // End of variables declaration//GEN-END:variables
+    // End of variables declaration//GEN-END:variables
 }
