@@ -107,19 +107,6 @@ public class AdminRegister extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_AdminBTNActionPerformed
 
-	private void LoginBTNActionPerformed(java.awt.event.ActionEvent evt) {
-		Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
-		if (w instanceof cephra.Frame.Admin) {
-			((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Login());
-		}
-	}
-
-	private void BackBTNActionPerformed(java.awt.event.ActionEvent evt) {
-		Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
-		if (w instanceof cephra.Frame.Admin) {
-			((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.StaffRecord());
-		}
-	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AdminBTN;

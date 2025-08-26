@@ -14,11 +14,14 @@ public class Phonelogin extends javax.swing.JPanel {
         username.setBackground(new Color(0, 0, 0, 0));
         pass.setOpaque(false);
         pass.setBackground(new Color(0, 0, 0, 0));
+       
+        
     }
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        SeePass = new javax.swing.JButton();
         reghere = new javax.swing.JButton();
         forgotpass = new javax.swing.JButton();
         pass = new javax.swing.JPasswordField();
@@ -30,59 +33,52 @@ public class Phonelogin extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-                 reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-         reghere.setForeground(new java.awt.Color(0, 204, 204));
-         reghere.setText("Register here");
-         reghere.setBorder(null);
-         reghere.setBorderPainted(false);
-         reghere.setContentAreaFilled(false);
-         reghere.setFocusPainted(false);
-         reghere.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-         reghere.addMouseListener(new java.awt.event.MouseAdapter() {
-             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                 reghere.setForeground(new java.awt.Color(0, 255, 255));
-                 reghere.setText("<html><u>Register here</u></html>");
-             }
-             public void mouseExited(java.awt.event.MouseEvent evt) {
-                 reghere.setForeground(new java.awt.Color(0, 204, 204));
-                 reghere.setText("Register here");
-             }
-         });
-         reghere.addActionListener(new java.awt.event.ActionListener() {
-             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                 reghereActionPerformed(evt);
-             }
-         });
+        SeePass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SeePassActionPerformed(evt);
+            }
+        });
+        add(SeePass);
+        SeePass.setBounds(255, 380, 50, 30);
+
+        reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        reghere.setForeground(new java.awt.Color(0, 204, 204));
+        reghere.setText("Register here");
+        reghere.setBorder(null);
+        reghere.setBorderPainted(false);
+        reghere.setContentAreaFilled(false);
+        reghere.setFocusPainted(false);
+        reghere.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reghereActionPerformed(evt);
+            }
+        });
         add(reghere);
         reghere.setBounds(190, 610, 120, 40);
 
-                 forgotpass.setForeground(new java.awt.Color(102, 102, 102));
-         forgotpass.setText("Forgot password?");
-         forgotpass.setBorder(null);
-         forgotpass.setBorderPainted(false);
-         forgotpass.setContentAreaFilled(false);
-         forgotpass.setFocusPainted(false);
-         forgotpass.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-                   forgotpass.addMouseListener(new java.awt.event.MouseAdapter() {
-              public void mouseEntered(java.awt.event.MouseEvent evt) {
-                  forgotpass.setText("<html><u>Forgot password?</u></html>");
-              }
-              public void mouseExited(java.awt.event.MouseEvent evt) {
-                  forgotpass.setText("Forgot password?");
-              }
-          });
-         forgotpass.addActionListener(new java.awt.event.ActionListener() {
-             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                 forgotpassActionPerformed(evt);
-             }
-         });
+        forgotpass.setForeground(new java.awt.Color(102, 102, 102));
+        forgotpass.setText("Forgot password?");
+        forgotpass.setBorder(null);
+        forgotpass.setBorderPainted(false);
+        forgotpass.setContentAreaFilled(false);
+        forgotpass.setFocusPainted(false);
+        forgotpass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                forgotpassActionPerformed(evt);
+            }
+        });
         add(forgotpass);
         forgotpass.setBounds(200, 410, 120, 40);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         pass.setBorder(null);
+        pass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passActionPerformed(evt);
+            }
+        });
         add(pass);
-        pass.setBounds(60, 380, 240, 30);
+        pass.setBounds(60, 381, 240, 30);
 
         username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
@@ -91,7 +87,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(60, 330, 240, 40);
+        username.setBounds(60, 334, 240, 30);
 
         loginhome.setBorder(null);
         loginhome.setBorderPainted(false);
@@ -107,7 +103,7 @@ public class Phonelogin extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/1.png"))); // NOI18N
         add(jLabel1);
-        // Label position will be set in setupLabelPosition() method
+        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -197,6 +193,14 @@ public class Phonelogin extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_forgotpassActionPerformed
 
+    private void passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_passActionPerformed
+
+    private void SeePassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeePassActionPerformed
+        
+    }//GEN-LAST:event_SeePassActionPerformed
+
     @Override
     public void addNotify() {
         super.addNotify();
@@ -226,6 +230,7 @@ public class Phonelogin extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton SeePass;
     private javax.swing.JButton forgotpass;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginhome;
