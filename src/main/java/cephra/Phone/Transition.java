@@ -58,25 +58,12 @@ public class Transition extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        exitlogin = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
-
-        exitlogin.setBorder(null);
-        exitlogin.setBorderPainted(false);
-        exitlogin.setContentAreaFilled(false);
-        exitlogin.setFocusPainted(false);
-        exitlogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitloginActionPerformed(evt);
-            }
-        });
-        add(exitlogin);
-        exitlogin.setBounds(60, 630, 220, 70);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Frame.png"))); // NOI18N
         add(jLabel1);
@@ -87,16 +74,8 @@ public class Transition extends javax.swing.JPanel {
         jLabel2.setBounds(0, 0, 390, 740);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
-        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Transition.this);
-        if (w instanceof cephra.Frame.Phone) {
-            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Phonelogin());
-        }
-    }//GEN-LAST:event_exitloginActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton exitlogin;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
