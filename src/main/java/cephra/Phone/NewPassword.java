@@ -1,18 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package cephra.Phone;
 
-/**
- *
- * @author usher
- */
 public class NewPassword extends javax.swing.JPanel {
 
-    /**
-     * Creates new form NewPassword
-     */
     public NewPassword() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));

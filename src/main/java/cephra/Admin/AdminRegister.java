@@ -78,10 +78,11 @@ public class AdminRegister extends javax.swing.JPanel {
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RegisterBTNActionPerformed
         String name = Fullname.getText().trim();
         String email = username.getText().trim();
-        String password = pass.getText().trim();
-        String confirm = ConPass.getText().trim();
+        String genderText = gender.getText().trim();
+        String password = new String(pass.getPassword()).trim();
+        String confirm = new String(ConPass.getPassword()).trim();
 
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+        if (name.isEmpty() || email.isEmpty() || genderText.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields", "Validation", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -107,19 +108,7 @@ public class AdminRegister extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_AdminBTNActionPerformed
 
-	private void LoginBTNActionPerformed(java.awt.event.ActionEvent evt) {
-		Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
-		if (w instanceof cephra.Frame.Admin) {
-			((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Login());
-		}
-	}
 
-	private void BackBTNActionPerformed(java.awt.event.ActionEvent evt) {
-		Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
-		if (w instanceof cephra.Frame.Admin) {
-			((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.StaffRecord());
-		}
-	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AdminBTN;

@@ -149,7 +149,6 @@ public class Login extends javax.swing.JPanel {
     }
 
     private void attemptLogin() {
-        String input = userfield.getText();
         String username = userfield.getText() != null ? userfield.getText().trim() : "";
         String password = new String(passfield.getPassword());
         if ("admin".equals(username) && "1234".equals(password)) {
@@ -157,12 +156,11 @@ public class Login extends javax.swing.JPanel {
             if (window instanceof cephra.Frame.Admin) {
                 cephra.Frame.Admin mainFrame = (cephra.Frame.Admin) window;
                 mainFrame.switchPanel(new cephra.Admin.Dashboard());
-            }  else {
+            }
+        } else {
             javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials (demo: admin / 1234)", "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
             passfield.setText(""); // Clear password field
             userfield.requestFocusInWindow(); // Refocus on username field
-        }
-            
         }
     }
 
