@@ -78,8 +78,8 @@ public class AdminRegister extends javax.swing.JPanel {
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RegisterBTNActionPerformed
         String name = Fullname.getText().trim();
         String email = username.getText().trim();
-        String password = pass.getText().trim();
-        String confirm = ConPass.getText().trim();
+        String password = new String(pass.getPassword()).trim();
+        String confirm = new String(ConPass.getPassword()).trim();
 
         if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields", "Validation", javax.swing.JOptionPane.WARNING_MESSAGE);

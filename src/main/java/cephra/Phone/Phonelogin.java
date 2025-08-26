@@ -1,8 +1,7 @@
 package cephra.Phone;
 
-import java.awt.Color;
-import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import javax.swing.*;
 
 public class Phonelogin extends javax.swing.JPanel {
    private int loginAttempts = 0;
