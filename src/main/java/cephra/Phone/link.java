@@ -10,13 +10,27 @@ public class link extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         setupLabelPosition(); // Set label position
+        if (cephra.Phone.AppState.isCarLinked) {
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    java.awt.Window[] windows = java.awt.Window.getWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof cephra.Frame.Phone) {
+                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                            phoneFrame.switchPanel(new cephra.Phone.PorscheTaycan());
+                            break;
+                        }
+                    }
+                }
+            });
+        }
     }
 
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        Link = new javax.swing.JButton();
+        Linkcar = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
@@ -27,16 +41,16 @@ public class link extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        Link.setBorder(null);
-        Link.setBorderPainted(false);
-        Link.setContentAreaFilled(false);
-        Link.addActionListener(new java.awt.event.ActionListener() {
+        Linkcar.setBorder(null);
+        Linkcar.setBorderPainted(false);
+        Linkcar.setContentAreaFilled(false);
+        Linkcar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                LinkActionPerformed(evt);
+                LinkcarActionPerformed(evt);
             }
         });
-        add(Link);
-        Link.setBounds(50, 560, 240, 50);
+        add(Linkcar);
+        Linkcar.setBounds(50, 560, 240, 50);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -159,24 +173,25 @@ public class link extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_homebuttonActionPerformed
 
-    private void LinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LinkActionPerformed
+    private void LinkcarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LinkcarActionPerformed
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                cephra.Phone.AppState.isCarLinked = true;
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.LinkedCar());
+                        phoneFrame.switchPanel(new cephra.Phone.PorscheTaycan());
                         break;
                     }
                 }
             }
         });
-    }//GEN-LAST:event_LinkActionPerformed
+    }//GEN-LAST:event_LinkcarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Link;
+    private javax.swing.JButton Linkcar;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;

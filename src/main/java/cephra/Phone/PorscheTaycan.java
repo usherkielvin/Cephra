@@ -7,10 +7,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
 
-public class LinkedCar extends javax.swing.JPanel {
+public class PorscheTaycan extends javax.swing.JPanel {
 
 
-    public LinkedCar() {
+    public PorscheTaycan() {
         initComponents();
          setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
@@ -38,7 +38,7 @@ public class LinkedCar extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(LinkedCar.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(PorscheTaycan.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
