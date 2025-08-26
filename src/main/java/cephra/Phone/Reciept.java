@@ -62,11 +62,6 @@ public class Reciept extends javax.swing.JPanel {
         share.setBorder(null);
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
-        share.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                shareActionPerformed(evt);
-            }
-        });
         add(share);
         share.setBounds(180, 680, 130, 40);
 
@@ -84,11 +79,6 @@ public class Reciept extends javax.swing.JPanel {
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
-        Download.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DownloadActionPerformed(evt);
-            }
-        });
         add(Download);
         Download.setBounds(30, 683, 120, 30);
 

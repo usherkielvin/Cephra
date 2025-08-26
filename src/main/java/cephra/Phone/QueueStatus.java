@@ -122,10 +122,11 @@ public class QueueStatus extends javax.swing.JPanel {
         add(jLabel2);
         jLabel2.setBounds(70, 290, 230, 30);
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 3, 28)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("QUEUE #1");
         add(jLabel3);
-        jLabel3.setBounds(80, 310, 180, 50);
+        jLabel3.setBounds(75, 310, 180, 50);
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
