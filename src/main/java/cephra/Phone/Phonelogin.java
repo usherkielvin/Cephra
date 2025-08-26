@@ -14,14 +14,14 @@ public class Phonelogin extends javax.swing.JPanel {
         username.setBackground(new Color(0, 0, 0, 0));
         pass.setOpaque(false);
         pass.setBackground(new Color(0, 0, 0, 0));
-       
+       See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
         
     }
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        SeePass = new javax.swing.JButton();
+        See = new javax.swing.JButton();
         reghere = new javax.swing.JButton();
         forgotpass = new javax.swing.JButton();
         pass = new javax.swing.JPasswordField();
@@ -33,13 +33,14 @@ public class Phonelogin extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        SeePass.addActionListener(new java.awt.event.ActionListener() {
+        See.setBorder(null);
+        See.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SeePassActionPerformed(evt);
+                SeeActionPerformed(evt);
             }
         });
-        add(SeePass);
-        SeePass.setBounds(255, 380, 50, 30);
+        add(See);
+        See.setBounds(260, 380, 50, 30);
 
         reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
@@ -78,7 +79,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(60, 381, 240, 30);
+        pass.setBounds(60, 381, 200, 30);
 
         username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
@@ -197,9 +198,30 @@ public class Phonelogin extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_passActionPerformed
 
-    private void SeePassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeePassActionPerformed
+    private void SeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeActionPerformed
         
-    }//GEN-LAST:event_SeePassActionPerformed
+        
+        
+        
+         
+        
+           if(pass.getEchoChar() == 0) {
+        pass.setEchoChar('•');
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
+    } else {
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeOpen.png")));
+        pass.setEchoChar((char) 0);
+    }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    }//GEN-LAST:event_SeeActionPerformed
 
     @Override
     public void addNotify() {
@@ -230,7 +252,7 @@ public class Phonelogin extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton SeePass;
+    private javax.swing.JButton See;
     private javax.swing.JButton forgotpass;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginhome;
