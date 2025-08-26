@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
 
 public class Reciept extends javax.swing.JPanel {
   
@@ -48,9 +49,6 @@ public class Reciept extends javax.swing.JPanel {
             }
         });
     }
-
-    
-    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -64,6 +62,11 @@ public class Reciept extends javax.swing.JPanel {
         share.setBorder(null);
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
+        share.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                shareActionPerformed(evt);
+            }
+        });
         add(share);
         share.setBounds(180, 680, 130, 40);
 
@@ -81,6 +84,11 @@ public class Reciept extends javax.swing.JPanel {
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
+        Download.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DownloadActionPerformed(evt);
+            }
+        });
         add(Download);
         Download.setBounds(30, 683, 120, 30);
 
@@ -103,6 +111,24 @@ public class Reciept extends javax.swing.JPanel {
             }
         });
     }//GEN-LAST:event_ExitActionPerformed
+
+    private void DownloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DownloadActionPerformed
+        JOptionPane.showMessageDialog(
+            this,
+            "Reciept saved to Photos",
+            "Saved",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }//GEN-LAST:event_DownloadActionPerformed
+
+    private void shareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shareActionPerformed
+        JOptionPane.showMessageDialog(
+            this,
+            "Link copied",
+            "Shared",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }//GEN-LAST:event_shareActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
