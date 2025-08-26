@@ -42,9 +42,9 @@ public class Queue extends javax.swing.JPanel {
             return;
         }
 
-        // Renderer: show Proceed on any row that has a real ticket
+        // Renderer: show plain text "Proceed" for rows with a ticket (no blue styling)
         queTab.getColumnModel().getColumn(actionCol).setCellRenderer(new TableCellRenderer() {
-            private final JButton button = createFlatButton();
+            private final JLabel label = new JLabel("");
             private final JLabel empty = new JLabel("");
 
             @Override
@@ -52,9 +52,11 @@ public class Queue extends javax.swing.JPanel {
                 Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
                 boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
                 if (hasTicket) {
-                    button.setText("Proceed");
-                    return button;
+                    label.setText("Proceed");
+                    label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                    return label;
                 }
+                empty.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                 return empty;
             }
         });
@@ -69,6 +71,7 @@ public class Queue extends javax.swing.JPanel {
         b.setContentAreaFilled(false);
         b.setFocusPainted(false);
         b.setOpaque(false);
+        b.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         b.setText("Proceed");
         return b;
     }
@@ -144,24 +147,35 @@ public class Queue extends javax.swing.JPanel {
                     // If paid, move to History and remove from Queue
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
                     if ("Paid".equalsIgnoreCase(payment)) {
-                        String ticket = ticketCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, ticketCol)) : "";
-                        String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                        String servedBy = "Admin";
-                        String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                        String reference = generateReference();
+                        final String ticket = ticketCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, ticketCol)) : "";
+                        final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                        final String servedBy = "Admin";
+                        final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        final String reference = generateReference();
+                        final int rowToRemove = editingRow;
 
-                        Object[] historyRow = new Object[] { ticket, customer, "", "", servedBy, dateTime, reference };
-                        try {
-                            cephra.Admin.HistoryBridge.addRecord(historyRow);
-                        } catch (Throwable t) {
-                            // ignore if history not ready
-                        }
-                        ((DefaultTableModel) queTab.getModel()).removeRow(editingRow);
-                        try {
-                            cephra.Admin.QueueBridge.removeTicket(ticket);
-                        } catch (Throwable t) {
-                            // ignore if queue not ready
-                        }
+                        // Use invokeLater to avoid EDT conflicts
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                Object[] historyRow = new Object[] { ticket, customer, "", "", servedBy, dateTime, reference };
+                                try {
+                                    cephra.Admin.HistoryBridge.addRecord(historyRow);
+                                } catch (Throwable t) {
+                                    // ignore if history not ready
+                                }
+                                try {
+                                    ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
+                                } catch (Throwable t) {
+                                    // ignore if row already removed
+                                }
+                                try {
+                                    cephra.Admin.QueueBridge.removeTicket(ticket);
+                                } catch (Throwable t) {
+                                    // ignore if queue not ready
+                                }
+                            }
+                        });
                     }
                 }
             }
@@ -196,7 +210,7 @@ public class Queue extends javax.swing.JPanel {
                 String status = statusCol >= 0 ? String.valueOf(table.getValueAt(row, statusCol)) : "";
                 if ("Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(v)) {
                     btn.setText("Pending");
-                    return btn;
+                    return btn; // transparent, unstyled button
                 }
                 label.setText(v);
                 return label;
@@ -377,7 +391,8 @@ public class Queue extends javax.swing.JPanel {
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
+                // Only Action column (column 5) and Payment column (column 4) are editable for button clicks
+                return column == 5 || column == 4;
             }
         });
         jScrollPane1.setViewportView(queTab);
