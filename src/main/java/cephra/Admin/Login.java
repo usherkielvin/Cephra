@@ -85,6 +85,18 @@ public class Login extends javax.swing.JPanel {
         add(passfield);
         passfield.setBounds(540, 435, 270, 40);
 
+        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
+        jButton1.setText("Forgot Password?");
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        add(jButton1);
+        jButton1.setBounds(740, 550, 200, 30);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1080, 750);
@@ -148,6 +160,10 @@ public class Login extends javax.swing.JPanel {
             }
         });
     }
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        javax.swing.JOptionPane.showMessageDialog(this, "Please contact the administrator to reset your password.", "Forgot Password", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     private void attemptLogin() {
     String username = userfield.getText() != null ? userfield.getText().trim() : "";
