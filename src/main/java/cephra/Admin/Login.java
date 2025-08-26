@@ -37,6 +37,7 @@ public class Login extends javax.swing.JPanel {
         userfield = new javax.swing.JTextField();
         loginbutton = new javax.swing.JButton();
         passfield = new javax.swing.JPasswordField();
+        jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
