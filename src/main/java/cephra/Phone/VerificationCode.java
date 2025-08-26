@@ -58,11 +58,6 @@ public class VerificationCode extends javax.swing.JPanel {
         contactsup.setBorderPainted(false);
         contactsup.setContentAreaFilled(false);
         contactsup.setFocusPainted(false);
-        contactsup.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                contactsupActionPerformed(evt);
-            }
-        });
         add(contactsup);
         contactsup.setBounds(160, 663, 130, 30);
 
@@ -100,7 +95,7 @@ public class VerificationCode extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/verifycode.png"))); // NOI18N
         add(jLabel1);
-        // Label position will be set in setupLabelPosition() method
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -184,12 +179,21 @@ public class VerificationCode extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_resetsendActionPerformed
 
-    private void resendActionPerformed(java.awt.event.ActionEvent evt) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Verification code resent to your email!", 
-            "Resent", 
-            javax.swing.JOptionPane.INFORMATION_MESSAGE);
-    }
+    private void resendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resendActionPerformed
+      javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.VerificationPop());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_resendActionPerformed
+
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {

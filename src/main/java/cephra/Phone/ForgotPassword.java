@@ -10,6 +10,7 @@ public class ForgotPassword extends javax.swing.JPanel {
         setSize(350, 750);
         email.setOpaque(false);
         email.setBackground(new java.awt.Color(0, 0, 0, 0));
+        setupLabelPosition();
     }
 
   
@@ -118,11 +119,6 @@ public class ForgotPassword extends javax.swing.JPanel {
     }//GEN-LAST:event_emailActionPerformed
 
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
-        // Handle reset/send action
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Password reset link sent to your email!", 
-            "Success", 
-            javax.swing.JOptionPane.INFORMATION_MESSAGE);
         
         // Navigate to VerificationCode panel after OK is clicked
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -131,7 +127,7 @@ public class ForgotPassword extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.VerificationCode());
+                        phoneFrame.switchPanel(new cephra.Phone.EmailPop());
                         break;
                     }
                 }
