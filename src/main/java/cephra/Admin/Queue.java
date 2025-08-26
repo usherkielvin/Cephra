@@ -120,17 +120,11 @@ public class Queue extends javax.swing.JPanel {
                     queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
                 } else if ("Waiting".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Charging", editingRow, statusColumnIndex);
-                    if (paymentCol >= 0) {
-                        queTab.setValueAt("Pending", editingRow, paymentCol);
-                    }
                 } else if ("Charging".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
                     if (paymentCol >= 0) {
-                        Object payVal = queTab.getValueAt(editingRow, paymentCol);
-                        String pay = payVal == null ? "" : String.valueOf(payVal).trim();
-                        if (pay.isEmpty()) {
-                            queTab.setValueAt("Pending", editingRow, paymentCol);
-                        }
+                        // Upon completion, payment becomes Pending
+                        queTab.setValueAt("Pending", editingRow, paymentCol);
                     }
                 }
             }
@@ -149,7 +143,9 @@ public class Queue extends javax.swing.JPanel {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 String v = value == null ? "" : String.valueOf(value).trim();
-                if ("Pending".equalsIgnoreCase(v)) {
+                int statusCol = getColumnIndex("Status");
+                String status = statusCol >= 0 ? String.valueOf(table.getValueAt(row, statusCol)) : "";
+                if ("Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(v)) {
                     btn.setText("Pending");
                     return btn;
                 }
@@ -176,7 +172,9 @@ public class Queue extends javax.swing.JPanel {
             editingRow = row;
             String v = value == null ? "" : String.valueOf(value).trim();
             editorValue = v;
-            if ("Pending".equalsIgnoreCase(v)) {
+            int statusCol = getColumnIndex("Status");
+            String status = statusCol >= 0 ? String.valueOf(table.getValueAt(row, statusCol)) : "";
+            if ("Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(v)) {
                 btn.setText("Pending");
                 return btn;
             }
