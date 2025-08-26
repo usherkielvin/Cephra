@@ -204,8 +204,8 @@ public class serviceoffered extends javax.swing.JPanel {
     }//GEN-LAST:event_homebuttonActionPerformed
 
     private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
-       // Set current selection to Fast Charging (ticket will auto-increment on submit)
-       QueueFlow.setCurrentServiceOnly("Fast Charging");
+       // Set Fast Charging service before switching to QueueTicket panel
+       cephra.Phone.QueueFlow.setCurrentServiceOnly("Fast Charging");
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -221,8 +221,8 @@ public class serviceoffered extends javax.swing.JPanel {
     }//GEN-LAST:event_fastchargeActionPerformed
 
     private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
-        // Set current selection to Normal Charging (ticket will auto-increment on submit)
-        QueueFlow.setCurrentServiceOnly("Normal Charging");
+        // Set Normal Charging service before switching to QueueTicket panel
+        cephra.Phone.QueueFlow.setCurrentServiceOnly("Normal Charging");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
