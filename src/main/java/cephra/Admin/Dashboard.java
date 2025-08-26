@@ -1,12 +1,15 @@
 package cephra.Admin;
 
+import java.awt.Color;
+
 public class Dashboard extends javax.swing.JPanel {
 
     private java.awt.Image dashboardImage;
-   
+    private javax.swing.JToggleButton toggleSwitch; // Add this line
+
     public Dashboard() {
         initComponents();
-         setPreferredSize(new java.awt.Dimension(1000, 750));
+        setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         loadDashboardImage();
         updateLabelIcon();
@@ -17,6 +20,24 @@ public class Dashboard extends javax.swing.JPanel {
                 updateLabelIcon();
             }
         });
+        
+        rateText.setOpaque(false);
+        rateText.setBackground(new Color(0, 0, 0, 0));
+        rateText.setBorder(null);
+        
+        minText.setOpaque(false);
+        minText.setBackground(new Color(0, 0, 0, 0));
+        minText.setBorder(null);
+
+        // --- TOGGLE SWITCH SETUP ---
+        toggleSwitch = new javax.swing.JToggleButton("Toggle");
+        toggleSwitch.setBounds(700, 10, 100, 40); // Adjust position and size as needed
+        add(toggleSwitch);
+        toggleSwitch.addPropertyChangeListener(evt -> {
+            if ("selected".equals(evt.getPropertyName())) {
+                dashboardTogglePropertyChange(evt);
+            }
+        });
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -24,16 +45,15 @@ public class Dashboard extends javax.swing.JPanel {
 
         totalsessions1 = new javax.swing.JLabel();
         totalsessions = new javax.swing.JLabel();
-        rate1 = new javax.swing.JLabel();
-        rate = new javax.swing.JLabel();
         staffbutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         Baybutton = new javax.swing.JButton();
         datetime1 = new javax.swing.JLabel();
         quebutton = new javax.swing.JButton();
         exitlogin = new javax.swing.JButton();
-        toggleSwitch = new cephra.Admin.ToggleSwitch();
         datetime = new javax.swing.JLabel();
+        rateText = new javax.swing.JTextField();
+        minText = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -42,28 +62,14 @@ public class Dashboard extends javax.swing.JPanel {
         setLayout(null);
 
         totalsessions1.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
-        totalsessions1.setForeground(new java.awt.Color(0, 0, 0));
         totalsessions1.setText("₱6,789");
         add(totalsessions1);
         totalsessions1.setBounds(70, 490, 310, 120);
 
         totalsessions.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
-        totalsessions.setForeground(new java.awt.Color(0, 0, 0));
         totalsessions.setText("31");
         add(totalsessions);
         totalsessions.setBounds(130, 250, 70, 120);
-
-        rate1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        rate1.setForeground(new java.awt.Color(0, 0, 0));
-        rate1.setText("50");
-        add(rate1);
-        rate1.setBounds(580, 470, 28, 60);
-
-        rate.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        rate.setForeground(new java.awt.Color(0, 0, 0));
-        rate.setText("20");
-        add(rate);
-        rate.setBounds(580, 350, 28, 50);
 
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
@@ -125,19 +131,20 @@ public class Dashboard extends javax.swing.JPanel {
         });
         add(exitlogin);
         exitlogin.setBounds(930, 0, 70, 60);
-        add(toggleSwitch);
-        toggleSwitch.setBounds(580, 600, 60, 30);
-        toggleSwitch.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                dashboardTogglePropertyChange(evt);
-            }
-        });
 
         datetime.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         datetime.setForeground(new java.awt.Color(255, 255, 255));
-        updateDateTime();
+        datetime.setText("10:44 AM 17 August, Sunday");
         add(datetime);
         datetime.setBounds(820, 40, 170, 20);
+
+        rateText.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        add(rateText);
+        rateText.setBounds(570, 353, 350, 50);
+
+        minText.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        add(minText);
+        minText.setBounds(570, 474, 350, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -180,13 +187,12 @@ public class Dashboard extends javax.swing.JPanel {
     }//GEN-LAST:event_exitloginActionPerformed
 
     private void dashboardTogglePropertyChange(java.beans.PropertyChangeEvent evt) {
-        // You can add functionality here when the dashboard toggle is switched
-        // For example, enable/disable certain features, change status, etc.
+        // Functionality when the dashboard toggle is switched
         if (toggleSwitch.isSelected()) {
-            // Toggle is ON - add your functionality here
+            // Toggle is ON
             System.out.println("Dashboard toggle is ON");
         } else {
-            // Toggle is OFF - add your functionality here
+            // Toggle is OFF
             System.out.println("Dashboard toggle is OFF");
         }
     }
@@ -198,10 +204,9 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
-    private cephra.Admin.ToggleSwitch toggleSwitch;
+    private javax.swing.JTextField minText;
     private javax.swing.JButton quebutton;
-    private javax.swing.JLabel rate;
-    private javax.swing.JLabel rate1;
+    private javax.swing.JTextField rateText;
     private javax.swing.JButton staffbutton;
     private javax.swing.JLabel totalsessions;
     private javax.swing.JLabel totalsessions1;
