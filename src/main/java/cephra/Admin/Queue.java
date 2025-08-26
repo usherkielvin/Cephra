@@ -29,6 +29,9 @@ public class Queue extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         panelLists = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         queTab = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
@@ -107,6 +110,18 @@ public class Queue extends javax.swing.JPanel {
         jTabbedPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         panelLists.setLayout(null);
+
+        jLabel3.setText("jLabel3");
+        panelLists.add(jLabel3);
+        jLabel3.setBounds(50, 480, 120, 70);
+
+        jLabel4.setText("jLabel3");
+        panelLists.add(jLabel4);
+        jLabel4.setBounds(50, 150, 120, 70);
+
+        jLabel5.setText("jLabel3");
+        panelLists.add(jLabel5);
+        jLabel5.setBounds(50, 310, 120, 70);
 
         queTab.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -270,6 +285,9 @@ public class Queue extends javax.swing.JPanel {
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel panelLists;

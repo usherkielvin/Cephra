@@ -73,7 +73,7 @@ public class AdminRegister extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RegisterBTNActionPerformed
         String name = Fullname.getText().trim();
@@ -90,7 +90,7 @@ public class AdminRegister extends javax.swing.JPanel {
             return;
         }
         javax.swing.JOptionPane.showMessageDialog(this, "Admin registration successful", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE); 
-    }//GEN-LAST:event_RegisterBTNActionPerformed
+    } //GEN-LAST:event_RegisterBTNActionPerformed
 
     private void logActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logActionPerformed
          Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
@@ -98,17 +98,17 @@ public class AdminRegister extends javax.swing.JPanel {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Login());
         }
 
-    }//GEN-LAST:event_logActionPerformed
+    } //GEN-LAST:event_logActionPerformed
 
     private void AdminBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AdminBTNActionPerformed
        Window w = SwingUtilities.getWindowAncestor(AdminRegister.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new StaffRecord());
         }
-    }//GEN-LAST:event_AdminBTNActionPerformed
+    } //GEN-LAST:event_AdminBTNActionPerformed
 
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AdminBTN;
     private javax.swing.JPasswordField ConPass;
     private javax.swing.JTextField Fullname;
@@ -118,5 +118,5 @@ public class AdminRegister extends javax.swing.JPanel {
     private javax.swing.JButton log;
     private javax.swing.JPasswordField pass;
     private javax.swing.JTextField username;
-    // End of variables declaration//GEN-END:variables
+     // End of variables declaration//GEN-END:variables
 }
