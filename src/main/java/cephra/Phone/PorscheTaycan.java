@@ -55,27 +55,23 @@ public class PorscheTaycan extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
+        percent = new javax.swing.JLabel();
+        km = new javax.swing.JLabel();
+        mins = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
 
         jPanel1.setOpaque(false);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 350, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 270, Short.MAX_VALUE)
-        );
+        jPanel1.setLayout(null);
+        jPanel1.add(jLabel2);
+        jLabel2.setBounds(0, 0, 350, 270);
 
         add(jPanel1);
         jPanel1.setBounds(0, 160, 350, 270);
@@ -139,6 +135,21 @@ public class PorscheTaycan extends javax.swing.JPanel {
         });
         add(charge);
         charge.setBounds(30, 680, 50, 40);
+
+        percent.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        percent.setText("25 %");
+        add(percent);
+        percent.setBounds(20, 455, 100, 30);
+
+        km.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        km.setText("400 km");
+        add(km);
+        km.setBounds(20, 515, 130, 30);
+
+        mins.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        mins.setText("42 mins");
+        add(mins);
+        mins.setBounds(20, 560, 140, 60);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Porsche.png"))); // NOI18N
         add(jLabel1);
@@ -226,8 +237,12 @@ public class PorscheTaycan extends javax.swing.JPanel {
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel km;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JLabel mins;
+    private javax.swing.JLabel percent;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
 }
