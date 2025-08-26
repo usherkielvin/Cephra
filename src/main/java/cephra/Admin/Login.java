@@ -90,6 +90,16 @@ public class Login extends javax.swing.JPanel {
         jButton1.setText("Forgot Password?");
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
+        jButton1.setForeground(new java.awt.Color(102, 102, 102));
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jButton1.setText("<html><font color='#666666'><u>Forgot Password?</u></font></html>");
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jButton1.setText("<html><font color='#666666'>Forgot Password?</font></html>");
+            }
+        });
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
