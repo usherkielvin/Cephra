@@ -33,6 +33,7 @@ public class VerificationPop extends javax.swing.JPanel {
         setLayout(null);
 
         email.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        email.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -40,7 +41,7 @@ public class VerificationPop extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(50, 340, 250, 30);
+        email.setBounds(54, 345, 250, 25);
 
         resend.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         resend.setForeground(new java.awt.Color(0, 204, 204));
