@@ -19,7 +19,7 @@ public class Login extends javax.swing.JPanel {
         passfield.setBorder(null);
 
         passfield.setEchoChar('•');
-        See.setIcon(new javax.swing.ImageIcon("/cephra/Photos/EyeClose.png")); 
+      See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
         See.setBorderPainted(false);
         See.setOpaque(false);
         See.setContentAreaFilled(false);
@@ -37,6 +37,7 @@ public class Login extends javax.swing.JPanel {
         userfield = new javax.swing.JTextField();
         loginbutton = new javax.swing.JButton();
         passfield = new javax.swing.JPasswordField();
+        jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -85,6 +86,18 @@ public class Login extends javax.swing.JPanel {
         add(passfield);
         passfield.setBounds(540, 435, 270, 40);
 
+        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
+        jButton1.setText("Forgot Password?");
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        add(jButton1);
+        jButton1.setBounds(740, 550, 200, 30);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1080, 750);
@@ -112,11 +125,11 @@ public class Login extends javax.swing.JPanel {
            if(passfield.getEchoChar() == 0) {
         passfield.setEchoChar('•');
         
-        See.setIcon(new javax.swing.ImageIcon("/cephra/Photos/EyeClose.png")); 
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
                 
         } else {
             
-            See.setIcon(new javax.swing.ImageIcon("/cephra/Photos/EyeOpen.png")); 
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeOpen.png")));
             passfield.setEchoChar((char) 0 );
             
         }
@@ -182,6 +195,7 @@ public class Login extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginbutton;
     private javax.swing.JPasswordField passfield;
