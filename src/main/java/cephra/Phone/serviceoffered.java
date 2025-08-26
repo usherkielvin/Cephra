@@ -50,6 +50,7 @@ public class serviceoffered extends javax.swing.JPanel {
 
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
+        fastcharge = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -81,6 +82,17 @@ public class serviceoffered extends javax.swing.JPanel {
         });
         add(historybutton);
         historybutton.setBounds(200, 680, 50, 40);
+
+        fastcharge.setBorder(null);
+        fastcharge.setBorderPainted(false);
+        fastcharge.setContentAreaFilled(false);
+        fastcharge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fastchargeActionPerformed(evt);
+            }
+        });
+        add(fastcharge);
+        fastcharge.setBounds(30, 243, 280, 70);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -179,8 +191,23 @@ public class serviceoffered extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_homebuttonActionPerformed
 
+    private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
+       SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Payment());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_fastchargeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton fastcharge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;

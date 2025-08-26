@@ -19,7 +19,6 @@ public class Payment extends javax.swing.JPanel {
     }
 
  
-    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -215,8 +214,6 @@ public class Payment extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
-    private javax.swing.JButton homebutton;
-    private javax.swing.JButton homebutton1;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
