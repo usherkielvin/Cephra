@@ -1,4 +1,4 @@
-# Compiled class files
+# Compiled Java class files
 *.class
 
 # Log files
@@ -23,7 +23,7 @@
 hs_err_pid*
 replay_pid*
 
-# NetBeans
+# NetBeans specific
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -33,27 +33,32 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-# Maven
+# Maven target directory
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
 
-# IDE
-.idea/
-*.iml
+# VS Code specific
 .vscode/
-*.swp
-*.swo
-*~
 
-# OS
+# IntelliJ IDEA specific
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse specific
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# OS specific
 .DS_Store
 .DS_Store?
 ._*
@@ -61,18 +66,3 @@ buildNumber.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Additional patterns to hide class files and build artifacts
-**/target/
-**/build/
-**/out/
-**/bin/
-**/classes/
-**/*.class
-**/generated/
-**/tmp/
-
-# Specifically hide class files from source directories
-src/**/*.class
-src/main/**/*.class
-src/test/**/*.class

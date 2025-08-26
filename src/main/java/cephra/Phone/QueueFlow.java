@@ -31,6 +31,13 @@ public final class QueueFlow {
     private static int nextNormalNumber = 1; // NCH001, NCH002, ...
 
     private QueueFlow() {}
+    
+    // Initialize counters for ticket generation
+    static {
+        // Reset the current service and ticket for normal operation
+        currentTicketId = "";
+        currentServiceName = "";
+    }
 
     public static void setCurrent(String ticketId, String serviceName) {
         currentTicketId = ticketId;

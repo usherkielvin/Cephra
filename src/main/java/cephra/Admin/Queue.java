@@ -13,14 +13,61 @@ import javax.swing.JTable;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JOptionPane;
 import java.awt.Component;
-
+import javax.swing.DefaultCellEditor;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import cephra.Frame.Monitor;
 
 public class Queue extends javax.swing.JPanel {
+private JButton[] gridButtons;
+private JPopupMenu popupMenu;
+private JMenuItem deleteItem;
+private JButton currentButton;
+private int buttonCount = 0;
+private static Monitor monitorInstance;
+
+
+
 
     public Queue() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(1000, 750));
-        setSize(1000, 750);       
+    setPreferredSize(new java.awt.Dimension(1000, 750));
+    setSize(1000, 750);
+ 
+    popupMenu = new JPopupMenu();
+    deleteItem = new JMenuItem("Delete");
+    popupMenu.add(deleteItem);
+    
+    // Initialize the button array with the buttons from the ControlPanel's jPanel1
+    gridButtons = new JButton[] {
+        jButton1, jButton2, jButton3, jButton4,
+        jButton5, jButton6, jButton7, jButton8
+    };
+
+    // Initially make all grid buttons invisible except the first one (our "Next" button)
+    for (JButton button : gridButtons) {
+        button.setVisible(false);
+        
+        // Add mouse listener for right-click popup menu
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                if (evt.isPopupTrigger() || evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+                    currentButton = (JButton) evt.getSource();
+                    popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+                }
+            }
+            
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                if (evt.isPopupTrigger() || evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+                    currentButton = (JButton) evt.getSource();
+                    popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+                }
+            }
+        });
+    }  
         
         JTableHeader header = queTab.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
@@ -32,15 +79,78 @@ public class Queue extends javax.swing.JPanel {
         setupActionColumn();
         // Setup Payment column for marking as paid
         setupPaymentColumn();
+        jPanel1.setOpaque(false);
+        deleteItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                // Use the stored button reference to call the delete method
+                if (currentButton != null) {
+                    deleteButton(currentButton);
+                    // Reset the reference
+                    currentButton = null;
+                }
+            }
+        });
         
+        // Create a single instance of Monitor
+        if (monitorInstance == null) {
+            monitorInstance = new cephra.Frame.Monitor();
+            monitorInstance.setVisible(true);
+        }
+    }
+    
+    private void updateDisplayFrame() {
+        String[] texts = new String[8];
+        for (int i = 0; i < gridButtons.length; i++) {
+            if (i < buttonCount) {
+                texts[i] = gridButtons[i].getText();
+            } else {
+                texts[i] = "";
+            }
+        }
+        
+        // Use the existing monitor instance
+        if (monitorInstance != null) {
+            monitorInstance.updateDisplay(texts);
+        }
+    }
+    
+    private void deleteButton(JButton buttonToDelete) {
+        int indexToDelete = -1;
+
+        // Find the index of the button to be deleted
+        for (int i = 0; i < buttonCount; i++) {
+            if (gridButtons[i] == buttonToDelete) {
+                indexToDelete = i;
+                break;
+            }
+        }
+
+        if (indexToDelete != -1) {
+            // Shift all buttons after the deleted one to the left
+            for (int i = indexToDelete; i < buttonCount - 1; i++) {
+                gridButtons[i].setText(gridButtons[i + 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+            
+            // Hide the last button and clear its text
+            gridButtons[buttonCount - 1].setText("");
+            gridButtons[buttonCount - 1].setVisible(false);
+            
+            // Decrease the button counter
+            buttonCount--;
+            
+            // Update the display frame
+            updateDisplayFrame();
+        }
     }
 
-    private void setupActionColumn() {
-        final int actionCol = getColumnIndex("Action");
-        final int statusCol = getColumnIndex("Status");
-        if (actionCol < 0 || statusCol < 0) {
-            return;
-        }
+private void setupActionColumn() {
+    final int actionCol = getColumnIndex("Action");
+    final int statusCol = getColumnIndex("Status");
+    if (actionCol < 0 || statusCol < 0) {
+        return;
+    }
 
         // Renderer: show Proceed on any row that has a real ticket
         queTab.getColumnModel().getColumn(actionCol).setCellRenderer(new TableCellRenderer() {
@@ -59,9 +169,49 @@ public class Queue extends javax.swing.JPanel {
             }
         });
 
-        // Editor: clicking updates status to "Waiting"
-        queTab.getColumnModel().getColumn(actionCol).setCellEditor(new ProceedEditor(statusCol));
-    }
+    // Editor: clicking updates status to "Waiting"
+    queTab.getColumnModel().getColumn(actionCol).setCellEditor(new ProceedEditor(statusCol));
+
+    // Add ActionListener to the button
+    queTab.getColumnModel().getColumn(actionCol).setCellEditor(new DefaultCellEditor(new JTextField()) {
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            JButton button = createFlatButton();
+            button.setText("Proceed");
+            button.addActionListener(e -> {
+                // Check if the row has a valid ticket before proceeding
+                Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
+                boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
+
+                if (hasTicket) {
+                    // Logic for button click
+                    if (buttonCount < 8) {
+                        // Shift the buttons to the right
+                        for (int i = buttonCount; i > 0; i--) {
+                            gridButtons[i].setText(gridButtons[i - 1].getText());
+                            gridButtons[i].setVisible(true);
+                        }
+
+                        // Place the new button at the beginning (index 0)
+                        gridButtons[0].setVisible(true);
+                        gridButtons[0].setText(String.valueOf(ticketVal));
+                        
+                        buttonCount++;
+                        
+                        // Update the monitor display immediately
+                        updateDisplayFrame();
+                    } else {
+                        JOptionPane.showMessageDialog(table, "Queue is full. Please wait for some tickets to be processed.");
+                    }
+                } else {
+                    // Optionally, show a message or feedback that the row is empty
+                    JOptionPane.showMessageDialog(table, "Cannot proceed: The row is empty.");
+                }
+            });
+            return button; // Return the button for editing
+        }
+    });
+}
 
     private static JButton createFlatButton() {
         JButton b = new JButton();
@@ -69,6 +219,7 @@ public class Queue extends javax.swing.JPanel {
         b.setContentAreaFilled(false);
         b.setFocusPainted(false);
         b.setOpaque(false);
+        b.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         b.setText("Proceed");
         return b;
     }
@@ -116,6 +267,8 @@ public class Queue extends javax.swing.JPanel {
                 Object statusVal = queTab.getValueAt(editingRow, statusColumnIndex);
                 String status = statusVal == null ? "" : String.valueOf(statusVal).trim();
                 int paymentCol = getColumnIndex("Payment");
+                int ticketCol = getColumnIndex("Ticket");
+                int customerCol = getColumnIndex("Customer");
                 if ("Pending".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
                 } else if ("Waiting".equalsIgnoreCase(status)) {
@@ -126,11 +279,69 @@ public class Queue extends javax.swing.JPanel {
                         // Upon completion, payment becomes Pending
                         queTab.setValueAt("Pending", editingRow, paymentCol);
                     }
+                    // Notify phone frame to show payment popup
+                    try {
+                        java.awt.Window[] windows = java.awt.Window.getWindows();
+                        for (java.awt.Window window : windows) {
+                            if (window instanceof cephra.Frame.Phone) {
+                                ((cephra.Frame.Phone) window).switchPanel(new cephra.Phone.PayPop());
+                                break;
+                            }
+                        }
+                    } catch (Throwable t) {
+                        // ignore if phone frame not running
+                    }
+                } else if ("Complete".equalsIgnoreCase(status)) {
+                    // If paid, move to History and remove from Queue
+                    String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
+                    if ("Paid".equalsIgnoreCase(payment)) {
+                        final String ticket = ticketCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, ticketCol)) : "";
+                        final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                        final String servedBy = "Admin";
+                        final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        final String reference = generateReference();
+                        final int rowToRemove = editingRow;
+
+                        // Use invokeLater to avoid EDT conflicts
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                Object[] historyRow = new Object[] { ticket, customer, "", "", servedBy, dateTime, reference };
+                                try {
+                                    cephra.Admin.HistoryBridge.addRecord(historyRow);
+                                } catch (Throwable t) {
+                                    // ignore if history not ready
+                                }
+                                try {
+                                    ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
+                                } catch (Throwable t) {
+                                    // ignore if row already removed
+                                }
+                                try {
+                                    cephra.Admin.QueueBridge.removeTicket(ticket);
+                                } catch (Throwable t) {
+                                    // ignore if queue not ready
+                                }
+                            }
+                        });
+                    }
                 }
             }
             stopCellEditing();
         }
     }
+
+    private static String generateReference() {
+        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        StringBuilder sb = new StringBuilder();
+        java.util.Random r = new java.util.Random();
+        for (int i = 0; i < 8; i++) {
+            sb.append(chars.charAt(r.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+
 
     private void setupPaymentColumn() {
         final int paymentCol = getColumnIndex("Payment");
@@ -147,7 +358,7 @@ public class Queue extends javax.swing.JPanel {
                 String status = statusCol >= 0 ? String.valueOf(table.getValueAt(row, statusCol)) : "";
                 if ("Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(v)) {
                     btn.setText("Pending");
-                    return btn;
+                    return btn; // transparent, unstyled button
                 }
                 label.setText(v);
                 return label;
@@ -209,6 +420,7 @@ public class Queue extends javax.swing.JPanel {
         }
     }
 
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -220,12 +432,22 @@ public class Queue extends javax.swing.JPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         panelLists = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
+        jButton9 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         queTab = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         ControlPanel = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
         B1 = new javax.swing.JLabel();
         B2 = new javax.swing.JLabel();
         B3 = new javax.swing.JLabel();
@@ -307,6 +529,15 @@ public class Queue extends javax.swing.JPanel {
         panelLists.add(jLabel3);
         jLabel3.setBounds(50, 480, 120, 70);
 
+        jButton9.setText("jButton9");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+        panelLists.add(jButton9);
+        jButton9.setBounds(740, 60, 75, 23);
+
         jLabel4.setText("jLabel3");
         panelLists.add(jLabel4);
         jLabel4.setBounds(50, 150, 120, 70);
@@ -325,7 +556,13 @@ public class Queue extends javax.swing.JPanel {
             new String [] {
                 "Ticket", "Customer", "Service", "Status", "Payment", "Action"
             }
-        ));
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Only Action column (column 5) and Payment column (column 4) are editable for button clicks
+                return column == 5 || column == 4;
+            }
+        });
         jScrollPane1.setViewportView(queTab);
 
         panelLists.add(jScrollPane1);
@@ -338,6 +575,75 @@ public class Queue extends javax.swing.JPanel {
         jTabbedPane1.addTab("Queue Lists", panelLists);
 
         ControlPanel.setLayout(null);
+
+        jPanel1.setLayout(new java.awt.GridLayout(4, 2, 100, 100));
+
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1);
+
+        jButton2.setText("jButton2");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton2);
+
+        jButton3.setText("jButton3");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton3);
+
+        jButton4.setText("jButton4");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton4);
+
+        jButton5.setText("jButton5");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton5);
+
+        jButton6.setText("jButton6");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton6);
+
+        jButton7.setText("jButton7");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton7);
+
+        jButton8.setText("jButton8");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton8);
+
+        ControlPanel.add(jPanel1);
+        jPanel1.setBounds(590, 120, 350, 410);
 
         B1.setBackground(new java.awt.Color(0, 147, 73));
         B1.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
@@ -469,6 +775,170 @@ public class Queue extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       if (buttonCount < 8) {
+            // Shift the buttons to the right
+            for (int i = buttonCount; i > 0; i--) {
+                gridButtons[i].setText(gridButtons[i - 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+
+            // Place the new button at the beginning (index 0)
+            gridButtons[0].setVisible(true);
+            gridButtons[0].setText(String.valueOf(buttonCount + 1));
+            
+            buttonCount++;
+            updateDisplayFrame(); // Update the clone display
+        }
+    
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+ if (buttonCount < 8) {
+            // Shift the buttons to the right
+            for (int i = buttonCount; i > 0; i--) {
+                gridButtons[i].setText(gridButtons[i - 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+
+            // Place the new button at the beginning (index 0)
+            gridButtons[0].setVisible(true);
+            gridButtons[0].setText(String.valueOf(buttonCount + 1));
+            
+            buttonCount++;
+            updateDisplayFrame(); // Update the clone display
+        
+}
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        // TODO add your handling code here:
+          // TODO add your handling code here:
+        
+        
+         if (buttonCount < 8) {
+        // Shift the buttons to the right
+        for (int i = buttonCount; i > 0; i--) {
+            gridButtons[i].setText(gridButtons[i - 1].getText());
+            gridButtons[i].setVisible(true);
+        }
+
+        // Place the new button at the beginning (index 0)
+        gridButtons[0].setVisible(true);
+        gridButtons[0].setText(String.valueOf(buttonCount + 1));
+        
+        buttonCount++;
+    }
+        
+        
+        
+        
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+ if (buttonCount < 8) {
+            // Shift the buttons to the right
+            for (int i = buttonCount; i > 0; i--) {
+                gridButtons[i].setText(gridButtons[i - 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+
+            // Place the new button at the beginning (index 0)
+            gridButtons[0].setVisible(true);
+            gridButtons[0].setText(String.valueOf(buttonCount + 1));
+            
+            buttonCount++;
+            updateDisplayFrame(); // Update the clone display
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+ if (buttonCount < 8) {
+            // Shift the buttons to the right
+            for (int i = buttonCount; i > 0; i--) {
+                gridButtons[i].setText(gridButtons[i - 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+
+            // Place the new button at the beginning (index 0)
+            gridButtons[0].setVisible(true);
+            gridButtons[0].setText(String.valueOf(buttonCount + 1));
+            
+            buttonCount++;
+            updateDisplayFrame(); // Update the clone display
+        
+}        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+ if (buttonCount < 8) {
+            // Shift the buttons to the right
+            for (int i = buttonCount; i > 0; i--) {
+                gridButtons[i].setText(gridButtons[i - 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+
+            // Place the new button at the beginning (index 0)
+            gridButtons[0].setVisible(true);
+            gridButtons[0].setText(String.valueOf(buttonCount + 1));
+            
+            buttonCount++;
+            updateDisplayFrame(); // Update the clone display
+        
+}        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+ if (buttonCount < 8) {
+            // Shift the buttons to the right
+            for (int i = buttonCount; i > 0; i--) {
+                gridButtons[i].setText(gridButtons[i - 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+
+            // Place the new button at the beginning (index 0)
+            gridButtons[0].setVisible(true);
+            gridButtons[0].setText(String.valueOf(buttonCount + 1));
+            
+            buttonCount++;
+            updateDisplayFrame(); // Update the clone display
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+ if (buttonCount < 8) {
+            // Shift the buttons to the right
+            for (int i = buttonCount; i > 0; i--) {
+                gridButtons[i].setText(gridButtons[i - 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+
+            // Place the new button at the beginning (index 0)
+            gridButtons[0].setVisible(true);
+            gridButtons[0].setText(String.valueOf(buttonCount + 1));
+            
+            buttonCount++;
+            updateDisplayFrame(); // Update the clone display
+        }
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+ if (buttonCount < 8) {
+            // Shift the buttons to the right
+            for (int i = buttonCount; i > 0; i--) {
+                gridButtons[i].setText(gridButtons[i - 1].getText());
+                gridButtons[i].setVisible(true);
+            }
+
+            // Place the new button at the beginning (index 0)
+            gridButtons[0].setVisible(true);
+            gridButtons[0].setText(String.valueOf(buttonCount + 1));
+            
+            buttonCount++;
+            updateDisplayFrame(); // Update the clone display
+        }
+    }//GEN-LAST:event_jButton8ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel B1;
@@ -485,13 +955,12 @@ public class Queue extends javax.swing.JPanel {
     private javax.swing.JButton businessbutton;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel panelLists;
