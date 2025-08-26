@@ -49,6 +49,11 @@ public class VerificationPop extends javax.swing.JPanel {
         resend.setBorderPainted(false);
         resend.setContentAreaFilled(false);
         resend.setFocusPainted(false);
+        resend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resendActionPerformed(evt);
+            }
+        });
         add(resend);
         resend.setBounds(170, 370, 150, 30);
 
@@ -200,6 +205,22 @@ public class VerificationPop extends javax.swing.JPanel {
          javax.swing.JOptionPane.showMessageDialog(this, "Contact support at: support@cephra.com", "Contact Support", javax.swing.JOptionPane.INFORMATION_MESSAGE);
     
     }//GEN-LAST:event_contactsupActionPerformed
+
+    private void resendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resendActionPerformed
+         cephra.CephraDB.generateAndStoreOTP(); // Add this line to generate a new OTP
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+            java.awt.Window[] windows = java.awt.Window.getWindows();
+            for (java.awt.Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    phoneFrame.switchPanel(new cephra.Phone.EmailApp());
+                    break;
+                }
+            }
+        }
+    });
+    }//GEN-LAST:event_resendActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

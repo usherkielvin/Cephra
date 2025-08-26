@@ -16,6 +16,8 @@ public class Transition extends javax.swing.JPanel {
         
         // Make the panel draggable
         makeDraggable();
+        // Align label like Porsche screens
+        setupLabelPosition();
          new Timer(7000, event -> {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Transition.this);
         if (w instanceof cephra.Frame.Phone) {
@@ -26,6 +28,26 @@ public class Transition extends javax.swing.JPanel {
             }).start();
         
         
+    }
+
+    // Match label position to Porsche-style screens
+    private void setupLabelPosition() {
+        if (jLabel1 != null) {
+            jLabel1.setBounds(-15, 0, 398, 750);
+        }
+        if (jLabel2 != null) {
+            jLabel2.setBounds(-15, 0, 398, 750);
+        }
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setupLabelPosition();
+            }
+        });
     }
    
     private void makeDraggable() {
@@ -65,13 +87,13 @@ public class Transition extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Frame.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/red.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-30, 10, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Transit.gif"))); // NOI18N
         add(jLabel2);
-        jLabel2.setBounds(0, 0, 390, 740);
+        jLabel2.setBounds(-20, 0, 390, 770);
     }// </editor-fold>//GEN-END:initComponents
 
 
