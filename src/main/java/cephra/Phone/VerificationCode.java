@@ -38,7 +38,7 @@ public class VerificationCode extends javax.swing.JPanel {
             }
         });
         add(resend);
-        resend.setBounds(170, 370, 150, 30);
+        resend.setBounds(177, 371, 150, 30);
 
         contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         contactsup.setForeground(new java.awt.Color(0, 204, 204));
@@ -61,6 +61,8 @@ public class VerificationCode extends javax.swing.JPanel {
         Back.setBounds(120, 630, 120, 23);
 
         email.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        email.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        email.setText("dwadwa");
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -68,7 +70,7 @@ public class VerificationCode extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(50, 340, 250, 30);
+        email.setBounds(48, 345, 250, 25);
 
         resetsend.setBorder(null);
         resetsend.setBorderPainted(false);
