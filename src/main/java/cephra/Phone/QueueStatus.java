@@ -7,10 +7,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
 
-public class QueueTicket extends javax.swing.JPanel {
+public class QueueStatus extends javax.swing.JPanel {
 
-   
-    public QueueTicket() {
+
+    public QueueStatus() {
         initComponents();
          setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
@@ -19,30 +19,42 @@ public class QueueTicket extends javax.swing.JPanel {
     }
 
  
+    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        checkstatus = new javax.swing.JButton();
+        cancelcharge = new javax.swing.JButton();
+        okaycondition = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
-        cancelticket = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
-        homebutton2 = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
+        homebutton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
 
-        checkstatus.setBorder(null);
-        checkstatus.setBorderPainted(false);
-        checkstatus.setContentAreaFilled(false);
-        checkstatus.addActionListener(new java.awt.event.ActionListener() {
+        cancelcharge.setBorder(null);
+        cancelcharge.setBorderPainted(false);
+        cancelcharge.setContentAreaFilled(false);
+        cancelcharge.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkstatusActionPerformed(evt);
+                cancelchargeActionPerformed(evt);
             }
         });
-        add(checkstatus);
-        checkstatus.setBounds(30, 500, 280, 40);
+        add(cancelcharge);
+        cancelcharge.setBounds(30, 430, 280, 40);
+
+        okaycondition.setBorder(null);
+        okaycondition.setBorderPainted(false);
+        okaycondition.setContentAreaFilled(false);
+        okaycondition.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                okayconditionActionPerformed(evt);
+            }
+        });
+        add(okaycondition);
+        okaycondition.setBounds(30, 480, 280, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -68,17 +80,6 @@ public class QueueTicket extends javax.swing.JPanel {
         add(linkbutton);
         linkbutton.setBounds(90, 680, 50, 40);
 
-        cancelticket.setBorder(null);
-        cancelticket.setBorderPainted(false);
-        cancelticket.setContentAreaFilled(false);
-        cancelticket.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelticketActionPerformed(evt);
-            }
-        });
-        add(cancelticket);
-        cancelticket.setBounds(30, 543, 280, 40);
-
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
@@ -90,18 +91,6 @@ public class QueueTicket extends javax.swing.JPanel {
         });
         add(historybutton);
         historybutton.setBounds(200, 680, 50, 40);
-
-        homebutton2.setBorder(null);
-        homebutton2.setBorderPainted(false);
-        homebutton2.setContentAreaFilled(false);
-        homebutton2.setFocusPainted(false);
-        homebutton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                homebutton2ActionPerformed(evt);
-            }
-        });
-        add(homebutton2);
-        homebutton2.setBounds(150, 680, 40, 40);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -115,26 +104,24 @@ public class QueueTicket extends javax.swing.JPanel {
         add(profilebutton);
         profilebutton.setBounds(260, 670, 50, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/FC - PANEL 1.png"))); // NOI18N
+        homebutton2.setBorder(null);
+        homebutton2.setBorderPainted(false);
+        homebutton2.setContentAreaFilled(false);
+        homebutton2.setFocusPainted(false);
+        homebutton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                homebutton2ActionPerformed(evt);
+            }
+        });
+        add(homebutton2);
+        homebutton2.setBounds(150, 680, 40, 40);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/queuestats.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.serviceoffered());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_chargeActionPerformed
- // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
+    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
@@ -155,7 +142,7 @@ public class QueueTicket extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(QueueTicket.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(QueueStatus.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -167,6 +154,25 @@ public class QueueTicket extends javax.swing.JPanel {
             }
         });
     }
+    private void okayconditionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okayconditionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_okayconditionActionPerformed
+
+    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.serviceoffered());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_chargeActionPerformed
+
     private void linkbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkbuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -227,7 +233,7 @@ public class QueueTicket extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_homebutton2ActionPerformed
 
-    private void cancelticketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelticketActionPerformed
+    private void cancelchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelchargeActionPerformed
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -240,32 +246,17 @@ public class QueueTicket extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_cancelticketActionPerformed
-
-    private void checkstatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkstatusActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.QueueStatus());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_checkstatusActionPerformed
+    }//GEN-LAST:event_cancelchargeActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cancelticket;
+    private javax.swing.JButton cancelcharge;
     private javax.swing.JButton charge;
-    private javax.swing.JButton checkstatus;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JButton okaycondition;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
 }

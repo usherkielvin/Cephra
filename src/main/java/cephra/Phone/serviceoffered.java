@@ -48,6 +48,7 @@ public class serviceoffered extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        normalcharge = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         fastcharge = new javax.swing.JButton();
@@ -58,6 +59,17 @@ public class serviceoffered extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(350, 750));
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
+
+        normalcharge.setBorder(null);
+        normalcharge.setBorderPainted(false);
+        normalcharge.setContentAreaFilled(false);
+        normalcharge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                normalchargeActionPerformed(evt);
+            }
+        });
+        add(normalcharge);
+        normalcharge.setBounds(30, 340, 280, 70);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -198,7 +210,7 @@ public class serviceoffered extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Payment());
+                        phoneFrame.switchPanel(new cephra.Phone.QueueTicket());
                         break;
                     }
                 }
@@ -206,12 +218,28 @@ public class serviceoffered extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_fastchargeActionPerformed
 
+    private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.QueueTicket());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_normalchargeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton fastcharge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JButton normalcharge;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
 
