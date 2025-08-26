@@ -69,7 +69,7 @@ public class serviceoffered extends javax.swing.JPanel {
             }
         });
         add(normalcharge);
-        normalcharge.setBounds(30, 340, 280, 70);
+        normalcharge.setBounds(30, 380, 280, 120);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -104,7 +104,7 @@ public class serviceoffered extends javax.swing.JPanel {
             }
         });
         add(fastcharge);
-        fastcharge.setBounds(30, 243, 280, 70);
+        fastcharge.setBounds(30, 243, 280, 120);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -130,7 +130,7 @@ public class serviceoffered extends javax.swing.JPanel {
         add(homebutton);
         homebutton.setBounds(140, 680, 50, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/SO-01.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/fast.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -204,6 +204,8 @@ public class serviceoffered extends javax.swing.JPanel {
     }//GEN-LAST:event_homebuttonActionPerformed
 
     private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
+       // Set current selection to Fast Charging (ticket will auto-increment on submit)
+       QueueFlow.setCurrentServiceOnly("Fast Charging");
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -219,6 +221,8 @@ public class serviceoffered extends javax.swing.JPanel {
     }//GEN-LAST:event_fastchargeActionPerformed
 
     private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
+        // Set current selection to Normal Charging (ticket will auto-increment on submit)
+        QueueFlow.setCurrentServiceOnly("Normal Charging");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();

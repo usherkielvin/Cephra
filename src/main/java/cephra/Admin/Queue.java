@@ -5,6 +5,13 @@ import java.awt.Window;
 import javax.swing.SwingUtilities;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.AbstractCellEditor;
+import java.awt.Component;
 
 
 public class Queue extends javax.swing.JPanel {
@@ -20,7 +27,93 @@ public class Queue extends javax.swing.JPanel {
         // Register the queue table model so other modules can add rows
         cephra.Admin.QueueBridge.registerModel((DefaultTableModel) queTab.getModel());
         
+        // Setup Action column with an invisible button that shows text "Proceed"
+        setupActionColumn();
         
+    }
+
+    private void setupActionColumn() {
+        final int actionCol = getColumnIndex("Action");
+        final int statusCol = getColumnIndex("Status");
+        if (actionCol < 0 || statusCol < 0) {
+            return;
+        }
+
+        // Renderer: show Proceed on any row that has a real ticket
+        queTab.getColumnModel().getColumn(actionCol).setCellRenderer(new TableCellRenderer() {
+            private final JButton button = createFlatButton();
+            private final JLabel empty = new JLabel("");
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
+                boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
+                if (hasTicket) {
+                    button.setText("Proceed");
+                    return button;
+                }
+                return empty;
+            }
+        });
+
+        // Editor: clicking updates status to "Waiting"
+        queTab.getColumnModel().getColumn(actionCol).setCellEditor(new ProceedEditor(statusCol));
+    }
+
+    private static JButton createFlatButton() {
+        JButton b = new JButton();
+        b.setBorderPainted(false);
+        b.setContentAreaFilled(false);
+        b.setFocusPainted(false);
+        b.setOpaque(false);
+        b.setText("Proceed");
+        return b;
+    }
+
+    private int getColumnIndex(String name) {
+        for (int i = 0; i < queTab.getColumnModel().getColumnCount(); i++) {
+            if (name.equals(queTab.getColumnModel().getColumn(i).getHeaderValue())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private class ProceedEditor extends AbstractCellEditor implements TableCellEditor, java.awt.event.ActionListener {
+        private final JButton button = createFlatButton();
+        private int editingRow = -1;
+        private final int statusColumnIndex;
+        private final JLabel empty = new JLabel("");
+
+        ProceedEditor(int statusColumnIndex) {
+            this.statusColumnIndex = statusColumnIndex;
+            button.addActionListener(this);
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            editingRow = row;
+            Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
+            boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
+            if (hasTicket) {
+                button.setText("Proceed");
+                return button;
+            }
+            return empty;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return "Proceed";
+        }
+
+        @Override
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+            if (editingRow >= 0 && editingRow < queTab.getRowCount()) {
+                queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
+            }
+            stopCellEditing();
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

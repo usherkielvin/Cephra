@@ -44,7 +44,7 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(cancelcharge);
-        cancelcharge.setBounds(30, 430, 280, 40);
+        cancelcharge.setBounds(30, 410, 280, 30);
 
         okaycondition.setBorder(null);
         okaycondition.setBorderPainted(false);
@@ -55,7 +55,7 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(okaycondition);
-        okaycondition.setBounds(30, 480, 280, 40);
+        okaycondition.setBounds(30, 460, 280, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -118,22 +118,22 @@ public class QueueStatus extends javax.swing.JPanel {
         homebutton2.setBounds(150, 680, 40, 40);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel2.setText("Please Proceed to");
+        jLabel2.setText("Your Vehicle is in Queue");
         add(jLabel2);
-        jLabel2.setBounds(100, 270, 150, 30);
+        jLabel2.setBounds(70, 290, 230, 30);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
-        jLabel3.setText("BAY 1291");
+        jLabel3.setText("QUEUE #1");
         add(jLabel3);
-        jLabel3.setBounds(90, 310, 180, 50);
+        jLabel3.setBounds(80, 310, 180, 50);
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("<html><div style='text-align:center;'>Your Vehicle is<br>Ready For Charging</div></html>");
+        jLabel4.setText("<html><div style='text-align:center;'>Your Vehicle is<br>Waiting For Charging</div></html>");
         add(jLabel4);
-        jLabel4.setBounds(100, 380, 150, 50);
+        jLabel4.setBounds(90, 350, 150, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/queuestats.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/123.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents

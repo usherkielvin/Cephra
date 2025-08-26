@@ -70,13 +70,14 @@ public class EmailApp extends javax.swing.JPanel {
         add(Return);
         Return.setBounds(85, 500, 200, 40);
 
-        otpLabel.setForeground(new java.awt.Color(255, 0, 0));
+        otpLabel.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        otpLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         otpLabel.setText("12345");
         add(otpLabel);
-        otpLabel.setBounds(90, 420, 80, 16);
+        otpLabel.setBounds(90, 436, 190, 51);
 
         jLabel1.setForeground(new java.awt.Color(255, 0, 51));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/emailApp.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ResetPass.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents

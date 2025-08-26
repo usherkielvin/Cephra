@@ -32,8 +32,8 @@ public class QueueTicket extends javax.swing.JPanel {
         homebutton2 = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
         percent = new javax.swing.JLabel();
-        fc = new javax.swing.JLabel();
-        fastCharge = new javax.swing.JLabel();
+        QTicket = new javax.swing.JLabel();
+        typeofcharge = new javax.swing.JLabel();
         mins1 = new javax.swing.JLabel();
         label1 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -128,17 +128,17 @@ public class QueueTicket extends javax.swing.JPanel {
         add(percent);
         percent.setBounds(120, 280, 100, 40);
 
-        fc.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
-        fc.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        fc.setText("FCPOO5");
-        add(fc);
-        fc.setBounds(70, 190, 200, 40);
+        QTicket.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
+        QTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        QTicket.setText("FCPOO5");
+        add(QTicket);
+        QTicket.setBounds(70, 190, 200, 40);
 
-        fastCharge.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        fastCharge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        fastCharge.setText("Fast Charging");
-        add(fastCharge);
-        fastCharge.setBounds(70, 230, 200, 30);
+        typeofcharge.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        typeofcharge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        typeofcharge.setText("Fast Charging");
+        add(typeofcharge);
+        typeofcharge.setBounds(70, 230, 200, 30);
 
         mins1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         mins1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -171,6 +171,31 @@ public class QueueTicket extends javax.swing.JPanel {
             }
         });
     }//GEN-LAST:event_chargeActionPerformed
+    
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                // Apply selected ticket/service to labels
+                String s = cephra.Phone.QueueFlow.getCurrentServiceName();
+                String t = cephra.Phone.QueueFlow.getCurrentTicketId();
+                // If ticket is not assigned yet, preview the next based on service
+                if (t == null || t.length() == 0) {
+                    if (s != null && s.toLowerCase().contains("fast")) {
+                        QTicket.setText("FCH" + String.format("%03d",  cephra.Phone.QueueFlow.getEntries().size() + 1));
+                    } else if (s != null && s.toLowerCase().contains("normal")) {
+                        QTicket.setText("NCH" + String.format("%03d",  cephra.Phone.QueueFlow.getEntries().size() + 1));
+                    }
+                } else {
+                    QTicket.setText(t);
+                }
+                if (s != null && s.length() > 0) {
+                    typeofcharge.setText(s);
+                }
+            }
+        });
+    }
  // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
@@ -282,18 +307,8 @@ public class QueueTicket extends javax.swing.JPanel {
     private void checkstatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkstatusActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    cephra.Admin.QueueBridge.addTicket(
-                        "FCH001",
-                        "dizon",
-                        "Fast Charging",
-                        "Pending",
-                        "",
-                        ""
-                    );
-                } catch (Throwable t) {
-                    // ignore if admin queue not ready
-                }
+                // Push current selection to Admin and store in memory list
+                cephra.Phone.QueueFlow.addCurrentToAdminAndStore("dizon");
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
@@ -308,11 +323,10 @@ public class QueueTicket extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel QTicket;
     private javax.swing.JButton cancelticket;
     private javax.swing.JButton charge;
     private javax.swing.JButton checkstatus;
-    private javax.swing.JLabel fastCharge;
-    private javax.swing.JLabel fc;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
@@ -321,5 +335,6 @@ public class QueueTicket extends javax.swing.JPanel {
     private javax.swing.JLabel mins1;
     private javax.swing.JLabel percent;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JLabel typeofcharge;
     // End of variables declaration//GEN-END:variables
 }

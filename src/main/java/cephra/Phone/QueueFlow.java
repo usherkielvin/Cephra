@@ -1,0 +1,138 @@
+package cephra.Phone;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public final class QueueFlow {
+
+    public static final class Entry {
+        public final String ticketId;
+        public final String customerName;
+        public final String serviceName;
+        public final String status;
+        public final String payment;
+        public final String action;
+
+        public Entry(String ticketId, String customerName, String serviceName, String status, String payment, String action) {
+            this.ticketId = ticketId;
+            this.customerName = customerName;
+            this.serviceName = serviceName;
+            this.status = status;
+            this.payment = payment;
+            this.action = action;
+        }
+    }
+
+    private static final List<Entry> entries = new ArrayList<Entry>();
+
+    private static String currentTicketId = "";
+    private static String currentServiceName = "";
+    private static int nextFastNumber = 1;   // FCH001, FCH002, ...
+    private static int nextNormalNumber = 1; // NCH001, NCH002, ...
+
+    private QueueFlow() {}
+
+    public static void setCurrent(String ticketId, String serviceName) {
+        currentTicketId = ticketId;
+        currentServiceName = serviceName;
+    }
+
+    public static void setCurrentServiceOnly(String serviceName) {
+        currentTicketId = "";
+        currentServiceName = serviceName;
+    }
+
+    public static String getCurrentTicketId() {
+        return currentTicketId;
+    }
+
+    public static String getCurrentServiceName() {
+        return currentServiceName;
+    }
+
+    public static List<Entry> getEntries() {
+        return entries;
+    }
+
+    public static void addCurrentToAdminAndStore(String customerName) {
+        String service = currentServiceName;
+        // If no ticket was pre-assigned, generate the next ID for the service
+        if (currentTicketId == null || currentTicketId.length() == 0) {
+            currentTicketId = generateNextTicketIdForService(service);
+        } else {
+            // If a ticket was pre-set (e.g., FCH001), update counters so subsequent tickets increment
+            updateCountersFromTicket(currentTicketId);
+        }
+        final String ticket = currentTicketId;
+        final String status = "Pending";
+        final String payment = "";
+        final String action = "";
+
+        // Store in memory list
+        entries.add(new Entry(ticket, customerName, service, status, payment, action));
+
+        // Reflect into Admin table if registered
+        try {
+            cephra.Admin.QueueBridge.addTicket(ticket, customerName, service, status, payment, action);
+        } catch (Throwable t) {
+            // ignore if admin queue not ready
+        }
+
+        // Prepare next number now that the current one has been used
+        bumpCounterForService(service, ticket);
+    }
+
+    private static String generateNextTicketIdForService(String serviceName) {
+        if (serviceName == null) {
+            serviceName = "";
+        }
+        if (serviceName.toLowerCase().contains("fast")) {
+            return formatTicket("FCH", nextFastNumber);
+        }
+        if (serviceName.toLowerCase().contains("normal")) {
+            return formatTicket("NCH", nextNormalNumber);
+        }
+        // default fall-back
+        return formatTicket("GEN", 1);
+    }
+
+    private static void bumpCounterForService(String serviceName, String ticket) {
+        if (serviceName == null) {
+            return;
+        }
+        if (serviceName.toLowerCase().contains("fast")) {
+            nextFastNumber = Math.max(nextFastNumber + 1, extractNumber(ticket) + 1);
+        } else if (serviceName.toLowerCase().contains("normal")) {
+            nextNormalNumber = Math.max(nextNormalNumber + 1, extractNumber(ticket) + 1);
+        }
+    }
+
+    private static void updateCountersFromTicket(String ticket) {
+        String upper = ticket == null ? "" : ticket.toUpperCase();
+        int num = extractNumber(upper);
+        if (upper.startsWith("FCH")) {
+            nextFastNumber = Math.max(nextFastNumber, num + 1);
+        } else if (upper.startsWith("NCH")) {
+            nextNormalNumber = Math.max(nextNormalNumber, num + 1);
+        }
+    }
+
+    private static int extractNumber(String ticket) {
+        if (ticket == null) return 0;
+        int n = 0;
+        for (int i = 0; i < ticket.length(); i++) {
+            char c = ticket.charAt(i);
+            if (c >= '0' && c <= '9') {
+                n = n * 10 + (c - '0');
+            }
+        }
+        return n;
+    }
+
+    private static String formatTicket(String prefix, int number) {
+        String numStr = String.format("%03d", number);
+        return prefix + numStr;
+    }
+}
+
+
