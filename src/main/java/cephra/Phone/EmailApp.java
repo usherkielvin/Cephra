@@ -11,15 +11,14 @@ public class EmailApp extends javax.swing.JPanel {
 
    
     public EmailApp() {
-        initComponents();
+       initComponents();
          setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        otpLabel.setText(cephra.CephraDB.getGeneratedOTP());
     }
-    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
-    // Setup label position to prevent NetBeans from changing it
-    private void setupLabelPosition() {
+     private void setupLabelPosition() {
         if (jLabel1 != null) {
             jLabel1.setBounds(-15, 0, 398, 750);
         }
@@ -50,11 +49,12 @@ public class EmailApp extends javax.swing.JPanel {
             }
         });
     }
-
+ 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         Return = new javax.swing.JButton();
+        otpLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -70,6 +70,12 @@ public class EmailApp extends javax.swing.JPanel {
         add(Return);
         Return.setBounds(85, 500, 200, 40);
 
+        otpLabel.setForeground(new java.awt.Color(255, 0, 0));
+        otpLabel.setText("12345");
+        add(otpLabel);
+        otpLabel.setBounds(90, 420, 80, 16);
+
+        jLabel1.setForeground(new java.awt.Color(255, 0, 51));
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/emailApp.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
@@ -94,5 +100,6 @@ public class EmailApp extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Return;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel otpLabel;
     // End of variables declaration//GEN-END:variables
 }

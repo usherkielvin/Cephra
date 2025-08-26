@@ -162,12 +162,16 @@ public class NewPassword extends javax.swing.JPanel {
 
     private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
         // Check if passwords match
-        String password1 = newpass.getText();
-        String password2 = newpass1.getText();
-        
-        if (password1.equals(password2) && !password1.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            
+     String password = newpass.getText();
+String password2 = newpass1.getText();
+
+if (password.equals(password2) && !password.isEmpty()) {
+    String userEmail = cephra.Phone.AppSessionState.userEmailForReset; // Replace the hardcoded email with this line
+    
+    if (userEmail != null && cephra.CephraDB.updateUserPassword(userEmail, password)) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        // Reset the email for the next session
+        cephra.Phone.AppSessionState.userEmailForReset = null;
             // Navigate to Phonelogin after OK is clicked
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -186,7 +190,10 @@ public class NewPassword extends javax.swing.JPanel {
             newpass.setText("");
             newpass1.setText("");
             newpass.requestFocusInWindow();
-        }
+        }   } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "An error occurred while updating the password.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    
+}
     }//GEN-LAST:event_updateActionPerformed
 
     private void newpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newpassActionPerformed
