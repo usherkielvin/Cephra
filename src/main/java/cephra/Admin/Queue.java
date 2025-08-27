@@ -6,12 +6,9 @@ import javax.swing.table.*;
 import cephra.Frame.Monitor;
 
 public class Queue extends javax.swing.JPanel {
-private JButton[] gridButtons;
-private JPopupMenu popupMenu;
-private JMenuItem deleteItem;
-private JButton currentButton;
-private int buttonCount = 0;
 private static Monitor monitorInstance;
+private JButton[] gridButtons;
+private int buttonCount = 0;
 
 
 
@@ -21,39 +18,7 @@ private static Monitor monitorInstance;
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);       
  
-    popupMenu = new JPopupMenu();
-    deleteItem = new JMenuItem("Delete");
-    popupMenu.add(deleteItem);
-    
-    // Initialize the button array with the buttons from the ControlPanel's jPanel1
-    gridButtons = new JButton[] {
-        jButton1, jButton2, jButton3, jButton4,
-        jButton5, jButton6, jButton7, jButton8, jButton9
-    };
-
-    // Initially make all grid buttons invisible except the first one (our "Next" button)
-    for (JButton button : gridButtons) {
-        button.setVisible(false);
-        
-        // Add mouse listener for right-click popup menu
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                if (evt.isPopupTrigger() || evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
-                    currentButton = (JButton) evt.getSource();
-                    popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-                }
-            }
-            
-            @Override
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                if (evt.isPopupTrigger() || evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
-                    currentButton = (JButton) evt.getSource();
-                    popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-                }
-            }
-        });
-    }  
+  
         
         JTableHeader header = queTab.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
@@ -66,100 +31,29 @@ private static Monitor monitorInstance;
         // Setup Payment column for marking as paid
         setupPaymentColumn();
         jPanel1.setOpaque(false);
-        deleteItem.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                // Use the stored button reference to call the delete method
-                if (currentButton != null) {
-                    deleteButton(currentButton);
-                    // Reset the reference
-                    currentButton = null;
-                }
-            }
-        });
         
         // Create a single instance of Monitor
         if (monitorInstance == null) {
             monitorInstance = new cephra.Frame.Monitor();
             monitorInstance.setVisible(true);
         }
-    }
-    
-    private void updateDisplayFrame() {
-        String[] texts = new String[9];
-        for (int i = 0; i < gridButtons.length; i++) {
-            if (i < buttonCount) {
-                texts[i] = gridButtons[i].getText();
-            } else {
-                texts[i] = "";
-            }
+        
+        // Initialize grid buttons
+        gridButtons = new JButton[] {
+            jButton1, jButton2, jButton3, jButton4, jButton5,
+            jButton6, jButton7, jButton8, jButton9, jButton10
+        };
+        
+        // Initially hide all grid buttons
+        for (JButton button : gridButtons) {
+            button.setVisible(false);
         }
         
-        // Use the existing monitor instance
-        if (monitorInstance != null) {
-            monitorInstance.updateDisplay(texts);
-        }
+        // Setup next buttons
+        setupNextButtons();
     }
-    
-    private void removeTicketFromGrid(JButton buttonToRemove) {
-        if (buttonCount > 0) {
-            // Find the index of this button in the grid
-            int buttonIndex = -1;
-            for (int i = 0; i < buttonCount; i++) {
-                if (gridButtons[i] == buttonToRemove) {
-                    buttonIndex = i;
-                    break;
-                }
-            }
-            
-            if (buttonIndex >= 0) {
-                // Shift all buttons after this one to the left
-                for (int i = buttonIndex; i < buttonCount - 1; i++) {
-                    gridButtons[i].setText(gridButtons[i + 1].getText());
-                }
-                
-                // Hide the last button
-                gridButtons[buttonCount - 1].setVisible(false);
-                gridButtons[buttonCount - 1].setText("");
-                
-                // Decrease the button counter
-                buttonCount--;
-                
-                // Update the display frame
-                updateDisplayFrame();
-            }
-        }
-    }
-    
-    private void deleteButton(JButton buttonToDelete) {
-        int indexToDelete = -1;
 
-        // Find the index of the button to be deleted
-        for (int i = 0; i < buttonCount; i++) {
-            if (gridButtons[i] == buttonToDelete) {
-                indexToDelete = i;
-                break;
-            }
-        }
 
-        if (indexToDelete != -1) {
-            // Shift all buttons after the deleted one to the left
-            for (int i = indexToDelete; i < buttonCount - 1; i++) {
-                gridButtons[i].setText(gridButtons[i + 1].getText());
-                gridButtons[i].setVisible(true);
-            }
-            
-            // Hide the last button and clear its text
-            gridButtons[buttonCount - 1].setText("");
-            gridButtons[buttonCount - 1].setVisible(false);
-            
-            // Decrease the button counter
-            buttonCount--;
-            
-            // Update the display frame
-            updateDisplayFrame();
-        }
-    }
 
     private void setupActionColumn() {
         final int actionCol = getColumnIndex("Action");
@@ -232,23 +126,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 if ("Pending".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
                 
-                // Add to grid buttons when status changes to Waiting
-                if (buttonCount < 8 && !ticket.isEmpty()) {
-                    // Shift the buttons to the right
-                    for (int i = buttonCount; i > 0; i--) {
-                        gridButtons[i].setText(gridButtons[i - 1].getText());
-                        gridButtons[i].setVisible(true);
-                    }
-                    // Place the new button at the beginning (index 0)
-                    gridButtons[0].setVisible(true);
-                    gridButtons[0].setText(ticket);
+                    // Add ticket to waiting grid (jPanel1)
+                    if (!ticket.isEmpty() && buttonCount < 10) {
+                        gridButtons[buttonCount].setText(ticket);
+                        gridButtons[buttonCount].setVisible(true);
                     buttonCount++;
-                    updateDisplayFrame();
+                        
+                        // Update Monitor display
+                        updateMonitorDisplay();
                 }
-                
                 } else if ("Waiting".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Charging", editingRow, statusColumnIndex);
-                
                 } else if ("Charging".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
                     if (paymentCol >= 0) {
@@ -267,8 +155,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     } catch (Throwable t) {
                         // ignore if phone frame not running
                     }
-                
                 } else if ("Complete".equalsIgnoreCase(status)) {
+                
                     // If paid, move to History and remove from Queue
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
                     if ("Paid".equalsIgnoreCase(payment)) {
@@ -336,6 +224,173 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
         return sb.toString();
     }
+    
+    private void setupNextButtons() {
+        nxtnormalbtn.addActionListener(e -> nextNormalTicket());
+        nxtfastbtn.addActionListener(e -> nextFastTicket());
+    }
+    
+    private void nextNormalTicket() {
+        String ticket = findNextTicketByType("NCH");
+        if (ticket != null) {
+            // Check if there's an available slot in normal charge grid
+            boolean slotAvailable = false;
+            
+            if (normalcharge1.getText().isEmpty() || normalcharge1.getText().equals("jButton11")) {
+                normalcharge1.setText(ticket);
+                normalcharge1.setVisible(true);
+                slotAvailable = true;
+            } else if (normalcharge2.getText().isEmpty() || normalcharge2.getText().equals("jButton11")) {
+                normalcharge2.setText(ticket);
+                normalcharge2.setVisible(true);
+                slotAvailable = true;
+            } else if (normalcharge3.getText().isEmpty() || normalcharge3.getText().equals("jButton12")) {
+                normalcharge3.setText(ticket);
+                normalcharge3.setVisible(true);
+                slotAvailable = true;
+            } else if (normalcharge4.getText().isEmpty() || normalcharge4.getText().equals("jButton13")) {
+                normalcharge4.setText(ticket);
+                normalcharge4.setVisible(true);
+                slotAvailable = true;
+            } else if (normalcharge5.getText().isEmpty() || normalcharge5.getText().equals("jButton14")) {
+                normalcharge5.setText(ticket);
+                normalcharge5.setVisible(true);
+                slotAvailable = true;
+            }
+            
+                         // Only remove from waiting grid if a slot was available
+             if (slotAvailable) {
+                 removeTicketFromGrid(ticket);
+                 // Update Monitor normal grid display
+                 updateMonitorNormalGrid();
+             } else {
+                 // Show message that all normal charge bays are full
+                 JOptionPane.showMessageDialog(this,
+                     "Normal Charge Bays 1-5 are full!\nTicket " + ticket + " remains in waiting queue.",
+                     "Normal Charge Bays Full",
+                     JOptionPane.INFORMATION_MESSAGE);
+             }
+             // If all 5 slots are full, ticket stays in waiting grid
+        }
+    }
+    
+    private void nextFastTicket() {
+        String ticket = findNextTicketByType("FCH");
+        if (ticket != null) {
+            // Check if there's an available slot in fast panel
+            boolean slotAvailable = false;
+            
+            if (fastslot1.getText().isEmpty() || fastslot1.getText().equals("jButton11")) {
+                fastslot1.setText(ticket);
+                fastslot1.setVisible(true);
+                slotAvailable = true;
+            } else if (fastslot2.getText().isEmpty() || fastslot2.getText().equals("jButton12")) {
+                fastslot2.setText(ticket);
+                fastslot2.setVisible(true);
+                slotAvailable = true;
+            } else if (fastslot3.getText().isEmpty() || fastslot3.getText().equals("jButton13")) {
+                fastslot3.setText(ticket);
+                fastslot3.setVisible(true);
+                slotAvailable = true;
+            }
+            
+                         // Only remove from waiting grid if a slot was available
+             if (slotAvailable) {
+                 removeTicketFromGrid(ticket);
+                 // Update Monitor fast grid display
+                 updateMonitorFastGrid();
+             } else {
+                 // Show message that all fast charge bays are full
+                 JOptionPane.showMessageDialog(this,
+                     "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue.",
+                     "Fast Charge Bays Full",
+                     JOptionPane.INFORMATION_MESSAGE);
+             }
+             // If all 3 slots are full, ticket stays in waiting grid
+        }
+    }
+    
+    private String findNextTicketByType(String type) {
+        // Find the lowest numbered ticket of the specified type
+        String lowestTicket = null;
+        int lowestNumber = Integer.MAX_VALUE;
+        
+        for (int i = 0; i < buttonCount; i++) {
+            String ticketText = gridButtons[i].getText();
+            if (ticketText.contains(type)) {
+                // Extract the number from the ticket (e.g., "NCH001" -> 1, "FCH002" -> 2)
+                try {
+                    String numberPart = ticketText.replaceAll("[^0-9]", "");
+                    if (!numberPart.isEmpty()) {
+                        int ticketNumber = Integer.parseInt(numberPart);
+                        if (ticketNumber < lowestNumber) {
+                            lowestNumber = ticketNumber;
+                            lowestTicket = ticketText;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    // If parsing fails, just use the ticket as is
+                    if (lowestTicket == null) {
+                        lowestTicket = ticketText;
+                    }
+                }
+            }
+        }
+        return lowestTicket;
+    }
+    
+    private void removeTicketFromGrid(String ticket) {
+        for (int i = 0; i < buttonCount; i++) {
+            if (gridButtons[i].getText().equals(ticket)) {
+                // Shift remaining buttons
+                for (int j = i; j < buttonCount - 1; j++) {
+                    gridButtons[j].setText(gridButtons[j + 1].getText());
+                    gridButtons[j].setVisible(gridButtons[j + 1].isVisible());
+                }
+                gridButtons[buttonCount - 1].setText("");
+                gridButtons[buttonCount - 1].setVisible(false);
+                buttonCount--;
+                updateMonitorDisplay();
+                break;
+            }
+        }
+    }
+    
+         private void updateMonitorDisplay() {
+         if (monitorInstance != null) {
+             String[] buttonTexts = new String[10];
+             for (int i = 0; i < 10; i++) {
+                 if (i < buttonCount) {
+                     buttonTexts[i] = gridButtons[i].getText();
+                 } else {
+                     buttonTexts[i] = "";
+                 }
+             }
+             monitorInstance.updateDisplay(buttonTexts);
+         }
+     }
+     
+     private void updateMonitorFastGrid() {
+         if (monitorInstance != null) {
+             String[] fastTickets = new String[3];
+             fastTickets[0] = fastslot1.getText().equals("jButton11") ? "" : fastslot1.getText();
+             fastTickets[1] = fastslot2.getText().equals("jButton12") ? "" : fastslot2.getText();
+             fastTickets[2] = fastslot3.getText().equals("jButton13") ? "" : fastslot3.getText();
+             monitorInstance.updateFastGrid(fastTickets);
+         }
+     }
+     
+     private void updateMonitorNormalGrid() {
+         if (monitorInstance != null) {
+             String[] normalTickets = new String[5];
+             normalTickets[0] = normalcharge1.getText().equals("jButton11") ? "" : normalcharge1.getText();
+             normalTickets[1] = normalcharge2.getText().equals("jButton11") ? "" : normalcharge2.getText();
+             normalTickets[2] = normalcharge3.getText().equals("jButton12") ? "" : normalcharge3.getText();
+             normalTickets[3] = normalcharge4.getText().equals("jButton13") ? "" : normalcharge4.getText();
+             normalTickets[4] = normalcharge5.getText().equals("jButton14") ? "" : normalcharge5.getText();
+             monitorInstance.updateNormalGrid(normalTickets);
+         }
+     }
 
 
 
@@ -417,6 +472,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
 
 
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -428,13 +484,16 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jTabbedPane1 = new javax.swing.JTabbedPane();
         panelLists = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jButton9 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         queTab = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         ControlPanel = new javax.swing.JPanel();
+        fastpanel = new javax.swing.JPanel();
+        fastslot1 = new javax.swing.JButton();
+        fastslot2 = new javax.swing.JButton();
+        fastslot3 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -444,20 +503,20 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton6 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
-        B1 = new javax.swing.JLabel();
-        B2 = new javax.swing.JLabel();
-        B3 = new javax.swing.JLabel();
-        B4 = new javax.swing.JLabel();
-        B5 = new javax.swing.JLabel();
-        B6 = new javax.swing.JLabel();
-        B7 = new javax.swing.JLabel();
-        B8 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
+        normalcharge1 = new javax.swing.JButton();
+        nxtfastbtn = new javax.swing.JButton();
+        nxtnormalbtn = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        normalcharge2 = new javax.swing.JButton();
+        normalcharge3 = new javax.swing.JButton();
+        normalcharge4 = new javax.swing.JButton();
+        normalcharge5 = new javax.swing.JButton();
         queIcon = new javax.swing.JLabel();
         MainIcon = new javax.swing.JLabel();
 
+        setMaximumSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
         Baybutton.setBorder(null);
@@ -525,15 +584,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         panelLists.add(jLabel3);
         jLabel3.setBounds(50, 480, 120, 70);
 
-        jButton9.setText("jButton9");
-        jButton9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton9ActionPerformed(evt);
-            }
-        });
-        panelLists.add(jButton9);
-        jButton9.setBounds(740, 60, 75, 23);
-
         jLabel4.setText("jLabel3");
         panelLists.add(jLabel4);
         jLabel4.setBounds(50, 150, 120, 70);
@@ -552,13 +602,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             new String [] {
                 "Ticket", "Customer", "Service", "Status", "Payment", "Action"
             }
-        ) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                // Only Action column (column 5) and Payment column (column 4) are editable for button clicks
-                return column == 5 || column == 4;
-            }
-        });
+        ));
         jScrollPane1.setViewportView(queTab);
 
         panelLists.add(jScrollPane1);
@@ -566,97 +610,181 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/QUEUEtable.png"))); // NOI18N
         panelLists.add(jLabel2);
-        jLabel2.setBounds(0, -80, 1010, 750);
+        jLabel2.setBounds(0, -60, 1010, 760);
 
         jTabbedPane1.addTab("Queue Lists", panelLists);
 
         ControlPanel.setLayout(null);
 
-        jPanel1.setLayout(null);
+        fastpanel.setOpaque(false);
+        fastpanel.setLayout(new java.awt.GridLayout(3, 1, 0, 20));
 
-        jButton1.setText("jButton1");
+        fastslot1.setBorder(null);
+        fastslot1.setBorderPainted(false);
+        fastslot1.setContentAreaFilled(false);
+        fastpanel.add(fastslot1);
+
+        fastslot2.setBorder(null);
+        fastslot2.setBorderPainted(false);
+        fastslot2.setContentAreaFilled(false);
+        fastpanel.add(fastslot2);
+
+        fastslot3.setBorder(null);
+        fastslot3.setBorderPainted(false);
+        fastslot3.setContentAreaFilled(false);
+        fastpanel.add(fastslot3);
+
+        ControlPanel.add(fastpanel);
+        fastpanel.setBounds(30, 20, 110, 470);
+
+        jPanel1.setOpaque(false);
+        jPanel1.setLayout(new java.awt.GridLayout(5, 2, 30, 40));
+
+        jButton1.setBorder(null);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton1);
-        jButton1.setBounds(0, 0, 190, 95);
 
-        jButton2.setText("jButton2");
+        jButton2.setBorder(null);
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton2);
-        jButton2.setBounds(190, 0, 190, 95);
 
-        jButton3.setText("jButton3");
+        jButton3.setBorder(null);
+        jButton3.setBorderPainted(false);
+        jButton3.setContentAreaFilled(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton3);
-        jButton3.setBounds(0, 95, 190, 95);
 
-        jButton4.setText("jButton4");
+        jButton4.setBorder(null);
+        jButton4.setBorderPainted(false);
+        jButton4.setContentAreaFilled(false);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton4);
-        jButton4.setBounds(190, 95, 190, 95);
 
-        jButton5.setText("jButton5");
+        jButton5.setBorder(null);
+        jButton5.setBorderPainted(false);
+        jButton5.setContentAreaFilled(false);
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton5);
-        jButton5.setBounds(0, 190, 190, 95);
 
-        jButton6.setText("jButton6");
+        jButton6.setBorder(null);
+        jButton6.setBorderPainted(false);
+        jButton6.setContentAreaFilled(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton6);
-        jButton6.setBounds(190, 190, 190, 95);
 
-        jButton7.setText("jButton7");
+        jButton7.setBorder(null);
+        jButton7.setBorderPainted(false);
+        jButton7.setContentAreaFilled(false);
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton7);
-        jButton7.setBounds(0, 285, 190, 95);
 
-        jButton8.setText("jButton8");
+        jButton8.setBorder(null);
+        jButton8.setBorderPainted(false);
+        jButton8.setContentAreaFilled(false);
         jButton8.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton8ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton8);
-        jButton8.setBounds(190, 285, 190, 95);
+
+        jButton9.setBorder(null);
+        jButton9.setBorderPainted(false);
+        jButton9.setContentAreaFilled(false);
+        jPanel1.add(jButton9);
+
+        jButton10.setBorder(null);
+        jButton10.setBorderPainted(false);
+        jButton10.setContentAreaFilled(false);
+        jPanel1.add(jButton10);
 
         ControlPanel.add(jPanel1);
-        jPanel1.setBounds(350, 130, 380, 380);
+        jPanel1.setBounds(610, 140, 320, 460);
+
+        normalcharge1.setBorder(null);
+        normalcharge1.setBorderPainted(false);
+        normalcharge1.setContentAreaFilled(false);
+        ControlPanel.add(normalcharge1);
+        normalcharge1.setBounds(40, 500, 90, 160);
+
+        nxtfastbtn.setBorder(null);
+        nxtfastbtn.setBorderPainted(false);
+        nxtfastbtn.setContentAreaFilled(false);
+        ControlPanel.add(nxtfastbtn);
+        nxtfastbtn.setBounds(330, 540, 140, 60);
+
+        nxtnormalbtn.setBorder(null);
+        nxtnormalbtn.setBorderPainted(false);
+        nxtnormalbtn.setContentAreaFilled(false);
+        ControlPanel.add(nxtnormalbtn);
+        nxtnormalbtn.setBounds(330, 450, 140, 70);
+
+        jPanel2.setOpaque(false);
+        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 35));
+
+        normalcharge2.setBorder(null);
+        normalcharge2.setBorderPainted(false);
+        normalcharge2.setContentAreaFilled(false);
+        jPanel2.add(normalcharge2);
+
+        normalcharge3.setBorder(null);
+        normalcharge3.setBorderPainted(false);
+        normalcharge3.setContentAreaFilled(false);
+        jPanel2.add(normalcharge3);
+
+        normalcharge4.setBorder(null);
+        normalcharge4.setBorderPainted(false);
+        normalcharge4.setContentAreaFilled(false);
+        jPanel2.add(normalcharge4);
+
+        normalcharge5.setBorder(null);
+        normalcharge5.setBorderPainted(false);
+        normalcharge5.setContentAreaFilled(false);
+        jPanel2.add(normalcharge5);
+
+        ControlPanel.add(jPanel2);
+        jPanel2.setBounds(200, 30, 90, 620);
 
         queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ControlQe.png"))); // NOI18N
         ControlPanel.add(queIcon);
-        queIcon.setBounds(0, -60, 1010, 740);
+        queIcon.setBounds(0, -70, 1010, 750);
 
         jTabbedPane1.addTab("Queue Control", ControlPanel);
 
         add(jTabbedPane1);
-        jTabbedPane1.setBounds(0, 50, 1020, 710);
+        jTabbedPane1.setBounds(0, 40, 1020, 710);
 
         MainIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Tab Pane.png"))); // NOI18N
         add(MainIcon);
@@ -698,72 +826,55 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        removeTicketFromGrid(jButton1);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    // Grid button action listeners
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Grid button clicked - can be used for additional functionality
+    }
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        removeTicketFromGrid(jButton4);
-    }//GEN-LAST:event_jButton4ActionPerformed
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Grid button clicked - can be used for additional functionality
+    }
 
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        removeTicketFromGrid(jButton9);
-    }//GEN-LAST:event_jButton9ActionPerformed
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Grid button clicked - can be used for additional functionality
+    }
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        removeTicketFromGrid(jButton2);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Grid button clicked - can be used for additional functionality
+    }
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        removeTicketFromGrid(jButton3);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Grid button clicked - can be used for additional functionality
+    }
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        removeTicketFromGrid(jButton5);
-    }//GEN-LAST:event_jButton5ActionPerformed
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Grid button clicked - can be used for additional functionality
+    }
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        removeTicketFromGrid(jButton6);
-    }//GEN-LAST:event_jButton6ActionPerformed
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Grid button clicked - can be used for additional functionality
+    }
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        removeTicketFromGrid(jButton7);
-    }//GEN-LAST:event_jButton7ActionPerformed
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Grid button clicked - can be used for additional functionality
+    }
 
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        removeTicketFromGrid(jButton8);
-    }//GEN-LAST:event_jButton8ActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel B1;
-    private javax.swing.JLabel B2;
-    private javax.swing.JLabel B3;
-    private javax.swing.JLabel B4;
-    private javax.swing.JLabel B5;
-    private javax.swing.JLabel B6;
-    private javax.swing.JLabel B7;
-    @SuppressWarnings("unused")
-    private javax.swing.JLabel B8;
     private javax.swing.JButton Baybutton;
     private javax.swing.JPanel ControlPanel;
     private javax.swing.JLabel MainIcon;
     private javax.swing.JButton businessbutton;
     private javax.swing.JButton exitlogin;
+    private javax.swing.JPanel fastpanel;
+    private javax.swing.JButton fastslot1;
+    private javax.swing.JButton fastslot2;
+    private javax.swing.JButton fastslot3;
     private javax.swing.JButton historybutton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JPanel panelLists;
-    private javax.swing.JLabel queIcon;
-    private javax.swing.JTable queTab;
-    private javax.swing.JButton staffbutton;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -772,6 +883,25 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JButton normalcharge1;
+    private javax.swing.JButton normalcharge2;
+    private javax.swing.JButton normalcharge3;
+    private javax.swing.JButton normalcharge4;
+    private javax.swing.JButton normalcharge5;
+    private javax.swing.JButton nxtfastbtn;
+    private javax.swing.JButton nxtnormalbtn;
+    private javax.swing.JPanel panelLists;
+    private javax.swing.JLabel queIcon;
+    private javax.swing.JTable queTab;
+    private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
 
 }
