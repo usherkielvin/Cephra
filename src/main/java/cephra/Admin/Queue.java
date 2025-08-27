@@ -28,7 +28,7 @@ private static Monitor monitorInstance;
     // Initialize the button array with the buttons from the ControlPanel's jPanel1
     gridButtons = new JButton[] {
         jButton1, jButton2, jButton3, jButton4,
-        jButton5, jButton6, jButton7, jButton8, jButton9
+        jButton5, jButton6, jButton7, jButton8, 
     };
 
     // Initially make all grid buttons invisible except the first one (our "Next" button)
@@ -428,7 +428,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jTabbedPane1 = new javax.swing.JTabbedPane();
         panelLists = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jButton9 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -453,8 +452,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         B7 = new javax.swing.JLabel();
         B8 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
+        jButton11 = new javax.swing.JButton();
         queIcon = new javax.swing.JLabel();
         MainIcon = new javax.swing.JLabel();
 
@@ -521,24 +520,21 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         panelLists.setLayout(null);
 
-        jLabel3.setText("jLabel3");
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("10");
         panelLists.add(jLabel3);
         jLabel3.setBounds(50, 480, 120, 70);
 
-        jButton9.setText("jButton9");
-        jButton9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton9ActionPerformed(evt);
-            }
-        });
-        panelLists.add(jButton9);
-        jButton9.setBounds(740, 60, 75, 23);
-
-        jLabel4.setText("jLabel3");
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("2");
         panelLists.add(jLabel4);
         jLabel4.setBounds(50, 150, 120, 70);
 
-        jLabel5.setText("jLabel3");
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("3");
         panelLists.add(jLabel5);
         jLabel5.setBounds(50, 310, 120, 70);
 
@@ -552,13 +548,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             new String [] {
                 "Ticket", "Customer", "Service", "Status", "Payment", "Action"
             }
-        ) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                // Only Action column (column 5) and Payment column (column 4) are editable for button clicks
-                return column == 5 || column == 4;
-            }
-        });
+        ));
         jScrollPane1.setViewportView(queTab);
 
         panelLists.add(jScrollPane1);
@@ -572,7 +562,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         ControlPanel.setLayout(null);
 
-        jPanel1.setLayout(null);
+        jPanel1.setLayout(new java.awt.GridLayout(4, 2, 100, 100));
 
         jButton1.setText("jButton1");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -581,7 +571,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton1);
-        jButton1.setBounds(0, 0, 190, 95);
 
         jButton2.setText("jButton2");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -590,7 +579,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton2);
-        jButton2.setBounds(190, 0, 190, 95);
 
         jButton3.setText("jButton3");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -599,7 +587,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton3);
-        jButton3.setBounds(0, 95, 190, 95);
 
         jButton4.setText("jButton4");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -608,7 +595,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton4);
-        jButton4.setBounds(190, 95, 190, 95);
 
         jButton5.setText("jButton5");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -617,7 +603,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton5);
-        jButton5.setBounds(0, 190, 190, 95);
 
         jButton6.setText("jButton6");
         jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -626,7 +611,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton6);
-        jButton6.setBounds(190, 190, 190, 95);
 
         jButton7.setText("jButton7");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
@@ -635,7 +619,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton7);
-        jButton7.setBounds(0, 285, 190, 95);
 
         jButton8.setText("jButton8");
         jButton8.addActionListener(new java.awt.event.ActionListener() {
@@ -644,10 +627,90 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton8);
-        jButton8.setBounds(190, 285, 190, 95);
 
         ControlPanel.add(jPanel1);
-        jPanel1.setBounds(350, 130, 380, 380);
+        jPanel1.setBounds(590, 120, 350, 410);
+
+        B1.setBackground(new java.awt.Color(0, 147, 73));
+        B1.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
+        B1.setForeground(new java.awt.Color(0, 147, 73));
+        B1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        B1.setText("EV - 001");
+        ControlPanel.add(B1);
+        B1.setBounds(30, 70, 100, 40);
+
+        B2.setBackground(new java.awt.Color(0, 147, 73));
+        B2.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
+        B2.setForeground(new java.awt.Color(0, 147, 73));
+        B2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        B2.setText("EV - 001");
+        ControlPanel.add(B2);
+        B2.setBounds(40, 230, 100, 40);
+
+        B3.setBackground(new java.awt.Color(0, 147, 73));
+        B3.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
+        B3.setForeground(new java.awt.Color(0, 147, 73));
+        B3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        B3.setText("EV - 001");
+        ControlPanel.add(B3);
+        B3.setBounds(40, 390, 100, 40);
+
+        B4.setBackground(new java.awt.Color(0, 147, 73));
+        B4.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
+        B4.setForeground(new java.awt.Color(0, 147, 73));
+        B4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        B4.setText("EV - 001");
+        ControlPanel.add(B4);
+        B4.setBounds(40, 550, 100, 40);
+
+        B5.setBackground(new java.awt.Color(0, 147, 73));
+        B5.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
+        B5.setForeground(new java.awt.Color(0, 147, 73));
+        B5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        B5.setText("EV - 001");
+        ControlPanel.add(B5);
+        B5.setBounds(200, 70, 100, 40);
+
+        B6.setBackground(new java.awt.Color(0, 147, 73));
+        B6.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
+        B6.setForeground(new java.awt.Color(0, 147, 73));
+        B6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        B6.setText("EV - 001");
+        ControlPanel.add(B6);
+        B6.setBounds(200, 230, 100, 40);
+
+        B7.setBackground(new java.awt.Color(0, 147, 73));
+        B7.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
+        B7.setForeground(new java.awt.Color(0, 147, 73));
+        B7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        B7.setText("EV - 001");
+        ControlPanel.add(B7);
+        B7.setBounds(200, 390, 100, 40);
+
+        B8.setBackground(new java.awt.Color(0, 147, 73));
+        B8.setFont(new java.awt.Font("Segoe UI", 1, 21)); // NOI18N
+        B8.setForeground(new java.awt.Color(0, 147, 73));
+        B8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        B8.setText("EV - 001");
+        ControlPanel.add(B8);
+        B8.setBounds(200, 550, 100, 40);
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 147, 73));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("EV - 001");
+        ControlPanel.add(jLabel1);
+        jLabel1.setBounds(610, 130, 140, 60);
+
+        jButton10.setBorderPainted(false);
+        jButton10.setContentAreaFilled(false);
+        ControlPanel.add(jButton10);
+        jButton10.setBounds(330, 450, 140, 70);
+
+        jButton11.setBorderPainted(false);
+        jButton11.setContentAreaFilled(false);
+        ControlPanel.add(jButton11);
+        jButton11.setBounds(330, 530, 140, 60);
 
         queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ControlQe.png"))); // NOI18N
         ControlPanel.add(queIcon);
@@ -706,10 +769,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         removeTicketFromGrid(jButton4);
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        removeTicketFromGrid(jButton9);
-    }//GEN-LAST:event_jButton9ActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         removeTicketFromGrid(jButton2);
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -743,7 +802,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JLabel B5;
     private javax.swing.JLabel B6;
     private javax.swing.JLabel B7;
-    @SuppressWarnings("unused")
     private javax.swing.JLabel B8;
     private javax.swing.JButton Baybutton;
     private javax.swing.JPanel ControlPanel;
@@ -751,6 +809,16 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton businessbutton;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -763,15 +831,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JLabel queIcon;
     private javax.swing.JTable queTab;
     private javax.swing.JButton staffbutton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     // End of variables declaration//GEN-END:variables
 
 }
