@@ -214,17 +214,27 @@ public class Monitor extends javax.swing.JFrame {
         f3 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMaximumSize(new java.awt.Dimension(1000, 750));
+        setPreferredSize(new java.awt.Dimension(1000, 750));
+        setResizable(false);
 
-        
+        Monitor.setMaximumSize(new java.awt.Dimension(1000, 750));
+        Monitor.setPreferredSize(new java.awt.Dimension(1000, 750));
         Monitor.setLayout(null);
 
         WaitingGrid.setOpaque(false);
         WaitingGrid.setLayout(new java.awt.GridLayout(5, 2, 20, 15));
 
+        jButton1.setText("AAAA");
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         WaitingGrid.add(jButton1);
 
         jButton2.setBorder(null);
@@ -255,11 +265,6 @@ public class Monitor extends javax.swing.JFrame {
         jButton7.setBorder(null);
         jButton7.setBorderPainted(false);
         jButton7.setContentAreaFilled(false);
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
-            }
-        });
         WaitingGrid.add(jButton7);
 
         jButton8.setBorder(null);
@@ -278,7 +283,7 @@ public class Monitor extends javax.swing.JFrame {
         WaitingGrid.add(jButton10);
 
         Monitor.add(WaitingGrid);
-        WaitingGrid.setBounds(30, 330, 300, 370);
+        WaitingGrid.setBounds(20, 320, 310, 370);
 
         jPanel2.setOpaque(false);
         jPanel2.setLayout(new java.awt.GridLayout(1, 4, 20, 20));
@@ -286,6 +291,11 @@ public class Monitor extends javax.swing.JFrame {
         b2.setBorder(null);
         b2.setBorderPainted(false);
         b2.setContentAreaFilled(false);
+        b2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b2ActionPerformed(evt);
+            }
+        });
         jPanel2.add(b2);
 
         b3.setBorder(null);
@@ -296,6 +306,11 @@ public class Monitor extends javax.swing.JFrame {
         b4.setBorder(null);
         b4.setBorderPainted(false);
         b4.setContentAreaFilled(false);
+        b4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b4ActionPerformed(evt);
+            }
+        });
         jPanel2.add(b4);
 
         b5.setBorder(null);
@@ -304,16 +319,16 @@ public class Monitor extends javax.swing.JFrame {
         jPanel2.add(b5);
 
         Monitor.add(jPanel2);
-        jPanel2.setBounds(410, 540, 550, 170);
+        jPanel2.setBounds(400, 540, 550, 160);
 
         b1.setBorder(null);
         b1.setBorderPainted(false);
         b1.setContentAreaFilled(false);
         Monitor.add(b1);
-        b1.setBounds(841, 320, 120, 180);
+        b1.setBounds(830, 310, 120, 180);
 
         jPanel1.setOpaque(false);
-        jPanel1.setLayout(new java.awt.GridLayout(1, 3, 20, 20));
+        jPanel1.setLayout(new java.awt.GridLayout(1, 3, 15, 20));
 
         f1.setBorder(null);
         f1.setBorderPainted(false);
@@ -331,11 +346,11 @@ public class Monitor extends javax.swing.JFrame {
         jPanel1.add(f3);
 
         Monitor.add(jPanel1);
-        jPanel1.setBounds(410, 300, 410, 190);
+        jPanel1.setBounds(400, 310, 410, 180);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/TV SCREEn.png"))); // NOI18N
         Monitor.add(jLabel1);
-        jLabel1.setBounds(0, 0, 1000, 750);
+        jLabel1.setBounds(-10, -10, 1000, 750);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -358,6 +373,18 @@ public class Monitor extends javax.swing.JFrame {
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void b2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_b2ActionPerformed
+
+    private void b4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_b4ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Grid buttons are display-only, no action listeners needed
 

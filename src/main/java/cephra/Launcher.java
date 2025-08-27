@@ -19,9 +19,7 @@ public final class Launcher {
             );
             admin.setVisible(true);
 
-            // Remove Monitor creation from Launcher - it will be created when needed
-            // cephra.Frame.Monitor monitor = new cephra.Frame.Monitor();
-            // monitor.setVisible(true);
+            // Monitor will be created when Queue panel is opened
 
             cephra.Frame.Phone phone = new cephra.Frame.Phone();
             int taskbarHeight = 30;
