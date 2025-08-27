@@ -55,6 +55,15 @@ public class Reciept extends javax.swing.JPanel {
         share = new javax.swing.JButton();
         Exit = new javax.swing.JButton();
         Download = new javax.swing.JButton();
+        price = new javax.swing.JLabel();
+        RefNumber = new javax.swing.JLabel();
+        TimeDate = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        AmountPaid = new javax.swing.JLabel();
+        Fee = new javax.swing.JLabel();
+        AccNumber = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -62,11 +71,6 @@ public class Reciept extends javax.swing.JPanel {
         share.setBorder(null);
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
-        share.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                shareActionPerformed(evt);
-            }
-        });
         add(share);
         share.setBounds(180, 680, 130, 40);
 
@@ -84,13 +88,57 @@ public class Reciept extends javax.swing.JPanel {
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
-        Download.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DownloadActionPerformed(evt);
-            }
-        });
         add(Download);
         Download.setBounds(30, 683, 120, 30);
+
+        price.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
+        price.setText("PHP 650.00");
+        add(price);
+        price.setBounds(70, 280, 210, 40);
+
+        RefNumber.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
+        RefNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        RefNumber.setText("33873585637");
+        add(RefNumber);
+        RefNumber.setBounds(168, 375, 100, 21);
+
+        TimeDate.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        TimeDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        TimeDate.setText("29 August 2025 05:31:02 PM");
+        add(TimeDate);
+        TimeDate.setBounds(70, 400, 190, 20);
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel5.setText("Details");
+        add(jLabel5);
+        jLabel5.setBounds(140, 450, 70, 30);
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setText("<html><div style='text-align:leading;'>Amount Paid: <br>Fee: <br>Account Number:  </div></html>");
+        add(jLabel6);
+        jLabel6.setBounds(40, 490, 110, 70);
+
+        AmountPaid.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        AmountPaid.setText("Php 650.00");
+        add(AmountPaid);
+        AmountPaid.setBounds(200, 490, 100, 20);
+
+        Fee.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        Fee.setText("Php 7.00");
+        add(Fee);
+        Fee.setBounds(200, 510, 70, 20);
+
+        AccNumber.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        AccNumber.setText("337293727");
+        add(AccNumber);
+        AccNumber.setBounds(200, 530, 90, 20);
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("Ref. Number: ");
+        add(jLabel8);
+        jLabel8.setBounds(70, 375, 100, 21);
+        jLabel8.getAccessibleContext().setAccessibleName("");
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Receipt.png"))); // NOI18N
         add(jLabel1);
@@ -132,9 +180,18 @@ public class Reciept extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel AccNumber;
+    private javax.swing.JLabel AmountPaid;
     private javax.swing.JButton Download;
     private javax.swing.JButton Exit;
+    private javax.swing.JLabel Fee;
+    private javax.swing.JLabel RefNumber;
+    private javax.swing.JLabel TimeDate;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel price;
     private javax.swing.JButton share;
     // End of variables declaration//GEN-END:variables
 }

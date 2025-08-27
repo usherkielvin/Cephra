@@ -10,6 +10,11 @@ private static Monitor monitorInstance;
 private JButton[] gridButtons;
 private int buttonCount = 0;
 
+// Add missing variable declarations
+private JPopupMenu popupMenu;
+private JMenuItem deleteItem;
+private JButton currentButton;
+
 
 
 
@@ -18,7 +23,39 @@ private int buttonCount = 0;
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);       
  
-  
+    popupMenu = new JPopupMenu();
+    deleteItem = new JMenuItem("Delete");
+    popupMenu.add(deleteItem);
+    
+    // Initialize the button array with the buttons from the ControlPanel's jPanel1
+    gridButtons = new JButton[] {
+        jButton1, jButton2, jButton3, jButton4,
+        jButton5, jButton6, jButton7, jButton8, jButton9
+    };
+
+    // Initially make all grid buttons invisible except the first one (our "Next" button)
+    for (JButton button : gridButtons) {
+        button.setVisible(false);
+        
+        // Add mouse listener for right-click popup menu
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                if (evt.isPopupTrigger() || evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+                    currentButton = (JButton) evt.getSource();
+                    popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+                }
+            }
+            
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                if (evt.isPopupTrigger() || evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+                    currentButton = (JButton) evt.getSource();
+                    popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+                }
+            }
+        });
+    }  
         
         JTableHeader header = queTab.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
@@ -503,16 +540,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton6 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
-        normalcharge1 = new javax.swing.JButton();
-        nxtfastbtn = new javax.swing.JButton();
-        nxtnormalbtn = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        normalcharge2 = new javax.swing.JButton();
-        normalcharge3 = new javax.swing.JButton();
-        normalcharge4 = new javax.swing.JButton();
-        normalcharge5 = new javax.swing.JButton();
+        B1 = new javax.swing.JLabel();
+        B2 = new javax.swing.JLabel();
+        B3 = new javax.swing.JLabel();
+        B4 = new javax.swing.JLabel();
+        B5 = new javax.swing.JLabel();
+        B6 = new javax.swing.JLabel();
+        B7 = new javax.swing.JLabel();
+        B8 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         queIcon = new javax.swing.JLabel();
         MainIcon = new javax.swing.JLabel();
 
@@ -580,15 +618,28 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         panelLists.setLayout(null);
 
-        jLabel3.setText("jLabel3");
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("10");
         panelLists.add(jLabel3);
         jLabel3.setBounds(50, 480, 120, 70);
+
+        jButton9.setText("jButton9");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+        panelLists.add(jButton9);
+        jButton9.setBounds(740, 60, 75, 23);
 
         jLabel4.setText("jLabel3");
         panelLists.add(jLabel4);
         jLabel4.setBounds(50, 150, 120, 70);
 
-        jLabel5.setText("jLabel3");
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("3");
         panelLists.add(jLabel5);
         jLabel5.setBounds(50, 310, 120, 70);
 
@@ -616,33 +667,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         ControlPanel.setLayout(null);
 
-        fastpanel.setOpaque(false);
-        fastpanel.setLayout(new java.awt.GridLayout(3, 1, 0, 20));
+        jPanel1.setLayout(null);
 
-        fastslot1.setBorder(null);
-        fastslot1.setBorderPainted(false);
-        fastslot1.setContentAreaFilled(false);
-        fastpanel.add(fastslot1);
-
-        fastslot2.setBorder(null);
-        fastslot2.setBorderPainted(false);
-        fastslot2.setContentAreaFilled(false);
-        fastpanel.add(fastslot2);
-
-        fastslot3.setBorder(null);
-        fastslot3.setBorderPainted(false);
-        fastslot3.setContentAreaFilled(false);
-        fastpanel.add(fastslot3);
-
-        ControlPanel.add(fastpanel);
-        fastpanel.setBounds(30, 20, 110, 470);
-
-        jPanel1.setOpaque(false);
-        jPanel1.setLayout(new java.awt.GridLayout(5, 2, 30, 40));
-
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
+        jButton1.setText("jButton1");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -719,63 +746,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         jPanel1.add(jButton8);
-
-        jButton9.setBorder(null);
-        jButton9.setBorderPainted(false);
-        jButton9.setContentAreaFilled(false);
-        jPanel1.add(jButton9);
-
-        jButton10.setBorder(null);
-        jButton10.setBorderPainted(false);
-        jButton10.setContentAreaFilled(false);
-        jPanel1.add(jButton10);
+        jButton8.setBounds(190, 285, 190, 95);
 
         ControlPanel.add(jPanel1);
-        jPanel1.setBounds(610, 140, 320, 460);
-
-        normalcharge1.setBorder(null);
-        normalcharge1.setBorderPainted(false);
-        normalcharge1.setContentAreaFilled(false);
-        ControlPanel.add(normalcharge1);
-        normalcharge1.setBounds(40, 500, 90, 160);
-
-        nxtfastbtn.setBorder(null);
-        nxtfastbtn.setBorderPainted(false);
-        nxtfastbtn.setContentAreaFilled(false);
-        ControlPanel.add(nxtfastbtn);
-        nxtfastbtn.setBounds(330, 540, 140, 60);
-
-        nxtnormalbtn.setBorder(null);
-        nxtnormalbtn.setBorderPainted(false);
-        nxtnormalbtn.setContentAreaFilled(false);
-        ControlPanel.add(nxtnormalbtn);
-        nxtnormalbtn.setBounds(330, 450, 140, 70);
-
-        jPanel2.setOpaque(false);
-        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 35));
-
-        normalcharge2.setBorder(null);
-        normalcharge2.setBorderPainted(false);
-        normalcharge2.setContentAreaFilled(false);
-        jPanel2.add(normalcharge2);
-
-        normalcharge3.setBorder(null);
-        normalcharge3.setBorderPainted(false);
-        normalcharge3.setContentAreaFilled(false);
-        jPanel2.add(normalcharge3);
-
-        normalcharge4.setBorder(null);
-        normalcharge4.setBorderPainted(false);
-        normalcharge4.setContentAreaFilled(false);
-        jPanel2.add(normalcharge4);
-
-        normalcharge5.setBorder(null);
-        normalcharge5.setBorderPainted(false);
-        normalcharge5.setContentAreaFilled(false);
-        jPanel2.add(normalcharge5);
-
-        ControlPanel.add(jPanel2);
-        jPanel2.setBounds(200, 30, 90, 620);
+        jPanel1.setBounds(350, 130, 380, 380);
 
         queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ControlQe.png"))); // NOI18N
         ControlPanel.add(queIcon);
@@ -826,22 +800,25 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 
-    // Grid button action listeners
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-        // Grid button clicked - can be used for additional functionality
-    }
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        removeTicketFromGrid(jButton1.getText());
+    }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
-        // Grid button clicked - can be used for additional functionality
-    }
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        removeTicketFromGrid(jButton4.getText());
+    }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-        // Grid button clicked - can be used for additional functionality
-    }
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        removeTicketFromGrid(jButton9.getText());
+    }//GEN-LAST:event_jButton9ActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
-        // Grid button clicked - can be used for additional functionality
-    }
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        removeTicketFromGrid(jButton2.getText());
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        removeTicketFromGrid(jButton3.getText());
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
         // Grid button clicked - can be used for additional functionality
@@ -863,6 +840,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel B1;
+    private javax.swing.JLabel B2;
+    private javax.swing.JLabel B3;
+    private javax.swing.JLabel B4;
+    private javax.swing.JLabel B5;
+    private javax.swing.JLabel B6;
+    private javax.swing.JLabel B7;
+    @SuppressWarnings("unused")
+    private javax.swing.JLabel B8;
     private javax.swing.JButton Baybutton;
     private javax.swing.JPanel ControlPanel;
     private javax.swing.JLabel MainIcon;
@@ -873,8 +859,19 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton fastslot2;
     private javax.swing.JButton fastslot3;
     private javax.swing.JButton historybutton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPanel panelLists;
+    private javax.swing.JLabel queIcon;
+    private javax.swing.JTable queTab;
+    private javax.swing.JButton staffbutton;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -883,25 +880,14 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JButton jButton10;
+    private javax.swing.JButton nxtnormalbtn;
+    private javax.swing.JButton nxtfastbtn;
     private javax.swing.JButton normalcharge1;
     private javax.swing.JButton normalcharge2;
     private javax.swing.JButton normalcharge3;
     private javax.swing.JButton normalcharge4;
     private javax.swing.JButton normalcharge5;
-    private javax.swing.JButton nxtfastbtn;
-    private javax.swing.JButton nxtnormalbtn;
-    private javax.swing.JPanel panelLists;
-    private javax.swing.JLabel queIcon;
-    private javax.swing.JTable queTab;
-    private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
 
 }
