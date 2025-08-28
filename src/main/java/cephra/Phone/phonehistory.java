@@ -62,55 +62,53 @@ public class phonehistory extends javax.swing.JPanel {
         profilebutton.setBorderPainted(false);
         profilebutton.setContentAreaFilled(false);
         profilebutton.setFocusPainted(false);
-        add(profilebutton);
-        profilebutton.setBounds(280, 680, 50, 50);
         profilebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 profilebuttonActionPerformed(evt);
             }
         });
+        add(profilebutton);
+        profilebutton.setBounds(260, 680, 40, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
         charge.setContentAreaFilled(false);
         charge.setFocusPainted(false);
-        add(charge);
-        charge.setBounds(30, 680, 50, 50);
         charge.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chargeActionPerformed(evt);
             }
         });
+        add(charge);
+        charge.setBounds(30, 680, 50, 50);
 
         homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
         homebutton.setContentAreaFilled(false);
         homebutton.setFocusPainted(false);
-        add(homebutton);
-        homebutton.setBounds(160, 680, 60, 40);
         homebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 homebuttonActionPerformed(evt);
             }
         });
+        add(homebutton);
+        homebutton.setBounds(160, 680, 60, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
         linkbutton.setContentAreaFilled(false);
         linkbutton.setFocusPainted(false);
-        add(linkbutton);
-        linkbutton.setBounds(90, 680, 60, 40);
         linkbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 linkbuttonActionPerformed(evt);
             }
         });
+        add(linkbutton);
+        linkbutton.setBounds(90, 680, 60, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HISTORY.png"))); // NOI18N
         add(jLabel1);
-        // Label position will be set in setupLabelPosition() method
-        // Keep background behind interactive components
-        setComponentZOrder(jLabel1, getComponentCount() - 1);
+        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
