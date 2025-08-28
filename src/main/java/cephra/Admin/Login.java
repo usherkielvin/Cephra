@@ -21,7 +21,7 @@ public class Login extends javax.swing.JPanel {
         passfield.setBorder(null);
 
         passfield.setEchoChar('•');
-        See.setIcon(new javax.swing.ImageIcon("/cephra/Photos/EyeClose.png")); 
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
         See.setBorderPainted(false);
         See.setOpaque(false);
         See.setContentAreaFilled(false);
@@ -136,14 +136,16 @@ public class Login extends javax.swing.JPanel {
     }//GEN-LAST:event_loginbuttonActionPerformed
 
     private void SeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeActionPerformed
-           if(passfield.getEchoChar() == 0) {
+         
+        
+        if(passfield.getEchoChar() == 0) {
         passfield.setEchoChar('•');
         
-        See.setIcon(new javax.swing.ImageIcon("/cephra/Photos/EyeClose.png")); 
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
                 
         } else {
             
-            See.setIcon(new javax.swing.ImageIcon("/cephra/Photos/EyeOpen.png")); 
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeOpen.png")));
             passfield.setEchoChar((char) 0 );
             
         }

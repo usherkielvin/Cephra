@@ -20,6 +20,10 @@ public class Phonelogin extends javax.swing.JPanel {
         // --- INTEGRATED FILTERS ---
         ((AbstractDocument) username.getDocument()).setDocumentFilter(new InputLimitFilter(15, true));
         ((AbstractDocument) pass.getDocument()).setDocumentFilter(new InputLimitFilter(15, false));
+        
+         See.setBorderPainted(false);
+        See.setOpaque(false);
+        See.setContentAreaFilled(false);
     }
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -38,6 +42,7 @@ public class Phonelogin extends javax.swing.JPanel {
         setLayout(null);
 
         See.setBorder(null);
+        See.setOpaque(true);
         See.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SeeActionPerformed(evt);

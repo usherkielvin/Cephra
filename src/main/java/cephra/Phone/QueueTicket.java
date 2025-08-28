@@ -308,7 +308,7 @@ public class QueueTicket extends javax.swing.JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // Push current selection to Admin and store in memory list
-                cephra.Phone.QueueFlow.addCurrentToAdminAndStore("dizon");
+                cephra.Phone.QueueFlow.addCurrentToAdminAndStore(cephra.CephraDB.getCurrentUsername());
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {

@@ -15,6 +15,12 @@ public class PayPop extends javax.swing.JPanel {
         setupLabelPosition(); // Set label position
         makeDraggable();
         updateTextWithAmount();
+        
+          String username = cephra.CephraDB.getCurrentUsername();
+        
+          if (LoggedName != null && !username.isEmpty()) {
+            LoggedName.setText(username);
+        }
     }
      // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
@@ -78,12 +84,6 @@ public class PayPop extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
-        ticketNo = new javax.swing.JLabel();
-        ChargingDue = new javax.swing.JLabel();
-        kWh = new javax.swing.JLabel();
-        TotalBill = new javax.swing.JLabel();
-        name = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -169,6 +169,10 @@ public class PayPop extends javax.swing.JPanel {
         });
         add(homebutton2);
         homebutton2.setBounds(150, 680, 40, 40);
+
+        LoggedName.setText("Name");
+        add(LoggedName);
+        LoggedName.setBounds(120, 120, 50, 30);
 
         ticketNo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         ticketNo.setText("FCH012");
@@ -377,8 +381,6 @@ public class PayPop extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Cash;
-    private javax.swing.JLabel ChargingDue;
-    private javax.swing.JLabel TotalBill;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;

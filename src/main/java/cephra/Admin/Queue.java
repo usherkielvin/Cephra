@@ -3,6 +3,8 @@ package cephra.Admin;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import cephra.Frame.Monitor;
 
 public class Queue extends javax.swing.JPanel {
@@ -51,6 +53,37 @@ private int buttonCount = 0;
         
         // Setup next buttons
         setupNextButtons();
+
+        // Listen to table changes to keep counters in sync
+        queTab.getModel().addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                updateStatusCounters();
+            }
+        });
+        // Initial counters
+        updateStatusCounters();
+    }
+
+    private void updateStatusCounters() {
+        int waiting = 0;
+        int charging = 0;
+        for (int i = 0; i < queTab.getRowCount(); i++) {
+            Object s = queTab.getValueAt(i, getColumnIndex("Status"));
+            String status = s == null ? "" : String.valueOf(s).trim();
+            if ("Waiting".equalsIgnoreCase(status)) waiting++;
+            else if ("Charging".equalsIgnoreCase(status)) charging++;
+        }
+        int paidCumulative = 0;
+        try {
+            paidCumulative = cephra.Admin.QueueBridge.getTotalPaidCount();
+        } catch (Throwable t) {
+            // ignore
+        }
+        // Map labels: top (jLabel4)=Waiting, middle (jLabel5)=Charging, bottom (jLabel3)=Paid cumulative
+        try { jLabel4.setText(String.valueOf(waiting)); } catch (Throwable t) {}
+        try { jLabel5.setText(String.valueOf(charging)); } catch (Throwable t) {}
+        try { jLabel3.setText(String.valueOf(paidCumulative)); } catch (Throwable t) {}
     }
 
 
@@ -245,6 +278,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     }
                 }
             }
+            // Keep counters in sync after any action
+            updateStatusCounters();
             stopCellEditing();
         }
 }
@@ -315,7 +350,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                          // Only remove from waiting grid if a slot was available
              if (slotAvailable) {
                 setTableStatusToChargingByTicket(ticket);
-                removeTicketFromGrid(ticket);
+                 removeTicketFromGrid(ticket);
                  // Update Monitor normal grid display
                  updateMonitorNormalGrid();
              } else {
@@ -327,6 +362,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
              }
              // If all 5 slots are full, ticket stays in waiting grid
         }
+        updateStatusCounters();
     }
     
     private void nextFastTicket() {
@@ -352,7 +388,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                          // Only remove from waiting grid if a slot was available
              if (slotAvailable) {
                 setTableStatusToChargingByTicket(ticket);
-                removeTicketFromGrid(ticket);
+                 removeTicketFromGrid(ticket);
                  // Update Monitor fast grid display
                  updateMonitorFastGrid();
              } else {
@@ -364,6 +400,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
              }
              // If all 3 slots are full, ticket stays in waiting grid
         }
+        updateStatusCounters();
     }
     
     private String findNextTicketByType(String type) {
@@ -448,19 +485,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
          }
      }
 
-    private void setTableStatusToChargingByTicket(String ticket) {
-        int ticketCol = getColumnIndex("Ticket");
-        int statusCol = getColumnIndex("Status");
-        if (ticketCol < 0 || statusCol < 0) return;
-        for (int row = 0; row < queTab.getRowCount(); row++) {
-            Object val = queTab.getValueAt(row, ticketCol);
-            if (val != null && ticket.equals(String.valueOf(val).trim())) {
-                queTab.setValueAt("Charging", row, statusCol);
-                break;
-            }
-        }
-    }
-
     private boolean assignToNormalSlot(String ticket) {
         if (normalcharge1.getText().isEmpty() || normalcharge1.getText().equals("jButton11")) {
             normalcharge1.setText(ticket);
@@ -512,19 +536,30 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
 
     private void removeFromChargingSlots(String ticket) {
-        // Clear from fast slots if present
         if (ticket.equals(fastslot1.getText())) { fastslot1.setText(""); fastslot1.setVisible(false); }
         if (ticket.equals(fastslot2.getText())) { fastslot2.setText(""); fastslot2.setVisible(false); }
         if (ticket.equals(fastslot3.getText())) { fastslot3.setText(""); fastslot3.setVisible(false); }
         updateMonitorFastGrid();
 
-        // Clear from normal slots if present
         if (ticket.equals(normalcharge1.getText())) { normalcharge1.setText(""); normalcharge1.setVisible(false); }
         if (ticket.equals(normalcharge2.getText())) { normalcharge2.setText(""); normalcharge2.setVisible(false); }
         if (ticket.equals(normalcharge3.getText())) { normalcharge3.setText(""); normalcharge3.setVisible(false); }
         if (ticket.equals(normalcharge4.getText())) { normalcharge4.setText(""); normalcharge4.setVisible(false); }
         if (ticket.equals(normalcharge5.getText())) { normalcharge5.setText(""); normalcharge5.setVisible(false); }
         updateMonitorNormalGrid();
+    }
+
+    private void setTableStatusToChargingByTicket(String ticket) {
+        int ticketCol = getColumnIndex("Ticket");
+        int statusCol = getColumnIndex("Status");
+        if (ticketCol < 0 || statusCol < 0) return;
+        for (int row = 0; row < queTab.getRowCount(); row++) {
+            Object val = queTab.getValueAt(row, ticketCol);
+            if (val != null && ticket.equals(String.valueOf(val).trim())) {
+                queTab.setValueAt("Charging", row, statusCol);
+                break;
+            }
+        }
     }
 
 
@@ -599,9 +634,19 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 );
                 if (choice == 0) {
                     editorValue = "Paid";
+                    // Sync cumulative paid counter and table via QueueBridge
+                    int ticketCol = getColumnIndex("Ticket");
+                    if (ticketCol >= 0) {
+                        Object v = queTab.getValueAt(editingRow, ticketCol);
+                        String ticket = v == null ? "" : String.valueOf(v).trim();
+                        if (!ticket.isEmpty()) {
+                            cephra.Admin.QueueBridge.markPaymentPaid(ticket);
+                        }
+                    }
                 }
             }
             stopCellEditing();
+            updateStatusCounters();
         }
     }
 
@@ -1106,5 +1151,4 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JTable queTab;
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
-
 }
