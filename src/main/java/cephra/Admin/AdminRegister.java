@@ -1,6 +1,5 @@
 package cephra.Admin;
 
-import java.awt.Color;
 import java.awt.Window;
 import javax.swing.SwingUtilities;
 

@@ -59,7 +59,6 @@ public class Reciept extends javax.swing.JPanel {
             int start = info == null ? 18 : info.initialPercent;
             double cap = info == null ? 40.0 : info.capacityKWh;
             double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
-            double usedKWh = (100.0 - start) / 100.0 * cap;
             AmountPaid.setText(String.format("Php %.2f", amount));
             Fee.setText("Php 0.00");
             price.setText(String.format("PHP %.2f", amount));
