@@ -15,6 +15,25 @@ public class Profile extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        
+        // Set the logged-in user's name and email
+        updateUserInfo();
+    }
+    
+    // Method to update the user information labels
+    private void updateUserInfo() {
+        // Get the current user's information from CephraDB
+        String username = cephra.CephraDB.getCurrentUsername();
+        String email = cephra.CephraDB.getCurrentEmail();
+        
+        // Update the labels
+        if (LoggedName != null && !username.isEmpty()) {
+            LoggedName.setText(username);
+        }
+        
+        if (LoggedMail != null && !email.isEmpty()) {
+            LoggedMail.setText(email);
+        }
     }
 
     private void makeDraggable() {
@@ -53,6 +72,8 @@ public class Profile extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
+        LoggedName = new javax.swing.JLabel();
+        LoggedMail = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
@@ -118,6 +139,14 @@ public class Profile extends javax.swing.JPanel {
         });
         add(linkbutton);
         linkbutton.setBounds(100, 680, 50, 40);
+
+        LoggedName.setText("Name");
+        add(LoggedName);
+        LoggedName.setBounds(70, 80, 50, 30);
+
+        LoggedMail.setText("Email");
+        add(LoggedMail);
+        LoggedMail.setBounds(70, 100, 220, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/PhoneProfile.png"))); // NOI18N
         add(jLabel1);
@@ -210,6 +239,8 @@ public class Profile extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel LoggedMail;
+    private javax.swing.JLabel LoggedName;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;

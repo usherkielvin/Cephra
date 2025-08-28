@@ -9,11 +9,15 @@ import javax.swing.SwingUtilities;
 public class home extends javax.swing.JPanel {
 
     public home() {
+          String username = cephra.CephraDB.getCurrentUsername();
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+         if (LoggedName != null && !username.isEmpty()) {
+            LoggedName.setText(username);
+        }
     }
 
     private void makeDraggable() {
@@ -52,6 +56,7 @@ public class home extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
+        LoggedName = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
@@ -116,6 +121,10 @@ public class home extends javax.swing.JPanel {
         });
         add(linkbutton);
         linkbutton.setBounds(90, 680, 50, 40);
+
+        LoggedName.setText("Name");
+        add(LoggedName);
+        LoggedName.setBounds(170, 110, 50, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HOMEPAGE-UPDET.png"))); // NOI18N
         add(jLabel1);
@@ -207,6 +216,7 @@ public class home extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel LoggedName;
     private javax.swing.JButton Paydemo;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;

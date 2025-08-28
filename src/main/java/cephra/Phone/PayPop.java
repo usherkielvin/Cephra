@@ -78,6 +78,7 @@ public class PayPop extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
+        LoggedName = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -163,6 +164,10 @@ public class PayPop extends javax.swing.JPanel {
         });
         add(homebutton2);
         homebutton2.setBounds(150, 680, 40, 40);
+
+        LoggedName.setText("Name");
+        add(LoggedName);
+        LoggedName.setBounds(120, 120, 50, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/paypop.png"))); // NOI18N
         add(jLabel1);
@@ -340,6 +345,7 @@ public class PayPop extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Cash;
+    private javax.swing.JLabel LoggedName;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;

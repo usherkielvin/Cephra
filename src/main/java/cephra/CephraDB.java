@@ -22,6 +22,9 @@ public class CephraDB {
     
     // Our "database" which is a static ArrayList of User objects
     private static ArrayList<User> userDatabase;
+    
+    // Current logged-in user
+    private static User currentUser;
 
     // Method to initialize the database with some dummy data
     public static void initializeDatabase() {
@@ -41,10 +44,21 @@ public class CephraDB {
         }
         for (User user : userDatabase) {
             if (user.username.equals(username) && user.password.equals(password)) {
+                currentUser = user; // Set the current user when login is successful
                 return true;
             }
         }
         return false;
+    }
+    
+    // Method to get the current logged-in username
+    public static String getCurrentUsername() {
+        return currentUser != null ? currentUser.username : "";
+    }
+    
+    // Method to get the current logged-in user's email
+    public static String getCurrentEmail() {
+        return currentUser != null ? currentUser.email : "";
     }
 
     // Method to add a new user to the database
