@@ -400,7 +400,7 @@ public class Monitor extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void f1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_f1ActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_f1ActionPerformed
 
     // Grid buttons are display-only, no action listeners needed
