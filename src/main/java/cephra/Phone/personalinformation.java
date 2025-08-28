@@ -86,33 +86,78 @@ public class personalinformation extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
-                   public void run() {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.helpcenter());
+                        phoneFrame.switchPanel(new cephra.Phone.serviceoffered());
                         break;
                     }
                 }
             }
-        });  // TODO add your handling code here:
+        });
     }//GEN-LAST:event_chargeActionPerformed
 
     private void linkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkActionPerformed
-        // TODO add your handling code here:
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.link());
+                        break;
+                    }
+                }
+            }
+        });
     }//GEN-LAST:event_linkActionPerformed
 
     private void homeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeActionPerformed
-        // TODO add your handling code here:
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.home());
+                        break;
+                    }
+                }
+            }
+        });
     }//GEN-LAST:event_homeActionPerformed
 
     private void historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historyActionPerformed
-        // TODO add your handling code here:
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.phonehistory());
+                        break;
+                    }
+                }
+            }
+        });
     }//GEN-LAST:event_historyActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-        // TODO add your handling code here:
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Profile());
+                        break;
+                    }
+                }
+            }
+        });
     }//GEN-LAST:event_backActionPerformed
 
 
