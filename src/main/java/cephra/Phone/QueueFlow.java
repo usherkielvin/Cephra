@@ -60,6 +60,42 @@ public final class QueueFlow {
     public static List<Entry> getEntries() {
         return entries;
     }
+    
+    public static void updatePaymentStatus(String ticketId, String paymentStatus) {
+        for (int i = 0; i < entries.size(); i++) {
+            Entry entry = entries.get(i);
+            if (entry.ticketId.equals(ticketId)) {
+                // Replace the entry with updated payment status
+                entries.set(i, new Entry(
+                    entry.ticketId,
+                    entry.customerName,
+                    entry.serviceName,
+                    entry.status,
+                    paymentStatus,
+                    entry.action
+                ));
+                System.out.println("QueueFlow: Updated payment status for ticket " + ticketId + " to " + paymentStatus);
+                break;
+            }
+        }
+    }
+    
+    public static boolean hasActiveTicket() {
+        return currentTicketId != null && !currentTicketId.trim().isEmpty();
+    }
+    
+    public static Entry getCurrentTicketEntry() {
+        if (!hasActiveTicket()) {
+            return null;
+        }
+        
+        for (Entry entry : entries) {
+            if (entry.ticketId.equals(currentTicketId)) {
+                return entry;
+            }
+        }
+        return null;
+    }
 
     public static void addCurrentToAdminAndStore(String customerName) {
         String service = currentServiceName;

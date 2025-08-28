@@ -43,28 +43,50 @@ public final class QueueBridge {
     }
 
     public static void markPaymentPaid(final String ticket) {
-        if (ticket == null) return;
+        if (ticket == null || ticket.trim().isEmpty()) {
+            System.err.println("QueueBridge: Invalid ticket ID provided for payment update");
+            return;
+        }
+        
+        System.out.println("QueueBridge: Marking payment as paid for ticket: " + ticket);
+        
+        boolean foundInRecords = false;
         // Update persisted records
         for (int i = 0; i < records.size(); i++) {
             Object[] r = records.get(i);
             if (r != null && r.length > 4 && ticket.equals(String.valueOf(r[0]))) {
                 r[4] = "Paid";
+                foundInRecords = true;
+                System.out.println("QueueBridge: Updated payment status in records for ticket: " + ticket);
                 break;
             }
         }
+        
+        if (!foundInRecords) {
+            System.out.println("QueueBridge: Ticket not found in records: " + ticket);
+        }
+        
         // Update visible table
         if (model != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    boolean foundInTable = false;
                     for (int i = 0; i < model.getRowCount(); i++) {
                         Object v = model.getValueAt(i, 0);
                         if (ticket.equals(String.valueOf(v))) {
                             model.setValueAt("Paid", i, 4);
+                            foundInTable = true;
+                            System.out.println("QueueBridge: Updated payment status in table for ticket: " + ticket);
                             break;
                         }
                     }
+                    if (!foundInTable) {
+                        System.out.println("QueueBridge: Ticket not found in table: " + ticket);
+                    }
                 }
             });
+        } else {
+            System.out.println("QueueBridge: No table model registered, skipping table update");
         }
     }
 

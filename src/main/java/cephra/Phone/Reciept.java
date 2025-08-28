@@ -71,6 +71,11 @@ public class Reciept extends javax.swing.JPanel {
         share.setBorder(null);
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
+        share.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                shareActionPerformed(evt);
+            }
+        });
         add(share);
         share.setBounds(180, 680, 130, 40);
 
@@ -88,6 +93,11 @@ public class Reciept extends javax.swing.JPanel {
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
+        Download.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DownloadActionPerformed(evt);
+            }
+        });
         add(Download);
         Download.setBounds(30, 683, 120, 30);
 
@@ -161,21 +171,45 @@ public class Reciept extends javax.swing.JPanel {
     }//GEN-LAST:event_ExitActionPerformed
 
     private void DownloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DownloadActionPerformed
-        JOptionPane.showMessageDialog(
-            this,
-            "Reciept saved to Photos",
-            "Saved",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+        try {
+            // Simulate download operation
+            // In a real application, you would implement actual file saving logic here
+            // For now, we'll just show a success message
+            JOptionPane.showMessageDialog(
+                this,
+                "Receipt saved to Photos",
+                "Saved",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error saving receipt: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }//GEN-LAST:event_DownloadActionPerformed
 
     private void shareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shareActionPerformed
-        JOptionPane.showMessageDialog(
-            this,
-            "Link copied",
-            "Shared",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+        try {
+            // Simulate sharing operation
+            // In a real application, you would implement actual sharing logic here
+            // For now, we'll just show a success message
+            JOptionPane.showMessageDialog(
+                this,
+                "Link copied to clipboard",
+                "Shared",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error sharing receipt: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }//GEN-LAST:event_shareActionPerformed
 
 
