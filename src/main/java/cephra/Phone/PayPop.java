@@ -15,6 +15,12 @@ public class PayPop extends javax.swing.JPanel {
         setupLabelPosition(); // Set label position
         makeDraggable();
         updateTextWithAmount();
+        
+          String username = cephra.CephraDB.getCurrentUsername();
+        
+          if (LoggedName != null && !username.isEmpty()) {
+            LoggedName.setText(username);
+        }
     }
      // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
