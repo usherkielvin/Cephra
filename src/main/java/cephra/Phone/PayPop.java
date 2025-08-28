@@ -242,14 +242,63 @@ public class PayPop extends javax.swing.JPanel {
     private void payonlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payonlineActionPerformed
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
-                if (currentTicket != null && !currentTicket.isEmpty()) {
-                    try {
-                        cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
-                    } catch (Throwable t) {
-                        // ignore if admin not available
+                try {
+                    // Check if there's an active ticket
+                    if (!cephra.Phone.QueueFlow.hasActiveTicket()) {
+                        System.out.println("No active ticket found for payment");
+                        
+                        // Show error message to user
+                        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                javax.swing.JOptionPane.showMessageDialog(
+                                    PayPop.this,
+                                    "No active ticket found for payment.\nPlease get a ticket first.",
+                                    "Payment Error",
+                                    javax.swing.JOptionPane.ERROR_MESSAGE
+                                );
+                            }
+                        });
+                        return;
                     }
+                    
+                    // Get current ticket ID
+                    String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+                    cephra.Phone.QueueFlow.Entry ticketEntry = cephra.Phone.QueueFlow.getCurrentTicketEntry();
+                    
+                    if (currentTicket != null && !currentTicket.isEmpty()) {
+                        // Update payment status in admin queue
+                        cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
+                        
+                        // Also update the local queue flow entries
+                        cephra.Phone.QueueFlow.updatePaymentStatus(currentTicket, "Paid");
+                        
+                        System.out.println("Payment marked as paid for ticket: " + currentTicket);
+                        
+                        // Show success message to user
+                        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                String message = "Payment processed successfully!\n";
+                                message += "Ticket: " + currentTicket + "\n";
+                                if (ticketEntry != null) {
+                                    message += "Service: " + ticketEntry.serviceName + "\n";
+                                    message += "Status: " + ticketEntry.status;
+                                }
+                                javax.swing.JOptionPane.showMessageDialog(
+                                    PayPop.this,
+                                    message,
+                                    "Payment Success",
+                                    javax.swing.JOptionPane.INFORMATION_MESSAGE
+                                );
+                            }
+                        });
+                    }
+
+                } catch (Exception e) {
+                    System.err.println("Error updating payment status: " + e.getMessage());
+                    e.printStackTrace();
                 }
+                
+                // Navigate to receipt regardless of payment update success
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
@@ -261,6 +310,8 @@ public class PayPop extends javax.swing.JPanel {
             }
         });
     }//GEN-LAST:event_payonlineActionPerformed
+
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

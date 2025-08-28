@@ -226,7 +226,6 @@ public class Monitor extends javax.swing.JFrame {
         WaitingGrid.setOpaque(false);
         WaitingGrid.setLayout(new java.awt.GridLayout(5, 2, 20, 15));
 
-        jButton1.setText("AAAA");
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -265,6 +264,11 @@ public class Monitor extends javax.swing.JFrame {
         jButton7.setBorder(null);
         jButton7.setBorderPainted(false);
         jButton7.setContentAreaFilled(false);
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
         WaitingGrid.add(jButton7);
 
         jButton8.setBorder(null);
@@ -371,19 +375,19 @@ public class Monitor extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void b2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b2ActionPerformed
-        // TODO add your handling code here:
+      
     }//GEN-LAST:event_b2ActionPerformed
 
     private void b4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b4ActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_b4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_jButton1ActionPerformed
 
     // Grid buttons are display-only, no action listeners needed
