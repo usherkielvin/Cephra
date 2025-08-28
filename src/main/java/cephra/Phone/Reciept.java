@@ -15,6 +15,7 @@ public class Reciept extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        populateAmounts();
     }
      // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
@@ -48,6 +49,25 @@ public class Reciept extends javax.swing.JPanel {
                 }
             }
         });
+    }
+
+    private void populateAmounts() {
+        try {
+            String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
+            if (ticket == null || ticket.isEmpty()) return;
+            cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+            int start = info == null ? 18 : info.initialPercent;
+            double cap = info == null ? 40.0 : info.capacityKWh;
+            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+            double usedKWh = (100.0 - start) / 100.0 * cap;
+            AmountPaid.setText(String.format("Php %.2f", amount));
+            Fee.setText("Php 0.00");
+            price.setText(String.format("PHP %.2f", amount));
+            RefNumber.setText(ticket);
+            TimeDate.setText(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy hh:mm:ss a")));
+        } catch (Throwable t) {
+            // ignore
+        }
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

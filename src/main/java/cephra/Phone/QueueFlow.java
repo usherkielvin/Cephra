@@ -12,14 +12,18 @@ public final class QueueFlow {
         public final String status;
         public final String payment;
         public final String action;
+        public final int initialBatteryPercent;
+        public final double batteryCapacityKWh;
 
-        public Entry(String ticketId, String customerName, String serviceName, String status, String payment, String action) {
+        public Entry(String ticketId, String customerName, String serviceName, String status, String payment, String action, int initialBatteryPercent, double batteryCapacityKWh) {
             this.ticketId = ticketId;
             this.customerName = customerName;
             this.serviceName = serviceName;
             this.status = status;
             this.payment = payment;
             this.action = action;
+            this.initialBatteryPercent = initialBatteryPercent;
+            this.batteryCapacityKWh = batteryCapacityKWh;
         }
     }
 
@@ -72,7 +76,9 @@ public final class QueueFlow {
                     entry.serviceName,
                     entry.status,
                     paymentStatus,
-                    entry.action
+                    entry.action,
+                    entry.initialBatteryPercent,
+                    entry.batteryCapacityKWh
                 ));
                 System.out.println("QueueFlow: Updated payment status for ticket " + ticketId + " to " + paymentStatus);
                 break;
@@ -110,13 +116,16 @@ public final class QueueFlow {
         final String status = "Pending";
         final String payment = "";
         final String action = "";
+        final int initialBatteryPercent = 18; // demo default
+        final double batteryCapacityKWh = 40.0; // demo default
 
         // Store in memory list
-        entries.add(new Entry(ticket, customerName, service, status, payment, action));
+        entries.add(new Entry(ticket, customerName, service, status, payment, action, initialBatteryPercent, batteryCapacityKWh));
 
         // Reflect into Admin table if registered
         try {
             cephra.Admin.QueueBridge.addTicket(ticket, customerName, service, status, payment, action);
+            cephra.Admin.QueueBridge.setTicketBatteryInfo(ticket, initialBatteryPercent, batteryCapacityKWh);
         } catch (Throwable t) {
             // ignore if admin queue not ready
         }

@@ -14,6 +14,7 @@ public class PayPop extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        updateTextWithAmount();
     }
      // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
@@ -47,6 +48,25 @@ public class PayPop extends javax.swing.JPanel {
                 }
             }
         });
+    }
+
+    private void updateTextWithAmount() {
+        try {
+            String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
+            if (ticket == null || ticket.isEmpty()) return;
+            cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+            double commission = cephra.Admin.QueueBridge.computePlatformCommission(amount);
+            double net = cephra.Admin.QueueBridge.computeNetToStation(amount);
+            int start = info == null ? 18 : info.initialPercent;
+            double cap = info == null ? 40.0 : info.capacityKWh;
+            double usedKWh = (100.0 - start) / 100.0 * cap;
+            String summary = String.format("Charging Complete – Please Pay ₱%.2f\nEnergy: %.1f kWh @ ₱15/kWh\nMin fee: ₱50 applies if higher\nCommission: ₱%.2f (18%%)\nNet to station: ₱%.2f", amount, usedKWh, commission, net);
+            // For lightweight UI without adding labels, print to stdout; UI image remains static
+            System.out.println(summary);
+        } catch (Throwable t) {
+            // ignore
+        }
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -263,36 +283,40 @@ public class PayPop extends javax.swing.JPanel {
                     
                     // Get current ticket ID
                     String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
-                    cephra.Phone.QueueFlow.Entry ticketEntry = cephra.Phone.QueueFlow.getCurrentTicketEntry();
-                    
-                    if (currentTicket != null && !currentTicket.isEmpty()) {
-                        // Update payment status in admin queue
-                        cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
-                        
-                        // Also update the local queue flow entries
-                        cephra.Phone.QueueFlow.updatePaymentStatus(currentTicket, "Paid");
-                        
-                        System.out.println("Payment marked as paid for ticket: " + currentTicket);
-                        
-                        // Show success message to user
-                        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                String message = "Payment processed successfully!\n";
-                                message += "Ticket: " + currentTicket + "\n";
-                                if (ticketEntry != null) {
-                                    message += "Service: " + ticketEntry.serviceName + "\n";
-                                    message += "Status: " + ticketEntry.status;
-                                }
-                                javax.swing.JOptionPane.showMessageDialog(
-                                    PayPop.this,
-                                    message,
-                                    "Payment Success",
-                                    javax.swing.JOptionPane.INFORMATION_MESSAGE
-                                );
-                            }
-                        });
-                    }
 
+                    // Validate that the ticket is Complete and Payment is Pending in admin table
+                    boolean validForPayment = false;
+                    try {
+                        javax.swing.table.DefaultTableModel m = (javax.swing.table.DefaultTableModel) cephra.Admin.QueueBridge.class.getDeclaredField("model").get(null);
+                        if (m != null) {
+                            for (int i = 0; i < m.getRowCount(); i++) {
+                                Object v = m.getValueAt(i, 0);
+                                if (currentTicket.equals(String.valueOf(v))) {
+                                    String status = String.valueOf(m.getValueAt(i, 3));
+                                    String payment = String.valueOf(m.getValueAt(i, 4));
+                                    validForPayment = "Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(payment);
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (Throwable t) {
+                        // if reflection fails, skip validation
+                        validForPayment = true;
+                    }
+                    if (!validForPayment) {
+                        javax.swing.JOptionPane.showMessageDialog(
+                            PayPop.this,
+                            "Ticket is not ready for payment.",
+                            "Payment Error",
+                            javax.swing.JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
+                    // Update payment status in admin queue
+                    cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
+                    // Also update the local queue flow entries
+                    cephra.Phone.QueueFlow.updatePaymentStatus(currentTicket, "Paid");
+                    System.out.println("Payment marked as paid for ticket: " + currentTicket);
                 } catch (Exception e) {
                     System.err.println("Error updating payment status: " + e.getMessage());
                     e.printStackTrace();

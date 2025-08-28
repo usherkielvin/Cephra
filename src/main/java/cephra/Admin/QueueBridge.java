@@ -3,11 +3,23 @@ package cephra.Admin;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class QueueBridge {
     private static DefaultTableModel model;
     private static final List<Object[]> records = new ArrayList<Object[]>();
+    private static final Map<String, BatteryInfo> ticketBattery = new HashMap<String, BatteryInfo>();
+
+    public static final class BatteryInfo {
+        public final int initialPercent;
+        public final double capacityKWh;
+        public BatteryInfo(int initialPercent, double capacityKWh) {
+            this.initialPercent = initialPercent;
+            this.capacityKWh = capacityKWh;
+        }
+    }
 
     private QueueBridge() {}
 
@@ -40,6 +52,36 @@ public final class QueueBridge {
             }
         });
         records.add(0, row);
+    }
+
+    public static void setTicketBatteryInfo(String ticket, int initialPercent, double capacityKWh) {
+        if (ticket == null) return;
+        ticketBattery.put(ticket, new BatteryInfo(initialPercent, capacityKWh));
+    }
+
+    public static BatteryInfo getTicketBatteryInfo(String ticket) {
+        return ticketBattery.get(ticket);
+    }
+
+    public static double computeAmountDue(String ticket) {
+        BatteryInfo info = ticketBattery.get(ticket);
+        if (info == null) {
+            // fallback defaults
+            info = new BatteryInfo(18, 40.0);
+        }
+        int start = Math.max(0, Math.min(100, info.initialPercent));
+        double usedFraction = (100.0 - start) / 100.0;
+        double energyKWh = usedFraction * info.capacityKWh;
+        double gross = energyKWh * 15.0;
+        return Math.max(gross, 50.0);
+    }
+
+    public static double computePlatformCommission(double grossAmount) {
+        return grossAmount * 0.18; // 18%
+    }
+
+    public static double computeNetToStation(double grossAmount) {
+        return grossAmount * 0.82; // 82%
     }
 
     public static void markPaymentPaid(final String ticket) {

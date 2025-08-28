@@ -124,25 +124,60 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             String ticket = ticketVal != null ? String.valueOf(ticketVal).trim() : "";
             
                 if ("Pending".equalsIgnoreCase(status)) {
-                    queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
-                
-                    // Add ticket to waiting grid (jPanel1)
+                    // Only move to Waiting if there is capacity in the waiting grid
                     if (!ticket.isEmpty() && buttonCount < 10) {
+                        queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
                         gridButtons[buttonCount].setText(ticket);
                         gridButtons[buttonCount].setVisible(true);
-                    buttonCount++;
-                        
-                        // Update Monitor display
+                        buttonCount++;
                         updateMonitorDisplay();
-                }
+                    } else {
+                        // Keep status as Pending and inform user that waiting grid is full
+                        JOptionPane.showMessageDialog(Queue.this,
+                            "Waiting grid is full! Ticket remains Pending.",
+                            "Waiting Grid Full",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    }
                 } else if ("Waiting".equalsIgnoreCase(status)) {
-                    queTab.setValueAt("Charging", editingRow, statusColumnIndex);
+                    boolean isFast = ticket.startsWith("FCH");
+                    boolean assigned = isFast ? assignToFastSlot(ticket) : assignToNormalSlot(ticket);
+                    if (assigned) {
+                        queTab.setValueAt("Charging", editingRow, statusColumnIndex);
+                        removeTicketFromGrid(ticket);
+                    } else {
+                        String msg = isFast ?
+                            "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue." :
+                            "Normal Charge Bays 1-5 are full!\nTicket " + ticket + " remains in waiting queue.";
+                        String title = isFast ? "Fast Charge Bays Full" : "Normal Charge Bays Full";
+                        JOptionPane.showMessageDialog(Queue.this, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                    }
                 } else if ("Charging".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
                     if (paymentCol >= 0) {
                         // Upon completion, payment becomes Pending
                         queTab.setValueAt("Pending", editingRow, paymentCol);
                     }
+                    // Remove from charging grids and refresh monitor
+                    removeFromChargingSlots(ticket);
+
+                    // Set current ticket context for phone and mark payment pending
+                    try {
+                        int serviceCol = getColumnIndex("Service");
+                        String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
+                        cephra.Phone.QueueFlow.setCurrent(ticket, serviceName);
+                        cephra.Phone.QueueFlow.updatePaymentStatus(ticket, "Pending");
+                    } catch (Throwable t) {
+                        // ignore
+                    }
+
+                    // Compute amount due (for popup/receipt display)
+                    try {
+                        double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                        System.out.println("Amount due for " + ticket + ": " + String.format("%.2f", amount));
+                    } catch (Throwable t) {
+                        // ignore compute errors
+                    }
+
                     // Notify phone frame to show payment popup
                     try {
                         java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -170,7 +205,26 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                        Object[] historyRow = new Object[] { ticket, customer, "", "", servedBy, dateTime, reference };
+                        double amount = 0.0;
+                        double usedKWh = 0.0;
+                        try {
+                            cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                            int start = info == null ? 18 : info.initialPercent;
+                            double cap = info == null ? 40.0 : info.capacityKWh;
+                            usedKWh = ((100.0 - start) / 100.0) * cap;
+                            amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                        } catch (Throwable t) {
+                            // ignore compute errors, leave defaults
+                        }
+                        Object[] historyRow = new Object[] {
+                            ticket,
+                            customer,
+                            String.format("%.2f", usedKWh),
+                            String.format("%.2f", amount),
+                            servedBy,
+                            dateTime,
+                            reference
+                        };
                         try {
                             cephra.Admin.HistoryBridge.addRecord(historyRow);
                         } catch (Throwable t) {
@@ -260,7 +314,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             
                          // Only remove from waiting grid if a slot was available
              if (slotAvailable) {
-                 removeTicketFromGrid(ticket);
+                setTableStatusToChargingByTicket(ticket);
+                removeTicketFromGrid(ticket);
                  // Update Monitor normal grid display
                  updateMonitorNormalGrid();
              } else {
@@ -296,7 +351,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             
                          // Only remove from waiting grid if a slot was available
              if (slotAvailable) {
-                 removeTicketFromGrid(ticket);
+                setTableStatusToChargingByTicket(ticket);
+                removeTicketFromGrid(ticket);
                  // Update Monitor fast grid display
                  updateMonitorFastGrid();
              } else {
@@ -392,6 +448,84 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
          }
      }
 
+    private void setTableStatusToChargingByTicket(String ticket) {
+        int ticketCol = getColumnIndex("Ticket");
+        int statusCol = getColumnIndex("Status");
+        if (ticketCol < 0 || statusCol < 0) return;
+        for (int row = 0; row < queTab.getRowCount(); row++) {
+            Object val = queTab.getValueAt(row, ticketCol);
+            if (val != null && ticket.equals(String.valueOf(val).trim())) {
+                queTab.setValueAt("Charging", row, statusCol);
+                break;
+            }
+        }
+    }
+
+    private boolean assignToNormalSlot(String ticket) {
+        if (normalcharge1.getText().isEmpty() || normalcharge1.getText().equals("jButton11")) {
+            normalcharge1.setText(ticket);
+            normalcharge1.setVisible(true);
+            updateMonitorNormalGrid();
+            return true;
+        } else if (normalcharge2.getText().isEmpty() || normalcharge2.getText().equals("jButton11")) {
+            normalcharge2.setText(ticket);
+            normalcharge2.setVisible(true);
+            updateMonitorNormalGrid();
+            return true;
+        } else if (normalcharge3.getText().isEmpty() || normalcharge3.getText().equals("jButton12")) {
+            normalcharge3.setText(ticket);
+            normalcharge3.setVisible(true);
+            updateMonitorNormalGrid();
+            return true;
+        } else if (normalcharge4.getText().isEmpty() || normalcharge4.getText().equals("jButton13")) {
+            normalcharge4.setText(ticket);
+            normalcharge4.setVisible(true);
+            updateMonitorNormalGrid();
+            return true;
+        } else if (normalcharge5.getText().isEmpty() || normalcharge5.getText().equals("jButton14")) {
+            normalcharge5.setText(ticket);
+            normalcharge5.setVisible(true);
+            updateMonitorNormalGrid();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean assignToFastSlot(String ticket) {
+        if (fastslot1.getText().isEmpty() || fastslot1.getText().equals("jButton11")) {
+            fastslot1.setText(ticket);
+            fastslot1.setVisible(true);
+            updateMonitorFastGrid();
+            return true;
+        } else if (fastslot2.getText().isEmpty() || fastslot2.getText().equals("jButton12")) {
+            fastslot2.setText(ticket);
+            fastslot2.setVisible(true);
+            updateMonitorFastGrid();
+            return true;
+        } else if (fastslot3.getText().isEmpty() || fastslot3.getText().equals("jButton13")) {
+            fastslot3.setText(ticket);
+            fastslot3.setVisible(true);
+            updateMonitorFastGrid();
+            return true;
+        }
+        return false;
+    }
+
+    private void removeFromChargingSlots(String ticket) {
+        // Clear from fast slots if present
+        if (ticket.equals(fastslot1.getText())) { fastslot1.setText(""); fastslot1.setVisible(false); }
+        if (ticket.equals(fastslot2.getText())) { fastslot2.setText(""); fastslot2.setVisible(false); }
+        if (ticket.equals(fastslot3.getText())) { fastslot3.setText(""); fastslot3.setVisible(false); }
+        updateMonitorFastGrid();
+
+        // Clear from normal slots if present
+        if (ticket.equals(normalcharge1.getText())) { normalcharge1.setText(""); normalcharge1.setVisible(false); }
+        if (ticket.equals(normalcharge2.getText())) { normalcharge2.setText(""); normalcharge2.setVisible(false); }
+        if (ticket.equals(normalcharge3.getText())) { normalcharge3.setText(""); normalcharge3.setVisible(false); }
+        if (ticket.equals(normalcharge4.getText())) { normalcharge4.setText(""); normalcharge4.setVisible(false); }
+        if (ticket.equals(normalcharge5.getText())) { normalcharge5.setText(""); normalcharge5.setVisible(false); }
+        updateMonitorNormalGrid();
+    }
 
 
     private void setupPaymentColumn() {
@@ -496,6 +630,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastslot3 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
@@ -504,7 +639,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton7 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
         normalcharge1 = new javax.swing.JButton();
         nxtfastbtn = new javax.swing.JButton();
         nxtnormalbtn = new javax.swing.JButton();
