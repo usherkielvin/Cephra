@@ -212,7 +212,7 @@ public class Monitor extends javax.swing.JFrame {
         f1 = new javax.swing.JButton();
         f2 = new javax.swing.JButton();
         f3 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        IconTV = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -226,7 +226,6 @@ public class Monitor extends javax.swing.JFrame {
         WaitingGrid.setOpaque(false);
         WaitingGrid.setLayout(new java.awt.GridLayout(5, 2, 20, 15));
 
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -237,66 +236,59 @@ public class Monitor extends javax.swing.JFrame {
         });
         WaitingGrid.add(jButton1);
 
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setBorder(null);
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
         WaitingGrid.add(jButton2);
 
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
         jButton3.setBorder(null);
         jButton3.setBorderPainted(false);
         jButton3.setContentAreaFilled(false);
         WaitingGrid.add(jButton3);
 
-        jButton4.setForeground(new java.awt.Color(255, 255, 255));
         jButton4.setBorder(null);
         jButton4.setBorderPainted(false);
         jButton4.setContentAreaFilled(false);
         WaitingGrid.add(jButton4);
 
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
         jButton5.setBorder(null);
         jButton5.setBorderPainted(false);
         jButton5.setContentAreaFilled(false);
         WaitingGrid.add(jButton5);
 
-        jButton6.setForeground(new java.awt.Color(255, 255, 255));
         jButton6.setBorder(null);
         jButton6.setBorderPainted(false);
         jButton6.setContentAreaFilled(false);
         WaitingGrid.add(jButton6);
 
-        jButton7.setForeground(new java.awt.Color(255, 255, 255));
         jButton7.setBorder(null);
         jButton7.setBorderPainted(false);
         jButton7.setContentAreaFilled(false);
         WaitingGrid.add(jButton7);
 
-        jButton8.setForeground(new java.awt.Color(255, 255, 255));
         jButton8.setBorder(null);
         jButton8.setBorderPainted(false);
         jButton8.setContentAreaFilled(false);
         WaitingGrid.add(jButton8);
 
-        jButton9.setForeground(new java.awt.Color(255, 255, 255));
         jButton9.setBorder(null);
         jButton9.setBorderPainted(false);
         jButton9.setContentAreaFilled(false);
         WaitingGrid.add(jButton9);
 
-        jButton10.setForeground(new java.awt.Color(255, 255, 255));
         jButton10.setBorder(null);
         jButton10.setBorderPainted(false);
         jButton10.setContentAreaFilled(false);
         WaitingGrid.add(jButton10);
 
         Monitor.add(WaitingGrid);
-        WaitingGrid.setBounds(20, 320, 310, 370);
+        WaitingGrid.setBounds(30, 330, 300, 370);
 
         jPanel2.setOpaque(false);
         jPanel2.setLayout(new java.awt.GridLayout(1, 4, 20, 20));
 
+        b2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        b2.setForeground(new java.awt.Color(41, 182, 246));
         b2.setBorder(null);
         b2.setBorderPainted(false);
         b2.setContentAreaFilled(false);
@@ -307,11 +299,15 @@ public class Monitor extends javax.swing.JFrame {
         });
         jPanel2.add(b2);
 
+        b3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        b3.setForeground(new java.awt.Color(41, 182, 246));
         b3.setBorder(null);
         b3.setBorderPainted(false);
         b3.setContentAreaFilled(false);
         jPanel2.add(b3);
 
+        b4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        b4.setForeground(new java.awt.Color(41, 182, 246));
         b4.setBorder(null);
         b4.setBorderPainted(false);
         b4.setContentAreaFilled(false);
@@ -322,58 +318,70 @@ public class Monitor extends javax.swing.JFrame {
         });
         jPanel2.add(b4);
 
+        b5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        b5.setForeground(new java.awt.Color(41, 182, 246));
         b5.setBorder(null);
         b5.setBorderPainted(false);
         b5.setContentAreaFilled(false);
         jPanel2.add(b5);
 
         Monitor.add(jPanel2);
-        jPanel2.setBounds(400, 540, 550, 160);
+        jPanel2.setBounds(412, 540, 540, 170);
 
+        b1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        b1.setForeground(new java.awt.Color(41, 182, 246));
         b1.setBorder(null);
         b1.setBorderPainted(false);
         b1.setContentAreaFilled(false);
         Monitor.add(b1);
-        b1.setBounds(830, 310, 120, 180);
+        b1.setBounds(840, 320, 110, 180);
 
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.setOpaque(false);
         jPanel1.setLayout(new java.awt.GridLayout(1, 3, 15, 20));
 
+        f1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        f1.setForeground(new java.awt.Color(0, 230, 118));
         f1.setBorder(null);
         f1.setBorderPainted(false);
         f1.setContentAreaFilled(false);
+        f1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                f1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(f1);
 
+        f2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        f2.setForeground(new java.awt.Color(0, 230, 118));
         f2.setBorder(null);
         f2.setBorderPainted(false);
         f2.setContentAreaFilled(false);
         jPanel1.add(f2);
 
+        f3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        f3.setForeground(new java.awt.Color(0, 230, 118));
         f3.setBorder(null);
         f3.setBorderPainted(false);
         f3.setContentAreaFilled(false);
         jPanel1.add(f3);
 
         Monitor.add(jPanel1);
-        jPanel1.setBounds(400, 310, 410, 180);
+        jPanel1.setBounds(412, 320, 400, 180);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/TV SCREEn.png"))); // NOI18N
-        Monitor.add(jLabel1);
-        jLabel1.setBounds(-10, -10, 1000, 750);
+        IconTV.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/TV.gif"))); // NOI18N
+        Monitor.add(IconTV);
+        IconTV.setBounds(-3, -4, 1010, 760);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(Monitor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(Monitor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(Monitor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(Monitor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -392,9 +400,14 @@ public class Monitor extends javax.swing.JFrame {
        
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void f1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_f1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_f1ActionPerformed
+
     // Grid buttons are display-only, no action listeners needed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel IconTV;
     private javax.swing.JPanel Monitor;
     private javax.swing.JPanel WaitingGrid;
     private javax.swing.JButton b1;
@@ -415,7 +428,6 @@ public class Monitor extends javax.swing.JFrame {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
