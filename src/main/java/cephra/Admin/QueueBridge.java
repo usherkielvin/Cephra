@@ -11,6 +11,7 @@ public final class QueueBridge {
     private static DefaultTableModel model;
     private static final List<Object[]> records = new ArrayList<Object[]>();
     private static final Map<String, BatteryInfo> ticketBattery = new HashMap<String, BatteryInfo>();
+    private static int totalPaidCount = 0;
 
     public static final class BatteryInfo {
         public final int initialPercent;
@@ -84,6 +85,10 @@ public final class QueueBridge {
         return grossAmount * 0.82; // 82%
     }
 
+    public static int getTotalPaidCount() {
+        return totalPaidCount;
+    }
+
     public static void markPaymentPaid(final String ticket) {
         if (ticket == null || ticket.trim().isEmpty()) {
             System.err.println("QueueBridge: Invalid ticket ID provided for payment update");
@@ -93,15 +98,23 @@ public final class QueueBridge {
         System.out.println("QueueBridge: Marking payment as paid for ticket: " + ticket);
         
         boolean foundInRecords = false;
+        boolean incrementCounter = false;
         // Update persisted records
         for (int i = 0; i < records.size(); i++) {
             Object[] r = records.get(i);
             if (r != null && r.length > 4 && ticket.equals(String.valueOf(r[0]))) {
+                String prev = String.valueOf(r[4]);
+                if (!"Paid".equalsIgnoreCase(prev)) {
+                    incrementCounter = true;
+                }
                 r[4] = "Paid";
                 foundInRecords = true;
                 System.out.println("QueueBridge: Updated payment status in records for ticket: " + ticket);
                 break;
             }
+        }
+        if (incrementCounter) {
+            totalPaidCount++;
         }
         
         if (!foundInRecords) {
