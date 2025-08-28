@@ -15,25 +15,6 @@ public class Profile extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
-        
-        // Set the logged-in user's name and email
-        updateUserInfo();
-    }
-    
-    // Method to update the user information labels
-    private void updateUserInfo() {
-        // Get the current user's information from CephraDB
-        String username = cephra.CephraDB.getCurrentUsername();
-        String email = cephra.CephraDB.getCurrentEmail();
-        
-        // Update the labels
-        if (LoggedName != null && !username.isEmpty()) {
-            LoggedName.setText(username);
-        }
-        
-        if (LoggedMail != null && !email.isEmpty()) {
-            LoggedMail.setText(email);
-        }
     }
 
     private void makeDraggable() {
@@ -72,8 +53,10 @@ public class Profile extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
-        LoggedName = new javax.swing.JLabel();
-        LoggedMail = new javax.swing.JLabel();
+        PersonalInformation = new javax.swing.JButton();
+        PaymentMethod = new javax.swing.JButton();
+        Language = new javax.swing.JButton();
+        Help = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
@@ -140,13 +123,45 @@ public class Profile extends javax.swing.JPanel {
         add(linkbutton);
         linkbutton.setBounds(100, 680, 50, 40);
 
-        LoggedName.setText("Name");
-        add(LoggedName);
-        LoggedName.setBounds(70, 80, 50, 30);
+        PersonalInformation.setBorderPainted(false);
+        PersonalInformation.setContentAreaFilled(false);
+        PersonalInformation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PersonalInformationActionPerformed(evt);
+            }
+        });
+        add(PersonalInformation);
+        PersonalInformation.setBounds(30, 280, 290, 50);
 
-        LoggedMail.setText("Email");
-        add(LoggedMail);
-        LoggedMail.setBounds(70, 100, 220, 30);
+        PaymentMethod.setBorderPainted(false);
+        PaymentMethod.setContentAreaFilled(false);
+        PaymentMethod.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PaymentMethodActionPerformed(evt);
+            }
+        });
+        add(PaymentMethod);
+        PaymentMethod.setBounds(30, 360, 290, 50);
+
+        Language.setBorderPainted(false);
+        Language.setContentAreaFilled(false);
+        Language.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LanguageActionPerformed(evt);
+            }
+        });
+        add(Language);
+        Language.setBounds(30, 440, 290, 50);
+
+        Help.setBorderPainted(false);
+        Help.setContentAreaFilled(false);
+        Help.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                HelpActionPerformed(evt);
+            }
+        });
+        add(Help);
+        Help.setBounds(30, 520, 290, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/PhoneProfile.png"))); // NOI18N
         add(jLabel1);
@@ -237,10 +252,72 @@ public class Profile extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
 
+    private void PersonalInformationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PersonalInformationActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.personalinformation());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_PersonalInformationActionPerformed
+
+    private void PaymentMethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PaymentMethodActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.payment());
+                        break;
+                    }
+                }
+            }
+        });        // TODO add your handling code here:
+    }//GEN-LAST:event_PaymentMethodActionPerformed
+
+    private void LanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LanguageActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.language());
+                        break;
+                    }
+                }
+            }
+        });           // TODO add your handling code here:
+    }//GEN-LAST:event_LanguageActionPerformed
+
+    private void HelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HelpActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.helpcenter());
+                        break;
+                    }
+                }
+            }
+        });           // TODO add your handling code here:
+    }//GEN-LAST:event_HelpActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel LoggedMail;
-    private javax.swing.JLabel LoggedName;
+    private javax.swing.JButton Help;
+    private javax.swing.JButton Language;
+    private javax.swing.JButton PaymentMethod;
+    private javax.swing.JButton PersonalInformation;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
