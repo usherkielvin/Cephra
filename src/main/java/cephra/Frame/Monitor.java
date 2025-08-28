@@ -216,7 +216,6 @@ public class Monitor extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(1000, 750));
-        setPreferredSize(new java.awt.Dimension(1000, 750));
         setResizable(false);
 
         Monitor.setMaximumSize(new java.awt.Dimension(1000, 750));
