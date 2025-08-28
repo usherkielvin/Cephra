@@ -78,6 +78,12 @@ public class PayPop extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
+        ticketNo = new javax.swing.JLabel();
+        ChargingDue = new javax.swing.JLabel();
+        kWh = new javax.swing.JLabel();
+        TotalBill = new javax.swing.JLabel();
+        name = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -164,6 +170,37 @@ public class PayPop extends javax.swing.JPanel {
         add(homebutton2);
         homebutton2.setBounds(150, 680, 40, 40);
 
+        ticketNo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        ticketNo.setText("FCH012");
+        add(ticketNo);
+        ticketNo.setBounds(220, 310, 60, 17);
+
+        ChargingDue.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        ChargingDue.setText("Php 20.0");
+        add(ChargingDue);
+        ChargingDue.setBounds(220, 335, 60, 17);
+
+        kWh.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        kWh.setText("23.0khw");
+        add(kWh);
+        kWh.setBounds(220, 360, 60, 17);
+
+        TotalBill.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        TotalBill.setText("1000.00");
+        add(TotalBill);
+        TotalBill.setBounds(217, 405, 60, 17);
+
+        name.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        name.setText("Dizon");
+        add(name);
+        name.setBounds(68, 73, 190, 30);
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        jLabel3.setText(",");
+        add(jLabel3);
+        jLabel3.setBounds(55, 75, 20, 30);
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/paypop.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
@@ -340,12 +377,18 @@ public class PayPop extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Cash;
+    private javax.swing.JLabel ChargingDue;
+    private javax.swing.JLabel TotalBill;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel kWh;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JLabel name;
     private javax.swing.JButton payonline;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JLabel ticketNo;
     // End of variables declaration//GEN-END:variables
 }

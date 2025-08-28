@@ -83,6 +83,7 @@ public class Reciept extends javax.swing.JPanel {
         Fee = new javax.swing.JLabel();
         AccNumber = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        NumTicket = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -90,11 +91,6 @@ public class Reciept extends javax.swing.JPanel {
         share.setBorder(null);
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
-        share.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                shareActionPerformed(evt);
-            }
-        });
         add(share);
         share.setBounds(180, 680, 130, 40);
 
@@ -112,11 +108,6 @@ public class Reciept extends javax.swing.JPanel {
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
-        Download.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DownloadActionPerformed(evt);
-            }
-        });
         add(Download);
         Download.setBounds(30, 683, 120, 30);
 
@@ -129,13 +120,13 @@ public class Reciept extends javax.swing.JPanel {
         RefNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         RefNumber.setText("33873585637");
         add(RefNumber);
-        RefNumber.setBounds(168, 375, 100, 21);
+        RefNumber.setBounds(168, 390, 100, 21);
 
         TimeDate.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         TimeDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         TimeDate.setText("29 August 2025 05:31:02 PM");
         add(TimeDate);
-        TimeDate.setBounds(70, 400, 190, 20);
+        TimeDate.setBounds(70, 410, 190, 20);
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel5.setText("Details");
@@ -166,8 +157,14 @@ public class Reciept extends javax.swing.JPanel {
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel8.setText("Ref. Number: ");
         add(jLabel8);
-        jLabel8.setBounds(70, 375, 100, 21);
+        jLabel8.setBounds(70, 390, 100, 21);
         jLabel8.getAccessibleContext().setAccessibleName("");
+
+        NumTicket.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        NumTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        NumTicket.setText("FCH008");
+        add(NumTicket);
+        NumTicket.setBounds(120, 360, 100, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Receipt.png"))); // NOI18N
         add(jLabel1);
@@ -238,6 +235,7 @@ public class Reciept extends javax.swing.JPanel {
     private javax.swing.JButton Download;
     private javax.swing.JButton Exit;
     private javax.swing.JLabel Fee;
+    private javax.swing.JLabel NumTicket;
     private javax.swing.JLabel RefNumber;
     private javax.swing.JLabel TimeDate;
     private javax.swing.JLabel jLabel1;
