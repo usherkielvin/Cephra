@@ -1,5 +1,6 @@
 package cephra.Admin;
 
+import java.awt.Color;
 import java.awt.Window;
 import javax.swing.SwingUtilities;
 
@@ -12,8 +13,10 @@ public class AdminRegister extends javax.swing.JPanel {
         gender.setText(""); // Plain email field
     }
 
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
+        
+        
 
         username = new javax.swing.JTextField();
         gender = new javax.swing.JTextField();

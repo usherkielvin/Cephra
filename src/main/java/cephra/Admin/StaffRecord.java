@@ -187,7 +187,7 @@ public class StaffRecord extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Staff .png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 1000, 750);
+        jLabel1.setBounds(10, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
@@ -225,18 +225,18 @@ public class StaffRecord extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_quebuttonActionPerformed
 
-    private void regActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regActionPerformed
-        Window w = SwingUtilities.getWindowAncestor(StaffRecord.this);
-        if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.AdminRegister());
-        }
-
-    }//GEN-LAST:event_regActionPerformed
-
     private void BTNsearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTNsearchActionPerformed
         
 
     }//GEN-LAST:event_BTNsearchActionPerformed
+
+    private void regActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regActionPerformed
+        Window w = SwingUtilities.getWindowAncestor(StaffRecord.this);
+        if (w instanceof cephra.Frame.Admin) {
+            ((cephra.Frame.Admin) w).switchPanel(new AdminRegister());
+        }
+       
+    }//GEN-LAST:event_regActionPerformed
 
     private void setupDateTimeTimer() {
         updateDateTime();

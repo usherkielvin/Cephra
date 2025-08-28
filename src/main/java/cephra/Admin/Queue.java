@@ -580,15 +580,21 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         panelLists.setLayout(null);
 
-        jLabel3.setText("jLabel3");
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("5");
         panelLists.add(jLabel3);
-        jLabel3.setBounds(50, 480, 120, 70);
+        jLabel3.setBounds(50, 500, 120, 70);
 
-        jLabel4.setText("jLabel3");
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("4");
         panelLists.add(jLabel4);
-        jLabel4.setBounds(50, 150, 120, 70);
+        jLabel4.setBounds(50, 170, 120, 70);
 
-        jLabel5.setText("jLabel3");
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("4");
         panelLists.add(jLabel5);
         jLabel5.setBounds(50, 310, 120, 70);
 
@@ -610,7 +616,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/QUEUEtable.png"))); // NOI18N
         panelLists.add(jLabel2);
-        jLabel2.setBounds(0, -60, 1010, 760);
+        jLabel2.setBounds(0, -80, 1010, 780);
 
         jTabbedPane1.addTab("Queue Lists", panelLists);
 
