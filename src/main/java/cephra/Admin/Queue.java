@@ -634,6 +634,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 );
                 if (choice == 0) {
                     editorValue = "Paid";
+                    // Sync cumulative paid counter and table via QueueBridge
+                    int ticketCol = getColumnIndex("Ticket");
+                    if (ticketCol >= 0) {
+                        Object v = queTab.getValueAt(editingRow, ticketCol);
+                        String ticket = v == null ? "" : String.valueOf(v).trim();
+                        if (!ticket.isEmpty()) {
+                            cephra.Admin.QueueBridge.markPaymentPaid(ticket);
+                        }
+                    }
                 }
             }
             stopCellEditing();
