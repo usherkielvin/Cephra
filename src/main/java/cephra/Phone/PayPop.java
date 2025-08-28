@@ -10,15 +10,21 @@ public class PayPop extends javax.swing.JPanel {
 
     public PayPop() {
         initComponents();
-           setPreferredSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
-        updateTextWithAmount();
         
-          String username = cephra.CephraDB.getCurrentUsername();
+        // Update labels with actual ticket data after components are initialized
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                updateTextWithAmount();
+            }
+        });
         
-          if (LoggedName != null && !username.isEmpty()) {
+        String username = cephra.CephraDB.getCurrentUsername();
+        
+        if (LoggedName != null && !username.isEmpty()) {
             LoggedName.setText(username);
         }
     }
@@ -60,6 +66,7 @@ public class PayPop extends javax.swing.JPanel {
         try {
             String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
             if (ticket == null || ticket.isEmpty()) return;
+            
             cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
             double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
             double commission = cephra.Admin.QueueBridge.computePlatformCommission(amount);
@@ -67,11 +74,31 @@ public class PayPop extends javax.swing.JPanel {
             int start = info == null ? 18 : info.initialPercent;
             double cap = info == null ? 40.0 : info.capacityKWh;
             double usedKWh = (100.0 - start) / 100.0 * cap;
+            
+            // Update all labels with actual ticket data
+            if (ticketNo != null) {
+                ticketNo.setText(ticket);
+            }
+            if (ChargingDue != null) {
+                ChargingDue.setText(String.format("₱%.2f", amount));
+            }
+            if (kWh != null) {
+                kWh.setText(String.format("%.1f kWh", usedKWh));
+            }
+            if (TotalBill != null) {
+                TotalBill.setText(String.format("₱%.2f", amount));
+            }
+            if (name != null) {
+                String username = cephra.CephraDB.getCurrentUsername();
+                if (username != null && !username.isEmpty()) {
+                    name.setText(username);
+                }
+            }
+            
             String summary = String.format("Charging Complete – Please Pay ₱%.2f\nEnergy: %.1f kWh @ ₱15/kWh\nMin fee: ₱50 applies if higher\nCommission: ₱%.2f (18%%)\nNet to station: ₱%.2f", amount, usedKWh, commission, net);
-            // For lightweight UI without adding labels, print to stdout; UI image remains static
             System.out.println(summary);
         } catch (Throwable t) {
-            // ignore
+            System.err.println("Error updating PayPop labels: " + t.getMessage());
         }
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -84,7 +111,6 @@ public class PayPop extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
-        LoggedName = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -171,10 +197,48 @@ public class PayPop extends javax.swing.JPanel {
         add(homebutton2);
         homebutton2.setBounds(150, 680, 40, 40);
 
+        LoggedName = new javax.swing.JLabel();
         LoggedName.setText("Name");
         add(LoggedName);
         LoggedName.setBounds(120, 120, 50, 30);
 
+        ticketNo = new javax.swing.JLabel();
+        ticketNo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        ticketNo.setText(""); // Will be populated with actual ticket number
+        add(ticketNo);
+        ticketNo.setBounds(220, 310, 60, 17);
+
+        ChargingDue = new javax.swing.JLabel();
+        ChargingDue.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        ChargingDue.setText(""); // Will be populated with actual amount
+        add(ChargingDue);
+        ChargingDue.setBounds(220, 335, 60, 17);
+
+        kWh = new javax.swing.JLabel();
+        kWh.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        kWh.setText(""); // Will be populated with actual kWh
+        add(kWh);
+        kWh.setBounds(220, 360, 60, 17);
+
+        TotalBill = new javax.swing.JLabel();
+        TotalBill.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        TotalBill.setText(""); // Will be populated with actual total
+        add(TotalBill);
+        TotalBill.setBounds(217, 405, 60, 17);
+
+        name = new javax.swing.JLabel();
+        name.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        name.setText(""); // Will be populated with actual username
+        add(name);
+        name.setBounds(68, 73, 190, 30);
+
+        jLabel3 = new javax.swing.JLabel();
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        jLabel3.setText(",");
+        add(jLabel3);
+        jLabel3.setBounds(55, 75, 20, 30);
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/paypop.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
@@ -351,13 +415,19 @@ public class PayPop extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Cash;
-    private javax.swing.JLabel LoggedName;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel kWh;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JLabel name;
     private javax.swing.JButton payonline;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JLabel ticketNo;
+    private javax.swing.JLabel LoggedName;
+    private javax.swing.JLabel ChargingDue;
+    private javax.swing.JLabel TotalBill;
     // End of variables declaration//GEN-END:variables
 }

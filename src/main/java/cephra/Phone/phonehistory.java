@@ -230,8 +230,6 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
                 profilebuttonActionPerformed(evt);
             }
         });
-        add(profilebutton);
-        profilebutton.setBounds(280, 680, 50, 50);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);

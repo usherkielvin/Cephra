@@ -225,9 +225,13 @@ public class Monitor extends javax.swing.JFrame {
         WaitingGrid.setOpaque(false);
         WaitingGrid.setLayout(new java.awt.GridLayout(5, 2, 20, 15));
 
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
+        jButton1.setFocusPainted(false);
+        jButton1.setFocusable(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -235,49 +239,85 @@ public class Monitor extends javax.swing.JFrame {
         });
         WaitingGrid.add(jButton1);
 
+        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setBorder(null);
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
+        jButton2.setFocusPainted(false);
+        jButton2.setFocusable(false);
         WaitingGrid.add(jButton2);
 
+        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton3.setForeground(new java.awt.Color(255, 255, 255));
         jButton3.setBorder(null);
         jButton3.setBorderPainted(false);
         jButton3.setContentAreaFilled(false);
+        jButton3.setFocusPainted(false);
+        jButton3.setFocusable(false);
         WaitingGrid.add(jButton3);
 
+        jButton4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton4.setForeground(new java.awt.Color(255, 255, 255));
         jButton4.setBorder(null);
         jButton4.setBorderPainted(false);
         jButton4.setContentAreaFilled(false);
+        jButton4.setFocusPainted(false);
+        jButton4.setFocusable(false);
         WaitingGrid.add(jButton4);
 
+        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton5.setForeground(new java.awt.Color(255, 255, 255));
         jButton5.setBorder(null);
         jButton5.setBorderPainted(false);
         jButton5.setContentAreaFilled(false);
+        jButton5.setFocusPainted(false);
+        jButton5.setFocusable(false);
         WaitingGrid.add(jButton5);
 
+        jButton6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton6.setForeground(new java.awt.Color(255, 255, 255));
         jButton6.setBorder(null);
         jButton6.setBorderPainted(false);
         jButton6.setContentAreaFilled(false);
+        jButton6.setFocusPainted(false);
+        jButton6.setFocusable(false);
         WaitingGrid.add(jButton6);
 
+        jButton7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton7.setForeground(new java.awt.Color(255, 255, 255));
         jButton7.setBorder(null);
         jButton7.setBorderPainted(false);
         jButton7.setContentAreaFilled(false);
+        jButton7.setFocusPainted(false);
+        jButton7.setFocusable(false);
         WaitingGrid.add(jButton7);
 
+        jButton8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton8.setForeground(new java.awt.Color(255, 255, 255));
         jButton8.setBorder(null);
         jButton8.setBorderPainted(false);
         jButton8.setContentAreaFilled(false);
+        jButton8.setFocusPainted(false);
+        jButton8.setFocusable(false);
         WaitingGrid.add(jButton8);
 
+        jButton9.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton9.setForeground(new java.awt.Color(255, 255, 255));
         jButton9.setBorder(null);
         jButton9.setBorderPainted(false);
         jButton9.setContentAreaFilled(false);
+        jButton9.setFocusPainted(false);
+        jButton9.setFocusable(false);
         WaitingGrid.add(jButton9);
 
+        jButton10.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton10.setForeground(new java.awt.Color(255, 255, 255));
         jButton10.setBorder(null);
         jButton10.setBorderPainted(false);
         jButton10.setContentAreaFilled(false);
+        jButton10.setFocusPainted(false);
+        jButton10.setFocusable(false);
         WaitingGrid.add(jButton10);
 
         Monitor.add(WaitingGrid);
@@ -291,6 +331,8 @@ public class Monitor extends javax.swing.JFrame {
         b2.setBorder(null);
         b2.setBorderPainted(false);
         b2.setContentAreaFilled(false);
+        b2.setFocusPainted(false);
+        b2.setFocusable(false);
         b2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 b2ActionPerformed(evt);
@@ -303,6 +345,8 @@ public class Monitor extends javax.swing.JFrame {
         b3.setBorder(null);
         b3.setBorderPainted(false);
         b3.setContentAreaFilled(false);
+        b3.setFocusPainted(false);
+        b3.setFocusable(false);
         jPanel2.add(b3);
 
         b4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -310,6 +354,8 @@ public class Monitor extends javax.swing.JFrame {
         b4.setBorder(null);
         b4.setBorderPainted(false);
         b4.setContentAreaFilled(false);
+        b4.setFocusPainted(false);
+        b4.setFocusable(false);
         b4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 b4ActionPerformed(evt);
@@ -322,6 +368,8 @@ public class Monitor extends javax.swing.JFrame {
         b5.setBorder(null);
         b5.setBorderPainted(false);
         b5.setContentAreaFilled(false);
+        b5.setFocusPainted(false);
+        b5.setFocusable(false);
         jPanel2.add(b5);
 
         Monitor.add(jPanel2);
@@ -332,18 +380,22 @@ public class Monitor extends javax.swing.JFrame {
         b1.setBorder(null);
         b1.setBorderPainted(false);
         b1.setContentAreaFilled(false);
+        b1.setFocusPainted(false);
+        b1.setFocusable(false);
         Monitor.add(b1);
         b1.setBounds(840, 320, 110, 180);
 
         jPanel1.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.setOpaque(false);
-        jPanel1.setLayout(new java.awt.GridLayout(1, 3, 15, 20));
+        jPanel1.setLayout(new java.awt.GridLayout(1, 3, 15, 15));
 
         f1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         f1.setForeground(new java.awt.Color(0, 230, 118));
         f1.setBorder(null);
         f1.setBorderPainted(false);
         f1.setContentAreaFilled(false);
+        f1.setFocusPainted(false);
+        f1.setFocusable(false);
         f1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 f1ActionPerformed(evt);
@@ -356,6 +408,8 @@ public class Monitor extends javax.swing.JFrame {
         f2.setBorder(null);
         f2.setBorderPainted(false);
         f2.setContentAreaFilled(false);
+        f2.setFocusPainted(false);
+        f2.setFocusable(false);
         jPanel1.add(f2);
 
         f3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -363,10 +417,12 @@ public class Monitor extends javax.swing.JFrame {
         f3.setBorder(null);
         f3.setBorderPainted(false);
         f3.setContentAreaFilled(false);
+        f3.setFocusPainted(false);
+        f3.setFocusable(false);
         jPanel1.add(f3);
 
         Monitor.add(jPanel1);
-        jPanel1.setBounds(412, 320, 400, 180);
+        jPanel1.setBounds(412, 320, 405, 180);
 
         IconTV.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/TV.gif"))); // NOI18N
         Monitor.add(IconTV);

@@ -55,20 +55,31 @@ public class Reciept extends javax.swing.JPanel {
         try {
             String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
             if (ticket == null || ticket.isEmpty()) return;
+            
             cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
             int start = info == null ? 18 : info.initialPercent;
             double cap = info == null ? 40.0 : info.capacityKWh;
             double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
             double usedKWh = (100.0 - start) / 100.0 * cap;
+            
+            // Get reference number from QueueBridge
+            String refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
+            if (refNumber.isEmpty()) {
+                // Fallback if reference number not found
+                refNumber = String.format("REF%s", ticket);
+            }
+            
             // Use values to avoid warnings and aid debugging
             System.out.println("Receipt for " + ticket + ": start=" + start + ", cap=" + cap + "kWh, used=" + String.format("%.2f", usedKWh) + "kWh");
+            
             AmountPaid.setText(String.format("Php %.2f", amount));
             Fee.setText("Php 0.00");
             price.setText(String.format("PHP %.2f", amount));
-            RefNumber.setText(ticket);
+            RefNumber.setText(refNumber); // Use admin queue reference number
+            NumTicket.setText(ticket); // Use FCH ticket number
             TimeDate.setText(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy hh:mm:ss a")));
         } catch (Throwable t) {
-            // ignore
+            System.err.println("Error populating receipt amounts: " + t.getMessage());
         }
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -86,6 +97,7 @@ public class Reciept extends javax.swing.JPanel {
         Fee = new javax.swing.JLabel();
         AccNumber = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        NumTicket = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -93,11 +105,6 @@ public class Reciept extends javax.swing.JPanel {
         share.setBorder(null);
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
-        share.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                shareActionPerformed(evt);
-            }
-        });
         add(share);
         share.setBounds(180, 680, 130, 40);
 
@@ -115,11 +122,6 @@ public class Reciept extends javax.swing.JPanel {
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
-        Download.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DownloadActionPerformed(evt);
-            }
-        });
         add(Download);
         Download.setBounds(30, 683, 120, 30);
 
@@ -132,13 +134,13 @@ public class Reciept extends javax.swing.JPanel {
         RefNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         RefNumber.setText("33873585637");
         add(RefNumber);
-        RefNumber.setBounds(168, 375, 100, 21);
+        RefNumber.setBounds(168, 390, 100, 21);
 
         TimeDate.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         TimeDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         TimeDate.setText("29 August 2025 05:31:02 PM");
         add(TimeDate);
-        TimeDate.setBounds(70, 400, 190, 20);
+        TimeDate.setBounds(70, 410, 190, 20);
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel5.setText("Details");
@@ -169,8 +171,14 @@ public class Reciept extends javax.swing.JPanel {
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel8.setText("Ref. Number: ");
         add(jLabel8);
-        jLabel8.setBounds(70, 375, 100, 21);
+        jLabel8.setBounds(70, 390, 100, 21);
         jLabel8.getAccessibleContext().setAccessibleName("");
+
+        NumTicket.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        NumTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        NumTicket.setText("FCH008");
+        add(NumTicket);
+        NumTicket.setBounds(120, 360, 100, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Receipt.png"))); // NOI18N
         add(jLabel1);
@@ -241,6 +249,7 @@ public class Reciept extends javax.swing.JPanel {
     private javax.swing.JButton Download;
     private javax.swing.JButton Exit;
     private javax.swing.JLabel Fee;
+    private javax.swing.JLabel NumTicket;
     private javax.swing.JLabel RefNumber;
     private javax.swing.JLabel TimeDate;
     private javax.swing.JLabel jLabel1;
