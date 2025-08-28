@@ -62,7 +62,6 @@ public class VerificationCode extends javax.swing.JPanel {
 
         email.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         email.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        email.setText("dwadwa");
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
