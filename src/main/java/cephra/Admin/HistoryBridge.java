@@ -43,6 +43,21 @@ public final class HistoryBridge {
             records.add(0, row);
         }
     }
+    
+    public static List<Object[]> getRecordsForUser(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        List<Object[]> userRecords = new ArrayList<>();
+        for (Object[] record : records) {
+            if (record != null && record.length > 1 && username.equals(String.valueOf(record[1]))) {
+                userRecords.add(record);
+            }
+        }
+        
+        return userRecords;
+    }
 }
 
 

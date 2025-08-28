@@ -99,6 +99,9 @@ public final class QueueBridge {
         
         boolean foundInRecords = false;
         boolean incrementCounter = false;
+        String serviceName = "";
+        String customerName = "";
+        
         // Update persisted records
         for (int i = 0; i < records.size(); i++) {
             Object[] r = records.get(i);
@@ -109,6 +112,13 @@ public final class QueueBridge {
                 }
                 r[4] = "Paid";
                 foundInRecords = true;
+                
+                // Get service name and customer name for history entry
+                if (r.length > 2) {
+                    customerName = String.valueOf(r[1]);
+                    serviceName = String.valueOf(r[2]);
+                }
+                
                 System.out.println("QueueBridge: Updated payment status in records for ticket: " + ticket);
                 break;
             }
@@ -119,6 +129,20 @@ public final class QueueBridge {
         
         if (!foundInRecords) {
             System.out.println("QueueBridge: Ticket not found in records: " + ticket);
+        } else {
+            // Add history entry for the user
+            try {
+                // Add history entry with 40 minutes charging time
+                cephra.Phone.UserHistoryManager.addHistoryEntry(
+                    customerName, 
+                    ticket, 
+                    serviceName, 
+                    "40 mins"
+                );
+                System.out.println("QueueBridge: Added history entry for user: " + customerName);
+            } catch (Throwable t) {
+                System.err.println("QueueBridge: Error adding history entry: " + t.getMessage());
+            }
         }
         
         // Update visible table
