@@ -55,20 +55,31 @@ public class Reciept extends javax.swing.JPanel {
         try {
             String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
             if (ticket == null || ticket.isEmpty()) return;
+            
             cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
             int start = info == null ? 18 : info.initialPercent;
             double cap = info == null ? 40.0 : info.capacityKWh;
             double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
             double usedKWh = (100.0 - start) / 100.0 * cap;
+            
+            // Get reference number from QueueBridge
+            String refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
+            if (refNumber.isEmpty()) {
+                // Fallback if reference number not found
+                refNumber = String.format("REF%s", ticket);
+            }
+            
             // Use values to avoid warnings and aid debugging
             System.out.println("Receipt for " + ticket + ": start=" + start + ", cap=" + cap + "kWh, used=" + String.format("%.2f", usedKWh) + "kWh");
+            
             AmountPaid.setText(String.format("Php %.2f", amount));
             Fee.setText("Php 0.00");
             price.setText(String.format("PHP %.2f", amount));
-            RefNumber.setText(ticket);
+            RefNumber.setText(refNumber); // Use admin queue reference number
+            NumTicket.setText(ticket); // Use FCH ticket number
             TimeDate.setText(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy hh:mm:ss a")));
         } catch (Throwable t) {
-            // ignore
+            System.err.println("Error populating receipt amounts: " + t.getMessage());
         }
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

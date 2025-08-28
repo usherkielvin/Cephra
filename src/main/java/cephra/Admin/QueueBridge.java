@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public final class QueueBridge {
     private static DefaultTableModel model;
     private static final List<Object[]> records = new ArrayList<Object[]>();
     private static final Map<String, BatteryInfo> ticketBattery = new HashMap<String, BatteryInfo>();
     private static int totalPaidCount = 0;
+    private static final Random random = new Random();
 
     public static final class BatteryInfo {
         public final int initialPercent;
@@ -32,9 +34,19 @@ public final class QueueBridge {
                 public void run() {
                     // Clear initial template rows
                     model.setRowCount(0);
-                    // Insert saved records, newest first at top
+                    // Insert saved records, newest first at top (only visible columns)
                     for (int i = snapshot.size() - 1; i >= 0; i--) {
-                        model.insertRow(0, snapshot.get(i));
+                        Object[] fullRecord = snapshot.get(i);
+                        // Convert full record to visible row (skip ref number column)
+                        Object[] visibleRow = new Object[] { 
+                            fullRecord[0], // ticket
+                            fullRecord[2], // customer  
+                            fullRecord[3], // service
+                            fullRecord[4], // status
+                            fullRecord[5], // payment
+                            fullRecord[6]  // action
+                        };
+                        model.insertRow(0, visibleRow);
                     }
                 }
             });
@@ -42,17 +54,26 @@ public final class QueueBridge {
     }
 
     public static void addTicket(String ticket, String customer, String service, String status, String payment, String action) {
-        final Object[] row = new Object[] { ticket, customer, service, status, payment, action };
+        // Generate random reference number (7 digits) - hidden from table
+        String refNumber = String.valueOf(1000000 + random.nextInt(9000000)); // Random 7-digit number
+        
+        // Store complete record with ref number internally
+        final Object[] fullRecord = new Object[] { ticket, refNumber, customer, service, status, payment, action };
+        
+        // Store in records with ref number
+        records.add(0, fullRecord);
+        
+        // Only show visible columns in table (without ref number)
+        final Object[] visibleRow = new Object[] { ticket, customer, service, status, payment, action };
+        
         if (model == null) {
-            records.add(0, row);
             return;
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                model.insertRow(0, row);
+                model.insertRow(0, visibleRow);
             }
         });
-        records.add(0, row);
     }
 
     public static void setTicketBatteryInfo(String ticket, int initialPercent, double capacityKWh) {
@@ -62,6 +83,29 @@ public final class QueueBridge {
 
     public static BatteryInfo getTicketBatteryInfo(String ticket) {
         return ticketBattery.get(ticket);
+    }
+
+    public static String getTicketRefNumber(String ticket) {
+        if (ticket == null) return "";
+        
+        // Search in records first
+        for (Object[] record : records) {
+            if (record != null && record.length > 1 && ticket.equals(String.valueOf(record[0]))) {
+                return String.valueOf(record[1]); // Reference number is in column 1
+            }
+        }
+        
+        // Search in table model if available
+        if (model != null) {
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Object ticketId = model.getValueAt(i, 0);
+                if (ticket.equals(String.valueOf(ticketId))) {
+                    return String.valueOf(model.getValueAt(i, 1)); // Reference number is in column 1
+                }
+            }
+        }
+        
+        return "";
     }
 
     public static double computeAmountDue(String ticket) {
@@ -102,12 +146,12 @@ public final class QueueBridge {
         // Update persisted records
         for (int i = 0; i < records.size(); i++) {
             Object[] r = records.get(i);
-            if (r != null && r.length > 4 && ticket.equals(String.valueOf(r[0]))) {
-                String prev = String.valueOf(r[4]);
+            if (r != null && r.length > 5 && ticket.equals(String.valueOf(r[0]))) {
+                String prev = String.valueOf(r[5]); // Payment is now at index 5
                 if (!"Paid".equalsIgnoreCase(prev)) {
                     incrementCounter = true;
                 }
-                r[4] = "Paid";
+                r[5] = "Paid";
                 foundInRecords = true;
                 System.out.println("QueueBridge: Updated payment status in records for ticket: " + ticket);
                 break;
@@ -129,7 +173,7 @@ public final class QueueBridge {
                     for (int i = 0; i < model.getRowCount(); i++) {
                         Object v = model.getValueAt(i, 0);
                         if (ticket.equals(String.valueOf(v))) {
-                            model.setValueAt("Paid", i, 4);
+                            model.setValueAt("Paid", i, 4); // Payment column is still at index 4 in visible table
                             foundInTable = true;
                             System.out.println("QueueBridge: Updated payment status in table for ticket: " + ticket);
                             break;
