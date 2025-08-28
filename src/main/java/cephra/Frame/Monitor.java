@@ -226,6 +226,7 @@ public class Monitor extends javax.swing.JFrame {
         WaitingGrid.setOpaque(false);
         WaitingGrid.setLayout(new java.awt.GridLayout(5, 2, 20, 15));
 
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -236,51 +237,55 @@ public class Monitor extends javax.swing.JFrame {
         });
         WaitingGrid.add(jButton1);
 
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setBorder(null);
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
         WaitingGrid.add(jButton2);
 
+        jButton3.setForeground(new java.awt.Color(255, 255, 255));
         jButton3.setBorder(null);
         jButton3.setBorderPainted(false);
         jButton3.setContentAreaFilled(false);
         WaitingGrid.add(jButton3);
 
+        jButton4.setForeground(new java.awt.Color(255, 255, 255));
         jButton4.setBorder(null);
         jButton4.setBorderPainted(false);
         jButton4.setContentAreaFilled(false);
         WaitingGrid.add(jButton4);
 
+        jButton5.setForeground(new java.awt.Color(255, 255, 255));
         jButton5.setBorder(null);
         jButton5.setBorderPainted(false);
         jButton5.setContentAreaFilled(false);
         WaitingGrid.add(jButton5);
 
+        jButton6.setForeground(new java.awt.Color(255, 255, 255));
         jButton6.setBorder(null);
         jButton6.setBorderPainted(false);
         jButton6.setContentAreaFilled(false);
         WaitingGrid.add(jButton6);
 
+        jButton7.setForeground(new java.awt.Color(255, 255, 255));
         jButton7.setBorder(null);
         jButton7.setBorderPainted(false);
         jButton7.setContentAreaFilled(false);
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
-            }
-        });
         WaitingGrid.add(jButton7);
 
+        jButton8.setForeground(new java.awt.Color(255, 255, 255));
         jButton8.setBorder(null);
         jButton8.setBorderPainted(false);
         jButton8.setContentAreaFilled(false);
         WaitingGrid.add(jButton8);
 
+        jButton9.setForeground(new java.awt.Color(255, 255, 255));
         jButton9.setBorder(null);
         jButton9.setBorderPainted(false);
         jButton9.setContentAreaFilled(false);
         WaitingGrid.add(jButton9);
 
+        jButton10.setForeground(new java.awt.Color(255, 255, 255));
         jButton10.setBorder(null);
         jButton10.setBorderPainted(false);
         jButton10.setContentAreaFilled(false);
