@@ -9,17 +9,17 @@ public class AdminRegister extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
-        gender.setText(""); // Plain email field
+        email.setText(""); // Plain email field
     }
 
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     @SuppressWarnings("unchecked")
     private void initComponents() {
         
         
 
         username = new javax.swing.JTextField();
-        gender = new javax.swing.JTextField();
+        email = new javax.swing.JTextField();
         RegisterBTN = new javax.swing.JButton();
         pass = new javax.swing.JPasswordField();
         ConPass = new javax.swing.JPasswordField();
@@ -32,8 +32,8 @@ public class AdminRegister extends javax.swing.JPanel {
         setLayout(null);
         add(username);
         username.setBounds(722, 268, 245, 40);
-        add(gender);
-        gender.setBounds(433, 373, 245, 38);
+        add(email);
+        email.setBounds(433, 373, 245, 38);
 
         RegisterBTN.setBorderPainted(false);
         RegisterBTN.setContentAreaFilled(false);
@@ -75,16 +75,16 @@ public class AdminRegister extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png")));
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
-    } // </editor-fold>//GEN-END:initComponents 
+    } // </editor-fold>//GEN-END:initComponents
 
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {
         String name = Fullname.getText().trim();
         String usernameVal = username.getText().trim();
-        String email = gender.getText().trim();
+        String emailVal = email.getText().trim();
         String password = new String(pass.getPassword()).trim();
         String confirm = new String(ConPass.getPassword()).trim();
 
-        if (name.isEmpty() || usernameVal.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+        if (name.isEmpty() || usernameVal.isEmpty() || emailVal.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields", "Validation", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -93,17 +93,17 @@ public class AdminRegister extends javax.swing.JPanel {
             return;
         }
         // Basic email format check
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        if (!emailVal.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Validation", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        cephra.Admin.StaffData.addStaff(name, usernameVal, email, password);
+        cephra.Admin.StaffData.addStaff(name, usernameVal, emailVal, password);
 
         javax.swing.JOptionPane.showMessageDialog(this, "Admin registration successful", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
         Fullname.setText("");
         username.setText("");
-        gender.setText("");
+        email.setText("");
         pass.setText("");
         ConPass.setText("");
     }
@@ -127,7 +127,7 @@ public class AdminRegister extends javax.swing.JPanel {
     private javax.swing.JPasswordField ConPass;
     private javax.swing.JTextField Fullname;
     private javax.swing.JButton RegisterBTN;
-    private javax.swing.JTextField gender;
+    private javax.swing.JTextField email;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton log;
     private javax.swing.JPasswordField pass;

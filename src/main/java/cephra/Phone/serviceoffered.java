@@ -215,6 +215,14 @@ public class serviceoffered extends javax.swing.JPanel {
                "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
            return;
        }
+       // Prevent charging if battery is already full
+       int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+       if (batteryLevel >= 100) {
+           javax.swing.JOptionPane.showMessageDialog(this,
+               "Your battery is already 100%. Charging is not available.",
+               "Battery Full", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+           return;
+       }
        
        // Set Fast Charging service before switching to QueueTicket panel
        cephra.Phone.QueueFlow.setCurrentServiceOnly("Fast Charging");
@@ -239,6 +247,14 @@ public class serviceoffered extends javax.swing.JPanel {
             javax.swing.JOptionPane.showMessageDialog(this, 
                 "You already have an active charging ticket. Please complete your current session first.", 
                 "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        // Prevent charging if battery is already full
+        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+        if (batteryLevel >= 100) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Your battery is already 100%. Charging is not available.",
+                "Battery Full", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
@@ -278,6 +294,12 @@ public class serviceoffered extends javax.swing.JPanel {
             // Add visual indication that buttons are disabled
             fastcharge.setToolTipText("You have an active charging ticket. Complete it first.");
             normalcharge.setToolTipText("You have an active charging ticket. Complete it first.");
+        } else if (cephra.CephraDB.getUserBatteryLevel(username) >= 100) {
+            // Disable if battery is full
+            fastcharge.setEnabled(false);
+            normalcharge.setEnabled(false);
+            fastcharge.setToolTipText("Your battery is already 100%.");
+            normalcharge.setToolTipText("Your battery is already 100%.");
         } else {
             // Enable charge buttons
             fastcharge.setEnabled(true);
