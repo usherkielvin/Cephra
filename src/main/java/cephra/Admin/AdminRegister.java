@@ -13,10 +13,7 @@ public class AdminRegister extends javax.swing.JPanel {
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    @SuppressWarnings("unchecked")
     private void initComponents() {
-        
-        
 
         username = new javax.swing.JTextField();
         email = new javax.swing.JTextField();
@@ -72,10 +69,10 @@ public class AdminRegister extends javax.swing.JPanel {
         add(Fullname);
         Fullname.setBounds(430, 270, 245, 38);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png")));
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
-    } // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
 
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {
         String name = Fullname.getText().trim();

@@ -48,11 +48,11 @@ public class Profile extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        historybutton = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
         logout = new javax.swing.JButton();
-        historybutton = new javax.swing.JButton();
-        charge = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
+        charge = new javax.swing.JButton();
         PersonalInformation = new javax.swing.JButton();
         PaymentMethod = new javax.swing.JButton();
         Language = new javax.swing.JButton();
@@ -62,30 +62,6 @@ public class Profile extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(350, 750));
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
-
-        homebutton.setBorder(null);
-        homebutton.setBorderPainted(false);
-        homebutton.setContentAreaFilled(false);
-        homebutton.setFocusPainted(false);
-        homebutton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                homebuttonActionPerformed(evt);
-            }
-        });
-        add(homebutton);
-        homebutton.setBounds(150, 680, 50, 40);
-
-        logout.setBorder(null);
-        logout.setBorderPainted(false);
-        logout.setContentAreaFilled(false);
-        logout.setFocusPainted(false);
-        logout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                logoutActionPerformed(evt);
-            }
-        });
-        add(logout);
-        logout.setBounds(60, 610, 250, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -99,17 +75,29 @@ public class Profile extends javax.swing.JPanel {
         add(historybutton);
         historybutton.setBounds(210, 683, 30, 40);
 
-        charge.setBorder(null);
-        charge.setBorderPainted(false);
-        charge.setContentAreaFilled(false);
-        charge.setFocusPainted(false);
-        charge.addActionListener(new java.awt.event.ActionListener() {
+        homebutton.setBorder(null);
+        homebutton.setBorderPainted(false);
+        homebutton.setContentAreaFilled(false);
+        homebutton.setFocusPainted(false);
+        homebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chargeActionPerformed(evt);
+                homebuttonActionPerformed(evt);
             }
         });
-        add(charge);
-        charge.setBounds(40, 680, 50, 40);
+        add(homebutton);
+        homebutton.setBounds(150, 680, 40, 40);
+
+        logout.setBorder(null);
+        logout.setBorderPainted(false);
+        logout.setContentAreaFilled(false);
+        logout.setFocusPainted(false);
+        logout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutActionPerformed(evt);
+            }
+        });
+        add(logout);
+        logout.setBounds(60, 610, 250, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -121,7 +109,19 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(100, 680, 50, 40);
+        linkbutton.setBounds(100, 680, 30, 40);
+
+        charge.setBorder(null);
+        charge.setBorderPainted(false);
+        charge.setContentAreaFilled(false);
+        charge.setFocusPainted(false);
+        charge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chargeActionPerformed(evt);
+            }
+        });
+        add(charge);
+        charge.setBounds(40, 680, 40, 40);
 
         PersonalInformation.setBorderPainted(false);
         PersonalInformation.setContentAreaFilled(false);
