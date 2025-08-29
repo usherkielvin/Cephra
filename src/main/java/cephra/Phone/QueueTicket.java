@@ -347,15 +347,10 @@ public class QueueTicket extends javax.swing.JPanel {
     
     private void updateBatteryDisplay() {
         try {
-            String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
-            if (ticket != null && !ticket.isEmpty()) {
-                cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-                if (info != null) {
-                    int batteryLevel = info.initialPercent;
-                    String status = batteryLevel <= 20 ? " (LOW)" : batteryLevel <= 50 ? " (MED)" : " (OK)";
-                    batterypercent.setText(batteryLevel + "%" + status);
-                }
-            }
+            String username = cephra.CephraDB.getCurrentUsername();
+            int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+            String status = batteryLevel <= 20 ? " (LOW)" : batteryLevel <= 50 ? " (MED)" : " (OK)";
+            batterypercent.setText(batteryLevel + "%" + status);
         } catch (Exception e) {
             System.err.println("Error updating battery display: " + e.getMessage());
         }

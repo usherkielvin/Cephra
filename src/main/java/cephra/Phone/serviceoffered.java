@@ -295,6 +295,8 @@ public class serviceoffered extends javax.swing.JPanel {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setupLabelPosition();
+                // Refresh button status when screen becomes visible
+                checkAndDisableChargeButtons();
             }
         });
     }
