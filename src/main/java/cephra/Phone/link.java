@@ -192,6 +192,16 @@ public class link extends javax.swing.JPanel {
     private void LinkcarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LinkcarActionPerformed
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                // Generate and set battery level for current user when linking car
+                String username = cephra.CephraDB.getCurrentUsername();
+                if (username != null && !username.isEmpty()) {
+                    // Generate random battery level (15-50%) for the user
+                    java.util.Random random = new java.util.Random();
+                    int batteryLevel = 15 + random.nextInt(36); // 15 to 50
+                    cephra.CephraDB.setUserBatteryLevel(username, batteryLevel);
+                    System.out.println("LinkCar: Set battery level for " + username + " to " + batteryLevel + "%");
+                }
+                
                 cephra.Phone.AppState.isCarLinked = true;
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {

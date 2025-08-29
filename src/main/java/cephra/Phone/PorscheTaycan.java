@@ -25,10 +25,6 @@ public class PorscheTaycan extends javax.swing.JPanel {
         // Update range based on battery level (roughly 8km per 1% battery)
         int rangeKm = (int)(batteryLevel * 8);
         km.setText(rangeKm + " km");
-        
-        // Update charging time estimate (roughly 1 minute per 1% needed)
-        int timeToFull = 100 - batteryLevel;
-        mins.setText(timeToFull + " mins");
     }
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
