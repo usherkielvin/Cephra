@@ -49,13 +49,14 @@ public class Login extends javax.swing.JPanel {
 
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
         See.setBorderPainted(false);
+        See.setFocusPainted(false);
         See.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SeeActionPerformed(evt);
             }
         });
         add(See);
-        See.setBounds(810, 430, 93, 50);
+        See.setBounds(810, 430, 27, 50);
 
         userfield.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         userfield.setBorder(null);

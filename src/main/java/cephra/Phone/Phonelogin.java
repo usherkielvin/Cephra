@@ -47,6 +47,7 @@ public class Phonelogin extends javax.swing.JPanel {
 
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
         See.setBorder(null);
+        See.setFocusPainted(false);
         See.setOpaque(true);
         See.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
