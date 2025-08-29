@@ -67,15 +67,19 @@ public class PayPop extends javax.swing.JPanel {
             String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
             if (ticket == null || ticket.isEmpty()) return;
             
-            // Get actual user battery level from CephraDB
-            String username = cephra.CephraDB.getCurrentUsername();
-            int start = cephra.CephraDB.getUserBatteryLevel(username);
-            double cap = 40.0; // 40kWh capacity
-            double usedKWh = (100.0 - start) / 100.0 * cap;
-            double amount = usedKWh * 15.0; // ₱15 per kWh
-            amount = Math.max(amount, 50.0); // Minimum ₱50
+            // Use centralized calculation from QueueBridge for consistency
+            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
             double commission = cephra.Admin.QueueBridge.computePlatformCommission(amount);
             double net = cephra.Admin.QueueBridge.computeNetToStation(amount);
+            
+            // Get kWh calculation from QueueBridge for consistency
+            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+            double usedKWh = 0.0;
+            if (batteryInfo != null) {
+                int start = batteryInfo.initialPercent;
+                double cap = batteryInfo.capacityKWh;
+                usedKWh = (100.0 - start) / 100.0 * cap;
+            }
             
             // Update all labels with actual ticket data
             if (ticketNo != null) {
@@ -91,12 +95,21 @@ public class PayPop extends javax.swing.JPanel {
                 TotalBill.setText(String.format("₱%.2f", amount));
             }
             if (name != null) {
+                String username = cephra.CephraDB.getCurrentUsername();
                 if (username != null && !username.isEmpty()) {
                     name.setText(username);
                 }
             }
             
-            String summary = String.format("Charging Complete – Please Pay ₱%.2f\nEnergy: %.1f kWh @ ₱15/kWh\nMin fee: ₱50 applies if higher\nCommission: ₱%.2f (18%%)\nNet to station: ₱%.2f", amount, usedKWh, commission, net);
+            String summary = String.format(
+                "Charging Complete – Please Pay ₱%.2f\nEnergy: %.1f kWh @ ₱%.2f/kWh\nMin fee: ₱%.2f applies if higher\nCommission: ₱%.2f (18%%)\nNet to station: ₱%.2f",
+                amount,
+                usedKWh,
+                cephra.Admin.QueueBridge.getRatePerKWh(),
+                cephra.Admin.QueueBridge.getMinimumFee(),
+                commission,
+                net
+            );
             System.out.println(summary);
         } catch (Throwable t) {
             System.err.println("Error updating PayPop labels: " + t.getMessage());

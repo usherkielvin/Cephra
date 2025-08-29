@@ -15,6 +15,10 @@ public final class QueueBridge {
     private static int totalPaidCount = 0;
     private static final Random random = new Random();
 
+    // Configurable billing settings (central source of truth)
+    private static volatile double RATE_PER_KWH = 15.0; // pesos per kWh
+    private static volatile double MINIMUM_FEE = 50.0;   // pesos
+
     // Battery info storage
     public static final class BatteryInfo {
         public final int initialPercent;
@@ -117,8 +121,8 @@ public final class QueueBridge {
         int start = Math.max(0, Math.min(100, info.initialPercent));
         double usedFraction = (100.0 - start) / 100.0;
         double energyKWh = usedFraction * info.capacityKWh;
-        double gross = energyKWh * 15.0;
-        return Math.max(gross, 50.0);
+        double gross = energyKWh * RATE_PER_KWH;
+        return Math.max(gross, MINIMUM_FEE);
     }
     
     /** Helper method to get customer name from ticket */
@@ -207,6 +211,27 @@ public final class QueueBridge {
         // Generate 8-digit number (10000000 to 99999999)
         int number = 10000000 + r.nextInt(90000000);
         return String.valueOf(number);
+    }
+    
+    // Billing settings API (for Dashboard/Admin to control)
+    public static void setRatePerKWh(double rate) {
+        if (rate > 0) {
+            RATE_PER_KWH = rate;
+        }
+    }
+
+    public static double getRatePerKWh() {
+        return RATE_PER_KWH;
+    }
+
+    public static void setMinimumFee(double minFee) {
+        if (minFee >= 0) {
+            MINIMUM_FEE = minFee;
+        }
+    }
+
+    public static double getMinimumFee() {
+        return MINIMUM_FEE;
     }
     
 
