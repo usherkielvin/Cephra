@@ -51,6 +51,13 @@ public final class QueueBridge {
 
         records.add(0, fullRecord);
 
+        // Store battery info for this ticket
+        int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+        ticketBattery.put(ticket, new BatteryInfo(userBatteryLevel, 40.0)); // 40kWh capacity
+        
+        // Set this as the user's active ticket
+        cephra.CephraDB.setActiveTicket(customer, ticket);
+
         if (model != null) {
             final Object[] visibleRow = toVisibleRow(fullRecord);
             SwingUtilities.invokeLater(() -> model.insertRow(0, visibleRow));
@@ -159,6 +166,9 @@ public final class QueueBridge {
         if (foundInRecords) {
             try {
                 cephra.Phone.UserHistoryManager.addHistoryEntry(customerName, ticket, serviceName, "40 mins");
+                // Clear the active ticket and charge battery to full when payment is completed
+                cephra.CephraDB.clearActiveTicket(customerName);
+                cephra.CephraDB.chargeUserBatteryToFull(customerName);
             } catch (Throwable t) {
                 System.err.println("QueueBridge: Error adding history entry: " + t.getMessage());
             }

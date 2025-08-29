@@ -15,8 +15,13 @@ public class home extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
-         if (LoggedName != null && !username.isEmpty()) {
-            LoggedName.setText(username);
+         if (LoggedName != null) {
+            String safeUser = username != null ? username.trim() : "";
+            if (safeUser.isEmpty()) {
+                LoggedName.setText("Hi !");
+            } else {
+                LoggedName.setText("Hi " + safeUser + "!");
+            }
         }
     }
 

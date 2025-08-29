@@ -16,6 +16,9 @@ public class QueueTicket extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        
+        // Update battery percentage from current ticket
+        updateBatteryDisplay();
 
        // jLabel1.setText("<html>You are next after<br>current charging session</html>");
     }
@@ -31,7 +34,7 @@ public class QueueTicket extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
-        percent = new javax.swing.JLabel();
+        batterypercent = new javax.swing.JLabel();
         QTicket = new javax.swing.JLabel();
         typeofcharge = new javax.swing.JLabel();
         mins1 = new javax.swing.JLabel();
@@ -122,11 +125,11 @@ public class QueueTicket extends javax.swing.JPanel {
         add(profilebutton);
         profilebutton.setBounds(260, 670, 50, 50);
 
-        percent.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        percent.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        percent.setText("18% (LOW)");
-        add(percent);
-        percent.setBounds(120, 280, 100, 40);
+        batterypercent.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        batterypercent.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        batterypercent.setText("18% (LOW)");
+        add(batterypercent);
+        batterypercent.setBounds(120, 280, 100, 40);
 
         QTicket.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
         QTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -290,6 +293,10 @@ public class QueueTicket extends javax.swing.JPanel {
     }//GEN-LAST:event_homebutton2ActionPerformed
 
     private void cancelticketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelticketActionPerformed
+       // Clear the active ticket when user cancels
+       String username = cephra.CephraDB.getCurrentUsername();
+       cephra.CephraDB.clearActiveTicket(username);
+       
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -324,6 +331,7 @@ public class QueueTicket extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel QTicket;
+    private javax.swing.JLabel batterypercent;
     private javax.swing.JButton cancelticket;
     private javax.swing.JButton charge;
     private javax.swing.JButton checkstatus;
@@ -333,8 +341,23 @@ public class QueueTicket extends javax.swing.JPanel {
     private javax.swing.JLabel label1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JLabel mins1;
-    private javax.swing.JLabel percent;
     private javax.swing.JButton profilebutton;
     private javax.swing.JLabel typeofcharge;
     // End of variables declaration//GEN-END:variables
+    
+    private void updateBatteryDisplay() {
+        try {
+            String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
+            if (ticket != null && !ticket.isEmpty()) {
+                cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                if (info != null) {
+                    int batteryLevel = info.initialPercent;
+                    String status = batteryLevel <= 20 ? " (LOW)" : batteryLevel <= 50 ? " (MED)" : " (OK)";
+                    batterypercent.setText(batteryLevel + "%" + status);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating battery display: " + e.getMessage());
+        }
+    }
 }

@@ -15,6 +15,9 @@ public class serviceoffered extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        
+        // Check if user has active ticket and disable buttons if needed
+        checkAndDisableChargeButtons();
     }
 
     private void makeDraggable() {
@@ -204,6 +207,15 @@ public class serviceoffered extends javax.swing.JPanel {
     }//GEN-LAST:event_homebuttonActionPerformed
 
     private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
+       // Check if user already has an active ticket
+       String username = cephra.CephraDB.getCurrentUsername();
+       if (cephra.CephraDB.hasActiveTicket(username)) {
+           javax.swing.JOptionPane.showMessageDialog(this, 
+               "You already have an active charging ticket. Please complete your current session first.", 
+               "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
+           return;
+       }
+       
        // Set Fast Charging service before switching to QueueTicket panel
        cephra.Phone.QueueFlow.setCurrentServiceOnly("Fast Charging");
        SwingUtilities.invokeLater(new Runnable() {
@@ -221,6 +233,15 @@ public class serviceoffered extends javax.swing.JPanel {
     }//GEN-LAST:event_fastchargeActionPerformed
 
     private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
+        // Check if user already has an active ticket
+        String username = cephra.CephraDB.getCurrentUsername();
+        if (cephra.CephraDB.hasActiveTicket(username)) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "You already have an active charging ticket. Please complete your current session first.", 
+                "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
         // Set Normal Charging service before switching to QueueTicket panel
         cephra.Phone.QueueFlow.setCurrentServiceOnly("Normal Charging");
         SwingUtilities.invokeLater(new Runnable() {
@@ -246,6 +267,27 @@ public class serviceoffered extends javax.swing.JPanel {
     private javax.swing.JButton normalcharge;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
+    
+    private void checkAndDisableChargeButtons() {
+        String username = cephra.CephraDB.getCurrentUsername();
+        if (cephra.CephraDB.hasActiveTicket(username)) {
+            // Disable charge buttons and show visual feedback
+            fastcharge.setEnabled(false);
+            normalcharge.setEnabled(false);
+            
+            // Add visual indication that buttons are disabled
+            fastcharge.setToolTipText("You have an active charging ticket. Complete it first.");
+            normalcharge.setToolTipText("You have an active charging ticket. Complete it first.");
+        } else {
+            // Enable charge buttons
+            fastcharge.setEnabled(true);
+            normalcharge.setEnabled(true);
+            
+            // Clear tooltips
+            fastcharge.setToolTipText(null);
+            normalcharge.setToolTipText(null);
+        }
+    }
 
     @Override
     public void addNotify() {

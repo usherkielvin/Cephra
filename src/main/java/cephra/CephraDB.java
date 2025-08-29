@@ -25,6 +25,12 @@ public class CephraDB {
     
     // Current logged-in user
     private static User currentUser;
+    
+    // Battery percentage storage per user
+    private static java.util.HashMap<String, Integer> userBatteryLevels = new java.util.HashMap<>();
+    
+    // Active ticket tracking per user
+    private static java.util.HashMap<String, String> userActiveTickets = new java.util.HashMap<>();
 
     // Method to initialize the database with some dummy data
     public static void initializeDatabase() {
@@ -114,5 +120,42 @@ public class CephraDB {
     // Method to get the stored OTP
     public static String getGeneratedOTP() {
         return generatedOTP;
+    }
+    
+    // Battery management methods
+    public static int getUserBatteryLevel(String username) {
+        if (userBatteryLevels.containsKey(username)) {
+            return userBatteryLevels.get(username);
+        }
+        // Generate random battery level (15-50%) for new users
+        java.util.Random random = new java.util.Random();
+        int batteryLevel = 15 + random.nextInt(36); // 15 to 50
+        userBatteryLevels.put(username, batteryLevel);
+        return batteryLevel;
+    }
+    
+    public static void setUserBatteryLevel(String username, int batteryLevel) {
+        userBatteryLevels.put(username, batteryLevel);
+    }
+    
+    public static void chargeUserBatteryToFull(String username) {
+        userBatteryLevels.put(username, 100);
+    }
+    
+    // Active ticket management methods
+    public static boolean hasActiveTicket(String username) {
+        return userActiveTickets.containsKey(username) && userActiveTickets.get(username) != null;
+    }
+    
+    public static void setActiveTicket(String username, String ticketId) {
+        userActiveTickets.put(username, ticketId);
+    }
+    
+    public static void clearActiveTicket(String username) {
+        userActiveTickets.remove(username);
+    }
+    
+    public static String getActiveTicket(String username) {
+        return userActiveTickets.get(username);
     }
 }

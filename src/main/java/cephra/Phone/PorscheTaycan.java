@@ -16,6 +16,19 @@ public class PorscheTaycan extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        
+        // Update battery percentage from user's stored level
+        String username = cephra.CephraDB.getCurrentUsername();
+        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+        batterypercent.setText(batteryLevel + " %");
+        
+        // Update range based on battery level (roughly 8km per 1% battery)
+        int rangeKm = (int)(batteryLevel * 8);
+        km.setText(rangeKm + " km");
+        
+        // Update charging time estimate (roughly 1 minute per 1% needed)
+        int timeToFull = 100 - batteryLevel;
+        mins.setText(timeToFull + " mins");
     }
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
@@ -61,7 +74,7 @@ public class PorscheTaycan extends javax.swing.JPanel {
         homebutton2 = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
-        percent = new javax.swing.JLabel();
+        batterypercent = new javax.swing.JLabel();
         km = new javax.swing.JLabel();
         mins = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -136,10 +149,10 @@ public class PorscheTaycan extends javax.swing.JPanel {
         add(charge);
         charge.setBounds(30, 680, 50, 40);
 
-        percent.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        percent.setText("25 %");
-        add(percent);
-        percent.setBounds(20, 455, 100, 30);
+        batterypercent.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        batterypercent.setText("25 %");
+        add(batterypercent);
+        batterypercent.setBounds(20, 455, 100, 30);
 
         km.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         km.setText("400 km");
@@ -233,6 +246,7 @@ public class PorscheTaycan extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel batterypercent;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
@@ -242,7 +256,6 @@ public class PorscheTaycan extends javax.swing.JPanel {
     private javax.swing.JLabel km;
     private javax.swing.JButton linkbutton;
     private javax.swing.JLabel mins;
-    private javax.swing.JLabel percent;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
 }
