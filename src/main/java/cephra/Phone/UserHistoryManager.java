@@ -125,8 +125,9 @@ public class UserHistoryManager {
                     if (record.length >= 7) {
                         String ticketId = String.valueOf(record[0]);
                         String serviceType = String.valueOf(record[2]);
-                        // Default charging time is 40 mins
-                        result.add(new HistoryEntry(ticketId, serviceType, "40 mins"));
+                        // Get actual charging time from KWh field (index 2)
+                        String chargingTime = String.valueOf(record[2]);
+                        result.add(new HistoryEntry(ticketId, serviceType, chargingTime));
                     }
                 }
             }
