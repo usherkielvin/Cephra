@@ -66,12 +66,24 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         if (historyScrollPane == null) {
             historyScrollPane = new JScrollPane(historyPanel);
             historyScrollPane.setBorder(null);
-            historyScrollPane.setBounds(30, 150, 290, 450);
+            historyScrollPane.setBounds(30, 150, 290, 480);
             add(historyScrollPane);
         } else {
             // Just update the viewport with the new history panel
             historyScrollPane.setViewportView(historyPanel);
         }
+
+        // Hide scrollbars but keep scrolling possible
+        historyScrollPane.setBorder(null);
+        historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        if (historyScrollPane.getVerticalScrollBar() != null) {
+            historyScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+        }
+        if (historyScrollPane.getHorizontalScrollBar() != null) {
+            historyScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
+        }
+        historyScrollPane.setWheelScrollingEnabled(true);
     }
     
     private void loadHistoryEntries() {
@@ -126,52 +138,85 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         JPanel historyItemPanel = new JPanel();
         historyItemPanel.setLayout(new BorderLayout(5, 0));
         historyItemPanel.setBackground(Color.WHITE);
-        historyItemPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
+        historyItemPanel.setBorder(null);
+        historyItemPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         // Set cursor to hand to indicate clickable
         historyItemPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         // Set a fixed preferred and maximum height for each history item panel
-        int itemHeight = 50; // Smaller fixed height for each item
+        int itemHeight = 70; // Increased height for better visibility
         int itemWidth = 290; // Width of the scroll pane
         historyItemPanel.setPreferredSize(new Dimension(itemWidth, itemHeight));
         historyItemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, itemHeight));
 
+        // Date label at top
         JLabel dateLabel = new JLabel(entry.getFormattedDate());
-        dateLabel.setFont(new Font("Arial", Font.BOLD, 11));
-        dateLabel.setForeground(Color.GRAY);
+        dateLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        dateLabel.setForeground(new Color(70, 70, 70));
 
-        JPanel timeServiceDetailsPanel = new JPanel();
-        timeServiceDetailsPanel.setLayout(new BoxLayout(timeServiceDetailsPanel, BoxLayout.Y_AXIS));
-        timeServiceDetailsPanel.setBackground(Color.WHITE);
+        // Left panel for details
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBackground(Color.WHITE);
 
-        JLabel timeLabelItem = new JLabel(entry.getFormattedTime());
-        timeLabelItem.setFont(new Font("Arial", Font.PLAIN, 10));
-        timeLabelItem.setForeground(Color.DARK_GRAY);
-        timeLabelItem.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Time
+        JLabel timeLabel = new JLabel(entry.getFormattedTime());
+        timeLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+        timeLabel.setForeground(Color.DARK_GRAY);
+        timeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Clean up service name to remove any price information (like 32.80)
-        String serviceType = entry.getServiceType();
-        if (serviceType != null && serviceType.contains("32.80")) {
-            serviceType = serviceType.replaceAll("\\s*32\\.80\\s*", "");
+        // Service type
+        JLabel serviceLabel = new JLabel(entry.getServiceType());
+        serviceLabel.setFont(new Font("Arial", Font.BOLD, 11));
+        serviceLabel.setForeground(new Color(50, 100, 150));
+        serviceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Total amount
+        JLabel totalLabel = new JLabel("Total: " + entry.getTotal());
+        totalLabel.setFont(new Font("Arial", Font.BOLD, 11));
+        totalLabel.setForeground(new Color(0, 100, 0));
+        totalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        leftPanel.add(timeLabel);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        leftPanel.add(serviceLabel);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        leftPanel.add(totalLabel);
+
+        // Right panel for ticket and reference
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBackground(Color.WHITE);
+
+        // Ticket ID
+        JLabel ticketLabel = new JLabel("Ticket: " + entry.getTicketId());
+        ticketLabel.setFont(new Font("Arial", Font.BOLD, 11));
+        ticketLabel.setForeground(new Color(50, 50, 50));
+        ticketLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+        // Reference number
+        String refNumber = entry.getReferenceNumber();
+        System.out.println("PhoneHistory: Reference number for ticket " + entry.getTicketId() + " is: '" + refNumber + "'");
+        
+        // If reference number is empty or null, try to get it from QueueBridge
+        if (refNumber == null || refNumber.trim().isEmpty() || refNumber.equals("null")) {
+            refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(entry.getTicketId());
+            System.out.println("PhoneHistory: Got reference number from QueueBridge: '" + refNumber + "'");
         }
         
-        JLabel serviceInfoLabel = new JLabel("Service: " + serviceType + " | Time: " + entry.getChargingTime());
-        serviceInfoLabel.setFont(new Font("Arial", Font.PLAIN, 10));
-        serviceInfoLabel.setForeground(Color.DARK_GRAY);
-        serviceInfoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel referenceLabel = new JLabel("Ref: " + refNumber);
+        referenceLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+        referenceLabel.setForeground(Color.GRAY);
+        referenceLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
-        timeServiceDetailsPanel.add(timeLabelItem);
-        timeServiceDetailsPanel.add(serviceInfoLabel);
-
-        JLabel ticketLabel = new JLabel("Ticket: " + entry.getTicketId());
-        ticketLabel.setFont(new Font("Arial", Font.BOLD, 10));
-        ticketLabel.setForeground(new Color(50, 50, 50));
-        ticketLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        rightPanel.add(ticketLabel);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        rightPanel.add(referenceLabel);
 
         historyItemPanel.add(dateLabel, BorderLayout.NORTH);
-        historyItemPanel.add(timeServiceDetailsPanel, BorderLayout.WEST);
-        historyItemPanel.add(ticketLabel, BorderLayout.EAST);
+        historyItemPanel.add(leftPanel, BorderLayout.WEST);
+        historyItemPanel.add(rightPanel, BorderLayout.EAST);
         ///////
         // Add click listener to show details when clicked
         historyItemPanel.addMouseListener(new MouseAdapter() {
@@ -179,24 +224,9 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             public void mouseClicked(MouseEvent e) {
                 showHistoryDetails(entry);
             }
-            
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                historyItemPanel.setBackground(new Color(240, 240, 250));
-            }
-            
-            @Override
-            public void mouseExited(MouseEvent e) {
-                historyItemPanel.setBackground(Color.WHITE);
-            }
-        });////////
+        });
 
         historyPanel.add(historyItemPanel);
-
-        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-        separator.setForeground(new Color(220, 220, 220));
-        separator.setPreferredSize(new Dimension(itemWidth, 1));
-        historyPanel.add(separator);
     }
 /////
     private JPanel detailsPanel;
@@ -225,6 +255,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         // Add header
         JLabel headerLabel = new JLabel("Charging Details");
         headerLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        headerLabel.setForeground(new Color(50, 50, 50));
         headerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         detailsPanel.add(headerLabel);
         
@@ -234,21 +265,31 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         addDetailRow(detailsPanel, "Ticket", entry.getTicketId());
         addDetailRow(detailsPanel, "Customer", cephra.CephraDB.getCurrentUsername());
         
-        // Clean up service name
-        String serviceType = entry.getServiceType();
-        if (serviceType != null && serviceType.contains("32.80")) {
-            serviceType = serviceType.replaceAll("\\s*32\\.80\\s*", "");
-        }
-        addDetailRow(detailsPanel, "Service", serviceType);
+        // Add service type (Fast Charge or Normal Charge)
+        addDetailRow(detailsPanel, "Service", entry.getServiceType());
         
-        // Add kWh detail
-        addDetailRow(detailsPanel, "kWh", "32.80");
+        // Add kWh detail (get from admin history record)
+        String kWh = "32.80"; // Default value
+        try {
+            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.CephraDB.getCurrentUsername());
+            if (adminRecords != null) {
+                for (Object[] record : adminRecords) {
+                    if (record.length >= 7 && entry.getTicketId().equals(String.valueOf(record[0]))) {
+                        kWh = String.valueOf(record[2]); // KWh is at index 2
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting kWh from admin history: " + e.getMessage());
+        }
+        addDetailRow(detailsPanel, "kWh", kWh);
         
         // Add charging time
-        addDetailRow(detailsPanel, "Charging Time", "40 mins");
+        addDetailRow(detailsPanel, "Charging Time", entry.getChargingTime());
         
-        // Add total with correct price
-        addDetailRow(detailsPanel, "Total", "  "); // Fixed price for charging service
+        // Add total amount
+        addDetailRow(detailsPanel, "Total", entry.getTotal());
         
         // Add served by with correct value
         addDetailRow(detailsPanel, "Served By", "Cephra");
@@ -257,17 +298,14 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         addDetailRow(detailsPanel, "Date", entry.getFormattedDate());
         addDetailRow(detailsPanel, "Time", entry.getFormattedTime());
         
-        // Add charging time
-        addDetailRow(detailsPanel, "Charging Time", entry.getChargingTime());
-        
-        // Add reference (using ticket ID as reference)
-        addDetailRow(detailsPanel, "Ticket ID", entry.getTicketId());
+        // Add reference number
+        addDetailRow(detailsPanel, "Reference", entry.getReferenceNumber());
         
         detailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         
         // Add OK button
         JButton okButton = new JButton("OK");
-        okButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         okButton.addActionListener(e -> closeDetailsPanel());
         detailsPanel.add(okButton);
         
@@ -299,22 +337,35 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     
     private void addDetailRow(JPanel panel, String label, String value) {
         JPanel rowPanel = new JPanel();
-        rowPanel.setLayout(new BorderLayout(10, 0));
+        rowPanel.setLayout(new BorderLayout(15, 0));
         rowPanel.setBackground(Color.WHITE);
-        rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
         rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         JLabel labelComponent = new JLabel(label + ":");
-        labelComponent.setFont(new Font("Arial", Font.BOLD, 12));
+        labelComponent.setFont(new Font("Arial", Font.BOLD, 13));
+        labelComponent.setForeground(new Color(70, 70, 70));
         
         JLabel valueComponent = new JLabel(value);
-        valueComponent.setFont(new Font("Arial", Font.PLAIN, 12));
+        valueComponent.setFont(new Font("Arial", Font.PLAIN, 13));
+        valueComponent.setForeground(new Color(30, 30, 30));
+        
+        // Special formatting for certain fields
+        if (label.equals("Total")) {
+            valueComponent.setFont(new Font("Arial", Font.BOLD, 13));
+            valueComponent.setForeground(new Color(0, 100, 0));
+        } else if (label.equals("Service")) {
+            valueComponent.setForeground(new Color(50, 100, 150));
+        } else if (label.equals("Reference")) {
+            valueComponent.setFont(new Font("Arial", Font.BOLD, 12));
+            valueComponent.setForeground(new Color(100, 50, 150));
+        }
         
         rowPanel.add(labelComponent, BorderLayout.WEST);
         rowPanel.add(valueComponent, BorderLayout.CENTER);
         
         panel.add(rowPanel);
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
     }
     ////
     private void makeDraggable() {
@@ -355,12 +406,15 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         homebutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
+        historyScrollPane.setBorder(null);
+        historyScrollPane.setOpaque(false);
+
+        historyPanel.setOpaque(false);
         historyPanel.setLayout(new javax.swing.BoxLayout(historyPanel, javax.swing.BoxLayout.LINE_AXIS));
         historyScrollPane.setViewportView(historyPanel);
 
@@ -415,11 +469,9 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         add(linkbutton);
         linkbutton.setBounds(90, 680, 60, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HISTORY.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HISTORY - if none.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
-        add(jPanel1);
-        jPanel1.setBounds(200, 40, 10, 10);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -497,7 +549,6 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     private javax.swing.JScrollPane historyScrollPane;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables

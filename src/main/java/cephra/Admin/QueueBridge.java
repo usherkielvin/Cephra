@@ -46,7 +46,7 @@ public final class QueueBridge {
 
     /** Add a ticket with hidden random reference number */
     public static void addTicket(String ticket, String customer, String service, String status, String payment, String action) {
-        String refNumber = String.valueOf(1000000 + random.nextInt(9000000)); // 7-digit ref #
+        String refNumber = generateReference(); // Use consistent 8-digit format
         final Object[] fullRecord = new Object[] { ticket, refNumber, customer, service, status, payment, action };
 
         records.add(0, fullRecord);
@@ -85,7 +85,10 @@ public final class QueueBridge {
         if (ticket == null) return "";
         for (Object[] record : records) {
             if (record != null && ticket.equals(String.valueOf(record[0]))) {
-                return String.valueOf(record[1]);
+                // Reference number is always stored at index 1
+                if (record[1] != null) {
+                    return String.valueOf(record[1]);
+                }
             }
         }
         return "";
@@ -127,8 +130,9 @@ public final class QueueBridge {
         boolean incrementCounter = false;
         String customerName = "";
         String serviceName = "";
+        String referenceNumber = "";
 
-        // Update in memory records
+        // Check if reference number already exists, if not generate one
         for (Object[] r : records) {
             if (r != null && ticket.equals(String.valueOf(r[0]))) {
                 String prev = String.valueOf(r[5]); // Payment is index 5
@@ -136,6 +140,13 @@ public final class QueueBridge {
                     incrementCounter = true;
                 }
                 r[5] = "Paid";
+                // Use existing reference number if available, otherwise generate new one
+                if (r[1] != null && !String.valueOf(r[1]).isEmpty()) {
+                    referenceNumber = String.valueOf(r[1]);
+                } else {
+                    referenceNumber = generateReference();
+                    r[1] = referenceNumber; // Store in the original reference field
+                }
                 foundInRecords = true;
                 customerName = String.valueOf(r[2]);
                 serviceName = String.valueOf(r[3]);
@@ -166,6 +177,15 @@ public final class QueueBridge {
             });
         }
     }
+    
+    private static String generateReference() {
+        java.util.Random r = new java.util.Random();
+        // Generate 8-digit number (10000000 to 99999999)
+        int number = 10000000 + r.nextInt(90000000);
+        return String.valueOf(number);
+    }
+    
+
 
     /** Remove a ticket from records and table */
     public static void removeTicket(final String ticket) {

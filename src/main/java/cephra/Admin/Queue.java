@@ -231,7 +231,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
                     final String servedBy = "Admin";
                     final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                    final String reference = generateReference();
+                    // Get reference number from QueueBridge to ensure consistency
+                    final String reference = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
                     final int rowToRemove = editingRow;
 
                     // Use invokeLater to avoid EDT conflicts
@@ -263,6 +264,14 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         } catch (Throwable t) {
                             // ignore if history not ready
                         }
+                        
+                        // Update QueueBridge payment status to ensure consistency
+                        try {
+                            cephra.Admin.QueueBridge.markPaymentPaid(ticket);
+                        } catch (Throwable t) {
+                            // ignore if queue bridge not ready
+                        }
+                        
                             try {
                                 ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
                             } catch (Throwable t) {
@@ -305,13 +314,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
 
     private static String generateReference() {
-        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        StringBuilder sb = new StringBuilder();
         java.util.Random r = new java.util.Random();
-        for (int i = 0; i < 8; i++) {
-            sb.append(chars.charAt(r.nextInt(chars.length())));
-        }
-        return sb.toString();
+        // Generate 8-digit number (10000000 to 99999999)
+        int number = 10000000 + r.nextInt(90000000);
+        return String.valueOf(number);
     }
     
     private void setupNextButtons() {

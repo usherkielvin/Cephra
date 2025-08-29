@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 
@@ -62,10 +63,28 @@ public class Reciept extends javax.swing.JPanel {
             double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
             double usedKWh = (100.0 - start) / 100.0 * cap;
             
-            // Get reference number from QueueBridge
+            // Get reference number from queue bridge first (most up-to-date)
             String refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
+            
+            // If not found in queue, try admin history
             if (refNumber.isEmpty()) {
-                // Fallback if reference number not found
+                try {
+                    List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.CephraDB.getCurrentUsername());
+                    if (adminRecords != null) {
+                        for (Object[] record : adminRecords) {
+                            if (record.length >= 7 && ticket.equals(String.valueOf(record[0]))) {
+                                refNumber = String.valueOf(record[6]); // Reference number is at index 6
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error getting reference from admin history: " + e.getMessage());
+                }
+            }
+            
+            // If still empty, generate a temporary reference
+            if (refNumber.isEmpty()) {
                 refNumber = String.format("REF%s", ticket);
             }
             
