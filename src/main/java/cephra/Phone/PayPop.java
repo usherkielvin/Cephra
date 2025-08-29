@@ -401,11 +401,11 @@ public class PayPop extends javax.swing.JPanel {
                         );
                         return;
                     }
-                    // Update payment status in admin queue
-                    cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
+                    // Update payment status in admin queue with GCash payment method
+                    cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
                     // Also update the local queue flow entries
                     cephra.Phone.QueueFlow.updatePaymentStatus(currentTicket, "Paid");
-                    System.out.println("Payment marked as paid for ticket: " + currentTicket);
+                    System.out.println("GCash payment marked as paid for ticket: " + currentTicket);
                 } catch (Exception e) {
                     System.err.println("Error updating payment status: " + e.getMessage());
                     e.printStackTrace();

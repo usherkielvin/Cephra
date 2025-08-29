@@ -33,7 +33,7 @@ public class StaffRecord extends javax.swing.JPanel {
     public void refreshStaffTable() {
         DefaultTableModel model = (DefaultTableModel) staffTable.getModel();
         model.setRowCount(0); // Clear table
-        for (String[] staff : StaffData.staffList) {
+        for (String[] staff : StaffData.getStaffList()) {
             // If your table has only 4 columns, you may want to skip the email or password
             // Adjust as needed for your table columns
             model.addRow(new Object[]{staff[0], staff[1], staff[2], staff[3], staff[4]});

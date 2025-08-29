@@ -39,16 +39,43 @@ public final class QueueBridge {
     public static void registerModel(DefaultTableModel m) {
         model = m;
         if (model != null) {
-            final List<Object[]> snapshot = new ArrayList<>(records);
+            loadQueueFromDatabase();
+        }
+    }
+    
+    /** Load queue tickets from database */
+    private static void loadQueueFromDatabase() {
+        try {
+            // Get all queue tickets from database
+            List<Object[]> dbTickets = cephra.CephraDB.getAllQueueTickets();
+            records.clear(); // Clear existing records
+            
+            for (Object[] dbTicket : dbTickets) {
+                // Convert database format to queue format
+                Object[] queueRecord = {
+                    dbTicket[0], // ticket_id
+                    dbTicket[1], // reference_number (or generate if null)
+                    dbTicket[2], // username
+                    dbTicket[3], // service_type
+                    dbTicket[4], // status
+                    dbTicket[5], // payment_status
+                    "" // action (empty for now)
+                };
+                records.add(queueRecord);
+            }
+            
+            // Update the table
             SwingUtilities.invokeLater(() -> {
                 model.setRowCount(0); // clear
-                // Insert saved records (newest first) into visible table
-                for (int i = snapshot.size() - 1; i >= 0; i--) {
-                    Object[] fullRecord = snapshot.get(i);
-                    Object[] visibleRow = toVisibleRow(fullRecord);
+                for (Object[] record : records) {
+                    Object[] visibleRow = toVisibleRow(record);
                     model.insertRow(0, visibleRow);
                 }
             });
+            
+        } catch (Exception e) {
+            System.err.println("Error loading queue from database: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -65,6 +92,9 @@ public final class QueueBridge {
         
         // Set this as the user's active ticket
         cephra.CephraDB.setActiveTicket(customer, ticket);
+        
+        // Add to database for persistent storage
+        cephra.CephraDB.addQueueTicket(ticket, customer, service, status, payment, userBatteryLevel);
 
         if (model != null) {
             final Object[] visibleRow = toVisibleRow(fullRecord);
@@ -152,8 +182,18 @@ public final class QueueBridge {
         return totalPaidCount;
     }
 
-    /** Mark a payment as Paid and add history */
+    /** Mark a payment as Paid and add history (Cash payment - Admin) */
     public static void markPaymentPaid(final String ticket) {
+        markPaymentPaidWithMethod(ticket, "Cash");
+    }
+    
+    /** Mark a payment as Paid and add history (GCash payment - Online) */
+    public static void markPaymentPaidOnline(final String ticket) {
+        markPaymentPaidWithMethod(ticket, "GCash");
+    }
+    
+    /** Mark a payment as Paid and add history with specified payment method */
+    private static void markPaymentPaidWithMethod(final String ticket, final String paymentMethod) {
         if (ticket == null || ticket.trim().isEmpty()) {
             System.err.println("QueueBridge: Invalid ticket ID");
             return;
@@ -187,15 +227,40 @@ public final class QueueBridge {
 
         if (foundInRecords) {
             try {
-                cephra.Phone.UserHistoryManager.addHistoryEntry(customerName, ticket, serviceName, "40 mins");
+                // Calculate charging details
+                BatteryInfo batteryInfo = getTicketBatteryInfo(ticket);
+                int initialBatteryLevel = batteryInfo != null ? batteryInfo.initialPercent : 20;
+                int chargingTimeMinutes = computeEstimatedMinutes(ticket);
+                double totalAmount = computeAmountDue(ticket);
+                
+                // Add to charging history in database
+                cephra.CephraDB.addChargingHistory(ticket, customerName, serviceName, 
+                                                 initialBatteryLevel, chargingTimeMinutes, 
+                                                 totalAmount, referenceNumber);
+                
+                // Add payment transaction record with specified payment method
+                cephra.CephraDB.addPaymentTransaction(ticket, customerName, totalAmount, 
+                                                    paymentMethod, referenceNumber);
+                
+                // Update queue ticket payment status in database
+                cephra.CephraDB.updateQueueTicketPayment(ticket, "Paid", referenceNumber);
+                
+                // Note: Phone and Admin history will be loaded from database automatically
+                // No need to add to in-memory lists to avoid duplicates
+                
                 // Clear the active ticket and charge battery to full when payment is completed
                 cephra.CephraDB.clearActiveTicket(customerName);
                 cephra.CephraDB.chargeUserBatteryToFull(customerName);
+                
+                System.out.println("QueueBridge: " + paymentMethod + " payment completed for ticket " + ticket + 
+                                 ", amount: ₱" + totalAmount + ", reference: " + referenceNumber);
+                
             } catch (Throwable t) {
-                System.err.println("QueueBridge: Error adding history entry: " + t.getMessage());
+                System.err.println("QueueBridge: Error processing payment completion: " + t.getMessage());
+                t.printStackTrace();
             }
         }
-
+        
         // Update JTable if present
         if (model != null) {
             SwingUtilities.invokeLater(() -> {
@@ -293,6 +358,9 @@ public final class QueueBridge {
     /** Remove a ticket from records and table */
     public static void removeTicket(final String ticket) {
         if (ticket == null) return;
+
+        // Remove from database first
+        cephra.CephraDB.removeQueueTicket(ticket);
 
         for (int i = records.size() - 1; i >= 0; i--) {
             Object[] r = records.get(i);

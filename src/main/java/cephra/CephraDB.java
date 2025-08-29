@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CephraDB {
 
@@ -28,12 +30,38 @@ public class CephraDB {
     // Method to initialize the database
     public static void initializeDatabase() {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            // Database is initialized through the connection
+            // Check if required tables exist
+            if (!tableExists(conn, "queue_tickets")) {
+                System.err.println("Warning: queue_tickets table does not exist. Please run the database initialization script.");
+            }
+            if (!tableExists(conn, "users")) {
+                System.err.println("Warning: users table does not exist. Please run the database initialization script.");
+            }
+            
+            // Clean up any existing duplicate battery level entries
+            cleanupDuplicateBatteryLevels();
+            
             System.out.println("Cephra MySQL database connected successfully.");
         } catch (SQLException e) {
             System.err.println("Failed to initialize database: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    // Helper method to check if a table exists
+    private static boolean tableExists(Connection conn, String tableName) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?")) {
+            stmt.setString(1, tableName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking if table exists: " + e.getMessage());
+        }
+        return false;
     }
 
     // Method to check if the given credentials are valid
@@ -93,6 +121,24 @@ public class CephraDB {
                 return false;
             }
             System.err.println("Error adding user: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    // Method to check if a user exists
+    public static boolean userExists(String username) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT username FROM users WHERE username = ?")) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // If there's a result, user exists
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking if user exists: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -213,12 +259,14 @@ public class CephraDB {
                     Random random = new Random();
                     int batteryLevel = 15 + random.nextInt(36); // 15 to 50
                     
-                    // Insert the new battery level
+                    // Insert the new battery level using ON DUPLICATE KEY UPDATE to prevent duplicates
                     try (PreparedStatement insertStmt = conn.prepareStatement(
-                            "INSERT INTO battery_levels (username, battery_level) VALUES (?, ?)")) {
+                            "INSERT INTO battery_levels (username, battery_level) VALUES (?, ?) " +
+                            "ON DUPLICATE KEY UPDATE battery_level = ?")) {
                         
                         insertStmt.setString(1, username);
                         insertStmt.setInt(2, batteryLevel);
+                        insertStmt.setInt(3, batteryLevel);
                         insertStmt.executeUpdate();
                     }
                     
@@ -253,6 +301,27 @@ public class CephraDB {
     
     public static void chargeUserBatteryToFull(String username) {
         setUserBatteryLevel(username, 100);
+    }
+    
+    // Method to clean up duplicate battery level entries
+    public static void cleanupDuplicateBatteryLevels() {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // Delete duplicate entries, keeping only the most recent one for each user
+            String cleanupSQL = 
+                "DELETE b1 FROM battery_levels b1 " +
+                "INNER JOIN battery_levels b2 " +
+                "WHERE b1.id > b2.id AND b1.username = b2.username";
+            
+            try (PreparedStatement stmt = conn.prepareStatement(cleanupSQL)) {
+                int deletedRows = stmt.executeUpdate();
+                if (deletedRows > 0) {
+                    System.out.println("Cleaned up " + deletedRows + " duplicate battery level entries");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error cleaning up duplicate battery levels: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     // Active ticket management methods
@@ -323,4 +392,338 @@ public class CephraDB {
         }
         return null;
     }
+    
+    // Queue ticket management methods
+    public static boolean addQueueTicket(String ticketId, String username, String serviceType, 
+                                       String status, String paymentStatus, int initialBatteryLevel) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First, ensure the user exists in the users table
+            if (!userExists(username)) {
+                // Create a temporary user if they don't exist
+                addUser(username, username + "@cephra.com", "temp123");
+            }
+            
+            // Now insert the queue ticket
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO queue_tickets (ticket_id, username, service_type, status, " +
+                    "payment_status, initial_battery_level) VALUES (?, ?, ?, ?, ?, ?)")) {
+                
+                stmt.setString(1, ticketId);
+                stmt.setString(2, username);
+                stmt.setString(3, serviceType);
+                stmt.setString(4, status);
+                stmt.setString(5, paymentStatus);
+                stmt.setInt(6, initialBatteryLevel);
+                
+                int rowsAffected = stmt.executeUpdate();
+                return rowsAffected > 0;
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error adding queue ticket: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean updateQueueTicketStatus(String ticketId, String status) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE queue_tickets SET status = ? WHERE ticket_id = ?")) {
+            
+            stmt.setString(1, status);
+            stmt.setString(2, ticketId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error updating queue ticket status: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean updateQueueTicketPayment(String ticketId, String paymentStatus, String referenceNumber) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE queue_tickets SET payment_status = ?, reference_number = ? WHERE ticket_id = ?")) {
+            
+            stmt.setString(1, paymentStatus);
+            stmt.setString(2, referenceNumber);
+            stmt.setString(3, ticketId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error updating queue ticket payment: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean removeQueueTicket(String ticketId) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "DELETE FROM queue_tickets WHERE ticket_id = ?")) {
+            
+            stmt.setString(1, ticketId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error removing queue ticket: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    // Charging history methods
+    public static boolean addChargingHistory(String ticketId, String username, String serviceType,
+                                           int initialBatteryLevel, int chargingTimeMinutes, 
+                                           double totalAmount, String referenceNumber) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO charging_history (ticket_id, username, service_type, " +
+                     "initial_battery_level, charging_time_minutes, total_amount, reference_number) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+            
+            stmt.setString(1, ticketId);
+            stmt.setString(2, username);
+            stmt.setString(3, serviceType);
+            stmt.setInt(4, initialBatteryLevel);
+            stmt.setInt(5, chargingTimeMinutes);
+            stmt.setDouble(6, totalAmount);
+            stmt.setString(7, referenceNumber);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error adding charging history: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static List<Object[]> getChargingHistoryForUser(String username) {
+        List<Object[]> history = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
+                     "total_amount, reference_number, completed_at FROM charging_history " +
+                     "WHERE username = ? ORDER BY completed_at DESC")) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getString("ticket_id"),
+                        rs.getString("username"),
+                        rs.getString("service_type"),
+                        rs.getInt("initial_battery_level"),
+                        rs.getInt("charging_time_minutes"),
+                        rs.getDouble("total_amount"),
+                        rs.getString("reference_number"),
+                        rs.getTimestamp("completed_at")
+                    };
+                    history.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting charging history: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return history;
+    }
+    
+    public static List<Object[]> getAllChargingHistory() {
+        List<Object[]> history = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
+                     "total_amount, reference_number, completed_at FROM charging_history " +
+                     "ORDER BY completed_at DESC")) {
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getString("ticket_id"),
+                        rs.getString("username"),
+                        rs.getString("service_type"),
+                        rs.getInt("initial_battery_level"),
+                        rs.getInt("charging_time_minutes"),
+                        rs.getDouble("total_amount"),
+                        rs.getString("reference_number"),
+                        rs.getTimestamp("completed_at")
+                    };
+                    history.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting all charging history: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return history;
+    }
+    
+    public static List<Object[]> getAllQueueTickets() {
+        List<Object[]> tickets = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT ticket_id, reference_number, username, service_type, status, payment_status " +
+                     "FROM queue_tickets ORDER BY created_at DESC")) {
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getString("ticket_id"),
+                        rs.getString("reference_number"),
+                        rs.getString("username"),
+                        rs.getString("service_type"),
+                        rs.getString("status"),
+                        rs.getString("payment_status")
+                    };
+                    tickets.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting all queue tickets: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+    
+    // Payment transaction methods
+        public static boolean addPaymentTransaction(String ticketId, String username, double amount, 
+                                               String paymentMethod, String referenceNumber) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO payment_transactions (ticket_id, username, amount, " +
+                     "payment_method, reference_number) VALUES (?, ?, ?, ?, ?)")) {
+            
+            stmt.setString(1, ticketId);
+            stmt.setString(2, username);
+            stmt.setDouble(3, amount);
+            stmt.setString(4, paymentMethod);
+            stmt.setString(5, referenceNumber);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error adding payment transaction: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    // Method to get payment method for a specific ticket
+    public static String getPaymentMethodForTicket(String ticketId) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT payment_method FROM payment_transactions WHERE ticket_id = ?")) {
+            
+            stmt.setString(1, ticketId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("payment_method");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting payment method for ticket: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    // Staff management methods
+    public static boolean addStaff(String name, String username, String email, String password) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO staff_records (name, username, email, password) VALUES (?, ?, ?, ?)")) {
+            
+            stmt.setString(1, name);
+            stmt.setString(2, username);
+            stmt.setString(3, email);
+            stmt.setString(4, password);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error adding staff: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static List<Object[]> getAllStaff() {
+        List<Object[]> staff = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT name, username, email, status, password FROM staff_records ORDER BY name")) {
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getString("name"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("status"),
+                        rs.getString("password")
+                    };
+                    staff.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting staff: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return staff;
+    }
+    
+    // System settings methods
+    public static String getSystemSetting(String settingKey) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT setting_value FROM system_settings WHERE setting_key = ?")) {
+            
+            stmt.setString(1, settingKey);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("setting_value");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting system setting: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static boolean updateSystemSetting(String settingKey, String settingValue) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE system_settings SET setting_value = ? WHERE setting_key = ?")) {
+            
+            stmt.setString(1, settingValue);
+            stmt.setString(2, settingKey);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error updating system setting: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+
 }

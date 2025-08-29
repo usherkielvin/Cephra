@@ -161,6 +161,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     // Only move to Waiting if there is capacity in the waiting grid
                     if (!ticket.isEmpty() && buttonCount < 10) {
                         queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
+                        // Update database status
+                        cephra.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
                         gridButtons[buttonCount].setText(ticket);
                         gridButtons[buttonCount].setVisible(true);
                         buttonCount++;
@@ -177,6 +179,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     boolean assigned = isFast ? assignToFastSlot(ticket) : assignToNormalSlot(ticket);
                     if (assigned) {
                         queTab.setValueAt("Charging", editingRow, statusColumnIndex);
+                        // Update database status
+                        cephra.CephraDB.updateQueueTicketStatus(ticket, "Charging");
                         removeTicketFromGrid(ticket);
                     } else {
                         String msg = isFast ?
@@ -187,6 +191,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     }
                 } else if ("Charging".equalsIgnoreCase(status)) {
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
+                    // Update database status
+                    cephra.CephraDB.updateQueueTicketStatus(ticket, "Complete");
                     if (paymentCol >= 0) {
                         // Upon completion, payment becomes Pending
                         queTab.setValueAt("Pending", editingRow, paymentCol);
@@ -577,6 +583,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             Object val = queTab.getValueAt(row, ticketCol);
             if (val != null && ticket.equals(String.valueOf(val).trim())) {
                 queTab.setValueAt("Charging", row, statusCol);
+                // Update database status
+                cephra.CephraDB.updateQueueTicketStatus(ticket, "Charging");
                 break;
             }
         }

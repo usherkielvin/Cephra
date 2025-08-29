@@ -37,4 +37,4 @@ This guide will help you set up the Cephra application with XAMPP's MySQL databa
   - Port: 3306
   - Database: cephradb
   - User: root
-  - Password: (empty)
+  - Password: (empty) 

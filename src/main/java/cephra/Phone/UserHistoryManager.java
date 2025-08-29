@@ -129,35 +129,42 @@ public class UserHistoryManager {
             return new ArrayList<>();
         }
         
-        // Get admin history records for this user (these are the source of truth)
-        List<HistoryEntry> adminEntries = getAdminHistoryForUser(username);
+        // Get charging history from database (this is the single source of truth)
+        List<Object[]> dbHistory = cephra.CephraDB.getChargingHistoryForUser(username);
+        List<HistoryEntry> historyEntries = new ArrayList<>();
         
-        // Get user's local history entries
-        List<HistoryEntry> userEntries = userHistoryMap.get(username);
-        if (userEntries == null) {
-            userEntries = new ArrayList<>();
-        } else {
-            userEntries = new ArrayList<>(userEntries);
-        }
-        
-        // Create a set of ticket IDs from admin entries to avoid duplicates
-        Set<String> adminTicketIds = new HashSet<>();
-        for (HistoryEntry adminEntry : adminEntries) {
-            adminTicketIds.add(adminEntry.getTicketId());
-        }
-        
-        // Only add local entries that don't exist in admin history
-        List<HistoryEntry> result = new ArrayList<>(adminEntries);
-        for (HistoryEntry localEntry : userEntries) {
-            if (!adminTicketIds.contains(localEntry.getTicketId())) {
-                result.add(localEntry);
-            }
+        for (Object[] record : dbHistory) {
+            String ticketId = (String) record[0];
+            String recordUsername = (String) record[1];
+            String serviceType = (String) record[2];
+            int initialBatteryLevel = (Integer) record[3];
+            int chargingTimeMinutes = (Integer) record[4];
+            double totalAmount = (Double) record[5];
+            String referenceNumber = (String) record[6];
+            java.sql.Timestamp timestamp = (java.sql.Timestamp) record[7];
+            
+            // Convert timestamp to LocalDateTime
+            LocalDateTime localDateTime = timestamp.toLocalDateTime();
+            
+            // Get payment method from database
+            String paymentMethod = cephra.CephraDB.getPaymentMethodForTicket(ticketId);
+            if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
+            
+            HistoryEntry entry = new HistoryEntry(
+                ticketId, 
+                serviceType + " (" + paymentMethod + ")", // Include payment method in service type
+                chargingTimeMinutes + " mins", 
+                String.format("₱%.2f", totalAmount), 
+                referenceNumber, 
+                localDateTime
+            );
+            historyEntries.add(entry);
         }
         
         // Sort the result by timestamp (newest first)
-        result.sort((entry1, entry2) -> entry2.getTimestamp().compareTo(entry1.getTimestamp()));
+        historyEntries.sort((entry1, entry2) -> entry2.getTimestamp().compareTo(entry1.getTimestamp()));
         
-        return result;
+        return historyEntries;
     }
     
     private static List<HistoryEntry> getAdminHistoryForUser(String username) {
