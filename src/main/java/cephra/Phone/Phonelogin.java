@@ -24,6 +24,10 @@ public class Phonelogin extends javax.swing.JPanel {
          See.setBorderPainted(false);
         See.setOpaque(false);
         See.setContentAreaFilled(false);
+
+        // Restore hover underline on Register and Forgot Password
+        addUnderlineOnHover(reghere);
+        addUnderlineOnHover(forgotpass);
     }
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -269,6 +273,22 @@ public class Phonelogin extends javax.swing.JPanel {
     private javax.swing.JButton reghere;
     private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
+
+    // Add underline on hover for link-like buttons
+    private void addUnderlineOnHover(final javax.swing.JButton button) {
+        if (button == null) return;
+        final String baseText = button.getText();
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                button.setText("<html><u>" + baseText + "</u></html>");
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setText(baseText);
+            }
+        });
+    }
 
     // Add this inner class at the end of your Phonelogin class (before the last closing brace)
     private static class InputLimitFilter extends DocumentFilter {

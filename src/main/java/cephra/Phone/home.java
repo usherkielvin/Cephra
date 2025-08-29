@@ -53,8 +53,8 @@ public class home extends javax.swing.JPanel {
 
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
-        charge = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
+        charge = new javax.swing.JButton();
         LoggedName = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -86,18 +86,6 @@ public class home extends javax.swing.JPanel {
         add(historybutton);
         historybutton.setBounds(200, 680, 50, 40);
 
-        charge.setBorder(null);
-        charge.setBorderPainted(false);
-        charge.setContentAreaFilled(false);
-        charge.setFocusPainted(false);
-        charge.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chargeActionPerformed(evt);
-            }
-        });
-        add(charge);
-        charge.setBounds(30, 680, 50, 40);
-
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
         linkbutton.setContentAreaFilled(false);
@@ -110,11 +98,25 @@ public class home extends javax.swing.JPanel {
         add(linkbutton);
         linkbutton.setBounds(90, 680, 50, 40);
 
-        LoggedName.setText("Name");
-        add(LoggedName);
-        LoggedName.setBounds(170, 110, 50, 30);
+        charge.setBorder(null);
+        charge.setBorderPainted(false);
+        charge.setContentAreaFilled(false);
+        charge.setFocusPainted(false);
+        charge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chargeActionPerformed(evt);
+            }
+        });
+        add(charge);
+        charge.setBounds(30, 680, 50, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HOMEPAGE-UPDET.png"))); // NOI18N
+        LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 32)); // NOI18N
+        LoggedName.setForeground(new java.awt.Color(0, 0, 0));
+        LoggedName.setText("Hi Dizon!");
+        add(LoggedName);
+        LoggedName.setBounds(20, 62, 220, 50);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HOME PAGE - not charging.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents

@@ -12,7 +12,8 @@ public class AdminRegister extends javax.swing.JPanel {
         gender.setText(""); // Plain email field
     }
 
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents                          
+    @SuppressWarnings("unchecked")
     private void initComponents() {
         
         
@@ -74,7 +75,7 @@ public class AdminRegister extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png")));
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
-    } 
+    } // </editor-fold>//GEN-END:initComponents 
 
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {
         String name = Fullname.getText().trim();

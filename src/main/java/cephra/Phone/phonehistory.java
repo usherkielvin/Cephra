@@ -79,11 +79,14 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         if (historyScrollPane.getVerticalScrollBar() != null) {
             historyScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+            // Adjust scroll speed (higher = faster). Try 20-40 for quicker scrolling
+            historyScrollPane.getVerticalScrollBar().setUnitIncrement(24);
         }
         if (historyScrollPane.getHorizontalScrollBar() != null) {
             historyScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
         }
         historyScrollPane.setWheelScrollingEnabled(true);
+        historyScrollPane.putClientProperty("JScrollPane.fastWheelScrolling", Boolean.TRUE);
     }
     
     private void loadHistoryEntries() {
