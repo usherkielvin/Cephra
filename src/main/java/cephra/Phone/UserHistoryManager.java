@@ -103,8 +103,9 @@ public class UserHistoryManager {
             userEntries = new ArrayList<>(userEntries);
         }
         
-        // If we already have entries, don't add admin entries to avoid duplicates
-        // Admin entries are already added through the addHistoryEntry method when payment is marked as paid
+        // Also get admin history records for this user
+        List<HistoryEntry> adminEntries = getAdminHistoryForUser(username);
+        userEntries.addAll(adminEntries);
         
         return userEntries;
     }
@@ -120,9 +121,9 @@ public class UserHistoryManager {
                 for (Object[] record : adminRecords) {
                     if (record.length >= 7) {
                         String ticketId = String.valueOf(record[0]);
-                        String serviceType = String.valueOf(record[2]);
-                        // Get actual charging time from KWh field (index 2)
-                        String chargingTime = String.valueOf(record[2]);
+                        // KWh is at index 2, Total amount is at index 3
+                        String serviceType = String.valueOf(record[2]) + " kWh"; // KWh used
+                        String chargingTime = String.valueOf(record[3]) + " PHP"; // Total amount
                         result.add(new HistoryEntry(ticketId, serviceType, chargingTime));
                     }
                 }
@@ -133,4 +134,6 @@ public class UserHistoryManager {
         
         return result;
     }
+    
+
 }
