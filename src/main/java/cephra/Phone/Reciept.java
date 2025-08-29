@@ -57,13 +57,17 @@ public class Reciept extends javax.swing.JPanel {
             String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
             if (ticket == null || ticket.isEmpty()) return;
             
-            // Get actual user battery level from CephraDB
-            String username = cephra.CephraDB.getCurrentUsername();
-            int start = cephra.CephraDB.getUserBatteryLevel(username);
-            double cap = 40.0; // 40kWh capacity
-            double usedKWh = (100.0 - start) / 100.0 * cap;
-            double amount = usedKWh * 15.0; // ₱15 per kWh
-            amount = Math.max(amount, 50.0); // Minimum ₱50
+            // Use centralized calculation from QueueBridge for consistency
+            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+            
+            // Get kWh calculation from QueueBridge for consistency
+            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+            double usedKWh = 0.0;
+            if (batteryInfo != null) {
+                int start = batteryInfo.initialPercent;
+                double cap = batteryInfo.capacityKWh;
+                usedKWh = (100.0 - start) / 100.0 * cap;
+            }
             
             // Get reference number from queue bridge first (most up-to-date)
             String refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
@@ -91,10 +95,10 @@ public class Reciept extends javax.swing.JPanel {
             }
             
             // Use values to avoid warnings and aid debugging
-            System.out.println("Receipt for " + ticket + ": start=" + start + ", cap=" + cap + "kWh, used=" + String.format("%.2f", usedKWh) + "kWh");
+            System.out.println("Receipt for " + ticket + ": used=" + String.format("%.2f", usedKWh) + "kWh, amount=" + String.format("%.2f", amount));
             
             AmountPaid.setText(String.format("Php %.2f", amount));
-            Fee.setText("Php 0.00");
+            Fee.setText(String.format("Php %.2f/kWh (min ₱%.2f)", cephra.Admin.QueueBridge.getRatePerKWh(), cephra.Admin.QueueBridge.getMinimumFee()));
             price.setText(String.format("PHP %.2f", amount));
             RefNumber.setText(refNumber); // Use admin queue reference number
             NumTicket.setText(ticket); // Use FCH ticket number

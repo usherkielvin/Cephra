@@ -251,12 +251,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         double amount = 0.0;
                         double usedKWh = 0.0;
                         try {
-                            // Get actual user battery level for accurate calculation
-                            int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
-                            double cap = 40.0; // 40kWh capacity
-                            usedKWh = ((100.0 - userBatteryLevel) / 100.0) * cap;
-                            amount = usedKWh * 15.0; // ₱15 per kWh
-                            amount = Math.max(amount, 50.0); // Minimum ₱50
+                            // Centralized calculation for total amount
+                            amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                            // Derive kWh from ticket battery info (fallback to user's current if missing)
+                            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                            if (batteryInfo == null) {
+                                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                                batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
+                            }
+                            usedKWh = ((100.0 - batteryInfo.initialPercent) / 100.0) * batteryInfo.capacityKWh;
                         } catch (Throwable t) {
                             // ignore compute errors, leave defaults
                         }
