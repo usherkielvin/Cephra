@@ -28,10 +28,10 @@ public class VerificationPop extends javax.swing.JPanel {
         email = new javax.swing.JTextField();
         resend = new javax.swing.JButton();
         Back = new javax.swing.JButton();
-        cephraemail = new javax.swing.JButton();
         resetsend = new javax.swing.JButton();
         contactsup = new javax.swing.JButton();
         otpPreviewLabel = new javax.swing.JLabel();
+        cephraemail = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -45,7 +45,7 @@ public class VerificationPop extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(54, 345, 250, 25);
+        email.setBounds(54, 336, 250, 25);
 
         resend.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         resend.setForeground(new java.awt.Color(0, 204, 204));
@@ -77,17 +77,6 @@ public class VerificationPop extends javax.swing.JPanel {
         add(Back);
         Back.setBounds(120, 630, 120, 23);
 
-        cephraemail.setBorder(null);
-        cephraemail.setBorderPainted(false);
-        cephraemail.setContentAreaFilled(false);
-        cephraemail.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cephraemailActionPerformed(evt);
-            }
-        });
-        add(cephraemail);
-        cephraemail.setBounds(20, 50, 330, 110);
-
         resetsend.setBorder(null);
         resetsend.setBorderPainted(false);
         resetsend.setContentAreaFilled(false);
@@ -115,11 +104,23 @@ public class VerificationPop extends javax.swing.JPanel {
         add(contactsup);
         contactsup.setBounds(160, 663, 130, 30);
 
+        otpPreviewLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         otpPreviewLabel.setText("jLabel2");
         add(otpPreviewLabel);
-        otpPreviewLabel.setBounds(120, 260, 37, 16);
+        otpPreviewLabel.setBounds(210, 133, 110, 16);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/veri.png"))); // NOI18N
+        cephraemail.setBorder(null);
+        cephraemail.setBorderPainted(false);
+        cephraemail.setContentAreaFilled(false);
+        cephraemail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cephraemailActionPerformed(evt);
+            }
+        });
+        add(cephraemail);
+        cephraemail.setBounds(20, 50, 330, 110);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/forgotpass-pop.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents

@@ -6,6 +6,10 @@ public class Dashboard extends javax.swing.JPanel {
 
     private java.awt.Image dashboardImage;
     private javax.swing.JToggleButton toggleSwitch; // Add this line
+    
+    // Variables to store spinner values
+    private int Min = 50; // Default minimum fee
+    private int RPH = 15; // Default rate per hour
 
     public Dashboard() {
         initComponents();
@@ -21,13 +25,20 @@ public class Dashboard extends javax.swing.JPanel {
             }
         });
         
-        rateText.setOpaque(false);
-        rateText.setBackground(new Color(0, 0, 0, 0));
-        rateText.setBorder(null);
+
         
-        minText.setOpaque(false);
-        minText.setBackground(new Color(0, 0, 0, 0));
-        minText.setBorder(null);
+        // Configure spinners with SpinnerNumberModel to prevent negative values
+        MinfeeSpinner.setModel(new javax.swing.SpinnerNumberModel(Min, 0, Integer.MAX_VALUE, 1));
+        RPHSpinner.setModel(new javax.swing.SpinnerNumberModel(RPH, 0, Integer.MAX_VALUE, 1));
+        
+        // Add change listeners to automatically save spinner values
+        MinfeeSpinner.addChangeListener(e -> {
+            Min = (Integer) MinfeeSpinner.getValue();
+        });
+        
+        RPHSpinner.addChangeListener(e -> {
+            RPH = (Integer) RPHSpinner.getValue();
+        });
 
         // --- TOGGLE SWITCH SETUP ---
         toggleSwitch = new javax.swing.JToggleButton("Toggle");
@@ -51,8 +62,10 @@ public class Dashboard extends javax.swing.JPanel {
         quebutton = new javax.swing.JButton();
         exitlogin = new javax.swing.JButton();
         datetime = new javax.swing.JLabel();
-        rateText = new javax.swing.JTextField();
-        minText = new javax.swing.JTextField();
+        MinfeeSpinner = new javax.swing.JSpinner();
+        RPHSpinner = new javax.swing.JSpinner();
+        Saveminfee = new javax.swing.JButton();
+        Saverateperhour = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -131,21 +144,35 @@ public class Dashboard extends javax.swing.JPanel {
         add(datetime);
         datetime.setBounds(820, 40, 170, 20);
 
-        rateText.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        rateText.setText("15");
-        rateText.setBorder(null);
-        rateText.addActionListener(new java.awt.event.ActionListener() {
+        MinfeeSpinner.setValue(50);
+        add(MinfeeSpinner);
+        MinfeeSpinner.setBounds(120, 512, 300, 30);
+
+        RPHSpinner.setValue(15);
+        add(RPHSpinner);
+        RPHSpinner.setBounds(600, 512, 300, 30);
+
+        Saveminfee.setBorderPainted(false);
+        Saveminfee.setContentAreaFilled(false);
+        Saveminfee.setFocusPainted(false);
+        Saveminfee.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rateTextActionPerformed(evt);
+                SaveminfeeActionPerformed(evt);
             }
         });
-        add(rateText);
-        rateText.setBounds(610, 510, 230, 30);
+        add(Saveminfee);
+        Saveminfee.setBounds(120, 550, 290, 50);
 
-        minText.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        minText.setText("50");
-        add(minText);
-        minText.setBounds(120, 510, 230, 40);
+        Saverateperhour.setBorderPainted(false);
+        Saverateperhour.setContentAreaFilled(false);
+        Saverateperhour.setFocusPainted(false);
+        Saverateperhour.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaverateperhourActionPerformed(evt);
+            }
+        });
+        add(Saverateperhour);
+        Saverateperhour.setBounds(610, 560, 290, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -174,11 +201,15 @@ public class Dashboard extends javax.swing.JPanel {
     }//GEN-LAST:event_historybuttonActionPerformed
 
     private void staffbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_staffbuttonActionPerformed
-      java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.StaffRecord());
         }
     }//GEN-LAST:event_staffbuttonActionPerformed
+    
+   
+    
+   
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
         java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
@@ -187,9 +218,18 @@ public class Dashboard extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_exitloginActionPerformed
 
-    private void rateTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rateTextActionPerformed
+    private void SaveminfeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveminfeeActionPerformed
+          Min = (Integer) MinfeeSpinner.getValue();
+        javax.swing.JOptionPane.showMessageDialog(this, "Minimum fee saved: " + Min);
+        
+        
+    }//GEN-LAST:event_SaveminfeeActionPerformed
+
+    private void SaverateperhourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaverateperhourActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_rateTextActionPerformed
+         RPH = (Integer) RPHSpinner.getValue();
+        javax.swing.JOptionPane.showMessageDialog(this, "Rate per hour saved: " + RPH);
+    }//GEN-LAST:event_SaverateperhourActionPerformed
 
     private void dashboardTogglePropertyChange(java.beans.PropertyChangeEvent evt) {
         // Functionality when the dashboard toggle is switched
@@ -204,13 +244,15 @@ public class Dashboard extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
+    private javax.swing.JSpinner MinfeeSpinner;
+    private javax.swing.JSpinner RPHSpinner;
+    private javax.swing.JButton Saveminfee;
+    private javax.swing.JButton Saverateperhour;
     private javax.swing.JLabel datetime;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JTextField minText;
     private javax.swing.JButton quebutton;
-    private javax.swing.JTextField rateText;
     private javax.swing.JButton staffbutton;
     private javax.swing.JLabel totalsessions;
     private javax.swing.JLabel totalsessions1;

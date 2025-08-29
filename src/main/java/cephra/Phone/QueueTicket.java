@@ -17,8 +17,9 @@ public class QueueTicket extends javax.swing.JPanel {
         setupLabelPosition(); // Set label position
         makeDraggable();
         
-        // Update battery percentage from current ticket
+        // Update battery percentage and estimated time
         updateBatteryDisplay();
+        updateEstimatedTime();
 
        // jLabel1.setText("<html>You are next after<br>current charging session</html>");
     }
@@ -147,7 +148,7 @@ public class QueueTicket extends javax.swing.JPanel {
         mins1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         mins1.setText("5 minutes");
         add(mins1);
-        mins1.setBounds(105, 390, 130, 40);
+        mins1.setBounds(35, 390, 280, 40);
 
         label1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         label1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -353,6 +354,38 @@ public class QueueTicket extends javax.swing.JPanel {
             batterypercent.setText(batteryLevel + "%" + status);
         } catch (Exception e) {
             System.err.println("Error updating battery display: " + e.getMessage());
+        }
+    }
+
+    private void updateEstimatedTime() {
+        try {
+            String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
+            String service = cephra.Phone.QueueFlow.getCurrentServiceName();
+            String username = cephra.CephraDB.getCurrentUsername();
+            int start = cephra.CephraDB.getUserBatteryLevel(username);
+            int minutes;
+            if (ticket != null && !ticket.isEmpty()) {
+                minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(ticket);
+            } else {
+                minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(start, service);
+            }
+            mins1.setText(formatTimeDisplay(minutes));
+        } catch (Exception e) {
+            System.err.println("Error updating estimated time: " + e.getMessage());
+        }
+    }
+    
+    private String formatTimeDisplay(int minutes) {
+        if (minutes >= 60) {
+            int hours = minutes / 60;
+            int remainingMinutes = minutes % 60;
+            if (remainingMinutes == 0) {
+                return hours + " hour" + (hours > 1 ? "s" : "");
+            } else {
+                return hours + " hour" + (hours > 1 ? "s" : "") + " " + remainingMinutes + " min" + (remainingMinutes > 1 ? "s" : "");
+            }
+        } else {
+            return minutes + " minute" + (minutes != 1 ? "s" : "");
         }
     }
 }

@@ -54,11 +54,6 @@ public class NewPassword extends javax.swing.JPanel {
         Back.setBorderPainted(false);
         Back.setContentAreaFilled(false);
         Back.setFocusPainted(false);
-        Back.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                backActionPerformed(evt);
-            }
-        });
         add(Back);
         Back.setBounds(120, 630, 120, 23);
 
@@ -69,11 +64,6 @@ public class NewPassword extends javax.swing.JPanel {
         contactsup.setBorderPainted(false);
         contactsup.setContentAreaFilled(false);
         contactsup.setFocusPainted(false);
-        contactsup.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                contactsupActionPerformed(evt);
-            }
-        });
         add(contactsup);
         contactsup.setBounds(160, 663, 130, 30);
 
@@ -89,9 +79,9 @@ public class NewPassword extends javax.swing.JPanel {
         add(update);
         update.setBounds(50, 440, 270, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/newpass.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/new-pass.png"))); // NOI18N
         add(jLabel1);
-        // Label position will be set in setupLabelPosition() method
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
