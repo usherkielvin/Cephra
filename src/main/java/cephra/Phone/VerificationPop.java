@@ -16,6 +16,9 @@ public class VerificationPop extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        
+        // Display current OTP in the preview label
+        otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
     }
 
    
@@ -28,6 +31,7 @@ public class VerificationPop extends javax.swing.JPanel {
         cephraemail = new javax.swing.JButton();
         resetsend = new javax.swing.JButton();
         contactsup = new javax.swing.JButton();
+        otpPreviewLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -110,6 +114,10 @@ public class VerificationPop extends javax.swing.JPanel {
         });
         add(contactsup);
         contactsup.setBounds(160, 663, 130, 30);
+
+        otpPreviewLabel.setText("jLabel2");
+        add(otpPreviewLabel);
+        otpPreviewLabel.setBounds(120, 260, 37, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/veri.png"))); // NOI18N
         add(jLabel1);
@@ -230,7 +238,11 @@ public class VerificationPop extends javax.swing.JPanel {
     private javax.swing.JButton contactsup;
     private javax.swing.JTextField email;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel otpPreviewLabel;
     private javax.swing.JButton resend;
     private javax.swing.JButton resetsend;
     // End of variables declaration//GEN-END:variables
+    
+    // Custom variables
+   
 }

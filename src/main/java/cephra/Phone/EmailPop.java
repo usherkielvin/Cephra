@@ -10,6 +10,9 @@ public class EmailPop extends javax.swing.JPanel {
         email.setOpaque(false);
         email.setBackground(new java.awt.Color(0, 0, 0, 0));
         setupLabelPosition();
+        
+        // Display current OTP in the preview label
+        otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
     }
        // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
@@ -27,6 +30,7 @@ public class EmailPop extends javax.swing.JPanel {
         contactsup = new javax.swing.JButton();
         Back = new javax.swing.JButton();
         cephraemail = new javax.swing.JButton();
+        otpPreviewLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -76,6 +80,10 @@ public class EmailPop extends javax.swing.JPanel {
         add(cephraemail);
         cephraemail.setBounds(20, 50, 330, 110);
 
+        otpPreviewLabel.setText("jLabel2");
+        add(otpPreviewLabel);
+        otpPreviewLabel.setBounds(120, 260, 37, 16);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/emailcheck.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
@@ -122,5 +130,9 @@ public class EmailPop extends javax.swing.JPanel {
     private javax.swing.JButton contactsup;
     private javax.swing.JTextField email;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel otpPreviewLabel;
     // End of variables declaration//GEN-END:variables
+    
+    // Custom variables
+   
 }
