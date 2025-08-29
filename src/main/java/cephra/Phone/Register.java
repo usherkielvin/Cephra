@@ -109,7 +109,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(name);
-        name.setBounds(40, 320, 280, 40);
+        name.setBounds(40, 314, 280, 40);
 
         register.setBorder(null);
         register.setBorderPainted(false);
@@ -125,7 +125,6 @@ public class Register extends javax.swing.JPanel {
 
         termscondition.setBackground(new java.awt.Color(255, 255, 255));
         termscondition.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        termscondition.setForeground(new java.awt.Color(0, 0, 0));
         termscondition.setText("I Agree to the Terms and Conditions");
         termscondition.setBorder(null);
         termscondition.setContentAreaFilled(false);
@@ -139,7 +138,6 @@ public class Register extends javax.swing.JPanel {
         termscondition.setBounds(46, 627, 280, 40);
 
         loginbutton.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        loginbutton.setForeground(new java.awt.Color(0, 0, 0));
         loginbutton.setText("Login");
         loginbutton.setBorder(null);
         loginbutton.setBorderPainted(false);
@@ -153,7 +151,7 @@ public class Register extends javax.swing.JPanel {
         add(loginbutton);
         loginbutton.setBounds(190, 673, 90, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/REGISTER.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/regis1.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, -4, 370, 760);
     }// </editor-fold>//GEN-END:initComponents

@@ -92,7 +92,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(60, 381, 200, 30);
+        pass.setBounds(60, 387, 200, 30);
 
         username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
@@ -115,7 +115,7 @@ public class Phonelogin extends javax.swing.JPanel {
         add(loginhome);
         loginhome.setBounds(80, 570, 220, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/1.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/login1.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
