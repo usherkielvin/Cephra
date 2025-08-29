@@ -1,5 +1,7 @@
 package cephra.Phone;
 
+import javax.swing.SwingUtilities;
+
 public class NewPassword extends javax.swing.JPanel {
 
     public NewPassword() {
@@ -54,6 +56,11 @@ public class NewPassword extends javax.swing.JPanel {
         Back.setBorderPainted(false);
         Back.setContentAreaFilled(false);
         Back.setFocusPainted(false);
+        Back.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BackActionPerformed(evt);
+            }
+        });
         add(Back);
         Back.setBounds(120, 630, 120, 23);
 
@@ -193,6 +200,26 @@ if (password.equals(password2) && !password.isEmpty()) {
     private void newpass1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newpass1ActionPerformed
         updateActionPerformed(evt); // Trigger update when Enter is pressed on confirm password field
     }//GEN-LAST:event_newpass1ActionPerformed
+
+    private void BackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackActionPerformed
+        // TODO add your handling code here:
+        
+          SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    java.awt.Window[] windows = java.awt.Window.getWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof cephra.Frame.Phone) {
+                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                            phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                            break;
+                        }
+                    }
+                }
+         });
+        
+        
+        
+    }//GEN-LAST:event_BackActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
