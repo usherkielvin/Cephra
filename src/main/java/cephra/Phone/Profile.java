@@ -97,7 +97,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(230, 683, 50, 40);
+        historybutton.setBounds(210, 683, 30, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);

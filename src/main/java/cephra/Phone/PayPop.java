@@ -67,13 +67,15 @@ public class PayPop extends javax.swing.JPanel {
             String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
             if (ticket == null || ticket.isEmpty()) return;
             
-            cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+            // Get actual user battery level from CephraDB
+            String username = cephra.CephraDB.getCurrentUsername();
+            int start = cephra.CephraDB.getUserBatteryLevel(username);
+            double cap = 40.0; // 40kWh capacity
+            double usedKWh = (100.0 - start) / 100.0 * cap;
+            double amount = usedKWh * 15.0; // ₱15 per kWh
+            amount = Math.max(amount, 50.0); // Minimum ₱50
             double commission = cephra.Admin.QueueBridge.computePlatformCommission(amount);
             double net = cephra.Admin.QueueBridge.computeNetToStation(amount);
-            int start = info == null ? 18 : info.initialPercent;
-            double cap = info == null ? 40.0 : info.capacityKWh;
-            double usedKWh = (100.0 - start) / 100.0 * cap;
             
             // Update all labels with actual ticket data
             if (ticketNo != null) {
@@ -89,7 +91,6 @@ public class PayPop extends javax.swing.JPanel {
                 TotalBill.setText(String.format("₱%.2f", amount));
             }
             if (name != null) {
-                String username = cephra.CephraDB.getCurrentUsername();
                 if (username != null && !username.isEmpty()) {
                     name.setText(username);
                 }

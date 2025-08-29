@@ -203,13 +203,22 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         // ignore
                     }
 
-                    // Compute amount due (for popup/receipt display)
-                    try {
-                        double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
-                        System.out.println("Amount due for " + ticket + ": " + String.format("%.2f", amount));
-                    } catch (Throwable t) {
-                        // ignore compute errors
-                    }
+                                            // Compute amount due and kWh based on actual battery level
+                        try {
+                            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                            // Get actual battery info for kWh calculation
+                            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                            if (batteryInfo == null) {
+                                // Get from user's actual battery level
+                                String customer = String.valueOf(queTab.getValueAt(editingRow, getColumnIndex("Customer")));
+                                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                                batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
+                            }
+                            double usedKWh = (100.0 - batteryInfo.initialPercent) / 100.0 * batteryInfo.capacityKWh;
+                            System.out.println("Amount due for " + ticket + ": " + String.format("%.2f", amount) + ", kWh: " + String.format("%.1f", usedKWh));
+                        } catch (Throwable t) {
+                            // ignore compute errors
+                        }
 
                     // Notify phone frame to show payment popup
                     try {
@@ -242,11 +251,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         double amount = 0.0;
                         double usedKWh = 0.0;
                         try {
-                            cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-                            int start = info == null ? 18 : info.initialPercent;
-                            double cap = info == null ? 40.0 : info.capacityKWh;
-                            usedKWh = ((100.0 - start) / 100.0) * cap;
-                            amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                            // Get actual user battery level for accurate calculation
+                            int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                            double cap = 40.0; // 40kWh capacity
+                            usedKWh = ((100.0 - userBatteryLevel) / 100.0) * cap;
+                            amount = usedKWh * 15.0; // ₱15 per kWh
+                            amount = Math.max(amount, 50.0); // Minimum ₱50
                         } catch (Throwable t) {
                             // ignore compute errors, leave defaults
                         }

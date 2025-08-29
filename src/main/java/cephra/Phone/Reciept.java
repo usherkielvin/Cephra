@@ -57,11 +57,13 @@ public class Reciept extends javax.swing.JPanel {
             String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
             if (ticket == null || ticket.isEmpty()) return;
             
-            cephra.Admin.QueueBridge.BatteryInfo info = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-            int start = info == null ? 18 : info.initialPercent;
-            double cap = info == null ? 40.0 : info.capacityKWh;
-            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+            // Get actual user battery level from CephraDB
+            String username = cephra.CephraDB.getCurrentUsername();
+            int start = cephra.CephraDB.getUserBatteryLevel(username);
+            double cap = 40.0; // 40kWh capacity
             double usedKWh = (100.0 - start) / 100.0 * cap;
+            double amount = usedKWh * 15.0; // ₱15 per kWh
+            amount = Math.max(amount, 50.0); // Minimum ₱50
             
             // Get reference number from queue bridge first (most up-to-date)
             String refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);

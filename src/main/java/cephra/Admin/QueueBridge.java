@@ -51,6 +51,13 @@ public final class QueueBridge {
 
         records.add(0, fullRecord);
 
+        // Store battery info for this ticket
+        int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+        ticketBattery.put(ticket, new BatteryInfo(userBatteryLevel, 40.0)); // 40kWh capacity
+        
+        // Set this as the user's active ticket
+        cephra.CephraDB.setActiveTicket(customer, ticket);
+
         if (model != null) {
             final Object[] visibleRow = toVisibleRow(fullRecord);
             SwingUtilities.invokeLater(() -> model.insertRow(0, visibleRow));
@@ -98,13 +105,31 @@ public final class QueueBridge {
     public static double computeAmountDue(String ticket) {
         BatteryInfo info = ticketBattery.get(ticket);
         if (info == null) {
-            info = new BatteryInfo(18, 40.0); // defaults
+            // Get actual user battery level from the ticket customer
+            String customer = getTicketCustomer(ticket);
+            if (customer != null && !customer.isEmpty()) {
+                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                info = new BatteryInfo(userBatteryLevel, 40.0);
+            } else {
+                info = new BatteryInfo(18, 40.0); // fallback default
+            }
         }
         int start = Math.max(0, Math.min(100, info.initialPercent));
         double usedFraction = (100.0 - start) / 100.0;
         double energyKWh = usedFraction * info.capacityKWh;
         double gross = energyKWh * 15.0;
         return Math.max(gross, 50.0);
+    }
+    
+    /** Helper method to get customer name from ticket */
+    private static String getTicketCustomer(String ticket) {
+        if (ticket == null) return null;
+        for (Object[] record : records) {
+            if (record != null && ticket.equals(String.valueOf(record[0]))) {
+                return String.valueOf(record[2]); // Customer is at index 2
+            }
+        }
+        return null;
     }
 
     public static double computePlatformCommission(double grossAmount) {
@@ -140,13 +165,9 @@ public final class QueueBridge {
                     incrementCounter = true;
                 }
                 r[5] = "Paid";
-                // Use existing reference number if available, otherwise generate new one
-                if (r[1] != null && !String.valueOf(r[1]).isEmpty()) {
-                    referenceNumber = String.valueOf(r[1]);
-                } else {
-                    referenceNumber = generateReference();
-                    r[1] = referenceNumber; // Store in the original reference field
-                }
+                // Always generate a new unique reference number for each payment
+                referenceNumber = generateReference();
+                r[1] = referenceNumber; // Store in the original reference field
                 foundInRecords = true;
                 customerName = String.valueOf(r[2]);
                 serviceName = String.valueOf(r[3]);
@@ -159,6 +180,9 @@ public final class QueueBridge {
         if (foundInRecords) {
             try {
                 cephra.Phone.UserHistoryManager.addHistoryEntry(customerName, ticket, serviceName, "40 mins");
+                // Clear the active ticket and charge battery to full when payment is completed
+                cephra.CephraDB.clearActiveTicket(customerName);
+                cephra.CephraDB.chargeUserBatteryToFull(customerName);
             } catch (Throwable t) {
                 System.err.println("QueueBridge: Error adding history entry: " + t.getMessage());
             }

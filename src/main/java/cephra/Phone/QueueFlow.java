@@ -116,8 +116,9 @@ public final class QueueFlow {
         final String status = "Pending";
         final String payment = "";
         final String action = "";
-        final int initialBatteryPercent = 18; // demo default
-        final double batteryCapacityKWh = 40.0; // demo default
+        // Get actual user battery level from CephraDB
+        final int initialBatteryPercent = cephra.CephraDB.getUserBatteryLevel(customerName);
+        final double batteryCapacityKWh = 40.0; // 40kWh capacity
 
         // Store in memory list
         entries.add(new Entry(ticket, customerName, service, status, payment, action, initialBatteryPercent, batteryCapacityKWh));
