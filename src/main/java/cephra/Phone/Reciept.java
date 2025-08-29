@@ -107,6 +107,7 @@ public class Reciept extends javax.swing.JPanel {
             System.err.println("Error populating receipt amounts: " + t.getMessage());
         }
     }
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
