@@ -186,7 +186,7 @@ public class UserHistoryManager {
                         try {
                             int est = cephra.Admin.QueueBridge.computeEstimatedMinutes(ticketId);
                             if (est > 0) {
-                                chargingTime = est + " mins";
+                                chargingTime = formatTimeDisplay(est);
                             }
                         } catch (Throwable t) {
                             // keep default
@@ -216,5 +216,18 @@ public class UserHistoryManager {
         return result;
     }
     
+    private static String formatTimeDisplay(int minutes) {
+        if (minutes >= 60) {
+            int hours = minutes / 60;
+            int remainingMinutes = minutes % 60;
+            if (remainingMinutes == 0) {
+                return hours + " hour" + (hours > 1 ? "s" : "");
+            } else {
+                return hours + " hour" + (hours > 1 ? "s" : "") + " " + remainingMinutes + " min" + (remainingMinutes > 1 ? "s" : "");
+            }
+        } else {
+            return minutes + " min" + (minutes != 1 ? "s" : "");
+        }
+    }
 
 }

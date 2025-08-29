@@ -148,7 +148,7 @@ public class QueueTicket extends javax.swing.JPanel {
         mins1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         mins1.setText("5 minutes");
         add(mins1);
-        mins1.setBounds(105, 390, 130, 40);
+        mins1.setBounds(35, 390, 280, 40);
 
         label1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         label1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -369,9 +369,23 @@ public class QueueTicket extends javax.swing.JPanel {
             } else {
                 minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(start, service);
             }
-            mins1.setText(minutes + " minutes");
+            mins1.setText(formatTimeDisplay(minutes));
         } catch (Exception e) {
             System.err.println("Error updating estimated time: " + e.getMessage());
+        }
+    }
+    
+    private String formatTimeDisplay(int minutes) {
+        if (minutes >= 60) {
+            int hours = minutes / 60;
+            int remainingMinutes = minutes % 60;
+            if (remainingMinutes == 0) {
+                return hours + " hour" + (hours > 1 ? "s" : "");
+            } else {
+                return hours + " hour" + (hours > 1 ? "s" : "") + " " + remainingMinutes + " min" + (remainingMinutes > 1 ? "s" : "");
+            }
+        } else {
+            return minutes + " minute" + (minutes != 1 ? "s" : "");
         }
     }
 }
