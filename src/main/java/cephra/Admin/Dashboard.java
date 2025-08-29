@@ -146,29 +146,33 @@ public class Dashboard extends javax.swing.JPanel {
 
         MinfeeSpinner.setValue(50);
         add(MinfeeSpinner);
-        MinfeeSpinner.setBounds(150, 510, 260, 30);
+        MinfeeSpinner.setBounds(120, 512, 300, 30);
 
         RPHSpinner.setValue(15);
         add(RPHSpinner);
-        RPHSpinner.setBounds(610, 510, 270, 30);
+        RPHSpinner.setBounds(600, 512, 300, 30);
 
-        Saveminfee.setText("Save");
+        Saveminfee.setBorderPainted(false);
+        Saveminfee.setContentAreaFilled(false);
+        Saveminfee.setFocusPainted(false);
         Saveminfee.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SaveminfeeActionPerformed(evt);
             }
         });
         add(Saveminfee);
-        Saveminfee.setBounds(130, 550, 270, 60);
+        Saveminfee.setBounds(120, 550, 290, 50);
 
-        Saverateperhour.setText("Save");
+        Saverateperhour.setBorderPainted(false);
+        Saverateperhour.setContentAreaFilled(false);
+        Saverateperhour.setFocusPainted(false);
         Saverateperhour.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SaverateperhourActionPerformed(evt);
             }
         });
         add(Saverateperhour);
-        Saverateperhour.setBounds(630, 550, 270, 60);
+        Saverateperhour.setBounds(610, 560, 290, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
