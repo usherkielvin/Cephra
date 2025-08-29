@@ -48,7 +48,6 @@ public class Dashboard extends javax.swing.JPanel {
         staffbutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         Baybutton = new javax.swing.JButton();
-        datetime1 = new javax.swing.JLabel();
         quebutton = new javax.swing.JButton();
         exitlogin = new javax.swing.JButton();
         datetime = new javax.swing.JLabel();
@@ -64,12 +63,12 @@ public class Dashboard extends javax.swing.JPanel {
         totalsessions1.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
         totalsessions1.setText("₱6,789");
         add(totalsessions1);
-        totalsessions1.setBounds(70, 490, 310, 120);
+        totalsessions1.setBounds(650, 220, 310, 120);
 
         totalsessions.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
         totalsessions.setText("31");
         add(totalsessions);
-        totalsessions.setBounds(130, 250, 70, 120);
+        totalsessions.setBounds(240, 220, 70, 120);
 
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
@@ -104,12 +103,6 @@ public class Dashboard extends javax.swing.JPanel {
         add(Baybutton);
         Baybutton.setBounds(380, 10, 40, 40);
 
-        datetime1.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        datetime1.setForeground(new java.awt.Color(153, 153, 153));
-        datetime1.setText("As of 8:00 AM of Aug 20, 2025");
-        add(datetime1);
-        datetime1.setBounds(250, 180, 230, 20);
-
         quebutton.setBorder(null);
         quebutton.setBorderPainted(false);
         quebutton.setContentAreaFilled(false);
@@ -139,12 +132,20 @@ public class Dashboard extends javax.swing.JPanel {
         datetime.setBounds(820, 40, 170, 20);
 
         rateText.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        rateText.setText("15");
+        rateText.setBorder(null);
+        rateText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rateTextActionPerformed(evt);
+            }
+        });
         add(rateText);
-        rateText.setBounds(570, 353, 350, 50);
+        rateText.setBounds(610, 510, 230, 30);
 
         minText.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        minText.setText("50");
         add(minText);
-        minText.setBounds(570, 474, 350, 50);
+        minText.setBounds(120, 510, 230, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -186,6 +187,10 @@ public class Dashboard extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_exitloginActionPerformed
 
+    private void rateTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rateTextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rateTextActionPerformed
+
     private void dashboardTogglePropertyChange(java.beans.PropertyChangeEvent evt) {
         // Functionality when the dashboard toggle is switched
         if (toggleSwitch.isSelected()) {
@@ -200,7 +205,6 @@ public class Dashboard extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
     private javax.swing.JLabel datetime;
-    private javax.swing.JLabel datetime1;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
@@ -241,12 +245,10 @@ public class Dashboard extends javax.swing.JPanel {
     
     private void setupDateTimeTimer() {
         updateDateTime();
-        updateDateTime1();
         javax.swing.Timer timer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 updateDateTime();
-                updateDateTime1();
             }
         });
         timer.start();
@@ -263,14 +265,5 @@ public class Dashboard extends javax.swing.JPanel {
         datetime.setText(time + " " + date);
     }
     
-    private void updateDateTime1() {
-        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
-        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
-        
-        java.util.Date now = new java.util.Date();
-        String time = timeFormat.format(now);
-        String date = dateFormat.format(now);
-        
-        datetime1.setText("As of " + time + " of " + date);
-    }
+
 }

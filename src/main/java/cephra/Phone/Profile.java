@@ -279,7 +279,7 @@ public class Profile extends javax.swing.JPanel {
                     }
                 }
             }
-        });        // TODO add your handling code here:
+        });       
     }//GEN-LAST:event_PaymentMethodActionPerformed
 
     private void LanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LanguageActionPerformed
@@ -294,7 +294,7 @@ public class Profile extends javax.swing.JPanel {
                     }
                 }
             }
-        });           // TODO add your handling code here:
+        });          
     }//GEN-LAST:event_LanguageActionPerformed
 
     private void HelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HelpActionPerformed
@@ -309,7 +309,7 @@ public class Profile extends javax.swing.JPanel {
                     }
                 }
             }
-        });           // TODO add your handling code here:
+        });           
     }//GEN-LAST:event_HelpActionPerformed
 
 
