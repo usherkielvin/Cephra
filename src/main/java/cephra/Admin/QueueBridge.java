@@ -19,6 +19,10 @@ public final class QueueBridge {
     private static volatile double RATE_PER_KWH = 15.0; // pesos per kWh
     private static volatile double MINIMUM_FEE = 50.0;   // pesos
 
+    // Configurable charging speed (minutes per 1% charge)
+    private static volatile double MINS_PER_PERCENT_FAST = 0.8;   // Fast charge
+    private static volatile double MINS_PER_PERCENT_NORMAL = 1.6; // Normal charge
+
     // Battery info storage
     public static final class BatteryInfo {
         public final int initialPercent;
@@ -212,6 +216,56 @@ public final class QueueBridge {
         int number = 10000000 + r.nextInt(90000000);
         return String.valueOf(number);
     }
+    
+    /** Get ticket service name (e.g., Fast Charging / Normal Charging) */
+    public static String getTicketService(String ticket) {
+        if (ticket == null) return null;
+        for (Object[] record : records) {
+            if (record != null && ticket.equals(String.valueOf(record[0]))) {
+                return String.valueOf(record[3]); // service at index 3
+            }
+        }
+        return null;
+    }
+
+    /** Compute estimated minutes to full using stored ticket battery and service */
+    public static int computeEstimatedMinutes(String ticket) {
+        BatteryInfo info = getTicketBatteryInfo(ticket);
+        if (info == null) {
+            // fallback: try reconstruct from customer
+            String customer = getTicketCustomer(ticket);
+            if (customer != null) {
+                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                info = new BatteryInfo(userBatteryLevel, 40.0);
+            } else {
+                info = new BatteryInfo(18, 40.0);
+            }
+        }
+        String service = getTicketService(ticket);
+        return computeEstimatedMinutes(info.initialPercent, service);
+    }
+
+    /** Compute estimated minutes from start percent and service name */
+    public static int computeEstimatedMinutes(int startPercent, String serviceName) {
+        int clamped = Math.max(0, Math.min(100, startPercent));
+        int needed = 100 - clamped;
+        double minsPerPercent = getMinsPerPercentForService(serviceName);
+        return (int)Math.round(needed * minsPerPercent);
+    }
+
+    /** Helper: get minutes per percent based on service */
+    public static double getMinsPerPercentForService(String serviceName) {
+        if (serviceName != null && serviceName.toLowerCase().contains("fast")) {
+            return MINS_PER_PERCENT_FAST;
+        }
+        return MINS_PER_PERCENT_NORMAL;
+    }
+
+    // Charging speed settings API
+    public static void setMinsPerPercentFast(double value) { if (value > 0) MINS_PER_PERCENT_FAST = value; }
+    public static double getMinsPerPercentFast() { return MINS_PER_PERCENT_FAST; }
+    public static void setMinsPerPercentNormal(double value) { if (value > 0) MINS_PER_PERCENT_NORMAL = value; }
+    public static double getMinsPerPercentNormal() { return MINS_PER_PERCENT_NORMAL; }
     
     // Billing settings API (for Dashboard/Admin to control)
     public static void setRatePerKWh(double rate) {

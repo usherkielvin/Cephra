@@ -215,6 +215,13 @@ public class serviceoffered extends javax.swing.JPanel {
                "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
            return;
        }
+       // Check if car is linked
+       if (!cephra.Phone.AppState.isCarLinked) {
+           javax.swing.JOptionPane.showMessageDialog(this,
+               "Please link your car first before charging.",
+               "Car Not Linked", javax.swing.JOptionPane.WARNING_MESSAGE);
+           return;
+       }
        // Prevent charging if battery is already full
        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
        if (batteryLevel >= 100) {
@@ -247,6 +254,13 @@ public class serviceoffered extends javax.swing.JPanel {
             javax.swing.JOptionPane.showMessageDialog(this, 
                 "You already have an active charging ticket. Please complete your current session first.", 
                 "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        // Check if car is linked
+        if (!cephra.Phone.AppState.isCarLinked) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Please link your car first before charging.",
+                "Car Not Linked", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
         // Prevent charging if battery is already full
@@ -286,20 +300,27 @@ public class serviceoffered extends javax.swing.JPanel {
     
     private void checkAndDisableChargeButtons() {
         String username = cephra.CephraDB.getCurrentUsername();
-        if (cephra.CephraDB.hasActiveTicket(username)) {
+        boolean hasActive = cephra.CephraDB.hasActiveTicket(username);
+        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+        boolean batteryFull = batteryLevel >= 100;
+        boolean carLinked = cephra.Phone.AppState.isCarLinked;
+        
+        if (hasActive || batteryFull || !carLinked) {
             // Disable charge buttons and show visual feedback
             fastcharge.setEnabled(false);
             normalcharge.setEnabled(false);
             
             // Add visual indication that buttons are disabled
-            fastcharge.setToolTipText("You have an active charging ticket. Complete it first.");
-            normalcharge.setToolTipText("You have an active charging ticket. Complete it first.");
-        } else if (cephra.CephraDB.getUserBatteryLevel(username) >= 100) {
-            // Disable if battery is full
-            fastcharge.setEnabled(false);
-            normalcharge.setEnabled(false);
-            fastcharge.setToolTipText("Your battery is already 100%.");
-            normalcharge.setToolTipText("Your battery is already 100%.");
+            String tip;
+            if (hasActive) {
+                tip = "You have an active charging ticket. Complete it first.";
+            } else if (batteryFull) {
+                tip = "Your battery is already 100%.";
+            } else {
+                tip = "Please link your car first.";
+            }
+            fastcharge.setToolTipText(tip);
+            normalcharge.setToolTipText(tip);
         } else {
             // Enable charge buttons
             fastcharge.setEnabled(true);

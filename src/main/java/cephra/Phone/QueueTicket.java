@@ -17,8 +17,9 @@ public class QueueTicket extends javax.swing.JPanel {
         setupLabelPosition(); // Set label position
         makeDraggable();
         
-        // Update battery percentage from current ticket
+        // Update battery percentage and estimated time
         updateBatteryDisplay();
+        updateEstimatedTime();
 
        // jLabel1.setText("<html>You are next after<br>current charging session</html>");
     }
@@ -353,6 +354,24 @@ public class QueueTicket extends javax.swing.JPanel {
             batterypercent.setText(batteryLevel + "%" + status);
         } catch (Exception e) {
             System.err.println("Error updating battery display: " + e.getMessage());
+        }
+    }
+
+    private void updateEstimatedTime() {
+        try {
+            String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
+            String service = cephra.Phone.QueueFlow.getCurrentServiceName();
+            String username = cephra.CephraDB.getCurrentUsername();
+            int start = cephra.CephraDB.getUserBatteryLevel(username);
+            int minutes;
+            if (ticket != null && !ticket.isEmpty()) {
+                minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(ticket);
+            } else {
+                minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(start, service);
+            }
+            mins1.setText(minutes + " minutes");
+        } catch (Exception e) {
+            System.err.println("Error updating estimated time: " + e.getMessage());
         }
     }
 }
