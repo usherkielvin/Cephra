@@ -182,7 +182,15 @@ public class UserHistoryManager {
                             serviceType = "Charging Service";
                         }
                         
-                        String chargingTime = "40 mins"; // Fixed charging time
+                        String chargingTime = "40 mins"; // default
+                        try {
+                            int est = cephra.Admin.QueueBridge.computeEstimatedMinutes(ticketId);
+                            if (est > 0) {
+                                chargingTime = est + " mins";
+                            }
+                        } catch (Throwable t) {
+                            // keep default
+                        }
                         String total = String.valueOf(record[3]) + " PHP"; // Total amount from admin history
                         String referenceNumber = String.valueOf(record[6]); // Reference number
                         System.out.println("UserHistoryManager: Extracted reference number '" + referenceNumber + "' for ticket " + ticketId + " from admin record");

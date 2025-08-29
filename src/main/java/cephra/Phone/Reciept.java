@@ -195,7 +195,7 @@ public class Reciept extends javax.swing.JPanel {
         Fee.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         Fee.setText("Php 7.00");
         add(Fee);
-        Fee.setBounds(200, 510, 70, 20);
+        Fee.setBounds(200, 510, 140, 20);
 
         AccNumber.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         AccNumber.setText("337293727");
@@ -221,18 +221,14 @@ public class Reciept extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitActionPerformed
-       SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.home());
-                        break;
-                    }
-                }
+        java.awt.Window[] windows = java.awt.Window.getWindows();
+        for (java.awt.Window window : windows) {
+            if (window instanceof cephra.Frame.Phone) {
+                cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                phoneFrame.switchPanel(new cephra.Phone.home());
+                break;
             }
-        });
+        }
     }//GEN-LAST:event_ExitActionPerformed
 
     private void DownloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DownloadActionPerformed
