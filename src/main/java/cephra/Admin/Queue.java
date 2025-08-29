@@ -20,6 +20,7 @@ private int buttonCount = 0;
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);       
  
+        jtableDesign.apply(queTab);
   
         
         JTableHeader header = queTab.getTableHeader();

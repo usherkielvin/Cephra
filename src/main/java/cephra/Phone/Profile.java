@@ -57,6 +57,8 @@ public class Profile extends javax.swing.JPanel {
         PaymentMethod = new javax.swing.JButton();
         Language = new javax.swing.JButton();
         Help = new javax.swing.JButton();
+        Fullname = new javax.swing.JLabel();
+        gmailProf = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
@@ -162,6 +164,16 @@ public class Profile extends javax.swing.JPanel {
         });
         add(Help);
         Help.setBounds(30, 520, 290, 50);
+
+        Fullname.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
+        Fullname.setText("Usher Kielvin Ponce");
+        add(Fullname);
+        Fullname.setBounds(110, 120, 220, 40);
+
+        gmailProf.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        gmailProf.setText("Usher@gmail.com");
+        add(gmailProf);
+        gmailProf.setBounds(130, 156, 190, 20);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/PhoneProfile.png"))); // NOI18N
         add(jLabel1);
@@ -314,11 +326,13 @@ public class Profile extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Fullname;
     private javax.swing.JButton Help;
     private javax.swing.JButton Language;
     private javax.swing.JButton PaymentMethod;
     private javax.swing.JButton PersonalInformation;
     private javax.swing.JButton charge;
+    private javax.swing.JLabel gmailProf;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;

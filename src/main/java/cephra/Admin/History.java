@@ -13,7 +13,9 @@ public class History extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         // Register history table model so other modules can add rows
+        jtableDesign.apply(jTable1);
         cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());
+        
     }
 
  
