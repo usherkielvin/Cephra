@@ -45,6 +45,7 @@ public class Phonelogin extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
         See.setBorder(null);
         See.setOpaque(true);
         See.addActionListener(new java.awt.event.ActionListener() {
@@ -53,7 +54,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(260, 380, 50, 30);
+        See.setBounds(260, 390, 50, 20);
 
         reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
