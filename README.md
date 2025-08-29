@@ -73,7 +73,24 @@ Cephra/
 
 - **Java 21** or higher
 - **Maven 3.6+** for building
+- **MySQL 8.0+** for database
 - **NetBeans IDE** (recommended for development)
+
+### Database Setup
+
+1. **Install MySQL Server** (if not already installed)
+   - Download from [MySQL official website](https://dev.mysql.com/downloads/mysql/)
+   - Follow the installation instructions for your operating system
+
+2. **Create the database**
+   - The application will automatically create the database on first run
+   - Default database name: `cephradb`
+   - Default credentials: username `root` with empty password
+   - To customize database settings, edit `DatabaseConnection.java`
+
+3. **Initialize database schema**
+   - The schema will be automatically created on first run
+   - You can also manually run the SQL script at `src/main/resources/db/init.sql`
 
 ### Quick Start
 
