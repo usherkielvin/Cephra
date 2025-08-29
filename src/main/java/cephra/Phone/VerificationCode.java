@@ -62,7 +62,6 @@ public class VerificationCode extends javax.swing.JPanel {
 
         email.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         email.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        email.setText("");
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -70,7 +69,7 @@ public class VerificationCode extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(48, 345, 250, 25);
+        email.setBounds(48, 335, 250, 25);
 
         resetsend.setBorder(null);
         resetsend.setBorderPainted(false);
@@ -84,7 +83,7 @@ public class VerificationCode extends javax.swing.JPanel {
         add(resetsend);
         resetsend.setBounds(50, 440, 270, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/verifycode.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/veri-code.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents

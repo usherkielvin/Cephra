@@ -80,9 +80,10 @@ public class EmailPop extends javax.swing.JPanel {
         add(cephraemail);
         cephraemail.setBounds(20, 50, 330, 110);
 
+        otpPreviewLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         otpPreviewLabel.setText("jLabel2");
         add(otpPreviewLabel);
-        otpPreviewLabel.setBounds(120, 260, 37, 16);
+        otpPreviewLabel.setBounds(210, 133, 80, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/emailcheck.png"))); // NOI18N
         add(jLabel1);

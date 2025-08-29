@@ -24,8 +24,6 @@ public class ForgotPassword extends javax.swing.JPanel {
         email = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
         contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -35,22 +33,6 @@ public class ForgotPassword extends javax.swing.JPanel {
         contactsup.setBorderPainted(false);
         contactsup.setContentAreaFilled(false);
         contactsup.setFocusPainted(false);
-        contactsup.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        contactsup.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                contactsup.setForeground(new java.awt.Color(0, 255, 255));
-                contactsup.setText("<html><u>Contact Support</u></html>");
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                contactsup.setForeground(new java.awt.Color(0, 204, 204));
-                contactsup.setText("Contact Support");
-            }
-        });
-        contactsup.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                contactsupActionPerformed(evt);
-            }
-        });
         add(contactsup);
         contactsup.setBounds(160, 663, 130, 30);
 
@@ -61,22 +43,6 @@ public class ForgotPassword extends javax.swing.JPanel {
         Back.setBorderPainted(false);
         Back.setContentAreaFilled(false);
         Back.setFocusPainted(false);
-        Back.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        Back.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                Back.setForeground(new java.awt.Color(0, 255, 255));
-                Back.setText("<html><u>Back</u></html>");
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                Back.setForeground(new java.awt.Color(0, 204, 204));
-                Back.setText("Back");
-            }
-        });
-        Back.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                backActionPerformed(evt);
-            }
-        });
         add(Back);
         Back.setBounds(120, 630, 120, 23);
 
@@ -101,9 +67,9 @@ public class ForgotPassword extends javax.swing.JPanel {
         add(email);
         email.setBounds(80, 330, 250, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/forgot password.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/forgot-pass.png"))); // NOI18N
         add(jLabel1);
-        // Label position will be set in setupLabelPosition() method
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
