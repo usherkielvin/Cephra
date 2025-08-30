@@ -38,6 +38,14 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         
         // Load history entries
         loadHistoryEntries();
+        
+        // Add component listener to refresh when panel becomes visible
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                refreshHistoryDisplay();
+            }
+        });
     }
     
     private void createHistoryPanel() {
@@ -86,6 +94,10 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         // Get current user's history (now includes admin history entries)
         List<UserHistoryManager.HistoryEntry> entries = UserHistoryManager.getUserHistory(currentUsername);
         
+        // Debug information
+        System.out.println("PhoneHistory: Refreshing history display for user: " + currentUsername);
+        System.out.println("PhoneHistory: Found " + entries.size() + " history entries");
+        
         if (entries.isEmpty()) {
             // Show "No history" message
             JPanel noHistoryPanel = new JPanel(new BorderLayout());
@@ -96,9 +108,24 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             noHistoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
             noHistoryPanel.add(noHistoryLabel, BorderLayout.CENTER);
             historyPanel.add(noHistoryPanel);
+            
+            // Debug: Check if there are any charging history records in database
+            try {
+                List<Object[]> dbHistory = cephra.CephraDB.getChargingHistoryForUser(currentUsername);
+                System.out.println("PhoneHistory: Database has " + dbHistory.size() + " charging history records for user: " + currentUsername);
+                if (!dbHistory.isEmpty()) {
+                    System.out.println("PhoneHistory: First record - Ticket: " + dbHistory.get(0)[0] + ", Service: " + dbHistory.get(0)[2]);
+                }
+            } catch (Exception e) {
+                System.err.println("PhoneHistory: Error checking database history: " + e.getMessage());
+            }
         } else {
             // Add history entries
             for (UserHistoryManager.HistoryEntry entry : entries) {
+                System.out.println("PhoneHistory: Adding entry - Ticket: " + entry.getTicketId() + 
+                                 ", Service: " + entry.getServiceType() + 
+                                 ", Total: " + entry.getTotal() + 
+                                 ", Date: " + entry.getFormattedDate());
                 addHistoryItem(entry);
             }
         }
@@ -120,7 +147,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         }
     }
     
-    private void addHistoryItem(UserHistoryManager.HistoryEntry entry) {
+    private void addHistoryItem(final UserHistoryManager.HistoryEntry entry) {
         // Create a panel for a single history item
         JPanel historyItemPanel = new JPanel();
         historyItemPanel.setLayout(new BorderLayout(5, 0));
@@ -204,7 +231,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         historyItemPanel.add(dateLabel, BorderLayout.NORTH);
         historyItemPanel.add(leftPanel, BorderLayout.WEST);
         historyItemPanel.add(rightPanel, BorderLayout.EAST);
-        ///////
+        
         // Add click listener to show details when clicked
         historyItemPanel.addMouseListener(new MouseAdapter() {
             @Override

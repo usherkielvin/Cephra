@@ -237,4 +237,29 @@ public class UserHistoryManager {
         }
     }
 
+    // Method to notify all listeners about a history update for a specific user
+    public static void notifyHistoryUpdate(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            System.err.println("UserHistoryManager: Cannot notify history update for empty username");
+            return;
+        }
+        
+        System.out.println("UserHistoryManager: Notifying listeners about history update for user: " + username);
+        System.out.println("UserHistoryManager: Number of registered listeners: " + listeners.size());
+        
+        // Notify all listeners about the history update
+        for (HistoryUpdateListener listener : listeners) {
+            try {
+                System.out.println("UserHistoryManager: Notifying listener: " + listener.getClass().getSimpleName());
+                listener.onHistoryUpdated(username);
+            } catch (Exception e) {
+                System.err.println("UserHistoryManager: Error notifying listener: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        
+        System.out.println("UserHistoryManager: Finished notifying all listeners for user: " + username);
+    }
+    
+    // Method to get current counter values for debugging
 }

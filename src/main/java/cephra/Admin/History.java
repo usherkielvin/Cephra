@@ -54,16 +54,27 @@ public class History extends javax.swing.JPanel {
             new String [] {
                 "Ticket", "Customer", "KWh", "Total", "Served By", "Date & Time", "Reference"
             }
-        ) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
-            }
-        });
+        ));
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
+        jTable1.setFocusable(false);
+        jTable1.setOpaque(false);
+        jTable1.getTableHeader().setResizingAllowed(false);
+        jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.setVerifyInputWhenFocusTarget(false);
         jScrollPane1.setViewportView(jTable1);
+        if (jTable1.getColumnModel().getColumnCount() > 0) {
+            jTable1.getColumnModel().getColumn(0).setResizable(false);
+            jTable1.getColumnModel().getColumn(1).setResizable(false);
+            jTable1.getColumnModel().getColumn(2).setResizable(false);
+            jTable1.getColumnModel().getColumn(3).setResizable(false);
+            jTable1.getColumnModel().getColumn(4).setResizable(false);
+            jTable1.getColumnModel().getColumn(5).setResizable(false);
+            jTable1.getColumnModel().getColumn(5).setPreferredWidth(120);
+            jTable1.getColumnModel().getColumn(6).setResizable(false);
+        }
 
         add(jScrollPane1);
-        jScrollPane1.setBounds(40, 160, 930, 600);
+        jScrollPane1.setBounds(20, 160, 970, 600);
 
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
@@ -122,7 +133,7 @@ public class History extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/SHBOARD - HISTORY.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 1000, 750);
+        jLabel1.setBounds(0, -10, 1000, 770);
     }// </editor-fold>//GEN-END:initComponents
 
     private void BaybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BaybuttonActionPerformed

@@ -13,9 +13,13 @@ if exist "%XAMPP_MYSQL%" (
     set XAMPP_MYSQL=mysql
 )
 
+REM Create database first
+echo Creating database...
+"%XAMPP_MYSQL%" -u root -e "CREATE DATABASE IF NOT EXISTS cephradb;"
+
 REM Create database and tables
 echo Creating database and tables...
-"%XAMPP_MYSQL%" -u root < src\main\resources\db\init.sql
+"%XAMPP_MYSQL%" -u root cephradb < src\main\resources\db\init.sql
 
 if %ERRORLEVEL% EQU 0 (
     echo Database initialization completed successfully!

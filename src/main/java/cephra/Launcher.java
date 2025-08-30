@@ -7,12 +7,14 @@ public final class Launcher {
     public static void main(String[] args) {
         // Test database connection first
         System.out.println("Testing Cephra Database Connection...");
-        System.out.println("=====================================");
         
         try {
             // Initialize database connection
             CephraDB.initializeDatabase();
             System.out.println("Database connection successful!");
+            
+            // Validate database integrity
+            CephraDB.validateDatabaseIntegrity();
             
             // Initialize ticket counters from database and history
             cephra.Phone.QueueFlow.refreshCountersFromDatabase();

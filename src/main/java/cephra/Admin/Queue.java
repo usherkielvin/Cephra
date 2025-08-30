@@ -182,6 +182,36 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         // Update database status
                         cephra.CephraDB.updateQueueTicketStatus(ticket, "Charging");
                         removeTicketFromGrid(ticket);
+                        
+                        // Create active ticket when charging starts
+                        try {
+                            String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                            int serviceCol = getColumnIndex("Service");
+                            String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
+                            
+                            // Get user's current battery level
+                            int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                            
+                            // Determine bay number based on assignment
+                            String bayNumber = "";
+                            if (isFast) {
+                                if (ticket.equals(fastslot1.getText())) bayNumber = "Bay-1";
+                                else if (ticket.equals(fastslot2.getText())) bayNumber = "Bay-2";
+                                else if (ticket.equals(fastslot3.getText())) bayNumber = "Bay-3";
+                            } else {
+                                if (ticket.equals(normalcharge1.getText())) bayNumber = "Bay-4";
+                                else if (ticket.equals(normalcharge2.getText())) bayNumber = "Bay-5";
+                                else if (ticket.equals(normalcharge3.getText())) bayNumber = "Bay-6";
+                                else if (ticket.equals(normalcharge4.getText())) bayNumber = "Bay-7";
+                                else if (ticket.equals(normalcharge5.getText())) bayNumber = "Bay-8";
+                            }
+                            
+                            // Create active ticket with full details
+                            cephra.CephraDB.setActiveTicket(customer, ticket, serviceName, userBatteryLevel, bayNumber);
+                            System.out.println("Created active ticket: " + ticket + " for customer: " + customer + " in bay: " + bayNumber);
+                        } catch (Exception ex) {
+                            System.err.println("Error setting up active ticket: " + ex.getMessage());
+                        }
                     } else {
                         String msg = isFast ?
                             "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue." :
@@ -243,49 +273,140 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 
                     // If paid, move to History and remove from Queue
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
+                    System.out.println("Queue: Processing Complete ticket " + ticket + " with payment status: " + payment);
+                    
                     if ("Paid".equalsIgnoreCase(payment)) {
-                    final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                    // Get the actual admin username who is currently logged in
-                    final String servedBy = cephra.CephraDB.getCurrentUsername();
-                    final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"));
-                    // Get reference number from QueueBridge to ensure consistency
-                    final String reference = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
-                    final int rowToRemove = editingRow;
-
-                    // Use invokeLater to avoid EDT conflicts
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                        double amount = 0.0;
-                        double usedKWh = 0.0;
-                        try {
-                            // Centralized calculation for total amount
-                            amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
-                            // Derive kWh from ticket battery info (fallback to user's current if missing)
-                            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-                            if (batteryInfo == null) {
-                                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
-                                batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
-                            }
-                            usedKWh = ((100.0 - batteryInfo.initialPercent) / 100.0) * batteryInfo.capacityKWh;
-                        } catch (Throwable t) {
-                            // ignore compute errors, leave defaults
-                        }
-                        // Payment processing is now handled by the Payment column editor
-                        // No need to call markPaymentPaid here to avoid duplicates
+                        final int rowToRemove = editingRow;
                         
+                        // Check if payment has already been processed to prevent duplicates
+                        boolean alreadyProcessed = cephra.CephraDB.isPaymentAlreadyProcessed(ticket);
+                        System.out.println("Queue: Checking if payment already processed for ticket " + ticket + ": " + alreadyProcessed);
+                        
+                        if (alreadyProcessed) {
+                            System.out.println("Queue: Payment already processed for ticket " + ticket + ", removing from queue directly");
+                            // Remove from table and queue bridge without processing payment again
                             try {
-                                ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
+                                if (rowToRemove >= 0 && rowToRemove < queTab.getRowCount()) {
+                                    ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
+                                    System.out.println("Queue: Successfully removed row " + rowToRemove + " from table");
+                                }
                             } catch (Throwable t) {
-                                // ignore if row already removed
+                                System.err.println("Error removing row from table: " + t.getMessage());
                             }
-                        try {
-                            cephra.Admin.QueueBridge.removeTicket(ticket);
-                        } catch (Throwable t) {
-                            // ignore if queue not ready
+                            
+                            try {
+                                cephra.Admin.QueueBridge.removeTicket(ticket);
+                                System.out.println("Queue: Successfully removed ticket " + ticket + " from queue bridge");
+                            } catch (Throwable t) {
+                                System.err.println("Error removing ticket from queue bridge: " + t.getMessage());
+                            }
+                            return; // Exit early since payment was already processed
                         }
-                        }
-                    });
+                        
+                        System.out.println("Queue: Payment not yet processed, proceeding with payment transaction for ticket " + ticket);
+                        
+                        final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                        // Get the actual admin username who is currently logged in
+                        final String servedBy = cephra.CephraDB.getCurrentUsername();
+                        final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"));
+                        // Get reference number from QueueBridge to ensure consistency
+                        final String reference = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
+                        
+                        // Use invokeLater to avoid EDT conflicts
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                double amount = 0.0;
+                                double usedKWh = 0.0;
+                                try {
+                                    // Centralized calculation for total amount
+                                    amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                                    // Derive kWh from ticket battery info (fallback to user's current if missing)
+                                    cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                                    if (batteryInfo == null) {
+                                        int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                                        batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
+                                    }
+                                    usedKWh = ((100.0 - batteryInfo.initialPercent) / 100.0) * batteryInfo.capacityKWh;
+                                } catch (Throwable t) {
+                                    // ignore compute errors, leave defaults
+                                    System.err.println("Error computing amount for ticket " + ticket + ": " + t.getMessage());
+                                }
+                                
+                                // Process payment transaction to move ticket to charging history
+                                try {
+                                    int serviceCol = getColumnIndex("Service");
+                                    String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
+                                    
+                                    // Get battery info for calculations
+                                    cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                                    if (batteryInfo == null) {
+                                        int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                                        batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
+                                    }
+                                    
+                                    // Calculate charging time based on service type
+                                    int chargingTimeMinutes = 0;
+                                    if (serviceName != null && serviceName.contains("Fast")) {
+                                        chargingTimeMinutes = (int)((100.0 - batteryInfo.initialPercent) * 0.8); // 0.8 min per 1%
+                                    } else {
+                                        chargingTimeMinutes = (int)((100.0 - batteryInfo.initialPercent) * 1.6); // 1.6 min per 1%
+                                    }
+                                    
+                                    // Process the payment transaction (this will add to charging history)
+                                    boolean success = cephra.CephraDB.processPaymentTransaction(
+                                        ticket, customer, serviceName, 
+                                        batteryInfo.initialPercent, chargingTimeMinutes, 
+                                        amount, "Cash", reference
+                                    );
+                                    
+                                    if (success) {
+                                        System.out.println("Successfully processed payment transaction for ticket: " + ticket);
+                                        // Clear the active ticket since it's now in history
+                                        try {
+                                            cephra.CephraDB.clearActiveTicketByTicketId(ticket);
+                                        } catch (Exception ex) {
+                                            System.err.println("Error clearing active ticket: " + ex.getMessage());
+                                        }
+                                    } else {
+                                        System.err.println("Failed to process payment transaction for ticket: " + ticket);
+                                        // Show error message to user
+                                        SwingUtilities.invokeLater(() -> {
+                                            JOptionPane.showMessageDialog(Queue.this,
+                                                "Failed to process payment for ticket " + ticket + ".\nPlease try again.",
+                                                "Payment Error",
+                                                JOptionPane.ERROR_MESSAGE);
+                                        });
+                                        return; // Don't remove from queue if payment failed
+                                    }
+                                } catch (Exception ex) {
+                                    System.err.println("Error processing payment transaction: " + ex.getMessage());
+                                    // Show error message to user
+                                    SwingUtilities.invokeLater(() -> {
+                                        JOptionPane.showMessageDialog(Queue.this,
+                                            "Error processing payment for ticket " + ticket + ".\nPlease try again.",
+                                            "Payment Error",
+                                            JOptionPane.ERROR_MESSAGE);
+                                    });
+                                    return; // Don't remove from queue if payment failed
+                                }
+                                
+                                // Only remove from table if payment was successful
+                                try {
+                                    if (rowToRemove >= 0 && rowToRemove < queTab.getRowCount()) {
+                                        ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
+                                    }
+                                } catch (Throwable t) {
+                                    System.err.println("Error removing row from table: " + t.getMessage());
+                                }
+                                
+                                try {
+                                    cephra.Admin.QueueBridge.removeTicket(ticket);
+                                } catch (Throwable t) {
+                                    System.err.println("Error removing ticket from queue bridge: " + t.getMessage());
+                                }
+                            }
+                        });
                     }
                 }
             }

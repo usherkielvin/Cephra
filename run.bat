@@ -10,11 +10,15 @@ if %ERRORLEVEL% NEQ 0 (
     timeout /t 3
 )
 
-REM Compile and run the application
-echo Compiling application...
-javac -cp "src/main/java;src/main/resources;lib/*" src/main/java/cephra/Launcher.java
+REM Compile and run the application using Maven
+echo Compiling application with Maven...
+call mvn clean compile
 
-echo Running application...
-java -cp "src/main/java;src/main/resources;lib/*" cephra.Launcher
+if %ERRORLEVEL% EQU 0 (
+    echo Running application...
+    call mvn exec:java -Dexec.mainClass="cephra.Launcher"
+) else (
+    echo Compilation failed! Please check the errors above.
+)
 
 pause

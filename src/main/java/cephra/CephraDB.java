@@ -49,10 +49,7 @@ public class CephraDB {
             }
             
             if (!allTablesExist) {
-                System.err.println("Some required tables are missing. Please run the database initialization script:");
-                System.err.println("1. Start XAMPP MySQL service");
-                System.err.println("2. Run: mysql -u root -p < src/main/resources/db/init.sql");
-                System.err.println("Or use the provided batch files: init-database.bat");
+                printDatabaseInitInstructions();
             } else {
                 System.out.println("All required database tables are present.");
             }
@@ -288,14 +285,18 @@ public class CephraDB {
                     Random random = new Random();
                     int batteryLevel = 15 + random.nextInt(36); // 15 to 50
                     
-                    // Insert the new battery level using ON DUPLICATE KEY UPDATE to prevent duplicates
+                    // Insert the new battery level with both battery_level and initial_battery_level
                     try (PreparedStatement insertStmt = conn.prepareStatement(
-                            "INSERT INTO battery_levels (username, battery_level) VALUES (?, ?) " +
-                            "ON DUPLICATE KEY UPDATE battery_level = ?")) {
+                            "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, ?, ?, ?) " +
+                            "ON DUPLICATE KEY UPDATE battery_level = ?, initial_battery_level = ?, battery_capacity_kwh = ?")) {
                         
                         insertStmt.setString(1, username);
                         insertStmt.setInt(2, batteryLevel);
-                        insertStmt.setInt(3, batteryLevel);
+                        insertStmt.setInt(3, batteryLevel); // initial_battery_level same as current
+                        insertStmt.setDouble(4, 40.0); // default battery capacity
+                        insertStmt.setInt(5, batteryLevel);
+                        insertStmt.setInt(6, batteryLevel);
+                        insertStmt.setDouble(7, 40.0);
                         insertStmt.executeUpdate();
                     }
                     
@@ -313,12 +314,16 @@ public class CephraDB {
     public static void setUserBatteryLevel(String username, int batteryLevel) {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO battery_levels (username, battery_level) VALUES (?, ?) " +
-                     "ON DUPLICATE KEY UPDATE battery_level = ?")) {
+                     "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, ?, ?, ?) " +
+                     "ON DUPLICATE KEY UPDATE battery_level = ?, initial_battery_level = ?, battery_capacity_kwh = ?")) {
             
             stmt.setString(1, username);
             stmt.setInt(2, batteryLevel);
-            stmt.setInt(3, batteryLevel);
+            stmt.setInt(3, batteryLevel); // initial_battery_level same as current
+            stmt.setDouble(4, 40.0); // default battery capacity
+            stmt.setInt(5, batteryLevel);
+            stmt.setInt(6, batteryLevel);
+            stmt.setDouble(7, 40.0);
             
             stmt.executeUpdate();
             
@@ -355,14 +360,22 @@ public class CephraDB {
     
     // Active ticket management methods
     public static boolean hasActiveTicket(String username) {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First check if the active_tickets table exists
+            if (!tableExists(conn, "active_tickets")) {
+                System.err.println("Warning: active_tickets table does not exist.");
+                printDatabaseInitInstructions();
+                return false; // No active tickets if table doesn't exist
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id FROM active_tickets WHERE username = ?")) {
-            
-            stmt.setString(1, username);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next(); // If there's a result, user has an active ticket
+                
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    return rs.next(); // If there's a result, user has an active ticket
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error checking active ticket: " + e.getMessage());
@@ -372,47 +385,137 @@ public class CephraDB {
     }
     
     public static void setActiveTicket(String username, String ticketId) {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO active_tickets (username, ticket_id) VALUES (?, ?) " +
-                     "ON DUPLICATE KEY UPDATE ticket_id = ?")) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First check if the active_tickets table exists
+            if (!tableExists(conn, "active_tickets")) {
+                System.err.println("Warning: active_tickets table does not exist.");
+                printDatabaseInitInstructions();
+                return; // Cannot set active ticket if table doesn't exist
+            }
             
-            stmt.setString(1, username);
-            stmt.setString(2, ticketId);
-            stmt.setString(3, ticketId);
-            
-            stmt.executeUpdate();
-            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status) VALUES (?, ?, ?, ?, ?, ?) " +
+                     "ON DUPLICATE KEY UPDATE ticket_id = ?, service_type = ?, initial_battery_level = ?, current_battery_level = ?, status = ?")) {
+                
+                // Get user's current battery level
+                int batteryLevel = getUserBatteryLevel(username);
+                
+                stmt.setString(1, username);
+                stmt.setString(2, ticketId);
+                stmt.setString(3, "Normal"); // Default service type
+                stmt.setInt(4, batteryLevel);
+                stmt.setInt(5, batteryLevel);
+                stmt.setString(6, "Active");
+                stmt.setString(7, ticketId);
+                stmt.setString(8, "Normal");
+                stmt.setInt(9, batteryLevel);
+                stmt.setInt(10, batteryLevel);
+                stmt.setString(11, "Active");
+                
+                stmt.executeUpdate();
+            }
         } catch (SQLException e) {
             System.err.println("Error setting active ticket: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
+    // Overloaded method to set active ticket with full details
+    public static void setActiveTicket(String username, String ticketId, String serviceType, int initialBatteryLevel, String bayNumber) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First check if the active_tickets table exists
+            if (!tableExists(conn, "active_tickets")) {
+                System.err.println("Warning: active_tickets table does not exist.");
+                printDatabaseInitInstructions();
+                return; // Cannot set active ticket if table doesn't exist
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, bay_number, status) VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                     "ON DUPLICATE KEY UPDATE service_type = ?, initial_battery_level = ?, current_battery_level = ?, bay_number = ?, status = ?")) {
+                
+                stmt.setString(1, username);
+                stmt.setString(2, ticketId);
+                stmt.setString(3, serviceType);
+                stmt.setInt(4, initialBatteryLevel);
+                stmt.setInt(5, initialBatteryLevel);
+                stmt.setString(6, bayNumber);
+                stmt.setString(7, "Active");
+                stmt.setString(8, serviceType);
+                stmt.setInt(9, initialBatteryLevel);
+                stmt.setInt(10, initialBatteryLevel);
+                stmt.setString(11, bayNumber);
+                stmt.setString(12, "Active");
+                
+                stmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error setting active ticket with details: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     public static void clearActiveTicket(String username) {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First check if the active_tickets table exists
+            if (!tableExists(conn, "active_tickets")) {
+                System.err.println("Warning: active_tickets table does not exist.");
+                printDatabaseInitInstructions();
+                return; // Cannot clear active ticket if table doesn't exist
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
                      "DELETE FROM active_tickets WHERE username = ?")) {
-            
-            stmt.setString(1, username);
-            stmt.executeUpdate();
-            
+                
+                stmt.setString(1, username);
+                stmt.executeUpdate();
+            }
         } catch (SQLException e) {
             System.err.println("Error clearing active ticket: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
+    // Method to clear active ticket by ticket ID
+    public static void clearActiveTicketByTicketId(String ticketId) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First check if the active_tickets table exists
+            if (!tableExists(conn, "active_tickets")) {
+                System.err.println("Warning: active_tickets table does not exist.");
+                printDatabaseInitInstructions();
+                return; // Cannot clear active ticket if table doesn't exist
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                     "DELETE FROM active_tickets WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                stmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error clearing active ticket by ticket ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     public static String getActiveTicket(String username) {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First check if the active_tickets table exists
+            if (!tableExists(conn, "active_tickets")) {
+                System.err.println("Warning: active_tickets table does not exist.");
+                printDatabaseInitInstructions();
+                return null; // No active ticket if table doesn't exist
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id FROM active_tickets WHERE username = ?")) {
-            
-            stmt.setString(1, username);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("ticket_id");
+                
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("ticket_id");
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -468,15 +571,50 @@ public class CephraDB {
     }
     
     public static boolean updateQueueTicketStatus(String ticketId, String status) {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "UPDATE queue_tickets SET status = ? WHERE ticket_id = ?")) {
+        // Validate input parameters
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid ticket ID for status update");
+            return false;
+        }
+        if (status == null || status.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid status for ticket " + ticketId);
+            return false;
+        }
+        
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            if (conn == null) {
+                System.err.println("CephraDB: Could not establish database connection for status update");
+                return false;
+            }
             
-            stmt.setString(1, status);
-            stmt.setString(2, ticketId);
+            // First check if the ticket exists
+            try (PreparedStatement checkStmt = conn.prepareStatement(
+                    "SELECT ticket_id FROM queue_tickets WHERE ticket_id = ?")) {
+                checkStmt.setString(1, ticketId);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (!rs.next()) {
+                        System.err.println("CephraDB: Ticket " + ticketId + " not found in queue_tickets table");
+                        return false;
+                    }
+                }
+            }
             
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            // Update the status
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE queue_tickets SET status = ? WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, status);
+                stmt.setString(2, ticketId);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("CephraDB: Successfully updated status to '" + status + "' for ticket " + ticketId);
+                    return true;
+                } else {
+                    System.err.println("CephraDB: No rows affected when updating status for ticket " + ticketId);
+                    return false;
+                }
+            }
             
         } catch (SQLException e) {
             System.err.println("Error updating queue ticket status: " + e.getMessage());
@@ -528,16 +666,24 @@ public class CephraDB {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO charging_history (ticket_id, username, service_type, " +
-                     "initial_battery_level, charging_time_minutes, total_amount, reference_number) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                     "initial_battery_level, final_battery_level, charging_time_minutes, total_amount, reference_number, served_by) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             
             stmt.setString(1, ticketId);
             stmt.setString(2, username);
             stmt.setString(3, serviceType);
             stmt.setInt(4, initialBatteryLevel);
-            stmt.setInt(5, chargingTimeMinutes);
-            stmt.setDouble(6, totalAmount);
-            stmt.setString(7, referenceNumber);
+            stmt.setInt(5, 100); // Final battery level is always 100% when completed
+            stmt.setInt(6, chargingTimeMinutes);
+            stmt.setDouble(7, totalAmount);
+            stmt.setString(8, referenceNumber);
+            
+            // Get the actual admin username who is currently logged in
+            String adminUsername = getCurrentUsername();
+            if (adminUsername == null || adminUsername.trim().isEmpty()) {
+                adminUsername = "Admin"; // Fallback if no admin logged in
+            }
+            stmt.setString(9, adminUsername);
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -707,27 +853,58 @@ public class CephraDB {
     public static boolean processPaymentTransaction(String ticketId, String username, String serviceType,
                                                   int initialBatteryLevel, int chargingTimeMinutes, 
                                                   double totalAmount, String paymentMethod, String referenceNumber) {
+        // Validate input parameters
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid ticket ID for payment transaction");
+            return false;
+        }
+        if (username == null || username.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid username for payment transaction");
+            return false;
+        }
+        if (serviceType == null || serviceType.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid service type for payment transaction");
+            return false;
+        }
+        if (totalAmount < 0) {
+            System.err.println("CephraDB: Invalid amount for payment transaction: " + totalAmount);
+            return false;
+        }
+        
         Connection conn = null;
         try {
             conn = DatabaseConnection.getConnection();
+            if (conn == null) {
+                System.err.println("CephraDB: Could not establish database connection for payment transaction");
+                return false;
+            }
             conn.setAutoCommit(false); // Start transaction
             
             // 1. Add to charging history
             try (PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO charging_history (ticket_id, username, service_type, " +
-                    "initial_battery_level, charging_time_minutes, total_amount, reference_number) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                    "initial_battery_level, final_battery_level, charging_time_minutes, total_amount, reference_number, served_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
                 
                 stmt.setString(1, ticketId);
                 stmt.setString(2, username);
                 stmt.setString(3, serviceType);
                 stmt.setInt(4, initialBatteryLevel);
-                stmt.setInt(5, chargingTimeMinutes);
-                stmt.setDouble(6, totalAmount);
-                stmt.setString(7, referenceNumber);
+                stmt.setInt(5, 100); // Final battery level is always 100% when completed
+                stmt.setInt(6, chargingTimeMinutes);
+                stmt.setDouble(7, totalAmount);
+                stmt.setString(8, referenceNumber != null ? referenceNumber : "");
+                
+                // Get the actual admin username who is currently logged in
+                String adminUsername = getCurrentUsername();
+                if (adminUsername == null || adminUsername.trim().isEmpty()) {
+                    adminUsername = "Admin"; // Fallback if no admin logged in
+                }
+                stmt.setString(9, adminUsername);
                 
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected <= 0) {
+                    System.err.println("CephraDB: Failed to insert charging history for ticket " + ticketId);
                     conn.rollback();
                     return false;
                 }
@@ -741,11 +918,12 @@ public class CephraDB {
                 stmt.setString(1, ticketId);
                 stmt.setString(2, username);
                 stmt.setDouble(3, totalAmount);
-                stmt.setString(4, paymentMethod);
-                stmt.setString(5, referenceNumber);
+                stmt.setString(4, paymentMethod != null ? paymentMethod : "Cash");
+                stmt.setString(5, referenceNumber != null ? referenceNumber : "");
                 
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected <= 0) {
+                    System.err.println("CephraDB: Failed to insert payment transaction for ticket " + ticketId);
                     conn.rollback();
                     return false;
                 }
@@ -756,14 +934,23 @@ public class CephraDB {
                     "UPDATE queue_tickets SET payment_status = ?, reference_number = ? WHERE ticket_id = ?")) {
                 
                 stmt.setString(1, "Paid");
-                stmt.setString(2, referenceNumber);
+                stmt.setString(2, referenceNumber != null ? referenceNumber : "");
                 stmt.setString(3, ticketId);
                 
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected <= 0) {
+                    System.err.println("CephraDB: Failed to update queue ticket payment status for ticket " + ticketId);
                     conn.rollback();
                     return false;
                 }
+            }
+            
+            // 3.5. Clear active ticket (if exists)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "DELETE FROM active_tickets WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                stmt.executeUpdate(); // Don't fail if no active ticket exists
             }
             
             // 4. Add to admin history (if HistoryBridge is available)
@@ -781,7 +968,7 @@ public class CephraDB {
                     String.format("%.2f", totalAmount),
                     adminUsername, // Use actual admin username instead of hardcoded "Admin"
                     java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")),
-                    referenceNumber
+                    referenceNumber != null ? referenceNumber : ""
                 };
                 cephra.Admin.HistoryBridge.addRecord(historyRow);
             } catch (Throwable t) {
@@ -790,6 +977,24 @@ public class CephraDB {
             }
             
             conn.commit(); // Commit transaction
+            System.out.println("CephraDB: Successfully committed payment transaction for ticket " + ticketId);
+            
+            // Notify phone history that a new entry has been added
+            try {
+                cephra.Phone.UserHistoryManager.notifyHistoryUpdate(username);
+                System.out.println("CephraDB: Notified phone history for user: " + username);
+            } catch (Exception e) {
+                System.err.println("CephraDB: Error notifying phone history: " + e.getMessage());
+            }
+            
+            // Refresh admin history table to show the new completed ticket
+            try {
+                cephra.Admin.HistoryBridge.refreshHistoryTable();
+                System.out.println("CephraDB: Refreshed admin history table after payment completion");
+            } catch (Exception e) {
+                System.err.println("CephraDB: Error refreshing admin history table: " + e.getMessage());
+            }
+            
             return true;
             
         } catch (SQLException e) {
@@ -798,6 +1003,7 @@ public class CephraDB {
             if (conn != null) {
                 try {
                     conn.rollback();
+                    System.err.println("CephraDB: Rolled back payment transaction for ticket " + ticketId);
                 } catch (SQLException rollbackEx) {
                     System.err.println("Error rolling back transaction: " + rollbackEx.getMessage());
                 }
@@ -922,6 +1128,24 @@ public class CephraDB {
         }
     }
     
+    // Method to provide database initialization instructions
+    public static void printDatabaseInitInstructions() {
+        System.err.println("================================================");
+        System.err.println("DATABASE INITIALIZATION REQUIRED");
+        System.err.println("================================================");
+        System.err.println("Some required database tables are missing.");
+        System.err.println("Please follow these steps to initialize the database:");
+        System.err.println("");
+        System.err.println("1. Start XAMPP Control Panel");
+        System.err.println("2. Start the MySQL service");
+        System.err.println("3. Run one of the following commands:");
+        System.err.println("   - Double-click: init-database.bat");
+        System.err.println("   - Or manually: mysql -u root -p < src/main/resources/db/init.sql");
+        System.err.println("");
+        System.err.println("After initialization, restart the application.");
+        System.err.println("================================================");
+    }
+    
     // Method to clean up orphaned queue tickets (tickets in queue but already in history)
     private static void cleanupOrphanedQueueTickets() {
         try (Connection conn = DatabaseConnection.getConnection();
@@ -936,6 +1160,87 @@ public class CephraDB {
             }
         } catch (SQLException e) {
             System.err.println("Error cleaning up orphaned queue tickets: " + e.getMessage());
+        }
+    }
+    
+    // Method to validate and ensure database integrity
+    public static void validateDatabaseIntegrity() {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            System.out.println("Validating database integrity...");
+            
+            // Check if all required tables exist
+            String[] requiredTables = {
+                "users", "battery_levels", "active_tickets", "otp_codes",
+                "queue_tickets", "charging_history", "staff_records", 
+                "charging_bays", "payment_transactions", "system_settings"
+            };
+            
+            boolean allTablesExist = true;
+            for (String tableName : requiredTables) {
+                if (!tableExists(conn, tableName)) {
+                    System.err.println("❌ Missing table: " + tableName);
+                    allTablesExist = false;
+                } else {
+                    System.out.println("✅ Table exists: " + tableName);
+                }
+            }
+            
+            if (!allTablesExist) {
+                printDatabaseInitInstructions();
+                return;
+            }
+            
+            // Check if charging bays are properly configured
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM charging_bays WHERE bay_type IN ('Fast', 'Normal')")) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int bayCount = rs.getInt(1);
+                        System.out.println("✅ Found " + bayCount + " charging bays configured");
+                        if (bayCount < 8) {
+                            System.err.println("⚠️  Warning: Expected at least 8 charging bays, found " + bayCount);
+                        }
+                    }
+                }
+            }
+            
+            // Check if system settings are configured
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM system_settings")) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int settingCount = rs.getInt(1);
+                        System.out.println("✅ Found " + settingCount + " system settings configured");
+                    }
+                }
+            }
+            
+            // Check if there are any records in key tables
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM users")) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int userCount = rs.getInt(1);
+                        System.out.println("✅ Found " + userCount + " users in database");
+                    }
+                }
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM charging_bays")) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int bayCount = rs.getInt(1);
+                        System.out.println("✅ Found " + bayCount + " charging bays in database");
+                    }
+                }
+            }
+            
+            System.out.println("✅ Database integrity validation completed successfully.");
+            
+        } catch (SQLException e) {
+            System.err.println("❌ Error validating database integrity: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

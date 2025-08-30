@@ -271,6 +271,14 @@ public final class QueueBridge {
                     
                     System.out.println("QueueBridge: " + paymentMethod + " payment completed for ticket " + ticket + 
                                      ", amount: ₱" + totalAmount + ", reference: " + referenceNumber);
+                    
+                    // Refresh history table to show the new completed ticket
+                    try {
+                        cephra.Admin.HistoryBridge.refreshHistoryTable();
+                        System.out.println("QueueBridge: Refreshed history table after payment completion");
+                    } catch (Exception e) {
+                        System.err.println("QueueBridge: Error refreshing history table: " + e.getMessage());
+                    }
                 } else {
                     System.err.println("QueueBridge: Failed to process payment transaction for ticket " + ticket);
                 }
@@ -377,29 +385,55 @@ public final class QueueBridge {
 
     /** Remove a ticket from records and table */
     public static void removeTicket(final String ticket) {
-        if (ticket == null) return;
-
-        // Remove from database first
-        cephra.CephraDB.removeQueueTicket(ticket);
-
-        for (int i = records.size() - 1; i >= 0; i--) {
-            Object[] r = records.get(i);
-            if (r != null && ticket.equals(String.valueOf(r[0]))) {
-                records.remove(i);
-                break;
-            }
+        if (ticket == null || ticket.trim().isEmpty()) {
+            System.err.println("QueueBridge: Cannot remove null or empty ticket");
+            return;
         }
 
-        if (model != null) {
-            SwingUtilities.invokeLater(() -> {
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    Object v = model.getValueAt(i, 0);
-                    if (ticket.equals(String.valueOf(v))) {
-                        model.removeRow(i);
-                        break;
-                    }
+        try {
+            // Remove from database first
+            boolean dbRemoved = cephra.CephraDB.removeQueueTicket(ticket);
+            if (!dbRemoved) {
+                System.err.println("QueueBridge: Failed to remove ticket " + ticket + " from database");
+            }
+        } catch (Exception e) {
+            System.err.println("QueueBridge: Error removing ticket from database: " + e.getMessage());
+        }
+
+        // Remove from memory records
+        try {
+            for (int i = records.size() - 1; i >= 0; i--) {
+                Object[] r = records.get(i);
+                if (r != null && ticket.equals(String.valueOf(r[0]))) {
+                    records.remove(i);
+                    // Also remove battery info
+                    ticketBattery.remove(ticket);
+                    break;
                 }
-            });
+            }
+        } catch (Exception e) {
+            System.err.println("QueueBridge: Error removing ticket from memory records: " + e.getMessage());
+        }
+
+        // Remove from table model
+        if (model != null) {
+            try {
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        for (int i = model.getRowCount() - 1; i >= 0; i--) {
+                            Object v = model.getValueAt(i, 0);
+                            if (v != null && ticket.equals(String.valueOf(v))) {
+                                model.removeRow(i);
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.err.println("QueueBridge: Error removing ticket from table model: " + e.getMessage());
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("QueueBridge: Error scheduling table model update: " + e.getMessage());
+            }
         }
     }
 }
