@@ -275,7 +275,24 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         addDetailRow(detailsPanel, "Total", entry.getTotal());
         
         // Add served by with correct value
-        addDetailRow(detailsPanel, "Served By", "Cephra");
+        String servedBy = "Admin"; // Default fallback
+        try {
+            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.CephraDB.getCurrentUsername());
+            if (adminRecords != null) {
+                for (Object[] record : adminRecords) {
+                    if (record.length >= 5 && entry.getTicketId().equals(String.valueOf(record[0]))) {
+                        String servedByValue = String.valueOf(record[4]); // Served By is at index 4
+                        if (servedByValue != null && !servedByValue.equals("null")) {
+                            servedBy = servedByValue;
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting served by from admin history: " + e.getMessage());
+        }
+        addDetailRow(detailsPanel, "Served By", servedBy);
         
         // Add date and time
         addDetailRow(detailsPanel, "Date", entry.getFormattedDate());

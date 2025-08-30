@@ -12,18 +12,16 @@ public final class Launcher {
         try {
             // Initialize database connection
             CephraDB.initializeDatabase();
-            System.out.println("✓ Database connection successful!");
-            System.out.println("✓ Cephra application starting...");
-            System.out.println("=====================================");
+            System.out.println("Database connection successful!");
+            
+            // Initialize ticket counters from database and history
+            cephra.Phone.QueueFlow.refreshCountersFromDatabase();
+            System.out.println("Ticket counters initialized from database and history!");
+            
+            System.out.println("Cephra application starting...");
         } catch (Exception e) {
             System.err.println("✗ Database connection failed!");
             System.err.println("Error: " + e.getMessage());
-            System.err.println("\nTroubleshooting steps:");
-            System.err.println("1. Make sure XAMPP is running");
-            System.err.println("2. Start MySQL service in XAMPP Control Panel");
-            System.err.println("3. Check if port 3306 is available");
-            System.err.println("4. Run init-database.bat to create database");
-            System.err.println("5. Or run setup-h2-database.bat for H2 database");
             e.printStackTrace();
             System.exit(1); // Exit if database connection fails
         }

@@ -102,7 +102,7 @@ public class Reciept extends javax.swing.JPanel {
             price.setText(String.format("PHP %.2f", amount));
             RefNumber.setText(refNumber); // Use admin queue reference number
             NumTicket.setText(ticket); // Use FCH ticket number
-            TimeDate.setText(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy hh:mm:ss a")));
+            TimeDate.setText(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy hh:mm a")));
         } catch (Throwable t) {
             System.err.println("Error populating receipt amounts: " + t.getMessage());
         }

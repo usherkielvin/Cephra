@@ -245,8 +245,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
                     if ("Paid".equalsIgnoreCase(payment)) {
                     final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                    final String servedBy = "Admin";
-                    final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    // Get the actual admin username who is currently logged in
+                    final String servedBy = cephra.CephraDB.getCurrentUsername();
+                    final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"));
                     // Get reference number from QueueBridge to ensure consistency
                     final String reference = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
                     final int rowToRemove = editingRow;
@@ -270,27 +271,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         } catch (Throwable t) {
                             // ignore compute errors, leave defaults
                         }
-                        Object[] historyRow = new Object[] {
-                            ticket,
-                            customer,
-                            String.format("%.2f", usedKWh),
-                            String.format("%.2f", amount),
-                            servedBy,
-                            dateTime,
-                            reference
-                        };
-                        try {
-                            cephra.Admin.HistoryBridge.addRecord(historyRow);
-                        } catch (Throwable t) {
-                            // ignore if history not ready
-                        }
-                        
-                        // Update QueueBridge payment status to ensure consistency
-                        try {
-                            cephra.Admin.QueueBridge.markPaymentPaid(ticket);
-                        } catch (Throwable t) {
-                            // ignore if queue bridge not ready
-                        }
+                        // Payment processing is now handled by the Payment column editor
+                        // No need to call markPaymentPaid here to avoid duplicates
                         
                             try {
                                 ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
