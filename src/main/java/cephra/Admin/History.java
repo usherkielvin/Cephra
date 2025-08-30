@@ -1,9 +1,11 @@
 
 package cephra.Admin;
 
+import java.awt.Font;
 import java.awt.Window;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 
 public class History extends javax.swing.JPanel {
@@ -14,6 +16,10 @@ public class History extends javax.swing.JPanel {
         setSize(1000, 750);
         // Register history table model so other modules can add rows
         jtableDesign.apply(jTable1);
+  
+        
+        JTableHeader header = jTable1.getTableHeader();
+        header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());
         
     }

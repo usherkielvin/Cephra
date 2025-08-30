@@ -10,11 +10,15 @@ import javax.swing.SwingUtilities;
 public class Profile extends javax.swing.JPanel {
 
     public Profile() {
+       String email = cephra.CephraDB.getCurrentEmail();
+         String name = cephra.CephraDB.getCurrentUsername();
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+         gmailProf.setText(email);
+          Fullname.setText(name);
     }
 
     private void makeDraggable() {

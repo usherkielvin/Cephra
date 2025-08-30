@@ -55,7 +55,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(260, 390, 50, 20);
+        See.setBounds(260, 393, 50, 20);
 
         reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
@@ -86,6 +86,7 @@ public class Phonelogin extends javax.swing.JPanel {
         add(forgotpass);
         forgotpass.setBounds(200, 410, 120, 40);
 
+        pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
         pass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -93,8 +94,9 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(60, 387, 200, 30);
+        pass.setBounds(60, 386, 200, 35);
 
+        username.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -102,7 +104,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(60, 334, 240, 30);
+        username.setBounds(60, 334, 240, 35);
 
         loginhome.setBorder(null);
         loginhome.setBorderPainted(false);
