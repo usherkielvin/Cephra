@@ -1,27 +1,11 @@
 
 package cephra.Phone;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.List;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 
 public class phonehistory extends javax.swing.JPanel implements UserHistoryManager.HistoryUpdateListener {
     
@@ -233,7 +217,6 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     }
 /////
     private JPanel detailsPanel;
-    private JPanel historyListPanel;
    
     
     private void showHistoryDetails(UserHistoryManager.HistoryEntry entry) {
@@ -241,9 +224,6 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         if (detailsPanel != null) {
             remove(detailsPanel);
         }
-        
-        // Store the current history panel
-        historyListPanel = historyPanel;
         
         // Hide the history scroll pane
         historyScrollPane.setVisible(false);

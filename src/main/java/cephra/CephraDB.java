@@ -12,6 +12,7 @@ import java.util.List;
 public class CephraDB {
 
     // Inner class to represent a user
+    @SuppressWarnings("unused")
     private static class User {
         String username;
         String email;

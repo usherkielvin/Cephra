@@ -120,7 +120,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
     }//GEN-LAST:event_resetsendActionPerformed
 
     private void BackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackActionPerformed
-        // TODO add your handling code here:
+      
         
          SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -144,28 +144,9 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
     }//GEN-LAST:event_BackActionPerformed
 
     private void contactsupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contactsupActionPerformed
-        // TODO add your handling code here:
+        
             javax.swing.JOptionPane.showMessageDialog(this, "Contact support at: support@cephra.com", "Contact Support", javax.swing.JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_contactsupActionPerformed
-
-    private void backActionPerformed(java.awt.event.ActionEvent evt) {
-         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
-                        break;
-                    }
-                }
-            }
-        });
-        
-    }
-    
-
-
 
     @Override
     public void addNotify() {
