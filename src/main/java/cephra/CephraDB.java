@@ -31,12 +31,30 @@ public class CephraDB {
     // Method to initialize the database
     public static void initializeDatabase() {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            // Check if required tables exist
-            if (!tableExists(conn, "queue_tickets")) {
-                System.err.println("Warning: queue_tickets table does not exist. Please run the database initialization script.");
+            System.out.println("Initializing Cephra Database...");
+            
+            // Check if all required tables exist
+            String[] requiredTables = {
+                "users", "battery_levels", "active_tickets", "otp_codes",
+                "queue_tickets", "charging_history", "staff_records", 
+                "charging_bays", "payment_transactions", "system_settings"
+            };
+            
+            boolean allTablesExist = true;
+            for (String tableName : requiredTables) {
+                if (!tableExists(conn, tableName)) {
+                    System.err.println("Warning: " + tableName + " table does not exist. Please run the database initialization script.");
+                    allTablesExist = false;
+                }
             }
-            if (!tableExists(conn, "users")) {
-                System.err.println("Warning: users table does not exist. Please run the database initialization script.");
+            
+            if (!allTablesExist) {
+                System.err.println("Some required tables are missing. Please run the database initialization script:");
+                System.err.println("1. Start XAMPP MySQL service");
+                System.err.println("2. Run: mysql -u root -p < src/main/resources/db/init.sql");
+                System.err.println("Or use the provided batch files: init-database.bat");
+            } else {
+                System.out.println("All required database tables are present.");
             }
             
             // Clean up any existing duplicate battery level entries
@@ -45,9 +63,16 @@ public class CephraDB {
             // Clean up any orphaned queue tickets (tickets in queue but already in history)
             cleanupOrphanedQueueTickets();
             
+            // Verify database connection and basic functionality
+            verifyDatabaseConnection(conn);
+            
             System.out.println("Cephra MySQL database connected successfully.");
         } catch (SQLException e) {
             System.err.println("Failed to initialize database: " + e.getMessage());
+            System.err.println("Please ensure:");
+            System.err.println("1. XAMPP MySQL service is running");
+            System.err.println("2. Database 'cephradb' exists");
+            System.err.println("3. All tables are created using init.sql");
             e.printStackTrace();
         }
     }
@@ -871,6 +896,29 @@ public class CephraDB {
             System.err.println("Error updating system setting: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    // Method to verify database connection and basic functionality
+    private static void verifyDatabaseConnection(Connection conn) {
+        try {
+            // Test basic query
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT 1")) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        System.out.println("Database connection verified successfully.");
+                    }
+                }
+            }
+            
+            // Check if admin user exists, create if not
+            if (!userExists("admin")) {
+                System.out.println("Creating default admin user...");
+                addUser("admin", "admin@cephra.com", "1234");
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error verifying database connection: " + e.getMessage());
         }
     }
     
