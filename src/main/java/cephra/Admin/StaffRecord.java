@@ -19,12 +19,14 @@ public class StaffRecord extends javax.swing.JPanel {
         search.setOpaque(false);
         search.setBackground(new Color(0, 0, 0, 0));
         search.setBorder(null);
-
+        
+        jtableDesign.apply(staffTable);
+  
+        
         JTableHeader header = staffTable.getTableHeader();
-        header.setFont(new Font("Sage UI", Font.BOLD, 16));
-        header.setBackground(new java.awt.Color(255,255,255));
-        header.setForeground(new java.awt.Color(0,0,0));
-
+        header.setFont(new Font("Sogie UI", Font.BOLD, 16));
+        cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) staffTable.getModel());
+        
        BTNsearch.addActionListener(evt -> searchStaff());
         refreshStaffTable();
     }
@@ -82,7 +84,7 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         });
         add(businessbutton);
-        businessbutton.setBounds(610, 10, 140, 40);
+        businessbutton.setBounds(620, 10, 140, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -115,7 +117,7 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         });
         add(quebutton);
-        quebutton.setBounds(270, 10, 100, 40);
+        quebutton.setBounds(280, 10, 90, 40);
 
         profRemove.setBorderPainted(false);
         profRemove.setContentAreaFilled(false);
@@ -187,7 +189,7 @@ public class StaffRecord extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Staff .png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(10, 0, 1000, 750);
+        jLabel1.setBounds(0, 0, 1010, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed

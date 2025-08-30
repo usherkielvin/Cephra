@@ -56,7 +56,7 @@ public class Login extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(810, 430, 27, 50);
+        See.setBounds(855, 430, 27, 50);
 
         userfield.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         userfield.setBorder(null);
@@ -66,7 +66,7 @@ public class Login extends javax.swing.JPanel {
             }
         });
         add(userfield);
-        userfield.setBounds(540, 320, 340, 40);
+        userfield.setBounds(540, 318, 340, 45);
 
         loginbutton.setBorder(null);
         loginbutton.setBorderPainted(false);
@@ -88,7 +88,7 @@ public class Login extends javax.swing.JPanel {
             }
         });
         add(passfield);
-        passfield.setBounds(540, 435, 270, 40);
+        passfield.setBounds(540, 433, 320, 45);
 
         jButton1.setText("Forgot Password?");
         jButton1.setBorder(null);

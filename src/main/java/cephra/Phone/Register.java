@@ -149,7 +149,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(loginbutton);
-        loginbutton.setBounds(190, 673, 90, 40);
+        loginbutton.setBounds(205, 673, 90, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/regis1.png"))); // NOI18N
         add(jLabel1);
