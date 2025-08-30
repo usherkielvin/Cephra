@@ -94,7 +94,15 @@ public final class QueueBridge {
         cephra.CephraDB.setActiveTicket(customer, ticket);
         
         // Add to database for persistent storage
-        cephra.CephraDB.addQueueTicket(ticket, customer, service, status, payment, userBatteryLevel);
+        boolean dbSuccess = cephra.CephraDB.addQueueTicket(ticket, customer, service, status, payment, userBatteryLevel);
+        
+        if (!dbSuccess) {
+            System.err.println("Failed to add ticket " + ticket + " to database. It may already exist.");
+            // Remove from memory records since database insertion failed
+            records.remove(0);
+            ticketBattery.remove(ticket);
+            cephra.CephraDB.clearActiveTicket(customer);
+        }
 
         if (model != null) {
             final Object[] visibleRow = toVisibleRow(fullRecord);
@@ -201,19 +209,25 @@ public final class QueueBridge {
 
         boolean foundInRecords = false;
         boolean incrementCounter = false;
+        boolean alreadyPaid = false;
         String customerName = "";
         String serviceName = "";
         String referenceNumber = "";
 
-        // Check if reference number already exists, if not generate one
+        // Check if payment has already been processed for this ticket
         for (Object[] r : records) {
             if (r != null && ticket.equals(String.valueOf(r[0]))) {
                 String prev = String.valueOf(r[5]); // Payment is index 5
+                if ("Paid".equalsIgnoreCase(prev)) {
+                    alreadyPaid = true;
+                    System.out.println("QueueBridge: Payment already processed for ticket " + ticket + ", skipping duplicate");
+                    break;
+                }
                 if (!"Paid".equalsIgnoreCase(prev)) {
                     incrementCounter = true;
                 }
                 r[5] = "Paid";
-                // Always generate a new unique reference number for each payment
+                // Generate a new unique reference number for this payment
                 referenceNumber = generateReference();
                 r[1] = referenceNumber; // Store in the original reference field
                 foundInRecords = true;
@@ -223,37 +237,43 @@ public final class QueueBridge {
             }
         }
 
+        // If already paid, don't process again
+        if (alreadyPaid) {
+            return;
+        }
+
         if (incrementCounter) totalPaidCount++;
 
         if (foundInRecords) {
             try {
+                // Check if payment already exists in database to prevent duplicates
+                if (cephra.CephraDB.isPaymentAlreadyProcessed(ticket)) {
+                    System.out.println("QueueBridge: Payment already exists in database for ticket " + ticket + ", skipping duplicate");
+                    return;
+                }
+                
                 // Calculate charging details
                 BatteryInfo batteryInfo = getTicketBatteryInfo(ticket);
                 int initialBatteryLevel = batteryInfo != null ? batteryInfo.initialPercent : 20;
                 int chargingTimeMinutes = computeEstimatedMinutes(ticket);
                 double totalAmount = computeAmountDue(ticket);
                 
-                // Add to charging history in database
-                cephra.CephraDB.addChargingHistory(ticket, customerName, serviceName, 
-                                                 initialBatteryLevel, chargingTimeMinutes, 
-                                                 totalAmount, referenceNumber);
+                // Use a single database transaction to ensure consistency
+                boolean dbSuccess = cephra.CephraDB.processPaymentTransaction(
+                    ticket, customerName, serviceName, initialBatteryLevel, 
+                    chargingTimeMinutes, totalAmount, paymentMethod, referenceNumber
+                );
                 
-                // Add payment transaction record with specified payment method
-                cephra.CephraDB.addPaymentTransaction(ticket, customerName, totalAmount, 
-                                                    paymentMethod, referenceNumber);
-                
-                // Update queue ticket payment status in database
-                cephra.CephraDB.updateQueueTicketPayment(ticket, "Paid", referenceNumber);
-                
-                // Note: Phone and Admin history will be loaded from database automatically
-                // No need to add to in-memory lists to avoid duplicates
-                
-                // Clear the active ticket and charge battery to full when payment is completed
-                cephra.CephraDB.clearActiveTicket(customerName);
-                cephra.CephraDB.chargeUserBatteryToFull(customerName);
-                
-                System.out.println("QueueBridge: " + paymentMethod + " payment completed for ticket " + ticket + 
-                                 ", amount: ₱" + totalAmount + ", reference: " + referenceNumber);
+                if (dbSuccess) {
+                    // Clear the active ticket and charge battery to full when payment is completed
+                    cephra.CephraDB.clearActiveTicket(customerName);
+                    cephra.CephraDB.chargeUserBatteryToFull(customerName);
+                    
+                    System.out.println("QueueBridge: " + paymentMethod + " payment completed for ticket " + ticket + 
+                                     ", amount: ₱" + totalAmount + ", reference: " + referenceNumber);
+                } else {
+                    System.err.println("QueueBridge: Failed to process payment transaction for ticket " + ticket);
+                }
                 
             } catch (Throwable t) {
                 System.err.println("QueueBridge: Error processing payment completion: " + t.getMessage());

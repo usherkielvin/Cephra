@@ -42,6 +42,9 @@ public class CephraDB {
             // Clean up any existing duplicate battery level entries
             cleanupDuplicateBatteryLevels();
             
+            // Clean up any orphaned queue tickets (tickets in queue but already in history)
+            cleanupOrphanedQueueTickets();
+            
             System.out.println("Cephra MySQL database connected successfully.");
         } catch (SQLException e) {
             System.err.println("Failed to initialize database: " + e.getMessage());
@@ -404,6 +407,18 @@ public class CephraDB {
                 addUser(username, username + "@cephra.com", "temp123");
             }
             
+            // Check if ticket already exists
+            try (PreparedStatement checkStmt = conn.prepareStatement(
+                    "SELECT ticket_id FROM queue_tickets WHERE ticket_id = ?")) {
+                checkStmt.setString(1, ticketId);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next()) {
+                        System.err.println("Ticket " + ticketId + " already exists in database. Skipping insertion.");
+                        return false; // Ticket already exists
+                    }
+                }
+            }
+            
             // Now insert the queue ticket
             try (PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO queue_tickets (ticket_id, username, service_type, status, " +
@@ -642,6 +657,139 @@ public class CephraDB {
         return null;
     }
     
+    // Method to check if payment has already been processed for a ticket
+    public static boolean isPaymentAlreadyProcessed(String ticketId) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT COUNT(*) FROM charging_history WHERE ticket_id = ?")) {
+            
+            stmt.setString(1, ticketId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0; // If count > 0, payment already exists
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking if payment already processed: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false; // Default to false if error occurs
+    }
+    
+    // Method to process payment transaction with all related database operations in a single transaction
+    public static boolean processPaymentTransaction(String ticketId, String username, String serviceType,
+                                                  int initialBatteryLevel, int chargingTimeMinutes, 
+                                                  double totalAmount, String paymentMethod, String referenceNumber) {
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+            
+            // 1. Add to charging history
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO charging_history (ticket_id, username, service_type, " +
+                    "initial_battery_level, charging_time_minutes, total_amount, reference_number) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                
+                stmt.setString(1, ticketId);
+                stmt.setString(2, username);
+                stmt.setString(3, serviceType);
+                stmt.setInt(4, initialBatteryLevel);
+                stmt.setInt(5, chargingTimeMinutes);
+                stmt.setDouble(6, totalAmount);
+                stmt.setString(7, referenceNumber);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected <= 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+            
+            // 2. Add payment transaction record
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO payment_transactions (ticket_id, username, amount, " +
+                    "payment_method, reference_number) VALUES (?, ?, ?, ?, ?)")) {
+                
+                stmt.setString(1, ticketId);
+                stmt.setString(2, username);
+                stmt.setDouble(3, totalAmount);
+                stmt.setString(4, paymentMethod);
+                stmt.setString(5, referenceNumber);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected <= 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+            
+            // 3. Update queue ticket payment status
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE queue_tickets SET payment_status = ?, reference_number = ? WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, "Paid");
+                stmt.setString(2, referenceNumber);
+                stmt.setString(3, ticketId);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected <= 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+            
+            // 4. Add to admin history (if HistoryBridge is available)
+            try {
+                // Get the actual admin username who is currently logged in
+                String adminUsername = getCurrentUsername();
+                if (adminUsername == null || adminUsername.trim().isEmpty()) {
+                    adminUsername = "Admin"; // Fallback if no admin logged in
+                }
+                
+                Object[] historyRow = new Object[] {
+                    ticketId,
+                    username,
+                    String.format("%.2f", (totalAmount / 100.0) * 40.0), // kWh calculation
+                    String.format("%.2f", totalAmount),
+                    adminUsername, // Use actual admin username instead of hardcoded "Admin"
+                    java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")),
+                    referenceNumber
+                };
+                cephra.Admin.HistoryBridge.addRecord(historyRow);
+            } catch (Throwable t) {
+                // Ignore if HistoryBridge is not available
+                System.out.println("Note: Could not add to admin history: " + t.getMessage());
+            }
+            
+            conn.commit(); // Commit transaction
+            return true;
+            
+        } catch (SQLException e) {
+            System.err.println("Error processing payment transaction: " + e.getMessage());
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error rolling back transaction: " + rollbackEx.getMessage());
+                }
+            }
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("Error closing connection: " + e.getMessage());
+                }
+            }
+        }
+    }
+    
     // Staff management methods
     public static boolean addStaff(String name, String username, String email, String password) {
         try (Connection conn = DatabaseConnection.getConnection();
@@ -726,5 +874,21 @@ public class CephraDB {
         }
     }
     
+    // Method to clean up orphaned queue tickets (tickets in queue but already in history)
+    private static void cleanupOrphanedQueueTickets() {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "DELETE qt FROM queue_tickets qt " +
+                     "INNER JOIN charging_history ch ON qt.ticket_id = ch.ticket_id " +
+                     "WHERE qt.payment_status = 'Paid'")) {
+            
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Cleaned up " + rowsAffected + " orphaned queue tickets that were already in history.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error cleaning up orphaned queue tickets: " + e.getMessage());
+        }
+    }
 
 }

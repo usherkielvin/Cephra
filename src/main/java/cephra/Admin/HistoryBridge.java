@@ -48,16 +48,22 @@ public final class HistoryBridge {
                 String paymentMethod = cephra.CephraDB.getPaymentMethodForTicket((String) record[0]);
                 if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
                 
+                // Get the admin username who served this transaction
+                String servedBy = cephra.CephraDB.getCurrentUsername();
+                if (servedBy == null || servedBy.trim().isEmpty()) {
+                    servedBy = "Admin"; // Fallback if no admin logged in
+                }
+                
                 // Convert database format to admin history format
                 // Columns: Ticket, Customer, KWh, Total, Served By, Date & Time, Reference
                 Object[] adminRecord = {
                     record[0], // ticket_id
                     record[1], // username
                     String.format("%.1f kWh", kwhUsed), // KWh used
-                    String.format("₱%.2f", record[5]), // total_amount
-                    "Cephra (" + paymentMethod + ")", // served_by with payment method
-                    record[7], // completed_at
-                    record[6]  // reference_number
+                    String.format("%.2f", record[5]), // Total amount
+                    servedBy + " (" + paymentMethod + ")", // served_by with payment method
+                    record[6], // date_time (already in correct format)
+                    record[7]  // reference_number
                 };
                 records.add(adminRecord);
             }
@@ -101,16 +107,26 @@ public final class HistoryBridge {
             double usedFraction = (finalBatteryLevel - initialBatteryLevel) / 100.0;
             double kwhUsed = usedFraction * batteryCapacityKWh;
             
+            // Get payment method from payment transactions table
+            String paymentMethod = cephra.CephraDB.getPaymentMethodForTicket((String) record[0]);
+            if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
+            
+            // Get the admin username who served this transaction
+            String servedBy = cephra.CephraDB.getCurrentUsername();
+            if (servedBy == null || servedBy.trim().isEmpty()) {
+                servedBy = "Admin"; // Fallback if no admin logged in
+            }
+            
             // Convert database format to admin history format
             // Columns: Ticket, Customer, KWh, Total, Served By, Date & Time, Reference
             Object[] adminRecord = {
                 record[0], // ticket_id
                 record[1], // username
                 String.format("%.1f kWh", kwhUsed), // KWh used
-                String.format("₱%.2f", record[5]), // total_amount
-                "Cephra", // served_by (default)
-                record[7], // completed_at
-                record[6]  // reference_number
+                String.format("%.2f", record[5]), // Total amount
+                servedBy + " (" + paymentMethod + ")", // served_by with payment method
+                record[6], // date_time (already in correct format)
+                record[7]  // reference_number
             };
             userRecords.add(adminRecord);
         }

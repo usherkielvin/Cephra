@@ -51,7 +51,7 @@ public class Monitor extends javax.swing.JFrame {
                  displayButtons[i].setText(buttonTexts[i]);
                  displayButtons[i].setVisible(true);
              } else {
-                 System.out.println("Hiding button " + i);
+                
                  displayButtons[i].setText("");
                  displayButtons[i].setVisible(false);
              }

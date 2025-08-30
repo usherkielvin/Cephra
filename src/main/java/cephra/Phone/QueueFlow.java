@@ -41,6 +41,51 @@ public final class QueueFlow {
         // Reset the current service and ticket for normal operation
         currentTicketId = "";
         currentServiceName = "";
+        
+        // Initialize counters from existing database tickets
+        initializeCountersFromDatabase();
+    }
+    
+    private static void initializeCountersFromDatabase() {
+        try {
+            int maxFastNumber = 0;
+            int maxNormalNumber = 0;
+            
+            // Get all existing queue tickets from database
+            List<Object[]> existingTickets = cephra.CephraDB.getAllQueueTickets();
+            for (Object[] ticket : existingTickets) {
+                String ticketId = String.valueOf(ticket[0]); // ticket_id is at index 0
+                if (ticketId.startsWith("FCH")) {
+                    int number = extractNumber(ticketId);
+                    maxFastNumber = Math.max(maxFastNumber, number);
+                } else if (ticketId.startsWith("NCH")) {
+                    int number = extractNumber(ticketId);
+                    maxNormalNumber = Math.max(maxNormalNumber, number);
+                }
+            }
+            
+            // Also check charging history for completed tickets
+            List<Object[]> completedTickets = cephra.CephraDB.getAllChargingHistory();
+            for (Object[] ticket : completedTickets) {
+                String ticketId = String.valueOf(ticket[0]); // ticket_id is at index 0
+                if (ticketId.startsWith("FCH")) {
+                    int number = extractNumber(ticketId);
+                    maxFastNumber = Math.max(maxFastNumber, number);
+                } else if (ticketId.startsWith("NCH")) {
+                    int number = extractNumber(ticketId);
+                    maxNormalNumber = Math.max(maxNormalNumber, number);
+                }
+            }
+            
+            // Set counters to next available number
+            nextFastNumber = maxFastNumber + 1;
+            nextNormalNumber = maxNormalNumber + 1;
+            
+            System.out.println("QueueFlow: Initialized counters from database and history - Fast: " + nextFastNumber + ", Normal: " + nextNormalNumber);
+        } catch (Exception e) {
+            System.err.println("Error initializing counters from database: " + e.getMessage());
+            // Keep default values if database access fails
+        }
     }
 
     public static void setCurrent(String ticketId, String serviceName) {
@@ -63,6 +108,16 @@ public final class QueueFlow {
 
     public static List<Entry> getEntries() {
         return entries;
+    }
+    
+    // Method to refresh counters from database (useful after application restart or manual refresh)
+    public static void refreshCountersFromDatabase() {
+        initializeCountersFromDatabase();
+    }
+    
+    // Method to get current counter values for debugging
+    public static String getCurrentCounterStatus() {
+        return "Fast: " + nextFastNumber + ", Normal: " + nextNormalNumber;
     }
     
     public static void updatePaymentStatus(String ticketId, String paymentStatus) {
@@ -140,10 +195,14 @@ public final class QueueFlow {
             serviceName = "";
         }
         if (serviceName.toLowerCase().contains("fast")) {
-            return formatTicket("FCH", nextFastNumber);
+            String ticket = formatTicket("FCH", nextFastNumber);
+            System.out.println("QueueFlow: Generated Fast ticket: " + ticket + " (counter: " + nextFastNumber + ")");
+            return ticket;
         }
         if (serviceName.toLowerCase().contains("normal")) {
-            return formatTicket("NCH", nextNormalNumber);
+            String ticket = formatTicket("NCH", nextNormalNumber);
+            System.out.println("QueueFlow: Generated Normal ticket: " + ticket + " (counter: " + nextNormalNumber + ")");
+            return ticket;
         }
         // default fall-back
         return formatTicket("GEN", 1);

@@ -208,6 +208,9 @@ public class Login extends javax.swing.JPanel {
     }
 
     if ("admin".equals(username) && "1234".equals(password)) {
+        // Set the current admin user for tracking who served the customer
+        cephra.CephraDB.validateLogin(username, password);
+        
         java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
         if (window instanceof cephra.Frame.Admin) {
             cephra.Frame.Admin mainFrame = (cephra.Frame.Admin) window;

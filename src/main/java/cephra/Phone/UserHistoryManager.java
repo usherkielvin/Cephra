@@ -206,7 +206,7 @@ public class UserHistoryManager {
                         LocalDateTime adminDateTime = LocalDateTime.now(); // Default to current time
                         try {
                             String dateTimeStr = String.valueOf(record[5]);
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
                             adminDateTime = LocalDateTime.parse(dateTimeStr, formatter);
                         } catch (Exception e) {
                             System.err.println("Error parsing admin history date: " + e.getMessage());

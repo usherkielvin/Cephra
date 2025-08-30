@@ -22,6 +22,13 @@ public class Phone extends javax.swing.JFrame {
         
         // Add curved edges to the frame
         setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 350, 750, 120, 120));
+        
+        // Refresh ticket counters when Phone frame is created
+        try {
+            cephra.Phone.QueueFlow.refreshCountersFromDatabase();
+        } catch (Exception e) {
+            System.err.println("Error refreshing ticket counters: " + e.getMessage());
+        }
     }
 
     private void setAppIcon() {
