@@ -254,15 +254,21 @@ public final class QueueBridge {
                 double totalAmount = computeAmountDue(ticket);
                 
                 // Use a single database transaction to ensure consistency
+                System.out.println("QueueBridge: About to process payment transaction for ticket " + ticket + 
+                                 ", customer: " + customerName + ", service: " + serviceName + 
+                                 ", amount: " + totalAmount + ", method: " + paymentMethod);
                 boolean dbSuccess = cephra.CephraDB.processPaymentTransaction(
                     ticket, customerName, serviceName, initialBatteryLevel, 
                     chargingTimeMinutes, totalAmount, paymentMethod, referenceNumber
                 );
+                System.out.println("QueueBridge: Payment transaction result for ticket " + ticket + ": " + dbSuccess);
                 
                 if (dbSuccess) {
-                    // Clear the active ticket and charge battery to full when payment is completed
-                    cephra.CephraDB.clearActiveTicket(customerName);
-                    cephra.CephraDB.chargeUserBatteryToFull(customerName);
+                    // Note: processPaymentTransaction already handles:
+                    // - Battery update to 100%
+                    // - Ticket removal from queue
+                    // - Active ticket clearing
+                    // - History addition
                     
                     System.out.println("QueueBridge: " + paymentMethod + " payment completed for ticket " + ticket + 
                                      ", amount: ₱" + totalAmount + ", reference: " + referenceNumber);

@@ -18,14 +18,67 @@ public class PorscheTaycan extends javax.swing.JPanel {
         makeDraggable();
         
         // Update battery percentage from user's stored level
-        String username = cephra.CephraDB.getCurrentUsername();
-        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
-        batterypercent.setText(batteryLevel + " %");
+        refreshBatteryDisplay();
         
-        // Update range based on battery level (roughly 8km per 1% battery)
-        int rangeKm = (int)(batteryLevel * 8);
-        km.setText(rangeKm + " km");
+        // Add a focus listener to refresh battery display when panel becomes visible
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                refreshBatteryDisplay();
+            }
+        });
+        
+        // Also refresh when component becomes visible
+        addHierarchyListener(new java.awt.event.HierarchyListener() {
+            @Override
+            public void hierarchyChanged(java.awt.event.HierarchyEvent e) {
+                if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (isShowing()) {
+                        refreshBatteryDisplay();
+                    }
+                }
+            }
+        });
     }
+    
+    // Method to refresh battery display with current values from database
+    public void refreshBatteryDisplay() {
+        try {
+            String username = cephra.CephraDB.getCurrentUsername();
+            if (username != null && !username.isEmpty()) {
+                int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+                
+                if (batteryLevel == -1) {
+                    // No battery initialized yet - show "Link Car" message
+                    batterypercent.setText("Link Car");
+                    km.setText("0 km");
+                    charge.setEnabled(false);
+                    charge.setToolTipText("Please link your car first to initialize battery level.");
+                    charge.setBackground(new java.awt.Color(200, 200, 200));
+                    charge.setForeground(new java.awt.Color(100, 100, 100));
+                    System.out.println("PorscheTaycan: No battery initialized for user " + username + " - showing 'Link Car' message");
+                } else {
+                    batterypercent.setText(batteryLevel + " %");
+                    
+                    // Update range based on battery level (roughly 8km per 1% battery)
+                    int rangeKm = (int)(batteryLevel * 8);
+                    km.setText(rangeKm + " km");
+                    
+                    // Keep charge button always enabled - full battery handling is done in action listener with JDialog
+                    charge.setEnabled(true);
+                    charge.setToolTipText(null);
+                    // Reset button appearance
+                    charge.setBackground(null);
+                    charge.setForeground(java.awt.Color.WHITE);
+                    
+                    System.out.println("PorscheTaycan: Updated battery display to " + batteryLevel + "% for user " + username);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error refreshing battery display: " + e.getMessage());
+        }
+    }
+    
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
@@ -222,6 +275,23 @@ public class PorscheTaycan extends javax.swing.JPanel {
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                // Check battery level before allowing charging
+                try {
+                    String username = cephra.CephraDB.getCurrentUsername();
+                    if (username != null && !username.isEmpty()) {
+                        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+                        if (batteryLevel >= 100) {
+                            javax.swing.JOptionPane.showMessageDialog(PorscheTaycan.this,
+                                "Battery is already 100%! Please log out to reset your battery level.",
+                                "Battery Full",
+                                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                            return;
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error checking battery level: " + e.getMessage());
+                }
+                
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
@@ -247,4 +317,11 @@ public class PorscheTaycan extends javax.swing.JPanel {
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
+    
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        // Refresh battery display when panel becomes visible
+        SwingUtilities.invokeLater(() -> refreshBatteryDisplay());
+    }
 }

@@ -19,6 +19,8 @@ public class Profile extends javax.swing.JPanel {
         makeDraggable();
          gmailProf.setText(email);
           Fullname.setText(name);
+        
+
     }
 
     private void makeDraggable() {
@@ -192,7 +194,71 @@ public class Profile extends javax.swing.JPanel {
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                cephra.Phone.AppState.isCarLinked = false;
+                // Only reset battery to random level on logout when battery is 100%
+                try {
+                    String username = cephra.CephraDB.getCurrentUsername();
+                    if (username != null && !username.isEmpty()) {
+                        int currentBatteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+                        
+                                                // Only reset battery if it's 100%
+                        if (currentBatteryLevel >= 100) {
+                            // Reset battery to random level (15-50%) when logging out with full battery
+                            java.util.Random random = new java.util.Random();
+                            int newBatteryLevel = 15 + random.nextInt(36); // 15 to 50
+                            
+                            // Save to database first
+                            cephra.CephraDB.setUserBatteryLevel(username, newBatteryLevel);
+                            System.out.println("Profile: Reset battery level for " + username + " from " + currentBatteryLevel + "% to " + newBatteryLevel + "% on logout");
+                            
+                            // Check for duplicate battery level entries
+                            cephra.CephraDB.checkDuplicateBatteryLevels(username);
+                            
+                            // Verify the database update worked
+                            try {
+                                int verifyBattery = cephra.CephraDB.getUserBatteryLevel(username);
+                                System.out.println("Profile: Verified database update - battery level is now " + verifyBattery + "%");
+                                if (verifyBattery != newBatteryLevel) {
+                                    System.err.println("Profile: WARNING - Database update failed! Expected " + newBatteryLevel + "% but got " + verifyBattery + "%");
+                                }
+                            } catch (Exception verifyEx) {
+                                System.err.println("Profile: Error verifying battery level update: " + verifyEx.getMessage());
+                            }
+                            
+                            // Keep car linked - users only link once
+                            // cephra.Phone.AppState.isCarLinked = false; // Removed - keep car linked
+                         
+                            // Refresh any visible Porsche panel to show the new battery level
+                            try {
+                                java.awt.Window[] allWindows = java.awt.Window.getWindows();
+                                for (java.awt.Window window : allWindows) {
+                                    if (window instanceof cephra.Frame.Phone) {
+                                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                                        if (phoneFrame.isVisible()) {
+                                            // Find and refresh any PorscheTaycan panel
+                                            java.awt.Component[] components = phoneFrame.getContentPane().getComponents();
+                                            for (java.awt.Component comp : components) {
+                                                if (comp instanceof cephra.Phone.PorscheTaycan) {
+                                                    cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) comp;
+                                                    porschePanel.refreshBatteryDisplay();
+                                                    System.out.println("Profile: Refreshed Porsche panel to show new battery level: " + newBatteryLevel + "%");
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (Exception refreshEx) {
+                                System.err.println("Error refreshing Porsche panel: " + refreshEx.getMessage());
+                            }
+                                                 } else {
+                             // Battery is not 100%, no reset needed
+                             System.out.println("Profile: User logged out with " + currentBatteryLevel + "% battery - no reset needed");
+                         }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error resetting battery level on logout: " + e.getMessage());
+                }
+                
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
