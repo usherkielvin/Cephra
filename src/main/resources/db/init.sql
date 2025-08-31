@@ -143,13 +143,11 @@ CREATE TABLE IF NOT EXISTS system_settings (
 
 -- Insert initial test users (using INSERT IGNORE to prevent duplicates)
 INSERT IGNORE INTO users (username, email, password) VALUES 
-('testuser', 'test@cephra.com', '1234'),
 ('dizon', 'dizon@cephra.com', '1234'),
 ('earnest', 'earnest@cephra.com', '1234');
 
 -- Insert initial staff records (using INSERT IGNORE to prevent duplicates)
 INSERT IGNORE INTO staff_records (name, username, email, status, password) VALUES 
-('Admin User', 'admin', 'admin@cephra.com', 'Active', 'admin123'),
 ('Staff Member', 'staff', 'staff@cephra.com', 'Active', 'staff123');
 
 -- Insert initial charging bays (8 total bays to match Queue.java expectations)

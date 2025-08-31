@@ -121,20 +121,6 @@ public class H2DatabaseConnection {
      * Insert initial data
      */
     private static void insertInitialData(Statement stmt) throws SQLException {
-        // Insert test user if not exists
-        stmt.execute("""
-            INSERT INTO users (username, email, password) 
-            SELECT 'testuser', 'test@cephra.com', '1234'
-            WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'testuser')
-        """);
-        
-        // Insert admin staff if not exists
-        stmt.execute("""
-            INSERT INTO staff_records (name, username, email, status, password) 
-            SELECT 'Admin User', 'admin', 'admin@cephra.com', 'Active', 'admin123'
-            WHERE NOT EXISTS (SELECT 1 FROM staff_records WHERE username = 'admin')
-        """);
-        
         // Insert charging bays if not exist
         stmt.execute("""
             INSERT INTO charging_bays (bay_number, bay_type, status) 
