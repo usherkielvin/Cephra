@@ -8,17 +8,11 @@ public final class Launcher {
         
         try {
             CephraDB.initializeDatabase();
-            System.out.println("Database connection successful!");
-            
+            System.out.println("Database connection successful!");          
             CephraDB.validateDatabaseIntegrity();
-            
-            // Initialize ticket counters from database and history
             cephra.Phone.QueueFlow.refreshCountersFromDatabase();
-            System.out.println("Ticket counters initialized from database and history!");
-            
-            System.out.println("Cephra application starting...");
         } catch (Exception e) {
-            System.err.println("✗ Database connection failed!");
+            System.err.println("Database connection failed!");
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);
@@ -50,5 +44,5 @@ public final class Launcher {
         });
     }
 
-    private Launcher() {}///
+    private Launcher() {}
 }
