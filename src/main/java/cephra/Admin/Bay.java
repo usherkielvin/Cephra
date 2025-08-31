@@ -48,8 +48,10 @@ public class Bay extends javax.swing.JPanel {
         quebutton = new javax.swing.JButton();
         staffbutton = new javax.swing.JButton();
         businessbutton = new javax.swing.JButton();
-        exitlogin = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
+        exitlogin = new javax.swing.JButton();
+        labelStaff = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -133,17 +135,6 @@ public class Bay extends javax.swing.JPanel {
         add(businessbutton);
         businessbutton.setBounds(610, 10, 140, 40);
 
-        exitlogin.setBorder(null);
-        exitlogin.setBorderPainted(false);
-        exitlogin.setContentAreaFilled(false);
-        exitlogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitloginActionPerformed(evt);
-            }
-        });
-        add(exitlogin);
-        exitlogin.setBounds(930, 0, 70, 60);
-
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
@@ -155,13 +146,32 @@ public class Bay extends javax.swing.JPanel {
         add(historybutton);
         historybutton.setBounds(430, 10, 60, 40);
 
+        exitlogin.setBorder(null);
+        exitlogin.setBorderPainted(false);
+        exitlogin.setContentAreaFilled(false);
+        exitlogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitloginActionPerformed(evt);
+            }
+        });
+        add(exitlogin);
+        exitlogin.setBounds(930, 0, 70, 60);
+
+        labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        labelStaff.setForeground(new java.awt.Color(255, 255, 255));
+        labelStaff.setText("Admin!");
+        add(labelStaff);
+        labelStaff.setBounds(870, 10, 70, 30);
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Hello,");
+        add(jLabel3);
+        jLabel3.setBounds(820, 10, 50, 30);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Bay.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
-
-
-
-
     }// </editor-fold>//GEN-END:initComponents
 
     private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quebuttonActionPerformed
@@ -237,6 +247,8 @@ public class Bay extends javax.swing.JPanel {
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel labelStaff;
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables

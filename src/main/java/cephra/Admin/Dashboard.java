@@ -70,8 +70,6 @@ public class Dashboard extends javax.swing.JPanel {
         datetimeStaff = new javax.swing.JLabel();
         Saveminfee = new javax.swing.JButton();
         Saverateperhour = new javax.swing.JButton();
-        labelStaff = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -184,17 +182,17 @@ public class Dashboard extends javax.swing.JPanel {
         add(Saverateperhour);
         Saverateperhour.setBounds(610, 560, 290, 40);
 
-        labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
-        add(labelStaff);
-        labelStaff.setBounds(870, 10, 70, 30);
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Hello,");
-        add(jLabel3);
-        jLabel3.setBounds(820, 10, 50, 30);
+        SaveFastMultiplier = new javax.swing.JButton();
+        SaveFastMultiplier.setBorderPainted(false);
+        SaveFastMultiplier.setContentAreaFilled(false);
+        SaveFastMultiplier.setFocusPainted(false);
+        SaveFastMultiplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveFastMultiplierActionPerformed(evt);
+            }
+        });
+        add(SaveFastMultiplier);
+        SaveFastMultiplier.setBounds(120, 620, 290, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -348,7 +346,7 @@ public class Dashboard extends javax.swing.JPanel {
         String time = timeFormat.format(now);
         String date = dateFormat.format(now);
 
-        datetime.setText(time + " " + date);
+        datetimeStaff.setText(time + " " + date);
     }
     
     private void loadSettingsFromDatabase() {
