@@ -1,5 +1,7 @@
 package cephra.Admin;
 
+import java.awt.Color;
+
 public class Dashboard extends javax.swing.JPanel {
 
     private java.awt.Image dashboardImage;
@@ -47,6 +49,15 @@ public class Dashboard extends javax.swing.JPanel {
                 dashboardTogglePropertyChange(evt);
             }
         });
+        
+        //Spinner setHorizontalAlignment
+        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) MinfeeSpinner.getEditor();
+        JFormattedTextField textfield = editor.getTextField();
+        textfield.setHorizontalAlignment(JTextField.CENTER);
+        
+        JSpinner.DefaultEditor editor1 = (JSpinner.DefaultEditor) RPHSpinner.getEditor();
+        JFormattedTextField textfield1 = editor1.getTextField();
+        textfield1.setHorizontalAlignment(JTextField.CENTER);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -142,13 +153,17 @@ public class Dashboard extends javax.swing.JPanel {
         add(datetime);
         datetime.setBounds(820, 40, 170, 20);
 
+        MinfeeSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
+        MinfeeSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));
         MinfeeSpinner.setValue(50);
         add(MinfeeSpinner);
-        MinfeeSpinner.setBounds(120, 512, 300, 30);
+        MinfeeSpinner.setBounds(120, 510, 300, 40);
 
+        RPHSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
+        RPHSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));
         RPHSpinner.setValue(15);
         add(RPHSpinner);
-        RPHSpinner.setBounds(600, 512, 300, 30);
+        RPHSpinner.setBounds(600, 508, 300, 40);
 
         Saveminfee.setBorderPainted(false);
         Saveminfee.setContentAreaFilled(false);
