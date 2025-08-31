@@ -81,13 +81,20 @@ public class History extends javax.swing.JPanel {
         ));
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
+        jTable1.setRequestFocusEnabled(false);
         jTable1.getTableHeader().setResizingAllowed(false);
         jTable1.getTableHeader().setReorderingAllowed(false);
         jTable1.setVerifyInputWhenFocusTarget(false);
+        
+        // Make table non-editable but allow row selection
+        jTable1.setDefaultEditor(Object.class, null);
+        jTable1.setCellSelectionEnabled(false);
+        jTable1.setRowSelectionAllowed(true);
+        jTable1.setColumnSelectionAllowed(false);
         jScrollPane1.setViewportView(jTable1);
 
         add(jScrollPane1);
-        jScrollPane1.setBounds(5, 210, 990, 550);
+        jScrollPane1.setBounds(-5, 210, 1010, 550);
 
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);

@@ -74,18 +74,8 @@ public class Bay extends javax.swing.JPanel {
         setSize(1000, 750);
         setupDateTimeTimer();
         
-        // Set default state to Available for all bays after components are initialized
+        // Set default state to Available for all bays
         SwingUtilities.invokeLater(() -> {
-            System.out.println("Setting toggle switches to true...");
-            toggleSwitch1.setSelected(true);
-            toggleSwitch2.setSelected(true);
-            toggleSwitch3.setSelected(true);
-            toggleSwitch4.setSelected(true);
-            toggleSwitch5.setSelected(true);
-            toggleSwitch6.setSelected(true);
-            toggleSwitch7.setSelected(true);
-            toggleSwitch8.setSelected(true);
-            
             bay1.setText("Available");
             bay1.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
             bay2.setText("Available");
@@ -248,100 +238,7 @@ public class Bay extends javax.swing.JPanel {
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
 
-        toggleSwitch1 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch1.setOpaque(true);
-        toggleSwitch1.setBackground(new java.awt.Color(255, 255, 255));
-        add(toggleSwitch1);
-        toggleSwitch1.setBounds(260, 270, 60, 30);
-        
-        // Test button to see if components are visible
-        javax.swing.JButton testButton = new javax.swing.JButton("TEST");
-        testButton.setBounds(260, 200, 60, 30);
-        testButton.setBackground(java.awt.Color.RED);
-        add(testButton);
 
-        toggleSwitch2 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch2.setOpaque(true);
-        add(toggleSwitch2);
-        toggleSwitch2.setBounds(570, 270, 60, 30);
-
-        toggleSwitch3 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch3.setOpaque(true);
-        add(toggleSwitch3);
-        toggleSwitch3.setBounds(890, 270, 60, 30);
-
-        toggleSwitch4 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch4.setOpaque(true);
-        add(toggleSwitch4);
-        toggleSwitch4.setBounds(260, 460, 60, 30);
-
-        toggleSwitch5 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch5.setOpaque(true);
-        add(toggleSwitch5);
-        toggleSwitch5.setBounds(560, 460, 60, 30);
-
-        toggleSwitch6 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch6.setOpaque(true);
-        add(toggleSwitch6);
-        toggleSwitch6.setBounds(880, 460, 60, 30);
-
-        toggleSwitch7 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch7.setOpaque(true);
-        add(toggleSwitch7);
-        toggleSwitch7.setBounds(260, 645, 60, 30);
-
-        toggleSwitch8 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch8.setOpaque(true);
-        add(toggleSwitch8);
-        toggleSwitch8.setBounds(560, 645, 60, 30);
-
-        toggleSwitch1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch1PropertyChange(evt);
-            }
-        });
-
-        toggleSwitch2.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch2PropertyChange(evt);
-            }
-        });
-
-        toggleSwitch3.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch3PropertyChange(evt);
-            }
-        });
-
-        toggleSwitch4.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch4PropertyChange(evt);
-            }
-        });
-
-        toggleSwitch5.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch5PropertyChange(evt);
-            }
-        });
-
-        toggleSwitch6.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch6PropertyChange(evt);
-            }
-        });
-
-        toggleSwitch7.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch7PropertyChange(evt);
-            }
-        });
-
-        toggleSwitch8.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch8PropertyChange(evt);
-            }
-        });
     }// </editor-fold>//GEN-END:initComponents
 
     private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quebuttonActionPerformed
@@ -379,85 +276,7 @@ public class Bay extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_exitloginActionPerformed
 
-    private void toggleSwitch1PropertyChange(java.beans.PropertyChangeEvent evt) {
-        if (toggleSwitch1.isSelected()) {
-            bay1.setText("Available");
-            bay1.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        } else {
-            bay1.setText("Unavailable");
-            bay1.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        }
-    }
-    
-    private void toggleSwitch2PropertyChange(java.beans.PropertyChangeEvent evt) {
-        if (toggleSwitch2.isSelected()) {
-            bay2.setText("Available");
-            bay2.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        } else {
-            bay2.setText("Unavailable");
-            bay2.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        }
-    }
-    
-    private void toggleSwitch3PropertyChange(java.beans.PropertyChangeEvent evt) {
-        if (toggleSwitch3.isSelected()) {
-            bay3.setText("Available");
-            bay3.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        } else {
-            bay3.setText("Unavailable");
-            bay3.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        }
-    }
-    
-    private void toggleSwitch4PropertyChange(java.beans.PropertyChangeEvent evt) {
-        if (toggleSwitch4.isSelected()) {
-            bay4.setText("Available");
-            bay4.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        } else {
-            bay4.setText("Unavailable");
-            bay4.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        }
-    }
-    
-    private void toggleSwitch5PropertyChange(java.beans.PropertyChangeEvent evt) {
-        if (toggleSwitch5.isSelected()) {
-            bay5.setText("Available");
-            bay5.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        } else {
-            bay5.setText("Unavailable");
-            bay5.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        }
-    }
-    
-    private void toggleSwitch6PropertyChange(java.beans.PropertyChangeEvent evt) {
-        if (toggleSwitch6.isSelected()) {
-            bay6.setText("Available");
-            bay6.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        } else {
-            bay6.setText("Unavailable");
-            bay6.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        }
-    }
-    
-    private void toggleSwitch7PropertyChange(java.beans.PropertyChangeEvent evt) {
-        if (toggleSwitch7.isSelected()) {
-            bay7.setText("Available");
-            bay7.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        } else {
-            bay7.setText("Unavailable");
-            bay7.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        }
-    }
-    
-    private void toggleSwitch8PropertyChange(java.beans.PropertyChangeEvent evt) {
-        if (toggleSwitch8.isSelected()) {
-            bay8.setText("Available");
-            bay8.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        } else {
-            bay8.setText("Unavailable");
-            bay8.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        }
-    }
+
     
     private void setupDateTimeTimer() {
         updateDateTime();
@@ -499,14 +318,6 @@ public class Bay extends javax.swing.JPanel {
     private javax.swing.JLabel labelStaff;
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
-    private cephra.Admin.ToggleSwitch toggleSwitch1;
-    private cephra.Admin.ToggleSwitch toggleSwitch2;
-    private cephra.Admin.ToggleSwitch toggleSwitch3;
-    private cephra.Admin.ToggleSwitch toggleSwitch4;
-    private cephra.Admin.ToggleSwitch toggleSwitch5;
-    private cephra.Admin.ToggleSwitch toggleSwitch6;
-    private cephra.Admin.ToggleSwitch toggleSwitch7;
-    private cephra.Admin.ToggleSwitch toggleSwitch8;
     // End of variables declaration//GEN-END:variables
     
     private String getLoggedInUsername() {
