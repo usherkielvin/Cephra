@@ -750,7 +750,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     editorValue = "Paid";
                     // Sync cumulative paid counter and table via QueueBridge
                     int ticketCol = getColumnIndex("Ticket");
-                    int customerCol = getColumnIndex("Customer");
                     if (ticketCol >= 0) {
                         Object v = queTab.getValueAt(editingRow, ticketCol);
                         String ticket = v == null ? "" : String.valueOf(v).trim();
