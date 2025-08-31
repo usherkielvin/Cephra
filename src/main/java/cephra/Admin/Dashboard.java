@@ -1,7 +1,5 @@
 package cephra.Admin;
 
-import java.awt.Color;
-
 public class Dashboard extends javax.swing.JPanel {
 
     private java.awt.Image dashboardImage;
@@ -226,7 +224,7 @@ public class Dashboard extends javax.swing.JPanel {
     }//GEN-LAST:event_SaveminfeeActionPerformed
 
     private void SaverateperhourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaverateperhourActionPerformed
-        // TODO add your handling code here:
+       
          RPH = (Integer) RPHSpinner.getValue();
         javax.swing.JOptionPane.showMessageDialog(this, "Rate per hour saved: " + RPH);
     }//GEN-LAST:event_SaverateperhourActionPerformed

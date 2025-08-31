@@ -306,9 +306,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         System.out.println("Queue: Payment not yet processed, proceeding with payment transaction for ticket " + ticket);
                         
                         final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                        // Get the actual admin username who is currently logged in
-                        final String servedBy = cephra.CephraDB.getCurrentUsername();
-                        final String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"));
                         // Get reference number from QueueBridge to ensure consistency
                         final String reference = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
                         
@@ -317,7 +314,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             @Override
                             public void run() {
                                 double amount = 0.0;
-                                double usedKWh = 0.0;
                                 try {
                                     // Centralized calculation for total amount
                                     amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
@@ -327,7 +323,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                         int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
                                         batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
                                     }
-                                    usedKWh = ((100.0 - batteryInfo.initialPercent) / 100.0) * batteryInfo.capacityKWh;
                                 } catch (Throwable t) {
                                     // ignore compute errors, leave defaults
                                     System.err.println("Error computing amount for ticket " + ticket + ": " + t.getMessage());
@@ -436,12 +431,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         return -1;
     }
 
-    private static String generateReference() {
-        java.util.Random r = new java.util.Random();
-        // Generate 8-digit number (10000000 to 99999999)
-        int number = 10000000 + r.nextInt(90000000);
-        return String.valueOf(number);
-    }
+
     
     private void setupNextButtons() {
         nxtnormalbtn.addActionListener(e -> nextNormalTicket());
