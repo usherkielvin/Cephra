@@ -1,19 +1,14 @@
 package cephra.Admin;
 
-import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import javax.swing.*;
+import javax.swing.table.*;
+import java.util.*;
 
 public final class QueueBridge {
     private static DefaultTableModel model;
     private static final List<Object[]> records = new ArrayList<>();
     private static final Map<String, BatteryInfo> ticketBattery = new HashMap<>();
     private static int totalPaidCount = 0;
-    private static final Random random = new Random();
 
     // Configurable billing settings (central source of truth)
     private static volatile double RATE_PER_KWH = 15.0; // pesos per kWh
@@ -304,9 +299,8 @@ public final class QueueBridge {
     }
     
     private static String generateReference() {
-        java.util.Random r = new java.util.Random();
         // Generate 8-digit number (10000000 to 99999999)
-        int number = 10000000 + r.nextInt(90000000);
+        int number = 10000000 + new Random().nextInt(90000000);
         return String.valueOf(number);
     }
     

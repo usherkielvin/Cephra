@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class UserHistoryManager {
-    private static final Map<String, List<HistoryEntry>> userHistoryMap = new HashMap<>();
     private static final List<HistoryUpdateListener> listeners = new CopyOnWriteArrayList<>();
     
     public interface HistoryUpdateListener {
@@ -93,36 +92,7 @@ public class UserHistoryManager {
         }
     }
     
-    public static void addHistoryEntry(String username, String ticketId, String serviceType, String chargingTime) {
-        if (username == null || username.trim().isEmpty()) {
-            System.err.println("UserHistoryManager: Cannot add history entry for empty username");
-            return;
-        }
-        
-        HistoryEntry entry = new HistoryEntry(ticketId, serviceType, chargingTime);
-        
-        List<HistoryEntry> userEntries = userHistoryMap.get(username);
-        if (userEntries == null) {
-            userEntries = new ArrayList<>();
-            userHistoryMap.put(username, userEntries);
-        }
-        
-        // Add to the beginning of the list (newest first)
-        userEntries.add(0, entry);
-        
-        System.out.println("UserHistoryManager: Added history entry for user: " + username + 
-                           ", ticket: " + ticketId + 
-                           ", service: " + serviceType);
-        
-        // Notify all listeners about the history update
-        for (HistoryUpdateListener listener : listeners) {
-            try {
-                listener.onHistoryUpdated(username);
-            } catch (Exception e) {
-                System.err.println("UserHistoryManager: Error notifying listener: " + e.getMessage());
-            }
-        }
-    }
+
     
     public static List<HistoryEntry> getUserHistory(String username) {
         if (username == null || username.trim().isEmpty()) {
@@ -135,9 +105,7 @@ public class UserHistoryManager {
         
         for (Object[] record : dbHistory) {
             String ticketId = (String) record[0];
-            String recordUsername = (String) record[1];
             String serviceType = (String) record[2];
-            int initialBatteryLevel = (Integer) record[3];
             int chargingTimeMinutes = (Integer) record[4];
             double totalAmount = (Double) record[5];
             String referenceNumber = (String) record[6];
@@ -167,75 +135,7 @@ public class UserHistoryManager {
         return historyEntries;
     }
     
-    private static List<HistoryEntry> getAdminHistoryForUser(String username) {
-        List<HistoryEntry> result = new ArrayList<>();
-        
-        try {
-            // Access admin history records
-            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(username);
-            
-            if (adminRecords != null) {
-                for (Object[] record : adminRecords) {
-                    if (record.length >= 7) {
-                        String ticketId = String.valueOf(record[0]);
-                        
-                        // Determine service type based on ticket ID (FCH = Fast Charge, NCH = Normal Charge)
-                        String serviceType = "";
-                        if (ticketId.startsWith("FCH")) {
-                            serviceType = "Fast Charge";
-                        } else if (ticketId.startsWith("NCH")) {
-                            serviceType = "Normal Charge";
-                        } else {
-                            serviceType = "Charging Service";
-                        }
-                        
-                        String chargingTime = "40 mins"; // default
-                        try {
-                            int est = cephra.Admin.QueueBridge.computeEstimatedMinutes(ticketId);
-                            if (est > 0) {
-                                chargingTime = formatTimeDisplay(est);
-                            }
-                        } catch (Throwable t) {
-                            // keep default
-                        }
-                        String total = String.valueOf(record[3]) + " PHP"; // Total amount from admin history
-                        String referenceNumber = String.valueOf(record[6]); // Reference number
-                        System.out.println("UserHistoryManager: Extracted reference number '" + referenceNumber + "' for ticket " + ticketId + " from admin record");
-                        
-                        // Parse date and time from admin history (index 5)
-                        LocalDateTime adminDateTime = LocalDateTime.now(); // Default to current time
-                        try {
-                            String dateTimeStr = String.valueOf(record[5]);
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
-                            adminDateTime = LocalDateTime.parse(dateTimeStr, formatter);
-                        } catch (Exception e) {
-                            System.err.println("Error parsing admin history date: " + e.getMessage());
-                        }
-                        
-                        result.add(new HistoryEntry(ticketId, serviceType, chargingTime, total, referenceNumber, adminDateTime));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error accessing admin history: " + e.getMessage());
-        }
-        
-        return result;
-    }
-    
-    private static String formatTimeDisplay(int minutes) {
-        if (minutes >= 60) {
-            int hours = minutes / 60;
-            int remainingMinutes = minutes % 60;
-            if (remainingMinutes == 0) {
-                return hours + " hour" + (hours > 1 ? "s" : "");
-            } else {
-                return hours + " hour" + (hours > 1 ? "s" : "") + " " + remainingMinutes + " min" + (remainingMinutes > 1 ? "s" : "");
-            }
-        } else {
-            return minutes + " min" + (minutes != 1 ? "s" : "");
-        }
-    }
+
 
     // Method to notify all listeners about a history update for a specific user
     public static void notifyHistoryUpdate(String username) {

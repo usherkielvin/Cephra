@@ -307,19 +307,6 @@ public class serviceoffered extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
     
     private void checkAndDisableChargeButtons() {
-        String username = cephra.CephraDB.getCurrentUsername();
-        boolean hasActive = false;
-        int batteryLevel = 0;
-        try {
-            hasActive = (username != null) && cephra.CephraDB.hasActiveTicket(username);
-            batteryLevel = (username != null) ? cephra.CephraDB.getUserBatteryLevel(username) : 0;
-        } catch (Throwable t) {
-            hasActive = false;
-            batteryLevel = 0;
-        }
-        boolean batteryFull = batteryLevel >= 100;
-        boolean carLinked = cephra.Phone.AppState.isCarLinked;
-        
         // Always keep buttons enabled; gating is handled in action listeners with dialogs
         fastcharge.setEnabled(true);
         normalcharge.setEnabled(true);
