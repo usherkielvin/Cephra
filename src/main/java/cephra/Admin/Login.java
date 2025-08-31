@@ -207,17 +207,15 @@ public class Login extends javax.swing.JPanel {
         return;
     }
 
-    if ("admin".equals(username) && "1234".equals(password)) {
-        // Set the current admin user for tracking who served the customer
-        cephra.CephraDB.validateLogin(username, password);
-        
+    // Validate staff login using the database
+    if (cephra.CephraDB.validateStaffLogin(username, password)) {
         java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
         if (window instanceof cephra.Frame.Admin) {
             cephra.Frame.Admin mainFrame = (cephra.Frame.Admin) window;
             mainFrame.switchPanel(new cephra.Admin.Dashboard());
         }
     } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials (demo: admin / 1234)", "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+        javax.swing.JOptionPane.showMessageDialog(this, "Invalid staff credentials. Please check your username and password.", "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
         passfield.setText(""); // Clear password field
         userfield.requestFocusInWindow(); // Refocus on username field
     }

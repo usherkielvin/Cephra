@@ -25,8 +25,9 @@ public class CephraDB {
         }
     }
 
-    // Current logged-in user
-    private static User currentUser;
+    // Current logged-in users (separate for phone and admin)
+    private static User currentPhoneUser;
+    private static User currentAdminUser;
     
     // Method to initialize the database
     public static void initializeDatabase() {
@@ -90,7 +91,7 @@ public class CephraDB {
         return false;
     }
 
-    // Method to check if the given credentials are valid
+    // Method to check if the given credentials are valid (for phone users)
     public static boolean validateLogin(String username, String password) {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -101,8 +102,8 @@ public class CephraDB {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    // Set the current user when login is successful
-                    currentUser = new User(
+                    // Set the current phone user when login is successful
+                    currentPhoneUser = new User(
                             rs.getString("username"),
                             rs.getString("email"),
                             rs.getString("password")
@@ -117,14 +118,24 @@ public class CephraDB {
         return false;
     }
     
-    // Method to get the current logged-in username
+    // Method to get the current logged-in username (phone user)
     public static String getCurrentUsername() {
-        return currentUser != null ? currentUser.username : "";
+        return currentPhoneUser != null ? currentPhoneUser.username : "";
     }
     
-    // Method to get the current logged-in user's email
+    // Method to get the current logged-in user's email (phone user)
     public static String getCurrentEmail() {
-        return currentUser != null ? currentUser.email : "";
+        return currentPhoneUser != null ? currentPhoneUser.email : "";
+    }
+    
+    // Method to get the current admin username
+    public static String getCurrentAdminUsername() {
+        return currentAdminUser != null ? currentAdminUser.username : "";
+    }
+    
+    // Method to get the current admin email
+    public static String getCurrentAdminEmail() {
+        return currentAdminUser != null ? currentAdminUser.email : "";
     }
 
     // Method to add a new user to the database
@@ -218,8 +229,8 @@ public class CephraDB {
         Random random = new Random();
         String generatedOTP = String.format("%06d", random.nextInt(1000000));
         
-        // If user is logged in, store OTP in database
-        if (currentUser != null) {
+        // If phone user is logged in, store OTP in database
+        if (currentPhoneUser != null) {
             try (Connection conn = DatabaseConnection.getConnection();
                  // Delete any existing OTP for this email
                  PreparedStatement deleteStmt = conn.prepareStatement(
@@ -228,10 +239,10 @@ public class CephraDB {
                  PreparedStatement insertStmt = conn.prepareStatement(
                          "INSERT INTO otp_codes (email, otp_code) VALUES (?, ?)")) {
                 
-                deleteStmt.setString(1, currentUser.email);
+                deleteStmt.setString(1, currentPhoneUser.email);
                 deleteStmt.executeUpdate();
                 
-                insertStmt.setString(1, currentUser.email);
+                insertStmt.setString(1, currentPhoneUser.email);
                 insertStmt.setString(2, generatedOTP);
                 insertStmt.executeUpdate();
                 
@@ -247,7 +258,7 @@ public class CephraDB {
 
     // Method to get the stored OTP
     public static String getGeneratedOTP() {
-        if (currentUser == null) {
+        if (currentPhoneUser == null) {
             return null;
         }
         
@@ -255,7 +266,7 @@ public class CephraDB {
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT otp_code FROM otp_codes WHERE email = ? AND expires_at > NOW()")) {
             
-            stmt.setString(1, currentUser.email);
+            stmt.setString(1, currentPhoneUser.email);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -679,7 +690,7 @@ public class CephraDB {
             stmt.setString(8, referenceNumber);
             
             // Get the actual admin username who is currently logged in
-            String adminUsername = getCurrentUsername();
+            String adminUsername = getCurrentAdminUsername();
             if (adminUsername == null || adminUsername.trim().isEmpty()) {
                 adminUsername = "Admin"; // Fallback if no admin logged in
             }
@@ -896,7 +907,7 @@ public class CephraDB {
                 stmt.setString(8, referenceNumber != null ? referenceNumber : "");
                 
                 // Get the actual admin username who is currently logged in
-                String adminUsername = getCurrentUsername();
+                String adminUsername = getCurrentAdminUsername();
                 if (adminUsername == null || adminUsername.trim().isEmpty()) {
                     adminUsername = "Admin"; // Fallback if no admin logged in
                 }
@@ -956,7 +967,7 @@ public class CephraDB {
             // 4. Add to admin history (if HistoryBridge is available)
             try {
                 // Get the actual admin username who is currently logged in
-                String adminUsername = getCurrentUsername();
+                String adminUsername = getCurrentAdminUsername();
                 if (adminUsername == null || adminUsername.trim().isEmpty()) {
                     adminUsername = "Admin"; // Fallback if no admin logged in
                 }
@@ -1065,6 +1076,33 @@ public class CephraDB {
             e.printStackTrace();
         }
         return staff;
+    }
+    
+    // Method to validate staff login credentials
+    public static boolean validateStaffLogin(String username, String password) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT username, email, password FROM staff_records WHERE username = ? AND password = ? AND status = 'Active'")) {
+            
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // Set the current admin user when login is successful
+                    currentAdminUser = new User(
+                            rs.getString("username"),
+                            rs.getString("email"),
+                            rs.getString("password")
+                    );
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error validating staff login: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
     
     // System settings methods

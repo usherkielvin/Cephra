@@ -148,6 +148,7 @@ INSERT IGNORE INTO users (username, email, password) VALUES
 
 -- Insert initial staff records (using INSERT IGNORE to prevent duplicates)
 INSERT IGNORE INTO staff_records (name, username, email, status, password) VALUES 
+('Admin User', 'admin', 'admin@cephra.com', 'Active', 'admin123'),
 ('Staff Member', 'staff', 'staff@cephra.com', 'Active', 'staff123');
 
 -- Insert initial charging bays (8 total bays to match Queue.java expectations)
@@ -256,7 +257,6 @@ DELIMITER ;
 
 -- Insert demo data for testing (using INSERT IGNORE to prevent duplicates)
 INSERT IGNORE INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES
-('testuser', 25, 25, 40.0),
 ('dizon', 30, 30, 40.0),
 ('earnest', 35, 35, 40.0);
 
