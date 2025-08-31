@@ -21,6 +21,7 @@ private int buttonCount = 0;
         setSize(1000, 750);       
  
         jtableDesign.apply(queTab);
+        jtableDesign.makeScrollPaneTransparent(jScrollPane1);
   
         
         JTableHeader header = queTab.getTableHeader();
@@ -81,10 +82,10 @@ private int buttonCount = 0;
         } catch (Throwable t) {
             // ignore
         }
-        // Map labels: top (jLabel4)=Waiting, middle (jLabel5)=Charging, bottom (jLabel3)=Paid cumulative
-        try { jLabel4.setText(String.valueOf(waiting)); } catch (Throwable t) {}
-        try { jLabel5.setText(String.valueOf(charging)); } catch (Throwable t) {}
-        try { jLabel3.setText(String.valueOf(paidCumulative)); } catch (Throwable t) {}
+        // Map labels: top (Waitings)=Waiting, middle (Charging)=Charging, bottom (Paid)=Paid cumulative
+        try { Waitings.setText(String.valueOf(waiting)); } catch (Throwable t) {}
+        try { Charging.setText(String.valueOf(charging)); } catch (Throwable t) {}
+        try { Paid.setText(String.valueOf(paidCumulative)); } catch (Throwable t) {}
     }
 
 
@@ -793,9 +794,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         historybutton = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         panelLists = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        Paid = new javax.swing.JLabel();
+        Waitings = new javax.swing.JLabel();
+        Charging = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         queTab = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
@@ -890,23 +891,23 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         panelLists.setLayout(null);
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("5");
-        panelLists.add(jLabel3);
-        jLabel3.setBounds(50, 500, 120, 70);
+        Paid.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        Paid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Paid.setText("5");
+        panelLists.add(Paid);
+        Paid.setBounds(50, 500, 120, 70);
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("4");
-        panelLists.add(jLabel4);
-        jLabel4.setBounds(50, 170, 120, 70);
+        Waitings.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        Waitings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Waitings.setText("4");
+        panelLists.add(Waitings);
+        Waitings.setBounds(50, 170, 120, 70);
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("4");
-        panelLists.add(jLabel5);
-        jLabel5.setBounds(50, 310, 120, 70);
+        Charging.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        Charging.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Charging.setText("4");
+        panelLists.add(Charging);
+        Charging.setBounds(50, 310, 120, 70);
 
         queTab.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -919,6 +920,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 "Ticket", "Customer", "Service", "Status", "Payment", "Action"
             }
         ));
+        queTab.setGridColor(new java.awt.Color(0, 0, 0));
         jScrollPane1.setViewportView(queTab);
 
         panelLists.add(jScrollPane1);
@@ -1243,8 +1245,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
+    private javax.swing.JLabel Charging;
     private javax.swing.JPanel ControlPanel;
     private javax.swing.JLabel MainIcon;
+    private javax.swing.JLabel Paid;
+    private javax.swing.JLabel Waitings;
     private javax.swing.JButton businessbutton;
     private javax.swing.JButton exitlogin;
     private javax.swing.JPanel fastpanel;
@@ -1263,9 +1268,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
