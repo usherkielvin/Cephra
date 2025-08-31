@@ -5,7 +5,6 @@ import javax.swing.*;
 public class Dashboard extends javax.swing.JPanel {
 
     private java.awt.Image dashboardImage;
-    private javax.swing.JToggleButton toggleSwitch; // Add this line
     
     // Variables to store spinner values
     private int Min = 50; // Default minimum fee
@@ -42,15 +41,7 @@ public class Dashboard extends javax.swing.JPanel {
             RPH = (Integer) RPHSpinner.getValue();
         });
 
-        // --- TOGGLE SWITCH SETUP ---
-        toggleSwitch = new javax.swing.JToggleButton("Toggle");
-        toggleSwitch.setBounds(700, 10, 100, 40); // Adjust position and size as needed
-        add(toggleSwitch);
-        toggleSwitch.addPropertyChangeListener(evt -> {
-            if ("selected".equals(evt.getPropertyName())) {
-                dashboardTogglePropertyChange(evt);
-            }
-        });
+
         
         //Spinner setHorizontalAlignment
         JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) MinfeeSpinner.getEditor();
@@ -305,16 +296,7 @@ public class Dashboard extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_SaveFastMultiplierActionPerformed
 
-    private void dashboardTogglePropertyChange(java.beans.PropertyChangeEvent evt) {
-        // Functionality when the dashboard toggle is changed
-        if (toggleSwitch.isSelected()) {
-            // Toggle is ON
-            System.out.println("Dashboard toggle is ON");
-        } else {
-            // Toggle is OFF
-            System.out.println("Dashboard toggle is OFF");
-        }
-    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;

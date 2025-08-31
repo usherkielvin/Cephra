@@ -9,35 +9,39 @@ public class Bay extends javax.swing.JPanel {
   
     public Bay() {
         initComponents();
-         setPreferredSize(new java.awt.Dimension(1000, 750));
+        setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         setupDateTimeTimer();
-        // Set default state to Available for all bays
-        toggleSwitch1.setSelected(true);
-        toggleSwitch2.setSelected(true);
-        toggleSwitch3.setSelected(true);
-        toggleSwitch4.setSelected(true);
-        toggleSwitch5.setSelected(true);
-        toggleSwitch6.setSelected(true);
-        toggleSwitch7.setSelected(true);
-        toggleSwitch8.setSelected(true);
         
-        bay1.setText("Available");
-        bay1.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        bay2.setText("Available");
-        bay2.setForeground(new java.awt.Color(0, 128, 0));
-        bay3.setText("Available");
-        bay3.setForeground(new java.awt.Color(0, 128, 0));
-        bay4.setText("Available");
-        bay4.setForeground(new java.awt.Color(0, 128, 0));
-        bay5.setText("Available");
-        bay5.setForeground(new java.awt.Color(0, 128, 0));
-        bay6.setText("Available");
-        bay6.setForeground(new java.awt.Color(0, 128, 0));
-        bay7.setText("Available");
-        bay7.setForeground(new java.awt.Color(0, 128, 0));
-        bay8.setText("Available");
-        bay8.setForeground(new java.awt.Color(0, 128, 0));
+        // Set default state to Available for all bays after components are initialized
+        SwingUtilities.invokeLater(() -> {
+            System.out.println("Setting toggle switches to true...");
+            toggleSwitch1.setSelected(true);
+            toggleSwitch2.setSelected(true);
+            toggleSwitch3.setSelected(true);
+            toggleSwitch4.setSelected(true);
+            toggleSwitch5.setSelected(true);
+            toggleSwitch6.setSelected(true);
+            toggleSwitch7.setSelected(true);
+            toggleSwitch8.setSelected(true);
+            
+            bay1.setText("Available");
+            bay1.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            bay2.setText("Available");
+            bay2.setForeground(new java.awt.Color(0, 128, 0));
+            bay3.setText("Available");
+            bay3.setForeground(new java.awt.Color(0, 128, 0));
+            bay4.setText("Available");
+            bay4.setForeground(new java.awt.Color(0, 128, 0));
+            bay5.setText("Available");
+            bay5.setForeground(new java.awt.Color(0, 128, 0));
+            bay6.setText("Available");
+            bay6.setForeground(new java.awt.Color(0, 128, 0));
+            bay7.setText("Available");
+            bay7.setForeground(new java.awt.Color(0, 128, 0));
+            bay8.setText("Available");
+            bay8.setForeground(new java.awt.Color(0, 128, 0));
+        });
     }
 
    
@@ -168,34 +172,49 @@ public class Bay extends javax.swing.JPanel {
         jLabel1.setBounds(0, 0, 1000, 750);
 
         toggleSwitch1 = new cephra.Admin.ToggleSwitch();
+        toggleSwitch1.setOpaque(true);
+        toggleSwitch1.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch1);
         toggleSwitch1.setBounds(260, 270, 60, 30);
+        
+        // Test button to see if components are visible
+        javax.swing.JButton testButton = new javax.swing.JButton("TEST");
+        testButton.setBounds(260, 200, 60, 30);
+        testButton.setBackground(java.awt.Color.RED);
+        add(testButton);
 
         toggleSwitch2 = new cephra.Admin.ToggleSwitch();
+        toggleSwitch2.setOpaque(true);
         add(toggleSwitch2);
         toggleSwitch2.setBounds(570, 270, 60, 30);
 
         toggleSwitch3 = new cephra.Admin.ToggleSwitch();
+        toggleSwitch3.setOpaque(true);
         add(toggleSwitch3);
         toggleSwitch3.setBounds(890, 270, 60, 30);
 
         toggleSwitch4 = new cephra.Admin.ToggleSwitch();
+        toggleSwitch4.setOpaque(true);
         add(toggleSwitch4);
         toggleSwitch4.setBounds(260, 460, 60, 30);
 
         toggleSwitch5 = new cephra.Admin.ToggleSwitch();
+        toggleSwitch5.setOpaque(true);
         add(toggleSwitch5);
         toggleSwitch5.setBounds(560, 460, 60, 30);
 
         toggleSwitch6 = new cephra.Admin.ToggleSwitch();
+        toggleSwitch6.setOpaque(true);
         add(toggleSwitch6);
         toggleSwitch6.setBounds(880, 460, 60, 30);
 
         toggleSwitch7 = new cephra.Admin.ToggleSwitch();
+        toggleSwitch7.setOpaque(true);
         add(toggleSwitch7);
         toggleSwitch7.setBounds(260, 645, 60, 30);
 
         toggleSwitch8 = new cephra.Admin.ToggleSwitch();
+        toggleSwitch8.setOpaque(true);
         add(toggleSwitch8);
         toggleSwitch8.setBounds(560, 645, 60, 30);
 
