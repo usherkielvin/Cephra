@@ -26,7 +26,18 @@ public class StaffRecord extends javax.swing.JPanel {
         JTableHeader header = staffTable.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         
-       BTNsearch.addActionListener(evt -> searchStaff());
+               BTNsearch.addActionListener(evt -> searchStaff());
+        
+        // Add Enter key listener to search field
+        search.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    searchStaff();
+                }
+            }
+        });
+        
         refreshStaffTable();
     }
 
@@ -158,8 +169,15 @@ public class StaffRecord extends javax.swing.JPanel {
             new String [] {
                 "Name", "Username", "Email", "Status", "Password"
             }
-        ));
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        });
+        staffTable.setFocusable(false);
         staffTable.setOpaque(false);
+        staffTable.setRequestFocusEnabled(false);
         staffTable.getTableHeader().setResizingAllowed(false);
         staffTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(staffTable);

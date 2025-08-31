@@ -17,6 +17,11 @@ public class AdminRegister extends javax.swing.JPanel {
         email.setBackground(new Color(0, 0, 0, 0));
         username.setOpaque(false);
         username.setBackground(new Color(0, 0, 0, 0));
+        pass.setOpaque(false);
+        pass.setBackground(new Color(0, 0, 0, 0));
+        ConPass.setOpaque(false);
+        ConPass.setBackground(new Color(0, 0, 0, 0));
+        
         
     }
 
