@@ -4,6 +4,10 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import cephra.Frame.Monitor;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Queue extends javax.swing.JPanel {
     private static Monitor monitorInstance;
@@ -200,15 +204,41 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                              // Determine bay number based on assignment
                              String bayNumber = "";
                              if (isFast) {
-                                 if (ticket.equals(fastslot1.getText())) bayNumber = "Bay-1";
-                                 else if (ticket.equals(fastslot2.getText())) bayNumber = "Bay-2";
-                                 else if (ticket.equals(fastslot3.getText())) bayNumber = "Bay-3";
+                                 // Find the first available fast charging bay that's not in use
+                                 for (int i = 0; i < 3; i++) {
+                                     String currentBay = "Bay-" + (i + 1);
+                                     // Check if bay is available and not currently in use by another active ticket
+                                     if (cephra.Admin.Bay.fastChargingAvailable[i] && !isBayInUse(currentBay)) {
+                                         bayNumber = currentBay;
+                                         break;
+                                     }
+                                 }
+                                 
+                                 // If no bay was found, use the original assignment logic as fallback
+                                 if (bayNumber.isEmpty()) {
+                                     if (ticket.equals(fastslot1.getText())) bayNumber = "Bay-1";
+                                     else if (ticket.equals(fastslot2.getText())) bayNumber = "Bay-2";
+                                     else if (ticket.equals(fastslot3.getText())) bayNumber = "Bay-3";
+                                 }
                              } else {
-                                 if (ticket.equals(normalcharge1.getText())) bayNumber = "Bay-4";
-                                 else if (ticket.equals(normalcharge2.getText())) bayNumber = "Bay-5";
-                                 else if (ticket.equals(normalcharge3.getText())) bayNumber = "Bay-6";
-                                 else if (ticket.equals(normalcharge4.getText())) bayNumber = "Bay-7";
-                                 else if (ticket.equals(normalcharge5.getText())) bayNumber = "Bay-8";
+                                 // Find the first available normal charging bay that's not in use
+                                 for (int i = 0; i < 5; i++) {
+                                     String currentBay = "Bay-" + (i + 4);
+                                     // Check if bay is available and not currently in use by another active ticket
+                                     if (Bay.normalChargingAvailable[i] && !isBayInUse(currentBay)) {
+                                         bayNumber = currentBay;
+                                         break;
+                                     }
+                                 }
+                                 
+                                 // If no bay was found, use the original assignment logic as fallback
+                                 if (bayNumber.isEmpty()) {
+                                     if (ticket.equals(normalcharge1.getText())) bayNumber = "Bay-4";
+                                     else if (ticket.equals(normalcharge2.getText())) bayNumber = "Bay-5";
+                                     else if (ticket.equals(normalcharge3.getText())) bayNumber = "Bay-6";
+                                     else if (ticket.equals(normalcharge4.getText())) bayNumber = "Bay-7";
+                                     else if (ticket.equals(normalcharge5.getText())) bayNumber = "Bay-8";
+                                 }
                              }
                              
                              // Create active ticket with initial battery level (save the starting point)
@@ -1342,6 +1372,27 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton nxtnormalbtn;
     private javax.swing.JPanel panelLists;
     private javax.swing.JLabel queIcon;
+    // Method to check if a bay is currently in use by an active ticket
+    private boolean isBayInUse(String bayNumber) {
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            try (PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT COUNT(*) FROM active_tickets WHERE bay_number = ?")) {
+                
+                stmt.setString(1, bayNumber);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt(1) > 0; // If count > 0, bay is in use
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking if bay is in use: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false; // Default to not in use if there's an error
+    }
+
     private javax.swing.JTable queTab;
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables

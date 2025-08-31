@@ -522,6 +522,9 @@ public class CephraDB {
                 stmt.setString(12, "Active");
                 
                 stmt.executeUpdate();
+                
+                // Mark the bay as occupied in the Bay class
+              
             }
         } catch (SQLException e) {
             System.err.println("Error setting active ticket with details: " + e.getMessage());
@@ -560,12 +563,28 @@ public class CephraDB {
                 return; // Cannot clear active ticket if table doesn't exist
             }
             
+            // First get the bay number before deleting
+            String bayNumber = null;
+            try (PreparedStatement queryStmt = conn.prepareStatement(
+                     "SELECT bay_number FROM active_tickets WHERE ticket_id = ?")) {
+                queryStmt.setString(1, ticketId);
+                try (ResultSet rs = queryStmt.executeQuery()) {
+                    if (rs.next()) {
+                        bayNumber = rs.getString("bay_number");
+                    }
+                }
+            }
+            
+            // Now delete the active ticket
             try (PreparedStatement stmt = conn.prepareStatement(
                      "DELETE FROM active_tickets WHERE ticket_id = ?")) {
                 
                 stmt.setString(1, ticketId);
                 stmt.executeUpdate();
             }
+            
+            // Mark the bay as free in the Bay class
+          
         } catch (SQLException e) {
             System.err.println("Error clearing active ticket by ticket ID: " + e.getMessage());
             e.printStackTrace();

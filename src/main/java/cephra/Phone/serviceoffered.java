@@ -238,6 +238,14 @@ public class serviceoffered extends javax.swing.JPanel {
                 "Battery Full", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+        
+        // Check if fast charging bays are available
+        if (!cephra.Admin.Bay.isFastChargingAvailable()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Fast charging is currently unavailable. Please try normal charging or try again later.",
+                "Fast Charging Unavailable", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
        
        // Set Fast Charging service before switching to QueueTicket panel
        cephra.Phone.QueueFlow.setCurrentServiceOnly("Fast Charging");
@@ -277,6 +285,14 @@ public class serviceoffered extends javax.swing.JPanel {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "Your battery is already 100%.",
                 "Battery Full", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        // Check if normal charging bays are available
+        if (!cephra.Admin.Bay.isNormalChargingAvailable()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Normal charging is currently unavailable. Please try fast charging or try again later.",
+                "Normal Charging Unavailable", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
         
