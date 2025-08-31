@@ -38,6 +38,26 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         });
         
+        // Initially disable profRemove and passReset buttons
+        profRemove.setEnabled(false);
+        passReset.setEnabled(false);
+        
+        // Add table selection listener to enable/disable buttons
+        staffTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = staffTable.getSelectedRow();
+                boolean hasSelection = selectedRow != -1;
+                profRemove.setEnabled(hasSelection);
+                passReset.setEnabled(hasSelection);
+            }
+        });
+        
+        // Add action listener to profRemove button
+        profRemove.addActionListener(evt -> removeSelectedStaff());
+        
+        // Add action listener to passReset button
+        passReset.addActionListener(evt -> resetSelectedStaffPassword());
+        
         refreshStaffTable();
     }
 
@@ -197,7 +217,9 @@ public class StaffRecord extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        // Get the logged-in username from the Admin frame
+        String username = getLoggedInUsername();
+        labelStaff.setText(username + "!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -300,6 +322,92 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         }
     }
+    
+    private void resetSelectedStaffPassword() {
+        int selectedRow = staffTable.getSelectedRow();
+        if (selectedRow == -1) {
+            return; // No row selected
+        }
+        
+        // Get the staff name and username from the selected row
+        String staffName = (String) staffTable.getValueAt(selectedRow, 0);
+        String staffUsername = (String) staffTable.getValueAt(selectedRow, 1);
+        
+        // Show confirmation dialog
+        int result = javax.swing.JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to reset the password for this staff member?\n\nName: " + staffName + "\nUsername: " + staffUsername + "\n\nPassword will be reset to: 123456",
+            "Confirm Password Reset",
+            javax.swing.JOptionPane.YES_NO_OPTION,
+            javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+        
+        if (result == javax.swing.JOptionPane.YES_OPTION) {
+            // Reset password in database
+            boolean reset = cephra.CephraDB.resetStaffPassword(staffUsername, "123456");
+            if (reset) {
+                javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Password reset successfully!\n\nNew password: 123456\n\nPlease inform the staff member to change their password after login.",
+                    "Success",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE
+                );
+                // Refresh the table to show updated data
+                refreshStaffTable();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Error resetting password!",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+    
+    private void removeSelectedStaff() {
+        int selectedRow = staffTable.getSelectedRow();
+        if (selectedRow == -1) {
+            return; // No row selected
+        }
+        
+        // Get the staff name from the selected row
+        String staffName = (String) staffTable.getValueAt(selectedRow, 0);
+        String staffUsername = (String) staffTable.getValueAt(selectedRow, 1);
+        
+        // Show confirmation dialog
+        int result = javax.swing.JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to remove this account?\n\nName: " + staffName + "\nUsername: " + staffUsername,
+            "Confirm Staff Removal",
+            javax.swing.JOptionPane.YES_NO_OPTION,
+            javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+        
+        if (result == javax.swing.JOptionPane.YES_OPTION) {
+            // Remove from database
+            boolean removed = cephra.CephraDB.removeStaff(staffUsername);
+            if (removed) {
+                javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Staff account removed successfully!",
+                    "Success",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE
+                );
+                // Refresh the table
+                refreshStaffTable();
+                // Disable the button since no row is selected
+                profRemove.setEnabled(false);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Error removing staff account!",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BTNsearch;
@@ -319,4 +427,19 @@ public class StaffRecord extends javax.swing.JPanel {
     private javax.swing.JTextField search;
     private javax.swing.JTable staffTable;
     // End of variables declaration//GEN-END:variables
+    
+    private String getLoggedInUsername() {
+        try {
+            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+            if (window instanceof cephra.Frame.Admin) {
+                // Use reflection to get the loggedInUsername field
+                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
+                usernameField.setAccessible(true);
+                return (String) usernameField.get(window);
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting logged-in username: " + e.getMessage());
+        }
+        return "Admin"; // Fallback
+    }
 }

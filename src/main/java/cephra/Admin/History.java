@@ -154,7 +154,9 @@ public class History extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        // Get the logged-in username from the Admin frame
+        String username = getLoggedInUsername();
+        labelStaff.setText(username + "!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -233,4 +235,19 @@ public class History extends javax.swing.JPanel {
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
+    
+    private String getLoggedInUsername() {
+        try {
+            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+            if (window instanceof cephra.Frame.Admin) {
+                // Use reflection to get the loggedInUsername field
+                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
+                usernameField.setAccessible(true);
+                return (String) usernameField.get(window);
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting logged-in username: " + e.getMessage());
+        }
+        return "Admin"; // Fallback
+    }
 }
