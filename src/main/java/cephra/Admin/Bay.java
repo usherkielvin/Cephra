@@ -2,17 +2,60 @@ package cephra.Admin;
 
 import java.awt.Window;
 import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
 
 
 public class Bay extends javax.swing.JPanel {
-
+//
+    // Static variables to track available bays
+    private static boolean[] fastChargingAvailable = {true, true, true}; // Bays 1-3
+    private static boolean[] normalChargingAvailable = {true, true, true, true, true}; // Bays 4-8
+    
+    // Static methods to check availability
+    public static boolean isFastChargingAvailable() {
+        for (boolean available : fastChargingAvailable) {
+            if (available) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isNormalChargingAvailable() {
+        for (boolean available : normalChargingAvailable) {
+            if (available) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static int getAvailableFastChargingCount() {
+        int count = 0;
+        for (boolean available : fastChargingAvailable) {
+            if (available) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public static int getAvailableNormalChargingCount() {
+        int count = 0;
+        for (boolean available : normalChargingAvailable) {
+            if (available) {
+                count++;
+            }
+        }
+        return count;
+    }
   
     public Bay() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         setupDateTimeTimer();
-        
+        //
         // Set default state to Available for all bays after components are initialized
         SwingUtilities.invokeLater(() -> {
             System.out.println("Setting toggle switches to true...");
@@ -306,80 +349,104 @@ public class Bay extends javax.swing.JPanel {
         if (toggleSwitch1.isSelected()) {
             bay1.setText("Available");
             bay1.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            fastChargingAvailable[0] = true;
         } else {
             bay1.setText("Unavailable");
             bay1.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
+            fastChargingAvailable[0] = false;
         }
+        System.out.println("Fast Charging Bays Available: " + getAvailableFastChargingCount());
     }
     
     private void toggleSwitch2PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch2.isSelected()) {
             bay2.setText("Available");
             bay2.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            fastChargingAvailable[1] = true;
         } else {
             bay2.setText("Unavailable");
             bay2.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
+            fastChargingAvailable[1] = false;
         }
+        System.out.println("Fast Charging Bays Available: " + getAvailableFastChargingCount());
     }
     
     private void toggleSwitch3PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch3.isSelected()) {
             bay3.setText("Available");
             bay3.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            fastChargingAvailable[2] = true;
         } else {
             bay3.setText("Unavailable");
             bay3.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
+            fastChargingAvailable[2] = false;
         }
+        System.out.println("Fast Charging Bays Available: " + getAvailableFastChargingCount());
     }
     
     private void toggleSwitch4PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch4.isSelected()) {
             bay4.setText("Available");
             bay4.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            normalChargingAvailable[0] = true;
         } else {
             bay4.setText("Unavailable");
             bay4.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
+            normalChargingAvailable[0] = false;
         }
+        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
     }
     
     private void toggleSwitch5PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch5.isSelected()) {
             bay5.setText("Available");
             bay5.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            normalChargingAvailable[1] = true;
         } else {
             bay5.setText("Unavailable");
             bay5.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
+            normalChargingAvailable[1] = false;
         }
+        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
     }
     
     private void toggleSwitch6PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch6.isSelected()) {
             bay6.setText("Available");
             bay6.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            normalChargingAvailable[2] = true;
         } else {
             bay6.setText("Unavailable");
             bay6.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
+            normalChargingAvailable[2] = false;
         }
+        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
     }
     
     private void toggleSwitch7PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch7.isSelected()) {
             bay7.setText("Available");
             bay7.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            normalChargingAvailable[3] = true;
         } else {
             bay7.setText("Unavailable");
             bay7.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
+            normalChargingAvailable[3] = false;
         }
+        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
     }
     
     private void toggleSwitch8PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch8.isSelected()) {
             bay8.setText("Available");
             bay8.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            normalChargingAvailable[4] = true;
         } else {
             bay8.setText("Unavailable");
             bay8.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
+            normalChargingAvailable[4] = false;
         }
+        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
     }
     
     private void setupDateTimeTimer() {
