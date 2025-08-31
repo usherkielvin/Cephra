@@ -36,6 +36,7 @@ public class AdminRegister extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
+        username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 usernameActionPerformed(evt);
