@@ -10,6 +10,7 @@ public class Dashboard extends javax.swing.JPanel {
     // Variables to store spinner values
     private int Min = 50; // Default minimum fee
     private int RPH = 15; // Default rate per hour
+    private double fastMultiplier = 1.25; // Fast charging gets 25% premium
 
     public Dashboard() {
         initComponents();
@@ -25,11 +26,15 @@ public class Dashboard extends javax.swing.JPanel {
             }
         });
         
-
+        // Load saved settings from database
+        loadSettingsFromDatabase();
         
         // Configure spinners with SpinnerNumberModel to prevent negative values
         MinfeeSpinner.setModel(new javax.swing.SpinnerNumberModel(Min, 0, Integer.MAX_VALUE, 1));
         RPHSpinner.setModel(new javax.swing.SpinnerNumberModel(RPH, 0, Integer.MAX_VALUE, 1));
+        
+        // Add fast multiplier spinner (percentage increase for fast charging)
+        FastMultiplierSpinner.setModel(new javax.swing.SpinnerNumberModel(fastMultiplier, 1.0, 3.0, 0.05));
         
         // Add change listeners to automatically save spinner values
         MinfeeSpinner.addChangeListener(e -> {
@@ -38,6 +43,10 @@ public class Dashboard extends javax.swing.JPanel {
         
         RPHSpinner.addChangeListener(e -> {
             RPH = (Integer) RPHSpinner.getValue();
+        });
+        
+        FastMultiplierSpinner.addChangeListener(e -> {
+            fastMultiplier = (Double) FastMultiplierSpinner.getValue();
         });
 
         // --- TOGGLE SWITCH SETUP ---
@@ -73,8 +82,10 @@ public class Dashboard extends javax.swing.JPanel {
         datetime = new javax.swing.JLabel();
         MinfeeSpinner = new javax.swing.JSpinner();
         RPHSpinner = new javax.swing.JSpinner();
+        FastMultiplierSpinner = new javax.swing.JSpinner();
         Saveminfee = new javax.swing.JButton();
         Saverateperhour = new javax.swing.JButton();
+        SaveFastMultiplier = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -165,6 +176,12 @@ public class Dashboard extends javax.swing.JPanel {
         add(RPHSpinner);
         RPHSpinner.setBounds(600, 508, 300, 40);
 
+        FastMultiplierSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
+        FastMultiplierSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));
+        FastMultiplierSpinner.setValue(1.25);
+        add(FastMultiplierSpinner);
+        FastMultiplierSpinner.setBounds(120, 650, 300, 40);
+
         Saveminfee.setBorderPainted(false);
         Saveminfee.setContentAreaFilled(false);
         Saveminfee.setFocusPainted(false);
@@ -186,6 +203,17 @@ public class Dashboard extends javax.swing.JPanel {
         });
         add(Saverateperhour);
         Saverateperhour.setBounds(610, 560, 290, 40);
+
+        SaveFastMultiplier.setBorderPainted(false);
+        SaveFastMultiplier.setContentAreaFilled(false);
+        SaveFastMultiplier.setFocusPainted(false);
+        SaveFastMultiplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveFastMultiplierActionPerformed(evt);
+            }
+        });
+        add(SaveFastMultiplier);
+        SaveFastMultiplier.setBounds(120, 690, 290, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -232,17 +260,46 @@ public class Dashboard extends javax.swing.JPanel {
     }//GEN-LAST:event_exitloginActionPerformed
 
     private void SaveminfeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveminfeeActionPerformed
-          Min = (Integer) MinfeeSpinner.getValue();
-        javax.swing.JOptionPane.showMessageDialog(this, "Minimum fee saved: " + Min);
+        Min = (Integer) MinfeeSpinner.getValue();
         
-        
+        // Save to database
+        boolean saved = cephra.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(Min));
+        if (saved) {
+            // Update QueueBridge with new minimum fee
+            cephra.Admin.QueueBridge.setMinimumFee(Min);
+            javax.swing.JOptionPane.showMessageDialog(this, "Minimum fee saved: ₱" + Min);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error saving minimum fee!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_SaveminfeeActionPerformed
 
     private void SaverateperhourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaverateperhourActionPerformed
-       
-         RPH = (Integer) RPHSpinner.getValue();
-        javax.swing.JOptionPane.showMessageDialog(this, "Rate per hour saved: " + RPH);
+        RPH = (Integer) RPHSpinner.getValue();
+        
+        // Save to database
+        boolean saved = cephra.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RPH));
+        if (saved) {
+            // Update QueueBridge with new rate
+            cephra.Admin.QueueBridge.setRatePerKWh(RPH);
+            javax.swing.JOptionPane.showMessageDialog(this, "Rate per kWh saved: ₱" + RPH);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error saving rate per kWh!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_SaverateperhourActionPerformed
+
+    private void SaveFastMultiplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveFastMultiplierActionPerformed
+        fastMultiplier = (Double) FastMultiplierSpinner.getValue();
+        
+        // Save to database
+        boolean saved = cephra.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(fastMultiplier));
+        if (saved) {
+            // Update QueueBridge with new fast multiplier
+            cephra.Admin.QueueBridge.setFastMultiplier(fastMultiplier);
+            javax.swing.JOptionPane.showMessageDialog(this, "Fast charging multiplier saved: " + String.format("%.0f%%", (fastMultiplier - 1) * 100));
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error saving fast multiplier!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_SaveFastMultiplierActionPerformed
 
     private void dashboardTogglePropertyChange(java.beans.PropertyChangeEvent evt) {
         // Functionality when the dashboard toggle is switched
@@ -259,8 +316,10 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JButton Baybutton;
     private javax.swing.JSpinner MinfeeSpinner;
     private javax.swing.JSpinner RPHSpinner;
+    private javax.swing.JSpinner FastMultiplierSpinner;
     private javax.swing.JButton Saveminfee;
     private javax.swing.JButton Saverateperhour;
+    private javax.swing.JButton SaveFastMultiplier;
     private javax.swing.JLabel datetime;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
@@ -318,6 +377,52 @@ public class Dashboard extends javax.swing.JPanel {
         String date = dateFormat.format(now);
         
         datetime.setText(time + " " + date);
+    }
+    
+    private void loadSettingsFromDatabase() {
+        try {
+            // Load minimum fee from database
+            String minFeeStr = cephra.CephraDB.getSystemSetting("minimum_fee");
+            if (minFeeStr != null && !minFeeStr.trim().isEmpty()) {
+                Min = Integer.parseInt(minFeeStr);
+                System.out.println("Dashboard: Loaded minimum fee from database: ₱" + Min);
+            } else {
+                // Set default if not found in database
+                cephra.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(Min));
+                System.out.println("Dashboard: Set default minimum fee: ₱" + Min);
+            }
+            
+            // Load rate per kWh from database
+            String rateStr = cephra.CephraDB.getSystemSetting("rate_per_kwh");
+            if (rateStr != null && !rateStr.trim().isEmpty()) {
+                RPH = Integer.parseInt(rateStr);
+                System.out.println("Dashboard: Loaded rate per kWh from database: ₱" + RPH);
+            } else {
+                // Set default if not found in database
+                cephra.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RPH));
+                System.out.println("Dashboard: Set default rate per kWh: ₱" + RPH);
+            }
+            
+            // Load fast multiplier from database
+            String multiplierStr = cephra.CephraDB.getSystemSetting("fast_multiplier");
+            if (multiplierStr != null && !multiplierStr.trim().isEmpty()) {
+                fastMultiplier = Double.parseDouble(multiplierStr);
+                System.out.println("Dashboard: Loaded fast multiplier from database: " + String.format("%.0f%%", (fastMultiplier - 1) * 100));
+            } else {
+                // Set default if not found in database
+                cephra.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(fastMultiplier));
+                System.out.println("Dashboard: Set default fast multiplier: " + String.format("%.0f%%", (fastMultiplier - 1) * 100));
+            }
+            
+            // Update QueueBridge with loaded values
+            cephra.Admin.QueueBridge.setMinimumFee(Min);
+            cephra.Admin.QueueBridge.setRatePerKWh(RPH);
+            cephra.Admin.QueueBridge.setFastMultiplier(fastMultiplier);
+            
+        } catch (Exception e) {
+            System.err.println("Dashboard: Error loading settings from database: " + e.getMessage());
+            // Keep default values if there's an error
+        }
     }
     
 
