@@ -25,7 +25,6 @@ public class StaffRecord extends javax.swing.JPanel {
         
         JTableHeader header = staffTable.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
-        cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) staffTable.getModel());
         
        BTNsearch.addActionListener(evt -> searchStaff());
         refreshStaffTable();
@@ -273,7 +272,7 @@ public class StaffRecord extends javax.swing.JPanel {
             return;
         } 
         
-        for (String[] staff : StaffData.staffList) {
+        for (String[] staff : StaffData.getStaffList()) {
             String name = staff[0];
             if (name.toLowerCase().contains(keyword)) {
                 model.addRow(new Object[]{staff[0], staff[1], staff[2], staff[3], staff[4]});

@@ -985,6 +985,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         ));
         queTab.setGridColor(new java.awt.Color(0, 0, 0));
+        queTab.getTableHeader().setResizingAllowed(false);
+        queTab.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(queTab);
 
         panelLists.add(jScrollPane1);

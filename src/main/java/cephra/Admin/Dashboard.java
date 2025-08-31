@@ -33,9 +33,6 @@ public class Dashboard extends javax.swing.JPanel {
         MinfeeSpinner.setModel(new javax.swing.SpinnerNumberModel(Min, 0, Integer.MAX_VALUE, 1));
         RPHSpinner.setModel(new javax.swing.SpinnerNumberModel(RPH, 0, Integer.MAX_VALUE, 1));
         
-        // Add fast multiplier spinner (percentage increase for fast charging)
-        FastMultiplierSpinner.setModel(new javax.swing.SpinnerNumberModel(fastMultiplier, 1.0, 3.0, 0.05));
-        
         // Add change listeners to automatically save spinner values
         MinfeeSpinner.addChangeListener(e -> {
             Min = (Integer) MinfeeSpinner.getValue();
@@ -43,10 +40,6 @@ public class Dashboard extends javax.swing.JPanel {
         
         RPHSpinner.addChangeListener(e -> {
             RPH = (Integer) RPHSpinner.getValue();
-        });
-        
-        FastMultiplierSpinner.addChangeListener(e -> {
-            fastMultiplier = (Double) FastMultiplierSpinner.getValue();
         });
 
         // --- TOGGLE SWITCH SETUP ---
@@ -61,12 +54,14 @@ public class Dashboard extends javax.swing.JPanel {
         
         //Spinner setHorizontalAlignment
         JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) MinfeeSpinner.getEditor();
-        JFormattedTextField textfield = editor.getTextField();
+        javax.swing.JFormattedTextField textfield = editor.getTextField();
         textfield.setHorizontalAlignment(JTextField.CENTER);
         
         JSpinner.DefaultEditor editor1 = (JSpinner.DefaultEditor) RPHSpinner.getEditor();
-        JFormattedTextField textfield1 = editor1.getTextField();
+        javax.swing.JFormattedTextField textfield1 = editor1.getTextField();
         textfield1.setHorizontalAlignment(JTextField.CENTER);
+        
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -114,6 +109,8 @@ public class Dashboard extends javax.swing.JPanel {
         RPHSpinner.setValue(15);
         add(RPHSpinner);
         RPHSpinner.setBounds(600, 508, 300, 40);
+
+
 
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
@@ -209,6 +206,18 @@ public class Dashboard extends javax.swing.JPanel {
         });
         add(Saverateperhour);
         Saverateperhour.setBounds(610, 560, 290, 40);
+
+        SaveFastMultiplier = new javax.swing.JButton();
+        SaveFastMultiplier.setBorderPainted(false);
+        SaveFastMultiplier.setContentAreaFilled(false);
+        SaveFastMultiplier.setFocusPainted(false);
+        SaveFastMultiplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveFastMultiplierActionPerformed(evt);
+            }
+        });
+        add(SaveFastMultiplier);
+        SaveFastMultiplier.setBounds(120, 620, 290, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -314,6 +323,7 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JSpinner FastMultiplierSpinner;
     private javax.swing.JButton Saveminfee;
     private javax.swing.JButton Saverateperhour;
+    private javax.swing.JButton SaveFastMultiplier;
     private javax.swing.JLabel datetime;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
