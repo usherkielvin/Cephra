@@ -1,6 +1,7 @@
 package cephra.Admin;
 
 import javax.swing.*;
+import java.util.List;
 
 public class Dashboard extends javax.swing.JPanel {
 
@@ -28,6 +29,9 @@ public class Dashboard extends javax.swing.JPanel {
         // Load saved settings from database
         loadSettingsFromDatabase();
         
+        // Load dashboard statistics
+        loadDashboardStats();
+        
         // Configure spinners with SpinnerNumberModel to prevent negative values
         MinfeeSpinner.setModel(new javax.swing.SpinnerNumberModel(Min, 0, Integer.MAX_VALUE, 1));
         RPHSpinner.setModel(new javax.swing.SpinnerNumberModel(RPH, 0, Integer.MAX_VALUE, 1));
@@ -39,6 +43,25 @@ public class Dashboard extends javax.swing.JPanel {
         
         RPHSpinner.addChangeListener(e -> {
             RPH = (Integer) RPHSpinner.getValue();
+        });
+        
+        // Add Enter key listeners to save values when Enter is pressed
+        MinfeeSpinner.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    SaveminfeeActionPerformed(null);
+                }
+            }
+        });
+        
+        RPHSpinner.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    SaverateperhourActionPerformed(null);
+                }
+            }
         });
 
 
@@ -60,8 +83,8 @@ public class Dashboard extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        totalsessions1 = new javax.swing.JLabel();
-        totalsessions = new javax.swing.JLabel();
+        earnings = new javax.swing.JLabel();
+        totalcharge = new javax.swing.JLabel();
         MinfeeSpinner = new javax.swing.JSpinner();
         RPHSpinner = new javax.swing.JSpinner();
         staffbutton = new javax.swing.JButton();
@@ -72,6 +95,8 @@ public class Dashboard extends javax.swing.JPanel {
         datetimeStaff = new javax.swing.JLabel();
         Saveminfee = new javax.swing.JButton();
         Saverateperhour = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        labelStaff = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -79,15 +104,15 @@ public class Dashboard extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
-        totalsessions1.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
-        totalsessions1.setText("₱6,789");
-        add(totalsessions1);
-        totalsessions1.setBounds(650, 220, 310, 120);
+        earnings.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
+        earnings.setText("₱6,789");
+        add(earnings);
+        earnings.setBounds(650, 220, 310, 120);
 
-        totalsessions.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
-        totalsessions.setText("31");
-        add(totalsessions);
-        totalsessions.setBounds(240, 220, 160, 120);
+        totalcharge.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
+        totalcharge.setText("31");
+        add(totalcharge);
+        totalcharge.setBounds(240, 220, 160, 120);
 
         MinfeeSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         MinfeeSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));
@@ -100,8 +125,6 @@ public class Dashboard extends javax.swing.JPanel {
         RPHSpinner.setValue(15);
         add(RPHSpinner);
         RPHSpinner.setBounds(600, 508, 300, 40);
-
-
 
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
@@ -186,7 +209,17 @@ public class Dashboard extends javax.swing.JPanel {
         add(Saverateperhour);
         Saverateperhour.setBounds(610, 560, 290, 40);
 
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Hello,");
+        add(jLabel3);
+        jLabel3.setBounds(820, 10, 50, 30);
 
+        labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        labelStaff.setForeground(new java.awt.Color(255, 255, 255));
+        labelStaff.setText("Admin!");
+        add(labelStaff);
+        labelStaff.setBounds(870, 10, 70, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -271,6 +304,7 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JButton Saveminfee;
     private javax.swing.JButton Saverateperhour;
     private javax.swing.JLabel datetimeStaff;
+    private javax.swing.JLabel earnings;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
@@ -278,8 +312,7 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JLabel labelStaff;
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
-    private javax.swing.JLabel totalsessions;
-    private javax.swing.JLabel totalsessions1;
+    private javax.swing.JLabel totalcharge;
     // End of variables declaration//GEN-END:variables
 
    
@@ -378,6 +411,40 @@ public class Dashboard extends javax.swing.JPanel {
         } catch (Exception e) {
             System.err.println("Dashboard: Error loading settings from database: " + e.getMessage());
             // Keep default values if there's an error
+        }
+    }
+    
+    private void loadDashboardStats() {
+        try {
+            // Get all charging history records
+            List<Object[]> historyRecords = cephra.CephraDB.getAllChargingHistory();
+            
+            // Calculate total charge sessions count
+            int totalSessions = historyRecords.size();
+            totalcharge.setText(String.valueOf(totalSessions));
+            System.out.println("Dashboard: Loaded total charge sessions: " + totalSessions);
+            
+            // Calculate total earnings from all records
+            double totalEarnings = 0.0;
+            for (Object[] record : historyRecords) {
+                // Total amount is at index 5 in the history record
+                if (record[5] != null) {
+                    try {
+                        totalEarnings += Double.parseDouble(record[5].toString());
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error parsing amount: " + record[5]);
+                    }
+                }
+            }
+            
+            earnings.setText("₱" + String.format("%,.0f", totalEarnings));
+            System.out.println("Dashboard: Loaded total earnings: ₱" + totalEarnings);
+            
+        } catch (Exception e) {
+            System.err.println("Dashboard: Error loading dashboard stats: " + e.getMessage());
+            // Set default values if there's an error
+            totalcharge.setText("0");
+            earnings.setText("₱0");
         }
     }
     
