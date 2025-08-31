@@ -16,6 +16,7 @@ public class History extends javax.swing.JPanel {
         setSize(1000, 750);
         // Register history table model so other modules can add rows
         jtableDesign.apply(jTable1);
+        jtableDesign.makeScrollPaneTransparent(jScrollPane1);
   
         
         JTableHeader header = jTable1.getTableHeader();
@@ -47,6 +48,8 @@ public class History extends javax.swing.JPanel {
         add(datetime);
         datetime.setBounds(820, 40, 170, 20);
 
+        jTable1.setBackground(new java.awt.Color(204, 204, 204));
+        jTable1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
@@ -80,7 +83,7 @@ public class History extends javax.swing.JPanel {
         }
 
         add(jScrollPane1);
-        jScrollPane1.setBounds(20, 160, 970, 600);
+        jScrollPane1.setBounds(15, 150, 980, 600);
 
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
