@@ -13,6 +13,12 @@ public final class QueueBridge {
     // Configurable billing settings (central source of truth)
     private static volatile double RATE_PER_KWH = 15.0; // pesos per kWh
     private static volatile double MINIMUM_FEE = 50.0;   // pesos
+    private static volatile double FAST_MULTIPLIER = 1.25; // Fast charging gets 25% premium
+    
+    // Static initialization block to load settings from database
+    static {
+        loadSettingsFromDatabase();
+    }
 
     // Configurable charging speed (minutes per 1% charge)
     private static volatile double MINS_PER_PERCENT_FAST = 0.8;   // Fast charge
@@ -155,11 +161,20 @@ public final class QueueBridge {
                 info = new BatteryInfo(18, 40.0); // fallback default
             }
         }
+        
+        // Get service type to determine pricing
+        String serviceType = getTicketService(ticket);
+        double multiplier = 1.0; // Default multiplier for normal charging
+        
+        if (serviceType != null && serviceType.toLowerCase().contains("fast")) {
+            multiplier = FAST_MULTIPLIER; // Apply fast charging premium
+        }
+        
         int start = Math.max(0, Math.min(100, info.initialPercent));
         double usedFraction = (100.0 - start) / 100.0;
         double energyKWh = usedFraction * info.capacityKWh;
-        double gross = energyKWh * RATE_PER_KWH;
-        return Math.max(gross, MINIMUM_FEE);
+        double gross = energyKWh * RATE_PER_KWH * multiplier; // Apply service multiplier
+        return Math.max(gross, MINIMUM_FEE * multiplier); // Apply multiplier to minimum fee too
     }
     
     /** Helper method to get customer name from ticket */
@@ -254,15 +269,21 @@ public final class QueueBridge {
                 double totalAmount = computeAmountDue(ticket);
                 
                 // Use a single database transaction to ensure consistency
+                System.out.println("QueueBridge: About to process payment transaction for ticket " + ticket + 
+                                 ", customer: " + customerName + ", service: " + serviceName + 
+                                 ", amount: " + totalAmount + ", method: " + paymentMethod);
                 boolean dbSuccess = cephra.CephraDB.processPaymentTransaction(
                     ticket, customerName, serviceName, initialBatteryLevel, 
                     chargingTimeMinutes, totalAmount, paymentMethod, referenceNumber
                 );
+                System.out.println("QueueBridge: Payment transaction result for ticket " + ticket + ": " + dbSuccess);
                 
                 if (dbSuccess) {
-                    // Clear the active ticket and charge battery to full when payment is completed
-                    cephra.CephraDB.clearActiveTicket(customerName);
-                    cephra.CephraDB.chargeUserBatteryToFull(customerName);
+                    // Note: processPaymentTransaction already handles:
+                    // - Battery update to 100%
+                    // - Ticket removal from queue
+                    // - Active ticket clearing
+                    // - History addition
                     
                     System.out.println("QueueBridge: " + paymentMethod + " payment completed for ticket " + ticket + 
                                      ", amount: ₱" + totalAmount + ", reference: " + referenceNumber);
@@ -408,6 +429,58 @@ public final class QueueBridge {
 
     public static double getMinimumFee() {
         return MINIMUM_FEE;
+    }
+    
+    public static void setFastMultiplier(double multiplier) {
+        if (multiplier >= 1.0) {
+            FAST_MULTIPLIER = multiplier;
+        }
+    }
+    
+    public static double getFastMultiplier() {
+        return FAST_MULTIPLIER;
+    }
+    
+    // Load settings from database
+    private static void loadSettingsFromDatabase() {
+        try {
+            // Load minimum fee from database
+            String minFeeStr = cephra.CephraDB.getSystemSetting("minimum_fee");
+            if (minFeeStr != null && !minFeeStr.trim().isEmpty()) {
+                MINIMUM_FEE = Double.parseDouble(minFeeStr);
+                System.out.println("QueueBridge: Loaded minimum fee from database: ₱" + MINIMUM_FEE);
+            } else {
+                // Set default if not found in database
+                cephra.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(MINIMUM_FEE));
+                System.out.println("QueueBridge: Set default minimum fee: ₱" + MINIMUM_FEE);
+            }
+            
+            // Load rate per kWh from database
+            String rateStr = cephra.CephraDB.getSystemSetting("rate_per_kwh");
+            if (rateStr != null && !rateStr.trim().isEmpty()) {
+                RATE_PER_KWH = Double.parseDouble(rateStr);
+                System.out.println("QueueBridge: Loaded rate per kWh from database: ₱" + RATE_PER_KWH);
+            } else {
+                // Set default if not found in database
+                cephra.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RATE_PER_KWH));
+                System.out.println("QueueBridge: Set default rate per kWh: ₱" + RATE_PER_KWH);
+            }
+            
+            // Load fast multiplier from database
+            String multiplierStr = cephra.CephraDB.getSystemSetting("fast_multiplier");
+            if (multiplierStr != null && !multiplierStr.trim().isEmpty()) {
+                FAST_MULTIPLIER = Double.parseDouble(multiplierStr);
+                System.out.println("QueueBridge: Loaded fast multiplier from database: " + String.format("%.0f%%", (FAST_MULTIPLIER - 1) * 100));
+            } else {
+                // Set default if not found in database
+                cephra.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(FAST_MULTIPLIER));
+                System.out.println("QueueBridge: Set default fast multiplier: " + String.format("%.0f%%", (FAST_MULTIPLIER - 1) * 100));
+            }
+            
+        } catch (Exception e) {
+            System.err.println("QueueBridge: Error loading settings from database: " + e.getMessage());
+            // Keep default values if there's an error
+        }
     }
     
 

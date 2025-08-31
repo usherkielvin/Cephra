@@ -23,6 +23,8 @@ public class home extends javax.swing.JPanel {
                 LoggedName.setText("Hi " + safeUser + "!");
             }
         }
+        
+
     }
 
     private void makeDraggable() {

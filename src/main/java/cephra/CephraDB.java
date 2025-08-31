@@ -58,6 +58,9 @@ public class CephraDB {
             // Clean up any existing duplicate battery level entries
             cleanupDuplicateBatteryLevels();
             
+            // Also clean up duplicates for all users to prevent future issues
+            cleanupAllDuplicateBatteryLevels();
+            
             // Clean up any orphaned queue tickets (tickets in queue but already in history)
             cleanupOrphanedQueueTickets();
             
@@ -287,59 +290,55 @@ public class CephraDB {
     public static int getUserBatteryLevel(String username) {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT battery_level FROM battery_levels WHERE username = ?")) {
+                     "SELECT battery_level FROM battery_levels WHERE username = ? ORDER BY id DESC LIMIT 1")) {
             
             stmt.setString(1, username);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("battery_level");
-                } else {
-                    // Generate random battery level (15-50%) for new users
-                    Random random = new Random();
-                    int batteryLevel = 15 + random.nextInt(36); // 15 to 50
-                    
-                    // Insert the new battery level with both battery_level and initial_battery_level
-                    try (PreparedStatement insertStmt = conn.prepareStatement(
-                            "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, ?, ?, ?) " +
-                            "ON DUPLICATE KEY UPDATE battery_level = ?, initial_battery_level = ?, battery_capacity_kwh = ?")) {
-                        
-                        insertStmt.setString(1, username);
-                        insertStmt.setInt(2, batteryLevel);
-                        insertStmt.setInt(3, batteryLevel); // initial_battery_level same as current
-                        insertStmt.setDouble(4, 40.0); // default battery capacity
-                        insertStmt.setInt(5, batteryLevel);
-                        insertStmt.setInt(6, batteryLevel);
-                        insertStmt.setDouble(7, 40.0);
-                        insertStmt.executeUpdate();
-                    }
-                    
+                    // Return the most recent stored battery level (no randomization)
+                    int batteryLevel = rs.getInt("battery_level");
+                    System.out.println("CephraDB: Retrieved battery level for " + username + ": " + batteryLevel + "%");
                     return batteryLevel;
+                } else {
+                    // No battery level found - return -1 to indicate no battery initialized yet
+                    System.out.println("CephraDB: No battery level found for " + username + " - returning -1");
+                    return -1;
                 }
             }
         } catch (SQLException e) {
             System.err.println("Error getting battery level: " + e.getMessage());
             e.printStackTrace();
-            // Return a default value in case of error
-            return 15;
+            // Return -1 to indicate no battery initialized
+            return -1;
         }
     }
     
     public static void setUserBatteryLevel(String username, int batteryLevel) {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, ?, ?, ?) " +
-                     "ON DUPLICATE KEY UPDATE battery_level = ?, initial_battery_level = ?, battery_capacity_kwh = ?")) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First, delete ALL existing battery level entries for this user
+            try (PreparedStatement deleteStmt = conn.prepareStatement(
+                    "DELETE FROM battery_levels WHERE username = ?")) {
+                
+                deleteStmt.setString(1, username);
+                int deletedRows = deleteStmt.executeUpdate();
+                if (deletedRows > 0) {
+                    System.out.println("CephraDB: Deleted " + deletedRows + " old battery level entries for " + username);
+                }
+            }
             
-            stmt.setString(1, username);
-            stmt.setInt(2, batteryLevel);
-            stmt.setInt(3, batteryLevel); // initial_battery_level same as current
-            stmt.setDouble(4, 40.0); // default battery capacity
-            stmt.setInt(5, batteryLevel);
-            stmt.setInt(6, batteryLevel);
-            stmt.setDouble(7, 40.0);
-            
-            stmt.executeUpdate();
+            // Then insert the new battery level entry
+            try (PreparedStatement insertStmt = conn.prepareStatement(
+                    "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, ?, ?, ?)")) {
+                
+                insertStmt.setString(1, username);
+                insertStmt.setInt(2, batteryLevel);
+                insertStmt.setInt(3, batteryLevel); // initial_battery_level same as current
+                insertStmt.setDouble(4, 40.0); // default battery capacity
+                
+                int rowsAffected = insertStmt.executeUpdate();
+                System.out.println("CephraDB: Set new battery level for " + username + " to " + batteryLevel + "% (rows affected: " + rowsAffected + ")");
+            }
             
         } catch (SQLException e) {
             System.err.println("Error setting battery level: " + e.getMessage());
@@ -349,6 +348,42 @@ public class CephraDB {
     
     public static void chargeUserBatteryToFull(String username) {
         setUserBatteryLevel(username, 100);
+    }
+    
+    // Method to check for duplicate battery level entries for a user
+    public static void checkDuplicateBatteryLevels(String username) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT COUNT(*) FROM battery_levels WHERE username = ?")) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    if (count > 1) {
+                        System.err.println("CephraDB: WARNING - Found " + count + " battery level entries for user " + username);
+                        
+                        // Show all entries for this user
+                        try (PreparedStatement detailStmt = conn.prepareStatement(
+                                "SELECT id, battery_level, initial_battery_level FROM battery_levels WHERE username = ? ORDER BY id")) {
+                            detailStmt.setString(1, username);
+                            try (ResultSet detailRs = detailStmt.executeQuery()) {
+                                while (detailRs.next()) {
+                                    System.err.println("CephraDB: Entry ID " + detailRs.getInt("id") + 
+                                                     " - battery_level: " + detailRs.getInt("battery_level") + 
+                                                     "%, initial_battery_level: " + detailRs.getInt("initial_battery_level") + "%");
+                                }
+                            }
+                        }
+                    } else {
+                        System.out.println("CephraDB: Found " + count + " battery level entry for user " + username);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking duplicate battery levels: " + e.getMessage());
+        }
     }
     
     // Method to clean up duplicate battery level entries
@@ -368,6 +403,31 @@ public class CephraDB {
             }
         } catch (SQLException e) {
             System.err.println("Error cleaning up duplicate battery levels: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    // Method to clean up all duplicate battery level entries for all users
+    public static void cleanupAllDuplicateBatteryLevels() {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // Keep only the most recent battery level entry for each user
+            String cleanupSQL = 
+                "DELETE b1 FROM battery_levels b1 " +
+                "LEFT JOIN (" +
+                "    SELECT username, MAX(id) as max_id " +
+                "    FROM battery_levels " +
+                "    GROUP BY username" +
+                ") b2 ON b1.username = b2.username AND b1.id = b2.max_id " +
+                "WHERE b2.max_id IS NULL";
+            
+            try (PreparedStatement stmt = conn.prepareStatement(cleanupSQL)) {
+                int deletedRows = stmt.executeUpdate();
+                if (deletedRows > 0) {
+                    System.out.println("Cleaned up " + deletedRows + " old duplicate battery level entries for all users");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error cleaning up all duplicate battery levels: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -967,6 +1027,41 @@ public class CephraDB {
                 stmt.executeUpdate(); // Don't fail if no active ticket exists
             }
             
+            // 3.6. Remove ticket from queue_tickets table (move to history)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "DELETE FROM queue_tickets WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("CephraDB: Removed ticket " + ticketId + " from queue_tickets table (moved to history)");
+                }
+            }
+            
+            // 3.7. Update user's battery level to 100% when charging is completed
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE battery_levels SET battery_level = 100 WHERE username = ?")) {
+                
+                stmt.setString(1, username);
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("CephraDB: Updated battery level to 100% for user " + username + " after charging completion");
+                } else {
+                    // If no battery level record exists, create one with 100%
+                    try (PreparedStatement insertStmt = conn.prepareStatement(
+                            "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, 100, 100, 40.0)")) {
+                        
+                        insertStmt.setString(1, username);
+                        insertStmt.executeUpdate();
+                        System.out.println("CephraDB: Created battery level record with 100% for user " + username + " after charging completion");
+                    }
+                }
+                
+                // Verify the battery level was updated correctly
+                int verifyBattery = getUserBatteryLevel(username);
+                System.out.println("CephraDB: Verified battery level after update: " + verifyBattery + "% for user " + username);
+            }
+            
             // 4. Add to admin history (if HistoryBridge is available)
             try {
                 // Get the actual admin username who is currently logged in
@@ -993,6 +1088,20 @@ public class CephraDB {
             conn.commit(); // Commit transaction
             System.out.println("CephraDB: Successfully committed payment transaction for ticket " + ticketId);
             
+            // Verify that the ticket was added to charging history
+            try (PreparedStatement verifyStmt = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM charging_history WHERE ticket_id = ?")) {
+                verifyStmt.setString(1, ticketId);
+                try (ResultSet rs = verifyStmt.executeQuery()) {
+                    if (rs.next()) {
+                        int count = rs.getInt(1);
+                        System.out.println("CephraDB: Verification - ticket " + ticketId + " found in charging_history: " + count + " records");
+                    }
+                }
+            } catch (Exception verifyEx) {
+                System.err.println("CephraDB: Error verifying ticket in charging_history: " + verifyEx.getMessage());
+            }
+            
             // Notify phone history that a new entry has been added
             try {
                 cephra.Phone.UserHistoryManager.notifyHistoryUpdate(username);
@@ -1007,6 +1116,45 @@ public class CephraDB {
                 System.out.println("CephraDB: Refreshed admin history table after payment completion");
             } catch (Exception e) {
                 System.err.println("CephraDB: Error refreshing admin history table: " + e.getMessage());
+            }
+            
+            // Refresh Porsche screen to show updated 100% battery level
+            try {
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    java.awt.Window[] windows = java.awt.Window.getWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof cephra.Frame.Phone) {
+                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                            if (phoneFrame.isVisible()) {
+                                java.awt.Component[] components = phoneFrame.getContentPane().getComponents();
+                                for (java.awt.Component comp : components) {
+                                    if (comp instanceof cephra.Phone.PorscheTaycan) {
+                                        cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) comp;
+                                        porschePanel.refreshBatteryDisplay();
+                                        System.out.println("CephraDB: Refreshed Porsche screen to show 100% battery for user " + username);
+                                        return;
+                                    }
+                                }
+                                
+                                // If PorscheTaycan is not found in current components, try to find it recursively
+                                try {
+                                    java.awt.Component currentPanel = findPorscheTaycanPanel(phoneFrame.getContentPane());
+                                    if (currentPanel instanceof cephra.Phone.PorscheTaycan) {
+                                        cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) currentPanel;
+                                        porschePanel.refreshBatteryDisplay();
+                                        System.out.println("CephraDB: Refreshed Porsche screen (found recursively) to show 100% battery for user " + username);
+                                        return;
+                                    }
+                                } catch (Exception panelEx) {
+                                    System.err.println("CephraDB: Could not refresh current panel: " + panelEx.getMessage());
+                                }
+                            }
+                        }
+                    }
+                    System.out.println("CephraDB: Porsche screen not found for refresh - user may not be on Porsche screen");
+                });
+            } catch (Exception e) {
+                System.err.println("CephraDB: Error refreshing Porsche screen: " + e.getMessage());
             }
             
             return true;
@@ -1259,6 +1407,22 @@ public class CephraDB {
         } catch (SQLException e) {
             System.err.println("Error cleaning up admin from users table: " + e.getMessage());
         }
+    }
+    
+    // Helper method to find PorscheTaycan panel recursively in a container
+    private static java.awt.Component findPorscheTaycanPanel(java.awt.Container container) {
+        for (java.awt.Component comp : container.getComponents()) {
+            if (comp instanceof cephra.Phone.PorscheTaycan) {
+                return comp;
+            }
+            if (comp instanceof java.awt.Container) {
+                java.awt.Component found = findPorscheTaycanPanel((java.awt.Container) comp);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
     
     // Method to validate and ensure database integrity

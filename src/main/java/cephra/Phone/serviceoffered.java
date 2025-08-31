@@ -234,7 +234,7 @@ public class serviceoffered extends javax.swing.JPanel {
         int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
         if (batteryLevel >= 100) {
             javax.swing.JOptionPane.showMessageDialog(this,
-                "Your battery is already 100%. Charging is not available.",
+                "Your battery is already 100%.",
                 "Battery Full", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -260,7 +260,7 @@ public class serviceoffered extends javax.swing.JPanel {
         String username = cephra.CephraDB.getCurrentUsername();
         if (cephra.CephraDB.hasActiveTicket(username)) {
             javax.swing.JOptionPane.showMessageDialog(this, 
-                "You already have an active charging ticket. Please complete your current session first.", 
+                "You already have an active charging ticket.", 
                 "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -275,7 +275,7 @@ public class serviceoffered extends javax.swing.JPanel {
         int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
         if (batteryLevel >= 100) {
             javax.swing.JOptionPane.showMessageDialog(this,
-                "Your battery is already 100%. Charging is not available.",
+                "Your battery is already 100%.",
                 "Battery Full", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -310,6 +310,12 @@ public class serviceoffered extends javax.swing.JPanel {
         // Always keep buttons enabled; gating is handled in action listeners with dialogs
         fastcharge.setEnabled(true);
         normalcharge.setEnabled(true);
+        
+        // Reset button appearance to normal
+        fastcharge.setBackground(null);
+        normalcharge.setBackground(null);
+        fastcharge.setForeground(java.awt.Color.WHITE);
+        normalcharge.setForeground(java.awt.Color.WHITE);
         
         // No tooltips to avoid gray hints
         fastcharge.setToolTipText(null);

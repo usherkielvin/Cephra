@@ -10,19 +10,32 @@ public class link extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         setupLabelPosition(); // Set label position
+        
+        // Check if car is already linked and user has a battery level
         if (cephra.Phone.AppState.isCarLinked) {
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    java.awt.Window[] windows = java.awt.Window.getWindows();
-                    for (java.awt.Window window : windows) {
-                        if (window instanceof cephra.Frame.Phone) {
-                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            phoneFrame.switchPanel(new cephra.Phone.PorscheTaycan());
-                            break;
-                        }
+            try {
+                String username = cephra.CephraDB.getCurrentUsername();
+                if (username != null && !username.isEmpty()) {
+                    int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+                    if (batteryLevel != -1) {
+                        // Car is linked and battery is initialized - go to Porsche
+                        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                java.awt.Window[] windows = java.awt.Window.getWindows();
+                                for (java.awt.Window window : windows) {
+                                    if (window instanceof cephra.Frame.Phone) {
+                                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                                        phoneFrame.switchPanel(new cephra.Phone.PorscheTaycan());
+                                        break;
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
-            });
+            } catch (Exception e) {
+                System.err.println("Error checking battery level in link constructor: " + e.getMessage());
+            }
         }
     }
 
@@ -195,11 +208,25 @@ public class link extends javax.swing.JPanel {
                 // Generate and set battery level for current user when linking car
                 String username = cephra.CephraDB.getCurrentUsername();
                 if (username != null && !username.isEmpty()) {
-                    // Generate random battery level (15-50%) for the user
-                    java.util.Random random = new java.util.Random();
-                    int batteryLevel = 15 + random.nextInt(36); // 15 to 50
-                    cephra.CephraDB.setUserBatteryLevel(username, batteryLevel);
-                    System.out.println("LinkCar: Set battery level for " + username + " to " + batteryLevel + "%");
+                            // Initialize battery to random level (15-50%) only if not already initialized
+        int currentBattery = cephra.CephraDB.getUserBatteryLevel(username);
+        if (currentBattery == -1) {
+            // No battery initialized yet - create new random battery
+            java.util.Random random = new java.util.Random();
+            int batteryLevel = 15 + random.nextInt(36); // 15 to 50
+            cephra.CephraDB.setUserBatteryLevel(username, batteryLevel);
+            System.out.println("Link: Initialized battery level for " + username + " to " + batteryLevel + "% when linking car");
+                } else {
+            // Battery already exists - keep the current level
+            System.out.println("Link: Battery level for " + username + " already exists: " + currentBattery + "% - keeping current level");
+        }
+                    
+                    // Ensure database update is complete before switching panels
+                    try {
+                        Thread.sleep(100); // Small delay to ensure database update is complete
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
                 
                 cephra.Phone.AppState.isCarLinked = true;
@@ -207,8 +234,8 @@ public class link extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        // Go directly to serviceoffered so buttons refresh and become clickable
-                        phoneFrame.switchPanel(new cephra.Phone.serviceoffered());
+                        // Go directly to PorscheTaycan instead of serviceoffered
+                        phoneFrame.switchPanel(new cephra.Phone.PorscheTaycan());
                         break;
                     }
                 }

@@ -17,6 +17,9 @@ public class History extends javax.swing.JPanel {
         // Register history table model so other modules can add rows
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
+        
+        // Hide the vertical scrollbar on the history table
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
   
         
         JTableHeader header = jTable1.getTableHeader();
