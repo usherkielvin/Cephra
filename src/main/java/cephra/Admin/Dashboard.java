@@ -1,6 +1,6 @@
 package cephra.Admin;
 
-import java.awt.Color;
+import javax.swing.*;
 
 public class Dashboard extends javax.swing.JPanel {
 
