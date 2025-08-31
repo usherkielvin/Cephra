@@ -5,8 +5,13 @@ import java.awt.Window;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.*; // Add this import
+import javax.swing.Timer;
 
 public class Login extends javax.swing.JPanel {
+    private int loginAttempts = 0;
+    private final int MAX_ATTEMPTS = 3;
+    private Timer cooldownTimer;
+    private int cooldownSeconds = 30;
 
     public Login() {
         initComponents();
@@ -25,6 +30,10 @@ public class Login extends javax.swing.JPanel {
         See.setBorderPainted(false);
         See.setOpaque(false);
         See.setContentAreaFilled(false);
+        
+        // Initialize cooldown label
+        cooldownLabel.setForeground(Color.RED);
+        cooldownLabel.setVisible(false);
 
         // --- INTEGRATED FILTERS ---
         ((AbstractDocument) userfield.getDocument()).setDocumentFilter(new InputLimitFilter(15, true));
@@ -41,6 +50,7 @@ public class Login extends javax.swing.JPanel {
         passfield = new javax.swing.JPasswordField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        cooldownLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -112,6 +122,10 @@ public class Login extends javax.swing.JPanel {
         });
         add(jButton2);
         jButton2.setBounds(935, 10, 50, 40);
+
+        cooldownLabel.setText("Cooldown");
+        add(cooldownLabel);
+        cooldownLabel.setBounds(490, 480, 110, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
@@ -191,6 +205,12 @@ public class Login extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void attemptLogin() {
+    // Check if in cooldown period
+    if (cooldownTimer != null && cooldownTimer.isRunning()) {
+        JOptionPane.showMessageDialog(this, "Please wait for the cooldown period to end.", "Login Locked", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
     String username = userfield.getText() != null ? userfield.getText().trim() : "";
     String password = new String(passfield.getPassword());
 
@@ -209,21 +229,71 @@ public class Login extends javax.swing.JPanel {
 
     // Validate staff login using the database
     if (cephra.CephraDB.validateStaffLogin(username, password)) {
+        // Reset login attempts on successful login
+        loginAttempts = 0;
         java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
         if (window instanceof cephra.Frame.Admin) {
             cephra.Frame.Admin mainFrame = (cephra.Frame.Admin) window;
             mainFrame.switchPanel(new cephra.Admin.Dashboard());
         }
     } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Invalid staff credentials. Please check your username and password.", "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+        // Increment failed login attempts
+        loginAttempts++;
+        
+        if (loginAttempts >= MAX_ATTEMPTS) {
+            // Start cooldown timer
+            startCooldownTimer();
+            JOptionPane.showMessageDialog(this, "Too many failed login attempts. Please wait 30 seconds before trying again.", 
+                "Login Locked", JOptionPane.ERROR_MESSAGE);
+        } else {
+            // Show warning with remaining attempts
+            int remainingAttempts = MAX_ATTEMPTS - loginAttempts;
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Invalid staff credentials. You have " + remainingAttempts + " attempts remaining.", 
+                "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+        
         passfield.setText(""); // Clear password field
         userfield.requestFocusInWindow(); // Refocus on username field
     }
 }
 
+private void startCooldownTimer() {
+    // Disable login components
+    loginbutton.setEnabled(false);
+    userfield.setEnabled(false);
+    passfield.setEnabled(false);
+    
+    // Reset cooldown seconds
+    cooldownSeconds = 30;
+    
+    // Update and show cooldown label
+    cooldownLabel.setText("Cooldown: " + cooldownSeconds + "s");
+    cooldownLabel.setVisible(true);
+    
+    // Create and start the timer
+    cooldownTimer = new Timer(1000, e -> {
+        cooldownSeconds--;
+        cooldownLabel.setText("Cooldown: " + cooldownSeconds + "s");
+        
+        if (cooldownSeconds <= 0) {
+            // Time's up, stop the timer and reset
+            ((Timer)e.getSource()).stop();
+            loginAttempts = 0;
+            cooldownLabel.setVisible(false);
+            loginbutton.setEnabled(true);
+            userfield.setEnabled(true);
+            passfield.setEnabled(true);
+        }
+    });
+    
+    cooldownTimer.start();
+}
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
+    private javax.swing.JLabel cooldownLabel;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
@@ -231,6 +301,8 @@ public class Login extends javax.swing.JPanel {
     private javax.swing.JPasswordField passfield;
     private javax.swing.JTextField userfield;
     // End of variables declaration//GEN-END:variables
+    
+  
 
     // Add this inner class at the end of your Login class (before the last closing brace)
     private static class InputLimitFilter extends DocumentFilter {

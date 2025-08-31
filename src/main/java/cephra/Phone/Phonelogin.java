@@ -6,8 +6,11 @@ import javax.swing.text.*; // Add this import
 
 public class Phonelogin extends javax.swing.JPanel {
    private int loginAttempts = 0;
-    private final int MAX_ATTEMPTS = 3;
-    public Phonelogin() {
+   private final int MAX_ATTEMPTS = 3;
+   private Timer cooldownTimer;
+   private int cooldownSeconds = 30;
+   
+   public Phonelogin() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
@@ -15,15 +18,19 @@ public class Phonelogin extends javax.swing.JPanel {
         username.setBackground(new Color(0, 0, 0, 0));
         pass.setOpaque(false);
         pass.setBackground(new Color(0, 0, 0, 0));
-       See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
 
         // --- INTEGRATED FILTERS ---
         ((AbstractDocument) username.getDocument()).setDocumentFilter(new InputLimitFilter(15, true));
         ((AbstractDocument) pass.getDocument()).setDocumentFilter(new InputLimitFilter(15, false));
         
-         See.setBorderPainted(false);
+        See.setBorderPainted(false);
         See.setOpaque(false);
         See.setContentAreaFilled(false);
+        
+        // Initialize cooldown label
+        cooldownLabel.setForeground(Color.RED);
+        cooldownLabel.setVisible(false);
 
         // Restore hover underline on Register and Forgot Password
         addUnderlineOnHover(reghere);
@@ -39,6 +46,7 @@ public class Phonelogin extends javax.swing.JPanel {
         pass = new javax.swing.JPasswordField();
         username = new javax.swing.JTextField();
         loginhome = new javax.swing.JButton();
+        cooldownLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
@@ -118,6 +126,10 @@ public class Phonelogin extends javax.swing.JPanel {
         add(loginhome);
         loginhome.setBounds(80, 570, 220, 40);
 
+        cooldownLabel.setText("Cooldown");
+        add(cooldownLabel);
+        cooldownLabel.setBounds(240, 460, 80, 30);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/login1.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
@@ -136,12 +148,12 @@ public class Phonelogin extends javax.swing.JPanel {
     }//GEN-LAST:event_loginhomeActionPerformed
 
      private void attemptLogin() {
-        // Check if login attempts are exhausted
-        if (loginAttempts >= MAX_ATTEMPTS) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Too many failed login attempts. Please use the 'Forgot Password' option.", "Login Disabled", javax.swing.JOptionPane.ERROR_MESSAGE);
+        // Check if in cooldown period
+        if (cooldownTimer != null && cooldownTimer.isRunning()) {
+            JOptionPane.showMessageDialog(this, "Please wait for the cooldown period to end.", "Login Locked", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
+        
         String usernameText = username.getText() != null ? username.getText().trim() : "";
         String password = new String(pass.getPassword());
 
@@ -164,16 +176,55 @@ public class Phonelogin extends javax.swing.JPanel {
         } else {
             // Login failed, increment attempts
             loginAttempts++;
-            int remainingAttempts = MAX_ATTEMPTS - loginAttempts;
-            if (remainingAttempts > 0) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials. You have " + remainingAttempts + " attempts remaining.", "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+            
+            if (loginAttempts >= MAX_ATTEMPTS) {
+                // Start cooldown timer
+                startCooldownTimer();
+                JOptionPane.showMessageDialog(this, "Too many failed login attempts. Please wait 30 seconds before trying again.", 
+                    "Login Locked", JOptionPane.ERROR_MESSAGE);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials. Too many failed attempts. The login button has been disabled.", "Login Disabled", javax.swing.JOptionPane.ERROR_MESSAGE);
-                loginhome.setEnabled(false); // Disable the login button
+                // Show warning with remaining attempts
+                int remainingAttempts = MAX_ATTEMPTS - loginAttempts;
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Invalid credentials. You have " + remainingAttempts + " attempts remaining.", 
+                    "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
             }
+            
             pass.setText(""); // Clear password field
             username.requestFocusInWindow(); // Refocus on username field
         }
+    }
+    
+    private void startCooldownTimer() {
+        // Disable login components
+        loginhome.setEnabled(false);
+        username.setEnabled(false);
+        pass.setEnabled(false);
+        
+        // Reset cooldown seconds
+        cooldownSeconds = 30;
+        
+        // Update and show cooldown label
+        cooldownLabel.setText("Cooldown: " + cooldownSeconds + "s");
+        cooldownLabel.setVisible(true);
+        
+        // Create and start the timer
+        cooldownTimer = new Timer(1000, e -> {
+            cooldownSeconds--;
+            cooldownLabel.setText("Cooldown: " + cooldownSeconds + "s");
+            
+            if (cooldownSeconds <= 0) {
+                // Time's up, stop the timer and reset
+                ((Timer)e.getSource()).stop();
+                loginAttempts = 0;
+                cooldownLabel.setVisible(false);
+                loginhome.setEnabled(true);
+                username.setEnabled(true);
+                pass.setEnabled(true);
+            }
+        });
+        
+        cooldownTimer.start();
     }
 
     private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed
@@ -270,6 +321,7 @@ public class Phonelogin extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
+    private javax.swing.JLabel cooldownLabel;
     private javax.swing.JButton forgotpass;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginhome;
@@ -277,6 +329,8 @@ public class Phonelogin extends javax.swing.JPanel {
     private javax.swing.JButton reghere;
     private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
+    
+  
 
     // Add underline on hover for link-like buttons
     private void addUnderlineOnHover(final javax.swing.JButton button) {
