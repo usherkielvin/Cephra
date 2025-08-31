@@ -849,6 +849,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         normalcharge4 = new javax.swing.JButton();
         normalcharge5 = new javax.swing.JButton();
         queIcon = new javax.swing.JLabel();
+        datetimeStaff = new javax.swing.JLabel();
+        labelStaff = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         MainIcon = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -1191,6 +1194,24 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         add(jTabbedPane1);
         jTabbedPane1.setBounds(0, 40, 1020, 710);
 
+        datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));
+        datetimeStaff.setText("10:44 AM 17 August, Sunday");
+        add(datetimeStaff);
+        datetimeStaff.setBounds(820, 40, 170, 20);
+
+        labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        labelStaff.setForeground(new java.awt.Color(255, 255, 255));
+        labelStaff.setText("Admin!");
+        add(labelStaff);
+        labelStaff.setBounds(870, 10, 70, 30);
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Hello,");
+        add(jLabel3);
+        jLabel3.setBounds(820, 10, 50, 30);
+
         MainIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Tab Pane.png"))); // NOI18N
         add(MainIcon);
         MainIcon.setBounds(0, -10, 1000, 770);
@@ -1275,6 +1296,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JLabel Paid;
     private javax.swing.JLabel Waitings;
     private javax.swing.JButton businessbutton;
+    private javax.swing.JLabel datetimeStaff;
     private javax.swing.JButton exitlogin;
     private javax.swing.JPanel fastpanel;
     private javax.swing.JButton fastslot1;
@@ -1292,10 +1314,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel labelStaff;
     private javax.swing.JButton normalcharge1;
     private javax.swing.JButton normalcharge2;
     private javax.swing.JButton normalcharge3;

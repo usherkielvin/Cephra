@@ -53,14 +53,6 @@ public class Bay extends javax.swing.JPanel {
         bay2 = new javax.swing.JLabel();
         bay1 = new javax.swing.JLabel();
         datetime = new javax.swing.JLabel();
-        toggleSwitch1 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch2 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch3 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch4 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch5 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch6 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch7 = new cephra.Admin.ToggleSwitch();
-        toggleSwitch8 = new cephra.Admin.ToggleSwitch();
         quebutton = new javax.swing.JButton();
         staffbutton = new javax.swing.JButton();
         businessbutton = new javax.swing.JButton();
@@ -71,49 +63,41 @@ public class Bay extends javax.swing.JPanel {
         setLayout(null);
 
         bay8.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bay8.setForeground(new java.awt.Color(0, 0, 0));
         bay8.setText("Available");
         add(bay8);
-        bay8.setBounds(400, 680, 150, 32);
+        bay8.setBounds(400, 645, 150, 32);
 
         bay7.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bay7.setForeground(new java.awt.Color(0, 0, 0));
         bay7.setText("Available");
         add(bay7);
-        bay7.setBounds(100, 680, 150, 32);
+        bay7.setBounds(100, 645, 150, 32);
 
         bay6.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bay6.setForeground(new java.awt.Color(0, 0, 0));
         bay6.setText("Available");
         add(bay6);
-        bay6.setBounds(720, 480, 150, 32);
+        bay6.setBounds(720, 460, 150, 32);
 
         bay5.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bay5.setForeground(new java.awt.Color(0, 0, 0));
         bay5.setText("Available");
         add(bay5);
-        bay5.setBounds(400, 480, 150, 32);
+        bay5.setBounds(400, 460, 150, 32);
 
         bay4.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bay4.setForeground(new java.awt.Color(0, 0, 0));
         bay4.setText("Available");
         add(bay4);
-        bay4.setBounds(100, 480, 150, 32);
+        bay4.setBounds(100, 460, 150, 32);
 
         bay3.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bay3.setForeground(new java.awt.Color(0, 0, 0));
         bay3.setText("Available");
         add(bay3);
         bay3.setBounds(730, 270, 150, 32);
 
         bay2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bay2.setForeground(new java.awt.Color(0, 0, 0));
         bay2.setText("Available");
         add(bay2);
         bay2.setBounds(410, 270, 150, 32);
 
         bay1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bay1.setForeground(new java.awt.Color(0, 0, 0));
         bay1.setText("Available");
         add(bay1);
         bay1.setBounds(100, 270, 150, 32);
@@ -123,71 +107,6 @@ public class Bay extends javax.swing.JPanel {
         datetime.setText("10:44 AM 17 August, Sunday");
         add(datetime);
         datetime.setBounds(820, 40, 170, 20);
-        
-        // Add toggle switches to the right of each bay label
-        add(toggleSwitch1);
-        toggleSwitch1.setBounds(260, 270, 60, 30);
-        toggleSwitch1.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch1PropertyChange(evt);
-            }
-        });
-        
-        add(toggleSwitch2);
-        toggleSwitch2.setBounds(570, 270, 60, 30);
-        toggleSwitch2.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch2PropertyChange(evt);
-            }
-        });
-        
-        add(toggleSwitch3);
-        toggleSwitch3.setBounds(890, 270, 60, 30);
-        toggleSwitch3.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch3PropertyChange(evt);
-            }
-        });
-        
-        add(toggleSwitch4);
-        toggleSwitch4.setBounds(260, 480, 60, 30);
-        toggleSwitch4.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch4PropertyChange(evt);
-            }
-        });
-        
-        add(toggleSwitch5);
-        toggleSwitch5.setBounds(570, 480, 60, 30);
-        toggleSwitch5.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch5PropertyChange(evt);
-            }
-        });
-        
-        add(toggleSwitch6);
-        toggleSwitch6.setBounds(890, 480, 60, 30);
-        toggleSwitch6.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch6PropertyChange(evt);
-            }
-        });
-        
-        add(toggleSwitch7);
-        toggleSwitch7.setBounds(260, 680, 60, 30);
-        toggleSwitch7.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch7PropertyChange(evt);
-            }
-        });
-        
-        add(toggleSwitch8);
-        toggleSwitch8.setBounds(570, 680, 60, 30);
-        toggleSwitch8.addPropertyChangeListener("selected", new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                toggleSwitch8PropertyChange(evt);
-            }
-        });
 
         quebutton.setBorder(null);
         quebutton.setBorderPainted(false);
@@ -247,6 +166,86 @@ public class Bay extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Bay.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
+
+        toggleSwitch1 = new cephra.Admin.ToggleSwitch();
+        add(toggleSwitch1);
+        toggleSwitch1.setBounds(260, 270, 60, 30);
+
+        toggleSwitch2 = new cephra.Admin.ToggleSwitch();
+        add(toggleSwitch2);
+        toggleSwitch2.setBounds(570, 270, 60, 30);
+
+        toggleSwitch3 = new cephra.Admin.ToggleSwitch();
+        add(toggleSwitch3);
+        toggleSwitch3.setBounds(890, 270, 60, 30);
+
+        toggleSwitch4 = new cephra.Admin.ToggleSwitch();
+        add(toggleSwitch4);
+        toggleSwitch4.setBounds(260, 460, 60, 30);
+
+        toggleSwitch5 = new cephra.Admin.ToggleSwitch();
+        add(toggleSwitch5);
+        toggleSwitch5.setBounds(560, 460, 60, 30);
+
+        toggleSwitch6 = new cephra.Admin.ToggleSwitch();
+        add(toggleSwitch6);
+        toggleSwitch6.setBounds(880, 460, 60, 30);
+
+        toggleSwitch7 = new cephra.Admin.ToggleSwitch();
+        add(toggleSwitch7);
+        toggleSwitch7.setBounds(260, 645, 60, 30);
+
+        toggleSwitch8 = new cephra.Admin.ToggleSwitch();
+        add(toggleSwitch8);
+        toggleSwitch8.setBounds(560, 645, 60, 30);
+
+        toggleSwitch1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch1PropertyChange(evt);
+            }
+        });
+
+        toggleSwitch2.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch2PropertyChange(evt);
+            }
+        });
+
+        toggleSwitch3.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch3PropertyChange(evt);
+            }
+        });
+
+        toggleSwitch4.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch4PropertyChange(evt);
+            }
+        });
+
+        toggleSwitch5.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch5PropertyChange(evt);
+            }
+        });
+
+        toggleSwitch6.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch6PropertyChange(evt);
+            }
+        });
+
+        toggleSwitch7.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch7PropertyChange(evt);
+            }
+        });
+
+        toggleSwitch8.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch8PropertyChange(evt);
+            }
+        });
     }// </editor-fold>//GEN-END:initComponents
 
     private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quebuttonActionPerformed
