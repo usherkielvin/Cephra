@@ -232,18 +232,5 @@ public class History extends javax.swing.JPanel {
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
     
-    private String getLoggedInUsername() {
-        try {
-            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-            if (window instanceof cephra.Frame.Admin) {
-                // Use reflection to get the loggedInUsername field
-                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
-                usernameField.setAccessible(true);
-                return (String) usernameField.get(window);
-            }
-        } catch (Exception e) {
-            System.err.println("Error getting logged-in username: " + e.getMessage());
-        }
-        return "Admin"; // Fallback
-    }
+
 }
