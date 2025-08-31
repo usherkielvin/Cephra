@@ -14,7 +14,8 @@ public class Queue extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);       
- 
+        setupDateTimeTimer();    
+        
         jtableDesign.apply(queTab);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
  
@@ -842,6 +843,28 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             updateStatusCounters();
         }
     }
+    
+     private void setupDateTimeTimer() {
+        updateDateTime();
+        javax.swing.Timer timer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                updateDateTime();
+            }
+        });
+        timer.start();
+    }
+    
+    private void updateDateTime() {
+        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd MMMM, EEEE");
+        
+        java.util.Date now = new java.util.Date();
+        String time = timeFormat.format(now);
+        String date = dateFormat.format(now);
+        
+        datetimeStaff.setText(time + " " + date);
+    }
 
 
 
@@ -959,19 +982,19 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         Paid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Paid.setText("5");
         panelLists.add(Paid);
-        Paid.setBounds(50, 500, 120, 70);
+        Paid.setBounds(50, 530, 120, 70);
 
         Waitings.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Waitings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Waitings.setText("4");
         panelLists.add(Waitings);
-        Waitings.setBounds(50, 170, 120, 70);
+        Waitings.setBounds(50, 165, 120, 70);
 
         Charging.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Charging.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Charging.setText("4");
         panelLists.add(Charging);
-        Charging.setBounds(50, 310, 120, 70);
+        Charging.setBounds(50, 350, 120, 70);
 
         queTab.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -990,11 +1013,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jScrollPane1.setViewportView(queTab);
 
         panelLists.add(jScrollPane1);
-        jScrollPane1.setBounds(210, 90, 750, 550);
+        jScrollPane1.setBounds(210, 90, 785, 580);
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/QUEUEtable.png"))); // NOI18N
         panelLists.add(jLabel2);
-        jLabel2.setBounds(0, -80, 1010, 780);
+        jLabel2.setBounds(0, -90, 1010, 790);
 
         jTabbedPane1.addTab("Queue Lists", panelLists);
 
@@ -1231,7 +1254,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jTabbedPane1.addTab("Queue Control", ControlPanel);
 
         add(jTabbedPane1);
-        jTabbedPane1.setBounds(0, 40, 1020, 710);
+        jTabbedPane1.setBounds(0, 50, 1020, 700);
 
         datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));

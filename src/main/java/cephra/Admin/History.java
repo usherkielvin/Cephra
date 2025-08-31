@@ -14,6 +14,7 @@ public class History extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
+        setupDateTimeTimer();
         // Register history table model so other modules can add rows
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
@@ -197,6 +198,27 @@ public class History extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_exitloginActionPerformed
 
+     private void setupDateTimeTimer() {
+        updateDateTime();
+        javax.swing.Timer timer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                updateDateTime();
+            }
+        });
+        timer.start();
+    }
+    
+    private void updateDateTime() {
+        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd MMMM, EEEE");
+        
+        java.util.Date now = new java.util.Date();
+        String time = timeFormat.format(now);
+        String date = dateFormat.format(now);
+        
+        datetime.setText(time + " " + date);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
