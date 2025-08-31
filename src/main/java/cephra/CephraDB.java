@@ -61,6 +61,9 @@ public class CephraDB {
             // Clean up any orphaned queue tickets (tickets in queue but already in history)
             cleanupOrphanedQueueTickets();
             
+            // Clean up admin users from users table (they should be in staff_records)
+            cleanupAdminFromUsersTable();
+            
             // Verify database connection and basic functionality
             verifyDatabaseConnection(conn);
             
@@ -1155,10 +1158,15 @@ public class CephraDB {
                 }
             }
             
-            // Check if admin user exists, create if not
-            if (!userExists("admin")) {
-                System.out.println("Creating default admin user...");
-                addUser("admin", "admin@cephra.com", "1234");
+            // Check if admin staff exists in staff_records, create if not
+            try (PreparedStatement checkStmt = conn.prepareStatement(
+                    "SELECT username FROM staff_records WHERE username = 'admin'")) {
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (!rs.next()) {
+                        System.out.println("Creating default admin staff...");
+                        addStaff("Admin User", "admin", "admin@cephra.com", "admin123");
+                    }
+                }
             }
             
         } catch (SQLException e) {
@@ -1198,6 +1206,58 @@ public class CephraDB {
             }
         } catch (SQLException e) {
             System.err.println("Error cleaning up orphaned queue tickets: " + e.getMessage());
+        }
+    }
+    
+    // Method to clean up admin users from users table (they should be in staff_records)
+    private static void cleanupAdminFromUsersTable() {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // Remove admin and testuser from users table
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "DELETE FROM users WHERE username IN ('admin', 'testuser')")) {
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Cleaned up " + rowsAffected + " admin/testuser entries from users table.");
+                }
+            }
+            
+            // Also remove any admin users with old password (1234) from staff_records
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "DELETE FROM staff_records WHERE username = 'admin' AND password = '1234'")) {
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Cleaned up " + rowsAffected + " admin entries with old password from staff_records.");
+                }
+            }
+            
+            // Ensure admin exists in staff_records with correct password
+            try (PreparedStatement checkStmt = conn.prepareStatement(
+                    "SELECT username FROM staff_records WHERE username = 'admin' AND password = 'admin123'")) {
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (!rs.next()) {
+                        // Admin doesn't exist with correct password, create it
+                        try (PreparedStatement insertStmt = conn.prepareStatement(
+                                "INSERT INTO staff_records (name, username, email, status, password) VALUES (?, ?, ?, ?, ?)")) {
+                            
+                            insertStmt.setString(1, "Admin User");
+                            insertStmt.setString(2, "admin");
+                            insertStmt.setString(3, "admin@cephra.com");
+                            insertStmt.setString(4, "Active");
+                            insertStmt.setString(5, "admin123");
+                            
+                            int rowsAffected = insertStmt.executeUpdate();
+                            if (rowsAffected > 0) {
+                                System.out.println("Created admin user with correct password in staff_records.");
+                            }
+                        }
+                    }
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error cleaning up admin from users table: " + e.getMessage());
         }
     }
     
