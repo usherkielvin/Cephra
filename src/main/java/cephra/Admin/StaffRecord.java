@@ -159,6 +159,9 @@ public class StaffRecord extends javax.swing.JPanel {
                 "Name", "Username", "Email", "Status", "Password"
             }
         ));
+        staffTable.setOpaque(false);
+        staffTable.getTableHeader().setResizingAllowed(false);
+        staffTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(staffTable);
 
         add(jScrollPane1);
