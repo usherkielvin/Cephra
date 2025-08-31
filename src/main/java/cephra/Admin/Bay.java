@@ -80,32 +80,34 @@ public class Bay extends javax.swing.JPanel {
         setSize(1000, 750);
         setupDateTimeTimer();
         
-        // Load toggle states from database or static variables
-        loadToggleStates();
-        
-        // Load toggle states from static variables
+        // Set default state to Available for all bays after components are initialized
         SwingUtilities.invokeLater(() -> {
-            System.out.println("Setting toggle UI states...");
+            System.out.println("Setting toggle switches to true...");
+            toggleSwitch1.setSelected(true);
+            toggleSwitch2.setSelected(true);
+            toggleSwitch3.setSelected(true);
+            toggleSwitch4.setSelected(true);
+            toggleSwitch5.setSelected(true);
+            toggleSwitch6.setSelected(true);
+            toggleSwitch7.setSelected(true);
+            toggleSwitch8.setSelected(true);
             
-            // Set toggle switches based on availability
-            toggleSwitch1.setSelected(fastChargingAvailable[0]);
-            toggleSwitch2.setSelected(fastChargingAvailable[1]);
-            toggleSwitch3.setSelected(fastChargingAvailable[2]);
-            toggleSwitch4.setSelected(normalChargingAvailable[0]);
-            toggleSwitch5.setSelected(normalChargingAvailable[1]);
-            toggleSwitch6.setSelected(normalChargingAvailable[2]);
-            toggleSwitch7.setSelected(normalChargingAvailable[3]);
-            toggleSwitch8.setSelected(normalChargingAvailable[4]);
-            
-            // Update bay labels based on toggle state
-            updateBayLabel(bay1, fastChargingAvailable[0]);
-            updateBayLabel(bay2, fastChargingAvailable[1]);
-            updateBayLabel(bay3, fastChargingAvailable[2]);
-            updateBayLabel(bay4, normalChargingAvailable[0]);
-            updateBayLabel(bay5, normalChargingAvailable[1]);
-            updateBayLabel(bay6, normalChargingAvailable[2]);
-            updateBayLabel(bay7, normalChargingAvailable[3]);
-            updateBayLabel(bay8, normalChargingAvailable[4]);
+            bay1.setText("Available");
+            bay1.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            bay2.setText("Available");
+            bay2.setForeground(new java.awt.Color(0, 128, 0));
+            bay3.setText("Available");
+            bay3.setForeground(new java.awt.Color(0, 128, 0));
+            bay4.setText("Available");
+            bay4.setForeground(new java.awt.Color(0, 128, 0));
+            bay5.setText("Available");
+            bay5.setForeground(new java.awt.Color(0, 128, 0));
+            bay6.setText("Available");
+            bay6.setForeground(new java.awt.Color(0, 128, 0));
+            bay7.setText("Available");
+            bay7.setForeground(new java.awt.Color(0, 128, 0));
+            bay8.setText("Available");
+            bay8.setForeground(new java.awt.Color(0, 128, 0));
         });
     }
 
@@ -125,8 +127,10 @@ public class Bay extends javax.swing.JPanel {
         quebutton = new javax.swing.JButton();
         staffbutton = new javax.swing.JButton();
         businessbutton = new javax.swing.JButton();
-        exitlogin = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
+        exitlogin = new javax.swing.JButton();
+        labelStaff = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -210,17 +214,6 @@ public class Bay extends javax.swing.JPanel {
         add(businessbutton);
         businessbutton.setBounds(610, 10, 140, 40);
 
-        exitlogin.setBorder(null);
-        exitlogin.setBorderPainted(false);
-        exitlogin.setContentAreaFilled(false);
-        exitlogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitloginActionPerformed(evt);
-            }
-        });
-        add(exitlogin);
-        exitlogin.setBounds(930, 0, 70, 60);
-
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
@@ -232,11 +225,36 @@ public class Bay extends javax.swing.JPanel {
         add(historybutton);
         historybutton.setBounds(430, 10, 60, 40);
 
+        exitlogin.setBorder(null);
+        exitlogin.setBorderPainted(false);
+        exitlogin.setContentAreaFilled(false);
+        exitlogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitloginActionPerformed(evt);
+            }
+        });
+        add(exitlogin);
+        exitlogin.setBounds(930, 0, 70, 60);
+
+        labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        labelStaff.setForeground(new java.awt.Color(255, 255, 255));
+        // Get the logged-in username from the Admin frame
+        String username = getLoggedInUsername();
+        labelStaff.setText(username + "!");
+        add(labelStaff);
+        labelStaff.setBounds(870, 10, 70, 30);
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Hello,");
+        add(jLabel3);
+        jLabel3.setBounds(820, 10, 50, 30);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Bay.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
 
-        toggleSwitch1 = new javax.swing.JToggleButton("ON/OFF");
+        toggleSwitch1 = new cephra.Admin.ToggleSwitch();
         toggleSwitch1.setOpaque(true);
         toggleSwitch1.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch1);
@@ -248,93 +266,86 @@ public class Bay extends javax.swing.JPanel {
         testButton.setBackground(java.awt.Color.RED);
         add(testButton);
 
-        toggleSwitch2 = new javax.swing.JToggleButton("ON/OFF");
+        toggleSwitch2 = new cephra.Admin.ToggleSwitch();
         toggleSwitch2.setOpaque(true);
-        toggleSwitch2.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch2);
         toggleSwitch2.setBounds(570, 270, 60, 30);
 
-        toggleSwitch3 = new javax.swing.JToggleButton("ON/OFF");
+        toggleSwitch3 = new cephra.Admin.ToggleSwitch();
         toggleSwitch3.setOpaque(true);
-        toggleSwitch3.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch3);
         toggleSwitch3.setBounds(890, 270, 60, 30);
 
-        toggleSwitch4 = new javax.swing.JToggleButton("ON/OFF");
+        toggleSwitch4 = new cephra.Admin.ToggleSwitch();
         toggleSwitch4.setOpaque(true);
-        toggleSwitch4.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch4);
         toggleSwitch4.setBounds(260, 460, 60, 30);
 
-        toggleSwitch5 = new javax.swing.JToggleButton("ON/OFF");
+        toggleSwitch5 = new cephra.Admin.ToggleSwitch();
         toggleSwitch5.setOpaque(true);
-        toggleSwitch5.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch5);
         toggleSwitch5.setBounds(560, 460, 60, 30);
 
-        toggleSwitch6 = new javax.swing.JToggleButton("ON/OFF");
+        toggleSwitch6 = new cephra.Admin.ToggleSwitch();
         toggleSwitch6.setOpaque(true);
-        toggleSwitch6.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch6);
         toggleSwitch6.setBounds(880, 460, 60, 30);
 
-        toggleSwitch7 = new javax.swing.JToggleButton("ON/OFF");
+        toggleSwitch7 = new cephra.Admin.ToggleSwitch();
         toggleSwitch7.setOpaque(true);
-        toggleSwitch7.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch7);
         toggleSwitch7.setBounds(260, 645, 60, 30);
 
-        toggleSwitch8 = new javax.swing.JToggleButton("ON/OFF");
+        toggleSwitch8 = new cephra.Admin.ToggleSwitch();
         toggleSwitch8.setOpaque(true);
-        toggleSwitch8.setBackground(new java.awt.Color(255, 255, 255));
         add(toggleSwitch8);
         toggleSwitch8.setBounds(560, 645, 60, 30);
 
-        toggleSwitch1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                toggleSwitch1ActionPerformed(evt);
+        toggleSwitch1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch1PropertyChange(evt);
             }
         });
 
-        toggleSwitch2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                toggleSwitch2ActionPerformed(evt);
+        toggleSwitch2.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch2PropertyChange(evt);
             }
         });
 
-        toggleSwitch3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                toggleSwitch3ActionPerformed(evt);
+        toggleSwitch3.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch3PropertyChange(evt);
             }
         });
 
-        toggleSwitch4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                toggleSwitch4ActionPerformed(evt);
+        toggleSwitch4.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch4PropertyChange(evt);
             }
         });
 
-        toggleSwitch5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                toggleSwitch5ActionPerformed(evt);
+        toggleSwitch5.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch5PropertyChange(evt);
             }
         });
 
-        toggleSwitch6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                toggleSwitch6ActionPerformed(evt);
+        toggleSwitch6.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch6PropertyChange(evt);
             }
         });
 
-        toggleSwitch7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                toggleSwitch7ActionPerformed(evt);
+        toggleSwitch7.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch7PropertyChange(evt);
             }
         });
 
-        toggleSwitch8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                toggleSwitch8ActionPerformed(evt);
+        toggleSwitch8.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                toggleSwitch8PropertyChange(evt);
             }
         });
     }// </editor-fold>//GEN-END:initComponents
@@ -374,103 +385,84 @@ public class Bay extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_exitloginActionPerformed
 
-    // Helper method to update bay label based on availability
-    private void updateBayLabel(javax.swing.JLabel bayLabel, boolean available) {
-        if (!available) {
-            bayLabel.setText("Unavailable");
-            bayLabel.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
-        } else {
-            bayLabel.setText("Available");
-            bayLabel.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
-        }
-    }
-    
-    private void toggleSwitch1ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void toggleSwitch1PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch1.isSelected()) {
-            fastChargingAvailable[0] = true;
+            bay1.setText("Available");
+            bay1.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
         } else {
-            fastChargingAvailable[0] = false;
+            bay1.setText("Unavailable");
+            bay1.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
         }
-        updateBayLabel(bay1, fastChargingAvailable[0]);
-        System.out.println("Fast Charging Bays Available: " + getAvailableFastChargingCount());
-        saveToggleStates();
     }
     
-    private void toggleSwitch2ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void toggleSwitch2PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch2.isSelected()) {
-            fastChargingAvailable[1] = true;
+            bay2.setText("Available");
+            bay2.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
         } else {
-            fastChargingAvailable[1] = false;
+            bay2.setText("Unavailable");
+            bay2.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
         }
-        updateBayLabel(bay2, fastChargingAvailable[1]);
-        System.out.println("Fast Charging Bays Available: " + getAvailableFastChargingCount());
-        saveToggleStates();
     }
     
-    private void toggleSwitch3ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void toggleSwitch3PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch3.isSelected()) {
-            fastChargingAvailable[2] = true;
+            bay3.setText("Available");
+            bay3.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
         } else {
-            fastChargingAvailable[2] = false;
+            bay3.setText("Unavailable");
+            bay3.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
         }
-        updateBayLabel(bay3, fastChargingAvailable[2]);
-        System.out.println("Fast Charging Bays Available: " + getAvailableFastChargingCount());
-        saveToggleStates();
     }
     
-    private void toggleSwitch4ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void toggleSwitch4PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch4.isSelected()) {
-            normalChargingAvailable[0] = true;
+            bay4.setText("Available");
+            bay4.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
         } else {
-            normalChargingAvailable[0] = false;
+            bay4.setText("Unavailable");
+            bay4.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
         }
-        updateBayLabel(bay4, normalChargingAvailable[0]);
-        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
-        saveToggleStates();
     }
     
-    private void toggleSwitch5ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void toggleSwitch5PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch5.isSelected()) {
-            normalChargingAvailable[1] = true;
+            bay5.setText("Available");
+            bay5.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
         } else {
-            normalChargingAvailable[1] = false;
+            bay5.setText("Unavailable");
+            bay5.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
         }
-        updateBayLabel(bay5, normalChargingAvailable[1]);
-        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
-        saveToggleStates();
     }
     
-    private void toggleSwitch6ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void toggleSwitch6PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch6.isSelected()) {
-            normalChargingAvailable[2] = true;
+            bay6.setText("Available");
+            bay6.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
         } else {
-            normalChargingAvailable[2] = false;
+            bay6.setText("Unavailable");
+            bay6.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
         }
-        updateBayLabel(bay6, normalChargingAvailable[2]);
-        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
-        saveToggleStates();
     }
     
-    private void toggleSwitch7ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void toggleSwitch7PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch7.isSelected()) {
-            normalChargingAvailable[3] = true;
+            bay7.setText("Available");
+            bay7.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
         } else {
-            normalChargingAvailable[3] = false;
+            bay7.setText("Unavailable");
+            bay7.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
         }
-        updateBayLabel(bay7, normalChargingAvailable[3]);
-        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
-        saveToggleStates();
     }
     
-    private void toggleSwitch8ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void toggleSwitch8PropertyChange(java.beans.PropertyChangeEvent evt) {
         if (toggleSwitch8.isSelected()) {
-            normalChargingAvailable[4] = true;
+            bay8.setText("Available");
+            bay8.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
         } else {
-            normalChargingAvailable[4] = false;
+            bay8.setText("Unavailable");
+            bay8.setForeground(new java.awt.Color(255, 0, 0)); // Red color for unavailable
         }
-        updateBayLabel(bay8, normalChargingAvailable[4]);
-        System.out.println("Normal Charging Bays Available: " + getAvailableNormalChargingCount());
-        saveToggleStates();
     }
     
     private void setupDateTimeTimer() {
@@ -509,15 +501,32 @@ public class Bay extends javax.swing.JPanel {
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel labelStaff;
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
-    private javax.swing.JToggleButton toggleSwitch1;
-    private javax.swing.JToggleButton toggleSwitch2;
-    private javax.swing.JToggleButton toggleSwitch3;
-    private javax.swing.JToggleButton toggleSwitch4;
-    private javax.swing.JToggleButton toggleSwitch5;
-    private javax.swing.JToggleButton toggleSwitch6;
-    private javax.swing.JToggleButton toggleSwitch7;
-    private javax.swing.JToggleButton toggleSwitch8;
+    private cephra.Admin.ToggleSwitch toggleSwitch1;
+    private cephra.Admin.ToggleSwitch toggleSwitch2;
+    private cephra.Admin.ToggleSwitch toggleSwitch3;
+    private cephra.Admin.ToggleSwitch toggleSwitch4;
+    private cephra.Admin.ToggleSwitch toggleSwitch5;
+    private cephra.Admin.ToggleSwitch toggleSwitch6;
+    private cephra.Admin.ToggleSwitch toggleSwitch7;
+    private cephra.Admin.ToggleSwitch toggleSwitch8;
     // End of variables declaration//GEN-END:variables
+    
+    private String getLoggedInUsername() {
+        try {
+            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+            if (window instanceof cephra.Frame.Admin) {
+                // Use reflection to get the loggedInUsername field
+                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
+                usernameField.setAccessible(true);
+                return (String) usernameField.get(window);
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting logged-in username: " + e.getMessage());
+        }
+        return "Admin"; // Fallback
+    }
 }

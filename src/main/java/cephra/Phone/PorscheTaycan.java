@@ -275,23 +275,6 @@ public class PorscheTaycan extends javax.swing.JPanel {
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                // Check battery level before allowing charging
-                try {
-                    String username = cephra.CephraDB.getCurrentUsername();
-                    if (username != null && !username.isEmpty()) {
-                        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
-                        if (batteryLevel >= 100) {
-                            javax.swing.JOptionPane.showMessageDialog(PorscheTaycan.this,
-                                "Battery is already 100%! Please log out to reset your battery level.",
-                                "Battery Full",
-                                javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                            return;
-                        }
-                    }
-                } catch (Exception e) {
-                    System.err.println("Error checking battery level: " + e.getMessage());
-                }
-                
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {

@@ -14,6 +14,7 @@ public class History extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
+        setupDateTimeTimer();
         // Register history table model so other modules can add rows
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
@@ -153,7 +154,9 @@ public class History extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        // Get the logged-in username from the Admin frame
+        String username = getLoggedInUsername();
+        labelStaff.setText(username + "!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -197,6 +200,27 @@ public class History extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_exitloginActionPerformed
 
+     private void setupDateTimeTimer() {
+        updateDateTime();
+        javax.swing.Timer timer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                updateDateTime();
+            }
+        });
+        timer.start();
+    }
+    
+    private void updateDateTime() {
+        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd MMMM, EEEE");
+        
+        java.util.Date now = new java.util.Date();
+        String time = timeFormat.format(now);
+        String date = dateFormat.format(now);
+        
+        datetime.setText(time + " " + date);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
@@ -211,4 +235,19 @@ public class History extends javax.swing.JPanel {
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
+    
+    private String getLoggedInUsername() {
+        try {
+            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+            if (window instanceof cephra.Frame.Admin) {
+                // Use reflection to get the loggedInUsername field
+                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
+                usernameField.setAccessible(true);
+                return (String) usernameField.get(window);
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting logged-in username: " + e.getMessage());
+        }
+        return "Admin"; // Fallback
+    }
 }

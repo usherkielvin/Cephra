@@ -1248,6 +1248,41 @@ public class CephraDB {
         return staff;
     }
     
+    public static boolean removeStaff(String username) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "DELETE FROM staff_records WHERE username = ?")) {
+            
+            stmt.setString(1, username);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error removing staff: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean resetStaffPassword(String username, String newPassword) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE staff_records SET password = ? WHERE username = ?")) {
+            
+            stmt.setString(1, newPassword);
+            stmt.setString(2, username);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error resetting staff password: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     // Method to validate staff login credentials
     public static boolean validateStaffLogin(String username, String password) {
         try (Connection conn = DatabaseConnection.getConnection();

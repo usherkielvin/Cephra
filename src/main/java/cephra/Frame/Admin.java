@@ -10,6 +10,8 @@ import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 
 public class Admin extends javax.swing.JFrame {
+    
+    private String loggedInUsername = "Admin";
 
     public Admin() {
         setUndecorated(true);
@@ -70,8 +72,30 @@ public class Admin extends javax.swing.JFrame {
     public void switchPanel(JPanel newPanel) {
         getContentPane().removeAll();
         getContentPane().add(newPanel, BorderLayout.CENTER);
+        
+        // Update labelStaff in admin panels if it's an admin panel
+        updateAdminPanelLabel(newPanel);
+        
         revalidate();
         repaint();
+    }
+    
+    public void setLoggedInUsername(String username) {
+        this.loggedInUsername = username;
+    }
+    
+    private void updateAdminPanelLabel(JPanel panel) {
+        try {
+            // Use reflection to find and update labelStaff in admin panels
+            java.lang.reflect.Field labelField = panel.getClass().getDeclaredField("labelStaff");
+            labelField.setAccessible(true);
+            javax.swing.JLabel labelStaff = (javax.swing.JLabel) labelField.get(panel);
+            if (labelStaff != null) {
+                labelStaff.setText(loggedInUsername + "!");
+            }
+        } catch (Exception e) {
+            // Not an admin panel or labelStaff not found, ignore
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
