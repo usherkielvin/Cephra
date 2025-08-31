@@ -372,7 +372,7 @@ public class Dashboard extends javax.swing.JPanel {
         String time = timeFormat.format(now);
         String date = dateFormat.format(now);
 
-        datetimeStaff.setText(time + " " + date);
+        datetime.setText(time + " " + date);
     }
     
     private void loadSettingsFromDatabase() {
