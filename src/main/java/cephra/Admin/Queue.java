@@ -56,7 +56,7 @@ public class Queue extends javax.swing.JPanel {
         setupNextButtons();
 
         // Listen to table changes to keep counters in sync
-        queTab.getModel().addTableModelListener(e -> updateStatusCounters());
+        queTab.getModel().addTableModelListener(_ -> updateStatusCounters());
         updateStatusCounters();
     }
 
@@ -474,8 +474,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
     
     private void setupNextButtons() {
-        nxtnormalbtn.addActionListener(e -> nextNormalTicket());
-        nxtfastbtn.addActionListener(e -> nextFastTicket());
+        nxtnormalbtn.addActionListener(_ -> nextNormalTicket());
+        nxtfastbtn.addActionListener(_ -> nextFastTicket());
     }
     
     private void nextNormalTicket() {

@@ -1,13 +1,7 @@
 package cephra.Admin;
 
-import java.awt.Window;
-import javax.swing.SwingUtilities;
-import javax.swing.JOptionPane;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import cephra.db.DatabaseConnection;
+import java.awt.*;
+import javax.swing.*;
 
 
 public class Bay extends javax.swing.JPanel {

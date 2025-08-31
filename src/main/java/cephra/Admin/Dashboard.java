@@ -37,11 +37,11 @@ public class Dashboard extends javax.swing.JPanel {
         RPHSpinner.setModel(new javax.swing.SpinnerNumberModel(RPH, 0, Integer.MAX_VALUE, 1));
         
         // Add change listeners to automatically save spinner values
-        MinfeeSpinner.addChangeListener(e -> {
+        MinfeeSpinner.addChangeListener(_ -> {
             Min = (Integer) MinfeeSpinner.getValue();
         });
         
-        RPHSpinner.addChangeListener(e -> {
+        RPHSpinner.addChangeListener(_ -> {
             RPH = (Integer) RPHSpinner.getValue();
         });
         

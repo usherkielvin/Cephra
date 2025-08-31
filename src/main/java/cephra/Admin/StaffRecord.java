@@ -26,7 +26,7 @@ public class StaffRecord extends javax.swing.JPanel {
         JTableHeader header = staffTable.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         
-               BTNsearch.addActionListener(evt -> searchStaff());
+               BTNsearch.addActionListener(_ -> searchStaff());
         
         // Add Enter key listener to search field
         search.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -43,20 +43,18 @@ public class StaffRecord extends javax.swing.JPanel {
         passReset.setEnabled(false);
         
         // Add table selection listener to enable/disable buttons
-        staffTable.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                int selectedRow = staffTable.getSelectedRow();
-                boolean hasSelection = selectedRow != -1;
-                profRemove.setEnabled(hasSelection);
-                passReset.setEnabled(hasSelection);
-            }
+        staffTable.getSelectionModel().addListSelectionListener(_ -> {
+            int selectedRow = staffTable.getSelectedRow();
+            boolean hasSelection = selectedRow != -1;
+            profRemove.setEnabled(hasSelection);
+            passReset.setEnabled(hasSelection);
         });
         
         // Add action listener to profRemove button
-        profRemove.addActionListener(evt -> removeSelectedStaff());
+        profRemove.addActionListener(_ -> removeSelectedStaff());
         
         // Add action listener to passReset button
-        passReset.addActionListener(evt -> resetSelectedStaffPassword());
+        passReset.addActionListener(_ -> resetSelectedStaffPassword());
         
         refreshStaffTable();
     }

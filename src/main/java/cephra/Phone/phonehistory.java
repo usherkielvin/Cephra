@@ -326,7 +326,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         // Add OK button
         JButton okButton = new JButton("OK");
         okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        okButton.addActionListener(e -> closeDetailsPanel());
+        okButton.addActionListener(_ -> closeDetailsPanel());
         detailsPanel.add(okButton);
         
         // Add the details panel to the phone frame
