@@ -32,8 +32,8 @@ public class Login extends javax.swing.JPanel {
         See.setContentAreaFilled(false);
         
         // Initialize cooldown label
-        cooldownLabel.setForeground(Color.RED);
-        cooldownLabel.setVisible(false);
+        cooldownlabel.setForeground(Color.RED);
+        cooldownlabel.setVisible(false);
 
         // --- INTEGRATED FILTERS ---
         ((AbstractDocument) userfield.getDocument()).setDocumentFilter(new InputLimitFilter(15, true));
@@ -48,9 +48,9 @@ public class Login extends javax.swing.JPanel {
         userfield = new javax.swing.JTextField();
         loginbutton = new javax.swing.JButton();
         passfield = new javax.swing.JPasswordField();
+        cooldownlabel = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        cooldownLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -99,6 +99,11 @@ public class Login extends javax.swing.JPanel {
         });
         add(passfield);
         passfield.setBounds(540, 433, 320, 45);
+        cooldownlabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        cooldownlabel.setForeground(new java.awt.Color(255, 0, 0));
+        cooldownlabel.setText("Cooldown");
+        add(cooldownlabel);
+        cooldownlabel.setBounds(520, 510, 160, 30);
 
         jButton1.setText("Forgot Password?");
         jButton1.setBorder(null);
@@ -122,10 +127,6 @@ public class Login extends javax.swing.JPanel {
         });
         add(jButton2);
         jButton2.setBounds(935, 10, 50, 40);
-
-        cooldownLabel.setText("Cooldown");
-        add(cooldownLabel);
-        cooldownLabel.setBounds(490, 480, 110, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
@@ -268,19 +269,19 @@ private void startCooldownTimer() {
     cooldownSeconds = 30;
     
     // Update and show cooldown label
-    cooldownLabel.setText("Cooldown: " + cooldownSeconds + "s");
-    cooldownLabel.setVisible(true);
+    cooldownlabel.setText("Cooldown: " + cooldownSeconds + "s");
+    cooldownlabel.setVisible(true);
     
     // Create and start the timer
     cooldownTimer = new Timer(1000, e -> {
         cooldownSeconds--;
-        cooldownLabel.setText("Cooldown: " + cooldownSeconds + "s");
+        cooldownlabel.setText("Cooldown: " + cooldownSeconds + "s");
         
         if (cooldownSeconds <= 0) {
             // Time's up, stop the timer and reset
             ((Timer)e.getSource()).stop();
             loginAttempts = 0;
-            cooldownLabel.setVisible(false);
+            cooldownlabel.setVisible(false);
             loginbutton.setEnabled(true);
             userfield.setEnabled(true);
             passfield.setEnabled(true);
@@ -293,7 +294,7 @@ private void startCooldownTimer() {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
-    private javax.swing.JLabel cooldownLabel;
+    private javax.swing.JLabel cooldownlabel;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;

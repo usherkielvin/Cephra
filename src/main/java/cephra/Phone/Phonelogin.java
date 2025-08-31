@@ -28,9 +28,7 @@ public class Phonelogin extends javax.swing.JPanel {
         See.setOpaque(false);
         See.setContentAreaFilled(false);
         
-        // Initialize cooldown label
-        cooldownLabel.setForeground(Color.RED);
-        cooldownLabel.setVisible(false);
+
 
         // Restore hover underline on Register and Forgot Password
         addUnderlineOnHover(reghere);
@@ -45,8 +43,8 @@ public class Phonelogin extends javax.swing.JPanel {
         forgotpass = new javax.swing.JButton();
         pass = new javax.swing.JPasswordField();
         username = new javax.swing.JTextField();
-        loginhome = new javax.swing.JButton();
         cooldownLabel = new javax.swing.JLabel();
+        loginhome = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
@@ -113,6 +111,8 @@ public class Phonelogin extends javax.swing.JPanel {
         });
         add(username);
         username.setBounds(60, 334, 240, 35);
+        add(cooldownLabel);
+        cooldownLabel.setBounds(100, 440, 160, 20);
 
         loginhome.setBorder(null);
         loginhome.setBorderPainted(false);
@@ -125,10 +125,6 @@ public class Phonelogin extends javax.swing.JPanel {
         });
         add(loginhome);
         loginhome.setBounds(80, 570, 220, 40);
-
-        cooldownLabel.setText("Cooldown");
-        add(cooldownLabel);
-        cooldownLabel.setBounds(240, 460, 80, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/login1.png"))); // NOI18N
         add(jLabel1);

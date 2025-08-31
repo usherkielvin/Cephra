@@ -328,8 +328,6 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel labelStaff;
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
     private javax.swing.JLabel totalsessions;
