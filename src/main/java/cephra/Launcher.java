@@ -5,15 +5,11 @@ import java.awt.GraphicsEnvironment;
 public final class Launcher {
 
     public static void main(String[] args) {
-        // Test database connection first
-        System.out.println("Testing Cephra Database Connection...");
         
         try {
-            // Initialize database connection
             CephraDB.initializeDatabase();
             System.out.println("Database connection successful!");
             
-            // Validate database integrity
             CephraDB.validateDatabaseIntegrity();
             
             // Initialize ticket counters from database and history
@@ -25,7 +21,7 @@ public final class Launcher {
             System.err.println("✗ Database connection failed!");
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
-            System.exit(1); // Exit if database connection fails
+            System.exit(1);
         }
 
         javax.swing.SwingUtilities.invokeLater(() -> {
@@ -41,8 +37,6 @@ public final class Launcher {
                 screenBounds.y
             );
             admin.setVisible(true);
-
-            // Monitor will be created when Queue panel is opened
 
             cephra.Frame.Phone phone = new cephra.Frame.Phone();
             int taskbarHeight = 30;
