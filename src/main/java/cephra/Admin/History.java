@@ -27,6 +27,15 @@ public class History extends javax.swing.JPanel {
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());
         
+        // Set column widths
+        jTable1.getColumnModel().getColumn(0).setPreferredWidth(80);  // Ticket
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(120); // Customer
+        jTable1.getColumnModel().getColumn(2).setPreferredWidth(60);  // KWh
+        jTable1.getColumnModel().getColumn(3).setPreferredWidth(80);  // Total
+        jTable1.getColumnModel().getColumn(4).setPreferredWidth(100); // Served By
+        jTable1.getColumnModel().getColumn(5).setPreferredWidth(120); // Date & Time
+        jTable1.getColumnModel().getColumn(6).setPreferredWidth(100); // Reference
+        
     }
 
  
@@ -70,23 +79,12 @@ public class History extends javax.swing.JPanel {
                 "Ticket", "Customer", "KWh", "Total", "Served By", "Date & Time", "Reference"
             }
         ));
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
         jTable1.getTableHeader().setResizingAllowed(false);
         jTable1.getTableHeader().setReorderingAllowed(false);
         jTable1.setVerifyInputWhenFocusTarget(false);
         jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(2).setResizable(false);
-            jTable1.getColumnModel().getColumn(3).setResizable(false);
-            jTable1.getColumnModel().getColumn(4).setResizable(false);
-            jTable1.getColumnModel().getColumn(5).setResizable(false);
-            jTable1.getColumnModel().getColumn(5).setPreferredWidth(120);
-            jTable1.getColumnModel().getColumn(6).setResizable(false);
-        }
 
         add(jScrollPane1);
         jScrollPane1.setBounds(5, 210, 990, 550);
@@ -154,9 +152,7 @@ public class History extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        // Get the logged-in username from the Admin frame
-        String username = getLoggedInUsername();
-        labelStaff.setText(username + "!");
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
