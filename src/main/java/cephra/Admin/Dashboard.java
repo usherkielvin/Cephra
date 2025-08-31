@@ -67,11 +67,11 @@ public class Dashboard extends javax.swing.JPanel {
         Baybutton = new javax.swing.JButton();
         quebutton = new javax.swing.JButton();
         exitlogin = new javax.swing.JButton();
-        datetime = new javax.swing.JLabel();
-        MinfeeSpinner = new javax.swing.JSpinner();
-        RPHSpinner = new javax.swing.JSpinner();
+        datetimeStaff = new javax.swing.JLabel();
         Saveminfee = new javax.swing.JButton();
         Saverateperhour = new javax.swing.JButton();
+        labelStaff = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -87,7 +87,7 @@ public class Dashboard extends javax.swing.JPanel {
         totalsessions.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
         totalsessions.setText("31");
         add(totalsessions);
-        totalsessions.setBounds(240, 220, 70, 120);
+        totalsessions.setBounds(240, 220, 160, 120);
 
         MinfeeSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         MinfeeSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));
@@ -100,8 +100,6 @@ public class Dashboard extends javax.swing.JPanel {
         RPHSpinner.setValue(15);
         add(RPHSpinner);
         RPHSpinner.setBounds(600, 508, 300, 40);
-
-
 
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
@@ -158,23 +156,11 @@ public class Dashboard extends javax.swing.JPanel {
         add(exitlogin);
         exitlogin.setBounds(930, 0, 70, 60);
 
-        datetime.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        datetime.setForeground(new java.awt.Color(255, 255, 255));
-        datetime.setText("10:44 AM 17 August, Sunday");
-        add(datetime);
-        datetime.setBounds(820, 40, 170, 20);
-
-        MinfeeSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
-        MinfeeSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));
-        MinfeeSpinner.setValue(50);
-        add(MinfeeSpinner);
-        MinfeeSpinner.setBounds(120, 510, 300, 40);
-
-        RPHSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
-        RPHSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));
-        RPHSpinner.setValue(15);
-        add(RPHSpinner);
-        RPHSpinner.setBounds(600, 508, 300, 40);
+        datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));
+        datetimeStaff.setText("10:44 AM 17 August, Sunday");
+        add(datetimeStaff);
+        datetimeStaff.setBounds(820, 40, 170, 20);
 
         Saveminfee.setBorderPainted(false);
         Saveminfee.setContentAreaFilled(false);
@@ -198,17 +184,17 @@ public class Dashboard extends javax.swing.JPanel {
         add(Saverateperhour);
         Saverateperhour.setBounds(610, 560, 290, 40);
 
-        SaveFastMultiplier = new javax.swing.JButton();
-        SaveFastMultiplier.setBorderPainted(false);
-        SaveFastMultiplier.setContentAreaFilled(false);
-        SaveFastMultiplier.setFocusPainted(false);
-        SaveFastMultiplier.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SaveFastMultiplierActionPerformed(evt);
-            }
-        });
-        add(SaveFastMultiplier);
-        SaveFastMultiplier.setBounds(120, 620, 290, 50);
+        labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        labelStaff.setForeground(new java.awt.Color(255, 255, 255));
+        labelStaff.setText("Admin!");
+        add(labelStaff);
+        labelStaff.setBounds(870, 10, 70, 30);
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Hello,");
+        add(jLabel3);
+        jLabel3.setBounds(820, 10, 50, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -302,14 +288,14 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JButton Baybutton;
     private javax.swing.JSpinner MinfeeSpinner;
     private javax.swing.JSpinner RPHSpinner;
-    private javax.swing.JSpinner FastMultiplierSpinner;
     private javax.swing.JButton Saveminfee;
     private javax.swing.JButton Saverateperhour;
-    private javax.swing.JButton SaveFastMultiplier;
-    private javax.swing.JLabel datetime;
+    private javax.swing.JLabel datetimeStaff;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel labelStaff;
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
     private javax.swing.JLabel totalsessions;

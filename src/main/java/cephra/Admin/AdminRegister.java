@@ -1,5 +1,6 @@
 package cephra.Admin;
 
+import java.awt.Color;
 import java.awt.Window;
 import javax.swing.SwingUtilities;
 
@@ -10,6 +11,13 @@ public class AdminRegister extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         email.setText(""); // Plain email field
+        Fullname.setOpaque(false);
+        Fullname.setBackground(new Color(0, 0, 0, 0));
+        email.setOpaque(false);
+        email.setBackground(new Color(0, 0, 0, 0));
+        username.setOpaque(false);
+        username.setBackground(new Color(0, 0, 0, 0));
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -27,8 +35,21 @@ public class AdminRegister extends javax.swing.JPanel {
 
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
+
+        username.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usernameActionPerformed(evt);
+            }
+        });
         add(username);
         username.setBounds(722, 268, 245, 40);
+
+        email.setBorder(null);
+        email.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailActionPerformed(evt);
+            }
+        });
         add(email);
         email.setBounds(433, 373, 245, 38);
 
@@ -41,8 +62,22 @@ public class AdminRegister extends javax.swing.JPanel {
         });
         add(RegisterBTN);
         RegisterBTN.setBounds(560, 670, 240, 60);
+
+        pass.setBorder(null);
+        pass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passActionPerformed(evt);
+            }
+        });
         add(pass);
         pass.setBounds(433, 477, 245, 40);
+
+        ConPass.setBorder(null);
+        ConPass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ConPassActionPerformed(evt);
+            }
+        });
         add(ConPass);
         ConPass.setBounds(433, 581, 245, 40);
 
@@ -66,6 +101,13 @@ public class AdminRegister extends javax.swing.JPanel {
         });
         add(AdminBTN);
         AdminBTN.setBounds(870, 60, 120, 30);
+
+        Fullname.setBorder(null);
+        Fullname.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                FullnameActionPerformed(evt);
+            }
+        });
         add(Fullname);
         Fullname.setBounds(430, 270, 245, 38);
 
@@ -73,6 +115,26 @@ public class AdminRegister extends javax.swing.JPanel {
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void FullnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FullnameActionPerformed
+        username.requestFocus();
+    }//GEN-LAST:event_FullnameActionPerformed
+
+    private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed
+        email.requestFocus();
+    }//GEN-LAST:event_usernameActionPerformed
+
+    private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
+        pass.requestFocus();
+    }//GEN-LAST:event_emailActionPerformed
+
+    private void passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passActionPerformed
+        ConPass.requestFocus();
+    }//GEN-LAST:event_passActionPerformed
+
+    private void ConPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConPassActionPerformed
+       
+    }//GEN-LAST:event_ConPassActionPerformed
 
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {
         String name = Fullname.getText().trim();
