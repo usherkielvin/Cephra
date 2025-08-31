@@ -67,7 +67,7 @@ public final class HistoryBridge {
                 if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
                 
                 // Get the admin username who served this transaction
-                String servedBy = cephra.CephraDB.getCurrentUsername();
+                String servedBy = cephra.CephraDB.getCurrentAdminUsername();
                 if (servedBy == null || servedBy.trim().isEmpty()) {
                     servedBy = "Admin"; // Fallback if no admin logged in
                 }
@@ -150,7 +150,7 @@ public final class HistoryBridge {
             if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
             
             // Get the admin username who served this transaction
-            String servedBy = cephra.CephraDB.getCurrentUsername();
+            String servedBy = cephra.CephraDB.getCurrentAdminUsername();
             if (servedBy == null || servedBy.trim().isEmpty()) {
                 servedBy = "Admin"; // Fallback if no admin logged in
             }

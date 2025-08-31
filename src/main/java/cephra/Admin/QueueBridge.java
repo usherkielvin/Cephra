@@ -85,8 +85,8 @@ public final class QueueBridge {
         int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
         ticketBattery.put(ticket, new BatteryInfo(userBatteryLevel, 40.0)); // 40kWh capacity
         
-        // Set this as the user's active ticket
-        cephra.CephraDB.setActiveTicket(customer, ticket);
+        // Set this as the user's active ticket with correct service type
+        cephra.CephraDB.setActiveTicket(customer, ticket, service, userBatteryLevel, "");
         
         // Add to database for persistent storage
         boolean dbSuccess = cephra.CephraDB.addQueueTicket(ticket, customer, service, status, payment, userBatteryLevel);
@@ -274,6 +274,41 @@ public final class QueueBridge {
                     } catch (Exception e) {
                         System.err.println("QueueBridge: Error refreshing history table: " + e.getMessage());
                     }
+                    
+                    // Simple panel switch: trigger home button click in PayPop panel
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            java.awt.Window[] windows = java.awt.Window.getWindows();
+                            for (java.awt.Window window : windows) {
+                                if (window instanceof cephra.Frame.Phone) {
+                                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                                    if (phoneFrame.isVisible()) {
+                                        java.awt.Component[] components = phoneFrame.getContentPane().getComponents();
+                                        for (java.awt.Component comp : components) {
+                                            if (comp instanceof cephra.Phone.PayPop) {
+                                                cephra.Phone.PayPop payPopPanel = (cephra.Phone.PayPop) comp;
+                                                // Use reflection to access the homebutton2 field directly
+                                                try {
+                                                    java.lang.reflect.Field homeButtonField = cephra.Phone.PayPop.class.getDeclaredField("homebutton2");
+                                                    homeButtonField.setAccessible(true);
+                                                    javax.swing.JButton homeButton = (javax.swing.JButton) homeButtonField.get(payPopPanel);
+                                                    if (homeButton != null) {
+                                                        homeButton.doClick();
+                                                        System.out.println("QueueBridge: Switched PayPop to home after payment for ticket " + ticket);
+                                                        return;
+                                                    }
+                                                } catch (Exception reflectionEx) {
+                                                    System.err.println("QueueBridge: Error accessing homebutton2 via reflection: " + reflectionEx.getMessage());
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.err.println("QueueBridge: Error switching panel: " + e.getMessage());
+                        }
+                    });
                 } else {
                     System.err.println("QueueBridge: Failed to process payment transaction for ticket " + ticket);
                 }

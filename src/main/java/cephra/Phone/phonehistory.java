@@ -95,7 +95,6 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         List<UserHistoryManager.HistoryEntry> entries = UserHistoryManager.getUserHistory(currentUsername);
         
         // Debug information
-        System.out.println("PhoneHistory: Refreshing history display for user: " + currentUsername);
         System.out.println("PhoneHistory: Found " + entries.size() + " history entries");
         
         if (entries.isEmpty()) {
@@ -122,10 +121,6 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         } else {
             // Add history entries
             for (UserHistoryManager.HistoryEntry entry : entries) {
-                System.out.println("PhoneHistory: Adding entry - Ticket: " + entry.getTicketId() + 
-                                 ", Service: " + entry.getServiceType() + 
-                                 ", Total: " + entry.getTotal() + 
-                                 ", Date: " + entry.getFormattedDate());
                 addHistoryItem(entry);
             }
         }
@@ -211,12 +206,10 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
 
         // Reference number
         String refNumber = entry.getReferenceNumber();
-        System.out.println("PhoneHistory: Reference number for ticket " + entry.getTicketId() + " is: '" + refNumber + "'");
         
         // If reference number is empty or null, try to get it from QueueBridge
         if (refNumber == null || refNumber.trim().isEmpty() || refNumber.equals("null")) {
             refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(entry.getTicketId());
-            System.out.println("PhoneHistory: Got reference number from QueueBridge: '" + refNumber + "'");
         }
         
         JLabel referenceLabel = new JLabel("Ref: " + refNumber);
