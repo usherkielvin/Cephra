@@ -31,7 +31,6 @@ public class Dashboard extends javax.swing.JPanel {
         // Configure spinners with SpinnerNumberModel to prevent negative values
         MinfeeSpinner.setModel(new javax.swing.SpinnerNumberModel(Min, 0, Integer.MAX_VALUE, 1));
         RPHSpinner.setModel(new javax.swing.SpinnerNumberModel(RPH, 0, Integer.MAX_VALUE, 1));
-        FastMultiplierSpinner.setModel(new javax.swing.SpinnerNumberModel(fastMultiplier, 1.0, 3.0, 0.05));
         
         // Add change listeners to automatically save spinner values
         MinfeeSpinner.addChangeListener(e -> {
@@ -40,10 +39,6 @@ public class Dashboard extends javax.swing.JPanel {
         
         RPHSpinner.addChangeListener(e -> {
             RPH = (Integer) RPHSpinner.getValue();
-        });
-        
-        FastMultiplierSpinner.addChangeListener(e -> {
-            fastMultiplier = (Double) FastMultiplierSpinner.getValue();
         });
 
 
@@ -57,9 +52,7 @@ public class Dashboard extends javax.swing.JPanel {
         javax.swing.JFormattedTextField textfield1 = editor1.getTextField();
         textfield1.setHorizontalAlignment(JTextField.CENTER);
         
-        JSpinner.DefaultEditor editor2 = (JSpinner.DefaultEditor) FastMultiplierSpinner.getEditor();
-        javax.swing.JFormattedTextField textfield2 = editor2.getTextField();
-        textfield2.setHorizontalAlignment(JTextField.CENTER);
+
         
 
     }
@@ -108,12 +101,7 @@ public class Dashboard extends javax.swing.JPanel {
         add(RPHSpinner);
         RPHSpinner.setBounds(600, 508, 300, 40);
 
-        FastMultiplierSpinner = new javax.swing.JSpinner();
-        FastMultiplierSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
-        FastMultiplierSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));
-        FastMultiplierSpinner.setValue(1.25);
-        add(FastMultiplierSpinner);
-        FastMultiplierSpinner.setBounds(120, 570, 300, 40);
+
 
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
@@ -198,17 +186,7 @@ public class Dashboard extends javax.swing.JPanel {
         add(Saverateperhour);
         Saverateperhour.setBounds(610, 560, 290, 40);
 
-        SaveFastMultiplier = new javax.swing.JButton();
-        SaveFastMultiplier.setBorderPainted(false);
-        SaveFastMultiplier.setContentAreaFilled(false);
-        SaveFastMultiplier.setFocusPainted(false);
-        SaveFastMultiplier.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SaveFastMultiplierActionPerformed(evt);
-            }
-        });
-        add(SaveFastMultiplier);
-        SaveFastMultiplier.setBounds(120, 620, 290, 50);
+
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
         add(jLabel1);
@@ -282,19 +260,7 @@ public class Dashboard extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_SaverateperhourActionPerformed
 
-    private void SaveFastMultiplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveFastMultiplierActionPerformed
-        fastMultiplier = (Double) FastMultiplierSpinner.getValue();
-        
-        // Save to database
-        boolean saved = cephra.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(fastMultiplier));
-        if (saved) {
-            // Update QueueBridge with new fast multiplier
-            cephra.Admin.QueueBridge.setFastMultiplier(fastMultiplier);
-            javax.swing.JOptionPane.showMessageDialog(this, "Fast charging multiplier saved: " + String.format("%.0f%%", (fastMultiplier - 1) * 100));
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Error saving fast multiplier!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_SaveFastMultiplierActionPerformed
+
 
 
 
@@ -302,10 +268,8 @@ public class Dashboard extends javax.swing.JPanel {
     private javax.swing.JButton Baybutton;
     private javax.swing.JSpinner MinfeeSpinner;
     private javax.swing.JSpinner RPHSpinner;
-    private javax.swing.JSpinner FastMultiplierSpinner;
     private javax.swing.JButton Saveminfee;
     private javax.swing.JButton Saverateperhour;
-    private javax.swing.JButton SaveFastMultiplier;
     private javax.swing.JLabel datetimeStaff;
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
@@ -405,7 +369,6 @@ public class Dashboard extends javax.swing.JPanel {
             // Update spinners with loaded values
             MinfeeSpinner.setValue(Min);
             RPHSpinner.setValue(RPH);
-            FastMultiplierSpinner.setValue(fastMultiplier);
             
             // Update QueueBridge with loaded values
             cephra.Admin.QueueBridge.setMinimumFee(Min);
