@@ -1,12 +1,16 @@
 
 package cephra.Phone;
 
+import java.awt.Color;
+
 public class OTP_forgotpass extends javax.swing.JPanel {
 
     public OTP_forgotpass() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
+          email.setOpaque(false);
+        email.setBackground(new Color(0, 0, 0, 0));
 
         setupLabelPosition();
         
@@ -127,7 +131,7 @@ public class OTP_forgotpass extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
-
+requestFocus();
     }//GEN-LAST:event_emailActionPerformed
 
     private void cephraemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cephraemailActionPerformed
