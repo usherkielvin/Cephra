@@ -8,17 +8,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
 
-public class VerificationPop extends javax.swing.JPanel {
+public class PasswordVerify extends javax.swing.JPanel {
 
    
-    public VerificationPop() {
+    public PasswordVerify() {
         initComponents();
-         setPreferredSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
+        email.setOpaque(false);
+        email.setBackground(new java.awt.Color(0, 0, 0, 0));
         setupLabelPosition(); // Set label position
-        makeDraggable();
-         email.setOpaque(false);
-        email.setBackground(new Color(0, 0, 0, 0));
+        setupButtons(); // Call our custom setup method
         
         // Display current OTP in the preview label
         otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
@@ -108,8 +108,9 @@ public class VerificationPop extends javax.swing.JPanel {
         contactsup.setBounds(160, 663, 130, 30);
 
         otpPreviewLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        otpPreviewLabel.setText("99999");
         add(otpPreviewLabel);
-        otpPreviewLabel.setBounds(210, 133, 110, 0);
+        otpPreviewLabel.setBounds(210, 131, 140, 20);
 
         cephraemail.setBorder(null);
         cephraemail.setBorderPainted(false);
@@ -147,7 +148,7 @@ public class VerificationPop extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(VerificationPop.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(PasswordVerify.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -160,7 +161,8 @@ public class VerificationPop extends javax.swing.JPanel {
         });
     }
     private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
-
+        // When Enter is pressed in the email field, trigger the resetsend button
+        resetsend.doClick();
     }//GEN-LAST:event_emailActionPerformed
 
     private void cephraemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cephraemailActionPerformed
@@ -170,7 +172,7 @@ public class VerificationPop extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.EmailApp());
+                        phoneFrame.switchPanel(new cephra.Phone.PasswordEmail());
                         break;
                     }
                 }
@@ -180,32 +182,41 @@ public class VerificationPop extends javax.swing.JPanel {
 
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
         // Handle verification code submission
-        javax.swing.JOptionPane.showMessageDialog(this, "Verification code submitted successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        String enteredOTP = email.getText();
+        String correctOTP = cephra.CephraDB.getGeneratedOTP();
 
-        // Navigate to NewPassword panel after OK is clicked
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.NewPassword());
-                        break;
+        if (enteredOTP.equals(correctOTP)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Verification code submitted successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            
+            // Navigate to PasswordNew panel after OK is clicked
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    java.awt.Window[] windows = java.awt.Window.getWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof cephra.Frame.Phone) {
+                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                            phoneFrame.switchPanel(new cephra.Phone.PasswordNew());
+                            break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Invalid verification code. Please try again.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            email.setText(""); // Clear the text field
+            email.requestFocusInWindow(); // Auto focus back on email field
+        }
     }//GEN-LAST:event_resetsendActionPerformed
 
     private void BackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackActionPerformed
-         // Navigate to NewPassword panel after OK is clicked
+         // Navigate to PasswordNew panel after OK is clicked
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.ForgotPassword());
+                        phoneFrame.switchPanel(new cephra.Phone.PasswordForgot());
                         break;
                     }
                 }
@@ -218,20 +229,21 @@ public class VerificationPop extends javax.swing.JPanel {
     
     }//GEN-LAST:event_contactsupActionPerformed
 
-    private void resendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resendActionPerformed
-         cephra.CephraDB.generateAndStoreOTP(); // Add this line to generate a new OTP
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-            java.awt.Window[] windows = java.awt.Window.getWindows();
-            for (java.awt.Window window : windows) {
-                if (window instanceof cephra.Frame.Phone) {
-                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.EmailApp());
-                    break;
-                }
-            }
-        }
-    });
+        private void resendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resendActionPerformed
+        // Generate a new OTP
+        cephra.CephraDB.generateAndStoreOTP();
+        
+        // Update the OTP label with the new OTP
+        otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
+        
+        // Clear the email field and show success message
+        email.setText("");
+        email.requestFocusInWindow();
+        
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "New verification code has been generated and sent!", 
+            "Resend Successful", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_resendActionPerformed
 
 
@@ -245,6 +257,99 @@ public class VerificationPop extends javax.swing.JPanel {
     private javax.swing.JButton resend;
     private javax.swing.JButton resetsend;
     // End of variables declaration//GEN-END:variables
+    
+    // Add button functionality after initComponents to prevent NetBeans from removing it
+    private void setupButtons() {
+        // Setup Resend button (only hover effects, action listener already set in initComponents)
+        resend.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        resend.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                resend.setForeground(new java.awt.Color(0, 255, 255));
+                resend.setText("<html><u>Resend</u></html>");
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                resend.setForeground(new java.awt.Color(0, 204, 204));
+                resend.setText("Resend");
+            }
+        });
+
+        // Setup Contact Support button (only hover effects, action listener already set in initComponents)
+        contactsup.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        contactsup.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                contactsup.setForeground(new java.awt.Color(0, 255, 255));
+                contactsup.setText("<html><u>Contact Support</u></html>");
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                contactsup.setForeground(new java.awt.Color(0, 204, 204));
+                contactsup.setText("Contact Support");
+            }
+        });
+
+        // Setup Back button
+        Back.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Back.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                Back.setForeground(new java.awt.Color(0, 255, 255));
+                Back.setText("<html><u>Back</u></html>");
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                Back.setForeground(new java.awt.Color(0, 204, 204));
+                Back.setText("Back");
+            }
+        });
+
+        // Setup email field center alignment
+        email.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        
+        // Add Enter key listener to email field - NetBeans cannot override this
+        email.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    resetsend.doClick();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setupLabelPosition(); // Set label position
+                setupButtons(); // Setup buttons when panel is added to container
+                if (email != null) {
+                    email.requestFocusInWindow();
+                }
+                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(PasswordVerify.this);
+                if (root != null && resetsend != null) {
+                    root.setDefaultButton(resetsend);
+                }
+                
+                // Ensure Enter key functionality is working
+                email.addKeyListener(new java.awt.event.KeyAdapter() {
+                    @Override
+                    public void keyPressed(java.awt.event.KeyEvent evt) {
+                        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                            resetsend.doClick();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public void focusEmailField() {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (email != null) {
+                    email.requestFocusInWindow();
+                }
+            }
+        });
+    }
     
     // Custom variables
    

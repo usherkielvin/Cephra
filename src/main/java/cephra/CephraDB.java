@@ -221,6 +221,26 @@ public class CephraDB {
         }
     }
     
+    // Method to get a user's current password by email
+    public static String getUserPasswordByEmail(String email) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT password FROM users WHERE email = ?")) {
+            
+            stmt.setString(1, email);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("password");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting user password: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     // Method to generate and store a new 6-digit OTP
     public static String generateAndStoreOTP() {
         Random random = new Random();

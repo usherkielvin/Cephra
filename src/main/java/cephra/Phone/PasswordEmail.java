@@ -7,10 +7,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
 
-public class EmailApp extends javax.swing.JPanel {
+public class PasswordEmail extends javax.swing.JPanel {
 
    
-    public EmailApp() {
+    public PasswordEmail() {
        initComponents();
          setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
@@ -37,7 +37,7 @@ public class EmailApp extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(EmailApp.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(PasswordEmail.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -89,7 +89,7 @@ public class EmailApp extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.VerificationCode());
+                        phoneFrame.switchPanel(new cephra.Phone.PasswordVerify());
                         break;
                     }
                 }

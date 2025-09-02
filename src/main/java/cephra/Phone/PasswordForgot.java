@@ -3,10 +3,10 @@ package cephra.Phone;
 
 import javax.swing.SwingUtilities;
 
-public class ForgotPassword extends javax.swing.JPanel {
+public class PasswordForgot extends javax.swing.JPanel {
 
   
-    public ForgotPassword() {
+    public PasswordForgot() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
@@ -85,8 +85,6 @@ public class ForgotPassword extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/forgot-pass.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
-
-        
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -114,7 +112,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.OTP_forgotpass());
+                        phoneFrame.switchPanel(new cephra.Phone.PasswordVerify());
                         break;
                     }
                 }
@@ -164,7 +162,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
                 if (email != null) {
                     email.requestFocusInWindow();
                 }
-                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(ForgotPassword.this);
+                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(PasswordForgot.this);
                 if (root != null && resetsend != null) {
                     root.setDefaultButton(resetsend);
                 }

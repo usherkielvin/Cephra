@@ -2,9 +2,9 @@ package cephra.Phone;
 
 import javax.swing.SwingUtilities;
 
-public class NewPassword extends javax.swing.JPanel {
+public class PasswordNew extends javax.swing.JPanel {
 
-    public NewPassword() {
+    public PasswordNew() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
@@ -149,7 +149,7 @@ public class NewPassword extends javax.swing.JPanel {
                 if (newpass != null) {
                     newpass.requestFocusInWindow();
                 }
-                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(NewPassword.this);
+                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(PasswordNew.this);
                 if (root != null && update != null) {
                     root.setDefaultButton(update);
                 }
@@ -159,38 +159,51 @@ public class NewPassword extends javax.swing.JPanel {
 
     private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
         // Check if passwords match
-     String password = newpass.getText();
-String password2 = newpass1.getText();
+        String password = newpass.getText();
+        String password2 = newpass1.getText();
 
-if (password.equals(password2) && !password.isEmpty()) {
-    String userEmail = cephra.Phone.AppSessionState.userEmailForReset; // Replace the hardcoded email with this line
-    
-    if (userEmail != null && cephra.CephraDB.updateUserPassword(userEmail, password)) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        // Reset the email for the next session
-        cephra.Phone.AppSessionState.userEmailForReset = null;
-            // Navigate to Phonelogin after OK is clicked
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    java.awt.Window[] windows = java.awt.Window.getWindows();
-                    for (java.awt.Window window : windows) {
-                        if (window instanceof cephra.Frame.Phone) {
-                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
-                            break;
+        if (password.equals(password2) && !password.isEmpty()) {
+            String userEmail = cephra.Phone.AppSessionState.userEmailForReset;
+            
+            // Check if new password is the same as old password
+            String oldPassword = cephra.CephraDB.getUserPasswordByEmail(userEmail);
+            if (oldPassword != null && password.equals(oldPassword)) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "New password cannot be the same as the old password!", 
+                    "Error", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                newpass.setText("");
+                newpass1.setText("");
+                newpass.requestFocusInWindow();
+                return;
+            }
+            
+            if (userEmail != null && cephra.CephraDB.updateUserPassword(userEmail, password)) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Reset the email for the next session
+                cephra.Phone.AppSessionState.userEmailForReset = null;
+                // Navigate to Phonelogin after OK is clicked
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        java.awt.Window[] windows = java.awt.Window.getWindows();
+                        for (java.awt.Window window : windows) {
+                            if (window instanceof cephra.Frame.Phone) {
+                                cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                                phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                                break;
+                            }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "An error occurred while updating the password.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
         } else {
             javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match or are empty!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             newpass.setText("");
             newpass1.setText("");
             newpass.requestFocusInWindow();
-        }   } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "An error occurred while updating the password.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-    
-}
+        }
     }//GEN-LAST:event_updateActionPerformed
 
     private void newpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newpassActionPerformed
