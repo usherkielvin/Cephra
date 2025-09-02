@@ -1,6 +1,7 @@
 
 package cephra.Phone;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,6 +17,8 @@ public class VerificationPop extends javax.swing.JPanel {
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+         email.setOpaque(false);
+        email.setBackground(new Color(0, 0, 0, 0));
         
         // Display current OTP in the preview label
         otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
@@ -105,9 +108,8 @@ public class VerificationPop extends javax.swing.JPanel {
         contactsup.setBounds(160, 663, 130, 30);
 
         otpPreviewLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        otpPreviewLabel.setText("jLabel2");
         add(otpPreviewLabel);
-        otpPreviewLabel.setBounds(210, 133, 110, 16);
+        otpPreviewLabel.setBounds(210, 133, 110, 0);
 
         cephraemail.setBorder(null);
         cephraemail.setBorderPainted(false);

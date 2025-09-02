@@ -1,17 +1,11 @@
 package cephra;
 
-import cephra.db.DatabaseConnection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Random;
-import java.util.ArrayList;
-import java.util.List;
+import cephra.db.*;
+import java.sql.*;
+import java.util.*;
 
 public class CephraDB {
 
-    // Inner class to represent a user
     @SuppressWarnings("unused")
     private static class User {
         String username;
@@ -24,12 +18,9 @@ public class CephraDB {
             this.password = password;
         }
     }
-
-    // Current logged-in users (separate for phone and admin)
     private static User currentPhoneUser;
     private static User currentAdminUser;
     
-    // Method to initialize the database
     public static void initializeDatabase() {
         try (Connection conn = DatabaseConnection.getConnection()) {
             System.out.println("Initializing Cephra Database...");
@@ -44,7 +35,7 @@ public class CephraDB {
             boolean allTablesExist = true;
             for (String tableName : requiredTables) {
                 if (!tableExists(conn, tableName)) {
-                    System.err.println("Warning: " + tableName + " table does not exist. Please run the database initialization script.");
+                    System.err.println("Warning: " + tableName + " table does not exist.");
                     allTablesExist = false;
                 }
             }
@@ -52,7 +43,7 @@ public class CephraDB {
             if (!allTablesExist) {
                 printDatabaseInitInstructions();
             } else {
-                System.out.println("All required database tables are present.");
+                System.out.println("All  database tables are present.");
             }
             
             // Clean up any existing duplicate battery level entries
@@ -235,22 +226,43 @@ public class CephraDB {
         Random random = new Random();
         String generatedOTP = String.format("%06d", random.nextInt(1000000));
         
-        // If phone user is logged in, store OTP in database
+        // Determine which email to use for OTP storage
+        String emailToUse = null;
         if (currentPhoneUser != null) {
+            emailToUse = currentPhoneUser.email;
+        } else if (cephra.Phone.AppSessionState.userEmailForReset != null) {
+            emailToUse = cephra.Phone.AppSessionState.userEmailForReset;
+        }
+        
+        // Store OTP in database if we have an email
+        if (emailToUse != null) {
             try (Connection conn = DatabaseConnection.getConnection();
-                 // Delete any existing OTP for this email
-                 PreparedStatement deleteStmt = conn.prepareStatement(
-                         "DELETE FROM otp_codes WHERE email = ?");
-                 // Insert new OTP
-                 PreparedStatement insertStmt = conn.prepareStatement(
-                         "INSERT INTO otp_codes (email, otp_code) VALUES (?, ?)")) {
+                 PreparedStatement findUserStmt = conn.prepareStatement(
+                         "SELECT username FROM users WHERE email = ?")) {
                 
-                deleteStmt.setString(1, currentPhoneUser.email);
-                deleteStmt.executeUpdate();
+                findUserStmt.setString(1, emailToUse);
+                ResultSet userRs = findUserStmt.executeQuery();
                 
-                insertStmt.setString(1, currentPhoneUser.email);
-                insertStmt.setString(2, generatedOTP);
-                insertStmt.executeUpdate();
+                if (userRs.next()) {
+                    String username = userRs.getString("username");
+                    
+                    // Delete any existing OTP for this username
+                    try (PreparedStatement deleteStmt = conn.prepareStatement(
+                            "DELETE FROM otp_codes WHERE username = ?")) {
+                        deleteStmt.setString(1, username);
+                        deleteStmt.executeUpdate();
+                    }
+                    
+                    // Insert new OTP with expiration (15 minutes from now)
+                    try (PreparedStatement insertStmt = conn.prepareStatement(
+                            "INSERT INTO otp_codes (username, otp_code, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE))")) {
+                        insertStmt.setString(1, username);
+                        insertStmt.setString(2, generatedOTP);
+                        insertStmt.executeUpdate();
+                    }
+                    
+                    System.out.println("Generated and stored OTP: " + generatedOTP + " for user: " + username);
+                }
                 
             } catch (SQLException e) {
                 System.err.println("Error storing OTP: " + e.getMessage());
@@ -264,19 +276,39 @@ public class CephraDB {
 
     // Method to get the stored OTP
     public static String getGeneratedOTP() {
-        if (currentPhoneUser == null) {
+        // Determine which email to use for OTP retrieval
+        String emailToUse = null;
+        if (currentPhoneUser != null) {
+            emailToUse = currentPhoneUser.email;
+        } else if (cephra.Phone.AppSessionState.userEmailForReset != null) {
+            emailToUse = cephra.Phone.AppSessionState.userEmailForReset;
+        }
+        
+        if (emailToUse == null) {
             return null;
         }
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT otp_code FROM otp_codes WHERE email = ? AND expires_at > NOW()")) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // First find username from email
+            PreparedStatement findUserStmt = conn.prepareStatement(
+                    "SELECT username FROM users WHERE email = ?");
             
-            stmt.setString(1, currentPhoneUser.email);
+            findUserStmt.setString(1, emailToUse);
+            ResultSet userRs = findUserStmt.executeQuery();
             
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("otp_code");
+            if (userRs.next()) {
+                String username = userRs.getString("username");
+                
+                // Now get OTP using username
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT otp_code FROM otp_codes WHERE username = ? AND expires_at > NOW()");
+                
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("otp_code");
+                    }
                 }
             }
         } catch (SQLException e) {

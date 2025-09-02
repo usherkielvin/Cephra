@@ -13,6 +13,9 @@ public class ForgotPassword extends javax.swing.JPanel {
         email.setOpaque(false);
         email.setBackground(new java.awt.Color(0, 0, 0, 0));
         setupLabelPosition();
+
+        addUnderlineOnHover(Back);
+        addUnderlineOnHover(contactsup);
     }
 
   
@@ -82,6 +85,8 @@ public class ForgotPassword extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/forgot-pass.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
+
+        
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -91,10 +96,11 @@ public class ForgotPassword extends javax.swing.JPanel {
             jLabel1.setBounds(-15, 0, 398, 750);
         }
     }
+ 
 
-    private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
-       
-    }//GEN-LAST:event_emailActionPerformed
+    private void emailActionPerformed(java.awt.event.ActionEvent evt) {
+    resetsendActionPerformed(evt);
+    }
 
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
         String emailText = email.getText().trim();
@@ -108,7 +114,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.EmailPop());
+                        phoneFrame.switchPanel(new cephra.Phone.OTP_forgotpass());
                         break;
                     }
                 }
@@ -116,6 +122,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
         });
     } else {
         javax.swing.JOptionPane.showMessageDialog(this, "Email address not found.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        email.setText("");
     }
     }//GEN-LAST:event_resetsendActionPerformed
 
@@ -183,4 +190,19 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton resetsend;
     // End of variables declaration//GEN-END:variables
+
+    private void addUnderlineOnHover(final javax.swing.JButton button) {
+        if (button == null) return;
+        final String baseText = button.getText();
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                button.setText("<html><u>" + baseText + "</u></html>");
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setText(baseText);
+            }
+        });
+    }
 }

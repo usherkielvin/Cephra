@@ -1,18 +1,20 @@
 
 package cephra.Phone;
 
-public class EmailPop extends javax.swing.JPanel {
+public class OTP_forgotpass extends javax.swing.JPanel {
 
-    public EmailPop() {
+    public OTP_forgotpass() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
-        email.setOpaque(false);
-        email.setBackground(new java.awt.Color(0, 0, 0, 0));
+
         setupLabelPosition();
         
         // Display current OTP in the preview label
         otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
+        
+        // Auto focus on the email text field
+        email.requestFocusInWindow();
     }
        // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
@@ -41,6 +43,16 @@ public class EmailPop extends javax.swing.JPanel {
                 emailActionPerformed(evt);
             }
         });
+        
+        // Add Enter key listener to email field
+        email.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    // Trigger the same action as clicking Contact Support
+                    contactsup.doClick();
+                }
+            }
+        });
         add(email);
         email.setBounds(80, 330, 250, 30);
 
@@ -51,6 +63,17 @@ public class EmailPop extends javax.swing.JPanel {
         contactsup.setBorderPainted(false);
         contactsup.setContentAreaFilled(false);
         contactsup.setFocusPainted(false);
+        
+        // Add hover effects for Contact Support button
+        contactsup.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                contactsup.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 204, 204)));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                contactsup.setBorder(null);
+            }
+        });
+        
         add(contactsup);
         contactsup.setBounds(160, 663, 130, 30);
 
@@ -61,6 +84,17 @@ public class EmailPop extends javax.swing.JPanel {
         Back.setBorderPainted(false);
         Back.setContentAreaFilled(false);
         Back.setFocusPainted(false);
+        
+        // Add hover effects for Back button
+        Back.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                Back.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 204, 204)));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                Back.setBorder(null);
+            }
+        });
+        
         Back.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BackActionPerformed(evt);
@@ -81,9 +115,11 @@ public class EmailPop extends javax.swing.JPanel {
         cephraemail.setBounds(20, 50, 330, 110);
 
         otpPreviewLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        otpPreviewLabel.setText("jLabel2");
+        otpPreviewLabel.setForeground(java.awt.Color.WHITE);
+        otpPreviewLabel.setOpaque(true);
+        otpPreviewLabel.setBackground(new java.awt.Color(0, 0, 0, 150));
         add(otpPreviewLabel);
-        otpPreviewLabel.setBounds(210, 133, 80, 16);
+        otpPreviewLabel.setBounds(210, 133, 80, 20);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/emailcheck.png"))); // NOI18N
         add(jLabel1);

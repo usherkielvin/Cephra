@@ -2,7 +2,7 @@ package cephra.Phone;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.text.*; // Add this import
+import javax.swing.text.*;
 
 public class Phonelogin extends javax.swing.JPanel {
    private int loginAttempts = 0;
