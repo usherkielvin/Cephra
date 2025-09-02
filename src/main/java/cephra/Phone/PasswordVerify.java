@@ -1,7 +1,6 @@
 
 package cephra.Phone;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -10,6 +9,10 @@ import javax.swing.SwingUtilities;
 
 public class PasswordVerify extends javax.swing.JPanel {
 
+    // Flag to prevent setupButtons from running multiple times
+    private boolean buttonsSetup = false;
+    // Flag to prevent multiple verification attempts
+    private boolean verificationInProgress = false;
    
     public PasswordVerify() {
         initComponents();
@@ -17,10 +20,9 @@ public class PasswordVerify extends javax.swing.JPanel {
         setSize(350, 750);
         email.setOpaque(false);
         email.setBackground(new java.awt.Color(0, 0, 0, 0));
-        setupLabelPosition(); // Set label position
-        setupButtons(); // Call our custom setup method
-        
-        // Display current OTP in the preview label
+        setupLabelPosition();
+        setupButtons(); 
+        makeDraggable();       
         otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
     }
 
@@ -42,11 +44,8 @@ public class PasswordVerify extends javax.swing.JPanel {
         email.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         email.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         email.setBorder(null);
-        email.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                emailActionPerformed(evt);
-            }
-        });
+        // Action listener removed to prevent duplicate Enter key handling
+        // Enter key is now handled by KeyListener in setupButtons()
         add(email);
         email.setBounds(54, 336, 250, 25);
 
@@ -160,10 +159,8 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
     }
-    private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
-        // When Enter is pressed in the email field, trigger the resetsend button
-        resetsend.doClick();
-    }//GEN-LAST:event_emailActionPerformed
+    // emailActionPerformed method removed - no longer needed
+    // Enter key is now handled by KeyListener in setupButtons()
 
     private void cephraemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cephraemailActionPerformed
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -181,6 +178,12 @@ public class PasswordVerify extends javax.swing.JPanel {
     }//GEN-LAST:event_cephraemailActionPerformed
 
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
+        // Prevent multiple verification attempts
+        if (verificationInProgress) {
+            return;
+        }
+        verificationInProgress = true;
+        
         // Handle verification code submission
         String enteredOTP = email.getText();
         String correctOTP = cephra.CephraDB.getGeneratedOTP();
@@ -206,6 +209,15 @@ public class PasswordVerify extends javax.swing.JPanel {
             email.setText(""); // Clear the text field
             email.requestFocusInWindow(); // Auto focus back on email field
         }
+        
+        // Reset verification flag after a short delay to ensure dialog is fully closed
+        javax.swing.Timer resetTimer = new javax.swing.Timer(100, new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verificationInProgress = false;
+            }
+        });
+        resetTimer.setRepeats(false);
+        resetTimer.start();
     }//GEN-LAST:event_resetsendActionPerformed
 
     private void BackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackActionPerformed
@@ -260,6 +272,12 @@ public class PasswordVerify extends javax.swing.JPanel {
     
     // Add button functionality after initComponents to prevent NetBeans from removing it
     private void setupButtons() {
+        // Prevent running multiple times
+        if (buttonsSetup) {
+            return;
+        }
+        buttonsSetup = true;
+        
         // Setup Resend button (only hover effects, action listener already set in initComponents)
         resend.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         resend.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -303,11 +321,46 @@ public class PasswordVerify extends javax.swing.JPanel {
         email.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         
         // Add Enter key listener to email field - NetBeans cannot override this
+        // Remove any existing KeyListeners first to prevent duplicates
+        for (java.awt.event.KeyListener kl : email.getKeyListeners()) {
+            email.removeKeyListener(kl);
+        }
+        
         email.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-                    resetsend.doClick();
+                    // First check if verification is already in progress
+                    if (verificationInProgress) {
+                        return; // Don't process Enter key if verification is ongoing
+                    }
+                    
+                    // Check if any dialog is currently showing - if so, don't process Enter key
+                    // This allows the dialog's OK button to receive the Enter key focus
+                    try {
+                        java.awt.Window[] windows = java.awt.Window.getWindows();
+                        for (java.awt.Window window : windows) {
+                            if (window instanceof javax.swing.JDialog && window.isVisible()) {
+                                return; // Dialog is showing, let it handle Enter key
+                            }
+                        }
+                        // Also check for JOptionPane dialogs
+                        if (javax.swing.SwingUtilities.getWindowAncestor(PasswordVerify.this) != null) {
+                            java.awt.Window parentWindow = javax.swing.SwingUtilities.getWindowAncestor(PasswordVerify.this);
+                            if (parentWindow.getOwnedWindows().length > 0) {
+                                for (java.awt.Window ownedWindow : parentWindow.getOwnedWindows()) {
+                                    if (ownedWindow instanceof javax.swing.JDialog && ownedWindow.isVisible()) {
+                                        return; // Owned dialog is showing
+                                    }
+                                }
+                            }
+                        }
+                        // No dialog showing and no verification in progress, process Enter key normally
+                        resetsend.doClick();
+                    } catch (Exception e) {
+                        // If any error occurs, don't process the Enter key
+                        return;
+                    }
                 }
             }
         });
@@ -328,15 +381,7 @@ public class PasswordVerify extends javax.swing.JPanel {
                     root.setDefaultButton(resetsend);
                 }
                 
-                // Ensure Enter key functionality is working
-                email.addKeyListener(new java.awt.event.KeyAdapter() {
-                    @Override
-                    public void keyPressed(java.awt.event.KeyEvent evt) {
-                        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-                            resetsend.doClick();
-                        }
-                    }
-                });
+                // Enter key functionality is already set up in setupButtons() method
             }
         });
     }
