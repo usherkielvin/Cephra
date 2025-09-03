@@ -53,6 +53,10 @@ public class ApiServer {
                     sendQueueResponse(out);
                 } else if ("/phone".equals(path) || "/phone/".equals(path) || "/phone/index.html".equals(path)) {
                     sendPhonePage(out);
+                } else if ("/phone/test-login.html".equals(path)) {
+                    sendTestPage(out);
+                } else if (path.startsWith("/phone/") && (path.endsWith(".css") || path.endsWith(".js"))) {
+                    sendStaticFile(out, path);
                 } else {
                     sendNotFound(out);
                 }
@@ -66,6 +70,12 @@ public class ApiServer {
                 } else if ("/api/test-login".equals(path)) {
                     // Simple test endpoint that always returns success
                     sendJsonResponse(out, "{\"success\":true,\"message\":\"Test login successful\",\"username\":\"test\"}");
+                } else if ("/api/create-ticket".equals(path)) {
+                    try {
+                        handleCreateTicket(in, out);
+                    } catch (IOException e) {
+                        sendJsonResponse(out, "{\"success\":false,\"message\":\"Error processing ticket creation\"}");
+                    }
                 } else {
                     sendMethodNotAllowed(out);
                 }
@@ -198,6 +208,131 @@ public class ApiServer {
             return false;
         }
     }
+    
+    private static void handleCreateTicket(BufferedReader in, PrintWriter out) throws IOException {
+        // Read POST data - we need to read the Content-Length header first
+        String contentLengthHeader = null;
+        String line;
+        
+        // Read headers to find Content-Length
+        while ((line = in.readLine()) != null && !line.isEmpty()) {
+            if (line.toLowerCase().startsWith("content-length:")) {
+                contentLengthHeader = line;
+                break;
+            }
+        }
+        
+        // Skip remaining headers
+        while ((line = in.readLine()) != null && !line.isEmpty()) {
+            // Skip all headers
+        }
+        
+        // Read the JSON body
+        int contentLength = 0;
+        if (contentLengthHeader != null) {
+            try {
+                contentLength = Integer.parseInt(contentLengthHeader.substring(16).trim());
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid Content-Length header: " + contentLengthHeader);
+                sendJsonResponse(out, "{\"success\":false,\"message\":\"Invalid request format\"}");
+                return;
+            }
+        }
+        
+        char[] body = new char[contentLength];
+        int bytesRead = in.read(body, 0, contentLength);
+        String jsonBody = new String(body, 0, bytesRead);
+        
+        System.out.println("DEBUG: Received ticket creation request: " + jsonBody);
+        
+        try {
+            // Parse JSON (simple parsing for now)
+            // Extract ticket_id, username, service_type, status, payment_status, initial_battery_level
+            String ticketId = extractJsonValue(jsonBody, "ticket_id");
+            String username = extractJsonValue(jsonBody, "username");
+            String serviceType = extractJsonValue(jsonBody, "service_type");
+            String status = extractJsonValue(jsonBody, "status");
+            String paymentStatus = extractJsonValue(jsonBody, "payment_status");
+            String initialBatteryLevelStr = extractJsonValue(jsonBody, "initial_battery_level");
+            
+            if (ticketId == null || username == null || serviceType == null) {
+                sendJsonResponse(out, "{\"success\":false,\"message\":\"Missing required fields\"}");
+                return;
+            }
+            
+            int initialBatteryLevel = 20; // Default value
+            try {
+                if (initialBatteryLevelStr != null) {
+                    initialBatteryLevel = Integer.parseInt(initialBatteryLevelStr);
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid battery level: " + initialBatteryLevelStr + ", using default: 20");
+            }
+            
+            // Create the ticket in the database
+            boolean success = cephra.CephraDB.addQueueTicket(ticketId, username, serviceType, status, paymentStatus, initialBatteryLevel);
+            
+            if (success) {
+                System.out.println("Successfully created ticket: " + ticketId + " for user: " + username);
+                sendJsonResponse(out, "{\"success\":true,\"message\":\"Ticket created successfully\",\"ticket_id\":\"" + ticketId + "\"}");
+            } else {
+                System.out.println("Failed to create ticket: " + ticketId + " (may already exist)");
+                sendJsonResponse(out, "{\"success\":false,\"message\":\"Ticket creation failed - ticket may already exist\"}");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error processing ticket creation: " + e.getMessage());
+            e.printStackTrace();
+            sendJsonResponse(out, "{\"success\":false,\"message\":\"Error processing ticket creation: " + e.getMessage() + "\"}");
+        }
+    }
+    
+    private static String extractJsonValue(String json, String key) {
+        String pattern = "\"" + key + "\":\"([^\"]*)\"";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+        java.util.regex.Matcher m = p.matcher(json);
+        if (m.find()) {
+            return m.group(1);
+        }
+        return null;
+    }
+    
+    private static void sendStaticFile(PrintWriter out, String path) {
+        try {
+            // Remove leading slash and convert to resource path
+            String resourcePath = "cephra/static" + path;
+            java.io.InputStream inputStream = cephra.api.ApiServer.class.getClassLoader()
+                .getResourceAsStream(resourcePath);
+            
+            if (inputStream != null) {
+                // Read the file
+                byte[] fileBytes = inputStream.readAllBytes();
+                inputStream.close();
+                
+                // Determine content type
+                String contentType = "text/plain";
+                if (path.endsWith(".css")) {
+                    contentType = "text/css";
+                } else if (path.endsWith(".js")) {
+                    contentType = "application/javascript";
+                }
+                
+                out.println("HTTP/1.1 200 OK");
+                out.println("Content-Type: " + contentType);
+                out.println("Content-Length: " + fileBytes.length);
+                out.println();
+                
+                // Convert bytes to string and send
+                String content = new String(fileBytes, "UTF-8");
+                out.println(content);
+            } else {
+                sendNotFound(out);
+            }
+        } catch (Exception e) {
+            System.err.println("Error serving static file " + path + ": " + e.getMessage());
+            sendNotFound(out);
+        }
+    }
 
     private static void sendJsonResponse(PrintWriter out, String json) {
         out.println("HTTP/1.1 200 OK");
@@ -219,12 +354,73 @@ public class ApiServer {
     }
 
     private static void sendPhonePage(PrintWriter out) {
-        String html = getPhoneHtml();
-        out.println("HTTP/1.1 200 OK");
-        out.println("Content-Type: text/html");
-        out.println("Content-Length: " + html.length());
-        out.println();
-        out.println(html);
+        try {
+            // Try to read the actual HTML file from resources
+            java.io.InputStream inputStream = cephra.api.ApiServer.class.getClassLoader()
+                .getResourceAsStream("cephra/static/phone/index.html");
+            
+            if (inputStream != null) {
+                // Read the HTML file
+                byte[] htmlBytes = inputStream.readAllBytes();
+                String html = new String(htmlBytes, "UTF-8");
+                inputStream.close();
+                
+                out.println("HTTP/1.1 200 OK");
+                out.println("Content-Type: text/html");
+                out.println("Content-Length: " + html.length());
+                out.println();
+                out.println(html);
+            } else {
+                // Fallback to embedded HTML if file not found
+                String html = getPhoneHtml();
+                out.println("HTTP/1.1 200 OK");
+                out.println("Content-Type: text/html");
+                out.println("Content-Length: " + html.length());
+                out.println();
+                out.println(html);
+            }
+        } catch (Exception e) {
+            System.err.println("Error reading phone HTML file: " + e.getMessage());
+            // Fallback to embedded HTML
+            String html = getPhoneHtml();
+            out.println("HTTP/1.1 200 OK");
+            out.println("Content-Type: text/html");
+            out.println("Content-Length: " + html.length());
+            out.println();
+            out.println(html);
+        }
+    }
+    
+    private static void sendTestPage(PrintWriter out) {
+        try {
+            // Try to read the test HTML file from resources
+            java.io.InputStream inputStream = cephra.api.ApiServer.class.getClassLoader()
+                .getResourceAsStream("cephra/static/phone/test-login.html");
+            
+            if (inputStream != null) {
+                // Read the HTML file
+                byte[] htmlBytes = inputStream.readAllBytes();
+                String html = new String(htmlBytes, "UTF-8");
+                inputStream.close();
+                
+                out.println("HTTP/1.1 200 OK");
+                out.println("Content-Type: text/html");
+                out.println("Content-Length: " + html.length());
+                out.println();
+                out.println(html);
+            } else {
+                out.println("HTTP/1.1 404 Not Found");
+                out.println("Content-Type: text/plain");
+                out.println();
+                out.println("Test page not found");
+            }
+        } catch (Exception e) {
+            System.err.println("Error reading test HTML file: " + e.getMessage());
+            out.println("HTTP/1.1 500 Internal Server Error");
+            out.println("Content-Type: text/plain");
+            out.println();
+            out.println("Error reading test page");
+        }
     }
 
     private static void sendNotFound(PrintWriter out) {
