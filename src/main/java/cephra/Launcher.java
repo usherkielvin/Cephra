@@ -56,7 +56,8 @@ public final class Launcher {
                 Thread.sleep(2000); // Wait 2 seconds
                 System.out.println("Testing API server connection...");
                 
-                java.net.URL url = new java.net.URL("http://localhost:8080/api/health");
+                java.net.URI uri = java.net.URI.create("http://localhost:8080/api/health");
+                java.net.URL url = uri.toURL();
                 java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(5000);
