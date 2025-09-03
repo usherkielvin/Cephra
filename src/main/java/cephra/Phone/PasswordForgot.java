@@ -121,6 +121,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
     } else {
         javax.swing.JOptionPane.showMessageDialog(this, "Email address not found.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         email.setText("");
+        email.requestFocusInWindow();
     }
     }//GEN-LAST:event_resetsendActionPerformed
 
