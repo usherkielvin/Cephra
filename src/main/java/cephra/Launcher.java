@@ -18,6 +18,18 @@ public final class Launcher {
             System.exit(1);
         }
 
+        // Start embedded API server for Phone UI (runs on 0.0.0.0:8080)
+        new Thread(() -> {
+            try {
+                System.out.println("Starting API server...");
+                cephra.api.ApiServer.start(new String[]{});
+                System.out.println("API server started successfully on port 8080");
+            } catch (Throwable t) {
+                System.err.println("Failed to start API server: " + t.getMessage());
+                t.printStackTrace();
+            }
+        }, "api-server").start();
+
         javax.swing.SwingUtilities.invokeLater(() -> {
             java.awt.Rectangle screenBounds = GraphicsEnvironment
                 .getLocalGraphicsEnvironment()
