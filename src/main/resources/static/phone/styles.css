@@ -1,0 +1,239 @@
+/* Phone Interface Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.phone-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 700px;
+    background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 25px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    border: 8px solid #333;
+}
+
+.login-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    z-index: 10;
+}
+
+.login-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 40px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.input-group {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: white;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    background: white;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #007bff;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.login-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.login-btn:active {
+    transform: scale(0.98);
+}
+
+.home-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.welcome-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin: 20px 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.nav-buttons {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 5;
+}
+
+.nav-btn {
+    position: relative;
+    width: 70px;
+    height: 60px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+}
+
+.nav-btn:active {
+    transform: scale(0.95);
+}
+
+.nav-btn.charge {
+    top: 0;
+    left: 40px;
+    width: 60px;
+    height: 50px;
+}
+
+.nav-btn.link {
+    top: 0;
+    left: 120px;
+    width: 60px;
+    height: 50px;
+}
+
+.nav-btn.history {
+    top: 0;
+    left: 240px;
+    width: 60px;
+    height: 50px;
+}
+
+.nav-btn.profile {
+    top: 0;
+    left: 320px;
+    width: 60px;
+    height: 50px;
+}
+
+.queue-section {
+    position: absolute;
+    top: 180px;
+    left: 25px;
+    right: 25px;
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 5;
+}
+
+.queue-item {
+    background: rgba(255, 255, 255, 0.95);
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.queue-title {
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+}
+
+.queue-details {
+    font-size: 15px;
+    color: #666;
+    margin-top: 6px;
+}
+
+.button-icon {
+    font-size: 22px;
+    display: block;
+    text-align: center;
+    line-height: 1;
+    color: #fff;
+}
+
+.button-text {
+    font-size: 11px;
+    display: block;
+    text-align: center;
+    color: #fff;
+    margin-top: 3px;
+}
