@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = 'localhost';
-    private $db_name = 'cephra';
+    private $db_name = 'cephradb';  // Your actual Cephra database
     private $username = 'root';
     private $password = '';
     private $conn;
@@ -16,6 +16,7 @@ class Database {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $this->conn;
         } catch(PDOException $e) {
+            error_log("Database connection failed: " . $e->getMessage());
             return null;
         }
     }
