@@ -439,7 +439,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(10, 140, 320, 530);
+        historyScrollPane.setBounds(10, 150, 320, 520);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);

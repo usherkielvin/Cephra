@@ -159,7 +159,7 @@ public class Bay extends javax.swing.JPanel {
         add(bay1);
         bay1.setBounds(100, 270, 150, 32);
 
-        datetime.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        datetime.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetime.setForeground(new java.awt.Color(255, 255, 255));
         datetime.setText("10:44 AM 17 August, Sunday");
         add(datetime);
@@ -222,9 +222,7 @@ public class Bay extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        // Get the logged-in username from the Admin frame
-        String username = getLoggedInUsername();
-        labelStaff.setText(username + "!");
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -237,8 +235,6 @@ public class Bay extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Bay.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
-
-
     }// </editor-fold>//GEN-END:initComponents
 
     private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quebuttonActionPerformed
@@ -320,6 +316,7 @@ public class Bay extends javax.swing.JPanel {
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
     
+    @SuppressWarnings("unused")
     private String getLoggedInUsername() {
         try {
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);

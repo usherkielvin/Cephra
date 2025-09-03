@@ -181,11 +181,11 @@ public class Dashboard extends javax.swing.JPanel {
         add(exitlogin);
         exitlogin.setBounds(930, 0, 70, 60);
 
-        datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));
         datetimeStaff.setText("10:44 AM 17 August, Sunday");
         add(datetimeStaff);
-        datetimeStaff.setBounds(820, 40, 170, 20);
+        datetimeStaff.setBounds(820, 40, 180, 20);
 
         Saveminfee.setBorderPainted(false);
         Saveminfee.setContentAreaFilled(false);
@@ -217,9 +217,7 @@ public class Dashboard extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        // Get the logged-in username from the Admin frame
-        String username = getLoggedInUsername();
-        labelStaff.setText(username + "!");
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -450,6 +448,7 @@ public class Dashboard extends javax.swing.JPanel {
         }
     }
     
+    @SuppressWarnings("unused")
     private String getLoggedInUsername() {
         try {
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);

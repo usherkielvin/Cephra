@@ -187,12 +187,7 @@ public class StaffRecord extends javax.swing.JPanel {
             new String [] {
                 "Name", "Username", "Email", "Status", "Password"
             }
-        ) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
-            }
-        });
+        ));
         staffTable.setFocusable(false);
         staffTable.setOpaque(false);
         staffTable.setRequestFocusEnabled(false);
@@ -207,7 +202,7 @@ public class StaffRecord extends javax.swing.JPanel {
         add(search);
         search.setBounds(70, 187, 480, 31);
 
-        datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));
         datetimeStaff.setText("10:44 AM 17 August, Sunday");
         add(datetimeStaff);
@@ -215,9 +210,7 @@ public class StaffRecord extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        // Get the logged-in username from the Admin frame
-        String username = getLoggedInUsername();
-        labelStaff.setText(username + "!");
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -426,6 +419,7 @@ public class StaffRecord extends javax.swing.JPanel {
     private javax.swing.JTable staffTable;
     // End of variables declaration//GEN-END:variables
     
+    @SuppressWarnings("unused")
     private String getLoggedInUsername() {
         try {
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);

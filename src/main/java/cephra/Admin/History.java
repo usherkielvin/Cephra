@@ -57,7 +57,7 @@ public class History extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
-        datetime.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        datetime.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetime.setForeground(new java.awt.Color(255, 255, 255));
         datetime.setText("10:44 AM 17 August, Sunday");
         add(datetime);
@@ -85,12 +85,6 @@ public class History extends javax.swing.JPanel {
         jTable1.getTableHeader().setResizingAllowed(false);
         jTable1.getTableHeader().setReorderingAllowed(false);
         jTable1.setVerifyInputWhenFocusTarget(false);
-        
-        // Make table non-editable but allow row selection
-        jTable1.setDefaultEditor(Object.class, null);
-        jTable1.setCellSelectionEnabled(false);
-        jTable1.setRowSelectionAllowed(true);
-        jTable1.setColumnSelectionAllowed(false);
         jScrollPane1.setViewportView(jTable1);
 
         add(jScrollPane1);

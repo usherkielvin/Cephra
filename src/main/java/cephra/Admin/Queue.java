@@ -4,10 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import cephra.Frame.Monitor;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class Queue extends javax.swing.JPanel {
     private static Monitor monitorInstance;
@@ -723,6 +719,31 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
 
+    // Helper: check if a specific bay (e.g., "Bay-1".."Bay-8") is currently occupied
+    private boolean isBayInUse(String bayNumber) {
+        if (bayNumber == null || !bayNumber.startsWith("Bay-")) return false;
+        try {
+            int idx = Integer.parseInt(bayNumber.substring(4));
+            // Fast bays: 1-3 map to indices 0-2
+            if (idx >= 1 && idx <= 3) {
+                int fastIndex = idx - 1;
+                if (fastIndex >= 0 && fastIndex < cephra.Admin.Bay.fastChargingOccupied.length) {
+                    return cephra.Admin.Bay.fastChargingOccupied[fastIndex];
+                }
+            }
+            // Normal bays: 4-8 map to indices 0-4
+            if (idx >= 4 && idx <= 8) {
+                int normalIndex = idx - 4;
+                if (normalIndex >= 0 && normalIndex < cephra.Admin.Bay.normalChargingOccupied.length) {
+                    return cephra.Admin.Bay.normalChargingOccupied[normalIndex];
+                }
+            }
+        } catch (NumberFormatException ignore) {
+            // If parsing fails, assume not in use
+        }
+        return false;
+    }
+
 
     private void setupPaymentColumn() {
         final int paymentCol = getColumnIndex("Payment");
@@ -1286,7 +1307,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         add(jTabbedPane1);
         jTabbedPane1.setBounds(0, 50, 1020, 700);
 
-        datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));
         datetimeStaff.setText("10:44 AM 17 August, Sunday");
         add(datetimeStaff);
@@ -1294,9 +1315,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        // Get the logged-in username from the Admin frame
-        String username = getLoggedInUsername();
-        labelStaff.setText(username + "!");
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -1397,31 +1416,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton nxtnormalbtn;
     private javax.swing.JPanel panelLists;
     private javax.swing.JLabel queIcon;
-    // Method to check if a bay is currently in use by an active ticket
-    private boolean isBayInUse(String bayNumber) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
-            try (PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT COUNT(*) FROM active_tickets WHERE bay_number = ?")) {
-                
-                stmt.setString(1, bayNumber);
-                
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getInt(1) > 0; // If count > 0, bay is in use
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error checking if bay is in use: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return false; // Default to not in use if there's an error
-    }
-
     private javax.swing.JTable queTab;
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
     
+    @SuppressWarnings("unused")
     private String getLoggedInUsername() {
         try {
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);

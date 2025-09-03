@@ -1,11 +1,12 @@
 package cephra.Admin;
 
-import java.awt.Color;
-import java.awt.Window;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.font.*;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.*;
 import javax.swing.text.*; // Add this import
-import javax.swing.Timer;
 
 public class Login extends javax.swing.JPanel {
     private int loginAttempts = 0;
@@ -38,6 +39,25 @@ public class Login extends javax.swing.JPanel {
         // --- INTEGRATED FILTERS ---
         ((AbstractDocument) userfield.getDocument()).setDocumentFilter(new InputLimitFilter(15, true));
         ((AbstractDocument) passfield.getDocument()).setDocumentFilter(new InputLimitFilter(15, false));
+
+        // Hover underline and hand cursor for "Forgot Password?"
+        if (jButton1 != null) {
+            final Font baseFont = jButton1.getFont();
+            jButton1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            jButton1.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    Map<TextAttribute, Object> attributes = new HashMap<>(baseFont.getAttributes());
+                    attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                    jButton1.setFont(baseFont.deriveFont(attributes));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    jButton1.setFont(baseFont);
+                }
+            });
+        }
     }
 
     
