@@ -2,10 +2,13 @@ package cephra.Admin;
 
 import java.awt.*;
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class Bay extends javax.swing.JPanel {
 //
+   
     // Static variables to track available bays
     public static boolean[] fastChargingAvailable = {true, true, true}; // Bays 1-3
     public static boolean[] normalChargingAvailable = {true, true, true, true, true}; // Bays 4-8
@@ -13,6 +16,9 @@ public class Bay extends javax.swing.JPanel {
     // Static variables to track occupied bays
     public static boolean[] fastChargingOccupied = {false, false, false}; // Bays 1-3
     public static boolean[] normalChargingOccupied = {false, false, false, false, false}; // Bays 4-8
+    
+    // Toggle buttons for bay availability
+    private JToggleButton[] bayToggleButtons = new JToggleButton[8];
     
     // Static methods to check availability
     public static boolean isFastChargingAvailable() {
@@ -31,6 +37,23 @@ public class Bay extends javax.swing.JPanel {
             }
         }
         return false;
+    }
+    
+    // Method to check if a specific bay is available for charging
+    public static boolean isBayAvailableForCharging(int bayNumber) {
+        // Bay numbers are 1-indexed, arrays are 0-indexed
+        int index = bayNumber - 1;
+        
+        // Check if it's a fast charging bay (1-3)
+        if (bayNumber >= 1 && bayNumber <= 3) {
+            return fastChargingAvailable[index] && !fastChargingOccupied[index];
+        }
+        // Check if it's a normal charging bay (4-8)
+        else if (bayNumber >= 4 && bayNumber <= 8) {
+            return normalChargingAvailable[index - 3] && !normalChargingOccupied[index - 3];
+        }
+        
+        return false; // Invalid bay number
     }
     
     public static int getAvailableFastChargingCount() {
@@ -73,7 +96,8 @@ public class Bay extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         setupDateTimeTimer();
-        
+        setupBayToggleButtons();
+          
         // Set default state to Available for all bays
         SwingUtilities.invokeLater(() -> {
             bay1.setText("Available");
@@ -122,37 +146,37 @@ public class Bay extends javax.swing.JPanel {
         bay8.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay8.setText("Available");
         add(bay8);
-        bay8.setBounds(400, 645, 150, 32);
+        bay8.setBounds(390, 650, 150, 32);
 
         bay7.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay7.setText("Available");
         add(bay7);
-        bay7.setBounds(100, 645, 150, 32);
+        bay7.setBounds(90, 640, 150, 32);
 
         bay6.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay6.setText("Available");
         add(bay6);
-        bay6.setBounds(720, 460, 150, 32);
+        bay6.setBounds(690, 460, 150, 32);
 
         bay5.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay5.setText("Available");
         add(bay5);
-        bay5.setBounds(400, 460, 150, 32);
+        bay5.setBounds(380, 460, 150, 32);
 
         bay4.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay4.setText("Available");
         add(bay4);
-        bay4.setBounds(100, 460, 150, 32);
+        bay4.setBounds(80, 460, 150, 32);
 
         bay3.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay3.setText("Available");
         add(bay3);
-        bay3.setBounds(730, 270, 150, 32);
+        bay3.setBounds(680, 270, 150, 32);
 
         bay2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay2.setText("Available");
         add(bay2);
-        bay2.setBounds(410, 270, 150, 32);
+        bay2.setBounds(380, 270, 150, 32);
 
         bay1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay1.setText("Available");
@@ -330,5 +354,108 @@ public class Bay extends javax.swing.JPanel {
             System.err.println("Error getting logged-in username: " + e.getMessage());
         }
         return "Admin"; // Fallback
+    }
+    
+    /**
+     * Sets up the toggle buttons for controlling bay availability
+     */
+    private void setupBayToggleButtons() {
+        // Create toggle buttons for each bay
+        for (int i = 0; i < 8; i++) {
+            final int bayIndex = i;
+            bayToggleButtons[i] = new JToggleButton();
+            bayToggleButtons[i].setText("Bay " + (i + 1));
+            
+            // Set initial state based on availability arrays
+            if (i < 3) { // Fast charging bays (0-2)
+                bayToggleButtons[i].setSelected(fastChargingAvailable[i]);
+                bayToggleButtons[i].setText("Fast Bay " + (i + 1));
+                bayToggleButtons[i].setBackground(new Color(0, 150, 255)); // Blue for fast charging
+            } else { // Normal charging bays (3-7)
+                bayToggleButtons[i].setSelected(normalChargingAvailable[i - 3]);
+                bayToggleButtons[i].setText("Normal Bay " + (i + 1));
+                bayToggleButtons[i].setBackground(new Color(0, 180, 0)); // Green for normal charging
+            }
+            
+            // Style the toggle button
+            bayToggleButtons[i].setForeground(Color.WHITE);
+            bayToggleButtons[i].setFont(new Font("Segoe UI", Font.BOLD, 14));
+            bayToggleButtons[i].setFocusPainted(false);
+            
+            // Add action listener to update availability arrays when toggled
+            bayToggleButtons[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JToggleButton source = (JToggleButton) e.getSource();
+                    boolean isAvailable = source.isSelected();
+                    
+                    // Update the appropriate availability array
+                    if (bayIndex < 3) { // Fast charging bays
+                        fastChargingAvailable[bayIndex] = isAvailable;
+                        // Update the bay label
+                        JLabel bayLabel = getBayLabel(bayIndex + 1);
+                        if (bayLabel != null) {
+                            updateBayLabel(bayLabel, isAvailable);
+                        }
+                    } else { // Normal charging bays
+                        normalChargingAvailable[bayIndex - 3] = isAvailable;
+                        // Update the bay label
+                        JLabel bayLabel = getBayLabel(bayIndex + 1);
+                        if (bayLabel != null) {
+                            updateBayLabel(bayLabel, isAvailable);
+                        }
+                    }
+                    
+                    // Save the updated toggle states
+                    saveToggleStates();
+                }
+            });
+            
+            // Add the toggle button to the panel
+            add(bayToggleButtons[i]);
+            
+            // Position the toggle buttons below the bay labels
+            if (i < 3) { // First row - Fast charging bays
+                bayToggleButtons[i].setBounds(230 + (i * 310), 275, 40, 40);
+            } else if (i < 6) { // Second row - Normal charging bays 4-6
+                bayToggleButtons[i].setBounds(230 + ((i - 3) * 310), 475, 150, 40);
+            } else { // Third row - Normal charging bays 7-8
+                bayToggleButtons[i].setBounds(230 + ((i - 6) * 310), 645, 150, 40);
+            }
+        }
+    }
+    
+    /**
+     * Gets the JLabel for a specific bay number
+     * @param bayNumber The bay number (1-8)
+     * @return The JLabel for the bay, or null if not found
+     */
+    private JLabel getBayLabel(int bayNumber) {
+        switch (bayNumber) {
+            case 1: return bay1;
+            case 2: return bay2;
+            case 3: return bay3;
+            case 4: return bay4;
+            case 5: return bay5;
+            case 6: return bay6;
+            case 7: return bay7;
+            case 8: return bay8;
+            default: return null;
+        }
+    }
+    
+    /**
+     * Updates a bay label based on availability
+     * @param label The JLabel to update
+     * @param isAvailable Whether the bay is available
+     */
+    private void updateBayLabel(JLabel label, boolean isAvailable) {
+        if (isAvailable) {
+            label.setText("Available");
+            label.setForeground(new java.awt.Color(0, 128, 0)); // Green for available
+        } else {
+            label.setText("Unavailable");
+            label.setForeground(new java.awt.Color(255, 0, 0)); // Red for unavailable
+        }
     }
 }

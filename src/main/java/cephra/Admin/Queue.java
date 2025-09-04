@@ -203,9 +203,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                              if (isFast) {
                                  // Find the first available fast charging bay that's not in use
                                  for (int i = 0; i < 3; i++) {
-                                     String currentBay = "Bay-" + (i + 1);
+                                     int bayNum = i + 1;
+                                     String currentBay = "Bay-" + bayNum;
                                      // Check if bay is available and not currently in use by another active ticket
-                                     if (cephra.Admin.Bay.fastChargingAvailable[i] && !isBayInUse(currentBay)) {
+                                     if (cephra.Admin.Bay.isBayAvailableForCharging(bayNum)) {
                                          bayNumber = currentBay;
                                          break;
                                      }
@@ -220,9 +221,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                              } else {
                                  // Find the first available normal charging bay that's not in use
                                  for (int i = 0; i < 5; i++) {
-                                     String currentBay = "Bay-" + (i + 4);
+                                     int bayNum = i + 4;
+                                     String currentBay = "Bay-" + bayNum;
                                      // Check if bay is available and not currently in use by another active ticket
-                                     if (Bay.normalChargingAvailable[i] && !isBayInUse(currentBay)) {
+                                     if (cephra.Admin.Bay.isBayAvailableForCharging(bayNum)) {
                                          bayNumber = currentBay;
                                          break;
                                      }
@@ -641,27 +643,36 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
      }
 
     private boolean assignToNormalSlot(String ticket) {
-        if (normalcharge1.getText().isEmpty() || normalcharge1.getText().equals("jButton11")) {
+        // Check Bay-4
+        if ((normalcharge1.getText().isEmpty() || normalcharge1.getText().equals("jButton11")) && cephra.Admin.Bay.isBayAvailableForCharging(4)) {
             normalcharge1.setText(ticket);
             normalcharge1.setVisible(true);
             updateMonitorNormalGrid();
             return true;
-        } else if (normalcharge2.getText().isEmpty() || normalcharge2.getText().equals("jButton11")) {
+        } 
+        // Check Bay-5
+        else if ((normalcharge2.getText().isEmpty() || normalcharge2.getText().equals("jButton11")) && cephra.Admin.Bay.isBayAvailableForCharging(5)) {
             normalcharge2.setText(ticket);
             normalcharge2.setVisible(true);
             updateMonitorNormalGrid();
             return true;
-        } else if (normalcharge3.getText().isEmpty() || normalcharge3.getText().equals("jButton12")) {
+        } 
+        // Check Bay-6
+        else if ((normalcharge3.getText().isEmpty() || normalcharge3.getText().equals("jButton12")) && cephra.Admin.Bay.isBayAvailableForCharging(6)) {
             normalcharge3.setText(ticket);
             normalcharge3.setVisible(true);
             updateMonitorNormalGrid();
             return true;
-        } else if (normalcharge4.getText().isEmpty() || normalcharge4.getText().equals("jButton13")) {
+        } 
+        // Check Bay-7
+        else if ((normalcharge4.getText().isEmpty() || normalcharge4.getText().equals("jButton13")) && cephra.Admin.Bay.isBayAvailableForCharging(7)) {
             normalcharge4.setText(ticket);
             normalcharge4.setVisible(true);
             updateMonitorNormalGrid();
             return true;
-        } else if (normalcharge5.getText().isEmpty() || normalcharge5.getText().equals("jButton14")) {
+        } 
+        // Check Bay-8
+        else if ((normalcharge5.getText().isEmpty() || normalcharge5.getText().equals("jButton14")) && cephra.Admin.Bay.isBayAvailableForCharging(8)) {
             normalcharge5.setText(ticket);
             normalcharge5.setVisible(true);
             updateMonitorNormalGrid();
@@ -671,17 +682,22 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
 
     private boolean assignToFastSlot(String ticket) {
-        if (fastslot1.getText().isEmpty() || fastslot1.getText().equals("jButton11")) {
+        // Check Bay-1
+        if ((fastslot1.getText().isEmpty() || fastslot1.getText().equals("jButton11")) && cephra.Admin.Bay.isBayAvailableForCharging(1)) {
             fastslot1.setText(ticket);
             fastslot1.setVisible(true);
             updateMonitorFastGrid();
             return true;
-        } else if (fastslot2.getText().isEmpty() || fastslot2.getText().equals("jButton12")) {
+        } 
+        // Check Bay-2
+        else if ((fastslot2.getText().isEmpty() || fastslot2.getText().equals("jButton12")) && cephra.Admin.Bay.isBayAvailableForCharging(2)) {
             fastslot2.setText(ticket);
             fastslot2.setVisible(true);
             updateMonitorFastGrid();
             return true;
-        } else if (fastslot3.getText().isEmpty() || fastslot3.getText().equals("jButton13")) {
+        } 
+        // Check Bay-3
+        else if ((fastslot3.getText().isEmpty() || fastslot3.getText().equals("jButton13")) && cephra.Admin.Bay.isBayAvailableForCharging(3)) {
             fastslot3.setText(ticket);
             fastslot3.setVisible(true);
             updateMonitorFastGrid();
