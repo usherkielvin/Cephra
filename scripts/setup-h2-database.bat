@@ -24,7 +24,7 @@ echo =====================================================
 echo H2 Database setup completed!
 echo.
 echo You can now run your application with:
-echo run.bat
+echo scripts/run.bat
 echo.
 echo The H2 database will be created automatically in the current directory.
 echo.

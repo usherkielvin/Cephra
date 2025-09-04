@@ -33,17 +33,17 @@ This guide will help you set up MySQL to work with your Cephra application.
 
 ## Step 4: Initialize the Database
 
-1. Run the `init-database.bat` script:
+1. Run the `scripts/init-database.bat` script:
    ```
-   init-database.bat
+   scripts/init-database.bat
    ```
 2. When prompted, enter your MySQL root password
 
 ## Step 5: Run the Application
 
-1. Run the application using the updated `run.bat` script:
+1. Run the application using the updated `scripts/run.bat` script:
    ```
-   run.bat
+   scripts/run.bat
    ```
 
 ## Troubleshooting
@@ -52,7 +52,7 @@ If you encounter any issues:
 
 1. **Connection errors**: Make sure MySQL service is running and the password in `DatabaseConnection.java` is correct
 2. **ClassNotFoundException**: Ensure the JAR files are in the `lib` folder
-3. **Database not found**: Run the `init-database.bat` script again to create the database
+3. **Database not found**: Run the `scripts/init-database.bat` script again to create the database
 
 ## Manual Database Setup (if needed)
 

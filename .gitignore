@@ -38,6 +38,7 @@ target/
 
 # VS Code specific
 .vscode/
+dev/.vscode/
 
 # IntelliJ IDEA specific
 .idea/

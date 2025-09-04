@@ -1429,7 +1429,7 @@ public class CephraDB {
         System.err.println("1. Start XAMPP Control Panel");
         System.err.println("2. Start the MySQL service");
         System.err.println("3. Run one of the following commands:");
-        System.err.println("   - Double-click: init-database.bat");
+        System.err.println("   - Double-click: scripts/init-database.bat");
         System.err.println("   - Or manually: mysql -u root -p < src/main/resources/db/init.sql");
         System.err.println("");
         System.err.println("After initialization, restart the application.");

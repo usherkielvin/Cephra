@@ -6,7 +6,7 @@ echo Checking MySQL connection...
 mysql --version > nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo WARNING: MySQL not found in PATH. Database features may not work correctly.
-    echo Please run init-database.bat first if this is your first time running with MySQL.
+    echo Please run scripts/init-database.bat first if this is your first time running with MySQL.
     timeout /t 3
 )
 
