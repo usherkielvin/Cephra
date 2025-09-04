@@ -79,7 +79,7 @@ Cephra/
 ### **Web Enhancement (Phone Interface)**
 ```
 cephra/ (XAMPP Web Server)
-├── phone/                      # Web-based phone interface
+├── mobileweb/                  # Web-based mobile interface
 │   ├── index.php              # Main phone interface
 │   ├── styles.css             # Modern styling
 │   └── script.js              # Interactive functionality
@@ -142,7 +142,7 @@ cephra/ (XAMPP Web Server)
 
 3. **Access Web Interface**
    ```
-   Phone Interface: http://localhost/cephra/phone/
+   Mobile Web Interface: http://localhost/cephra/mobileweb/
    Queue Monitor:  http://localhost/cephra/api/view-queue.php
    ```
 
@@ -271,8 +271,8 @@ Cephra/
 │           └── cephra/
 │               └── Photos/          # Application images and icons
 ├── 📁 cephra/                  # Web Interface (Phone Enhancement)
-│   ├── 📁 phone/               # Web-based phone interface
-│   │   ├── index.php           # Main phone interface
+│   ├── 📁 mobileweb/           # Mobile web interface
+│   │   ├── index.php           # Main mobile web interface
 │   │   ├── styles.css          # Modern styling
 │   │   └── script.js           # Interactive functionality
 │   ├── 📁 api/                 # PHP API backend
@@ -327,7 +327,7 @@ POST /api/mobile.php?action=create-ticket  # Create new tickets
 ```
 
 ### **Mobile Access**
-- **Local Network**: `http://[YOUR_IP]/cephra/phone/`
+- **Local Network**: `http://[YOUR_IP]/cephra/mobileweb/`
 - **Same Database**: Shares data with Java application
 - **Real-Time Sync**: Updates automatically with Java system
 
@@ -366,9 +366,9 @@ mvn install
 - **Team Collaboration** - Different developers can work on different files
 
 #### **Development Workflow**
-1. **Edit HTML** - Modify structure in `phone/index.html`
-2. **Style Changes** - Update design in `phone/styles.css`
-3. **Add Features** - Enhance functionality in `phone/script.js`
+1. **Edit HTML** - Modify structure in `mobileweb/index.html`
+2. **Style Changes** - Update design in `mobileweb/styles.css`
+3. **Add Features** - Enhance functionality in `mobileweb/script.js`
 4. **Test** - Refresh browser to see changes
 5. **Deploy** - Copy to production when ready
 

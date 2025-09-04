@@ -1,6 +1,6 @@
 # 🔋 Cephra - EV Charging Queue Management System
 
-A comprehensive Java-based Electric Vehicle (EV) charging station queue management system with **web-based phone interface improvements** for enhanced mobile accessibility.
+A comprehensive Java-based Electric Vehicle (EV) charging station queue management system with **mobile web interface improvements** for enhanced mobile accessibility.
 
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Maven](https://img.shields.io/badge/Maven-3.11.0-blue)
@@ -15,7 +15,7 @@ A comprehensive Java-based Electric Vehicle (EV) charging station queue manageme
 Cephra/
 ├── 📁 src/                     # Java Source Code (Primary System)
 │   └── main/java/cephra/       # Main application code
-├── 📁 phone/                   # Web-based phone interface
+├── 📁 mobileweb/               # Mobile web interface
 ├── 📁 api/                     # PHP API backend
 ├── 📁 config/                  # Configuration files
 ├── 📁 scripts/                 # Batch scripts for setup and management
@@ -39,7 +39,7 @@ scripts/run.bat
 ```
 
 ### 3. Access Web Interface
-- Phone Interface: `http://localhost/cephra/phone/`
+- Mobile Web Interface: `http://localhost/cephra/mobileweb/`
 - Queue Monitor: `http://localhost/cephra/api/view-queue.php`
 
 ## 📚 Documentation

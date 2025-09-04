@@ -20,7 +20,7 @@ class ApiEndpointTester {
     
     public function __construct() {
         $this->db = (new Database())->getConnection();
-        $this->baseUrl = 'http://localhost:8080/api';
+        $this->baseUrl = 'http://localhost/cephra/api';
     }
     
     /**

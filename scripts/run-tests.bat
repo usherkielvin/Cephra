@@ -37,24 +37,18 @@ if %ERRORLEVEL% NEQ 0 (
     echo.
 )
 
-REM Check if API server is running
-echo 2. Checking API Server Status...
+REM Java Swing application is ready
+echo 2. Java Swing Application Status...
 echo ================================
-curl -s http://localhost:8080/api/health > nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo WARNING: API server may not be running
-    echo Please start the application with: scripts/run.bat
-    echo.
-) else (
-    echo API server is running
-    echo.
-)
+echo Java Swing application is ready to run
+echo Use: scripts/run.bat to start the application
+echo.
 
 REM Run PHP tests
 echo 3. Running PHP API Tests...
 echo ================================
 echo Opening PHP test page in browser...
-start http://localhost:8080/api/test-endpoints.php
+start http://localhost/cephra/api/test-endpoints.php
 echo.
 echo PHP tests are running in your browser
 echo Check the results in the opened page
@@ -64,7 +58,7 @@ REM Run JavaScript tests
 echo 4. JavaScript Integration Tests...
 echo ================================
 echo Opening JavaScript test page...
-start http://localhost:8080/phone/?test=true
+start http://localhost/cephra/mobileweb/?test=true
 echo.
 echo JavaScript tests are running in your browser
 echo Check the browser console for results
@@ -81,7 +75,7 @@ echo - JavaScript Tests: Check browser console
 echo.
 echo For detailed results, check:
 echo - Maven test reports: target/surefire-reports/
-echo - PHP test page: http://localhost:8080/api/test-endpoints.php
+echo - PHP test page: http://localhost/cephra/api/test-endpoints.php
 echo - JavaScript tests: Browser console
 echo.
 pause

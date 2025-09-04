@@ -25,10 +25,10 @@ scripts/run-tests.bat
 mvn test
 
 # PHP tests only
-# Open: http://localhost:8080/api/test-endpoints.php
+# Open: http://localhost/cephra/api/test-endpoints.php
 
 # JavaScript tests only
-# Open: http://localhost:8080/phone/?test=true
+# Open: http://localhost/cephra/mobileweb/?test=true
 ```
 
 ## 📁 Test Structure
@@ -40,7 +40,7 @@ src/test/java/cephra/api/
 api/
 └── test-endpoints.php            # PHP API tests
 
-phone/
+mobileweb/
 └── test-api-integration.js       # JavaScript integration tests
 
 scripts/
@@ -79,7 +79,7 @@ mvn test -Dtest=ApiEndpointTest
 - ✅ Error Handling
 - ✅ HTML Page Rendering
 
-**Access**: `http://localhost:8080/api/test-endpoints.php`
+**Access**: `http://localhost/cephra/api/test-endpoints.php`
 
 ### 3. JavaScript Integration Tests (`test-api-integration.js`)
 
@@ -94,7 +94,7 @@ mvn test -Dtest=ApiEndpointTest
 - ✅ CORS Headers
 - ✅ Performance Testing
 
-**Access**: `http://localhost:8080/phone/?test=true`
+**Access**: `http://localhost/cephra/mobileweb/?test=true`
 
 ## 🎯 API Endpoints Tested
 
@@ -147,7 +147,7 @@ mvn test -Dtest=ApiEndpointTest
 
 ### Environment Setup
 1. Start the application: `scripts/run.bat`
-2. Ensure API server is running on port 8080
+2. Java Swing application is ready to run
 3. Verify database connection
 4. Run tests: `scripts/run-tests.bat`
 
@@ -211,7 +211,7 @@ The test suite can be integrated into CI/CD pipelines:
 # CI Pipeline Example
 mvn clean test
 # Run PHP tests
-curl http://localhost:8080/api/test-endpoints.php
+curl http://localhost/cephra/api/test-endpoints.php
 # Run JavaScript tests
 npm test  # If using Node.js
 ```

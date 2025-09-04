@@ -1,5 +1,5 @@
 /**
- * Frontend API Integration Tests for Cephra Phone Interface
+ * Frontend API Integration Tests for Cephra Mobile Web Interface
  * 
  * This file tests the API integration from the frontend perspective.
  * Run this in the browser console or include it in your test page.
@@ -7,7 +7,7 @@
 
 class CephraApiTester {
     constructor() {
-        this.baseUrl = 'http://localhost:8080/api';
+        this.baseUrl = 'http://localhost/cephra/api';
         this.testResults = [];
     }
     
