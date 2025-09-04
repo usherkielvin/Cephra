@@ -1,41 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cephra Mobile Web</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-    <div class="container">
-        <div id="loginForm" class="login-form">
-            <h2>Login</h2>
-            <input type="text" id="username" placeholder="Username" value="dizon">
-            <input type="password" id="password" placeholder="Password" value="123">
-            <button onclick="login()">Login</button>
-        </div>
-        
-        <div id="homePage" class="home-page">
-            <h2>Welcome <span id="welcomeUser"></span>!</h2>
-            
-            <div class="queue-header">
-                <h3>Live Queue</h3>
-                <div class="refresh-info">Auto-refresh every 5s</div>
-            </div>
-            
-            <div id="queue"></div>
-            
-            <div class="nav-buttons">
-                <button class="nav-btn" onclick="createTicket('Fast Charging')">Fast Charge</button>
-                <button class="nav-btn" onclick="createTicket('Normal Charging')">Normal Charge</button>
-            </div>
-            
-            <div class="last-updated">
-                Last updated: <span id="lastUpdated">Never</span>
-            </div>
-        </div>
+<!-- From Uiverse.io by ammarsaa -->
+<form class="form" id="loginForm">
+    <p class="title">Login </p>
+    <p class="message"></p>
+    <div class="flex">
+        <label>
+            <input class="input" type="text" id="username" name="username" placeholder="" required />
+            <span>Username</span>
+        </label>
     </div>
+    <label>
+        <input class="input" type="password" id="password" name="password" placeholder="" required />
+        
+        <span>Password</span>
 
-    <script src="script.js"></script>
+    </label>
+    <button class="submit" type="submit">Submit</button>
+
+    <p class="signin">Doesnt have an account? <a href="Register_Panel.php">Register Here</a></p>
+</form>
+
+<script src="script.js"></script>
 </body>
 </html>

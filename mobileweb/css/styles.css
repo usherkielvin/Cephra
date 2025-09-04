@@ -1,4 +1,5 @@
 /* Cephra Mobile Web Interface Styles */
+
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +8,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: white;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -25,58 +26,131 @@ body {
     min-height: 600px;
 }
 
-/* Login Form Styles */
-.login-form {
-    padding: 40px 30px;
+
+/* From Uiverse.io by ammarsaa */
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+    padding: 20px;
+    border-radius: 20px;
+    position: relative;
+    background-color: #1a1a1a;
+    color: #fff;
+    border: 1px solid #333;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+    color: #00c2ce;
+}
+
+.message,
+.signin {
+    font-size: 14.5px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.signin {
     text-align: center;
 }
 
-.login-form h2 {
-    color: #333;
-    margin-bottom: 30px;
-    font-size: 28px;
+.signin a:hover {
+    text-decoration: underline royalblue;
+}
+
+.signin a {
+    color: #00bfff;
+}
+
+.flex {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+}
+
+.form .flex label {
+    flex: 1;
+}
+
+.form label {
+    position: relative;
+}
+
+.form label .input {
+    background-color: #333;
+    color: #fff;
+    width: 100%;
+    padding: 20px 05px 05px 10px;
+    outline: 0;
+    border: 1px solid rgba(105, 105, 105, 0.397);
+    border-radius: 10px;
+}
+
+.form label .input+span {
+    color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    left: 10px;
+    top: 0px;
+    font-size: 0.9em;
+    cursor: text;
+    transition: 0.3s ease;
+}
+
+.form label .input:placeholder-shown+span {
+    top: 12.5px;
+    font-size: 0.9em;
+}
+
+.form label .input:focus+span,
+.form label .input:valid+span {
+    color: #00bfff;
+    top: 0px;
+    font-size: 0.7em;
     font-weight: 600;
 }
 
-.login-form input {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 2px solid #e1e5e9;
-    border-radius: 10px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
+.input {
+    font-size: medium;
 }
 
-.login-form input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.login-form button {
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+.submit {
     border: none;
+    outline: none;
+    padding: 10px;
     border-radius: 10px;
+    color: #fff;
     font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transform: .3s ease;
+    background-color: #00c2ce;
 }
 
-.login-form button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+.submit:hover {
+    background-color: #00bfff96;
 }
 
-.login-form button:active {
-    transform: translateY(0);
+@keyframes pulse {
+    from {
+        transform: scale(0.9);
+        opacity: 1;
+    }
+    to {
+        transform: scale(1.8);
+        opacity: 0;
+    }
 }
+
 
 /* Home Page Styles */
+
 .home-page {
     padding: 30px;
     display: none;
@@ -89,7 +163,9 @@ body {
     text-align: center;
 }
 
+
 /* Queue Header */
+
 .queue-header {
     display: flex;
     justify-content: space-between;
@@ -114,7 +190,9 @@ body {
     border-radius: 15px;
 }
 
+
 /* Queue Display */
+
 #queue {
     margin-bottom: 25px;
     max-height: 300px;
@@ -135,7 +213,9 @@ body {
     margin-bottom: 0;
 }
 
+
 /* Navigation Buttons */
+
 .nav-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -164,7 +244,9 @@ body {
     transform: translateY(0);
 }
 
+
 /* Last Updated */
+
 .last-updated {
     font-size: 11px;
     color: #999;
@@ -175,22 +257,22 @@ body {
     border-radius: 8px;
 }
 
+
 /* Responsive Design */
+
 @media (max-width: 480px) {
     .container {
         margin: 10px;
         border-radius: 15px;
     }
-    
-    .login-form, .home-page {
+    .form,
+    .home-page {
         padding: 25px 20px;
     }
-    
     .nav-buttons {
         grid-template-columns: 1fr;
         gap: 10px;
     }
-    
     .queue-header {
         flex-direction: column;
         gap: 10px;
@@ -198,7 +280,9 @@ body {
     }
 }
 
+
 /* Scrollbar Styling */
+
 #queue::-webkit-scrollbar {
     width: 6px;
 }
@@ -217,13 +301,17 @@ body {
     background: #a8a8a8;
 }
 
+
 /* Loading States */
+
 .loading {
     opacity: 0.6;
     pointer-events: none;
 }
 
+
 /* Success/Error Messages */
+
 .success-message {
     background: #d4edda;
     color: #155724;

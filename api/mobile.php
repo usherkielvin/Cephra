@@ -53,14 +53,49 @@ try {
                 echo json_encode(['error' => 'Method not allowed']);
             }
             break;
-            
+
+        case 'register':
+            if ($method === 'POST') {
+                $firstname = $_POST['firstname'] ?? '';
+                $lastname = $_POST['lastname'] ?? '';
+                $email = $_POST['email'] ?? '';
+                $password = $_POST['password'] ?? '';
+
+                if (!$firstname || !$lastname || !$email || !$password) {
+                    echo json_encode(['error' => 'Missing required fields']);
+                    exit;
+                }
+
+                // Check if email already exists
+                $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
+                $stmt->execute([$email]);
+                if ($stmt->rowCount() > 0) {
+                    echo json_encode(['error' => 'Email already registered']);
+                    exit;
+                }
+
+                // Insert new user
+                $stmt = $db->prepare("INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)");
+                $username = $_POST['username'] ?? '';
+                $result = $stmt->execute([$firstname, $lastname, $username, $email, $password]);
+
+                if ($result) {
+                    echo json_encode(['success' => true, 'message' => 'User registered successfully']);
+                } else {
+                    echo json_encode(['error' => 'Failed to register user']);
+                }
+            } else {
+                echo json_encode(['error' => 'Method not allowed']);
+            }
+            break;
+
         case 'create-ticket':
             if ($method === 'POST') {
                 $data = json_decode(file_get_contents('php://input'), true);
-                
+
                 // Insert into your actual queue_tickets table
                 $stmt = $db->prepare("INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level) VALUES (?, ?, ?, ?, ?, ?)");
-                
+
                 $result = $stmt->execute([
                     $data['ticket_id'],
                     $data['username'],
@@ -69,7 +104,7 @@ try {
                     'Pending',
                     $data['initial_battery_level'] ?? 20
                 ]);
-                
+
                 if ($result) {
                     echo json_encode(['success' => true, 'ticket_id' => $data['ticket_id']]);
                 } else {
@@ -79,12 +114,12 @@ try {
                 echo json_encode(['error' => 'Method not allowed']);
             }
             break;
-            
+
         default:
             // Show available actions
             echo json_encode([
                 'message' => 'Cephra Database API',
-                'available_actions' => ['login', 'queue', 'create-ticket'],
+                'available_actions' => ['login', 'register', 'queue', 'create-ticket'],
                 'usage' => 'Add ?action=ACTION or POST action=ACTION'
             ]);
     }
