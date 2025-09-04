@@ -1,4 +1,4 @@
-// Cephra Phone Interface JavaScript
+// Cephra Mobile Web Interface JavaScript
 
 // Get the current host and path to build correct API URLs
 const currentHost = window.location.protocol + '//' + window.location.host;

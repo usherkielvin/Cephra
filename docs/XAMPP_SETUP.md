@@ -14,11 +14,11 @@ This guide will help you set up the Cephra application with XAMPP's MySQL databa
 3. Make sure the MySQL service is running (status should be green)
 
 ### 2. Initialize the Database
-1. Run the `init-database.bat` file in the Cephra root directory
+1. Run the `scripts/init-database.bat` file in the Cephra root directory
 2. This will create the necessary database and tables in XAMPP's MySQL
 
 ### 3. Run the Application
-1. Run the `run.bat` file to start the Cephra application
+1. Run the `scripts/run.bat` file to start the Cephra application
 2. The application will now connect to the XAMPP MySQL database
 
 ## Troubleshooting

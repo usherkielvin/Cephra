@@ -28,7 +28,7 @@ public class DatabaseTest {
             if (rs.next()) {
                 System.out.println("✓ Database 'cephradb' exists");
             } else {
-                System.out.println("✗ Database 'cephradb' not found - run init-database.bat");
+                System.out.println("✗ Database 'cephradb' not found - run scripts/init-database.bat");
             }
             
             // Check if tables exist
@@ -42,7 +42,7 @@ public class DatabaseTest {
             if (tableCount > 0) {
                 System.out.println("✓ Found " + tableCount + " tables in database");
             } else {
-                System.out.println("✗ No tables found - run init-database.bat");
+                System.out.println("✗ No tables found - run scripts/init-database.bat");
             }
             
             // Test a simple query
@@ -67,7 +67,7 @@ public class DatabaseTest {
             System.err.println("1. Make sure XAMPP is running");
             System.err.println("2. Start MySQL service in XAMPP Control Panel");
             System.err.println("3. Check if port 3306 is available");
-            System.err.println("4. Run init-database.bat to create database");
+            System.err.println("4. Run scripts/init-database.bat to create database");
             e.printStackTrace();
         }
     }

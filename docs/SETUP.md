@@ -12,7 +12,7 @@
 - Ensure PHP and MySQL are running
 
 ### 3. Test the System
-- Open `http://localhost/cephra/phone/` in your browser
+- Open `http://localhost/cephra/mobileweb/` in your browser
 - Login with: `dizon` / `123`
 - Create tickets and view queue
 
@@ -23,8 +23,8 @@ cephra/
 │   └── database.php          # Database connection
 ├── api/
 │   └── index.php            # API endpoints
-└── phone/
-    └── index.php            # Phone interface
+└── mobileweb/
+    └── index.php            # Mobile web interface
 ```
 
 ## API Endpoints
