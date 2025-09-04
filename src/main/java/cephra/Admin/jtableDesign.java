@@ -9,8 +9,10 @@ public class jtableDesign {
     
     public static void apply(JTable table) {
         table.setRowHeight(30);
-        table.setShowGrid(false);
-        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setShowVerticalLines(false);
+        table.setShowHorizontalLines(true);
+        table.setGridColor(new Color(200, 200, 200)); // Light gray horizontal lines
+        table.setIntercellSpacing(new Dimension(0, 1));
 
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.setForeground(new Color(50, 50, 50));

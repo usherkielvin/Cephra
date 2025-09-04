@@ -105,14 +105,16 @@ public class Dashboard extends javax.swing.JPanel {
         setLayout(null);
 
         earnings.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
+        earnings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         earnings.setText("₱6,789");
         add(earnings);
-        earnings.setBounds(650, 220, 310, 120);
+        earnings.setBounds(600, 220, 310, 120);
 
         totalcharge.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
+        totalcharge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         totalcharge.setText("31");
         add(totalcharge);
-        totalcharge.setBounds(240, 220, 160, 120);
+        totalcharge.setBounds(150, 220, 250, 120);
 
         MinfeeSpinner.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         MinfeeSpinner.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray, java.awt.Color.lightGray));

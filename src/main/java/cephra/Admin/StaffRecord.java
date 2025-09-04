@@ -22,6 +22,7 @@ public class StaffRecord extends javax.swing.JPanel {
         
         jtableDesign.apply(staffTable);
   
+        jtableDesign.makeScrollPaneTransparent(jScrollPane1);
         
         JTableHeader header = staffTable.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
@@ -150,12 +151,12 @@ public class StaffRecord extends javax.swing.JPanel {
         profRemove.setBorderPainted(false);
         profRemove.setContentAreaFilled(false);
         add(profRemove);
-        profRemove.setBounds(580, 190, 120, 30);
+        profRemove.setBounds(520, 140, 120, 30);
 
         passReset.setBorderPainted(false);
         passReset.setContentAreaFilled(false);
         add(passReset);
-        passReset.setBounds(710, 190, 120, 30);
+        passReset.setBounds(660, 140, 120, 30);
 
         reg.setBorderPainted(false);
         reg.setContentAreaFilled(false);
@@ -165,7 +166,7 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         });
         add(reg);
-        reg.setBounds(850, 190, 110, 30);
+        reg.setBounds(840, 135, 150, 40);
 
         BTNsearch.setBorderPainted(false);
         BTNsearch.setContentAreaFilled(false);
@@ -189,6 +190,7 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         ));
         staffTable.setFocusable(false);
+        staffTable.setGridColor(new java.awt.Color(255, 255, 255));
         staffTable.setOpaque(false);
         staffTable.setRequestFocusEnabled(false);
         staffTable.getTableHeader().setResizingAllowed(false);
@@ -196,11 +198,11 @@ public class StaffRecord extends javax.swing.JPanel {
         jScrollPane1.setViewportView(staffTable);
 
         add(jScrollPane1);
-        jScrollPane1.setBounds(30, 230, 950, 520);
+        jScrollPane1.setBounds(10, 190, 980, 558);
 
         search.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         add(search);
-        search.setBounds(70, 187, 480, 31);
+        search.setBounds(70, 140, 350, 31);
 
         datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));

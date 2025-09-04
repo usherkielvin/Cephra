@@ -1023,7 +1023,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         add(historybutton);
         historybutton.setBounds(430, 10, 60, 40);
 
-        jTabbedPane1.setBackground(new java.awt.Color(63, 98, 110));
+        jTabbedPane1.setBackground(new java.awt.Color(4, 38, 55));
         jTabbedPane1.setForeground(new java.awt.Color(255, 255, 255));
         jTabbedPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
@@ -1033,19 +1033,19 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         Paid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Paid.setText("5");
         panelLists.add(Paid);
-        Paid.setBounds(50, 530, 120, 70);
+        Paid.setBounds(40, 520, 120, 70);
 
         Waitings.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Waitings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Waitings.setText("4");
         panelLists.add(Waitings);
-        Waitings.setBounds(50, 165, 120, 70);
+        Waitings.setBounds(40, 140, 120, 70);
 
         Charging.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Charging.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Charging.setText("4");
         panelLists.add(Charging);
-        Charging.setBounds(50, 350, 120, 70);
+        Charging.setBounds(40, 330, 120, 70);
 
         queTab.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1058,17 +1058,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 "Ticket", "Customer", "Service", "Status", "Payment", "Action"
             }
         ));
-        queTab.setGridColor(new java.awt.Color(0, 0, 0));
         queTab.getTableHeader().setResizingAllowed(false);
         queTab.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(queTab);
 
         panelLists.add(jScrollPane1);
-        jScrollPane1.setBounds(210, 90, 785, 580);
+        jScrollPane1.setBounds(210, 55, 770, 597);
 
+        jLabel2.setBackground(new java.awt.Color(4, 38, 55));
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/QUEUEtable.png"))); // NOI18N
         panelLists.add(jLabel2);
-        jLabel2.setBounds(0, -90, 1010, 790);
+        jLabel2.setBounds(-10, -90, 1000, 750);
 
         jTabbedPane1.addTab("Queue Lists", panelLists);
 
@@ -1106,7 +1106,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastpanel.add(fastslot3);
 
         ControlPanel.add(fastpanel);
-        fastpanel.setBounds(40, 33, 90, 442);
+        fastpanel.setBounds(57, 33, 90, 442);
 
         jPanel1.setOpaque(false);
         jPanel1.setLayout(new java.awt.GridLayout(5, 2, 30, 40));
@@ -1232,7 +1232,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton10);
 
         ControlPanel.add(jPanel1);
-        jPanel1.setBounds(613, 135, 312, 462);
+        jPanel1.setBounds(630, 135, 312, 462);
 
         normalcharge1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         normalcharge1.setForeground(new java.awt.Color(41, 182, 246));
@@ -1242,19 +1242,29 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         normalcharge1.setFocusPainted(false);
         normalcharge1.setFocusable(false);
         ControlPanel.add(normalcharge1);
-        normalcharge1.setBounds(40, 505, 90, 150);
+        normalcharge1.setBounds(57, 505, 90, 150);
 
         nxtfastbtn.setBorder(null);
         nxtfastbtn.setBorderPainted(false);
         nxtfastbtn.setContentAreaFilled(false);
+        nxtfastbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nxtfastbtnActionPerformed(evt);
+            }
+        });
         ControlPanel.add(nxtfastbtn);
-        nxtfastbtn.setBounds(330, 540, 140, 60);
+        nxtfastbtn.setBounds(350, 530, 140, 60);
 
         nxtnormalbtn.setBorder(null);
         nxtnormalbtn.setBorderPainted(false);
         nxtnormalbtn.setContentAreaFilled(false);
+        nxtnormalbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nxtnormalbtnActionPerformed(evt);
+            }
+        });
         ControlPanel.add(nxtnormalbtn);
-        nxtnormalbtn.setBounds(330, 450, 140, 70);
+        nxtnormalbtn.setBounds(350, 450, 140, 70);
 
         jPanel2.setOpaque(false);
         jPanel2.setLayout(new java.awt.GridLayout(4, 1, 10, 25));
@@ -1296,7 +1306,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel2.add(normalcharge5);
 
         ControlPanel.add(jPanel2);
-        jPanel2.setBounds(203, 20, 90, 630);
+        jPanel2.setBounds(222, 20, 90, 630);
 
         queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ControlQe.png"))); // NOI18N
         ControlPanel.add(queIcon);
@@ -1364,6 +1374,14 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             ((cephra.Frame.Admin) w).switchPanel(new Bay());
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
+
+    private void nxtnormalbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nxtnormalbtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nxtnormalbtnActionPerformed
+
+    private void nxtfastbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nxtfastbtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nxtfastbtnActionPerformed
 
     // Grid button action listeners - placeholder methods for future functionality
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {}

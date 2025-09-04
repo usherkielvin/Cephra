@@ -1,6 +1,7 @@
 
 package cephra.Admin;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Window;
 import javax.swing.SwingUtilities;
@@ -18,6 +19,18 @@ public class History extends javax.swing.JPanel {
         // Register history table model so other modules can add rows
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
+        adminHistorySRCH.setOpaque(false);
+        adminHistorySRCH.setBackground(new Color(0, 0, 0, 0));
+        adminHistorySRCH.setBorder(null);
+        
+        adminHistorySRCH.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    searchHistory();
+                }
+            }
+        });
         
         // Hide the vertical scrollbar on the history table
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -52,6 +65,7 @@ public class History extends javax.swing.JPanel {
         quebutton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         labelStaff = new javax.swing.JLabel();
+        adminHistorySRCH = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -88,7 +102,7 @@ public class History extends javax.swing.JPanel {
         jScrollPane1.setViewportView(jTable1);
 
         add(jScrollPane1);
-        jScrollPane1.setBounds(-5, 210, 1010, 550);
+        jScrollPane1.setBounds(10, 190, 980, 550);
 
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
@@ -156,6 +170,8 @@ public class History extends javax.swing.JPanel {
         labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
+        add(adminHistorySRCH);
+        adminHistorySRCH.setBounds(80, 140, 340, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/SHBOARD - HISTORY.png"))); // NOI18N
         add(jLabel1);
@@ -219,8 +235,10 @@ public class History extends javax.swing.JPanel {
         datetime.setText(time + " " + date);
     }
 
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
+    private javax.swing.JTextField adminHistorySRCH;
     private javax.swing.JButton businessbutton;
     private javax.swing.JLabel datetime;
     private javax.swing.JButton exitlogin;
@@ -232,6 +250,80 @@ public class History extends javax.swing.JPanel {
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
-    
 
+    private void searchHistory() {
+        String keyword = adminHistorySRCH.getText().trim().toLowerCase();
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+
+        if (keyword.isEmpty()) {
+            cephra.Admin.HistoryBridge.refreshHistoryTable();
+            return;
+        }
+
+        // Get all history records from database for searching
+        java.util.List<Object[]> allRecords = cephra.CephraDB.getAllChargingHistory();
+        for (Object[] record : allRecords) {
+            boolean match = false;
+            // Search through all fields in the record
+            for (Object field : record) {
+                if (field != null && field.toString().toLowerCase().contains(keyword)) {
+                    match = true;
+                    break;
+                }
+            }
+            if (match) {
+                // Convert database format to display format
+                // Calculate kWh used based on battery levels
+                int initialBatteryLevel = (Integer) record[3];
+                int finalBatteryLevel = 100; // Always 100% when completed
+                double batteryCapacityKWh = 40.0; // 40kWh capacity
+                double usedFraction = (finalBatteryLevel - initialBatteryLevel) / 100.0;
+                double kwhUsed = usedFraction * batteryCapacityKWh;
+
+                // Get payment method from payment transactions table
+                String paymentMethod = cephra.CephraDB.getPaymentMethodForTicket((String) record[0]);
+                if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
+
+                // Get the admin username who served this transaction
+                String servedBy = cephra.CephraDB.getCurrentAdminUsername();
+                if (servedBy == null || servedBy.trim().isEmpty()) {
+                    servedBy = "Admin"; // Fallback if no admin logged in
+                }
+
+                // Convert database format to admin history format
+                // Columns: Ticket, Customer, KWh, Total, Served By, Date & Time, Reference
+                Object[] adminRecord = {
+                    record[0], // ticket_id
+                    record[1], // username
+                    String.format("%.1f kWh", kwhUsed), // KWh used
+                    String.format("%.2f", record[5]), // Total amount
+                    servedBy + " (" + paymentMethod + ")", // served_by with payment method
+                    formatDateTimeForDisplay(record[7]), // completed_at - format as 12-hour without seconds
+                    record[6] // reference_number - compact format
+                };
+                model.addRow(adminRecord);
+            }
+        }
+    }
+
+    // Method to format timestamp for display (12-hour format without seconds)
+    private static String formatDateTimeForDisplay(Object timestamp) {
+        if (timestamp == null) {
+            return "";
+        }
+        try {
+            if (timestamp instanceof java.sql.Timestamp) {
+                java.sql.Timestamp ts = (java.sql.Timestamp) timestamp;
+                java.time.LocalDateTime ldt = ts.toLocalDateTime();
+                return ldt.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"));
+            } else if (timestamp instanceof String) {
+                // If it's already a formatted string, return as is
+                return (String) timestamp;
+            }
+        } catch (Exception e) {
+            System.err.println("Error formatting timestamp: " + e.getMessage());
+        }
+        return String.valueOf(timestamp);
+    }
 }
