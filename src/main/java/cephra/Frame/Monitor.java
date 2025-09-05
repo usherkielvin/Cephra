@@ -83,7 +83,8 @@ public class Monitor extends javax.swing.JFrame {
              }
          } else {
              f1.setText("");
-             f1.setVisible(false);
+             f1.setVisible(true);
+             f1.setForeground(new java.awt.Color(0, 230, 118)); // Green for available
          }
          
          if (fastTickets.length >= 2 && fastTickets[1] != null && !fastTickets[1].isEmpty()) {
@@ -94,7 +95,8 @@ public class Monitor extends javax.swing.JFrame {
              }
          } else {
              f2.setText("");
-             f2.setVisible(false);
+             f2.setVisible(true);
+             f2.setForeground(new java.awt.Color(0, 230, 118)); // Green for available
          }
          
          if (fastTickets.length >= 3 && fastTickets[2] != null && !fastTickets[2].isEmpty()) {
@@ -105,7 +107,8 @@ public class Monitor extends javax.swing.JFrame {
              }
          } else {
              f3.setText("");
-             f3.setVisible(false);
+             f3.setVisible(true);
+             f3.setForeground(new java.awt.Color(0, 230, 118)); // Green for available
          }
          
          System.out.println("Monitor fast grid update completed");
@@ -127,7 +130,8 @@ public class Monitor extends javax.swing.JFrame {
              }
          } else {
              b1.setText("");
-             b1.setVisible(false);
+             b1.setVisible(true);
+             b1.setForeground(new java.awt.Color(0, 230, 118)); // Green for available
          }
          
          if (normalTickets.length >= 2 && normalTickets[1] != null && !normalTickets[1].isEmpty()) {
@@ -138,7 +142,8 @@ public class Monitor extends javax.swing.JFrame {
              }
          } else {
              b2.setText("");
-             b2.setVisible(false);
+             b2.setVisible(true);
+             b2.setForeground(new java.awt.Color(0, 230, 118)); // Green for available
          }
          
          if (normalTickets.length >= 3 && normalTickets[2] != null && !normalTickets[2].isEmpty()) {
@@ -149,7 +154,8 @@ public class Monitor extends javax.swing.JFrame {
              }
          } else {
              b3.setText("");
-             b3.setVisible(false);
+             b3.setVisible(true);
+             b3.setForeground(new java.awt.Color(0, 230, 118)); // Green for available
          }
          
          if (normalTickets.length >= 4 && normalTickets[3] != null && !normalTickets[3].isEmpty()) {
@@ -160,7 +166,8 @@ public class Monitor extends javax.swing.JFrame {
              }
          } else {
              b4.setText("");
-             b4.setVisible(false);
+             b4.setVisible(true);
+             b4.setForeground(new java.awt.Color(0, 230, 118)); // Green for available
          }
          
          if (normalTickets.length >= 5 && normalTickets[4] != null && !normalTickets[4].isEmpty()) {
@@ -171,7 +178,8 @@ public class Monitor extends javax.swing.JFrame {
              }
          } else {
              b5.setText("");
-             b5.setVisible(false);
+             b5.setVisible(true);
+             b5.setForeground(new java.awt.Color(0, 230, 118)); // Green for available
          }
          
          System.out.println("Monitor normal grid update completed");

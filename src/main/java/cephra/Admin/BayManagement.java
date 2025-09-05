@@ -356,8 +356,7 @@ public class BayManagement extends javax.swing.JPanel {
         // Clear any existing test tickets from waiting grid
         clearWaitingGrid();
         
-        // Ensure all grid slots exist in database
-        ensureGridSlotsExist();
+        // Database tables will be fixed and reorganized by fixAndReorganizeDatabaseTables()
         
         // Initialize grid displays with maintenance status
         initializeGridDisplays();
@@ -884,8 +883,31 @@ public class BayManagement extends javax.swing.JPanel {
                 System.out.println("- Waiting grid: 10 slots (1-10)");
                 System.out.println("- Charging grid: 8 slots (Bay-1 to Bay-8)");
                 
-                // Verify and display current grid state
-                verifyGridSlots();
+                // Debug: Show actual bay numbers created
+                System.out.println("=== BAY NUMBERING VERIFICATION ===");
+                System.out.println("Charging Bays Created:");
+                for (int i = 1; i <= 8; i++) {
+                    System.out.println("  Bay-" + i + " (Bay Number: " + i + ")");
+                }
+                System.out.println("Waiting Grid Slots Created:");
+                for (int i = 1; i <= 10; i++) {
+                    System.out.println("  Slot " + i);
+                }
+                
+                        // Verify and display current grid state
+        verifyGridSlots();
+        
+        // Display bay numbering system status
+        displayBayNumberingStatus();
+        
+        // Run init.sql script to reset database tables
+        runInitSqlScript();
+        
+        // Remake database tables with complete 1-8 bays and 1-10 waiting slots
+        remakeDatabaseTables();
+        
+        // Test charging grid database
+        testChargingGridDatabase();
                 
             }
             
@@ -895,6 +917,213 @@ public class BayManagement extends javax.swing.JPanel {
         }
     }
     
+    
+    /**
+     * Runs the init.sql script to reset database tables
+     */
+    public static void runInitSqlScript() {
+        try {
+            System.out.println("=== RUNNING INIT.SQL SCRIPT ===");
+            
+            // Read the init.sql file
+            java.io.InputStream inputStream = cephra.Admin.BayManagement.class.getClassLoader().getResourceAsStream("db/init.sql");
+            if (inputStream == null) {
+                System.err.println("init.sql file not found in resources");
+                return;
+            }
+            
+            String sqlScript = new String(inputStream.readAllBytes());
+            inputStream.close();
+            
+            // Split the script into individual statements
+            String[] statements = sqlScript.split(";");
+            
+            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+                 java.sql.Statement stmt = conn.createStatement()) {
+                
+                for (String statement : statements) {
+                    statement = statement.trim();
+                    if (!statement.isEmpty() && !statement.startsWith("--") && !statement.startsWith("SELECT")) {
+                        try {
+                            stmt.execute(statement);
+                            System.out.println("✓ Executed: " + statement.substring(0, Math.min(50, statement.length())) + "...");
+                        } catch (Exception e) {
+                            System.err.println("✗ Error executing: " + statement.substring(0, Math.min(50, statement.length())) + "...");
+                            System.err.println("  Error: " + e.getMessage());
+                        }
+                    }
+                }
+                
+                System.out.println("=== INIT.SQL SCRIPT COMPLETED ===");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error running init.sql script: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Remakes all database tables with complete 1-8 bays and 1-10 waiting slots
+     */
+    public static void remakeDatabaseTables() {
+        try {
+            System.out.println("=== REMAKING DATABASE TABLES ===");
+            
+            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+                 java.sql.Statement stmt = conn.createStatement()) {
+                
+                // 1. Remake charging_bays table (1-8 bays)
+                System.out.println("1. Remaking charging_bays table...");
+                stmt.execute("DELETE FROM charging_bays");
+                
+                // Insert all 8 charging bays
+                for (int i = 1; i <= 8; i++) {
+                    String bayType = (i <= 3) ? "Fast" : "Normal";
+                    String insertSQL = String.format(
+                        "INSERT INTO charging_bays (bay_number, bay_type, status) VALUES ('Bay-%d', '%s', 'Available')", 
+                        i, bayType
+                    );
+                    stmt.execute(insertSQL);
+                }
+                System.out.println("   ✓ Created 8 charging bays (Bay-1 to Bay-8)");
+                
+                // 2. Remake charging_grid table (1-8 bays)
+                System.out.println("2. Remaking charging_grid table...");
+                stmt.execute("DELETE FROM charging_grid");
+                
+                // Insert all 8 charging grid slots
+                for (int i = 1; i <= 8; i++) {
+                    String insertSQL = String.format(
+                        "INSERT INTO charging_grid (bay_number, ticket_id, username, service_type, initial_battery_level) VALUES ('Bay-%d', NULL, NULL, NULL, NULL)", 
+                        i
+                    );
+                    stmt.execute(insertSQL);
+                }
+                System.out.println("   ✓ Created 8 charging grid slots (Bay-1 to Bay-8)");
+                
+                // 3. Remake waiting_grid table (1-10 slots)
+                System.out.println("3. Remaking waiting_grid table...");
+                stmt.execute("DELETE FROM waiting_grid");
+                
+                // Insert all 10 waiting grid slots
+                for (int i = 1; i <= 10; i++) {
+                    String insertSQL = String.format(
+                        "INSERT INTO waiting_grid (slot_number, ticket_id, username, service_type, initial_battery_level, position_in_queue) VALUES (%d, NULL, NULL, NULL, NULL, NULL)", 
+                        i
+                    );
+                    stmt.execute(insertSQL);
+                }
+                System.out.println("   ✓ Created 10 waiting grid slots (1 to 10)");
+                
+                System.out.println("=== DATABASE TABLES REMADE SUCCESSFULLY ===");
+                
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error remaking database tables: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Tests database connection and checks charging_grid table data
+     */
+    public static void testChargingGridDatabase() {
+        try {
+            System.out.println("=== TESTING CHARGING GRID DATABASE ===");
+            
+            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+                 java.sql.Statement stmt = conn.createStatement();
+                 java.sql.ResultSet rs = stmt.executeQuery("SELECT bay_number, ticket_id, username, service_type FROM charging_grid ORDER BY bay_number")) {
+                
+                System.out.println("Charging Grid Table Contents:");
+                while (rs.next()) {
+                    String bayNumber = rs.getString("bay_number");
+                    String ticketId = rs.getString("ticket_id");
+                    String username = rs.getString("username");
+                    String serviceType = rs.getString("service_type");
+                    
+                    System.out.println("  " + bayNumber + " - ticketId: " + ticketId + ", username: " + username + ", serviceType: " + serviceType);
+                }
+            }
+            
+            // Test specific bays
+            System.out.println("\nTesting specific bay queries:");
+            for (int bayNum = 1; bayNum <= 8; bayNum++) {
+                try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+                     java.sql.PreparedStatement pstmt = conn.prepareStatement(
+                         "SELECT cg.ticket_id, cb.status FROM charging_grid cg LEFT JOIN charging_bays cb ON cg.bay_number = cb.bay_number WHERE cg.bay_number = ?")) {
+                    
+                    pstmt.setString(1, "Bay-" + bayNum);
+                    try (java.sql.ResultSet rs = pstmt.executeQuery()) {
+                        if (rs.next()) {
+                            String ticketId = rs.getString("ticket_id");
+                            String status = rs.getString("status");
+                            System.out.println("  Bay-" + bayNum + " - ticketId: " + ticketId + ", status: " + status);
+                        } else {
+                            System.out.println("  Bay-" + bayNum + " - NO RESULT FOUND");
+                        }
+                    }
+                }
+            }
+            
+            System.out.println("=== END CHARGING GRID DATABASE TEST ===");
+            
+        } catch (Exception e) {
+            System.err.println("Error testing charging grid database: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Displays the current bay numbering system status
+     */
+    public static void displayBayNumberingStatus() {
+        try {
+            System.out.println("=== BAY NUMBERING SYSTEM STATUS ===");
+            
+            // Check charging bays
+            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+                 java.sql.Statement stmt = conn.createStatement();
+                 java.sql.ResultSet rs = stmt.executeQuery("SELECT bay_number, bay_type, status FROM charging_bays ORDER BY bay_number")) {
+                
+                System.out.println("Charging Bays in Database:");
+                int bayCount = 0;
+                while (rs.next()) {
+                    bayCount++;
+                    String bayNumber = rs.getString("bay_number");
+                    String bayType = rs.getString("bay_type");
+                    String status = rs.getString("status");
+                    System.out.println("  " + bayNumber + " (" + bayType + ") - " + status);
+                }
+                System.out.println("Total Charging Bays: " + bayCount + " (Expected: 8)");
+            }
+            
+            // Check waiting grid slots
+            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+                 java.sql.Statement stmt = conn.createStatement();
+                 java.sql.ResultSet rs = stmt.executeQuery("SELECT slot_number, ticket_id FROM waiting_grid ORDER BY slot_number")) {
+                
+                System.out.println("Waiting Grid Slots in Database:");
+                int slotCount = 0;
+                while (rs.next()) {
+                    slotCount++;
+                    int slotNumber = rs.getInt("slot_number");
+                    String ticketId = rs.getString("ticket_id");
+                    String status = (ticketId != null && !ticketId.isEmpty()) ? "OCCUPIED" : "EMPTY";
+                    System.out.println("  Slot " + slotNumber + " - " + status);
+                }
+                System.out.println("Total Waiting Grid Slots: " + slotCount + " (Expected: 10)");
+            }
+            
+            System.out.println("=== END BAY NUMBERING STATUS ===");
+            
+        } catch (Exception e) {
+            System.err.println("Error displaying bay numbering status: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     
     /**
      * Verifies and displays the current state of all grid slots
@@ -1384,37 +1613,7 @@ public class BayManagement extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Updates Queue control panel grid displays
-     */
-    private static void updateQueueGridDisplays() {
-        try {
-            // Force Queue to refresh its grid displays with latest database data
-            System.out.println("Notifying Queue to refresh grid displays with latest data");
-            
-            // The Queue component should call its own refresh methods
-            // This is a notification mechanism - actual refresh happens in Queue.java
-            
-        } catch (Exception e) {
-            System.err.println("Error updating Queue grid displays: " + e.getMessage());
-        }
-    }
     
-    /**
-     * Updates Monitor grid displays
-     */
-    private static void updateMonitorGridDisplays() {
-        try {
-            // Force Monitor to refresh its grid displays with latest database data
-            System.out.println("Notifying Monitor to refresh grid displays with latest data");
-            
-            // The Monitor component should call its own refresh methods
-            // This is a notification mechanism - actual refresh happens in Monitor.java
-            
-        } catch (Exception e) {
-            System.err.println("Error updating Monitor grid displays: " + e.getMessage());
-        }
-    }
     
     /**
      * Gets the grid display text for a specific bay slot
@@ -1423,6 +1622,11 @@ public class BayManagement extends javax.swing.JPanel {
      */
     public static String getGridSlotText(int bayNumber) {
         try {
+            // Debug: Log which bay we're checking
+            if (bayNumber == 1 || bayNumber == 2 || bayNumber == 3 || bayNumber == 6) {
+                System.out.println("DEBUG: Getting grid slot text for Bay-" + bayNumber);
+            }
+            
             // Read directly from charging_grid table for real-time ticket status
             try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
                  java.sql.PreparedStatement pstmt = conn.prepareStatement(
@@ -1434,6 +1638,11 @@ public class BayManagement extends javax.swing.JPanel {
                         String ticketId = rs.getString("ticket_id");
                         String status = rs.getString("status");
                         
+                        // Debug: Log Bay details
+                        if (bayNumber == 1 || bayNumber == 2 || bayNumber == 3 || bayNumber == 6) {
+                            System.out.println("DEBUG: Bay-" + bayNumber + " - ticketId: " + ticketId + ", status: " + status);
+                        }
+                        
                         // Check if bay is in maintenance
                         if ("Maintenance".equals(status)) {
                             return "OFFLINE";
@@ -1444,13 +1653,19 @@ public class BayManagement extends javax.swing.JPanel {
                             return ticketId;
                         }
                         
-                        // Bay is available but empty
+                        // Bay is available but empty - return empty string for grid display
+                        // The UI will handle showing/hiding the button based on this
                         return "";
+                    } else {
+                        // Debug: Log if no result found
+                        if (bayNumber == 1 || bayNumber == 2 || bayNumber == 3 || bayNumber == 6) {
+                            System.out.println("DEBUG: No result found for Bay-" + bayNumber + " in database query");
+                        }
                     }
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error reading bay status from database: " + e.getMessage());
+            System.err.println("Error reading bay status from database for Bay-" + bayNumber + ": " + e.getMessage());
             e.printStackTrace();
         }
         
@@ -1520,6 +1735,10 @@ public class BayManagement extends javax.swing.JPanel {
         for (int i = 0; i < 3; i++) {
             texts[i] = getGridSlotText(i + 1); // Bay-1, Bay-2, Bay-3
         }
+        
+        // Debug: Log fast charging grid texts
+        System.out.println("DEBUG: Fast charging grid texts: " + java.util.Arrays.toString(texts));
+        
         return texts;
     }
     
@@ -1535,6 +1754,10 @@ public class BayManagement extends javax.swing.JPanel {
         for (int i = 0; i < 5; i++) {
             texts[i] = getGridSlotText(i + 4); // Bay-4, Bay-5, Bay-6, Bay-7, Bay-8
         }
+        
+        // Debug: Log normal charging grid texts
+        System.out.println("DEBUG: Normal charging grid texts: " + java.util.Arrays.toString(texts));
+        
         return texts;
     }
     

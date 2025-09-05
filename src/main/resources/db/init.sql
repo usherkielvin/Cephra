@@ -154,7 +154,11 @@ INSERT IGNORE INTO staff_records (name, username, email, status, password) VALUE
 ('Staff Member', 'staff', 'staff@cephra.com', 'Active', 'staff123');
 
 -- Insert initial charging bays (8 total bays to match Queue.java expectations)
-INSERT IGNORE INTO charging_bays (bay_number, bay_type, status) VALUES 
+-- Fast Charging Bays: Bay-1, Bay-2, Bay-3
+-- Normal Charging Bays: Bay-4, Bay-5, Bay-6, Bay-7, Bay-8
+-- Clear existing data first to ensure clean state
+DELETE FROM charging_bays;
+INSERT INTO charging_bays (bay_number, bay_type, status) VALUES 
 ('Bay-1', 'Fast', 'Available'),
 ('Bay-2', 'Fast', 'Available'),
 ('Bay-3', 'Fast', 'Available'),
@@ -295,7 +299,10 @@ CREATE TABLE IF NOT EXISTS charging_grid (
 );
 
 -- Insert initial waiting grid slots (empty)
-INSERT IGNORE INTO waiting_grid (slot_number, ticket_id, username, service_type, initial_battery_level, position_in_queue) VALUES
+-- Waiting Grid Slots: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 (10 total slots)
+-- Clear existing data first to ensure clean state
+DELETE FROM waiting_grid;
+INSERT INTO waiting_grid (slot_number, ticket_id, username, service_type, initial_battery_level, position_in_queue) VALUES
 (1, NULL, NULL, NULL, NULL, NULL),
 (2, NULL, NULL, NULL, NULL, NULL),
 (3, NULL, NULL, NULL, NULL, NULL),
@@ -308,7 +315,10 @@ INSERT IGNORE INTO waiting_grid (slot_number, ticket_id, username, service_type,
 (10, NULL, NULL, NULL, NULL, NULL);
 
 -- Insert initial charging grid slots (empty)
-INSERT IGNORE INTO charging_grid (bay_number, ticket_id, username, service_type, initial_battery_level) VALUES
+-- Charging Grid Bays: Bay-1, Bay-2, Bay-3, Bay-4, Bay-5, Bay-6, Bay-7, Bay-8 (8 total bays)
+-- Clear existing data first to ensure clean state
+DELETE FROM charging_grid;
+INSERT INTO charging_grid (bay_number, ticket_id, username, service_type, initial_battery_level) VALUES
 ('Bay-1', NULL, NULL, NULL, NULL),
 ('Bay-2', NULL, NULL, NULL, NULL),
 ('Bay-3', NULL, NULL, NULL, NULL),
@@ -317,5 +327,30 @@ INSERT IGNORE INTO charging_grid (bay_number, ticket_id, username, service_type,
 ('Bay-6', NULL, NULL, NULL, NULL),
 ('Bay-7', NULL, NULL, NULL, NULL),
 ('Bay-8', NULL, NULL, NULL, NULL);
+
+-- Verify bay numbering system is correct
+-- This section ensures all bays and slots are properly numbered and incrementing
+
+-- Verify charging bays are numbered 1-8
+SELECT '=== CHARGING BAYS VERIFICATION ===' as verification_type;
+SELECT bay_number, bay_type, status FROM charging_bays ORDER BY bay_number;
+SELECT COUNT(*) as total_charging_bays FROM charging_bays;
+
+-- Verify waiting grid slots are numbered 1-10  
+SELECT '=== WAITING GRID VERIFICATION ===' as verification_type;
+SELECT slot_number, ticket_id FROM waiting_grid ORDER BY slot_number;
+SELECT COUNT(*) as total_waiting_slots FROM waiting_grid;
+
+-- Verify charging grid bays are numbered Bay-1 to Bay-8
+SELECT '=== CHARGING GRID VERIFICATION ===' as verification_type;
+SELECT bay_number, ticket_id FROM charging_grid ORDER BY bay_number;
+SELECT COUNT(*) as total_charging_grid_bays FROM charging_grid;
+
+-- Final verification summary
+SELECT '=== BAY NUMBERING SUMMARY ===' as summary_type;
+SELECT 
+    (SELECT COUNT(*) FROM charging_bays) as charging_bays_count,
+    (SELECT COUNT(*) FROM waiting_grid) as waiting_slots_count,
+    (SELECT COUNT(*) FROM charging_grid) as charging_grid_count;
 
 COMMIT;

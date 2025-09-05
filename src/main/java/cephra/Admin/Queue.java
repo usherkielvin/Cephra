@@ -712,14 +712,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         
         for (int i = 0; i < fastButtons.length && i < texts.length; i++) {
             if (texts[i] != null && !texts[i].isEmpty()) {
+                // Bay has a ticket or is offline
                 fastButtons[i].setText(texts[i]);
                 fastButtons[i].setVisible(true);
                 if (colors != null && i < colors.length) {
                     fastButtons[i].setForeground(colors[i]);
                 }
             } else {
+                // Bay is available but empty - show empty button
                 fastButtons[i].setText("");
-                fastButtons[i].setVisible(false);
+                fastButtons[i].setVisible(true);
+                fastButtons[i].setForeground(new java.awt.Color(0, 230, 118)); // Green for available
             }
          }
      }
@@ -746,14 +749,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         
         for (int i = 0; i < normalButtons.length && i < texts.length; i++) {
             if (texts[i] != null && !texts[i].isEmpty()) {
+                // Bay has a ticket or is offline
                 normalButtons[i].setText(texts[i]);
                 normalButtons[i].setVisible(true);
                 if (colors != null && i < colors.length) {
                     normalButtons[i].setForeground(colors[i]);
                 }
             } else {
+                // Bay is available but empty - show empty button
                 normalButtons[i].setText("");
-                normalButtons[i].setVisible(false);
+                normalButtons[i].setVisible(true);
+                normalButtons[i].setForeground(new java.awt.Color(0, 230, 118)); // Green for available
             }
         }
     }
