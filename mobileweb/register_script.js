@@ -3,12 +3,12 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
     const firstname = document.getElementById('firstname').value.trim();
     const lastname = document.getElementById('lastname').value.trim();
-    const username = document.getElementById('username').value.trim(); // create username from firstname+lastname
+    const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
     const confirmPassword = document.getElementById('confirmPassword').value.trim();
 
-    if (!firstname || !lastname || !email || !password || !confirmPassword) {
+    if (!firstname || !lastname || !username || !email || !password || !confirmPassword) {
         alert('Please fill in all fields.');
         return;
     }

@@ -58,11 +58,20 @@ try {
             if ($method === 'POST') {
                 $firstname = $_POST['firstname'] ?? '';
                 $lastname = $_POST['lastname'] ?? '';
+                $username = $_POST['username'] ?? '';
                 $email = $_POST['email'] ?? '';
                 $password = $_POST['password'] ?? '';
 
-                if (!$firstname || !$lastname || !$email || !$password) {
+                if (!$firstname || !$lastname || !$username || !$email || !$password) {
                     echo json_encode(['error' => 'Missing required fields']);
+                    exit;
+                }
+
+                // Check if username already exists
+                $stmt = $db->prepare("SELECT id FROM users WHERE username = ?");
+                $stmt->execute([$username]);
+                if ($stmt->rowCount() > 0) {
+                    echo json_encode(['error' => 'Username already exists']);
                     exit;
                 }
 
@@ -76,7 +85,6 @@ try {
 
                 // Insert new user
                 $stmt = $db->prepare("INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)");
-                $username = $_POST['username'] ?? '';
                 $result = $stmt->execute([$firstname, $lastname, $username, $email, $password]);
 
                 if ($result) {
