@@ -197,7 +197,7 @@ public class History extends javax.swing.JPanel {
     private void BaybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BaybuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(History.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new Bay());
+            ((cephra.Frame.Admin) w).switchPanel(new BayManagement());
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 

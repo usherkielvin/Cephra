@@ -238,7 +238,7 @@ public class Dashboard extends javax.swing.JPanel {
     private void BaybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BaybuttonActionPerformed
       java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Bay());
+            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.BayManagement());
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 
