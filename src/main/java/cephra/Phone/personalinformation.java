@@ -81,7 +81,7 @@ public class personalinformation extends javax.swing.JPanel {
         bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/personalinformation.png"))); // NOI18N
         bg.setFocusable(false);
         add(bg);
-        bg.setBounds(-10, -60, 400, 890);
+        bg.setBounds(-10, -50, 380, 870);
     }// </editor-fold>//GEN-END:initComponents
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed

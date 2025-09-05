@@ -54,14 +54,13 @@ public class Phonelogin extends javax.swing.JPanel {
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
         See.setBorder(null);
         See.setFocusPainted(false);
-        See.setOpaque(true);
         See.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SeeActionPerformed(evt);
             }
         });
         add(See);
-        See.setBounds(260, 393, 50, 20);
+        See.setBounds(273, 393, 50, 20);
 
         reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
