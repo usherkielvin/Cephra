@@ -6,12 +6,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.SwingConstants;
 
 public class Phone extends javax.swing.JFrame {
 
     private Point dragStartPoint;
-
+    private JLabel Iphoneframe;
     public Phone() {
+
         setUndecorated(true);
         initComponents();
         setSize(350, 750);
@@ -29,7 +33,10 @@ public class Phone extends javax.swing.JFrame {
         } catch (Exception e) {
             System.err.println("Error refreshing ticket counters: " + e.getMessage());
         }
-    }
+
+        // Create and setup kenji label to always appear on top
+        PhoneFrame();
+        }
 
     private void setAppIcon() {
         java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
@@ -72,11 +79,31 @@ public class Phone extends javax.swing.JFrame {
         });
     }
 
+    private void PhoneFrame() {
+        // Create the kenji label
+        Iphoneframe = new JLabel();
+         Iphoneframe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/red.png")));
+        Iphoneframe.setBounds(-27, 0, 401, 750); // center top
+        Iphoneframe.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        // Add to the root pane's layered pane to ensure it's always on top
+        getRootPane().getLayeredPane().add(Iphoneframe, JLayeredPane.POPUP_LAYER);
+        
+        // Make sure it's visible and on top
+        Iphoneframe.setVisible(true);
+        getRootPane().getLayeredPane().moveToFront(Iphoneframe);
+    }
+
     public void switchPanel(javax.swing.JPanel newPanel) {
         getContentPane().removeAll();
         getContentPane().add(newPanel);
         revalidate();
         repaint();
+        
+        // Ensure kenji label stays on top after panel switch
+        if (Iphoneframe != null) {
+            getRootPane().getLayeredPane().moveToFront(Iphoneframe);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

@@ -18,7 +18,7 @@ public class Transition extends javax.swing.JPanel {
         makeDraggable();
         // Align label like Porsche screens
         setupLabelPosition();
-         new Timer(900, _ -> {
+         new Timer(3000, _ -> {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Transition.this);
         if (w instanceof cephra.Frame.Phone) {
             ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Phonelogin());
@@ -87,7 +87,7 @@ public class Transition extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/red.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/sloww.gif"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
 
