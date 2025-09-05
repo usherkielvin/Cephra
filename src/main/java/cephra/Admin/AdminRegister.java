@@ -21,6 +21,9 @@ public class AdminRegister extends javax.swing.JPanel {
         pass.setBackground(new Color(0, 0, 0, 0));
         ConPass.setOpaque(false);
         ConPass.setBackground(new Color(0, 0, 0, 0));
+        LastNameAdminReg.setOpaque(false);
+        LastNameAdminReg.setBackground(new Color(0, 0, 0, 0));
+        
         
         
     }
@@ -36,11 +39,13 @@ public class AdminRegister extends javax.swing.JPanel {
         log = new javax.swing.JButton();
         AdminBTN = new javax.swing.JButton();
         Fullname = new javax.swing.JTextField();
+        LastNameAdminReg = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
+        username.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -48,8 +53,9 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(722, 268, 245, 40);
+        username.setBounds(388, 364, 260, 37);
 
+        email.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -57,7 +63,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(433, 373, 245, 38);
+        email.setBounds(388, 452, 260, 37);
 
         RegisterBTN.setBorderPainted(false);
         RegisterBTN.setContentAreaFilled(false);
@@ -67,8 +73,9 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(RegisterBTN);
-        RegisterBTN.setBounds(560, 670, 240, 60);
+        RegisterBTN.setBounds(570, 620, 230, 50);
 
+        pass.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         pass.setBorder(null);
         pass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -76,8 +83,9 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(433, 477, 245, 40);
+        pass.setBounds(700, 276, 260, 37);
 
+        ConPass.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         ConPass.setBorder(null);
         ConPass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -85,7 +93,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(ConPass);
-        ConPass.setBounds(433, 581, 245, 40);
+        ConPass.setBounds(700, 362, 260, 38);
 
         log.setBorderPainted(false);
         log.setContentAreaFilled(false);
@@ -95,7 +103,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(log);
-        log.setBounds(870, 20, 120, 30);
+        log.setBounds(870, 30, 110, 30);
         log.getAccessibleContext().setAccessibleName("log");
 
         AdminBTN.setBorderPainted(false);
@@ -106,8 +114,9 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(AdminBTN);
-        AdminBTN.setBounds(870, 60, 120, 30);
+        AdminBTN.setBounds(870, 73, 110, 30);
 
+        Fullname.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         Fullname.setBorder(null);
         Fullname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -115,7 +124,12 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(Fullname);
-        Fullname.setBounds(430, 270, 245, 38);
+        Fullname.setBounds(388, 276, 120, 37);
+
+        LastNameAdminReg.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        LastNameAdminReg.setBorder(null);
+        add(LastNameAdminReg);
+        LastNameAdminReg.setBounds(533, 276, 120, 37);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png"))); // NOI18N
         add(jLabel1);
@@ -191,6 +205,7 @@ public class AdminRegister extends javax.swing.JPanel {
     private javax.swing.JButton AdminBTN;
     private javax.swing.JPasswordField ConPass;
     private javax.swing.JTextField Fullname;
+    private javax.swing.JTextField LastNameAdminReg;
     private javax.swing.JButton RegisterBTN;
     private javax.swing.JTextField email;
     private javax.swing.JLabel jLabel1;

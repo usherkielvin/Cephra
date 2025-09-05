@@ -118,12 +118,11 @@ public class home extends javax.swing.JPanel {
         charge.setBounds(30, 680, 50, 40);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 32)); // NOI18N
-        LoggedName.setForeground(new java.awt.Color(0, 0, 0));
         LoggedName.setText("Hi Dizon!");
         add(LoggedName);
         LoggedName.setBounds(20, 62, 220, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/HOME PAGE - not charging.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Home Page - not charging vid.gif"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
