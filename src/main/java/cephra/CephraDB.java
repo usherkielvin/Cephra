@@ -124,6 +124,17 @@ public class CephraDB {
         return currentPhoneUser != null ? currentPhoneUser.email : "";
     }
     
+    // Method to logout the current phone user
+    public static void logoutCurrentUser() {
+        System.out.println("CephraDB: Logging out user " + (currentPhoneUser != null ? currentPhoneUser.username : "null"));
+        currentPhoneUser = null;
+    }
+    
+    // Method to check if any user is currently logged in
+    public static boolean isUserLoggedIn() {
+        return currentPhoneUser != null;
+    }
+    
     // Method to get the current admin username
     public static String getCurrentAdminUsername() {
         return currentAdminUser != null ? currentAdminUser.username : "";

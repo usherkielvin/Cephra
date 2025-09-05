@@ -259,6 +259,10 @@ public class Profile extends javax.swing.JPanel {
                     System.err.println("Error resetting battery level on logout: " + e.getMessage());
                 }
                 
+                // Properly logout the current user
+                cephra.CephraDB.logoutCurrentUser();
+                System.out.println("Profile: User has been logged out");
+                
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
