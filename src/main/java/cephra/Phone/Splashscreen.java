@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
 public class Splashscreen extends javax.swing.JPanel {
-   
     public Splashscreen() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
@@ -15,6 +14,8 @@ public class Splashscreen extends javax.swing.JPanel {
         
         // Make the panel draggable
         makeDraggable();
+        
+        
     }
    
     private void makeDraggable() {
@@ -47,12 +48,16 @@ public class Splashscreen extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        exitlogin = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        exitlogin = new javax.swing.JButton();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(350, 740));
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/splash in2.png"))); // NOI18N
+        add(jLabel1);
+        jLabel1.setBounds(0, 0, 398, 750);
 
         exitlogin.setBorder(null);
         exitlogin.setBorderPainted(false);
@@ -65,10 +70,6 @@ public class Splashscreen extends javax.swing.JPanel {
         });
         add(exitlogin);
         exitlogin.setBounds(60, 630, 220, 70);
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/splash in2.png"))); // NOI18N
-        add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed

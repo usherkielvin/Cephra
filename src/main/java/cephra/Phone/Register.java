@@ -65,6 +65,8 @@ public class Register extends javax.swing.JPanel {
         register = new javax.swing.JButton();
         termscondition = new javax.swing.JCheckBox();
         loginbutton = new javax.swing.JButton();
+        UsernamePhone = new javax.swing.JTextField();
+        LastNamePhone = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
@@ -79,7 +81,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(confirmpass);
-        confirmpass.setBounds(40, 510, 280, 40);
+        confirmpass.setBounds(45, 526, 280, 32);
 
         password.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         password.setBorder(null);
@@ -89,7 +91,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(password);
-        password.setBounds(40, 445, 280, 40);
+        password.setBounds(45, 464, 280, 31);
 
         email.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         email.setBorder(null);
@@ -99,7 +101,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(40, 380, 280, 40);
+        email.setBounds(45, 402, 280, 32);
 
         name.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         name.setBorder(null);
@@ -109,7 +111,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(name);
-        name.setBounds(40, 314, 280, 40);
+        name.setBounds(40, 280, 130, 30);
 
         register.setBorder(null);
         register.setBorderPainted(false);
@@ -121,7 +123,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(register);
-        register.setBounds(60, 580, 220, 50);
+        register.setBounds(90, 610, 200, 40);
 
         termscondition.setBackground(new java.awt.Color(255, 255, 255));
         termscondition.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -135,7 +137,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(termscondition);
-        termscondition.setBounds(46, 627, 280, 40);
+        termscondition.setBounds(70, 645, 280, 40);
 
         loginbutton.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         loginbutton.setText("Login");
@@ -150,6 +152,10 @@ public class Register extends javax.swing.JPanel {
         });
         add(loginbutton);
         loginbutton.setBounds(205, 673, 90, 40);
+        add(UsernamePhone);
+        UsernamePhone.setBounds(45, 340, 280, 32);
+        add(LastNamePhone);
+        LastNamePhone.setBounds(200, 279, 120, 32);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/regis1.png"))); // NOI18N
         add(jLabel1);
@@ -194,8 +200,13 @@ public class Register extends javax.swing.JPanel {
         password.setBackground(new java.awt.Color(0, 0, 0, 0));
         confirmpass.setOpaque(false);
         confirmpass.setBackground(new java.awt.Color(0, 0, 0, 0));
+        LastNamePhone.setOpaque(false);
+        LastNamePhone.setBackground(new java.awt.Color(0, 0, 0, 0));
+        UsernamePhone.setOpaque(false);
+        UsernamePhone.setBackground(new java.awt.Color(0, 0, 0, 0));
     }
 
+    
     // Ensure the background label (PNG) stays positioned correctly
     private void setupLabelPosition() {
         if (jLabel1 != null) {
@@ -428,6 +439,8 @@ public class Register extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField LastNamePhone;
+    private javax.swing.JTextField UsernamePhone;
     private javax.swing.JTextField confirmpass;
     private javax.swing.JTextField email;
     private javax.swing.JLabel jLabel1;

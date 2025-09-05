@@ -54,14 +54,13 @@ public class Phonelogin extends javax.swing.JPanel {
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
         See.setBorder(null);
         See.setFocusPainted(false);
-        See.setOpaque(true);
         See.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SeeActionPerformed(evt);
             }
         });
         add(See);
-        See.setBounds(260, 393, 50, 20);
+        See.setBounds(273, 393, 50, 20);
 
         reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
@@ -76,7 +75,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(reghere);
-        reghere.setBounds(190, 610, 120, 40);
+        reghere.setBounds(200, 610, 120, 40);
 
         forgotpass.setForeground(new java.awt.Color(102, 102, 102));
         forgotpass.setText("Forgot password?");
@@ -90,7 +89,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(forgotpass);
-        forgotpass.setBounds(200, 410, 120, 40);
+        forgotpass.setBounds(210, 410, 120, 40);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
@@ -100,7 +99,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(60, 386, 200, 35);
+        pass.setBounds(70, 386, 190, 35);
 
         username.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         username.setBorder(null);
@@ -110,7 +109,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(60, 334, 240, 35);
+        username.setBounds(70, 334, 230, 35);
         add(cooldownLabel);
         cooldownLabel.setBounds(100, 440, 160, 20);
 
@@ -126,9 +125,9 @@ public class Phonelogin extends javax.swing.JPanel {
         add(loginhome);
         loginhome.setBounds(80, 570, 220, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/login1.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN - closed eye.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(-5, 0, 360, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved

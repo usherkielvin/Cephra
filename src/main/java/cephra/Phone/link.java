@@ -115,9 +115,7 @@ public class link extends javax.swing.JPanel {
         homebutton.setBounds(150, 680, 40, 40);
 
         termscondition.setBackground(new java.awt.Color(255, 255, 255));
-        termscondition.setFont(new java.awt.Font("Segoe UI", 0, 8)); // NOI18N
-        termscondition.setForeground(new java.awt.Color(0, 0, 0));
-        termscondition.setText("By linking, I agree to the Terms & Conditions for connecting my EV to Cephra");
+        termscondition.setText("By linking, I agree to the Terms & Conditions ");
         termscondition.setBorder(null);
         termscondition.setContentAreaFilled(false);
         termscondition.setFocusPainted(false);
@@ -127,7 +125,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(termscondition);
-        termscondition.setBounds(30, 640, 310, 30);
+        termscondition.setBounds(40, 620, 310, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ConnectCar.gif"))); // NOI18N
         add(jLabel1);
@@ -279,7 +277,10 @@ public class link extends javax.swing.JPanel {
                 .replace("<", "&lt;")
                 .replace(">", "&gt;");
         String html = "<html><head><style>" +
-                "body{font-family:'Segoe UI',sans-serif;font-size:12px;line-height:1.5;text-align:justify;margin:0;}" +
+                "body{font-family:'Segoe UI',sans-serif;"
+                + "font-size:12px;"
+                + "line-height:1.5;"
+                + "text-align:justify;margin:0;}" +
                 ".container{padding:0 4px;}" +
                 "</style></head><body><div class='container'>" +
                 safeText.replace("\n", "<br/>") +
@@ -287,7 +288,7 @@ public class link extends javax.swing.JPanel {
 
         javax.swing.JEditorPane editorPane = new javax.swing.JEditorPane("text/html", html);
         editorPane.setEditable(false);
-        editorPane.setOpaque(false);
+        editorPane.setOpaque(true);
         editorPane.setFocusable(false);
         editorPane.setHighlighter(null);
         editorPane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -320,10 +321,13 @@ public class link extends javax.swing.JPanel {
             }
         });
         javax.swing.JPanel buttons = new javax.swing.JPanel();
+        buttons.setBackground(java.awt.Color.WHITE); 
         buttons.add(ok);
         content.add(buttons, java.awt.BorderLayout.SOUTH);
 
         dialog.setContentPane(content);
+        dialog.getContentPane().setBackground(java.awt.Color.WHITE); 
+        dialog.setBackground(java.awt.Color.WHITE);
         dialog.setSize(320, 600);
         if (owner != null) {
             dialog.setLocationRelativeTo(owner);
