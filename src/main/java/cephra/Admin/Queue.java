@@ -18,7 +18,7 @@ public class Queue extends javax.swing.JPanel {
         
         jtableDesign.apply(queTab);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
- 
+
         JTableHeader header = queTab.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         
@@ -26,9 +26,11 @@ public class Queue extends javax.swing.JPanel {
         cephra.Admin.QueueBridge.registerModel((DefaultTableModel) queTab.getModel());
         
         // Setup Action column with an invisible button that shows text "Proceed"
-        setupActionColumn();
-        // Setup Payment column for marking as paid
-        setupPaymentColumn();
+        // Delay setup to ensure table model is ready
+        SwingUtilities.invokeLater(() -> {
+            setupActionColumn();
+            setupPaymentColumn();
+        });
         jPanel1.setOpaque(false);
         
         // Create a single instance of Monitor
@@ -99,6 +101,8 @@ public class Queue extends javax.swing.JPanel {
                 if (hasTicket) {
                     button.setText("Proceed");
                     button.setForeground(new java.awt.Color(255, 255, 255)); // Ensure white text color
+                    button.setBackground(new java.awt.Color(0, 120, 215)); // Ensure visible background
+                    button.setOpaque(true); // Ensure button is opaque
                     return button;
                 }
                 return empty;
@@ -451,12 +455,14 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private static JButton createFlatButton() {
         JButton b = new JButton();
         b.setBorderPainted(false);
-        b.setContentAreaFilled(false);
+        b.setContentAreaFilled(true); // Make sure content area is filled
         b.setFocusPainted(false);
-        b.setOpaque(false);
+        b.setOpaque(true); // Make button opaque so it's visible
         b.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        b.setForeground(new java.awt.Color(255, 255, 255)); // Set text color to white to match table text
+        b.setForeground(new java.awt.Color(255, 255, 255)); // Set text color to white
+        b.setBackground(new java.awt.Color(0, 120, 215)); // Set a visible background color
         b.setText("Proceed");
+        b.setPreferredSize(new java.awt.Dimension(80, 25)); // Set preferred size
         return b;
     }
 
@@ -735,30 +741,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
 
-    // Helper: check if a specific bay (e.g., "Bay-1".."Bay-8") is currently occupied
-    private boolean isBayInUse(String bayNumber) {
-        if (bayNumber == null || !bayNumber.startsWith("Bay-")) return false;
-        try {
-            int idx = Integer.parseInt(bayNumber.substring(4));
-            // Fast bays: 1-3 map to indices 0-2
-            if (idx >= 1 && idx <= 3) {
-                int fastIndex = idx - 1;
-                if (fastIndex >= 0 && fastIndex < cephra.Admin.Bay.fastChargingOccupied.length) {
-                    return cephra.Admin.Bay.fastChargingOccupied[fastIndex];
-                }
-            }
-            // Normal bays: 4-8 map to indices 0-4
-            if (idx >= 4 && idx <= 8) {
-                int normalIndex = idx - 4;
-                if (normalIndex >= 0 && normalIndex < cephra.Admin.Bay.normalChargingOccupied.length) {
-                    return cephra.Admin.Bay.normalChargingOccupied[normalIndex];
-                }
-            }
-        } catch (NumberFormatException ignore) {
-            // If parsing fails, assume not in use
-        }
-        return false;
-    }
+  
 
 
     private void setupPaymentColumn() {
@@ -777,11 +760,14 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 if ("Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(v)) {
                     btn.setText("Pending");
                     btn.setForeground(new java.awt.Color(255, 255, 255)); // Ensure white text color
-                    return btn; // transparent, unstyled button
+                    btn.setBackground(new java.awt.Color(255, 140, 0)); // Orange background for pending
+                    btn.setOpaque(true); // Ensure button is opaque
+                    return btn;
                 } else if ("Complete".equalsIgnoreCase(status) && "Paid".equalsIgnoreCase(v)) {
                     btn.setText("Paid");
-                    btn.setBackground(new java.awt.Color(200, 200, 200)); // Gray background for paid
+                    btn.setBackground(new java.awt.Color(34, 139, 34)); // Green background for paid
                     btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
+                    btn.setOpaque(true); // Ensure button is opaque
                     return btn;
                 }
                 label.setText(v);
@@ -811,11 +797,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             String status = statusCol >= 0 ? String.valueOf(table.getValueAt(row, statusCol)) : "";
             if ("Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(v)) {
                 btn.setText("Pending");
+                btn.setBackground(new java.awt.Color(255, 140, 0)); // Orange background for pending
+                btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
+                btn.setOpaque(true); // Ensure button is opaque
                 return btn;
             } else if ("Complete".equalsIgnoreCase(status) && "Paid".equalsIgnoreCase(v)) {
                 btn.setText("Paid");
-                btn.setBackground(new java.awt.Color(200, 200, 200)); // Gray background for paid
+                btn.setBackground(new java.awt.Color(34, 139, 34)); // Green background for paid
                 btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
+                btn.setOpaque(true); // Ensure button is opaque
                 return btn;
             }
             label.setText(v);
@@ -1392,11 +1382,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }//GEN-LAST:event_BaybuttonActionPerformed
 
     private void nxtnormalbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nxtnormalbtnActionPerformed
-        // TODO add your handling code here:
+      
     }//GEN-LAST:event_nxtnormalbtnActionPerformed
 
-    private void nxtfastbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nxtfastbtnActionPerformed
-        // TODO add your handling code here:
+    private void nxtfastbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nxtfastbtnActionPerformed    
     }//GEN-LAST:event_nxtfastbtnActionPerformed
 
     // Grid button action listeners - placeholder methods for future functionality

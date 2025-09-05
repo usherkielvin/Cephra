@@ -38,7 +38,6 @@ public class History extends javax.swing.JPanel {
         
         JTableHeader header = jTable1.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
-        cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());
         
         // Set column widths
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(80);  // Ticket
@@ -48,6 +47,23 @@ public class History extends javax.swing.JPanel {
         jTable1.getColumnModel().getColumn(4).setPreferredWidth(100); // Served By
         jTable1.getColumnModel().getColumn(5).setPreferredWidth(120); // Date & Time
         jTable1.getColumnModel().getColumn(6).setPreferredWidth(100); // Reference
+        
+        // Make table completely non-editable by overriding the table model
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        jTable1.setModel(new javax.swing.table.DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        });
+        
+        // Copy the column headers from the original model
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            ((DefaultTableModel) jTable1.getModel()).addColumn(model.getColumnName(i));
+        }
+        
+        // Register the new non-editable model with HistoryBridge
+        cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());
         
     }
 
