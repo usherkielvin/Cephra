@@ -83,7 +83,7 @@ public class Phone extends javax.swing.JFrame {
         // Create the kenji label
         Iphoneframe = new JLabel();
          Iphoneframe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/red.png")));
-        Iphoneframe.setBounds(-27, 0, 401, 750); // center top
+        Iphoneframe.setBounds(-30, 0, 405, 750); // center top
         Iphoneframe.setHorizontalAlignment(SwingConstants.CENTER);
         
         // Add to the root pane's layered pane to ensure it's always on top
