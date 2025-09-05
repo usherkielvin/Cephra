@@ -262,6 +262,34 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         JOptionPane.showMessageDialog(Queue.this, msg, title, JOptionPane.INFORMATION_MESSAGE);
                     }
                 } else if ("Charging".equalsIgnoreCase(status)) {
+                    // FIRST: Validate if PayPop can be shown BEFORE completing charging
+                    String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                    boolean canShowPayPop = false;
+                    
+                    try {
+                        // Check if PayPop can be shown without actually showing it
+                        canShowPayPop = cephra.Phone.PayPop.canShowPayPop(ticket, customer);
+                        System.out.println("Queue: Checking if PayPop can be shown for ticket " + ticket + " and customer " + customer + ": " + canShowPayPop);
+                    } catch (Throwable t) {
+                        System.err.println("Error checking PayPop availability: " + t.getMessage());
+                        canShowPayPop = false;
+                    }
+                    
+                    if (!canShowPayPop) {
+                        // PayPop cannot be shown - don't complete charging, just set payment to Pending
+                        System.out.println("Queue: Cannot show PayPop for ticket " + ticket + " - setting payment to Pending");
+                        
+                        // Set payment status to Pending without completing charging
+                        if (paymentCol >= 0) {
+                            queTab.setValueAt("Pending", editingRow, paymentCol);
+                        }
+                        
+                        return; // Exit without completing charging
+                    }
+                    
+                    // ONLY complete charging if PayPop can be shown
+                    System.out.println("Queue: PayPop can be shown - completing charging for ticket " + ticket);
+                    
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
                     // Update database status
                     cephra.CephraDB.updateQueueTicketStatus(ticket, "Complete");
@@ -274,7 +302,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     
                     // Set battery level to 100% when charging is completed
                     try {
-                        String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
                         if (!customer.isEmpty()) {
                             cephra.CephraDB.setUserBatteryLevel(customer, 100);
                             System.out.println("Queue: Charging completed for " + customer + ", battery level set to 100%");
@@ -289,38 +316,37 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
                         cephra.Phone.QueueFlow.setCurrent(ticket, serviceName);
                         cephra.Phone.QueueFlow.updatePaymentStatus(ticket, "Pending");
-                            } catch (Throwable t) {
-            // Ignore errors
-        }
+                    } catch (Throwable t) {
+                        // Ignore errors
+                    }
 
-                                            // Compute amount due and kWh based on actual battery level
-                        try {
-                            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
-                            // Get actual battery info for kWh calculation
-                            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-                            if (batteryInfo == null) {
-                                // Get from user's actual battery level
-                                String customer = String.valueOf(queTab.getValueAt(editingRow, getColumnIndex("Customer")));
-                                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
-                                batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
-                            }
-                            double usedKWh = (100.0 - batteryInfo.initialPercent) / 100.0 * batteryInfo.capacityKWh;
-                            System.out.println("Amount due for " + ticket + ": " + String.format("%.2f", amount) + ", kWh: " + String.format("%.1f", usedKWh));
-                        } catch (Throwable t) {
-                            // Ignore compute errors
-                        }
-
-                    // Notify phone frame to show payment popup
+                    // Compute amount due and kWh based on actual battery level
                     try {
-                        java.awt.Window[] windows = java.awt.Window.getWindows();
-                        for (java.awt.Window window : windows) {
-                            if (window instanceof cephra.Frame.Phone) {
-                                ((cephra.Frame.Phone) window).switchPanel(new cephra.Phone.PayPop());
-                                break;
-                            }
+                        double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                        // Get actual battery info for kWh calculation
+                        cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                        if (batteryInfo == null) {
+                            // Get from user's actual battery level
+                            String customerForBattery = String.valueOf(queTab.getValueAt(editingRow, getColumnIndex("Customer")));
+                            int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customerForBattery);
+                            batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
+                        }
+                        double usedKWh = (100.0 - batteryInfo.initialPercent) / 100.0 * batteryInfo.capacityKWh;
+                        System.out.println("Amount due for " + ticket + ": " + String.format("%.2f", amount) + ", kWh: " + String.format("%.1f", usedKWh));
+                    } catch (Throwable t) {
+                        // Ignore compute errors
+                    }
+
+                    // NOW show the PayPop (we already validated it can be shown)
+                    try {
+                        boolean success = cephra.Phone.PayPop.showPayPop(ticket, customer);
+                        if (success) {
+                            System.out.println("PayPop successfully shown for ticket " + ticket + " and user " + customer);
+                        } else {
+                            System.err.println("Unexpected: PayPop validation passed but showing failed for ticket " + ticket);
                         }
                     } catch (Throwable t) {
-                        // Ignore if phone frame not running
+                        System.err.println("Error showing PayPop: " + t.getMessage());
                     }
                 } else if ("Complete".equalsIgnoreCase(status)) {
                 
