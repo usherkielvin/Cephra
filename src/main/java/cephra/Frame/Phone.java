@@ -80,7 +80,6 @@ public class Phone extends javax.swing.JFrame {
     }
 
     private void PhoneFrame() {
-        // Create the kenji label
         Iphoneframe = new JLabel();
          Iphoneframe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/red.png")));
         Iphoneframe.setBounds(-30, 0, 405, 750); // center top
@@ -109,7 +108,7 @@ public class Phone extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        phonePanel = new cephra.Phone.Splashscreen();
+        phonePanel = new cephra.Phone.ChargeOption();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(350, 750));

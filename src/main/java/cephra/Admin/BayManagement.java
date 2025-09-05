@@ -4,11 +4,11 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-
-public class Bay extends javax.swing.JPanel {
-//
-   
+public class BayManagement extends javax.swing.JPanel {
+    
     // Static variables to track available bays
     public static boolean[] fastChargingAvailable = {true, true, true}; // Bays 1-3
     public static boolean[] normalChargingAvailable = {true, true, true, true, true}; // Bays 4-8
@@ -17,7 +17,7 @@ public class Bay extends javax.swing.JPanel {
     public static boolean[] fastChargingOccupied = {false, false, false}; // Bays 1-3
     public static boolean[] normalChargingOccupied = {false, false, false, false, false}; // Bays 4-8
     
-    // Toggle buttons for bay availability
+    // Toggle buttons array for easy access
     private JToggleButton[] bayToggleButtons = new JToggleButton[8];
     
     // Static methods to check availability
@@ -39,21 +39,14 @@ public class Bay extends javax.swing.JPanel {
         return false;
     }
     
-    // Method to check if a specific bay is available for charging
     public static boolean isBayAvailableForCharging(int bayNumber) {
-        // Bay numbers are 1-indexed, arrays are 0-indexed
         int index = bayNumber - 1;
-        
-        // Check if it's a fast charging bay (1-3)
         if (bayNumber >= 1 && bayNumber <= 3) {
             return fastChargingAvailable[index] && !fastChargingOccupied[index];
-        }
-        // Check if it's a normal charging bay (4-8)
-        else if (bayNumber >= 4 && bayNumber <= 8) {
+        } else if (bayNumber >= 4 && bayNumber <= 8) {
             return normalChargingAvailable[index - 3] && !normalChargingOccupied[index - 3];
         }
-        
-        return false; // Invalid bay number
+        return false;
     }
     
     public static int getAvailableFastChargingCount() {
@@ -76,32 +69,51 @@ public class Bay extends javax.swing.JPanel {
         return count;
     }
     
-    // Method to load toggle states from the database
     public static void loadToggleStates() {
-        System.out.println("Loading toggle states...");
-        
-        // Could add database loading of toggle states here if needed
+        System.out.println("Loading toggle states from database...");
+        try {
+            // Create bay_toggle_states table if it doesn't exist
+            createToggleStatesTable();
+            
+            // Load toggle states from database
+            loadToggleStatesFromDatabase();
+            
+        } catch (Exception e) {
+            System.err.println("Error loading toggle states: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
-    // Method to save toggle states
     public static void saveToggleStates() {
-        // This would ideally save to database, but for now we'll just use the static variables
-        System.out.println("Saving toggle states...");
-        System.out.println("Fast Charging Available: " + getAvailableFastChargingCount() + "/3");
-        System.out.println("Normal Charging Available: " + getAvailableNormalChargingCount() + "/5");
+        System.out.println("Saving toggle states to database...");
+        try {
+            // Save toggle states to database
+            saveToggleStatesToDatabase();
+            
+            System.out.println("Fast Charging Available: " + getAvailableFastChargingCount() + "/3");
+            System.out.println("Normal Charging Available: " + getAvailableNormalChargingCount() + "/5");
+            
+        } catch (Exception e) {
+            System.err.println("Error saving toggle states: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
   
-    public Bay() {
+    public BayManagement() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         setupDateTimeTimer();
-        setupBayToggleButtons();
+        
+        // Load toggle states from database first
+        loadToggleStates();
+        
+        setupIOSToggles();
           
         // Set default state to Available for all bays
         SwingUtilities.invokeLater(() -> {
             bay1.setText("Available");
-            bay1.setForeground(new java.awt.Color(0, 128, 0)); // Green color for available
+            bay1.setForeground(new java.awt.Color(0, 128, 0));
             bay2.setText("Available");
             bay2.setForeground(new java.awt.Color(0, 128, 0));
             bay3.setText("Available");
@@ -119,10 +131,17 @@ public class Bay extends javax.swing.JPanel {
         });
     }
 
-   
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        toggle7 = new javax.swing.JToggleButton();
+        toggle6 = new javax.swing.JToggleButton();
+        toggle5 = new javax.swing.JToggleButton();
+        toggle4 = new javax.swing.JToggleButton();
+        toggle3 = new javax.swing.JToggleButton();
+        toggle2 = new javax.swing.JToggleButton();
+        toggle8 = new javax.swing.JToggleButton();
+        toggle1 = new javax.swing.JToggleButton();
         bay8 = new javax.swing.JLabel();
         bay7 = new javax.swing.JLabel();
         bay6 = new javax.swing.JLabel();
@@ -142,48 +161,76 @@ public class Bay extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
+        add(toggle7);
+        toggle7.setBounds(260, 650, 60, 30);
+
+        toggle6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                toggle6ActionPerformed(evt);
+            }
+        });
+        add(toggle6);
+        toggle6.setBounds(860, 460, 60, 30);
+        add(toggle5);
+        toggle5.setBounds(560, 460, 60, 30);
+
+        toggle4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                toggle4ActionPerformed(evt);
+            }
+        });
+        add(toggle4);
+        toggle4.setBounds(260, 460, 60, 30);
+        add(toggle3);
+        toggle3.setBounds(860, 270, 60, 30);
+        add(toggle2);
+        toggle2.setBounds(560, 270, 60, 30);
+        add(toggle8);
+        toggle8.setBounds(560, 650, 60, 30);
+        add(toggle1);
+        toggle1.setBounds(260, 270, 60, 30);
 
         bay8.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay8.setText("Available");
         add(bay8);
-        bay8.setBounds(390, 650, 150, 32);
+        bay8.setBounds(400, 645, 150, 32);
 
         bay7.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay7.setText("Available");
         add(bay7);
-        bay7.setBounds(90, 640, 150, 32);
+        bay7.setBounds(100, 645, 150, 32);
 
         bay6.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay6.setText("Available");
         add(bay6);
-        bay6.setBounds(690, 460, 150, 32);
+        bay6.setBounds(720, 460, 150, 32);
 
         bay5.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay5.setText("Available");
         add(bay5);
-        bay5.setBounds(380, 460, 150, 32);
+        bay5.setBounds(400, 460, 150, 32);
 
         bay4.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay4.setText("Available");
         add(bay4);
-        bay4.setBounds(80, 460, 150, 32);
+        bay4.setBounds(100, 460, 150, 32);
 
         bay3.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay3.setText("Available");
         add(bay3);
-        bay3.setBounds(680, 270, 150, 32);
+        bay3.setBounds(730, 270, 150, 32);
 
         bay2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay2.setText("Available");
         add(bay2);
-        bay2.setBounds(380, 270, 150, 32);
+        bay2.setBounds(410, 270, 150, 32);
 
         bay1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         bay1.setText("Available");
         add(bay1);
         bay1.setBounds(100, 270, 150, 32);
 
-        datetime.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        datetime.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         datetime.setForeground(new java.awt.Color(255, 255, 255));
         datetime.setText("10:44 AM 17 August, Sunday");
         add(datetime);
@@ -261,43 +308,49 @@ public class Bay extends javax.swing.JPanel {
         jLabel1.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quebuttonActionPerformed
-        Window w = SwingUtilities.getWindowAncestor(Bay.this);
+    private void toggle4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_toggle4ActionPerformed
+      
+    }//GEN-LAST:event_toggle4ActionPerformed
+
+    private void toggle6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_toggle6ActionPerformed
+        
+    }//GEN-LAST:event_toggle6ActionPerformed
+
+    private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {
+        Window w = SwingUtilities.getWindowAncestor(BayManagement.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new Queue());
         }
-    }//GEN-LAST:event_quebuttonActionPerformed
+    }
 
-    private void staffbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_staffbuttonActionPerformed
-        Window w = SwingUtilities.getWindowAncestor(Bay.this);
+    private void staffbuttonActionPerformed(java.awt.event.ActionEvent evt) {
+        Window w = SwingUtilities.getWindowAncestor(BayManagement.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new StaffRecord());
         }
-    }//GEN-LAST:event_staffbuttonActionPerformed
+    }
 
-    private void businessbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_businessbuttonActionPerformed
-        Window w = SwingUtilities.getWindowAncestor(Bay.this);
+    private void businessbuttonActionPerformed(java.awt.event.ActionEvent evt) {
+        Window w = SwingUtilities.getWindowAncestor(BayManagement.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Dashboard());
         }
-    }//GEN-LAST:event_businessbuttonActionPerformed
+    }
 
-    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
-        Window w = SwingUtilities.getWindowAncestor(Bay.this);
+    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {
+        Window w = SwingUtilities.getWindowAncestor(BayManagement.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new History());
         }
-    }//GEN-LAST:event_historybuttonActionPerformed
+    }
 
-    private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
-        Window w = SwingUtilities.getWindowAncestor(Bay.this);
+    private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {
+        Window w = SwingUtilities.getWindowAncestor(BayManagement.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Login());
         }
-    }//GEN-LAST:event_exitloginActionPerformed
+    }
 
-
-    
     private void setupDateTimeTimer() {
         updateDateTime();
         javax.swing.Timer timer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
@@ -338,6 +391,14 @@ public class Bay extends javax.swing.JPanel {
     private javax.swing.JLabel labelStaff;
     private javax.swing.JButton quebutton;
     private javax.swing.JButton staffbutton;
+    private javax.swing.JToggleButton toggle1;
+    private javax.swing.JToggleButton toggle2;
+    private javax.swing.JToggleButton toggle3;
+    private javax.swing.JToggleButton toggle4;
+    private javax.swing.JToggleButton toggle5;
+    private javax.swing.JToggleButton toggle6;
+    private javax.swing.JToggleButton toggle7;
+    private javax.swing.JToggleButton toggle8;
     // End of variables declaration//GEN-END:variables
     
     @SuppressWarnings("unused")
@@ -345,7 +406,6 @@ public class Bay extends javax.swing.JPanel {
         try {
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
             if (window instanceof cephra.Frame.Admin) {
-                // Use reflection to get the loggedInUsername field
                 java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
                 usernameField.setAccessible(true);
                 return (String) usernameField.get(window);
@@ -353,83 +413,79 @@ public class Bay extends javax.swing.JPanel {
         } catch (Exception e) {
             System.err.println("Error getting logged-in username: " + e.getMessage());
         }
-        return "Admin"; // Fallback
+        return "Admin";
     }
     
     /**
-     * Sets up the toggle buttons for controlling bay availability
+     * Sets up iOS-style toggle switches using NetBeans toggle buttons
      */
-    private void setupBayToggleButtons() {
-        // Create toggle buttons for each bay
+    private void setupIOSToggles() {
+        // Initialize toggle buttons array with NetBeans toggles
+        bayToggleButtons[0] = toggle1;
+        bayToggleButtons[1] = toggle2;
+        bayToggleButtons[2] = toggle3;
+        bayToggleButtons[3] = toggle4;
+        bayToggleButtons[4] = toggle5;
+        bayToggleButtons[5] = toggle6;
+        bayToggleButtons[6] = toggle7;
+        bayToggleButtons[7] = toggle8;
+        
         for (int i = 0; i < 8; i++) {
             final int bayIndex = i;
-            bayToggleButtons[i] = new JToggleButton();
-            bayToggleButtons[i].setText("Bay " + (i + 1));
+            JToggleButton toggle = bayToggleButtons[i];
             
-            // Set initial state based on availability arrays
-            if (i < 3) { // Fast charging bays (0-2)
-                bayToggleButtons[i].setSelected(fastChargingAvailable[i]);
-                bayToggleButtons[i].setText("Fast Bay " + (i + 1));
-                bayToggleButtons[i].setBackground(new Color(0, 150, 255)); // Blue for fast charging
-            } else { // Normal charging bays (3-7)
-                bayToggleButtons[i].setSelected(normalChargingAvailable[i - 3]);
-                bayToggleButtons[i].setText("Normal Bay " + (i + 1));
-                bayToggleButtons[i].setBackground(new Color(0, 180, 0)); // Green for normal charging
+            // Set initial state
+            if (i < 3) { // Fast charging bays
+                toggle.setSelected(fastChargingAvailable[i]);
+            } else { // Normal charging bays
+                toggle.setSelected(normalChargingAvailable[i - 3]);
             }
             
-            // Style the toggle button
-            bayToggleButtons[i].setForeground(Color.WHITE);
-            bayToggleButtons[i].setFont(new Font("Segoe UI", Font.BOLD, 14));
-            bayToggleButtons[i].setFocusPainted(false);
+            // Apply iOS-style customization
+            customizeToggleForIOS(toggle, i < 3);
             
-            // Add action listener to update availability arrays when toggled
-            bayToggleButtons[i].addActionListener(new ActionListener() {
+            // Add action listener
+            toggle.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JToggleButton source = (JToggleButton) e.getSource();
-                    boolean isAvailable = source.isSelected();
+                    boolean isSelected = source.isSelected();
                     
-                    // Update the appropriate availability array
-                    if (bayIndex < 3) { // Fast charging bays
-                        fastChargingAvailable[bayIndex] = isAvailable;
-                        // Update the bay label
+                    // Update availability arrays
+                    if (bayIndex < 3) {
+                        fastChargingAvailable[bayIndex] = isSelected;
                         JLabel bayLabel = getBayLabel(bayIndex + 1);
                         if (bayLabel != null) {
-                            updateBayLabel(bayLabel, isAvailable);
+                            updateBayLabel(bayLabel, isSelected);
                         }
-                    } else { // Normal charging bays
-                        normalChargingAvailable[bayIndex - 3] = isAvailable;
-                        // Update the bay label
+                    } else {
+                        normalChargingAvailable[bayIndex - 3] = isSelected;
                         JLabel bayLabel = getBayLabel(bayIndex + 1);
                         if (bayLabel != null) {
-                            updateBayLabel(bayLabel, isAvailable);
+                            updateBayLabel(bayLabel, isSelected);
                         }
                     }
                     
-                    // Save the updated toggle states
                     saveToggleStates();
                 }
             });
-            
-            // Add the toggle button to the panel
-            add(bayToggleButtons[i]);
-            
-            // Position the toggle buttons below the bay labels
-            if (i < 3) { // First row - Fast charging bays
-                bayToggleButtons[i].setBounds(230 + (i * 310), 275, 40, 40);
-            } else if (i < 6) { // Second row - Normal charging bays 4-6
-                bayToggleButtons[i].setBounds(230 + ((i - 3) * 310), 475, 150, 40);
-            } else { // Third row - Normal charging bays 7-8
-                bayToggleButtons[i].setBounds(230 + ((i - 6) * 310), 645, 150, 40);
-            }
         }
     }
     
     /**
-     * Gets the JLabel for a specific bay number
-     * @param bayNumber The bay number (1-8)
-     * @return The JLabel for the bay, or null if not found
+     * Customizes a toggle button to look like iOS toggle
      */
+    private void customizeToggleForIOS(JToggleButton toggle, boolean isFastCharging) {
+        // Remove default styling
+        toggle.setBorderPainted(false);
+        toggle.setFocusPainted(false);
+        toggle.setContentAreaFilled(false);
+        toggle.setOpaque(false);
+        
+        // Apply custom iOS UI
+        toggle.setUI(new IOSToggleUI(isFastCharging));
+    }
+    
     private JLabel getBayLabel(int bayNumber) {
         switch (bayNumber) {
             case 1: return bay1;
@@ -444,18 +500,209 @@ public class Bay extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Updates a bay label based on availability
-     * @param label The JLabel to update
-     * @param isAvailable Whether the bay is available
-     */
     private void updateBayLabel(JLabel label, boolean isAvailable) {
         if (isAvailable) {
             label.setText("Available");
-            label.setForeground(new java.awt.Color(0, 128, 0)); // Green for available
+            label.setForeground(new java.awt.Color(0, 128, 0));
         } else {
             label.setText("Unavailable");
-            label.setForeground(new java.awt.Color(255, 0, 0)); // Red for unavailable
+            label.setForeground(new java.awt.Color(255, 0, 0));
+        }
+    }
+    
+    /**
+     * Custom iOS-style toggle UI for JToggleButton
+     */
+    public static class IOSToggleUI extends javax.swing.plaf.basic.BasicToggleButtonUI {
+        private Color onColor;
+        private Color offColor = new Color(142, 142, 147); // iOS gray
+        private Color thumbColor = Color.WHITE;
+        
+        public IOSToggleUI(boolean isFastCharging) {
+            if (isFastCharging) {
+                this.onColor = new Color(52, 199, 89); // iOS green for bays 1-3
+            } else {
+                this.onColor = new Color(0, 122, 255); // iOS blue for bays 4-8
+            }
+        }
+        
+        @Override
+        public void paint(Graphics g, JComponent c) {
+            JToggleButton button = (JToggleButton) c;
+            Graphics2D g2d = (Graphics2D) g.create();
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            int width = button.getWidth();
+            int height = button.getHeight();
+            
+            // Background track
+            Color trackColor = button.isSelected() ? onColor : offColor;
+            g2d.setColor(trackColor);
+            g2d.fillRoundRect(0, 0, width, height, height, height);
+            
+            // Thumb circle
+            int thumbSize = height - 4;
+            int thumbX = button.isSelected() ? width - thumbSize - 2 : 2;
+            int thumbY = 2;
+            
+            // Thumb shadow
+            g2d.setColor(new Color(0, 0, 0, 30));
+            g2d.fillOval(thumbX + 1, thumbY + 1, thumbSize, thumbSize);
+            
+            // Thumb
+            g2d.setColor(thumbColor);
+            g2d.fillOval(thumbX, thumbY, thumbSize, thumbSize);
+            
+            g2d.dispose();
+        }
+    }
+    
+    /**
+     * Creates the bay_toggle_states table if it doesn't exist
+     */
+    private static void createToggleStatesTable() {
+        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+             java.sql.Statement stmt = conn.createStatement()) {
+            
+            String createTableSQL = """
+                CREATE TABLE IF NOT EXISTS bay_toggle_states (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    bay_number INT NOT NULL UNIQUE,
+                    is_available BOOLEAN NOT NULL DEFAULT TRUE,
+                    bay_type VARCHAR(20) NOT NULL,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """;
+            
+            stmt.execute(createTableSQL);
+            
+            // Insert initial toggle states if they don't exist
+            for (int i = 1; i <= 8; i++) {
+                String bayType = (i <= 3) ? "Fast" : "Normal";
+                String insertSQL = String.format("""
+                    INSERT IGNORE INTO bay_toggle_states (bay_number, is_available, bay_type) 
+                    VALUES (%d, TRUE, '%s')
+                """, i, bayType);
+                stmt.execute(insertSQL);
+            }
+            
+            System.out.println("Bay toggle states table created/verified successfully");
+            
+        } catch (Exception e) {
+            System.err.println("Error creating toggle states table: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Loads toggle states from the database
+     */
+    private static void loadToggleStatesFromDatabase() {
+        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+             java.sql.Statement stmt = conn.createStatement()) {
+            
+            // First, try to load from bay_toggle_states table
+            try (java.sql.ResultSet rs = stmt.executeQuery("SELECT bay_number, is_available FROM bay_toggle_states ORDER BY bay_number")) {
+                boolean hasToggleStates = false;
+                
+                while (rs.next()) {
+                    hasToggleStates = true;
+                    int bayNumber = rs.getInt("bay_number");
+                    boolean isAvailable = rs.getBoolean("is_available");
+                    
+                    // Update the static arrays
+                    if (bayNumber >= 1 && bayNumber <= 3) {
+                        fastChargingAvailable[bayNumber - 1] = isAvailable;
+                    } else if (bayNumber >= 4 && bayNumber <= 8) {
+                        normalChargingAvailable[bayNumber - 4] = isAvailable;
+                    }
+                }
+                
+                if (hasToggleStates) {
+                    System.out.println("Toggle states loaded from bay_toggle_states table successfully");
+                    return;
+                }
+            }
+            
+            // If no toggle states found, load from charging_bays table
+            try (java.sql.ResultSet rs = stmt.executeQuery("SELECT bay_number, status FROM charging_bays ORDER BY bay_number")) {
+                while (rs.next()) {
+                    String bayNumberStr = rs.getString("bay_number");
+                    String status = rs.getString("status");
+                    
+                    // Extract bay number from "Bay-X" format
+                    int bayNumber = Integer.parseInt(bayNumberStr.replace("Bay-", ""));
+                    boolean isAvailable = !"Maintenance".equals(status);
+                    
+                    // Update the static arrays
+                    if (bayNumber >= 1 && bayNumber <= 3) {
+                        fastChargingAvailable[bayNumber - 1] = isAvailable;
+                    } else if (bayNumber >= 4 && bayNumber <= 8) {
+                        normalChargingAvailable[bayNumber - 4] = isAvailable;
+                    }
+                }
+                
+                System.out.println("Toggle states loaded from charging_bays table successfully");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error loading toggle states from database: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Saves toggle states to the database
+     */
+    private static void saveToggleStatesToDatabase() {
+        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            
+            // Update bay_toggle_states table
+            try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
+                    "UPDATE bay_toggle_states SET is_available = ? WHERE bay_number = ?")) {
+                
+                // Save fast charging bays (1-3)
+                for (int i = 0; i < fastChargingAvailable.length; i++) {
+                    pstmt.setBoolean(1, fastChargingAvailable[i]);
+                    pstmt.setInt(2, i + 1);
+                    pstmt.executeUpdate();
+                }
+                
+                // Save normal charging bays (4-8)
+                for (int i = 0; i < normalChargingAvailable.length; i++) {
+                    pstmt.setBoolean(1, normalChargingAvailable[i]);
+                    pstmt.setInt(2, i + 4);
+                    pstmt.executeUpdate();
+                }
+            }
+            
+            // Update charging_bays table status
+            try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
+                    "UPDATE charging_bays SET status = ? WHERE bay_number = ?")) {
+                
+                // Update fast charging bays (1-3)
+                for (int i = 0; i < fastChargingAvailable.length; i++) {
+                    String status = fastChargingAvailable[i] ? "Available" : "Maintenance";
+                    pstmt.setString(1, status);
+                    pstmt.setString(2, "Bay-" + (i + 1));
+                    pstmt.executeUpdate();
+                }
+                
+                // Update normal charging bays (4-8)
+                for (int i = 0; i < normalChargingAvailable.length; i++) {
+                    String status = normalChargingAvailable[i] ? "Available" : "Maintenance";
+                    pstmt.setString(1, status);
+                    pstmt.setString(2, "Bay-" + (i + 4));
+                    pstmt.executeUpdate();
+                }
+            }
+            
+            System.out.println("Toggle states and bay status updated in database successfully");
+            
+        } catch (Exception e) {
+            System.err.println("Error saving toggle states to database: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
