@@ -28,6 +28,12 @@ public class Monitor extends javax.swing.JFrame {
         System.out.println("Monitor constructor completed - displayButtons initialized");
         
         // Use only NetBeans positioning - no override
+        
+        // Initialize grid displays with maintenance status from BayManagement
+        initializeGridDisplays();
+        
+        // Register this Monitor instance with BayManagement for real-time updates
+        cephra.Admin.BayManagement.registerMonitorInstance(this);
     }
     
 
@@ -65,10 +71,16 @@ public class Monitor extends javax.swing.JFrame {
      public void updateFastGrid(String[] fastTickets) {
          System.out.println("Monitor updateFastGrid called with " + fastTickets.length + " texts");
          
+         // Get colors from BayManagement for maintenance status
+         java.awt.Color[] fastColors = cephra.Admin.BayManagement.getFastChargingGridColors();
+         
          // Update fast charge buttons (f1, f2, f3)
          if (fastTickets.length >= 1 && fastTickets[0] != null && !fastTickets[0].isEmpty()) {
              f1.setText(fastTickets[0]);
              f1.setVisible(true);
+             if (fastColors != null && fastColors.length >= 1) {
+                 f1.setForeground(fastColors[0]);
+             }
          } else {
              f1.setText("");
              f1.setVisible(false);
@@ -77,6 +89,9 @@ public class Monitor extends javax.swing.JFrame {
          if (fastTickets.length >= 2 && fastTickets[1] != null && !fastTickets[1].isEmpty()) {
              f2.setText(fastTickets[1]);
              f2.setVisible(true);
+             if (fastColors != null && fastColors.length >= 2) {
+                 f2.setForeground(fastColors[1]);
+             }
          } else {
              f2.setText("");
              f2.setVisible(false);
@@ -85,6 +100,9 @@ public class Monitor extends javax.swing.JFrame {
          if (fastTickets.length >= 3 && fastTickets[2] != null && !fastTickets[2].isEmpty()) {
              f3.setText(fastTickets[2]);
              f3.setVisible(true);
+             if (fastColors != null && fastColors.length >= 3) {
+                 f3.setForeground(fastColors[2]);
+             }
          } else {
              f3.setText("");
              f3.setVisible(false);
@@ -97,10 +115,16 @@ public class Monitor extends javax.swing.JFrame {
      public void updateNormalGrid(String[] normalTickets) {
          System.out.println("Monitor updateNormalGrid called with " + normalTickets.length + " texts");
          
+         // Get colors from BayManagement for maintenance status
+         java.awt.Color[] normalColors = cephra.Admin.BayManagement.getNormalChargingGridColors();
+         
          // Update normal charge buttons (b1, b2, b3, b4, b5)
          if (normalTickets.length >= 1 && normalTickets[0] != null && !normalTickets[0].isEmpty()) {
              b1.setText(normalTickets[0]);
              b1.setVisible(true);
+             if (normalColors != null && normalColors.length >= 1) {
+                 b1.setForeground(normalColors[0]);
+             }
          } else {
              b1.setText("");
              b1.setVisible(false);
@@ -109,6 +133,9 @@ public class Monitor extends javax.swing.JFrame {
          if (normalTickets.length >= 2 && normalTickets[1] != null && !normalTickets[1].isEmpty()) {
              b2.setText(normalTickets[1]);
              b2.setVisible(true);
+             if (normalColors != null && normalColors.length >= 2) {
+                 b2.setForeground(normalColors[1]);
+             }
          } else {
              b2.setText("");
              b2.setVisible(false);
@@ -117,6 +144,9 @@ public class Monitor extends javax.swing.JFrame {
          if (normalTickets.length >= 3 && normalTickets[2] != null && !normalTickets[2].isEmpty()) {
              b3.setText(normalTickets[2]);
              b3.setVisible(true);
+             if (normalColors != null && normalColors.length >= 3) {
+                 b3.setForeground(normalColors[2]);
+             }
          } else {
              b3.setText("");
              b3.setVisible(false);
@@ -125,6 +155,9 @@ public class Monitor extends javax.swing.JFrame {
          if (normalTickets.length >= 4 && normalTickets[3] != null && !normalTickets[3].isEmpty()) {
              b4.setText(normalTickets[3]);
              b4.setVisible(true);
+             if (normalColors != null && normalColors.length >= 4) {
+                 b4.setForeground(normalColors[3]);
+             }
          } else {
              b4.setText("");
              b4.setVisible(false);
@@ -133,6 +166,9 @@ public class Monitor extends javax.swing.JFrame {
          if (normalTickets.length >= 5 && normalTickets[4] != null && !normalTickets[4].isEmpty()) {
              b5.setText(normalTickets[4]);
              b5.setVisible(true);
+             if (normalColors != null && normalColors.length >= 5) {
+                 b5.setForeground(normalColors[4]);
+             }
          } else {
              b5.setText("");
              b5.setVisible(false);
@@ -486,4 +522,64 @@ public class Monitor extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
+    
+    /**
+     * Public method to refresh all grid displays with latest database data
+     * Called by BayManagement when tickets are moved to charging
+     */
+    public void refreshGridDisplays() {
+        try {
+            System.out.println("Monitor: Refreshing all grid displays with latest database data...");
+            
+            // Get fresh data directly from BayManagement without triggering refresh cycle
+            String[] fastTexts = cephra.Admin.BayManagement.getFastChargingGridTexts();
+            updateFastGrid(fastTexts);
+            
+            // Refresh normal charging grid
+            String[] normalTexts = cephra.Admin.BayManagement.getNormalChargingGridTexts();
+            updateNormalGrid(normalTexts);
+            
+            System.out.println("Monitor: All grid displays refreshed successfully");
+            
+        } catch (Exception e) {
+            System.err.println("Error refreshing Monitor grid displays: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Initializes grid displays with offline status from BayManagement
+     */
+    private void initializeGridDisplays() {
+        try {
+            System.out.println("Monitor: Initializing grid displays with database data...");
+            
+            // Force BayManagement to load data from database first
+            cephra.Admin.BayManagement.ensureMaintenanceDisplay();
+            
+            // Initialize fast charging grid with BayManagement data
+            String[] fastTexts = cephra.Admin.BayManagement.getFastChargingGridTexts();
+            java.awt.Color[] fastColors = cephra.Admin.BayManagement.getFastChargingGridColors();
+            
+            System.out.println("Monitor: Fast charging texts from database: " + java.util.Arrays.toString(fastTexts));
+            System.out.println("Monitor: Fast charging colors from database: " + java.util.Arrays.toString(fastColors));
+            
+            updateFastGrid(fastTexts);
+            
+            // Initialize normal charging grid with BayManagement data
+            String[] normalTexts = cephra.Admin.BayManagement.getNormalChargingGridTexts();
+            java.awt.Color[] normalColors = cephra.Admin.BayManagement.getNormalChargingGridColors();
+            
+            System.out.println("Monitor: Normal charging texts from database: " + java.util.Arrays.toString(normalTexts));
+            System.out.println("Monitor: Normal charging colors from database: " + java.util.Arrays.toString(normalColors));
+            
+            updateNormalGrid(normalTexts);
+            
+            System.out.println("Monitor: Grid displays initialized with offline status from database");
+            
+        } catch (Exception e) {
+            System.err.println("Error initializing Monitor grid displays: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

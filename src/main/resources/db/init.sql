@@ -263,7 +263,59 @@ INSERT IGNORE INTO battery_levels (username, battery_level, initial_battery_leve
 ('earnest', 35, 35, 40.0);
 
 -- Insert demo queue ticket (using INSERT IGNORE to prevent duplicates)
-INSERT IGNORE INTO queue_tickets (ticket_id, username, service_type, initial_battery_level, status, payment_status, priority) VALUES
-('FCH001', 'dizon', 'Fast', 30, 'Pending', 'Pending', 1);
+-- INSERT IGNORE INTO queue_tickets (ticket_id, username, service_type, initial_battery_level, status, payment_status, priority) VALUES
+-- ('FCH001', 'dizon', 'Fast', 30, 'Pending', 'Pending', 1);
+
+-- Create waiting grid table to track tickets in waiting slots
+CREATE TABLE IF NOT EXISTS waiting_grid (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    slot_number INT NOT NULL UNIQUE, -- 1-10 for waiting grid slots
+    ticket_id VARCHAR(50),
+    username VARCHAR(50),
+    service_type VARCHAR(20), -- 'Fast', 'Normal'
+    initial_battery_level INT,
+    position_in_queue INT, -- Order in waiting queue
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+);
+
+-- Create charging grid table to track tickets in charging bays
+CREATE TABLE IF NOT EXISTS charging_grid (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    bay_number VARCHAR(10) NOT NULL UNIQUE, -- Bay-1 to Bay-8
+    ticket_id VARCHAR(50),
+    username VARCHAR(50),
+    service_type VARCHAR(20), -- 'Fast', 'Normal'
+    initial_battery_level INT,
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+);
+
+-- Insert initial waiting grid slots (empty)
+INSERT IGNORE INTO waiting_grid (slot_number, ticket_id, username, service_type, initial_battery_level, position_in_queue) VALUES
+(1, NULL, NULL, NULL, NULL, NULL),
+(2, NULL, NULL, NULL, NULL, NULL),
+(3, NULL, NULL, NULL, NULL, NULL),
+(4, NULL, NULL, NULL, NULL, NULL),
+(5, NULL, NULL, NULL, NULL, NULL),
+(6, NULL, NULL, NULL, NULL, NULL),
+(7, NULL, NULL, NULL, NULL, NULL),
+(8, NULL, NULL, NULL, NULL, NULL),
+(9, NULL, NULL, NULL, NULL, NULL),
+(10, NULL, NULL, NULL, NULL, NULL);
+
+-- Insert initial charging grid slots (empty)
+INSERT IGNORE INTO charging_grid (bay_number, ticket_id, username, service_type, initial_battery_level) VALUES
+('Bay-1', NULL, NULL, NULL, NULL),
+('Bay-2', NULL, NULL, NULL, NULL),
+('Bay-3', NULL, NULL, NULL, NULL),
+('Bay-4', NULL, NULL, NULL, NULL),
+('Bay-5', NULL, NULL, NULL, NULL),
+('Bay-6', NULL, NULL, NULL, NULL),
+('Bay-7', NULL, NULL, NULL, NULL),
+('Bay-8', NULL, NULL, NULL, NULL);
 
 COMMIT;

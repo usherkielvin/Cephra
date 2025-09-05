@@ -257,7 +257,7 @@ public class Login extends javax.swing.JPanel {
             cephra.Frame.Admin mainFrame = (cephra.Frame.Admin) window;
             // Update the admin frame to store the logged-in username
             mainFrame.setLoggedInUsername(username);
-            mainFrame.switchPanel(new cephra.Admin.Dashboard());
+            mainFrame.switchPanel(new cephra.Admin.Business_Overview());
         }
     } else {
         // Increment failed login attempts

@@ -93,7 +93,7 @@ public final class HistoryBridge {
         }
     }
     
-    // Method to format timestamp for display (12-hour format without seconds)
+    // Method to format timestamp for display (compact format to fit table)
     private static String formatDateTimeForDisplay(Object timestamp) {
         if (timestamp == null) {
             return "";
@@ -102,7 +102,7 @@ public final class HistoryBridge {
             if (timestamp instanceof java.sql.Timestamp) {
                 java.sql.Timestamp ts = (java.sql.Timestamp) timestamp;
                 java.time.LocalDateTime ldt = ts.toLocalDateTime();
-                return ldt.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"));
+                return ldt.format(java.time.format.DateTimeFormatter.ofPattern("MM/dd/yy hh:mm a"));
             } else if (timestamp instanceof String) {
                 // If it's already a formatted string, return as is
                 return (String) timestamp;
