@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/usherkielvin/cephra/discussions
+    about: Ask questions, share ideas, and discuss Cephra with the community
+  - name: 📧 Email Support
+    url: mailto:ponceud@students.nu-moa.edu.ph
+    about: Contact the project lead directly for urgent issues or private matters
+  - name: 📚 Documentation
+    url: https://github.com/usherkielvin/cephra/wiki
+    about: Check our comprehensive documentation and guides
