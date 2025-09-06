@@ -75,6 +75,7 @@
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="opaque" type="boolean" value="false"/>
             <Property name="requestFocusEnabled" type="boolean" value="false"/>
+            <Property name="showHorizontalLines" type="boolean" value="true"/>
             <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
               <TableHeader reorderingAllowed="false" resizingAllowed="false"/>
             </Property>

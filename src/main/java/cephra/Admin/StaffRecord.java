@@ -193,6 +193,7 @@ public class StaffRecord extends javax.swing.JPanel {
         staffTable.setGridColor(new java.awt.Color(255, 255, 255));
         staffTable.setOpaque(false);
         staffTable.setRequestFocusEnabled(false);
+        staffTable.setShowHorizontalLines(true);
         staffTable.getTableHeader().setResizingAllowed(false);
         staffTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(staffTable);
