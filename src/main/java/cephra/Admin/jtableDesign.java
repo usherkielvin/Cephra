@@ -9,10 +9,10 @@ public class jtableDesign {
     
     public static void apply(JTable table) {
         table.setRowHeight(30);
-        table.setShowVerticalLines(false);
-        table.setShowHorizontalLines(true);
-        table.setGridColor(new Color(200, 200, 200)); // Light gray horizontal lines
-        table.setIntercellSpacing(new Dimension(0, 1));
+        table.setShowVerticalLines(true); // Show vertical lines
+        table.setShowHorizontalLines(false); // Remove horizontal lines
+        table.setGridColor(Color.WHITE); // Make grid color white
+        table.setIntercellSpacing(new Dimension(1, 0)); // Add spacing for vertical lines
 
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.setForeground(new Color(50, 50, 50));
@@ -27,6 +27,7 @@ public class jtableDesign {
         header.setOpaque(true);
         header.setBackground(new Color(240, 240, 240)); // light gray or your preferred color
         header.setForeground(Color.BLACK);
+        header.setBorder(BorderFactory.createEmptyBorder()); // Remove header border
 
         // Cell renderer to make cells transparent except when selected
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -50,10 +51,13 @@ public class jtableDesign {
                        c.setBackground(new Color(0,0,0));
                    }
                 }
+                // Remove all borders from cells
+                ((JComponent) c).setBorder(BorderFactory.createEmptyBorder());
                 return c;
             }
         });
 
+        // Remove all borders from the table
         table.setBorder(BorderFactory.createEmptyBorder());
     }
 

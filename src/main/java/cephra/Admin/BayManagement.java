@@ -469,7 +469,7 @@ public class BayManagement extends javax.swing.JPanel {
         add(bay1);
         bay1.setBounds(100, 270, 150, 32);
 
-        datetime.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        datetime.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetime.setForeground(new java.awt.Color(255, 255, 255));
         datetime.setText("10:44 AM 17 August, Sunday");
         add(datetime);
