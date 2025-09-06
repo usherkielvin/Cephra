@@ -193,6 +193,7 @@ public class StaffRecord extends javax.swing.JPanel {
         staffTable.setGridColor(new java.awt.Color(255, 255, 255));
         staffTable.setOpaque(false);
         staffTable.setRequestFocusEnabled(false);
+        staffTable.setShowHorizontalLines(true);
         staffTable.getTableHeader().setResizingAllowed(false);
         staffTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(staffTable);
@@ -237,7 +238,7 @@ public class StaffRecord extends javax.swing.JPanel {
     private void businessbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_businessbuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(StaffRecord.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Dashboard());
+            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Business_Overview());
         }
     }//GEN-LAST:event_businessbuttonActionPerformed
 
@@ -251,7 +252,7 @@ public class StaffRecord extends javax.swing.JPanel {
     private void BaybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BaybuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(StaffRecord.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new Bay());
+            ((cephra.Frame.Admin) w).switchPanel(new BayManagement());
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 

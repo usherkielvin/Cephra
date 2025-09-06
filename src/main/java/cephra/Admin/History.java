@@ -45,7 +45,7 @@ public class History extends javax.swing.JPanel {
         jTable1.getColumnModel().getColumn(2).setPreferredWidth(60);  // KWh
         jTable1.getColumnModel().getColumn(3).setPreferredWidth(80);  // Total
         jTable1.getColumnModel().getColumn(4).setPreferredWidth(100); // Served By
-        jTable1.getColumnModel().getColumn(5).setPreferredWidth(120); // Date & Time
+        jTable1.getColumnModel().getColumn(5).setPreferredWidth(100); // Date & Time (reduced for compact format)
         jTable1.getColumnModel().getColumn(6).setPreferredWidth(100); // Reference
         
         // Make table completely non-editable by overriding the table model
@@ -94,7 +94,7 @@ public class History extends javax.swing.JPanel {
         datetime.setBounds(820, 40, 170, 20);
 
         jTable1.setBackground(new java.awt.Color(204, 204, 204));
-        jTable1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        jTable1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
@@ -108,10 +108,21 @@ public class History extends javax.swing.JPanel {
             new String [] {
                 "Ticket", "Customer", "KWh", "Total", "Served By", "Date & Time", "Reference"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        jTable1.setAutoscrolls(false);
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
         jTable1.setRequestFocusEnabled(false);
+        jTable1.setShowHorizontalLines(true);
         jTable1.getTableHeader().setResizingAllowed(false);
         jTable1.getTableHeader().setReorderingAllowed(false);
         jTable1.setVerifyInputWhenFocusTarget(false);
@@ -197,14 +208,14 @@ public class History extends javax.swing.JPanel {
     private void BaybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BaybuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(History.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new Bay());
+            ((cephra.Frame.Admin) w).switchPanel(new BayManagement());
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 
     private void businessbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_businessbuttonActionPerformed
         Window w = SwingUtilities.getWindowAncestor(History.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Dashboard());
+            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Business_Overview());
         }
     }//GEN-LAST:event_businessbuttonActionPerformed
 

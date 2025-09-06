@@ -240,7 +240,7 @@ public class serviceoffered extends javax.swing.JPanel {
         }
         
         // Check if fast charging bays are available
-        if (!cephra.Admin.Bay.isFastChargingAvailable()) {
+        if (!cephra.Admin.BayManagement.isFastChargingAvailable()) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "Fast charging is currently unavailable. All fast charging bays are either unavailable or occupied. Please try normal charging or try again later.",
                 "Fast Charging Unavailable", javax.swing.JOptionPane.WARNING_MESSAGE);
@@ -289,7 +289,7 @@ public class serviceoffered extends javax.swing.JPanel {
         }
         
         // Check if normal charging bays are available
-        if (!cephra.Admin.Bay.isNormalChargingAvailable()) {
+        if (!cephra.Admin.BayManagement.isNormalChargingAvailable()) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "Normal charging is currently unavailable. All normal charging bays are either unavailable or occupied. Please try fast charging or try again later.",
                 "Normal Charging Unavailable", javax.swing.JOptionPane.WARNING_MESSAGE);

@@ -11,12 +11,18 @@ import java.sql.Statement;
  */
 public class H2DatabaseConnection {
     
-    private static final String DB_URL = "jdbc:h2:./cephra-db;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1";
-    private static final String DB_USER = "sa";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/cephradb";
+    private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "";
     
     static {
-        initializeDatabase();
+        try {
+            // Load MySQL driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            initializeDatabase();
+        } catch (ClassNotFoundException e) {
+            System.err.println("MySQL JDBC Driver not found: " + e.getMessage());
+        }
     }
     
     /**
@@ -24,9 +30,6 @@ public class H2DatabaseConnection {
      */
     private static void initializeDatabase() {
         try {
-            // Load H2 driver
-            Class.forName("org.h2.Driver");
-            
             // Create connection and tables
             try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  Statement stmt = conn.createStatement()) {
@@ -110,6 +113,38 @@ public class H2DatabaseConnection {
                 bay_type VARCHAR(20) NOT NULL,
                 status VARCHAR(20) NOT NULL DEFAULT 'Available',
                 current_ticket_id VARCHAR(50),
+                current_username VARCHAR(50),
+                start_time TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """);
+        
+        // Waiting grid table
+        stmt.execute("""
+            CREATE TABLE IF NOT EXISTS waiting_grid (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                slot_number INT NOT NULL UNIQUE,
+                ticket_id VARCHAR(50),
+                username VARCHAR(50),
+                service_type VARCHAR(20),
+                initial_battery_level INT,
+                position_in_queue INT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """);
+        
+        // Charging grid table
+        stmt.execute("""
+            CREATE TABLE IF NOT EXISTS charging_grid (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                bay_number VARCHAR(10) NOT NULL UNIQUE,
+                ticket_id VARCHAR(50),
+                username VARCHAR(50),
+                service_type VARCHAR(20),
+                initial_battery_level INT,
+                start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -123,18 +158,37 @@ public class H2DatabaseConnection {
      * Insert initial data
      */
     private static void insertInitialData(Statement stmt) throws SQLException {
-        // Insert charging bays if not exist
-        stmt.execute("""
-            INSERT INTO charging_bays (bay_number, bay_type, status) 
-            SELECT 'Bay-1', 'Fast', 'Available'
-            WHERE NOT EXISTS (SELECT 1 FROM charging_bays WHERE bay_number = 'Bay-1')
-        """);
+        // Insert all charging bays (1-8)
+        String[] bayNumbers = {"Bay-1", "Bay-2", "Bay-3", "Bay-4", "Bay-5", "Bay-6", "Bay-7", "Bay-8"};
+        String[] bayTypes = {"Fast", "Fast", "Fast", "Normal", "Normal", "Normal", "Normal", "Normal"};
         
-        stmt.execute("""
-            INSERT INTO charging_bays (bay_number, bay_type, status) 
-            SELECT 'Bay-2', 'Fast', 'Available'
-            WHERE NOT EXISTS (SELECT 1 FROM charging_bays WHERE bay_number = 'Bay-2')
-        """);
+        for (int i = 0; i < bayNumbers.length; i++) {
+            stmt.execute(String.format("""
+                INSERT INTO charging_bays (bay_number, bay_type, status) 
+                SELECT '%s', '%s', 'Available'
+                WHERE NOT EXISTS (SELECT 1 FROM charging_bays WHERE bay_number = '%s')
+                """, bayNumbers[i], bayTypes[i], bayNumbers[i]));
+        }
+        
+        // Insert waiting grid slots (1-10)
+        for (int i = 1; i <= 10; i++) {
+            stmt.execute(String.format("""
+                INSERT INTO waiting_grid (slot_number, ticket_id, username, service_type, initial_battery_level, position_in_queue) 
+                SELECT %d, NULL, NULL, NULL, NULL, NULL
+                WHERE NOT EXISTS (SELECT 1 FROM waiting_grid WHERE slot_number = %d)
+                """, i, i));
+        }
+        
+        // Insert charging grid slots (Bay-1 to Bay-8)
+        for (String bayNumber : bayNumbers) {
+            stmt.execute(String.format("""
+                INSERT INTO charging_grid (bay_number, ticket_id, username, service_type, initial_battery_level) 
+                SELECT '%s', NULL, NULL, NULL, NULL
+                WHERE NOT EXISTS (SELECT 1 FROM charging_grid WHERE bay_number = '%s')
+                """, bayNumber, bayNumber));
+        }
+        
+        System.out.println("✓ Initial data inserted: 8 charging bays, 10 waiting slots, 8 charging grid slots");
     }
     
     /**

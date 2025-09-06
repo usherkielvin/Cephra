@@ -152,8 +152,12 @@ public class Register extends javax.swing.JPanel {
         });
         add(loginbutton);
         loginbutton.setBounds(205, 673, 90, 40);
+
+        UsernamePhone.setBorder(null);
         add(UsernamePhone);
         UsernamePhone.setBounds(45, 340, 280, 32);
+
+        LastNamePhone.setBorder(null);
         add(LastNamePhone);
         LastNamePhone.setBounds(200, 279, 120, 32);
 

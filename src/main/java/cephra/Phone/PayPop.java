@@ -1,19 +1,131 @@
 package cephra.Phone;
 
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
+import javax.swing.JLayeredPane;
 
 public class PayPop extends javax.swing.JPanel {
+    
+    // Static state management to prevent multiple instances
+    private static PayPop currentInstance = null;
+    private static String currentTicketId = null;
+    private static boolean isShowing = false;
+    
+    // Static method to check if PayPop is currently showing for a ticket
+    public static boolean isShowingForTicket(String ticketId) {
+        return isShowing && ticketId != null && ticketId.equals(currentTicketId);
+    }
+    
+    // Static method to check if PayPop CAN be shown (validation only, doesn't show)
+    public static boolean canShowPayPop(String ticketId, String customerUsername) {
+        System.out.println("=== PayPop.canShowPayPop() validation ===");
+        System.out.println("- Ticket ID: '" + ticketId + "'");
+        System.out.println("- Customer Username: '" + customerUsername + "'");
+        System.out.println("- Currently showing: " + isShowing);
+        
+        // Allow reappearing - if already showing, hide first then show again
+        if (isShowing) {
+            System.out.println("PayPop: Already showing, will hide and reshow");
+            hidePayPop(); // Hide current instance to allow reappearing
+        }
+        
+        // Strict validation: Check if anyone is logged in first
+        if (!cephra.CephraDB.isUserLoggedIn()) {
+            System.out.println("PayPop: No user is currently logged in");
+            return false;
+        }
+        
+        // Get current logged-in user
+        String currentUser = cephra.CephraDB.getCurrentUsername();
+        if (currentUser == null || currentUser.trim().isEmpty()) {
+            System.out.println("PayPop: Current user is null or empty");
+            return false;
+        }
+        
+        // Validate current user matches ticket owner exactly
+        if (!currentUser.trim().equals(customerUsername.trim())) {
+            System.out.println("PayPop: User mismatch - current user ('" + currentUser + "') does not match ticket owner ('" + customerUsername + "')");
+            return false;
+        }
+        
+        System.out.println("PayPop: Validation passed - PayPop CAN be shown for user '" + currentUser + "' and ticket '" + ticketId + "'");
+        return true;
+    }
+    
+    // Static method to show PayPop with validation
+    public static boolean showPayPop(String ticketId, String customerUsername) {
+        System.out.println("=== PayPop.showPayPop() called ===");
+        
+        // Use the validation method
+        if (!canShowPayPop(ticketId, customerUsername)) {
+            return false;
+        }
+        
+        // Find Phone frame and show centered PayPop
+        java.awt.Window[] windows = java.awt.Window.getWindows();
+        for (java.awt.Window window : windows) {
+            if (window instanceof cephra.Frame.Phone) {
+                cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                showCenteredPayPop(phoneFrame, ticketId);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Static method to show PayPop centered on Phone frame
+    private static void showCenteredPayPop(cephra.Frame.Phone phoneFrame, String ticketId) {
+        SwingUtilities.invokeLater(() -> {
+            currentInstance = new PayPop();
+            currentTicketId = ticketId;
+            isShowing = true;
+            
+            // Center the PayPop on the phone frame (350x750)
+            int popupWidth = 320;
+            int popupHeight = 280;
+            int x = (350 - popupWidth) / 2;  // (350-320)/2 = 15
+            int y = (750 - popupHeight) / 2; // (750-280)/2 = 235
+            
+            currentInstance.setBounds(x, y, popupWidth, popupHeight);
+            
+            // Add to layered pane so it appears on top of current panel
+            JLayeredPane layeredPane = phoneFrame.getRootPane().getLayeredPane();
+            layeredPane.add(currentInstance, JLayeredPane.MODAL_LAYER);
+            layeredPane.moveToFront(currentInstance);
+            
+            currentInstance.setVisible(true);
+            phoneFrame.repaint();
+        });
+    }
+    
+    // Static method to hide PayPop
+    public static void hidePayPop() {
+        if (currentInstance != null && isShowing) {
+            SwingUtilities.invokeLater(() -> {
+                if (currentInstance.getParent() != null) {
+                    currentInstance.getParent().remove(currentInstance);
+                }
+                currentInstance = null;
+                currentTicketId = null;
+                isShowing = false;
+                
+                // Repaint the phone frame
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        window.repaint();
+                        break;
+                    }
+                }
+            });
+        }
+    }
 
     public PayPop() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(320, 280));
+        setSize(320, 280);
         setupLabelPosition(); // Set label position
-        makeDraggable();
+        setupCloseButton(); // Add close functionality
         
         // Update labels with actual ticket data after components are initialized
         SwingUtilities.invokeLater(new Runnable() {
@@ -31,34 +143,26 @@ public class PayPop extends javax.swing.JPanel {
      // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
-        if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+        if (ticketNo != null) {
+            ticketNo.setBounds(-15, 0, 398, 750);
         }
     }
-     private void makeDraggable() {
-        final Point[] dragPoint = {null};
-
-        addMouseListener(new MouseAdapter() {
+    // Setup close button functionality (clicking outside or ESC)
+    private void setupCloseButton() {
+        // Add key listener for ESC to close
+        setFocusable(true);
+        addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                dragPoint[0] = e.getPoint();
-            }
-        });
-
-        addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(PayPop.this);
-                    if (window != null) {
-                        Point currentLocation = window.getLocation();
-                        window.setLocation(
-                            currentLocation.x + e.getX() - dragPoint[0].x,
-                            currentLocation.y + e.getY() - dragPoint[0].y
-                        );
-                    }
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE) {
+                    hidePayPop();
                 }
             }
+        });
+        
+        // Request focus so key events work
+        SwingUtilities.invokeLater(() -> {
+            requestFocusInWindow();
         });
     }
 
@@ -118,16 +222,44 @@ public class PayPop extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        payonline = new javax.swing.JButton();
+        ChargingDue = new javax.swing.JLabel();
+        ticketNo = new javax.swing.JLabel();
+        kWh = new javax.swing.JLabel();
+        TotalBill = new javax.swing.JLabel();
         Cash = new javax.swing.JButton();
-        charge = new javax.swing.JButton();
-        profilebutton = new javax.swing.JButton();
-        historybutton = new javax.swing.JButton();
-        linkbutton = new javax.swing.JButton();
-        homebutton2 = new javax.swing.JButton();
+        payonline = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        name = new javax.swing.JLabel();
+        LoggedName = new javax.swing.JLabel();
 
         setLayout(null);
+
+        ChargingDue.setText("jLabel1");
+        add(ChargingDue);
+        ChargingDue.setBounds(160, 100, 90, 16);
+
+        ticketNo.setText("jLabel1");
+        add(ticketNo);
+        ticketNo.setBounds(160, 80, 90, 16);
+
+        kWh.setText("jLabel1");
+        add(kWh);
+        kWh.setBounds(160, 120, 80, 16);
+
+        TotalBill.setText("jLabel1");
+        add(TotalBill);
+        TotalBill.setBounds(70, 170, 90, 16);
+
+        Cash.setBorder(null);
+        Cash.setContentAreaFilled(false);
+        Cash.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CashActionPerformed(evt);
+            }
+        });
+        add(Cash);
+        Cash.setBounds(10, 210, 110, 50);
 
         payonline.setBorder(null);
         payonline.setBorderPainted(false);
@@ -138,203 +270,63 @@ public class PayPop extends javax.swing.JPanel {
             }
         });
         add(payonline);
-        payonline.setBounds(170, 450, 130, 40);
+        payonline.setBounds(140, 210, 110, 50);
 
-        Cash.setBorder(null);
-        Cash.setBorderPainted(false);
-        Cash.setContentAreaFilled(false);
-        Cash.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CashActionPerformed(evt);
-            }
-        });
-        add(Cash);
-        Cash.setBounds(45, 453, 120, 40);
-
-        charge.setBorder(null);
-        charge.setBorderPainted(false);
-        charge.setContentAreaFilled(false);
-        charge.setFocusPainted(false);
-        charge.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chargeActionPerformed(evt);
-            }
-        });
-        add(charge);
-        charge.setBounds(30, 680, 50, 40);
-
-        profilebutton.setBorder(null);
-        profilebutton.setBorderPainted(false);
-        profilebutton.setContentAreaFilled(false);
-        profilebutton.setFocusPainted(false);
-        profilebutton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                profilebuttonActionPerformed(evt);
-            }
-        });
-        add(profilebutton);
-        profilebutton.setBounds(260, 670, 50, 50);
-
-        historybutton.setBorder(null);
-        historybutton.setBorderPainted(false);
-        historybutton.setContentAreaFilled(false);
-        historybutton.setFocusPainted(false);
-        historybutton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                historybuttonActionPerformed(evt);
-            }
-        });
-        add(historybutton);
-        historybutton.setBounds(200, 680, 50, 40);
-
-        linkbutton.setBorder(null);
-        linkbutton.setBorderPainted(false);
-        linkbutton.setContentAreaFilled(false);
-        linkbutton.setFocusPainted(false);
-        linkbutton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                linkbuttonActionPerformed(evt);
-            }
-        });
-        add(linkbutton);
-        linkbutton.setBounds(90, 680, 50, 40);
-
-        homebutton2.setBorder(null);
-        homebutton2.setBorderPainted(false);
-        homebutton2.setContentAreaFilled(false);
-        homebutton2.setFocusPainted(false);
-        homebutton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                homebutton2ActionPerformed(evt);
-            }
-        });
-        add(homebutton2);
-        homebutton2.setBounds(150, 680, 40, 40);
-
-        LoggedName = new javax.swing.JLabel();
-        LoggedName.setText("Name");
-        add(LoggedName);
-        LoggedName.setBounds(120, 120, 50, 30);
-
-        ticketNo = new javax.swing.JLabel();
-        ticketNo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        ticketNo.setText(""); // Will be populated with actual ticket number
-        add(ticketNo);
-        ticketNo.setBounds(220, 310, 60, 17);
-
-        ChargingDue = new javax.swing.JLabel();
-        ChargingDue.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        ChargingDue.setText(""); // Will be populated with actual amount
-        add(ChargingDue);
-        ChargingDue.setBounds(220, 335, 60, 17);
-
-        kWh = new javax.swing.JLabel();
-        kWh.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        kWh.setText(""); // Will be populated with actual kWh
-        add(kWh);
-        kWh.setBounds(220, 360, 60, 17);
-
-        TotalBill = new javax.swing.JLabel();
-        TotalBill.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        TotalBill.setText(""); // Will be populated with actual total
-        add(TotalBill);
-        TotalBill.setBounds(217, 405, 60, 17);
-
-        name = new javax.swing.JLabel();
-        name.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
-        name.setText(""); // Will be populated with actual username
-        add(name);
-        name.setBounds(68, 73, 190, 30);
-
-        jLabel3 = new javax.swing.JLabel();
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jLabel3.setText(",");
-        add(jLabel3);
-        jLabel3.setBounds(55, 75, 20, 30);
-
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/paypop.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Rilpipop.png"))); // NOI18N
+        jLabel1.setText("jLabel1");
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 260, 280);
+
+        jPanel1.setBackground(new java.awt.Color(255, 0, 51));
+        jPanel1.setOpaque(false);
+
+        name.setText("jLabel1");
+
+        LoggedName.setText("jLabel1");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(85, 85, 85)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(LoggedName)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(151, 151, 151)
+                        .addComponent(name)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(76, 76, 76)
+                .addComponent(name)
+                .addGap(46, 46, 46)
+                .addComponent(LoggedName)
+                .addContainerGap(116, Short.MAX_VALUE))
+        );
+
+        add(jPanel1);
+        jPanel1.setBounds(0, 0, 260, 270);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.serviceoffered());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_chargeActionPerformed
-
-    private void linkbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkbuttonActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.link());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_linkbuttonActionPerformed
-
-    private void homebutton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homebutton2ActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.home());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_homebutton2ActionPerformed
-
-    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.phonehistory());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_historybuttonActionPerformed
-
-    private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profilebuttonActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Profile());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_profilebuttonActionPerformed
-
     private void CashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CashActionPerformed
-       SwingUtilities.invokeLater(new Runnable() {
+        // Validate user is still logged in before processing payment
+        if (!cephra.CephraDB.isUserLoggedIn()) {
+            System.err.println("Cash payment blocked: No user is logged in");
+            hidePayPop();
+            return;
+        }
+        
+        String currentUser = cephra.CephraDB.getCurrentUsername();
+        System.out.println("Processing cash payment for user: " + currentUser);
+        
+        // Hide the PayPop first
+        hidePayPop();
+        
+        // Then navigate to home
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
@@ -349,7 +341,17 @@ public class PayPop extends javax.swing.JPanel {
     }//GEN-LAST:event_CashActionPerformed
 
     private void payonlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payonlineActionPerformed
-       SwingUtilities.invokeLater(new Runnable() {
+        // Validate user is still logged in before processing payment
+        if (!cephra.CephraDB.isUserLoggedIn()) {
+            System.err.println("Online payment blocked: No user is logged in");
+            hidePayPop();
+            return;
+        }
+        
+        String currentUser = cephra.CephraDB.getCurrentUsername();
+        System.out.println("Processing online payment for user: " + currentUser);
+        
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
                     // Check if there's an active ticket
@@ -411,6 +413,9 @@ public class PayPop extends javax.swing.JPanel {
                     e.printStackTrace();
                 }
                 
+                // Hide PayPop first
+                hidePayPop();
+                
                 // Navigate to receipt regardless of payment update success
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
@@ -429,19 +434,14 @@ public class PayPop extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Cash;
-    private javax.swing.JButton charge;
-    private javax.swing.JButton historybutton;
-    private javax.swing.JButton homebutton2;
+    private javax.swing.JLabel ChargingDue;
+    private javax.swing.JLabel LoggedName;
+    private javax.swing.JLabel TotalBill;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel kWh;
-    private javax.swing.JButton linkbutton;
     private javax.swing.JLabel name;
     private javax.swing.JButton payonline;
-    private javax.swing.JButton profilebutton;
     private javax.swing.JLabel ticketNo;
-    private javax.swing.JLabel LoggedName;
-    private javax.swing.JLabel ChargingDue;
-    private javax.swing.JLabel TotalBill;
     // End of variables declaration//GEN-END:variables
 }

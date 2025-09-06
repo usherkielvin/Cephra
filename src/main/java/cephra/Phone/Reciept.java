@@ -131,11 +131,6 @@ public class Reciept extends javax.swing.JPanel {
         share.setBorder(null);
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
-        share.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                shareActionPerformed(evt);
-            }
-        });
         add(share);
         share.setBounds(180, 680, 130, 40);
 
@@ -153,11 +148,6 @@ public class Reciept extends javax.swing.JPanel {
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
-        Download.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DownloadActionPerformed(evt);
-            }
-        });
         add(Download);
         Download.setBounds(30, 683, 120, 30);
 
@@ -231,7 +221,7 @@ public class Reciept extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_ExitActionPerformed
-
+@SuppressWarnings("unused")
     private void DownloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DownloadActionPerformed
         try {
             // Simulate download operation
@@ -252,7 +242,7 @@ public class Reciept extends javax.swing.JPanel {
             );
         }
     }//GEN-LAST:event_DownloadActionPerformed
-
+@SuppressWarnings("unused")
     private void shareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shareActionPerformed
         try {
             // Simulate sharing operation

@@ -3,7 +3,7 @@ package cephra.Admin;
 import javax.swing.*;
 import java.util.List;
 
-public class Dashboard extends javax.swing.JPanel {
+public class Business_Overview extends javax.swing.JPanel {
 
     private java.awt.Image dashboardImage;
     
@@ -12,7 +12,7 @@ public class Dashboard extends javax.swing.JPanel {
     private int RPH = 15; // Default rate per hour
     private double fastMultiplier = 1.25; // Fast charging gets 25% premium
 
-    public Dashboard() {
+    public Business_Overview() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
@@ -229,28 +229,28 @@ public class Dashboard extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void quebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quebuttonActionPerformed
-        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Business_Overview.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Queue());
         }
     }//GEN-LAST:event_quebuttonActionPerformed
 
     private void BaybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BaybuttonActionPerformed
-      java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
+      java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Business_Overview.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Bay());
+            ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.BayManagement());
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 
     private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
-       java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
+       java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Business_Overview.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.History());
         }
     }//GEN-LAST:event_historybuttonActionPerformed
 
     private void staffbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_staffbuttonActionPerformed
-        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Business_Overview.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.StaffRecord());
         }
@@ -261,7 +261,7 @@ public class Dashboard extends javax.swing.JPanel {
    
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
-        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Dashboard.this);
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Business_Overview.this);
         if (w instanceof cephra.Frame.Admin) {
             ((cephra.Frame.Admin) w).switchPanel(new cephra.Admin.Login());
         }

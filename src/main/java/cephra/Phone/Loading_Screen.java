@@ -6,8 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-public class Splashscreen extends javax.swing.JPanel {
-    public Splashscreen() {
+public class Loading_Screen extends javax.swing.JPanel {
+    public Loading_Screen() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
@@ -32,7 +32,7 @@ public class Splashscreen extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(Splashscreen.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(Loading_Screen.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -69,11 +69,11 @@ public class Splashscreen extends javax.swing.JPanel {
             }
         });
         add(exitlogin);
-        exitlogin.setBounds(60, 630, 220, 70);
+        exitlogin.setBounds(30, 440, 300, 260);
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
-        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Splashscreen.this);
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Loading_Screen.this);
         if (w instanceof cephra.Frame.Phone) {
             ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Transition());
         }
