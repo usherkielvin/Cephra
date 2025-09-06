@@ -13,9 +13,12 @@ public class PasswordForgot extends javax.swing.JPanel {
         email.setOpaque(false);
         email.setBackground(new java.awt.Color(0, 0, 0, 0));
         setupLabelPosition();
+        
+        // Add email prefix functionality
+        setupEmailPrefix();
 
-        addUnderlineOnHover(Back);
-        addUnderlineOnHover(contactsup);
+        addUnderlineOnHover(Back_Button);
+        addUnderlineOnHover(Contact_Support_Button);
     }
 
   
@@ -23,43 +26,42 @@ public class PasswordForgot extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        contactsup = new javax.swing.JButton();
-        Back = new javax.swing.JButton();
+        Contact_Support_Button = new javax.swing.JButton();
+        Back_Button = new javax.swing.JButton();
         resetsend = new javax.swing.JButton();
         email = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
 
-        contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        contactsup.setForeground(new java.awt.Color(0, 204, 204));
-        contactsup.setText("Contact Support");
-        contactsup.setBorder(null);
-        contactsup.setBorderPainted(false);
-        contactsup.setContentAreaFilled(false);
-        contactsup.setFocusPainted(false);
-        contactsup.addActionListener(new java.awt.event.ActionListener() {
+        Contact_Support_Button.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        Contact_Support_Button.setForeground(new java.awt.Color(0, 204, 204));
+        Contact_Support_Button.setText("Contact Support");
+        Contact_Support_Button.setBorder(null);
+        Contact_Support_Button.setBorderPainted(false);
+        Contact_Support_Button.setContentAreaFilled(false);
+        Contact_Support_Button.setFocusPainted(false);
+        Contact_Support_Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                contactsupActionPerformed(evt);
+                Contact_Support_ButtonActionPerformed(evt);
             }
         });
-        add(contactsup);
-        contactsup.setBounds(160, 663, 130, 30);
+        add(Contact_Support_Button);
+        Contact_Support_Button.setBounds(160, 663, 130, 30);
 
-        Back.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        Back.setForeground(new java.awt.Color(0, 204, 204));
-        Back.setText("Back");
-        Back.setBorder(null);
-        Back.setBorderPainted(false);
-        Back.setContentAreaFilled(false);
-        Back.setFocusPainted(false);
-        Back.addActionListener(new java.awt.event.ActionListener() {
+        Back_Button.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        Back_Button.setText("back to login");
+        Back_Button.setBorder(null);
+        Back_Button.setBorderPainted(false);
+        Back_Button.setContentAreaFilled(false);
+        Back_Button.setFocusPainted(false);
+        Back_Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BackActionPerformed(evt);
+                Back_ButtonActionPerformed(evt);
             }
         });
-        add(Back);
-        Back.setBounds(120, 630, 120, 23);
+        add(Back_Button);
+        Back_Button.setBounds(120, 440, 120, 23);
 
         resetsend.setBorder(null);
         resetsend.setBorderPainted(false);
@@ -80,9 +82,9 @@ public class PasswordForgot extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(80, 330, 250, 30);
+        email.setBounds(80, 330, 240, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/forgot-pass.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/FORGOTPASSWORD.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -93,6 +95,69 @@ public class PasswordForgot extends javax.swing.JPanel {
         if (jLabel1 != null) {
             jLabel1.setBounds(-15, 0, 398, 750);
         }
+    }
+    
+    // Setup email prefix functionality and placeholder text
+    private void setupEmailPrefix() {
+        // Set placeholder text
+        email.setText("Enter your email");
+        email.setForeground(new java.awt.Color(128, 128, 128)); // Gray color for placeholder
+        
+        // Handle focus events for placeholder and prefix
+        email.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (email.getText().equals("Enter your email")) {
+                    email.setText("");
+                    email.setForeground(new java.awt.Color(0, 0, 0)); // Black color for actual text
+                }
+            }
+            
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                String currentText = email.getText();
+                String prefix = "@cephra.com";
+                
+                if (currentText.isEmpty()) {
+                    email.setText("Enter your email");
+                    email.setForeground(new java.awt.Color(128, 128, 128)); // Gray color for placeholder
+                } else if (!currentText.endsWith(prefix)) {
+                    if (currentText.contains(prefix)) {
+                        currentText = currentText.replace(prefix, "");
+                    }
+                    email.setText(currentText + prefix);
+                }
+            }
+        });
+        
+        email.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent e) {
+                String currentText = email.getText();
+                String prefix = "@cephra.com";
+                
+                // If placeholder text is still there, clear it
+                if (currentText.equals("Enter your email")) {
+                    email.setText("");
+                    email.setForeground(new java.awt.Color(0, 0, 0)); // Black color for actual text
+                    currentText = "";
+                }
+                
+                // If the field is empty or doesn't end with the prefix, add it
+                if (currentText.isEmpty() || !currentText.endsWith(prefix)) {
+                    // Remove the prefix if it exists elsewhere in the text
+                    if (currentText.contains(prefix)) {
+                        currentText = currentText.replace(prefix, "");
+                    }
+                    // Add the typed character and then the prefix
+                    String newText = currentText + e.getKeyChar() + prefix;
+                    email.setText(newText);
+                    // Position cursor before the prefix
+                    email.setCaretPosition(newText.length() - prefix.length());
+                    e.consume(); // Prevent the default character insertion
+                }
+            }
+        });
     }
  
 
@@ -125,7 +190,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
     }
     }//GEN-LAST:event_resetsendActionPerformed
 
-    private void BackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackActionPerformed
+    private void Back_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Back_ButtonActionPerformed
       
         
          SwingUtilities.invokeLater(new Runnable() {
@@ -147,12 +212,12 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
         
         
         
-    }//GEN-LAST:event_BackActionPerformed
+    }//GEN-LAST:event_Back_ButtonActionPerformed
 
-    private void contactsupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contactsupActionPerformed
+    private void Contact_Support_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Contact_Support_ButtonActionPerformed
         
             javax.swing.JOptionPane.showMessageDialog(this, "Contact support at: support@cephra.com", "Contact Support", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_contactsupActionPerformed
+    }//GEN-LAST:event_Contact_Support_ButtonActionPerformed
 
     @Override
     public void addNotify() {
@@ -160,9 +225,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setupLabelPosition(); // Set label position
-                if (email != null) {
-                    email.requestFocusInWindow();
-                }
+                // Removed auto-focus on email field
                 javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(PasswordForgot.this);
                 if (root != null && resetsend != null) {
                     root.setDefaultButton(resetsend);
@@ -183,8 +246,8 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Back;
-    private javax.swing.JButton contactsup;
+    private javax.swing.JButton Back_Button;
+    private javax.swing.JButton Contact_Support_Button;
     private javax.swing.JTextField email;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton resetsend;

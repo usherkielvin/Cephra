@@ -221,7 +221,7 @@ public class Reciept extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_ExitActionPerformed
-
+@SuppressWarnings("unused")
     private void DownloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DownloadActionPerformed
         try {
             // Simulate download operation
@@ -242,7 +242,7 @@ public class Reciept extends javax.swing.JPanel {
             );
         }
     }//GEN-LAST:event_DownloadActionPerformed
-
+@SuppressWarnings("unused")
     private void shareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shareActionPerformed
         try {
             // Simulate sharing operation

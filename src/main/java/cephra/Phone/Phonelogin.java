@@ -89,7 +89,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(forgotpass);
-        forgotpass.setBounds(210, 410, 120, 40);
+        forgotpass.setBounds(208, 410, 120, 40);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
@@ -111,7 +111,7 @@ public class Phonelogin extends javax.swing.JPanel {
         add(username);
         username.setBounds(70, 334, 230, 35);
         add(cooldownLabel);
-        cooldownLabel.setBounds(100, 440, 160, 20);
+        cooldownLabel.setBounds(40, 440, 160, 20);
 
         loginhome.setBorder(null);
         loginhome.setBorderPainted(false);
@@ -125,9 +125,9 @@ public class Phonelogin extends javax.swing.JPanel {
         add(loginhome);
         loginhome.setBounds(80, 570, 220, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN - closed eye.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/PHONELOGIN.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-5, 0, 360, 750);
+        jLabel1.setBounds(0, 0, 360, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved

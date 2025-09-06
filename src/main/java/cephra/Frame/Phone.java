@@ -108,7 +108,7 @@ public class Phone extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        phonePanel = new cephra.Phone.ChargeOption();
+        phonePanel = new cephra.Phone.Loading_Screen();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(350, 750));
