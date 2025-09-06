@@ -73,7 +73,7 @@ public class PasswordForgot extends javax.swing.JPanel {
             }
         });
         add(resetsend);
-        resetsend.setBounds(50, 440, 270, 50);
+        resetsend.setBounds(60, 390, 270, 50);
 
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
@@ -169,6 +169,7 @@ public class PasswordForgot extends javax.swing.JPanel {
         String emailText = email.getText().trim();
 if (cephra.CephraDB.findUserByEmail(emailText) != null) {
     cephra.Phone.AppSessionState.userEmailForReset = emailText; // Add this line
+    cephra.Phone.AppSessionState.showOtpNotification = true; // Show notification when coming from PasswordForgot
     cephra.CephraDB.generateAndStoreOTP();
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {

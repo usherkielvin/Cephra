@@ -86,7 +86,8 @@ public class Phone extends javax.swing.JFrame {
         Iphoneframe.setHorizontalAlignment(SwingConstants.CENTER);
         
         // Add to the root pane's layered pane to ensure it's always on top
-        getRootPane().getLayeredPane().add(Iphoneframe, JLayeredPane.POPUP_LAYER);
+        // Using DRAG_LAYER which is higher than POPUP_LAYER to ensure iPhone frame is always on top
+        getRootPane().getLayeredPane().add(Iphoneframe, JLayeredPane.DRAG_LAYER);
         
         // Make sure it's visible and on top
         Iphoneframe.setVisible(true);
@@ -99,7 +100,17 @@ public class Phone extends javax.swing.JFrame {
         revalidate();
         repaint();
         
-        // Ensure kenji label stays on top after panel switch
+        // Ensure iPhone frame stays on top after panel switch
+        if (Iphoneframe != null) {
+            getRootPane().getLayeredPane().moveToFront(Iphoneframe);
+        }
+    }
+
+    /**
+     * Ensures the iPhone frame is always on top of all other components
+     * This should be called after adding any new components to the layered pane
+     */
+    public void ensureIphoneFrameOnTop() {
         if (Iphoneframe != null) {
             getRootPane().getLayeredPane().moveToFront(Iphoneframe);
         }
