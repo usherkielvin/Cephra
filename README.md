@@ -257,7 +257,7 @@ We welcome contributions! Please see our contributing guidelines:
 ### Development Team
 
 #### 🎨 UI/UX Designer
-**Mark Dwayne Dela Cruz** - User Interface & User Experience Design
+**Mark Dwayne P. Dela Cruz** - User Interface & User Experience Design
 - Specializes in mobile-first responsive design
 - Creates intuitive user interfaces for both Java and web applications
 
@@ -267,7 +267,7 @@ We welcome contributions! Please see our contributing guidelines:
 - Handles server-side logic and data management
 
 #### 💻 Frontend Developer
-**Kenji** - Frontend Development & Web Technologies
+**Kenji A. Hizon** - Frontend Development & Web Technologies
 - Specializes in modern web technologies (HTML5, CSS3, JavaScript)
 - Creates responsive and interactive user interfaces
 
