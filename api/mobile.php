@@ -34,6 +34,8 @@ try {
                 $stmt->execute([$username, $password]);
                 
                 if ($stmt->rowCount() > 0) {
+                    session_start();
+                    $_SESSION['username'] = $username;
                     echo json_encode(['success' => true, 'username' => $username]);
                 } else {
                     echo json_encode(['error' => 'Invalid credentials']);

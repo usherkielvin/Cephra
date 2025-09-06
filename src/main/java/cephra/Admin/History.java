@@ -122,6 +122,7 @@ public class History extends javax.swing.JPanel {
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
         jTable1.setRequestFocusEnabled(false);
+        jTable1.setShowHorizontalLines(true);
         jTable1.getTableHeader().setResizingAllowed(false);
         jTable1.getTableHeader().setReorderingAllowed(false);
         jTable1.setVerifyInputWhenFocusTarget(false);

@@ -1197,6 +1197,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 "Ticket", "Customer", "Service", "Status", "Payment", "Action"
             }
         ));
+        queTab.setShowHorizontalLines(true);
         queTab.getTableHeader().setResizingAllowed(false);
         queTab.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(queTab);

@@ -1,4 +1,4 @@
-<?php
+n<?php
 session_start();
 if (!isset($_SESSION['username'])) {
     header("Location: index.php");
@@ -55,7 +55,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 									<nav id="nav">
 										<ul>
 											<li class="current_page_item"><a href="index.html">Home</a></li>
-											<li><a href="link.php">Link</a></li>
+											<li><a href="left-sidebar.html">Link</a></li>
 											<li><a href="right-sidebar.html">History</a></li>
 											<li><a href="no-sidebar.html">Profile</a></li>
 										</ul>
@@ -64,17 +64,6 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 							</div>
 						</header>
 
-					<div class="container">
-                        <h2 class="greeting">Hello, <?php echo htmlspecialchars($firstname ?? 'User'); ?></h2>
-						<!-- Banner -->
-							<div id="banner">
-								<h2>
-								<a href="#" class="image featured"><img src="images/ads.png" alt="" /></a>
-								</h2>
-								<p>Every tap starts your power. With Cephra, charging isn’t just energy it’s freedom. </p>
-								<a href="ChargingPage.php" id="start-charging" class="button large">Start Charging</a>
-							</div>
-					</div>
 				</div>
 
 			<!-- Main Wrapper -->
@@ -90,24 +79,26 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 										<div class="col-6 col-12-medium">
 											<section>
 												<header class="major">
-													<h2>Rewards</h2>
-													<p>Earn points every charge with Cephra Rewards and unlock perks made for you.</p>
+													<h2>Normal Charging</h2>
+													<p>Reliable and steady power for your device, ensuring safe and consistent charging at a standard speed.</p>
 												</header>
-												<p><a href="#" class="image featured"><img src="images/ads.png" alt="" /></a></p>
+												
 												<footer>
-													<a href="#" class="button medium alt icon solid fa-info-circle">Rewards</a>
+													
+													<a href="charge_action.php" id="normalChargeBtn" class="button medium alt icon solid fa-info-circle">Charge Now</a>
 												</footer>
 											</section>
 										</div>
 										<div class="col-6 col-12-medium">
 											<section>
 												<header class="major">
-													<h2>Wallet</h2>
-													<p>Securely store, manage, and use your balance with ease through Cephra Wallet.</p>
+													<h2>Fast Charging</h2>
+													<p>Boost your power in less time with high-speed charging, designed for efficiency without compromising safety.</p>
 												</header>
-												<p><a href="#" class="image featured"><img src="images/ads.png" alt="" /></a></p>
+												
 												<footer>
-													<a href="#" class="button medium alt icon solid fa-info-circle">Wait, what?</a>
+													
+													<a href="charge_action.php" id="fastChargeBtn" class="button medium alt icon solid fa-info-circle">Charge Now</a>
 												</footer>
 											</section>
 										</div>
@@ -185,6 +176,76 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+
+			<script>
+				$(document).ready(function() {
+					// Normal Charge Button Click Handler
+					$('#normalChargeBtn').click(function(e) {
+						e.preventDefault();
+						processChargeRequest('Normal Charging');
+					});
+
+					// Fast Charge Button Click Handler
+					$('#fastChargeBtn').click(function(e) {
+						e.preventDefault();
+						processChargeRequest('Fast Charging');
+					});
+
+					function processChargeRequest(serviceType) {
+						// Disable buttons during processing
+						$('#normalChargeBtn, #fastChargeBtn').prop('disabled', true);
+
+						$.ajax({
+							url: 'charge_action.php',
+							type: 'POST',
+							data: { serviceType: serviceType },
+							dataType: 'json',
+							success: function(response) {
+								if (response.success) {
+									// Show queue ticket popup
+									showQueueTicketPopup(response);
+								} else if (response.error) {
+									alert(response.error);
+								}
+							},
+							error: function(xhr, status, error) {
+								alert('An error occurred while processing your request. Please try again.');
+								console.error('AJAX Error:', error);
+							},
+							complete: function() {
+								// Re-enable buttons
+								$('#normalChargeBtn, #fastChargeBtn').prop('disabled', false);
+							}
+						});
+					}
+
+					function showQueueTicketPopup(response) {
+						if (response.success) {
+							var ticketId = response.ticketId;
+							var serviceType = response.serviceType;
+							var batteryLevel = response.batteryLevel;
+
+							// Create popup HTML
+							var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 300px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
+							popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Your Queue Ticket</h2>';
+							popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
+							popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
+							popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
+							popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
+							popupHtml += '<button onclick="closePopup()" style="display: block; margin: 15px auto 0; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>';
+							popupHtml += '</div>';
+
+							// Append to body
+							$('body').append(popupHtml);
+						}
+					}
+
+					// Function to close popup (defined globally)
+					window.closePopup = function() {
+						$('#queuePopup').remove();
+					};
+				});
+			</script>
 
 	</body>
 </html>

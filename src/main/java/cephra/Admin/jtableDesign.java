@@ -9,9 +9,9 @@ public class jtableDesign {
     
     public static void apply(JTable table) {
         table.setRowHeight(30);
-        table.setShowVerticalLines(true); // Show vertical lines
-        table.setShowHorizontalLines(false); // Remove horizontal lines
-        table.setGridColor(Color.WHITE); // Make grid color white
+        table.setShowVerticalLines(false); // hide vertical lines
+        table.setShowHorizontalLines(true); // Show horizontal lines
+        table.setGridColor(Color.WHITE); 
         table.setIntercellSpacing(new Dimension(1, 0)); // Add spacing for vertical lines
 
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
