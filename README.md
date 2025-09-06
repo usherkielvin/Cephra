@@ -250,10 +250,9 @@ We welcome contributions! Please see our contributing guidelines:
 ### Project Lead
 **Usher Kielvin Ponce** - Project Lead, Backend Developer & EV Technology Enthusiast
 
-- 🌐 **Portfolio**: [yourportfolio.com](https://yourportfolio.com)
-- 💼 **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- 🐙 **GitHub**: [github.com/yourusername](https://github.com/yourusername)
-- 📧 **Email**: your.email@example.com
+- 💼 **LinkedIn**: [linkedin.com/in/usherkielvinponce](https://linkedin.com/in/usherkielvinponce)
+- 🐙 **GitHub**: [github.com/usherkielvin](https://github.com/usherkielvin)
+- 📧 **Email**: ponceud@students.nu-moa.edu.ph
 
 ### Development Team
 
