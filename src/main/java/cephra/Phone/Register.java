@@ -1,16 +1,14 @@
 package cephra.Phone;
 
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class Register extends javax.swing.JPanel {
 
     public Register() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new Dimension(350, 750));
         setSize(350, 750);
      
         setupButtons(); // Setup button hover effects
@@ -18,11 +16,9 @@ public class Register extends javax.swing.JPanel {
         makeDraggable();
         
         // Auto-focus on name field
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (fname != null) {
-                    fname.requestFocusInWindow();
-                }
+        SwingUtilities.invokeLater(() -> {
+            if (fname != null) {
+                fname.requestFocusInWindow();
             }
         });
     }
@@ -41,7 +37,7 @@ public class Register extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(Register.this);
+                    Window window = SwingUtilities.getWindowAncestor(Register.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -69,11 +65,11 @@ public class Register extends javax.swing.JPanel {
         lname = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new Dimension(350, 750));
+        setPreferredSize(new Dimension(350, 750));
         setLayout(null);
 
-        confirmpass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        confirmpass.setFont(new Font("Segoe UI", 0, 18)); // NOI18N
         confirmpass.setBorder(null);
         confirmpass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -83,7 +79,7 @@ public class Register extends javax.swing.JPanel {
         add(confirmpass);
         confirmpass.setBounds(45, 526, 280, 32);
 
-        password.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        password.setFont(new Font("Segoe UI", 0, 18)); // NOI18N
         password.setBorder(null);
         password.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -93,7 +89,7 @@ public class Register extends javax.swing.JPanel {
         add(password);
         password.setBounds(45, 464, 280, 31);
 
-        email.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        email.setFont(new Font("Segoe UI", 0, 18)); // NOI18N
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -103,7 +99,7 @@ public class Register extends javax.swing.JPanel {
         add(email);
         email.setBounds(45, 402, 280, 32);
 
-        fname.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        fname.setFont(new Font("Segoe UI", 0, 18)); // NOI18N
         fname.setBorder(null);
         fname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -125,8 +121,8 @@ public class Register extends javax.swing.JPanel {
         add(register);
         register.setBounds(90, 610, 200, 40);
 
-        termscondition.setBackground(new java.awt.Color(255, 255, 255));
-        termscondition.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        termscondition.setBackground(new Color(255, 255, 255));
+        termscondition.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         termscondition.setText("I Agree to the Terms and Conditions");
         termscondition.setBorder(null);
         termscondition.setContentAreaFilled(false);
@@ -139,7 +135,7 @@ public class Register extends javax.swing.JPanel {
         add(termscondition);
         termscondition.setBounds(70, 645, 280, 40);
 
-        loginbutton.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        loginbutton.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
         loginbutton.setText("Login");
         loginbutton.setBorder(null);
         loginbutton.setBorderPainted(false);
@@ -154,10 +150,20 @@ public class Register extends javax.swing.JPanel {
         loginbutton.setBounds(205, 673, 90, 40);
 
         UsernamePhone.setBorder(null);
+        UsernamePhone.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                UsernamePhoneActionPerformed(evt);
+            }
+        });
         add(UsernamePhone);
         UsernamePhone.setBounds(45, 340, 280, 32);
 
         lname.setBorder(null);
+        lname.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LastNamePhoneActionPerformed(evt);
+            }
+        });
         add(lname);
         lname.setBounds(200, 279, 120, 32);
 
@@ -169,25 +175,25 @@ public class Register extends javax.swing.JPanel {
     // Setup button hover effects
     private void setupButtons() {
         // Setup Register button hover effects
-        register.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        register.setCursor(new Cursor(Cursor.HAND_CURSOR));
         register.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                register.setForeground(new java.awt.Color(0, 204, 204));
+                register.setForeground(new Color(0, 204, 204));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                register.setForeground(new java.awt.Color(0, 0, 0));
+                register.setForeground(new Color(0, 0, 0));
             }
         });
 
         // Setup Login button hover effects
-        loginbutton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        loginbutton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginbutton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                loginbutton.setForeground(new java.awt.Color(0, 204, 204));
+                loginbutton.setForeground(new Color(0, 204, 204));
                 loginbutton.setText("<html><u>Login</u></html>");
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                loginbutton.setForeground(new java.awt.Color(51, 51, 51));
+                loginbutton.setForeground(new Color(51, 51, 51));
                 loginbutton.setText("Login");
             }
         });
@@ -197,17 +203,17 @@ public class Register extends javax.swing.JPanel {
     private void setupTextFields() {
         // Make text fields transparent
         fname.setOpaque(false);
-        fname.setBackground(new java.awt.Color(0, 0, 0, 0));
+        fname.setBackground(new Color(0, 0, 0, 0));
         email.setOpaque(false);
-        email.setBackground(new java.awt.Color(0, 0, 0, 0));
+        email.setBackground(new Color(0, 0, 0, 0));
         password.setOpaque(false);
-        password.setBackground(new java.awt.Color(0, 0, 0, 0));
+        password.setBackground(new Color(0, 0, 0, 0));
         confirmpass.setOpaque(false);
-        confirmpass.setBackground(new java.awt.Color(0, 0, 0, 0));
+        confirmpass.setBackground(new Color(0, 0, 0, 0));
         lname.setOpaque(false);
-        lname.setBackground(new java.awt.Color(0, 0, 0, 0));
+        lname.setBackground(new Color(0, 0, 0, 0));
         UsernamePhone.setOpaque(false);
-        UsernamePhone.setBackground(new java.awt.Color(0, 0, 0, 0));
+        UsernamePhone.setBackground(new Color(0, 0, 0, 0));
     }
 
     
@@ -221,23 +227,17 @@ public class Register extends javax.swing.JPanel {
     @Override
     public void addNotify() {
         super.addNotify();
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setupLabelPosition();
-            }
-        });
+        SwingUtilities.invokeLater(() -> setupLabelPosition());
     }
 
     private void loginbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginbuttonActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
-                        break;
-                    }
+        SwingUtilities.invokeLater(() -> {
+            Window[] windows = Window.getWindows();
+            for (Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                    break;
                 }
             }
         });
@@ -260,13 +260,13 @@ public class Register extends javax.swing.JPanel {
     String confirmPassText = confirmpass.getText().trim();
 
     if (nameText.isEmpty() || lastNameText.isEmpty() || usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty() || confirmPassText.isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", javax.swing.JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", JOptionPane.WARNING_MESSAGE);
         return;
     }
 
     // Check if passwords match
     if (!passwordText.equals(confirmPassText)) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match!", "Password Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Passwords do not match!", "Password Error", JOptionPane.ERROR_MESSAGE);
         password.setText("");
         confirmpass.setText("");
         password.requestFocusInWindow();
@@ -275,31 +275,29 @@ public class Register extends javax.swing.JPanel {
 
     // Check if terms and conditions are agreed to
     if (!termscondition.isSelected()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Please agree to the Terms and Conditions before registering!", "Terms and Conditions Required", javax.swing.JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Please agree to the Terms and Conditions before registering!", "Terms and Conditions Required", JOptionPane.WARNING_MESSAGE);
         return;
     }
 
     // Call the database method to add the new user
     if (cephra.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
         // Registration successful
-        javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
         // Navigate to Phonelogin after OK is clicked
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
-                        break;
-                    }
+        SwingUtilities.invokeLater(() -> {
+            Window[] windows = Window.getWindows();
+            for (Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                    break;
                 }
             }
         });
     } else {
         // Username or email already exists
-        javax.swing.JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", JOptionPane.WARNING_MESSAGE);
         fname.requestFocusInWindow();
     }
     }//GEN-LAST:event_registerActionPerformed
