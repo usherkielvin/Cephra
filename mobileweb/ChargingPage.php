@@ -1,4 +1,4 @@
-n<?php
+<?php
 session_start();
 if (!isset($_SESSION['username'])) {
     header("Location: index.php");
@@ -48,14 +48,14 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 								<!-- Logo -->
 									<h1>
 									
-									<a href="index.html" id="logo">Cephra</a>
+									<a href="dashboard.php" id="logo">Cephra</a>
 									</h1>
 
 								<!-- Nav -->
 									<nav id="nav">
 										<ul>
-											<li class="current_page_item"><a href="index.html">Home</a></li>
-											<li><a href="left-sidebar.html">Link</a></li>
+											<li class="current_page_item"><a href="dashboard.php">Home</a></li>
+											<li><a href="link.php">Link</a></li>
 											<li><a href="right-sidebar.html">History</a></li>
 											<li><a href="no-sidebar.html">Profile</a></li>
 										</ul>
@@ -192,13 +192,23 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 					});
 
 					function processChargeRequest(serviceType) {
+						// Force exact service type strings expected by backend
+						let serviceTypeMapped = '';
+						if (serviceType === 'Normal Charging' || serviceType === 'normal charging') {
+							serviceTypeMapped = 'Normal Charging';
+						} else if (serviceType === 'Fast Charging' || serviceType === 'fast charging') {
+							serviceTypeMapped = 'Fast Charging';
+						} else {
+							serviceTypeMapped = serviceType; // fallback
+						}
+
 						// Disable buttons during processing
 						$('#normalChargeBtn, #fastChargeBtn').prop('disabled', true);
 
 						$.ajax({
 							url: 'charge_action.php',
 							type: 'POST',
-							data: { serviceType: serviceType },
+							data: { serviceType: serviceTypeMapped },
 							dataType: 'json',
 							success: function(response) {
 								if (response.success) {

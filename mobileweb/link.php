@@ -128,15 +128,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div id="page-wrapper">
         <!-- Header -->
         <div id="header-wrapper">
+            <!-- Header -->
             <header id="header">
                 <div class="inner">
-                    <h1><a href="index.html" id="logo">Cephra</a></h1>
+                    <!-- Logo -->
+                    <h1>
+                        <a href="dashboard.php" id="logo">Cephra</a>
+                    </h1>
+                    <!-- Nav -->
                     <nav id="nav">
                         <ul>
                             <li><a href="dashboard.php">Home</a></li>
                             <li class="current_page_item"><a href="link.php">Link</a></li>
-                            <li><a href="ChargingPage.php">Charge</a></li>
-                            <li><a href="dashboard.php">Profile</a></li>
+                            <li><a href="right-sidebar.html">History</a></li>
+                            <li><a href="no-sidebar.html">Profile</a></li>
                         </ul>
                     </nav>
                 </div>

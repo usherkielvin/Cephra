@@ -48,13 +48,13 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 								<!-- Logo -->
 									<h1>
 									
-									<a href="index.html" id="logo">Cephra</a>
+									<a href="dashboard.php" id="logo">Cephra</a>
 									</h1>
 
 								<!-- Nav -->
 									<nav id="nav">
 										<ul>
-											<li class="current_page_item"><a href="index.html">Home</a></li>
+											<li class="current_page_item"><a href="dashboard.php">Home</a></li>
 											<li><a href="link.php">Link</a></li>
 											<li><a href="right-sidebar.html">History</a></li>
 											<li><a href="no-sidebar.html">Profile</a></li>

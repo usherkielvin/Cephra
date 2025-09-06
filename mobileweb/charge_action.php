@@ -121,12 +121,11 @@ if (!$bayNumber) {
     exit();
 }
 
-$stmt = $conn->prepare("INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status, bay_number) VALUES (:username, :ticket_id, :service_type, :battery_level, :battery_level, 'Active', :bay_number)");
+$stmt = $conn->prepare("INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status, bay_number) VALUES (:username, :ticket_id, :service_type, :battery_level, :battery_level, 'Active', '')");
 $stmt->bindParam(':username', $username);
 $stmt->bindParam(':ticket_id', $ticketId);
-$stmt->bindParam(':service_type', $bayType);
+$stmt->bindParam(':service_type', $serviceType);  // Fix: bind correct serviceType, not bayType
 $stmt->bindParam(':battery_level', $batteryLevel);
-$stmt->bindParam(':bay_number', $bayNumber);
 
 if (!$stmt->execute()) {
     $errorInfo = $stmt->errorInfo();
