@@ -9,18 +9,20 @@ import javax.swing.SwingUtilities;
 public class home extends javax.swing.JPanel {
 
     public home() {
-          String username = cephra.CephraDB.getCurrentUsername();
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
-         if (LoggedName != null) {
-            String safeUser = username != null ? username.trim() : "";
-            if (safeUser.isEmpty()) {
+        
+        // Get current user's firstname and display it
+        if (LoggedName != null) {
+            String firstname = cephra.CephraDB.getCurrentFirstname();
+            String safeFirstname = firstname != null ? firstname.trim() : "";
+            if (safeFirstname.isEmpty()) {
                 LoggedName.setText("Hi !");
             } else {
-                LoggedName.setText("Hi " + safeUser + "!");
+                LoggedName.setText("Hi " + safeFirstname + "!");
             }
         }
         

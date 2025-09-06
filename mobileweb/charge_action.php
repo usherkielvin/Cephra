@@ -80,27 +80,15 @@ if ($batteryLevel >= 100) {
     exit();
 }
 
-// Check bay availability
+// Determine service type for database storage
 $bayType = ($serviceType === 'Fast Charging') ? 'Fast' : 'Normal';
-$stmt = $conn->prepare("SELECT COUNT(*) FROM charging_bays WHERE bay_type = :bayType AND status = 'Available'");
-$stmt->bindParam(':bayType', $bayType);
-$stmt->execute();
-$availableBays = $stmt->fetchColumn();
-
-if ($availableBays == 0) {
-    $message = ($serviceType === 'Fast Charging')
-        ? 'Fast charging is currently unavailable. All fast charging bays are either unavailable or occupied. Please try normal charging or try again later.'
-        : 'Normal charging is currently unavailable. All normal charging bays are either unavailable or occupied. Please try fast charging or try again later.';
-    echo json_encode(['error' => $message]);
-    exit();
-}
 
 // Generate ticket ID
 $ticketPrefix = ($serviceType === 'Fast Charging') ? 'FCH' : 'NCH';
 
-// Get the next ticket number
+// Get the next ticket number from queue_tickets table (not active_tickets)
 $prefixPattern = $ticketPrefix . '%';
-$stmt = $conn->prepare("SELECT MAX(CAST(SUBSTRING(ticket_id, 4) AS UNSIGNED)) as max_num FROM active_tickets WHERE ticket_id LIKE :prefix");
+$stmt = $conn->prepare("SELECT MAX(CAST(SUBSTRING(ticket_id, 4) AS UNSIGNED)) as max_num FROM queue_tickets WHERE ticket_id LIKE :prefix");
 $stmt->bindParam(':prefix', $prefixPattern);
 $stmt->execute();
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -130,7 +118,7 @@ $stmt->bindParam(':battery_level', $batteryLevel);
 if (!$stmt->execute()) {
     $errorInfo = $stmt->errorInfo();
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to create ticket', 'db_error' => $errorInfo[2]]);
+    echo json_encode(['error' => 'Failed to create queue ticket', 'db_error' => $errorInfo[2]]);
     exit();
 }
 

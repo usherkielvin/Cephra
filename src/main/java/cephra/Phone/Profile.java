@@ -10,15 +10,36 @@ import javax.swing.SwingUtilities;
 public class Profile extends javax.swing.JPanel {
 
     public Profile() {
-       String email = cephra.CephraDB.getCurrentEmail();
-         String name = cephra.CephraDB.getCurrentUsername();
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
-         gmailProf.setText(email);
-          Fullname.setText(name);
+        
+        // Get current user's email, firstname, and lastname
+        String email = cephra.CephraDB.getCurrentEmail();
+        String firstname = cephra.CephraDB.getCurrentFirstname();
+        String lastname = cephra.CephraDB.getCurrentLastname();
+        
+        // Set the labels
+        if (gmailProf != null) {
+            gmailProf.setText(email != null ? email : "");
+        }
+        if (Fullname != null) {
+            // Combine firstname and lastname
+            String fullName = "";
+            if (firstname != null && !firstname.trim().isEmpty()) {
+                fullName = firstname.trim();
+            }
+            if (lastname != null && !lastname.trim().isEmpty()) {
+                if (!fullName.isEmpty()) {
+                    fullName += " " + lastname.trim();
+                } else {
+                    fullName = lastname.trim();
+                }
+            }
+            Fullname.setText(fullName);
+        }
         
 
     }

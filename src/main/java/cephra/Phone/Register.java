@@ -20,8 +20,8 @@ public class Register extends javax.swing.JPanel {
         // Auto-focus on name field
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (name != null) {
-                    name.requestFocusInWindow();
+                if (fname != null) {
+                    fname.requestFocusInWindow();
                 }
             }
         });
@@ -61,12 +61,12 @@ public class Register extends javax.swing.JPanel {
         confirmpass = new javax.swing.JTextField();
         password = new javax.swing.JTextField();
         email = new javax.swing.JTextField();
-        name = new javax.swing.JTextField();
+        fname = new javax.swing.JTextField();
         register = new javax.swing.JButton();
         termscondition = new javax.swing.JCheckBox();
         loginbutton = new javax.swing.JButton();
         UsernamePhone = new javax.swing.JTextField();
-        LastNamePhone = new javax.swing.JTextField();
+        lname = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(350, 750));
@@ -103,15 +103,15 @@ public class Register extends javax.swing.JPanel {
         add(email);
         email.setBounds(45, 402, 280, 32);
 
-        name.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        name.setBorder(null);
-        name.addActionListener(new java.awt.event.ActionListener() {
+        fname.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        fname.setBorder(null);
+        fname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nameActionPerformed(evt);
+                fnameActionPerformed(evt);
             }
         });
-        add(name);
-        name.setBounds(40, 280, 130, 30);
+        add(fname);
+        fname.setBounds(40, 280, 130, 30);
 
         register.setBorder(null);
         register.setBorderPainted(false);
@@ -157,9 +157,9 @@ public class Register extends javax.swing.JPanel {
         add(UsernamePhone);
         UsernamePhone.setBounds(45, 340, 280, 32);
 
-        LastNamePhone.setBorder(null);
-        add(LastNamePhone);
-        LastNamePhone.setBounds(200, 279, 120, 32);
+        lname.setBorder(null);
+        add(lname);
+        lname.setBounds(200, 279, 120, 32);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/regis1.png"))); // NOI18N
         add(jLabel1);
@@ -196,16 +196,16 @@ public class Register extends javax.swing.JPanel {
     // Setup text field properties
     private void setupTextFields() {
         // Make text fields transparent
-        name.setOpaque(false);
-        name.setBackground(new java.awt.Color(0, 0, 0, 0));
+        fname.setOpaque(false);
+        fname.setBackground(new java.awt.Color(0, 0, 0, 0));
         email.setOpaque(false);
         email.setBackground(new java.awt.Color(0, 0, 0, 0));
         password.setOpaque(false);
         password.setBackground(new java.awt.Color(0, 0, 0, 0));
         confirmpass.setOpaque(false);
         confirmpass.setBackground(new java.awt.Color(0, 0, 0, 0));
-        LastNamePhone.setOpaque(false);
-        LastNamePhone.setBackground(new java.awt.Color(0, 0, 0, 0));
+        lname.setOpaque(false);
+        lname.setBackground(new java.awt.Color(0, 0, 0, 0));
         UsernamePhone.setOpaque(false);
         UsernamePhone.setBackground(new java.awt.Color(0, 0, 0, 0));
     }
@@ -252,12 +252,14 @@ public class Register extends javax.swing.JPanel {
 
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
           // Validate all fields are filled
-    String nameText = name.getText().trim();
+    String nameText = fname.getText().trim();
+    String lastNameText = lname.getText().trim();
+    String usernameText = UsernamePhone.getText().trim();
     String emailText = email.getText().trim();
     String passwordText = password.getText().trim();
     String confirmPassText = confirmpass.getText().trim();
 
-    if (nameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty() || confirmPassText.isEmpty()) {
+    if (nameText.isEmpty() || lastNameText.isEmpty() || usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty() || confirmPassText.isEmpty()) {
         javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", javax.swing.JOptionPane.WARNING_MESSAGE);
         return;
     }
@@ -278,7 +280,7 @@ public class Register extends javax.swing.JPanel {
     }
 
     // Call the database method to add the new user
-    if (cephra.CephraDB.addUser(nameText, emailText, passwordText)) {
+    if (cephra.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
         // Registration successful
         javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 
@@ -298,13 +300,21 @@ public class Register extends javax.swing.JPanel {
     } else {
         // Username or email already exists
         javax.swing.JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
-        name.requestFocusInWindow();
+        fname.requestFocusInWindow();
     }
     }//GEN-LAST:event_registerActionPerformed
 
-    private void nameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameActionPerformed
+    private void fnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fnameActionPerformed
+        lname.requestFocusInWindow(); // Move focus to lastname field
+    }//GEN-LAST:event_fnameActionPerformed
+
+    private void LastNamePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LastNamePhoneActionPerformed
+        UsernamePhone.requestFocusInWindow(); // Move focus to username field
+    }//GEN-LAST:event_LastNamePhoneActionPerformed
+
+    private void UsernamePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsernamePhoneActionPerformed
         email.requestFocusInWindow(); // Move focus to email field
-    }//GEN-LAST:event_nameActionPerformed
+    }//GEN-LAST:event_UsernamePhoneActionPerformed
 
     private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
         password.requestFocusInWindow(); // Move focus to password field
@@ -443,13 +453,13 @@ public class Register extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField LastNamePhone;
     private javax.swing.JTextField UsernamePhone;
     private javax.swing.JTextField confirmpass;
     private javax.swing.JTextField email;
+    private javax.swing.JTextField fname;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JTextField lname;
     private javax.swing.JButton loginbutton;
-    private javax.swing.JTextField name;
     private javax.swing.JTextField password;
     private javax.swing.JButton register;
     private javax.swing.JCheckBox termscondition;
