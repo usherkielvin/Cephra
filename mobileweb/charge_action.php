@@ -80,58 +80,33 @@ if ($batteryLevel >= 100) {
     exit();
 }
 
-// Check bay availability
+// Determine service type for database storage
 $bayType = ($serviceType === 'Fast Charging') ? 'Fast' : 'Normal';
-$stmt = $conn->prepare("SELECT COUNT(*) FROM charging_bays WHERE bay_type = :bayType AND status = 'Available'");
-$stmt->bindParam(':bayType', $bayType);
-$stmt->execute();
-$availableBays = $stmt->fetchColumn();
-
-if ($availableBays == 0) {
-    $message = ($serviceType === 'Fast Charging')
-        ? 'Fast charging is currently unavailable. All fast charging bays are either unavailable or occupied. Please try normal charging or try again later.'
-        : 'Normal charging is currently unavailable. All normal charging bays are either unavailable or occupied. Please try fast charging or try again later.';
-    echo json_encode(['error' => $message]);
-    exit();
-}
 
 // Generate ticket ID
 $ticketPrefix = ($serviceType === 'Fast Charging') ? 'FCH' : 'NCH';
 
-// Get the next ticket number
+// Get the next ticket number from queue_tickets table (not active_tickets)
 $prefixPattern = $ticketPrefix . '%';
-$stmt = $conn->prepare("SELECT MAX(CAST(SUBSTRING(ticket_id, 4) AS UNSIGNED)) as max_num FROM active_tickets WHERE ticket_id LIKE :prefix");
+$stmt = $conn->prepare("SELECT MAX(CAST(SUBSTRING(ticket_id, 4) AS UNSIGNED)) as max_num FROM queue_tickets WHERE ticket_id LIKE :prefix");
 $stmt->bindParam(':prefix', $prefixPattern);
 $stmt->execute();
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
 $nextNum = ($result['max_num'] ?? 0) + 1;
 $ticketId = $ticketPrefix . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
 
-// Insert ticket into active_tickets table with bay_number assigned
-// Find an available bay number for the service type
-$stmt = $conn->prepare("SELECT bay_number FROM charging_bays WHERE bay_type = :bayType AND status = 'Available' LIMIT 1");
-$stmt->bindParam(':bayType', $bayType);
-$stmt->execute();
-$bay = $stmt->fetch(PDO::FETCH_ASSOC);
-$bayNumber = $bay ? $bay['bay_number'] : null;
-
-if (!$bayNumber) {
-    http_response_code(500);
-    echo json_encode(['error' => 'No available charging bay found']);
-    exit();
-}
-
-$stmt = $conn->prepare("INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status, bay_number) VALUES (:username, :ticket_id, :service_type, :battery_level, :battery_level, 'Active', :bay_number)");
-$stmt->bindParam(':username', $username);
+// Insert ticket into queue_tickets table (NOT active_tickets)
+// This will make it appear in the admin queue table
+$stmt = $conn->prepare("INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level) VALUES (:ticket_id, :username, :service_type, 'Pending', 'Pending', :battery_level)");
 $stmt->bindParam(':ticket_id', $ticketId);
+$stmt->bindParam(':username', $username);
 $stmt->bindParam(':service_type', $bayType);
 $stmt->bindParam(':battery_level', $batteryLevel);
-$stmt->bindParam(':bay_number', $bayNumber);
 
 if (!$stmt->execute()) {
     $errorInfo = $stmt->errorInfo();
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to create ticket', 'db_error' => $errorInfo[2]]);
+    echo json_encode(['error' => 'Failed to create queue ticket', 'db_error' => $errorInfo[2]]);
     exit();
 }
 

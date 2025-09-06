@@ -124,6 +124,54 @@ public class CephraDB {
         return currentPhoneUser != null ? currentPhoneUser.email : "";
     }
     
+    // Method to get the current logged-in user's firstname (phone user)
+    public static String getCurrentFirstname() {
+        if (currentPhoneUser == null || currentPhoneUser.username == null) {
+            return "";
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT firstname FROM users WHERE username = ?")) {
+            
+            stmt.setString(1, currentPhoneUser.username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("firstname");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting current user's firstname: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
+    // Method to get the current logged-in user's lastname (phone user)
+    public static String getCurrentLastname() {
+        if (currentPhoneUser == null || currentPhoneUser.username == null) {
+            return "";
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT lastname FROM users WHERE username = ?")) {
+            
+            stmt.setString(1, currentPhoneUser.username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("lastname");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting current user's lastname: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
     // Method to logout the current phone user
     public static void logoutCurrentUser() {
         System.out.println("CephraDB: Logging out user " + (currentPhoneUser != null ? currentPhoneUser.username : "null"));
@@ -146,14 +194,16 @@ public class CephraDB {
     }
 
     // Method to add a new user to the database
-    public static boolean addUser(String username, String email, String password) {
+    public static boolean addUser(String firstname, String lastname, String username, String email, String password) {
         try (Connection conn = cephra.db.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO users (username, email, password) VALUES (?, ?, ?)")) {
+                     "INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)")) {
             
-            stmt.setString(1, username);
-            stmt.setString(2, email);
-            stmt.setString(3, password);
+            stmt.setString(1, firstname);
+            stmt.setString(2, lastname);
+            stmt.setString(3, username);
+            stmt.setString(4, email);
+            stmt.setString(5, password);
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -677,7 +727,7 @@ public class CephraDB {
             // First, ensure the user exists in the users table
             if (!userExists(username)) {
                 // Create a temporary user if they don't exist
-                addUser(username, username + "@cephra.com", "temp123");
+                addUser("Temp", "User", username, username + "@cephra.com", "temp123");
             }
             
             // Check if ticket already exists

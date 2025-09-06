@@ -144,9 +144,9 @@ CREATE TABLE IF NOT EXISTS system_settings (
 );
 
 -- Insert initial test users (using INSERT IGNORE to prevent duplicates)
-INSERT IGNORE INTO users (username, email, password) VALUES 
-('dizon', 'dizon@cephra.com', '1234'),
-('earnest', 'earnest@cephra.com', '1234');
+INSERT IGNORE INTO users (firstname, lastname, username, email, password) VALUES 
+('John', 'Dizon', 'dizon', 'dizon@cephra.com', '1234'),
+('Earnest', 'Smith', 'earnest', 'earnest@cephra.com', '1234');
 
 -- Insert initial staff records (using INSERT IGNORE to prevent duplicates)
 INSERT IGNORE INTO staff_records (name, username, email, status, password) VALUES 

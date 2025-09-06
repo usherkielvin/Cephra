@@ -84,6 +84,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     private void loadHistoryEntries() {
         // Get current user's history
         currentUsername = cephra.CephraDB.getCurrentUsername();
+        System.out.println("PhoneHistory: Loaded history for user: " + currentUsername);
         refreshHistoryDisplay();
     }
     
@@ -137,8 +138,12 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     
     @Override
     public void onHistoryUpdated(String username) {
+        System.out.println("PhoneHistory: onHistoryUpdated called for username: " + username + ", currentUsername: " + currentUsername);
         if (username != null && username.equals(currentUsername)) {
+            System.out.println("PhoneHistory: Username matches, refreshing history display");
             SwingUtilities.invokeLater(this::refreshHistoryDisplay);
+        } else {
+            System.out.println("PhoneHistory: Username does not match, ignoring update");
         }
     }
     
