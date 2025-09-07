@@ -1,7 +1,8 @@
 package cephra.Phone;
 
-import javax.swing.SwingUtilities;
-import javax.swing.JLayeredPane;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 public class PayPop extends javax.swing.JPanel {
     
@@ -10,12 +11,27 @@ public class PayPop extends javax.swing.JPanel {
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
-    // Static method to check if PayPop is currently showing for a ticket
+    // Constants for popup dimensions (match background image size exactly)
+    private static final int POPUP_WIDTH = 260;
+    private static final int POPUP_HEIGHT = 280;
+    private static final int PHONE_WIDTH = 350; // fallback if frame size not yet realized
+    private static final int PHONE_HEIGHT = 750; // fallback if frame size not yet realized
+    
+    /**
+     * Checks if PayPop is currently showing for a specific ticket
+     * @param ticketId the ticket ID to check
+     * @return true if PayPop is showing for this ticket
+     */
     public static boolean isShowingForTicket(String ticketId) {
         return isShowing && ticketId != null && ticketId.equals(currentTicketId);
     }
     
-    // Static method to check if PayPop CAN be shown (validation only, doesn't show)
+    /**
+     * Validates if PayPop can be shown for the given ticket and user
+     * @param ticketId the ticket ID
+     * @param customerUsername the customer username
+     * @return true if PayPop can be shown
+     */
     public static boolean canShowPayPop(String ticketId, String customerUsername) {
         System.out.println("=== PayPop.canShowPayPop() validation ===");
         System.out.println("- Ticket ID: '" + ticketId + "'");
@@ -25,23 +41,23 @@ public class PayPop extends javax.swing.JPanel {
         // Allow reappearing - if already showing, hide first then show again
         if (isShowing) {
             System.out.println("PayPop: Already showing, will hide and reshow");
-            hidePayPop(); // Hide current instance to allow reappearing
+            hidePayPop();
         }
         
-        // Strict validation: Check if anyone is logged in first
+        // Validate user is logged in
         if (!cephra.CephraDB.isUserLoggedIn()) {
             System.out.println("PayPop: No user is currently logged in");
             return false;
         }
         
-        // Get current logged-in user
+        // Get and validate current user
         String currentUser = cephra.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
             System.out.println("PayPop: Current user is null or empty");
             return false;
         }
         
-        // Validate current user matches ticket owner exactly
+        // Validate user matches ticket owner
         if (!currentUser.trim().equals(customerUsername.trim())) {
             System.out.println("PayPop: User mismatch - current user ('" + currentUser + "') does not match ticket owner ('" + customerUsername + "')");
             return false;
@@ -51,18 +67,22 @@ public class PayPop extends javax.swing.JPanel {
         return true;
     }
     
-    // Static method to show PayPop with validation
+    /**
+     * Shows PayPop with validation
+     * @param ticketId the ticket ID
+     * @param customerUsername the customer username
+     * @return true if PayPop was shown successfully
+     */
     public static boolean showPayPop(String ticketId, String customerUsername) {
         System.out.println("=== PayPop.showPayPop() called ===");
         
-        // Use the validation method
         if (!canShowPayPop(ticketId, customerUsername)) {
             return false;
         }
         
         // Find Phone frame and show centered PayPop
-        java.awt.Window[] windows = java.awt.Window.getWindows();
-        for (java.awt.Window window : windows) {
+        Window[] windows = Window.getWindows();
+        for (Window window : windows) {
             if (window instanceof cephra.Frame.Phone) {
                 cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
                 showCenteredPayPop(phoneFrame, ticketId);
@@ -72,20 +92,28 @@ public class PayPop extends javax.swing.JPanel {
         return false;
     }
     
-    // Static method to show PayPop centered on Phone frame
+    /**
+     * Shows PayPop centered on the Phone frame
+     * @param phoneFrame the Phone frame to center on
+     * @param ticketId the ticket ID
+     */
     private static void showCenteredPayPop(cephra.Frame.Phone phoneFrame, String ticketId) {
         SwingUtilities.invokeLater(() -> {
             currentInstance = new PayPop();
             currentTicketId = ticketId;
             isShowing = true;
             
-            // Center the PayPop on the phone frame (350x750)
-            int popupWidth = 320;
-            int popupHeight = 280;
-            int x = (350 - popupWidth) / 2;  // (350-320)/2 = 15
-            int y = (750 - popupHeight) / 2; // (750-280)/2 = 235
+            // Determine phone content size (fallback to constants if not realized yet)
+            int containerW = phoneFrame.getContentPane() != null ? phoneFrame.getContentPane().getWidth() : 0;
+            int containerH = phoneFrame.getContentPane() != null ? phoneFrame.getContentPane().getHeight() : 0;
+            if (containerW <= 0) containerW = PHONE_WIDTH;
+            if (containerH <= 0) containerH = PHONE_HEIGHT;
             
-            currentInstance.setBounds(x, y, popupWidth, popupHeight);
+            // Center the PayPop on the phone frame
+            int x = (containerW - POPUP_WIDTH) / 2;
+            int y = (containerH - POPUP_HEIGHT) / 2;
+            
+            currentInstance.setBounds(x, y, POPUP_WIDTH, POPUP_HEIGHT);
             
             // Add to layered pane so it appears on top of current panel
             JLayeredPane layeredPane = phoneFrame.getRootPane().getLayeredPane();
@@ -97,7 +125,9 @@ public class PayPop extends javax.swing.JPanel {
         });
     }
     
-    // Static method to hide PayPop
+    /**
+     * Hides the PayPop and cleans up resources
+     */
     public static void hidePayPop() {
         if (currentInstance != null && isShowing) {
             SwingUtilities.invokeLater(() -> {
@@ -109,8 +139,8 @@ public class PayPop extends javax.swing.JPanel {
                 isShowing = false;
                 
                 // Repaint the phone frame
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
+                Window[] windows = Window.getWindows();
+                for (Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         window.repaint();
                         break;
@@ -120,104 +150,153 @@ public class PayPop extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * Constructor for PayPop
+     */
     public PayPop() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(320, 280));
-        setSize(320, 280);
-        setupLabelPosition(); // Set label position
-        setupCloseButton(); // Add close functionality
+        initializePayPop();
+    }
+    
+    /**
+     * Initializes PayPop components and data
+     */
+    private void initializePayPop() {
+        // Match popup panel to background image and remove excess white by making it transparent
+        setPreferredSize(new Dimension(POPUP_WIDTH, POPUP_HEIGHT));
+        setSize(POPUP_WIDTH, POPUP_HEIGHT);
+        setOpaque(false);
+        setupLabelPosition();
+        setupCloseButton();
         
         // Update labels with actual ticket data after components are initialized
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                updateTextWithAmount();
-            }
-        });
+        SwingUtilities.invokeLater(this::updateTextWithAmount);
         
+        // Set username if available
         String username = cephra.CephraDB.getCurrentUsername();
-        
-        if (LoggedName != null && !username.isEmpty()) {
+        if (LoggedName != null && username != null && !username.isEmpty()) {
             LoggedName.setText(username);
         }
     }
-     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
-    // Setup label position to prevent NetBeans from changing it
+    /**
+     * Sets up label position to prevent NetBeans from changing it
+     * CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
+     */
     private void setupLabelPosition() {
         if (ticketNo != null) {
             ticketNo.setBounds(-15, 0, 398, 750);
         }
     }
-    // Setup close button functionality (clicking outside or ESC)
+    /**
+     * Sets up close button functionality (ESC key)
+     */
     private void setupCloseButton() {
-        // Add key listener for ESC to close
         setFocusable(true);
-        addKeyListener(new java.awt.event.KeyAdapter() {
+        addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE) {
+            public void keyPressed(KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     hidePayPop();
                 }
             }
         });
         
         // Request focus so key events work
-        SwingUtilities.invokeLater(() -> {
-            requestFocusInWindow();
-        });
+        SwingUtilities.invokeLater(this::requestFocusInWindow);
     }
 
+    /**
+     * Updates PayPop labels with current ticket data and amounts
+     */
     private void updateTextWithAmount() {
         try {
             String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
-            if (ticket == null || ticket.isEmpty()) return;
+            if (ticket == null || ticket.isEmpty()) {
+                System.err.println("PayPop: No current ticket found");
+                return;
+            }
             
-            // Use centralized calculation from QueueBridge for consistency
+            // Calculate amounts using centralized QueueBridge methods
             double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
             double commission = cephra.Admin.QueueBridge.computePlatformCommission(amount);
             double net = cephra.Admin.QueueBridge.computeNetToStation(amount);
             
-            // Get kWh calculation from QueueBridge for consistency
-            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-            double usedKWh = 0.0;
-            if (batteryInfo != null) {
-                int start = batteryInfo.initialPercent;
-                double cap = batteryInfo.capacityKWh;
-                usedKWh = (100.0 - start) / 100.0 * cap;
-            }
+            // Calculate energy usage
+            double usedKWh = calculateEnergyUsage(ticket);
             
-            // Update all labels with actual ticket data
-            if (ticketNo != null) {
-                ticketNo.setText(ticket);
-            }
-            if (ChargingDue != null) {
-                ChargingDue.setText(String.format("₱%.2f", amount));
-            }
-            if (kWh != null) {
-                kWh.setText(String.format("%.1f kWh", usedKWh));
-            }
-            if (TotalBill != null) {
-                TotalBill.setText(String.format("₱%.2f", amount));
-            }
-            if (name != null) {
-                String username = cephra.CephraDB.getCurrentUsername();
-                if (username != null && !username.isEmpty()) {
-                    name.setText(username);
-                }
-            }
+            // Update UI labels
+            updateLabels(ticket, amount, usedKWh);
             
-            String summary = String.format(
-                "Charging Complete – Please Pay ₱%.2f\nEnergy: %.1f kWh @ ₱%.2f/kWh\nMin fee: ₱%.2f applies if higher\nCommission: ₱%.2f (18%%)\nNet to station: ₱%.2f",
-                amount,
-                usedKWh,
-                cephra.Admin.QueueBridge.getRatePerKWh(),
-                cephra.Admin.QueueBridge.getMinimumFee(),
-                commission,
-                net
-            );
-            System.out.println(summary);
-        } catch (Throwable t) {
-            System.err.println("Error updating PayPop labels: " + t.getMessage());
+            // Log summary for debugging
+            logPaymentSummary(ticket, amount, usedKWh, commission, net);
+            
+        } catch (Exception e) {
+            System.err.println("Error updating PayPop labels: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+    
+    /**
+     * Calculates energy usage for the ticket
+     * @param ticket the ticket ID
+     * @return energy usage in kWh
+     */
+    private double calculateEnergyUsage(String ticket) {
+        cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+        if (batteryInfo != null) {
+            int start = batteryInfo.initialPercent;
+            double cap = batteryInfo.capacityKWh;
+            return (100.0 - start) / 100.0 * cap;
+        }
+        return 0.0;
+    }
+    
+    /**
+     * Updates all UI labels with ticket data
+     * @param ticket the ticket ID
+     * @param amount the total amount
+     * @param usedKWh the energy usage
+     */
+    private void updateLabels(String ticket, double amount, double usedKWh) {
+        if (ticketNo != null) {
+            ticketNo.setText(ticket);
+        }
+        if (ChargingDue != null) {
+            ChargingDue.setText(String.format("₱%.2f", amount));
+        }
+        if (kWh != null) {
+            kWh.setText(String.format("%.1f kWh", usedKWh));
+        }
+        if (TotalBill != null) {
+            TotalBill.setText(String.format("₱%.2f", amount));
+        }
+        if (name != null) {
+            String username = cephra.CephraDB.getCurrentUsername();
+            if (username != null && !username.isEmpty()) {
+                name.setText(username);
+            }
+        }
+    }
+    
+    /**
+     * Logs payment summary for debugging
+     * @param ticket the ticket ID
+     * @param amount the total amount
+     * @param usedKWh the energy usage
+     * @param commission the commission amount
+     * @param net the net amount to station
+     */
+    private void logPaymentSummary(String ticket, double amount, double usedKWh, double commission, double net) {
+        String summary = String.format(
+            "Charging Complete – Please Pay ₱%.2f\nEnergy: %.1f kWh @ ₱%.2f/kWh\nMin fee: ₱%.2f applies if higher\nCommission: ₱%.2f (18%%)\nNet to station: ₱%.2f",
+            amount,
+            usedKWh,
+            cephra.Admin.QueueBridge.getRatePerKWh(),
+            cephra.Admin.QueueBridge.getMinimumFee(),
+            commission,
+            net
+        );
+        System.out.println("PayPop Summary for " + ticket + ":\n" + summary);
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -272,10 +351,10 @@ public class PayPop extends javax.swing.JPanel {
         add(payonline);
         payonline.setBounds(140, 210, 110, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rilpipop.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/paypop.png"))); // NOI18N
         jLabel1.setText("jLabel1");
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 260, 280);
+        jLabel1.setBounds(160, 30, 380, 280);
 
         jPanel1.setBackground(new java.awt.Color(255, 0, 51));
         jPanel1.setOpaque(false);
@@ -311,147 +390,181 @@ public class PayPop extends javax.swing.JPanel {
         jPanel1.setBounds(0, 0, 260, 270);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void CashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CashActionPerformed
-        // Validate user is still logged in before processing payment
-        if (!cephra.CephraDB.isUserLoggedIn()) {
-            System.err.println("Cash payment blocked: No user is logged in");
-            hidePayPop();
+    /**
+     * Handles cash payment action
+     * @param evt the action event
+     */
+    private void CashActionPerformed(ActionEvent evt) {
+        System.out.println("Cash payment button clicked");
+        
+        if (!validateUserLoggedIn()) {
             return;
         }
         
         String currentUser = cephra.CephraDB.getCurrentUsername();
         System.out.println("Processing cash payment for user: " + currentUser);
         
-        // Hide the PayPop first
+        // Hide PayPop and navigate to home
         hidePayPop();
-        
-        // Then navigate to home
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.home());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_CashActionPerformed
+        navigateToHome();
+    }
 
-    private void payonlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payonlineActionPerformed
-        // Validate user is still logged in before processing payment
-        if (!cephra.CephraDB.isUserLoggedIn()) {
-            System.err.println("Online payment blocked: No user is logged in");
-            hidePayPop();
+    /**
+     * Handles online payment action
+     * @param evt the action event
+     */
+    private void payonlineActionPerformed(ActionEvent evt) {
+        System.out.println("Online payment button clicked");
+        
+        if (!validateUserLoggedIn()) {
             return;
         }
         
         String currentUser = cephra.CephraDB.getCurrentUsername();
         System.out.println("Processing online payment for user: " + currentUser);
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    // Check if there's an active ticket
-                    if (!cephra.Phone.QueueFlow.hasActiveTicket()) {
-                        System.out.println("No active ticket found for payment");
-                        
-                        // Show error message to user
-                        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                javax.swing.JOptionPane.showMessageDialog(
-                                    PayPop.this,
-                                    "No active ticket found for payment.\nPlease get a ticket first.",
-                                    "Payment Error",
-                                    javax.swing.JOptionPane.ERROR_MESSAGE
-                                );
-                            }
-                        });
-                        return;
-                    }
-                    
-                    // Get current ticket ID
-                    String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
-
-                    // Validate that the ticket is Complete and Payment is Pending in admin table
-                    boolean validForPayment = false;
-                    try {
-                        javax.swing.table.DefaultTableModel m = (javax.swing.table.DefaultTableModel) cephra.Admin.QueueBridge.class.getDeclaredField("model").get(null);
-                        if (m != null) {
-                            for (int i = 0; i < m.getRowCount(); i++) {
-                                Object v = m.getValueAt(i, 0);
-                                if (currentTicket.equals(String.valueOf(v))) {
-                                    String status = String.valueOf(m.getValueAt(i, 3));
-                                    String payment = String.valueOf(m.getValueAt(i, 4));
-                                    validForPayment = "Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(payment);
-                                    break;
-                                }
-                            }
-                        }
-                    } catch (Throwable t) {
-                        // if reflection fails, skip validation
-                        validForPayment = true;
-                    }
-                    if (!validForPayment) {
-                        javax.swing.JOptionPane.showMessageDialog(
-                            PayPop.this,
-                            "Ticket is not ready for payment.",
-                            "Payment Error",
-                            javax.swing.JOptionPane.ERROR_MESSAGE
-                        );
-                        return;
-                    }
-                    // Update payment status in admin queue with GCash payment method
-                    cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
-                    // Also update the local queue flow entries
-                    cephra.Phone.QueueFlow.updatePaymentStatus(currentTicket, "Paid");
-                    System.out.println("GCash payment marked as paid for ticket: " + currentTicket);
-                    
-                    // Show success message to user
-                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            javax.swing.JOptionPane.showMessageDialog(
-                                PayPop.this,
-                                "GCash payment processed successfully!\nTicket: " + currentTicket,
-                                "Payment Success",
-                                javax.swing.JOptionPane.INFORMATION_MESSAGE
-                            );
-                        }
-                    });
-                } catch (Exception e) {
-                    System.err.println("Error updating payment status: " + e.getMessage());
-                    e.printStackTrace();
-                    
-                    // Show error message to user
-                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            javax.swing.JOptionPane.showMessageDialog(
-                                PayPop.this,
-                                "Failed to process GCash payment.\nError: " + e.getMessage() + "\nPlease try again or contact support.",
-                                "Payment Error",
-                                javax.swing.JOptionPane.ERROR_MESSAGE
-                            );
-                        }
-                    });
-                }
-                
-                // Hide PayPop first
+        SwingUtilities.invokeLater(() -> {
+            try {
+                processOnlinePayment();
+            } catch (Exception e) {
+                handlePaymentError(e);
+            } finally {
                 hidePayPop();
-                
-                // Navigate to receipt regardless of payment update success
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Reciept());
-                        break;
+                navigateToReceipt();
+            }
+        });
+    }
+    
+    /**
+     * Validates that user is logged in
+     * @return true if user is logged in, false otherwise
+     */
+    private boolean validateUserLoggedIn() {
+        if (!cephra.CephraDB.isUserLoggedIn()) {
+            System.err.println("Payment blocked: No user is logged in");
+            hidePayPop();
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Processes online payment
+     * @throws Exception if payment processing fails
+     */
+    private void processOnlinePayment() throws Exception {
+        // Check if there's an active ticket
+        if (!cephra.Phone.QueueFlow.hasActiveTicket()) {
+            showErrorMessage("No active ticket found for payment.\nPlease get a ticket first.");
+            return;
+        }
+        
+        String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+        
+        // Validate ticket is ready for payment
+        if (!isTicketValidForPayment(currentTicket)) {
+            showErrorMessage("Ticket is not ready for payment.");
+            return;
+        }
+        
+        // Process payment
+        cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
+        cephra.Phone.QueueFlow.updatePaymentStatus(currentTicket, "Paid");
+        
+        System.out.println("GCash payment marked as paid for ticket: " + currentTicket);
+        
+        // Clear charging bay and grid after successful payment
+        cephra.Admin.BayManagement.clearChargingBayForCompletedTicket(currentTicket);
+        
+        // No need to show success message - receipt panel will display the information
+    }
+    
+    /**
+     * Validates if ticket is ready for payment
+     * @param ticketId the ticket ID
+     * @return true if ticket is valid for payment
+     */
+    private boolean isTicketValidForPayment(String ticketId) {
+        try {
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) 
+                cephra.Admin.QueueBridge.class.getDeclaredField("model").get(null);
+            
+            if (model != null) {
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    Object ticketValue = model.getValueAt(i, 0);
+                    if (ticketId.equals(String.valueOf(ticketValue))) {
+                        String status = String.valueOf(model.getValueAt(i, 3));
+                        String payment = String.valueOf(model.getValueAt(i, 4));
+                        return "Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(payment);
                     }
                 }
             }
+        } catch (Exception e) {
+            System.err.println("Error validating ticket for payment: " + e.getMessage());
+            // If validation fails, allow payment to proceed
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Shows error message to user
+     * @param message the error message
+     */
+    private void showErrorMessage(String message) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(
+                this,
+                message,
+                "Payment Error",
+                JOptionPane.ERROR_MESSAGE
+            );
         });
-    }//GEN-LAST:event_payonlineActionPerformed
+    }
+    
+    
+    /**
+     * Handles payment errors
+     * @param e the exception
+     */
+    private void handlePaymentError(Exception e) {
+        System.err.println("Error updating payment status: " + e.getMessage());
+        e.printStackTrace();
+        
+        showErrorMessage("Failed to process GCash payment.\nError: " + e.getMessage() + "\nPlease try again or contact support.");
+    }
+    
+    /**
+     * Navigates to home screen
+     */
+    private void navigateToHome() {
+        SwingUtilities.invokeLater(() -> {
+            Window[] windows = Window.getWindows();
+            for (Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    phoneFrame.switchPanel(new cephra.Phone.home());
+                    break;
+                }
+            }
+        });
+    }
+    
+    /**
+     * Navigates to receipt screen
+     */
+    private void navigateToReceipt() {
+        SwingUtilities.invokeLater(() -> {
+            Window[] windows = Window.getWindows();
+            for (Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    phoneFrame.switchPanel(new cephra.Phone.Reciept());
+                    break;
+                }
+            }
+        });
+    }
 
 
 

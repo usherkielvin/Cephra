@@ -327,8 +327,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         // Upon completion, payment becomes Pending
                         queTab.setValueAt("Pending", editingRow, paymentCol);
                     }
-                    // Remove from charging grids and refresh monitor
-                    removeFromChargingSlots(ticket);
+                    // Clear charging bay and grid for completed ticket
+                    cephra.Admin.BayManagement.clearChargingBayForCompletedTicket(ticket);
                     
                     // Set battery level to 100% when charging is completed
                     try {
@@ -823,48 +823,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         return false;
     }
 
-    private void removeFromChargingSlots(String ticket) {
-        // Remove from database charging grid
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(
-                 "UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?")) {
-            pstmt.setString(1, ticket);
-            pstmt.executeUpdate();
-            System.out.println("Queue: Removed ticket " + ticket + " from charging grid database");
-        } catch (Exception e) {
-            System.err.println("Error removing ticket from charging grid database: " + e.getMessage());
-        }
-        
-        // Remove from database charging_bays table
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(
-                 "UPDATE charging_bays SET ticket_id = NULL, username = NULL, status = 'Available' WHERE ticket_id = ?")) {
-            pstmt.setString(1, ticket);
-            pstmt.executeUpdate();
-            System.out.println("Queue: Released bay for ticket " + ticket + " in charging_bays table");
-        } catch (Exception e) {
-            System.err.println("Error releasing bay in charging_bays table: " + e.getMessage());
-        }
-        
-        // Update UI displays
-        if (ticket.equals(fastslot1.getText())) { fastslot1.setText(""); fastslot1.setVisible(false); }
-        if (ticket.equals(fastslot2.getText())) { fastslot2.setText(""); fastslot2.setVisible(false); }
-        if (ticket.equals(fastslot3.getText())) { fastslot3.setText(""); fastslot3.setVisible(false); }
-        updateMonitorFastGrid();
-
-        if (ticket.equals(normalcharge1.getText())) { normalcharge1.setText(""); normalcharge1.setVisible(false); }
-        if (ticket.equals(normalcharge2.getText())) { normalcharge2.setText(""); normalcharge2.setVisible(false); }
-        if (ticket.equals(normalcharge3.getText())) { normalcharge3.setText(""); normalcharge3.setVisible(false); }
-        if (ticket.equals(normalcharge4.getText())) { normalcharge4.setText(""); normalcharge4.setVisible(false); }
-        if (ticket.equals(normalcharge5.getText())) { normalcharge5.setText(""); normalcharge5.setVisible(false); }
-        updateMonitorNormalGrid();
-        
-        // Force refresh of all grid displays
-        updateLocalFastButtons(cephra.Admin.BayManagement.getFastChargingGridTexts(), 
-                             cephra.Admin.BayManagement.getFastChargingGridColors());
-        updateLocalNormalButtons(cephra.Admin.BayManagement.getNormalChargingGridTexts(), 
-                               cephra.Admin.BayManagement.getNormalChargingGridColors());
-    }
 
     private void setTableStatusToChargingByTicket(String ticket) {
         int ticketCol = getColumnIndex("Ticket");

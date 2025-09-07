@@ -1136,6 +1136,27 @@ public class CephraDB {
                 stmt.executeUpdate(); // Don't fail if no active ticket exists
             }
             
+            // 3.5.1. Clear charging bays and charging grid for this ticket
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                int bayRowsUpdated = stmt.executeUpdate();
+                if (bayRowsUpdated > 0) {
+                    System.out.println("CephraDB: Cleared charging bay for ticket " + ticketId + " - rows updated: " + bayRowsUpdated);
+                }
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                int gridRowsUpdated = stmt.executeUpdate();
+                if (gridRowsUpdated > 0) {
+                    System.out.println("CephraDB: Cleared charging grid for ticket " + ticketId + " - rows updated: " + gridRowsUpdated);
+                }
+            }
+            
             // 3.6. Remove ticket from queue_tickets table (move to history)
             try (PreparedStatement stmt = conn.prepareStatement(
                     "DELETE FROM queue_tickets WHERE ticket_id = ?")) {
@@ -1176,6 +1197,9 @@ public class CephraDB {
             
             conn.commit(); // Commit transaction
             System.out.println("CephraDB: Successfully committed payment transaction for ticket " + ticketId);
+            
+            // Clear charging bay and grid after successful payment
+            cephra.Admin.BayManagement.clearChargingBayForCompletedTicket(ticketId);
             
             // Verify that the ticket was added to charging history
             try (PreparedStatement verifyStmt = conn.prepareStatement(

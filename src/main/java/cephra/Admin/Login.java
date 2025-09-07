@@ -219,9 +219,10 @@ public class Login extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-    Window w = SwingUtilities.getWindowAncestor(Login.this);
+        // Close the Admin frame when back/close is pressed
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Login.this);
         if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).switchPanel(new Splash());
+            ((cephra.Frame.Admin) w).dispose();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 

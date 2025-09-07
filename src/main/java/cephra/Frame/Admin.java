@@ -22,8 +22,8 @@ public class Admin extends javax.swing.JFrame {
         addEscapeKeyListener();
         makeDraggable();
         
-        // Start with the Splash panel
-        switchPanel(new cephra.Admin.Splash());
+        // Start with the Login panel (Splash removed)
+        switchPanel(new cephra.Admin.Login());
     }
 
     private void setAppIcon() {

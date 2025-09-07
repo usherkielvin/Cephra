@@ -98,7 +98,7 @@ public class Reciept extends javax.swing.JPanel {
             System.out.println("Receipt for " + ticket + ": used=" + String.format("%.2f", usedKWh) + "kWh, amount=" + String.format("%.2f", amount));
             
             AmountPaid.setText(String.format("Php %.2f", amount));
-            Fee.setText(String.format("Php %.2f/kWh (min ₱%.2f)", cephra.Admin.QueueBridge.getRatePerKWh(), cephra.Admin.QueueBridge.getMinimumFee()));
+            Fee.setText(String.format("Php %.2f", cephra.Admin.QueueBridge.getMinimumFee()));
             price.setText(String.format("PHP %.2f", amount));
             RefNumber.setText(refNumber); // Use admin queue reference number
             NumTicket.setText(ticket); // Use FCH ticket number
