@@ -1,14 +1,26 @@
 
 package cephra.Phone;
 
+import javax.swing.Timer;
 
-public class payment extends javax.swing.JPanel {
+
+public class Intro extends javax.swing.JPanel {
 
 
-    public payment() {
+    public Intro() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
+        
+           new Timer(8000, _ -> {
+                java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Intro.this);
+        if (w instanceof cephra.Frame.Phone) {
+            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Loading_Screen());
+        }
+               
+             
+            }).start();
+        
     }
 
 
@@ -17,7 +29,7 @@ public class payment extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PAYMENT.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Coolintro.gif"))); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

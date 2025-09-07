@@ -35,7 +35,7 @@ public class Phone extends javax.swing.JFrame {
         }
 
         // Start with loading screen panel
-        switchPanel(new cephra.Phone.Loading_Screen());
+        switchPanel(new cephra.Phone.Intro());
         
         // Create and setup phone frame overlay to always appear on top
         PhoneFrame();

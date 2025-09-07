@@ -48,6 +48,7 @@ public class Loading_Screen extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         exitlogin = new javax.swing.JButton();
 
@@ -55,9 +56,13 @@ public class Loading_Screen extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/splash in2.png"))); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/tatatata.png"))); // NOI18N
+        add(jLabel2);
+        jLabel2.setBounds(100, 120, 160, 60);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/aaaa.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
 
         exitlogin.setBorder(null);
         exitlogin.setBorderPainted(false);
@@ -83,5 +88,6 @@ public class Loading_Screen extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exitlogin;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 }
