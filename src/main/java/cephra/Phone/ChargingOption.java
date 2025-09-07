@@ -1,15 +1,12 @@
-
 package cephra.Phone;
 
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-public class serviceoffered extends javax.swing.JPanel {
+public class ChargingOption extends javax.swing.JPanel {
 
-    public serviceoffered() {
+    public ChargingOption() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(350, 750));
         setSize(350, 750);
@@ -42,7 +39,7 @@ public class serviceoffered extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(serviceoffered.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(ChargingOption.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -92,7 +89,7 @@ public class serviceoffered extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 670, 50, 50);
+        profilebutton.setBounds(260, 680, 50, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -104,7 +101,7 @@ public class serviceoffered extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(200, 680, 50, 40);
+        historybutton.setBounds(210, 680, 40, 40);
 
         fastcharge.setBorder(null);
         fastcharge.setBorderPainted(false);
@@ -127,7 +124,7 @@ public class serviceoffered extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 50, 40);
+        linkbutton.setBounds(90, 680, 40, 40);
 
         homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
@@ -139,7 +136,7 @@ public class serviceoffered extends javax.swing.JPanel {
             }
         });
         add(homebutton);
-        homebutton.setBounds(140, 680, 50, 40);
+        homebutton.setBounds(150, 680, 40, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/fast.png"))); // NOI18N
         add(jLabel1);
@@ -217,7 +214,7 @@ public class serviceoffered extends javax.swing.JPanel {
     private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
        // Check if user already has an active ticket
        String username = cephra.CephraDB.getCurrentUsername();
-               if (cephra.CephraDB.hasActiveTicket(username)) {
+       if (cephra.CephraDB.hasActiveTicket(username)) {
             javax.swing.JOptionPane.showMessageDialog(this, 
                 "You already have an active charging ticket. Please complete your current session first.", 
                 "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
@@ -337,8 +334,6 @@ public class serviceoffered extends javax.swing.JPanel {
         fastcharge.setToolTipText(null);
         normalcharge.setToolTipText(null);
     }
-    
-    // Remove disabled-button click handler utilities as they're no longer needed
 
     @Override
     public void addNotify() {
@@ -346,8 +341,6 @@ public class serviceoffered extends javax.swing.JPanel {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setupLabelPosition();
-                // Refresh button status when screen becomes visible
-                checkAndDisableChargeButtons();
             }
         });
     }

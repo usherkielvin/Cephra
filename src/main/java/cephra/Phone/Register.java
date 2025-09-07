@@ -15,6 +15,10 @@ public class Register extends javax.swing.JPanel {
         setupTextFields(); // Setup text field properties
         makeDraggable(); // Make the panel draggable
         
+        // Add action listeners that NetBeans might remove
+        lname.addActionListener(evt -> lnameActionPerformed(evt));
+        UsernamePhone.addActionListener(evt -> UsernamePhoneActionPerformed(evt));
+        
         // Auto-focus on name field
         SwingUtilities.invokeLater(() -> {
             if (fname != null) {
@@ -74,8 +78,6 @@ public class Register extends javax.swing.JPanel {
         See.setBorderPainted(false);
         See.setContentAreaFilled(false);
         See.setFocusPainted(false);
-        See.setOpaque(false);
-        See.setCursor(new Cursor(Cursor.HAND_CURSOR));
         See.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SeeActionPerformed(evt);

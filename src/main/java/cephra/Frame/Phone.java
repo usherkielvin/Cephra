@@ -120,6 +120,8 @@ public class Phone extends javax.swing.JFrame {
 
     public void switchPanel(javax.swing.JPanel newPanel) {
         getContentPane().removeAll();
+        // Add padding to move panel up a few pixels
+        newPanel.setLocation(0, -10); // Move up 10 pixels
         getContentPane().add(newPanel);
         revalidate();
         repaint();

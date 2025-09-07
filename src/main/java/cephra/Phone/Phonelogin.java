@@ -62,7 +62,7 @@ public class Phonelogin extends javax.swing.JPanel {
         add(See);
         See.setBounds(270, 360, 50, 30);
 
-        reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        reghere.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
         reghere.setText("Sign Up");
         reghere.setBorder(null);
@@ -76,7 +76,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(reghere);
-        reghere.setBounds(220, 669, 80, 30);
+        reghere.setBounds(220, 667, 80, 30);
 
         forgotpass.setForeground(new java.awt.Color(0, 204, 204));
         forgotpass.setText("Forgot password?");

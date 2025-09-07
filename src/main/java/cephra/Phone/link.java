@@ -147,7 +147,7 @@ public class link extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.serviceoffered());
+                        phoneFrame.switchPanel(new cephra.Phone.ChargingOption());
                         break;
                     }
                 }
@@ -232,7 +232,7 @@ public class link extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        // Go directly to PorscheTaycan instead of serviceoffered
+                        // Go directly to PorscheTaycan instead of ChargingOption
                         phoneFrame.switchPanel(new cephra.Phone.PorscheTaycan());
                         break;
                     }
