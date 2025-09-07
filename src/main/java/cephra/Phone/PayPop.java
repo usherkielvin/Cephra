@@ -169,18 +169,7 @@ public class PayPop extends javax.swing.JPanel {
         } catch (Exception ignore) {}
     }
 
-    // Force ticket label to be visible and on top
-    private void ensureTicketLabelVisible() {
-        try {
-            if (TICKETNUMBER != null) {
-                TICKETNUMBER.setVisible(true);
-                TICKETNUMBER.setOpaque(false);
-                TICKETNUMBER.setForeground(java.awt.Color.BLACK);
-                TICKETNUMBER.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-                TICKETNUMBER.repaint();
-            }
-        } catch (Exception ignore) {}
-    }
+    // ensureTicketLabelVisible: removed; form manages visual properties
 
     // Read the latest ticket for the current user directly from Admin Queue table model
     private String findLatestTicketForUserFromAdminModel(String username) {
