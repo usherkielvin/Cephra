@@ -110,7 +110,6 @@ public class PayPop extends javax.swing.JPanel {
                     resolved = currentInstance.findLatestTicketForUserFromAdminModel(currentUser);
                 }
                 currentInstance.setTicketOnUi(resolved);
-                currentInstance.ensureTicketLabelVisible();
             } catch (Exception ignore) {}
             
             // Determine phone content size (fallback to constants if not realized yet)
@@ -178,11 +177,8 @@ public class PayPop extends javax.swing.JPanel {
                 TICKETNUMBER.setOpaque(false);
                 TICKETNUMBER.setForeground(java.awt.Color.BLACK);
                 TICKETNUMBER.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-                setComponentZOrder(TICKETNUMBER, 0);
                 TICKETNUMBER.repaint();
             }
-            // Keep background behind
-            sendBackgroundToBack();
         } catch (Exception ignore) {}
     }
 
@@ -235,11 +231,7 @@ public class PayPop extends javax.swing.JPanel {
         setPreferredSize(new Dimension(POPUP_WIDTH, POPUP_HEIGHT));
         setSize(POPUP_WIDTH, POPUP_HEIGHT);
         setOpaque(false);
-        setupLabelPosition();
-        // Ensure background image stays behind the other components
-        sendBackgroundToBack();
         setupCloseButton();
-        bringDataLabelsToFront();
         
         // Update labels with actual ticket data after components are initialized
         SwingUtilities.invokeLater(this::updateTextWithAmount);
@@ -247,41 +239,14 @@ public class PayPop extends javax.swing.JPanel {
         // Set username if available (optional display label removed)
     }
 
-    /**
-     * Ensures the background label is behind other controls
-     */
-    private void sendBackgroundToBack() {
-        try {
-            if (jLabel1 != null && jLabel1.getParent() == this) {
-                setComponentZOrder(jLabel1, getComponentCount() - 1);
-                revalidate();
-                repaint();
-            }
-        } catch (Exception ignore) {}
-    }
+    // NetBeans form manages background order by default
 
-    /**
-     * Ensures ticket and amount labels are above the background image
-     */
-    private void bringDataLabelsToFront() {
-        try {
-            if (TICKETNUMBER != null) setComponentZOrder(TICKETNUMBER, 0);
-            if (ChargingDue != null) setComponentZOrder(ChargingDue, 0);
-            if (kWh != null) setComponentZOrder(kWh, 0);
-            if (TotalBill != null) setComponentZOrder(TotalBill, 0);
-            revalidate();
-            repaint();
-        } catch (Exception ignore) {}
-    }
+    // NetBeans form manages component Z-order
     /**
      * Sets up label position to prevent NetBeans from changing it
      * CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
      */
-    private void setupLabelPosition() {
-        if (TICKETNUMBER != null) {
-            TICKETNUMBER.setBounds(-15, 0, 398, 750);
-        }
-    }
+    // NetBeans form manages label positions
     /**
      * Sets up close button functionality (ESC key)
      */
@@ -329,7 +294,6 @@ public class PayPop extends javax.swing.JPanel {
             
             // Update UI labels
             updateLabels(ticket, amount, usedKWh);
-            ensureTicketLabelVisible();
             
             // Log summary for debugging
             logPaymentSummary(ticket, amount, usedKWh, commission, net);
@@ -409,14 +373,16 @@ public class PayPop extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
+
+        TICKETNUMBER.setText("9999");
         add(TICKETNUMBER);
-        TICKETNUMBER.setBounds(110, 40, 130, 50);
+        TICKETNUMBER.setBounds(150, 70, 60, 30);
         add(ChargingDue);
         ChargingDue.setBounds(150, 100, 90, 20);
         add(kWh);
         kWh.setBounds(150, 120, 80, 20);
         add(TotalBill);
-        TotalBill.setBounds(160, 160, 90, 20);
+        TotalBill.setBounds(140, 170, 90, 20);
 
         Cash.setBorder(null);
         Cash.setContentAreaFilled(false);

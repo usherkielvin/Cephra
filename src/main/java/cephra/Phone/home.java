@@ -28,6 +28,8 @@ public class home extends javax.swing.JPanel {
             }
         }
         
+        // Background is moved up by 3 pixels via bounds
+
 
     }
 

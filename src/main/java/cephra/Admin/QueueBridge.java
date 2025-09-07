@@ -296,38 +296,13 @@ public final class QueueBridge {
                         System.err.println("QueueBridge: Error refreshing history table: " + e.getMessage());
                     }
                     
-                    // Simple panel switch: trigger home button click in PayPop panel
+                    // Close PayPop on the phone if it is currently showing
                     SwingUtilities.invokeLater(() -> {
                         try {
-                            java.awt.Window[] windows = java.awt.Window.getWindows();
-                            for (java.awt.Window window : windows) {
-                                if (window instanceof cephra.Frame.Phone) {
-                                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                                    if (phoneFrame.isVisible()) {
-                                        java.awt.Component[] components = phoneFrame.getContentPane().getComponents();
-                                        for (java.awt.Component comp : components) {
-                                            if (comp instanceof cephra.Phone.PayPop) {
-                                                cephra.Phone.PayPop payPopPanel = (cephra.Phone.PayPop) comp;
-                                                // Use reflection to access the homebutton2 field directly
-                                                try {
-                                                    java.lang.reflect.Field homeButtonField = cephra.Phone.PayPop.class.getDeclaredField("homebutton2");
-                                                    homeButtonField.setAccessible(true);
-                                                    javax.swing.JButton homeButton = (javax.swing.JButton) homeButtonField.get(payPopPanel);
-                                                    if (homeButton != null) {
-                                                        homeButton.doClick();
-                                                        System.out.println("QueueBridge: Switched PayPop to home after payment for ticket " + ticket);
-                                                        return;
-                                                    }
-                                                } catch (Exception reflectionEx) {
-                                                    System.err.println("QueueBridge: Error accessing homebutton2 via reflection: " + reflectionEx.getMessage());
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (Exception e) {
-                            System.err.println("QueueBridge: Error switching panel: " + e.getMessage());
+                            cephra.Phone.PayPop.hidePayPop();
+                            System.out.println("QueueBridge: Closed PayPop on phone after marking ticket as Paid: " + ticket);
+                        } catch (Throwable t) {
+                            System.err.println("QueueBridge: Failed to close PayPop: " + t.getMessage());
                         }
                     });
                 } else {

@@ -12,14 +12,16 @@ public class Phone extends javax.swing.JFrame {
 
         setUndecorated(true);
         initComponents();
-        setSize(350, 750);
+        setSize(370, 750);
         setResizable(false);
         setAppIcon();
         addEscapeKeyListener();
         makeDraggable();
+        // Use absolute positioning for phone panels
+        getContentPane().setLayout(null);
         
         // Add curved edges to the frame
-        setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 350, 750, 120, 120));
+        setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 370, 750, 120, 120));
         
         // Refresh ticket counters when Phone frame is created
         try {
@@ -90,7 +92,7 @@ public class Phone extends javax.swing.JFrame {
     private void PhoneFrame() {
         Iphoneframe = new JLabel();
         Iphoneframe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PHONEFRAME.png")));
-        Iphoneframe.setBounds(-30, 0, 405, 750);
+        Iphoneframe.setBounds(0, 0, 370, 750);
         Iphoneframe.setHorizontalAlignment(SwingConstants.CENTER);
         Iphoneframe.setOpaque(false);
         
@@ -107,7 +109,7 @@ public class Phone extends javax.swing.JFrame {
                     jLabel1.setOpaque(false);
                     jLabel1.setForeground(Color.BLACK);
                     jLabel1.setVisible(true);
-                    jLabel1.setBounds(28, 21, 55, 20);
+                    jLabel1.setBounds(36, 21, 55, 20);
                     getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.MODAL_LAYER);
                     getRootPane().getLayeredPane().moveToFront(jLabel1);
                     getRootPane().revalidate();
@@ -125,7 +127,7 @@ public class Phone extends javax.swing.JFrame {
 
     public void switchPanel(javax.swing.JPanel newPanel) {
         getContentPane().removeAll();
-        newPanel.setLocation(0, -10); // Move up 10 pixels
+        newPanel.setBounds(0, -6, 370, 756);
         getContentPane().add(newPanel);
         revalidate();
         repaint();
