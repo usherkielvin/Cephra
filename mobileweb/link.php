@@ -15,6 +15,7 @@ $username = $_SESSION['username'];
 // Check if car is already linked and user has battery level
 $isCarLinked = false;
 $hasBatteryData = false;
+$currentBatteryLevel = null;
 
 if ($conn) {
     // Check if user has battery data (equivalent to car being linked)
@@ -29,12 +30,12 @@ if ($conn) {
         $stmt->bindParam(':username', $username);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $batteryLevel = (int)($result['battery_level'] ?? 0);
+        $batteryLevel = (int)($result['battery_level'] ?? -1);
+        $currentBatteryLevel = $batteryLevel;
 
-        if ($batteryLevel != -1) {
-            // Car is linked and battery is initialized - redirect to dashboard
-            header("Location: dashboard.php");
-            exit();
+        if ($batteryLevel > 0) {
+            // Car is linked and battery is initialized - keep Link panel visible
+            $isCarLinked = true;
         }
     }
 }
@@ -43,23 +44,31 @@ if ($conn) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['link_car'])) {
         // Link car functionality
-        if ($conn && !$hasBatteryData) {
-            // Initialize battery to random level (15-50%) only if not already initialized
-            $batteryLevel = 15 + rand(0, 35); // 15 to 50
+        if ($conn) {
+            // Initialize battery to random level (15-50%)
+            $newBatteryLevel = 15 + rand(0, 35); // 15 to 50
 
-            $stmt = $conn->prepare("INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (:username, :battery_level, :initial_battery_level, 40.0)");
-            $stmt->bindParam(':username', $username);
-            $stmt->bindParam(':battery_level', $batteryLevel);
-            $stmt->bindParam(':initial_battery_level', $batteryLevel);
+            if (!$hasBatteryData) {
+                // No record yet -> insert
+                $stmt = $conn->prepare("INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (:username, :battery_level, :initial_battery_level, 40.0)");
+                $stmt->bindParam(':username', $username);
+                $stmt->bindParam(':battery_level', $newBatteryLevel);
+                $stmt->bindParam(':initial_battery_level', $newBatteryLevel);
+            } else if ($currentBatteryLevel <= 0) {
+                // Record exists but unlinked sentinel (-1) -> update
+                $stmt = $conn->prepare("UPDATE battery_levels SET battery_level = :battery_level, initial_battery_level = :battery_level WHERE username = :username");
+                $stmt->bindParam(':username', $username);
+                $stmt->bindParam(':battery_level', $newBatteryLevel);
+            } else {
+                // Already linked -> nothing to do
+                $stmt = null;
+            }
 
-            if ($stmt->execute()) {
-                // Set car as linked in session
+            if ($stmt && $stmt->execute()) {
                 $_SESSION['car_linked'] = true;
-
-                // Redirect to dashboard
                 header("Location: dashboard.php");
                 exit();
-            } else {
+            } elseif ($stmt) {
                 $error = "Failed to link car. Please try again.";
             }
         }
@@ -78,6 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .link-container {
             text-align: center;
             padding: 20px;
+            position: relative;
+            z-index: 200;
         }
         .link-button {
             background: #4CAF50;
@@ -104,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateX(-50%);
             display: flex;
             gap: 20px;
+            z-index: 100;
         }
         .nav-button {
             width: 50px;
@@ -140,8 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <ul>
                             <li><a href="dashboard.php">Home</a></li>
                             <li class="current_page_item"><a href="link.php">Link</a></li>
-                            <li><a href="right-sidebar.html">History</a></li>
-                            <li><a href="no-sidebar.html">Profile</a></li>
+                            <li><a href="history.php">History</a></li>
+                            <li><a href="profile.php">Profile</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -153,25 +165,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="wrapper style1">
                 <div class="inner">
                     <div class="link-container">
-                        <h2>Link Your Electric Vehicle</h2>
-                        <p>Connect your EV to start charging at Cephra stations</p>
-
-                        <img src="images/ConnectCar.gif" alt="Connect Car" style="max-width: 100%; height: auto; margin: 20px 0;">
-
-                        <form method="post" id="linkForm">
-                            <div class="terms-checkbox">
-                                <input type="checkbox" id="terms" name="terms" required>
-                                <label for="terms">By linking, I agree to the <a href="#" onclick="showTerms(); return false;">Terms & Conditions</a></label>
+                        <?php if (!empty($isCarLinked)): ?>
+                            <h2>Your Vehicle is Linked</h2>
+                            <p>Porsche connected. You're ready to charge.</p>
+                            <img src="images/ads.png" alt="Porsche" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px;">
+                            <div style="display:flex; gap:12px; justify-content:center;">
+                                <a href="dashboard.php" class="button">Go to Dashboard</a>
+                                <a href="ChargingPage.php" class="button alt">Start Charging</a>
                             </div>
-
-                            <?php if (isset($error)): ?>
-                                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-                            <?php endif; ?>
-
-                            <button type="submit" name="link_car" class="link-button" id="linkBtn" disabled>
-                                Link My Car
-                            </button>
-                        </form>
+                        <?php else: ?>
+                            <h2>Link Your Electric Vehicle</h2>
+                            <p>Connect your EV to start charging at Cephra stations</p>
+                            <img src="images/ConnectCar.gif" alt="Connect Car" style="max-width: 100%; height: auto; margin: 20px 0;">
+                            <form method="post" id="linkForm">
+                                <div class="terms-checkbox">
+                                    <input type="checkbox" id="terms" name="terms" required>
+                                    <label for="terms">By linking, I agree to the <a href="#" onclick="showTerms(); return false;">Terms & Conditions</a></label>
+                                </div>
+                                <?php if (isset($error)): ?>
+                                    <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+                                <?php endif; ?>
+                                <button type="submit" name="link_car" class="link-button" id="linkBtn" disabled>
+                                    Link My Car
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                        <div class="panel-nav" style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+                            <a class="button alt" href="profile.php">Prev: Profile</a>
+                            <a class="button" href="history.php">Next: History</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -181,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="nav-buttons">
             <button class="nav-button" onclick="window.location.href='dashboard.php'" title="Home">🏠</button>
             <button class="nav-button" onclick="window.location.href='ChargingPage.php'" title="Charge">🔋</button>
-            <button class="nav-button" onclick="window.location.href='dashboard.php'" title="Profile">👤</button>
+            <button class="nav-button" onclick="window.location.href='profile.php'" title="Profile">👤</button>
         </div>
     </div>
 
@@ -194,6 +216,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="assets/js/main.js"></script>
 
     <script>
+        function showDialog(title, message) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
+            const dialog = document.createElement('div');
+            dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
+            const header = document.createElement('div');
+            header.style.cssText = 'background:#00c2ce;color:#fff;padding:12px 16px;font-weight:700';
+            header.textContent = title || 'Notice';
+            const body = document.createElement('div');
+            body.style.cssText = 'padding:16px;color:#333;line-height:1.5;';
+            body.textContent = message || '';
+            const footer = document.createElement('div');
+            footer.style.cssText = 'padding:12px 16px;display:flex;justify-content:flex-end;gap:8px;background:#f7f7f7;';
+            const ok = document.createElement('button');
+            ok.textContent = 'OK';
+            ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
+            ok.onclick = () => document.body.removeChild(overlay);
+            footer.appendChild(ok);
+            dialog.appendChild(header);
+            dialog.appendChild(body);
+            dialog.appendChild(footer);
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+        }
         function showTerms() {
             const termsText = `CEPHRA EV LINKING TERMS AND CONDITIONS
 Effective Date: <?php echo date('Y-m-d'); ?>
@@ -278,7 +324,7 @@ By checking "I agree", you confirm you have read and accept these Terms.`;
             const termsCheckbox = document.getElementById('terms');
             if (!termsCheckbox.checked) {
                 e.preventDefault();
-                alert('Please agree to the Terms & Conditions to continue.');
+                showDialog('Link Vehicle', 'Please agree to the Terms & Conditions to continue.');
                 return false;
             }
         });
@@ -306,6 +352,15 @@ By checking "I agree", you confirm you have read and accept these Terms.`;
                 linkBtn.style.background = '#cccccc';
                 linkBtn.style.cursor = 'not-allowed';
             }
+            // Ensure click triggers submission when enabled
+            linkBtn.addEventListener('click', function(e) {
+                if (!termsCheckbox.checked) {
+                    e.preventDefault();
+                    showDialog('Link Vehicle', 'Please agree to the Terms & Conditions to continue.');
+                    return false;
+                }
+                // allow normal form submit
+            });
         });
     </script>
 </body>

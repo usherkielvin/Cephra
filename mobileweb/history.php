@@ -1,0 +1,130 @@
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+	header("Location: index.php");
+	exit();
+}
+
+require_once '../config/database.php';
+
+$db = new Database();
+$conn = $db->getConnection();
+
+$username = $_SESSION['username'];
+
+$payments = [];
+if ($conn) {
+	$stmt = $conn->prepare("SELECT ticket_id, amount, payment_method, reference_number, transaction_status, processed_at FROM payment_transactions WHERE username = :username ORDER BY processed_at DESC LIMIT 20");
+	$stmt->bindParam(':username', $username);
+	$stmt->execute();
+	$payments = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+?>
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>History - Cephra</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="icon" type="image/png" href="images/logo.png" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<style>
+			.history-list { background: #fff; border-radius: 8px; padding: 10px; }
+			.history-item { border-bottom: 1px solid #eee; padding: 10px 5px; }
+			.history-item:last-child { border-bottom: 0; }
+			.history-meta { font-size: 0.9em; color: #666; }
+			.panel-nav { display:flex; gap:12px; justify-content:center; margin-top:16px; }
+			.panel-nav .button { min-width: 110px; text-align:center; }
+			.nav-buttons { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
+			.nav-button { width: 50px; height: 50px; border-radius: 50%; border: none; background: #007bff; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+		</style>
+	</head>
+	<body class="homepage is-preload">
+		<div id="page-wrapper">
+			<div id="header-wrapper">
+				<header id="header">
+					<div class="inner">
+						<h1><a href="dashboard.php" id="logo">Cephra</a></h1>
+						<nav id="nav">
+							<ul>
+								<li><a href="dashboard.php">Home</a></li>
+								<li><a href="link.php">Link</a></li>
+								<li class="current_page_item"><a href="history.php">History</a></li>
+								<li><a href="profile.php">Profile</a></li>
+							</ul>
+						</nav>
+					</div>
+				</header>
+			</div>
+
+			<div id="main-wrapper">
+				<div class="wrapper style1">
+					<div class="inner">
+						<section class="container box feature2">
+							<header class="major">
+								<h2>Payment History</h2>
+								<p>Your 20 most recent payments</p>
+							</header>
+							<div class="history-list">
+								<?php if (empty($payments)): ?>
+									<div class="history-item">No payments yet.</div>
+								<?php else: foreach ($payments as $p): ?>
+									<?php
+										$when = $p['processed_at'] ?? '';
+										$whenFmt = $when;
+										try {
+											$dt = new DateTime($when);
+											$whenFmt = $dt->format('M d, Y h:i A');
+										} catch (Exception $e) {}
+									?>
+									<div class="history-item">
+										<strong><?php echo htmlspecialchars($p['ticket_id']); ?></strong>
+										<div class="history-meta">
+											₱<?php echo number_format((float)($p['amount'] ?? 0), 2); ?> •
+											<?php echo htmlspecialchars($p['payment_method'] ?? ''); ?> •
+											Ref: <?php echo htmlspecialchars($p['reference_number'] ?? ''); ?> •
+											<?php echo htmlspecialchars($p['transaction_status'] ?? ''); ?> •
+											<?php echo htmlspecialchars($whenFmt); ?>
+										</div>
+									</div>
+								<?php endforeach; endif; ?>
+							</div>
+							<div class="panel-nav">
+								<a class="button alt" href="link.php">Prev: Link</a>
+								<a class="button" href="profile.php">Next: Profile</a>
+							</div>
+							<div class="nav-buttons">
+								<button class="nav-button" onclick="window.location.href='dashboard.php'" title="Home">🏠</button>
+								<button class="nav-button" onclick="window.location.href='ChargingPage.php'" title="Charge">🔋</button>
+								<button class="nav-button" onclick="window.location.href='profile.php'" title="Profile">👤</button>
+							</div>
+						</section>
+					</div>
+				</div>
+			</div>
+
+			<div id="footer-wrapper">
+				<footer id="footer" class="container">
+					<div class="row">
+						<div class="col-12">
+							<div id="copyright">
+								<ul class="menu">
+									<li>&copy; Cephra. All rights reserved</li><li>Design: <a href="http://html5up.net">Cephra Designer</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</footer>
+			</div>
+		</div>
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.dropotron.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+	</body>
+</html>
+
+

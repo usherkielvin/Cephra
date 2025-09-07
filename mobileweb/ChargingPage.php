@@ -56,8 +56,8 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 										<ul>
 											<li class="current_page_item"><a href="dashboard.php">Home</a></li>
 											<li><a href="link.php">Link</a></li>
-											<li><a href="right-sidebar.html">History</a></li>
-											<li><a href="no-sidebar.html">Profile</a></li>
+											<li><a href="history.php">History</a></li>
+											<li><a href="profile.php">Profile</a></li>
 										</ul>
 									</nav>
 
@@ -178,6 +178,30 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 			<script src="assets/js/main.js"></script>
 
 			<script>
+				function showDialog(title, message) {
+					const overlay = document.createElement('div');
+					overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
+					const dialog = document.createElement('div');
+					dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
+					const header = document.createElement('div');
+					header.style.cssText = 'background:#00c2ce;color:#fff;padding:12px 16px;font-weight:700';
+					header.textContent = title || 'Notice';
+					const body = document.createElement('div');
+					body.style.cssText = 'padding:16px;color:#333;line-height:1.5;';
+					body.textContent = message || '';
+					const footer = document.createElement('div');
+					footer.style.cssText = 'padding:12px 16px;display:flex;justify-content:flex-end;gap:8px;background:#f7f7f7;';
+					const ok = document.createElement('button');
+					ok.textContent = 'OK';
+					ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
+					ok.onclick = () => document.body.removeChild(overlay);
+					footer.appendChild(ok);
+					dialog.appendChild(header);
+					dialog.appendChild(body);
+					dialog.appendChild(footer);
+					overlay.appendChild(dialog);
+					document.body.appendChild(overlay);
+				}
 				$(document).ready(function() {
 					// Normal Charge Button Click Handler
 					$('#normalChargeBtn').click(function(e) {
@@ -215,11 +239,11 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 									// Show queue ticket popup
 									showQueueTicketPopup(response);
 								} else if (response.error) {
-									alert(response.error);
+									showDialog('Charging', response.error);
 								}
 							},
 							error: function(xhr, status, error) {
-								alert('An error occurred while processing your request. Please try again.');
+								showDialog('Charging', 'An error occurred while processing your request. Please try again.');
 								console.error('AJAX Error:', error);
 							},
 							complete: function() {
@@ -257,5 +281,14 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				});
 			</script>
 
-	</body>
-</html>
+			<style>
+				.nav-buttons { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
+				.nav-button { width: 50px; height: 50px; border-radius: 50%; border: none; background: #007bff; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+			</style>
+			<div class="nav-buttons">
+				<button class="nav-button" onclick="window.location.href='dashboard.php'" title="Home">🏠</button>
+				<button class="nav-button" onclick="window.location.href='ChargingPage.php'" title="Charge">🔋</button>
+				<button class="nav-button" onclick="window.location.href='profile.php'" title="Profile">👤</button>
+			</div>
+ 	</body>
+ </html>

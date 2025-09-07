@@ -1635,7 +1635,7 @@
     
     #nav>ul>li>a,
     #nav>ul>li>span {
-        color: #fff;
+        color: #ffffff;
         text-decoration: none;
         text-transform: uppercase;
         font-weight: 800;
@@ -1644,7 +1644,9 @@
         padding: 0.5em 0.8em 0.5em 0.8em;
         border-radius: 6px;
         outline: 0;
+        border-bottom: 2px solid transparent;
     }
+    #nav>ul>li>a:hover { border-bottom-color: #00c2ce; }
     
     #nav>ul>li.active>a,
     #nav>ul>li.current_page_item>a,
@@ -1819,7 +1821,7 @@
     #header {
         position: relative;
         border-radius: 0;
-        background: #00c4ce00;
+        background: #062635;
         margin-bottom: 0;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
@@ -1827,10 +1829,10 @@
     #header .inner {
         position: relative;
         height: 5.5em;
-        background-color: #00c2ce;
+        background-color: #062635;
         border-radius: 0;
-        box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.45), inset 0px 2px 1px 0px rgba(255, 255, 255, 0.15);
-        text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.5);
+        box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.45), inset 0px 2px 1px 0px rgba(255, 255, 255, 0.05);
+        text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.4);
     }
     
     #header h1 {
@@ -1840,6 +1842,32 @@
         margin-top: -0.65em;
         font-size: 1.5em;
         color: #fff;
+    }
+    #header h1 a#logo {
+        color:#ffffff;
+        text-decoration:none;
+        font-weight:800;
+        letter-spacing:.06em;
+    }
+    #header h1 a#logo:before {
+        content:"";
+        display:inline-block;
+        width:28px; height:28px; border-radius:50%;
+        background: #0f3a49;
+        box-shadow: inset 0 0 0 2px rgba(0,194,206,.5);
+        margin-right:10px;
+        vertical-align:middle;
+    }
+
+    /* Navigation bar header refinements */
+    #nav>ul { display:flex; gap:.6em; }
+    #nav>ul>li { padding: 0 0.6em; }
+    #nav>ul>li.active>a,
+    #nav>ul>li.current_page_item>a,
+    #nav>ul>li.active>span,
+    #nav>ul>li.current_page_item>span {
+        border-bottom-color: #00c2ce;
+        color: #00e1ee;
     }
     /* Footer */
     

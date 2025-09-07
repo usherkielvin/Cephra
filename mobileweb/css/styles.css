@@ -8,13 +8,71 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: white;
+    background: #0d1b2a;
+    min-height: 100vh;
+}
+
+.auth-page {
+    background: radial-gradient(800px 400px at 10% 0%, rgba(0,194,206,0.15) 0%, transparent 60%),
+                radial-gradient(700px 400px at 90% 100%, rgba(0,194,206,0.12) 0%, transparent 60%),
+                linear-gradient(180deg, #0d1b2a 0%, #102a43 100%);
+}
+
+.auth-wrapper {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 24px;
 }
+
+.auth-layout { display:flex; width:100%; max-width: 980px; gap:24px; align-items: center; justify-content:center; margin: 0 auto; }
+.auth-card {
+    width: 100%;
+    max-width: 520px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.25);
+    padding: 32px 28px;
+    border: 1px solid #e6eef3;
+}
+
+.auth-side { flex:1; position:relative; border-radius:24px; overflow:hidden; background: radial-gradient(1200px 400px at -10% -10%, #00c2ce33 0%, transparent 60%), radial-gradient(1200px 400px at 120% 120%, #00c2ce33 0%, transparent 60%), linear-gradient(160deg, #0d1b2a 0%, #102a43 50%, #0d1b2a 100%); box-shadow: 0 24px 60px rgba(0,0,0,0.25); display:none; }
+.auth-shape { position:absolute; width:220px; height:220px; border-radius: 24px; background:#00c2ce; filter: blur(60px); opacity:0.35; top:10%; left:10%; }
+.auth-shape.second { width:280px; height:280px; top:auto; bottom:10%; left:auto; right:10%; }
+.auth-tagline { position:absolute; bottom:24px; left:24px; color:#80f0f6; font-weight:700; font-size:20px; letter-spacing:.5px; }
+
+@media (min-width: 900px) {
+    .auth-side { display:block; }
+}
+
+@media (max-width: 480px) {
+    .auth-card { padding: 24px 18px; border-radius: 20px; }
+    .auth-title { font-size: 24px; }
+}
+
+.auth-header { margin-bottom: 16px; }
+.brand { display:flex; align-items:center; gap:10px; margin-bottom: 12px; }
+.brand-badge { width: 36px; height: 36px; border-radius: 10px; background:#00c2ce; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:20px; }
+.brand-text { color:#00c2ce; font-weight: 800; letter-spacing: 1px; font-size: 22px; }
+.auth-title { font-size: 28px; line-height: 1.1; color: #0f172a; margin: 8px 0; }
+.auth-subtitle { color:#64748b; font-size: 13px; }
+
+.auth-form { margin-top: 8px; display:flex; flex-direction: column; gap: 14px; }
+.auth-input-group { position: relative; display:flex; align-items:center; background:#e9ecef; border-radius: 12px; padding: 10px 12px; }
+.auth-icon { font-size:18px; margin-right: 8px; }
+.auth-input { border: 0; outline: 0; background: transparent; width: 100%; font-size: 15px; color:#0f172a; }
+.auth-eye { position:absolute; right:10px; top:50%; transform: translateY(-50%); background: transparent; border: 0; cursor: pointer; font-size: 16px; }
+
+.auth-actions { text-align: right; margin-top: -4px; }
+.auth-link { color:#00c2ce; text-decoration: none; font-weight: 600; font-size: 13px; }
+.auth-link:hover { text-decoration: underline; }
+
+.auth-btn { width:100%; background:#0b2d39; color:#fff; border: 0; border-radius: 14px; padding: 12px 0; font-weight: 700; font-size: 16px; cursor: pointer; transition: transform .05s ease, box-shadow .2s ease; box-shadow: 0 6px 14px rgba(13,45,57,.25); }
+.auth-btn:hover { background:#0e3a49; }
+.auth-btn:active { transform: translateY(1px); box-shadow: 0 3px 8px rgba(13,45,57,.25); }
+
+.auth-footer { display:flex; gap:8px; justify-content:center; align-items:center; margin-top: 14px; color:#64748b; font-size: 13px; }
 
 .container {
     background: white;
@@ -29,6 +87,7 @@ body {
 
 /* From Uiverse.io by ammarsaa */
 
+/* legacy form (kept for reference) */
 .form {
     display: flex;
     flex-direction: column;
@@ -41,6 +100,59 @@ body {
     color: #fff;
     border: 1px solid #333;
 }
+@media (min-width: 992px) {
+    .form { max-width: 640px; padding: 32px; }
+    .title { font-size: 34px; }
+    .form label .input { padding: 26px 10px 10px 14px; font-size: 18px; }
+    .submit { padding: 16px; font-size: 18px; }
+}
+
+@media (min-width: 1400px) {
+    .form { max-width: 720px; padding: 36px; }
+    .title { font-size: 36px; }
+    .form label .input { padding: 28px 12px 12px 16px; font-size: 19px; }
+    .submit { padding: 18px; font-size: 19px; }
+}
+
+/* Double slider auth (Cephra palette) */
+.ds-container { background-color:#0d1b2a; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,.35); position:relative; overflow:hidden; width: 100%; max-width: 420px; min-height: 560px; display:flex; }
+.ds-form-container { position:relative; top:0; height:100%; transition: none; display:flex; align-items:center; justify-content:center; width:100%; }
+.ds-sign-in-container { left:0; z-index:2; width:100%; }
+.ds-container.right-panel-active .ds-sign-in-container { transform: translateX(100%); }
+.ds-sign-up-container { display:none; }
+.ds-container.right-panel-active .ds-sign-up-container { transform: translateX(100%); opacity:1; z-index:5; }
+.ds-form { background:#ffffff; border-radius: 18px; padding: 28px 26px; width:100%; height:auto; min-height: 520px; display:flex; flex-direction:column; align-items:stretch; justify-content:center; text-align:left; gap:14px; }
+.ds-form h1 { color:#0f172a; margin:0 0 6px 0; }
+.ds-form span { display:none; }
+.ds-form input { background:#e9ecef; border:1px solid transparent; padding:12px 15px; margin:8px 0; width:100%; border-radius:12px; transition:border-color .2s ease, box-shadow .2s ease; }
+.ds-form input:focus { border-color:#00c2ce; box-shadow:0 0 0 3px rgba(0,194,206,.15); outline:0; background:#f2f5f7; }
+.ds-password { position:relative; width:100%; }
+.ds-password input { width:100%; padding-right:40px; }
+.ds-eye { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:transparent; border:0; cursor:pointer; }
+.ds-link { color:#ffffff; text-decoration:none; font-size:13px; }
+.ds-link:hover { text-decoration:underline; }
+.ds-btn { border-radius: 22px; border: 0; background-image: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: #FFFFFF; font-size: 12px; font-weight: 800; padding: 12px 45px; letter-spacing: 1px; text-transform: uppercase; transition: transform 80ms ease-in, box-shadow .2s ease, filter .2s ease; box-shadow: 0 8px 18px rgba(0,194,206,.35); cursor:pointer; }
+.ds-btn:hover { filter: brightness(1.06); }
+.ds-btn:active { transform: translateY(1px); }
+.ds-btn.ghost { background-color: transparent; border:2px solid #ffffff; box-shadow:none; }
+
+.ds-overlay-container { display:none; }
+.ds-container.right-panel-active .ds-overlay-container{ transform: translateX(-100%); }
+.ds-overlay { display:none; }
+
+@keyframes dsGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.ds-container.right-panel-active .ds-overlay { transform: translateX(50%); }
+.ds-overlay-panel { position:absolute; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:0 40px; text-align:center; top:0; height:100%; width:50%; transform: translateX(0); transition: transform .6s ease-in-out; }
+.ds-overlay-left { transform: translateX(-20%); }
+.ds-container.right-panel-active .ds-overlay-left { transform: translateX(0); }
+.ds-overlay-right { right:0; transform: translateX(0); }
+.ds-container.right-panel-active .ds-overlay-right { transform: translateX(20%); }
+
+/* Simplified to single clean sign-in card on all sizes */
 
 .title {
     font-size: 28px;
@@ -50,8 +162,12 @@ body {
     display: flex;
     align-items: center;
     padding-left: 5px;
-    color: #00c2ce;
 }
+
+/* Make login page texts white */
+.auth-wrapper .title { color: #ffffff; }
+.auth-wrapper .message { color: #ffffff; }
+.auth-wrapper .brand-text { color: #ffffff; }
 
 .message,
 .signin {
@@ -112,7 +228,7 @@ body {
 
 .form label .input:focus+span,
 .form label .input:valid+span {
-    color: #00bfff;
+    color: #ffffff;
     top: 0px;
     font-size: 0.7em;
     font-weight: 600;

@@ -82,38 +82,50 @@ if ($batteryLevel >= 100) {
 
 // Determine service type for database storage
 $bayType = ($serviceType === 'Fast Charging') ? 'Fast' : 'Normal';
+// Queue ticket should mirror Phone Java panel labels
+$queueServiceType = ($serviceType === 'Fast Charging') ? 'Fast Charging' : 'Normal Charging';
 
-// Generate ticket ID
+// Generate ticket ID using DB-driven increment across both tables
 $ticketPrefix = ($serviceType === 'Fast Charging') ? 'FCH' : 'NCH';
-
-// Get the next ticket number from queue_tickets table (not active_tickets)
 $prefixPattern = $ticketPrefix . '%';
-$stmt = $conn->prepare("SELECT MAX(CAST(SUBSTRING(ticket_id, 4) AS UNSIGNED)) as max_num FROM queue_tickets WHERE ticket_id LIKE :prefix");
-$stmt->bindParam(':prefix', $prefixPattern);
+
+// Compute the next number based on the greatest ticket suffix present in either queue_tickets or active_tickets
+$sql = "SELECT GREATEST(
+            IFNULL((SELECT MAX(CAST(SUBSTRING(ticket_id,4) AS UNSIGNED)) FROM queue_tickets WHERE ticket_id LIKE :prefix1), 0),
+            IFNULL((SELECT MAX(CAST(SUBSTRING(ticket_id,4) AS UNSIGNED)) FROM active_tickets WHERE ticket_id LIKE :prefix2), 0)
+        ) AS max_num";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':prefix1', $prefixPattern);
+$stmt->bindParam(':prefix2', $prefixPattern);
 $stmt->execute();
-$result = $stmt->fetch(PDO::FETCH_ASSOC);
-$nextNum = ($result['max_num'] ?? 0) + 1;
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+$nextNum = (isset($row['max_num']) ? (int)$row['max_num'] : 0) + 1;
 $ticketId = $ticketPrefix . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
 
-// Insert ticket into active_tickets table with bay_number assigned
-// Find an available bay number for the service type
-$stmt = $conn->prepare("SELECT bay_number FROM charging_bays WHERE bay_type = :bayType AND status = 'Available' LIMIT 1");
-$stmt->bindParam(':bayType', $bayType);
-$stmt->execute();
-$bay = $stmt->fetch(PDO::FETCH_ASSOC);
-$bayNumber = $bay ? $bay['bay_number'] : null;
+// Do NOT assign a bay at ticket creation time; mirror Java flow
+// Ticket stays in Pending state until routed to a bay by Admin
+$bayNumber = null;
 
-if (!$bayNumber) {
+// First, record the ticket in queue_tickets so it appears on Admin Queue
+$stmt = $conn->prepare("INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level, priority) VALUES (:ticket_id, :username, :service_type, 'Pending', '', :battery_level, 0)");
+$stmt->bindParam(':ticket_id', $ticketId);
+$stmt->bindParam(':username', $username);
+$stmt->bindParam(':service_type', $queueServiceType);
+$stmt->bindParam(':battery_level', $batteryLevel);
+if (!$stmt->execute()) {
+    $errorInfo = $stmt->errorInfo();
     http_response_code(500);
-    echo json_encode(['error' => 'No available charging bay found']);
+    echo json_encode(['error' => 'Failed to create queue record', 'db_error' => $errorInfo[2]]);
     exit();
 }
 
-$stmt = $conn->prepare("INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status, bay_number) VALUES (:username, :ticket_id, :service_type, :battery_level, :battery_level, 'Active', '')");
+// Also create an active_tickets entry used by the charging flow
+$stmt = $conn->prepare("INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status, bay_number) VALUES (:username, :ticket_id, :service_type, :battery_level, :battery_level, 'Pending', :bay_number)");
 $stmt->bindParam(':username', $username);
 $stmt->bindParam(':ticket_id', $ticketId);
 $stmt->bindParam(':service_type', $serviceType);  // Fix: bind correct serviceType, not bayType
 $stmt->bindParam(':battery_level', $batteryLevel);
+$stmt->bindParam(':bay_number', $bayNumber);
 
 if (!$stmt->execute()) {
     $errorInfo = $stmt->errorInfo();

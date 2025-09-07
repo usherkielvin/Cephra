@@ -56,8 +56,8 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 										<ul>
 											<li class="current_page_item"><a href="dashboard.php">Home</a></li>
 											<li><a href="link.php">Link</a></li>
-											<li><a href="right-sidebar.html">History</a></li>
-											<li><a href="no-sidebar.html">Profile</a></li>
+											<li><a href="history.php">History</a></li>
+											<li><a href="profile.php">Profile</a></li>
 										</ul>
 									</nav>
 
@@ -107,7 +107,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 												</header>
 												<p><a href="#" class="image featured"><img src="images/ads.png" alt="" /></a></p>
 												<footer>
-													<a href="#" class="button medium alt icon solid fa-info-circle">Wait, what?</a>
+													<a href="profile.php" class="button medium alt icon solid fa-info-circle">Profile</a>
 												</footer>
 											</section>
 										</div>
@@ -186,5 +186,119 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
 
-	</body>
-</html>
+            <script>
+                function showDialog(title, message) {
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
+                    const dialog = document.createElement('div');
+                    dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
+                    const header = document.createElement('div');
+                    header.style.cssText = 'background:#00c2ce;color:#fff;padding:12px 16px;font-weight:700';
+                    header.textContent = title || 'Notice';
+                    const body = document.createElement('div');
+                    body.style.cssText = 'padding:16px;color:#333;line-height:1.5;';
+                    body.textContent = message || '';
+                    const footer = document.createElement('div');
+                    footer.style.cssText = 'padding:12px 16px;display:flex;justify-content:flex-end;gap:8px;background:#f7f7f7;';
+                    const ok = document.createElement('button');
+                    ok.textContent = 'OK';
+                    ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
+                    ok.onclick = () => document.body.removeChild(overlay);
+                    footer.appendChild(ok);
+                    dialog.appendChild(header);
+                    dialog.appendChild(body);
+                    dialog.appendChild(footer);
+                    overlay.appendChild(dialog);
+                    document.body.appendChild(overlay);
+                }
+
+                $(document).ready(function() {
+                    // Normal Charge Button Click Handler
+                    $('#normalChargeBtn').click(function(e) {
+                        e.preventDefault();
+                        processChargeRequest('Normal Charging');
+                    });
+
+                    // Fast Charge Button Click Handler
+                    $('#fastChargeBtn').click(function(e) {
+                        e.preventDefault();
+                        processChargeRequest('Fast Charging');
+                    });
+
+                    function processChargeRequest(serviceType) {
+                        // Force exact service type strings expected by backend
+                        let serviceTypeMapped = '';
+                        if (serviceType === 'Normal Charging' || serviceType === 'normal charging') {
+                            serviceTypeMapped = 'Normal Charging';
+                        } else if (serviceType === 'Fast Charging' || serviceType === 'fast charging') {
+                            serviceTypeMapped = 'Fast Charging';
+                        } else {
+                            serviceTypeMapped = serviceType; // fallback
+                        }
+
+                        // Disable buttons during processing
+                        $('#normalChargeBtn, #fastChargeBtn').prop('disabled', true);
+
+                        $.ajax({
+                            url: 'charge_action.php',
+                            type: 'POST',
+                            data: { serviceType: serviceTypeMapped },
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    // Show queue ticket popup
+                                    showQueueTicketPopup(response);
+                                } else if (response.error) {
+                                    showDialog('Charging', response.error);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                showDialog('Charging', 'An error occurred while processing your request. Please try again.');
+                                console.error('AJAX Error:', error);
+                            },
+                            complete: function() {
+                                // Re-enable buttons
+                                $('#normalChargeBtn, #fastChargeBtn').prop('disabled', false);
+                            }
+                        });
+                    }
+
+                    function showQueueTicketPopup(response) {
+                        if (response.success) {
+                            var ticketId = response.ticketId;
+                            var serviceType = response.serviceType;
+                            var batteryLevel = response.batteryLevel;
+
+                            // Create popup HTML
+                            var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 300px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
+                            popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Your Queue Ticket</h2>';
+                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
+                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
+                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
+                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
+                            popupHtml += '<button onclick="closePopup()" style="display: block; margin: 15px auto 0; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>';
+                            popupHtml += '</div>';
+
+                            // Append to body
+                            $('body').append(popupHtml);
+                        }
+                    }
+
+                    // Function to close popup (defined globally)
+                    window.closePopup = function() {
+                        $('#queuePopup').remove();
+                    };
+                });
+            </script>
+
+            <style>
+                .nav-buttons { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
+                .nav-button { width: 50px; height: 50px; border-radius: 50%; border: none; background: #007bff; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+            </style>
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="window.location.href='dashboard.php'" title="Home">🏠</button>
+                <button class="nav-button" onclick="window.location.href='ChargingPage.php'" title="Charge">🔋</button>
+                <button class="nav-button" onclick="window.location.href='profile.php'" title="Profile">👤</button>
+            </div>
+        </body>
+        </html>
