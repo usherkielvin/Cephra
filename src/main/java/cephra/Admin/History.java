@@ -200,7 +200,7 @@ public class History extends javax.swing.JPanel {
         add(adminHistorySRCH);
         adminHistorySRCH.setBounds(80, 140, 340, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/SHBOARD - HISTORY.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/SHBOARD - HISTORY.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, -10, 1000, 770);
     }// </editor-fold>//GEN-END:initComponents

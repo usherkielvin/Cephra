@@ -23,7 +23,7 @@ public class personalinformation extends javax.swing.JPanel {
         back = new javax.swing.JButton();
         bg = new javax.swing.JLabel();
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/personalinformation.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/personalinformation.png"))); // NOI18N
 
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
@@ -78,7 +78,7 @@ public class personalinformation extends javax.swing.JPanel {
         add(back);
         back.setBounds(20, 60, 40, 40);
 
-        bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/personalinformation.png"))); // NOI18N
+        bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/personalinformation.png"))); // NOI18N
         bg.setFocusable(false);
         add(bg);
         bg.setBounds(-10, -50, 380, 870);

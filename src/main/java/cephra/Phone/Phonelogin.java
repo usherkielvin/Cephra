@@ -18,10 +18,10 @@ public class Phonelogin extends javax.swing.JPanel {
         username.setBackground(new Color(0, 0, 0, 0));
         pass.setOpaque(false);
         pass.setBackground(new Color(0, 0, 0, 0));
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
 
         // --- INTEGRATED FILTERS ---
-        ((AbstractDocument) username.getDocument()).setDocumentFilter(new InputLimitFilter(15, true));
+        // Removed username character limit - no longer restricting username length
         ((AbstractDocument) pass.getDocument()).setDocumentFilter(new InputLimitFilter(15, false));
         
         See.setBorderPainted(false);
@@ -51,7 +51,7 @@ public class Phonelogin extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
         See.setBorder(null);
         See.setFocusPainted(false);
         See.addActionListener(new java.awt.event.ActionListener() {
@@ -60,36 +60,38 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(273, 393, 50, 20);
+        See.setBounds(270, 360, 50, 30);
 
         reghere.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
-        reghere.setText("Register here");
+        reghere.setText("Sign Up");
         reghere.setBorder(null);
         reghere.setBorderPainted(false);
         reghere.setContentAreaFilled(false);
         reghere.setFocusPainted(false);
+        reghere.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         reghere.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 reghereActionPerformed(evt);
             }
         });
         add(reghere);
-        reghere.setBounds(200, 610, 120, 40);
+        reghere.setBounds(220, 669, 80, 30);
 
-        forgotpass.setForeground(new java.awt.Color(102, 102, 102));
+        forgotpass.setForeground(new java.awt.Color(0, 204, 204));
         forgotpass.setText("Forgot password?");
         forgotpass.setBorder(null);
         forgotpass.setBorderPainted(false);
         forgotpass.setContentAreaFilled(false);
         forgotpass.setFocusPainted(false);
+        forgotpass.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         forgotpass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 forgotpassActionPerformed(evt);
             }
         });
         add(forgotpass);
-        forgotpass.setBounds(208, 410, 120, 40);
+        forgotpass.setBounds(210, 390, 120, 30);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
@@ -99,7 +101,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(70, 386, 190, 35);
+        pass.setBounds(70, 360, 210, 30);
 
         username.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         username.setBorder(null);
@@ -109,7 +111,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(70, 334, 230, 35);
+        username.setBounds(70, 300, 230, 35);
         add(cooldownLabel);
         cooldownLabel.setBounds(40, 440, 160, 20);
 
@@ -123,9 +125,9 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(loginhome);
-        loginhome.setBounds(80, 570, 220, 40);
+        loginhome.setBounds(40, 430, 290, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/PHONELOGIN.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 360, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -270,9 +272,9 @@ public class Phonelogin extends javax.swing.JPanel {
         
            if(pass.getEchoChar() == 0) {
         pass.setEchoChar('•');
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
     } else {
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeOpen.png")));
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
         pass.setEchoChar((char) 0);
     }
         

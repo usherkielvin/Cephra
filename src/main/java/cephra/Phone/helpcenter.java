@@ -87,7 +87,7 @@ public class helpcenter extends javax.swing.JPanel {
         add(homebutton2);
         homebutton2.setBounds(160, 680, 40, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/helpcenter.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/helpcenter.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents

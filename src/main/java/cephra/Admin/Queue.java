@@ -1206,7 +1206,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jScrollPane1.setBounds(210, 55, 770, 597);
 
         jLabel2.setBackground(new java.awt.Color(4, 38, 55));
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/QUEUEtable.png"))); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/QUEUEtable.png"))); // NOI18N
         panelLists.add(jLabel2);
         jLabel2.setBounds(-10, -90, 1000, 750);
 
@@ -1448,7 +1448,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         ControlPanel.add(jPanel2);
         jPanel2.setBounds(222, 20, 90, 630);
 
-        queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ControlQe.png"))); // NOI18N
+        queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ControlQe.png"))); // NOI18N
         ControlPanel.add(queIcon);
         queIcon.setBounds(0, -70, 1010, 750);
 
@@ -1475,7 +1475,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         add(jLabel3);
         jLabel3.setBounds(820, 10, 50, 30);
 
-        MainIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Tab Pane.png"))); // NOI18N
+        MainIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Tab Pane.png"))); // NOI18N
         add(MainIcon);
         MainIcon.setBounds(0, -10, 1000, 770);
     }// </editor-fold>//GEN-END:initComponents

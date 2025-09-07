@@ -51,7 +51,7 @@ public class NotificationPop extends javax.swing.JPanel {
         add(cephraemail);
         cephraemail.setBounds(-60, 0, 390, 170);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Notif.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Notif.png"))); // NOI18N
         jLabel1.setText("jLabel1");
         add(jLabel1);
         jLabel1.setBounds(-20, 0, 380, 189);

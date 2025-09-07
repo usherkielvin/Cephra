@@ -282,7 +282,7 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/cephra/Photos/Staff .png"/>
+          <Image iconType="3" name="/cephra/Cephra Images/Staff .png"/>
         </Property>
       </Properties>
       <Constraints>

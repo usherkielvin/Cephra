@@ -66,7 +66,7 @@ public class PasswordNew extends javax.swing.JPanel {
         add(pass);
         pass.setBounds(90, 290, 220, 35);
 
-        See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
+        See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
         See1.setBorderPainted(false);
         See1.setContentAreaFilled(false);
         See1.setFocusPainted(false);
@@ -78,7 +78,7 @@ public class PasswordNew extends javax.swing.JPanel {
         add(See1);
         See1.setBounds(300, 350, 30, 40);
 
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
         See.setBorderPainted(false);
         See.setContentAreaFilled(false);
         See.setFocusPainted(false);
@@ -127,7 +127,7 @@ public class PasswordNew extends javax.swing.JPanel {
         add(update);
         update.setBounds(50, 410, 300, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/newpass.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/newpass.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -271,9 +271,9 @@ public class PasswordNew extends javax.swing.JPanel {
 
         if(pass.getEchoChar() == 0) {
             pass.setEchoChar('•');
-            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
         } else {
-            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeOpen.png")));
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
             pass.setEchoChar((char) 0 );
         }
     }//GEN-LAST:event_SeeActionPerformed
@@ -281,9 +281,9 @@ public class PasswordNew extends javax.swing.JPanel {
     private void See1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_See1ActionPerformed
         if(pass1.getEchoChar() == 0) {
             pass1.setEchoChar('•');
-            See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
+            See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
         } else {
-            See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeOpen.png")));
+            See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
             pass1.setEchoChar((char) 0 );
         }
     }//GEN-LAST:event_See1ActionPerformed

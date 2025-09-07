@@ -13,7 +13,7 @@ public class Register extends javax.swing.JPanel {
      
         setupButtons(); // Setup button hover effects
         setupTextFields(); // Setup text field properties
-        makeDraggable();
+        makeDraggable(); // Make the panel draggable
         
         // Auto-focus on name field
         SwingUtilities.invokeLater(() -> {
@@ -54,8 +54,8 @@ public class Register extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        confirmpass = new javax.swing.JTextField();
-        password = new javax.swing.JTextField();
+        See = new javax.swing.JButton();
+        pass = new javax.swing.JPasswordField();
         email = new javax.swing.JTextField();
         fname = new javax.swing.JTextField();
         register = new javax.swing.JButton();
@@ -65,31 +65,36 @@ public class Register extends javax.swing.JPanel {
         lname = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new Dimension(350, 750));
-        setPreferredSize(new Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        confirmpass.setFont(new Font("Segoe UI", 0, 18)); // NOI18N
-        confirmpass.setBorder(null);
-        confirmpass.addActionListener(new java.awt.event.ActionListener() {
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
+        See.setBorder(null);
+        See.setBorderPainted(false);
+        See.setContentAreaFilled(false);
+        See.setFocusPainted(false);
+        See.setOpaque(false);
+        See.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        See.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                confirmpassActionPerformed(evt);
+                SeeActionPerformed(evt);
             }
         });
-        add(confirmpass);
-        confirmpass.setBounds(45, 526, 280, 32);
+        add(See);
+        See.setBounds(280, 470, 50, 20);
 
-        password.setFont(new Font("Segoe UI", 0, 18)); // NOI18N
-        password.setBorder(null);
-        password.addActionListener(new java.awt.event.ActionListener() {
+        pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        pass.setBorder(null);
+        pass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                passwordActionPerformed(evt);
+                passActionPerformed(evt);
             }
         });
-        add(password);
-        password.setBounds(45, 464, 280, 31);
+        add(pass);
+        pass.setBounds(40, 460, 250, 35);
 
-        email.setFont(new Font("Segoe UI", 0, 18)); // NOI18N
+        email.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -99,7 +104,7 @@ public class Register extends javax.swing.JPanel {
         add(email);
         email.setBounds(45, 402, 280, 32);
 
-        fname.setFont(new Font("Segoe UI", 0, 18)); // NOI18N
+        fname.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         fname.setBorder(null);
         fname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -119,10 +124,10 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(register);
-        register.setBounds(90, 610, 200, 40);
+        register.setBounds(30, 520, 310, 50);
 
-        termscondition.setBackground(new Color(255, 255, 255));
-        termscondition.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
+        termscondition.setBackground(new java.awt.Color(255, 255, 255));
+        termscondition.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         termscondition.setText("I Agree to the Terms and Conditions");
         termscondition.setBorder(null);
         termscondition.setContentAreaFilled(false);
@@ -133,10 +138,11 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(termscondition);
-        termscondition.setBounds(70, 645, 280, 40);
+        termscondition.setBounds(60, 490, 280, 40);
 
-        loginbutton.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
-        loginbutton.setText("Login");
+        loginbutton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        loginbutton.setForeground(new java.awt.Color(0, 204, 204));
+        loginbutton.setText("Sign in here");
         loginbutton.setBorder(null);
         loginbutton.setBorderPainted(false);
         loginbutton.setContentAreaFilled(false);
@@ -147,8 +153,9 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(loginbutton);
-        loginbutton.setBounds(205, 673, 90, 40);
+        loginbutton.setBounds(220, 670, 90, 50);
 
+        UsernamePhone.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         UsernamePhone.setBorder(null);
         UsernamePhone.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -158,16 +165,17 @@ public class Register extends javax.swing.JPanel {
         add(UsernamePhone);
         UsernamePhone.setBounds(45, 340, 280, 32);
 
+        lname.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         lname.setBorder(null);
         lname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                LastNamePhoneActionPerformed(evt);
+                lnameActionPerformed(evt);
             }
         });
         add(lname);
         lname.setBounds(200, 279, 120, 32);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/regis1.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/REGISTER.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, -4, 370, 760);
     }// </editor-fold>//GEN-END:initComponents
@@ -189,12 +197,12 @@ public class Register extends javax.swing.JPanel {
         loginbutton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginbutton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                loginbutton.setForeground(new Color(0, 204, 204));
-                loginbutton.setText("<html><u>Login</u></html>");
+                loginbutton.setForeground(new Color(0, 150, 150)); // Darker cyan on hover
+                loginbutton.setText("<html><u>Sign in here</u></html>");
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                loginbutton.setForeground(new Color(51, 51, 51));
-                loginbutton.setText("Login");
+                loginbutton.setForeground(new Color(0, 204, 204)); // Original cyan color
+                loginbutton.setText("Sign in here");
             }
         });
     }
@@ -206,14 +214,139 @@ public class Register extends javax.swing.JPanel {
         fname.setBackground(new Color(0, 0, 0, 0));
         email.setOpaque(false);
         email.setBackground(new Color(0, 0, 0, 0));
-        password.setOpaque(false);
-        password.setBackground(new Color(0, 0, 0, 0));
-        confirmpass.setOpaque(false);
-        confirmpass.setBackground(new Color(0, 0, 0, 0));
+        pass.setOpaque(false);
+        pass.setBackground(new Color(0, 0, 0, 0));
         lname.setOpaque(false);
         lname.setBackground(new Color(0, 0, 0, 0));
         UsernamePhone.setOpaque(false);
         UsernamePhone.setBackground(new Color(0, 0, 0, 0));
+        
+        // Add auto-capitalization to name fields
+        setupAutoCapitalization(fname);
+        setupAutoCapitalization(lname);
+        
+        // Add auto-fill functionality
+        setupAutoFillUsername();
+        setupEmailDomainCompletion();
+        
+        // Add backspace focus navigation
+        setupBackspaceNavigation();
+    }
+    
+    // Setup auto-capitalization for text fields
+    private void setupAutoCapitalization(JTextField textField) {
+        textField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // Don't process if user is still typing (avoid interfering with spaces)
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    return; // Let space be added naturally
+                }
+                
+                String text = textField.getText();
+                if (!text.isEmpty()) {
+                    // Capitalize first letter of each word (supports multiple names)
+                    String[] words = text.split("\\s+");
+                    StringBuilder capitalized = new StringBuilder();
+                    for (int i = 0; i < words.length; i++) {
+                        if (!words[i].isEmpty()) {
+                            // Capitalize first letter of each word
+                            capitalized.append(words[i].substring(0, 1).toUpperCase());
+                            if (words[i].length() > 1) {
+                                // Make rest of the word lowercase
+                                capitalized.append(words[i].substring(1).toLowerCase());
+                            }
+                        }
+                        // Add space between words (except after the last word)
+                        if (i < words.length - 1) {
+                            capitalized.append(" ");
+                        }
+                    }
+                    
+                    // Only update if the text has actually changed to avoid cursor jumping
+                    String newText = capitalized.toString();
+                    if (!newText.equals(text)) {
+                        int caretPos = textField.getCaretPosition();
+                        textField.setText(newText);
+                        // Maintain cursor position or move to end if at end
+                        if (caretPos >= newText.length()) {
+                            textField.setCaretPosition(newText.length());
+                        } else {
+                            textField.setCaretPosition(caretPos);
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Setup auto-fill username from first name + last name
+    private void setupAutoFillUsername() {
+        // Add focus listener to last name field to auto-fill username
+        lname.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                String firstName = fname.getText().trim();
+                String lastName = lname.getText().trim();
+                
+                if (!firstName.isEmpty() && !lastName.isEmpty()) {
+                    // Combine first name + last name in lowercase (removes spaces)
+                    String suggestedUsername = (firstName + lastName).replaceAll("\\s+", "").toLowerCase();
+                    UsernamePhone.setText(suggestedUsername);
+                }
+            }
+        });
+    }
+    
+    // Setup email domain auto-completion
+    private void setupEmailDomainCompletion() {
+        email.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String text = email.getText();
+                int caretPos = email.getCaretPosition();
+                
+                // Check if user typed @g and suggest gmail.com
+                if (text.endsWith("@g") && caretPos == text.length()) {
+                    email.setText(text + "mail.com");
+                    email.setCaretPosition(email.getText().length()); // Position cursor at end
+                }
+                // Check if user typed @c and suggest cephra.com
+                else if (text.endsWith("@c") && caretPos == text.length()) {
+                    email.setText(text + "ephra.com");
+                    email.setCaretPosition(email.getText().length()); // Position cursor at end
+                }
+            }
+        });
+    }
+    
+    // Setup backspace navigation to move focus to previous field
+    private void setupBackspaceNavigation() {
+        // Define the field order for navigation
+        JTextField[] fields = {fname, lname, UsernamePhone, email, pass};
+        
+        for (int i = 0; i < fields.length; i++) {
+            final int currentIndex = i;
+            final JTextField currentField = fields[i];
+            
+            currentField.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    // Only handle backspace key when field is empty
+                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && currentField.getText().isEmpty()) {
+                        // Prevent default backspace behavior and move to previous field
+                        e.consume();
+                        if (currentIndex > 0) {
+                            fields[currentIndex - 1].requestFocusInWindow();
+                            // Move cursor to end of previous field
+                            SwingUtilities.invokeLater(() -> {
+                                fields[currentIndex - 1].setCaretPosition(fields[currentIndex - 1].getText().length());
+                            });
+                        }
+                    }
+                }
+            });
+        }
     }
 
     
@@ -256,20 +389,10 @@ public class Register extends javax.swing.JPanel {
     String lastNameText = lname.getText().trim();
     String usernameText = UsernamePhone.getText().trim();
     String emailText = email.getText().trim();
-    String passwordText = password.getText().trim();
-    String confirmPassText = confirmpass.getText().trim();
+    String passwordText = new String(pass.getPassword()).trim();
 
-    if (nameText.isEmpty() || lastNameText.isEmpty() || usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty() || confirmPassText.isEmpty()) {
+    if (nameText.isEmpty() || lastNameText.isEmpty() || usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    // Check if passwords match
-    if (!passwordText.equals(confirmPassText)) {
-        JOptionPane.showMessageDialog(this, "Passwords do not match!", "Password Error", JOptionPane.ERROR_MESSAGE);
-        password.setText("");
-        confirmpass.setText("");
-        password.requestFocusInWindow();
         return;
     }
 
@@ -306,25 +429,35 @@ public class Register extends javax.swing.JPanel {
         lname.requestFocusInWindow(); // Move focus to lastname field
     }//GEN-LAST:event_fnameActionPerformed
 
-    private void LastNamePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LastNamePhoneActionPerformed
+    private void lnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lnameActionPerformed
         UsernamePhone.requestFocusInWindow(); // Move focus to username field
-    }//GEN-LAST:event_LastNamePhoneActionPerformed
+    }//GEN-LAST:event_lnameActionPerformed
 
     private void UsernamePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsernamePhoneActionPerformed
         email.requestFocusInWindow(); // Move focus to email field
     }//GEN-LAST:event_UsernamePhoneActionPerformed
 
     private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
-        password.requestFocusInWindow(); // Move focus to password field
+        pass.requestFocusInWindow(); // Move focus to password field
     }//GEN-LAST:event_emailActionPerformed
 
-    private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed
-        confirmpass.requestFocusInWindow(); // Move focus to confirm password field
-    }//GEN-LAST:event_passwordActionPerformed
+    private void passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passActionPerformed
+        // When Enter key is pressed on password field, trigger registration
+        registerActionPerformed(evt);
+    }//GEN-LAST:event_passActionPerformed
 
-    private void confirmpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmpassActionPerformed
-        registerActionPerformed(evt); // Trigger registration when Enter is pressed on confirm password
-    }//GEN-LAST:event_confirmpassActionPerformed
+    private void SeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeActionPerformed
+        // Toggle password visibility
+        if(pass.getEchoChar() == 0) {
+            // Currently showing password, hide it
+            pass.setEchoChar('•');
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
+        } else {
+            // Currently hiding password, show it
+            pass.setEchoChar((char) 0);
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
+        }
+    }//GEN-LAST:event_SeeActionPerformed
 
     private void showTermsAndConditions() {
         String termsText = getTermsAndConditionsText();
@@ -451,14 +584,14 @@ public class Register extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton See;
     private javax.swing.JTextField UsernamePhone;
-    private javax.swing.JTextField confirmpass;
     private javax.swing.JTextField email;
     private javax.swing.JTextField fname;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField lname;
     private javax.swing.JButton loginbutton;
-    private javax.swing.JTextField password;
+    private javax.swing.JPasswordField pass;
     private javax.swing.JButton register;
     private javax.swing.JCheckBox termscondition;
     // End of variables declaration//GEN-END:variables

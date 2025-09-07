@@ -77,7 +77,7 @@ public class PasswordEmail extends javax.swing.JPanel {
         otpLabel.setBounds(82, 436, 190, 51);
 
         jLabel1.setForeground(new java.awt.Color(255, 0, 51));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ResetPass.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ResetPass.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents

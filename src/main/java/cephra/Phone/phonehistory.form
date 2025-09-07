@@ -125,7 +125,7 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/cephra/Photos/HISTORY - if none.png"/>
+          <Image iconType="3" name="/cephra/Cephra Images/HISTORY - if none.png"/>
         </Property>
       </Properties>
       <Constraints>

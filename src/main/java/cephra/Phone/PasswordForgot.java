@@ -84,7 +84,7 @@ public class PasswordForgot extends javax.swing.JPanel {
         add(email);
         email.setBounds(80, 330, 240, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/FORGOTPASSWORD.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/FORGOTPASSWORD.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents

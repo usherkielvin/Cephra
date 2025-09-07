@@ -15,14 +15,16 @@ public class home extends javax.swing.JPanel {
         setupLabelPosition(); // Set label position
         makeDraggable();
         
-        // Get current user's firstname and display it
+        // Get current user's firstname and display only the first word
         if (LoggedName != null) {
             String firstname = cephra.CephraDB.getCurrentFirstname();
             String safeFirstname = firstname != null ? firstname.trim() : "";
             if (safeFirstname.isEmpty()) {
                 LoggedName.setText("Hi !");
             } else {
-                LoggedName.setText("Hi " + safeFirstname + "!");
+                // Get only the first word of the firstname
+                String firstWord = safeFirstname.split("\\s+")[0];
+                LoggedName.setText("Hi " + firstWord + "!");
             }
         }
         
@@ -124,7 +126,7 @@ public class home extends javax.swing.JPanel {
         add(LoggedName);
         LoggedName.setBounds(20, 62, 220, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Home Page - not charging vid.gif"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home Page - not charging vid.gif"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents

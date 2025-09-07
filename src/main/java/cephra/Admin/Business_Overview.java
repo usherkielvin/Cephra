@@ -223,7 +223,7 @@ public class Business_Overview extends javax.swing.JPanel {
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Business.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Business.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1240, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -321,12 +321,12 @@ public class Business_Overview extends javax.swing.JPanel {
 
     private void loadDashboardImage() {
         try {
-            java.net.URL url = getClass().getResource("/cephra/Photos/Business.png");
-            if (url == null) url = getClass().getResource("/cephra/Photos/res.png");
-            if (url == null) url = getClass().getResource("/cephra/Photos/emp.png");
-            if (url == null) url = getClass().getResource("/cephra/Photos/bigs.png");
-            if (url == null) url = getClass().getResource("/cephra/Photos/logi.png");
-            if (url == null) url = getClass().getResource("/cephra/Photos/pho.png");
+            java.net.URL url = getClass().getResource("/cephra/Cephra Images/Business.png");
+            if (url == null) url = getClass().getResource("/cephra/Cephra Images/res.png");
+            if (url == null) url = getClass().getResource("/cephra/Cephra Images/emp.png");
+            if (url == null) url = getClass().getResource("/cephra/Cephra Images/bigs.png");
+            if (url == null) url = getClass().getResource("/cephra/Cephra Images/logi.png");
+            if (url == null) url = getClass().getResource("/cephra/Cephra Images/pho.png");
             if (url != null) {
                 dashboardImage = new javax.swing.ImageIcon(url).getImage();
             }

@@ -27,7 +27,7 @@ public class Login extends javax.swing.JPanel {
         passfield.setBorder(null);
 
         passfield.setEchoChar('•');
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
         See.setBorderPainted(false);
         See.setOpaque(false);
         See.setContentAreaFilled(false);
@@ -77,7 +77,7 @@ public class Login extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png"))); // NOI18N
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
         See.setBorderPainted(false);
         See.setFocusPainted(false);
         See.addActionListener(new java.awt.event.ActionListener() {
@@ -148,7 +148,7 @@ public class Login extends javax.swing.JPanel {
         add(jButton2);
         jButton2.setBounds(935, 10, 50, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/LOGIN PANEL.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1080, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -177,11 +177,11 @@ public class Login extends javax.swing.JPanel {
         if(passfield.getEchoChar() == 0) {
         passfield.setEchoChar('•');
         
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeClose.png")));
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
                 
         } else {
             
-            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/EyeOpen.png")));
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
             passfield.setEchoChar((char) 0 );
             
         }

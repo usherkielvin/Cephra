@@ -27,9 +27,24 @@ public class Admin extends javax.swing.JFrame {
     }
 
     private void setAppIcon() {
-        java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
-        if (iconUrl != null) {
-            setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
+        try {
+            // Try different resource paths to find the icon
+            java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/lod.png");
+            if (iconUrl == null) {
+                iconUrl = getClass().getClassLoader().getResource("cephra/Cephra Images/lod.png");
+            }
+            if (iconUrl == null) {
+                iconUrl = getClass().getResource("/cephra/Photos/lod.png");
+            }
+            
+            if (iconUrl != null) {
+                setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
+                System.out.println("Admin app icon loaded successfully from: " + iconUrl);
+            } else {
+                System.err.println("Could not find admin app icon: lod.png");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading admin app icon: " + e.getMessage());
         }
     }
 

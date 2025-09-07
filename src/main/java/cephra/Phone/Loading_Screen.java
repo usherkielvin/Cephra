@@ -55,7 +55,7 @@ public class Loading_Screen extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/splash in2.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/splash in2.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 398, 750);
 

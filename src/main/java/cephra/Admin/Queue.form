@@ -255,7 +255,7 @@
                   <Color blue="37" green="26" red="4" type="rgb"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/cephra/Photos/QUEUEtable.png"/>
+                  <Image iconType="3" name="/cephra/Cephra Images/QUEUEtable.png"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -679,7 +679,7 @@
             <Component class="javax.swing.JLabel" name="queIcon">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/cephra/Photos/ControlQe.png"/>
+                  <Image iconType="3" name="/cephra/Cephra Images/ControlQe.png"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -743,7 +743,7 @@
     <Component class="javax.swing.JLabel" name="MainIcon">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/cephra/Photos/Tab Pane.png"/>
+          <Image iconType="3" name="/cephra/Cephra Images/Tab Pane.png"/>
         </Property>
       </Properties>
       <Constraints>

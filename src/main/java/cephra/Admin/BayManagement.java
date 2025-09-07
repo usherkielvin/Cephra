@@ -542,7 +542,7 @@ public class BayManagement extends javax.swing.JPanel {
         add(jLabel3);
         jLabel3.setBounds(820, 10, 50, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Bay.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Bay.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents

@@ -188,9 +188,24 @@ public class Monitor extends javax.swing.JFrame {
 
 
     private void setAppIcon() {
-        java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
-        if (iconUrl != null) {
-            setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
+        try {
+            // Try different resource paths to find the icon
+            java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/lod.png");
+            if (iconUrl == null) {
+                iconUrl = getClass().getClassLoader().getResource("cephra/Cephra Images/lod.png");
+            }
+            if (iconUrl == null) {
+                iconUrl = getClass().getResource("/cephra/Photos/lod.png");
+            }
+            
+            if (iconUrl != null) {
+                setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
+                System.out.println("Monitor app icon loaded successfully from: " + iconUrl);
+            } else {
+                System.err.println("Could not find monitor app icon: lod.png");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading monitor app icon: " + e.getMessage());
         }
     }
 
@@ -468,7 +483,7 @@ public class Monitor extends javax.swing.JFrame {
         Monitor.add(jPanel1);
         jPanel1.setBounds(412, 320, 405, 180);
 
-        IconTV.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/TV.gif"))); // NOI18N
+        IconTV.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/TV.gif"))); // NOI18N
         Monitor.add(IconTV);
         IconTV.setBounds(-3, -4, 1010, 760);
 

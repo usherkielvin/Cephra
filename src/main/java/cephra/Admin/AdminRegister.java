@@ -131,7 +131,7 @@ public class AdminRegister extends javax.swing.JPanel {
         add(LastNameAdminReg);
         LastNameAdminReg.setBounds(533, 276, 120, 37);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/ADMINregister.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ADMINregister.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents

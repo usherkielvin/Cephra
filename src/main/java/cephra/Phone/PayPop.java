@@ -272,7 +272,7 @@ public class PayPop extends javax.swing.JPanel {
         add(payonline);
         payonline.setBounds(140, 210, 110, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/Rilpipop.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rilpipop.png"))); // NOI18N
         jLabel1.setText("jLabel1");
         add(jLabel1);
         jLabel1.setBounds(0, 0, 260, 280);

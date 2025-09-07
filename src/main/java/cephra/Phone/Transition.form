@@ -29,7 +29,7 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/cephra/Photos/sloww.gif"/>
+          <Image iconType="3" name="/cephra/Cephra Images/sloww.gif"/>
         </Property>
       </Properties>
       <Constraints>
@@ -41,7 +41,7 @@
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/cephra/Photos/Transis.gif"/>
+          <Image iconType="3" name="/cephra/Cephra Images/Transis.gif"/>
         </Property>
       </Properties>
       <Constraints>

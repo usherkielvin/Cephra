@@ -34,14 +34,32 @@ public class Phone extends javax.swing.JFrame {
             System.err.println("Error refreshing ticket counters: " + e.getMessage());
         }
 
-        // Create and setup kenji label to always appear on top
+        // Start with loading screen panel
+        switchPanel(new cephra.Phone.Loading_Screen());
+        
+        // Create and setup phone frame overlay to always appear on top
         PhoneFrame();
         }
 
     private void setAppIcon() {
-        java.net.URL iconUrl = getClass().getClassLoader().getResource("cephra/Photos/lod.png");
-        if (iconUrl != null) {
-            setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
+        try {
+            // Try different resource paths to find the icon
+            java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/lod.png");
+            if (iconUrl == null) {
+                iconUrl = getClass().getClassLoader().getResource("cephra/Cephra Images/lod.png");
+            }
+            if (iconUrl == null) {
+                iconUrl = getClass().getResource("/cephra/Photos/lod.png");
+            }
+            
+            if (iconUrl != null) {
+                setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
+                System.out.println("App icon loaded successfully from: " + iconUrl);
+            } else {
+                System.err.println("Could not find app icon: lod.png");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading app icon: " + e.getMessage());
         }
     }
 
@@ -81,17 +99,23 @@ public class Phone extends javax.swing.JFrame {
 
     private void PhoneFrame() {
         Iphoneframe = new JLabel();
-         Iphoneframe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Photos/red.png")));
+        Iphoneframe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PHONEFRAME.png")));
         Iphoneframe.setBounds(-30, 0, 405, 750); // center top
         Iphoneframe.setHorizontalAlignment(SwingConstants.CENTER);
+        Iphoneframe.setOpaque(false); // Make sure it's transparent
         
         // Add to the root pane's layered pane to ensure it's always on top
         // Using DRAG_LAYER which is higher than POPUP_LAYER to ensure iPhone frame is always on top
         getRootPane().getLayeredPane().add(Iphoneframe, JLayeredPane.DRAG_LAYER);
         
+        // Add the time label to a higher layer so it appears above the phone frame
+        getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.MODAL_LAYER);
+        
         // Make sure it's visible and on top
         Iphoneframe.setVisible(true);
+        jLabel1.setVisible(true);
         getRootPane().getLayeredPane().moveToFront(Iphoneframe);
+        getRootPane().getLayeredPane().moveToFront(jLabel1);
     }
 
     public void switchPanel(javax.swing.JPanel newPanel) {
@@ -100,46 +124,75 @@ public class Phone extends javax.swing.JFrame {
         revalidate();
         repaint();
         
-        // Ensure iPhone frame stays on top after panel switch
+        // Ensure iPhone frame and time label stay on top after panel switch
         if (Iphoneframe != null) {
             getRootPane().getLayeredPane().moveToFront(Iphoneframe);
+        }
+        if (jLabel1 != null) {
+            getRootPane().getLayeredPane().moveToFront(jLabel1);
         }
     }
 
     /**
-     * Ensures the iPhone frame is always on top of all other components
+     * Ensures the iPhone frame and time label are always on top of all other components
      * This should be called after adding any new components to the layered pane
      */
     public void ensureIphoneFrameOnTop() {
         if (Iphoneframe != null) {
             getRootPane().getLayeredPane().moveToFront(Iphoneframe);
         }
+        if (jLabel1 != null) {
+            getRootPane().getLayeredPane().moveToFront(jLabel1);
+        }
+    }
+    
+    /**
+     * Updates the time label with current time in 12-hour format
+     */
+    private void updateTime() {
+        if (jLabel1 != null) {
+            java.time.LocalTime now = java.time.LocalTime.now();
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("h:mm a");
+            String timeString = now.format(formatter);
+            jLabel1.setText(timeString);
+        }
+    }
+    
+    /**
+     * Starts a timer to update the time every minute
+     */
+    private void startTimeTimer() {
+        javax.swing.Timer timer = new javax.swing.Timer(60000, _ -> updateTime()); // Update every minute
+        timer.setRepeats(true);
+        timer.start();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        phonePanel = new cephra.Phone.Loading_Screen();
+        jLabel1 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setResizable(false);
+        jLabel1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
+        jLabel1.setForeground(java.awt.Color.BLACK); // Make text black
+        jLabel1.setBounds(28, 21, 55, 20); // Set absolute positioning
+        
+        // Set initial time and start timer
+        updateTime();
+        startTimeTimer();
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(phonePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGap(0, 350, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(phonePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGap(0, 750, Short.MAX_VALUE)
         );
-
-        // pack(); // Removed to prevent frame from becoming displayable before setUndecorated
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel phonePanel;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }
