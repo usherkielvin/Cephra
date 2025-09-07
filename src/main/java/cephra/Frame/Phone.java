@@ -117,15 +117,19 @@ public class Phone extends JFrame {
         iphoneFrame.setHorizontalAlignment(SwingConstants.CENTER);
         iphoneFrame.setOpaque(false);
         
-        // Add to layered pane to ensure it's always on top
+        // Add phone frame to layered pane
         getRootPane().getLayeredPane().add(iphoneFrame, JLayeredPane.DRAG_LAYER);
-        getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.MODAL_LAYER);
         
-        // Ensure visibility
+        // Ensure time label is visible and on top
+        if (jLabel1 != null) {
+            jLabel1.setVisible(true);
+            jLabel1.setOpaque(false);
+            getRootPane().getLayeredPane().moveToFront(jLabel1);
+        }
+        
+        // Ensure phone frame is visible
         iphoneFrame.setVisible(true);
-        jLabel1.setVisible(true);
         getRootPane().getLayeredPane().moveToFront(iphoneFrame);
-        getRootPane().getLayeredPane().moveToFront(jLabel1);
     }
 
     /**
@@ -147,11 +151,11 @@ public class Phone extends JFrame {
      * Ensures the iPhone frame overlay stays on top of all content.
      */
     public void ensureIphoneFrameOnTop() {
-        if (iphoneFrame != null) {
-            getRootPane().getLayeredPane().moveToFront(iphoneFrame);
-        }
         if (jLabel1 != null) {
             getRootPane().getLayeredPane().moveToFront(jLabel1);
+        }
+        if (iphoneFrame != null) {
+            getRootPane().getLayeredPane().moveToFront(iphoneFrame);
         }
     }
     
@@ -170,6 +174,10 @@ public class Phone extends JFrame {
      * Starts the timer to update the time display every minute.
      */
     private void startTimeTimer() {
+        // Set initial time
+        updateTime();
+        
+        // Start timer to update every minute
         Timer timer = new Timer(60000, _ -> updateTime());
         timer.setRepeats(true);
         timer.start();
@@ -182,26 +190,19 @@ public class Phone extends JFrame {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
         jLabel1.setText("12:24");
+        jLabel1.setBounds(39, 21, 55, 20); // Set absolute positioning (moved to match form)
+        jLabel1.setForeground(Color.BLACK); // Make text black
+        jLabel1.setOpaque(false); // Make background transparent
+        jLabel1.setVisible(true); // Ensure it's visible
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(287, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(jLabel1)
-                .addContainerGap(713, Short.MAX_VALUE))
-        );
+        // Add time label to layered pane instead of content pane
+        getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.POPUP_LAYER);
+        
+        // Set content pane layout to null for absolute positioning
+        getContentPane().setLayout(null);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JLabel jLabel1;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

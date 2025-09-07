@@ -157,28 +157,28 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(Help);
-        Help.setBounds(30, 520, 290, 50);
+        Help.setBounds(50, 520, 290, 50);
 
         Fullname.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
         Fullname.setText("Usher Kielvin Ponce");
         add(Fullname);
-        Fullname.setBounds(110, 120, 220, 40);
+        Fullname.setBounds(130, 120, 220, 40);
 
         gmailProf.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         gmailProf.setText("Usher@gmail.com");
         add(gmailProf);
-        gmailProf.setBounds(130, 156, 190, 20);
+        gmailProf.setBounds(150, 156, 190, 20);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PhoneProfile.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
 

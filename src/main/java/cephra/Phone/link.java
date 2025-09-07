@@ -112,7 +112,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(homebutton);
-        homebutton.setBounds(150, 680, 40, 40);
+        homebutton.setBounds(170, 680, 40, 40);
 
         termscondition.setBackground(new java.awt.Color(255, 255, 255));
         termscondition.setText("By linking, I agree to the Terms & Conditions ");
@@ -125,18 +125,18 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(termscondition);
-        termscondition.setBounds(40, 620, 310, 30);
+        termscondition.setBounds(60, 620, 310, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ConnectCar.gif"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
 
