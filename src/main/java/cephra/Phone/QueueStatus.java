@@ -12,8 +12,8 @@ public class QueueStatus extends javax.swing.JPanel {
 
     public QueueStatus() {
         initComponents();
-         setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+         setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
     }
@@ -44,7 +44,7 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(cancelcharge);
-        cancelcharge.setBounds(30, 410, 280, 30);
+        cancelcharge.setBounds(50, 410, 280, 30);
 
         okaycondition.setBorder(null);
         okaycondition.setBorderPainted(false);
@@ -55,7 +55,7 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(okaycondition);
-        okaycondition.setBounds(30, 460, 280, 40);
+        okaycondition.setBounds(50, 460, 280, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -67,7 +67,7 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(30, 680, 50, 40);
+        charge.setBounds(50, 680, 50, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -79,7 +79,7 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 50, 40);
+        linkbutton.setBounds(110, 680, 50, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -91,7 +91,7 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(200, 680, 50, 40);
+        historybutton.setBounds(220, 680, 50, 40);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -103,7 +103,7 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 670, 50, 50);
+        profilebutton.setBounds(280, 670, 50, 50);
 
         homebutton2.setBorder(null);
         homebutton2.setBorderPainted(false);
@@ -115,35 +115,35 @@ public class QueueStatus extends javax.swing.JPanel {
             }
         });
         add(homebutton2);
-        homebutton2.setBounds(150, 680, 40, 40);
+        homebutton2.setBounds(170, 680, 40, 40);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel2.setText("Your Vehicle is in Queue");
         add(jLabel2);
-        jLabel2.setBounds(70, 290, 230, 30);
+        jLabel2.setBounds(90, 290, 230, 30);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 3, 28)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("QUEUE #1");
         add(jLabel3);
-        jLabel3.setBounds(75, 310, 180, 50);
+        jLabel3.setBounds(95, 310, 180, 50);
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("<html><div style='text-align:center;'>Your Vehicle is<br>Waiting For Charging</div></html>");
         add(jLabel4);
-        jLabel4.setBounds(90, 350, 150, 50);
+        jLabel4.setBounds(110, 350, 150, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/123.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
      private void makeDraggable() {

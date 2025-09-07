@@ -6,8 +6,8 @@ public class PasswordNew extends javax.swing.JPanel {
 
     public PasswordNew() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         pass.setOpaque(false);
         pass.setBackground(new java.awt.Color(0, 0, 0, 0));
         pass1.setOpaque(false);

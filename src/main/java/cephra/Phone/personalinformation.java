@@ -7,8 +7,8 @@ public class personalinformation extends javax.swing.JPanel {
  
     public personalinformation() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
     }
 
 
@@ -25,7 +25,7 @@ public class personalinformation extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/personalinformation.png"))); // NOI18N
 
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         charge.setBorderPainted(false);

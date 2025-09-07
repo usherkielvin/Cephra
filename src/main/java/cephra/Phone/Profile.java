@@ -11,8 +11,8 @@ public class Profile extends javax.swing.JPanel {
 
     public Profile() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
         
@@ -85,8 +85,8 @@ public class Profile extends javax.swing.JPanel {
         gmailProf = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         historybutton.setBorder(null);
@@ -99,7 +99,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(210, 683, 30, 40);
+        historybutton.setBounds(230, 683, 30, 40);
 
         homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
@@ -111,7 +111,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(homebutton);
-        homebutton.setBounds(150, 680, 40, 40);
+        homebutton.setBounds(170, 680, 40, 40);
 
         logout.setBorder(null);
         logout.setBorderPainted(false);
@@ -123,7 +123,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(logout);
-        logout.setBounds(60, 610, 250, 40);
+        logout.setBounds(80, 610, 250, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -135,7 +135,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(100, 680, 30, 40);
+        linkbutton.setBounds(120, 680, 30, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -147,7 +147,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(40, 680, 40, 40);
+        charge.setBounds(60, 680, 40, 40);
 
         Help.setBorderPainted(false);
         Help.setContentAreaFilled(false);

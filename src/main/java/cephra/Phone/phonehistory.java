@@ -16,8 +16,8 @@ public class phonehistory extends javax.swing.JPanel implements UserHistoryManag
 
     public phonehistory() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
         
@@ -58,7 +58,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         if (historyScrollPane == null) {
             historyScrollPane = new JScrollPane(historyPanel);
             historyScrollPane.setBorder(null);
-            historyScrollPane.setBounds(30, 150, 290, 480);
+            historyScrollPane.setBounds(50, 150, 290, 480);
             add(historyScrollPane);
         } else {
             // Just update the viewport with the new history panel
@@ -258,7 +258,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
         detailsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         detailsPanel.setBackground(Color.WHITE);
-        detailsPanel.setBounds(30, 150, 290, 450);
+        detailsPanel.setBounds(50, 150, 290, 450);
         
         // Add header
         JLabel headerLabel = new JLabel("Charging Details");
@@ -432,8 +432,8 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         linkbutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         historyScrollPane.setBorder(null);
@@ -444,7 +444,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(10, 150, 320, 520);
+        historyScrollPane.setBounds(30, 150, 320, 520);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -456,7 +456,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 680, 40, 40);
+        profilebutton.setBounds(280, 680, 40, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -468,7 +468,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
         add(charge);
-        charge.setBounds(30, 680, 50, 50);
+        charge.setBounds(50, 680, 50, 50);
 
         homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
@@ -480,7 +480,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
         add(homebutton);
-        homebutton.setBounds(160, 680, 60, 40);
+        homebutton.setBounds(180, 680, 60, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -492,18 +492,18 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 60, 40);
+        linkbutton.setBounds(110, 680, 60, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/HISTORY - if none.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
 

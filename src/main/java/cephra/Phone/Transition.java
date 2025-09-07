@@ -11,8 +11,8 @@ public class Transition extends javax.swing.JPanel {
    
     public Transition() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         
         // Make the panel draggable
         makeDraggable();
@@ -33,10 +33,10 @@ public class Transition extends javax.swing.JPanel {
     // Match label position to Porsche-style screens
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
         if (jLabel2 != null) {
-            jLabel2.setBounds(-15, 0, 398, 750);
+            jLabel2.setBounds(0, 0, 370, 750);
         }
     }
 
@@ -83,8 +83,8 @@ public class Transition extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/sad.gif"))); // NOI18N
@@ -93,7 +93,7 @@ public class Transition extends javax.swing.JPanel {
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Transis.gif"))); // NOI18N
         add(jLabel2);
-        jLabel2.setBounds(-30, 0, 390, 770);
+        jLabel2.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
 

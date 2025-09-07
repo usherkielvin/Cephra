@@ -1,31 +1,37 @@
 package cephra.Frame;
 
-import java.awt.Point;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.SwingConstants;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.RoundRectangle2D;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import javax.swing.*;
 
-public class Phone extends javax.swing.JFrame {
-
+/**
+ * Phone frame class that creates a mobile-like interface with curved edges
+ * and draggable functionality.
+ */
+public class Phone extends JFrame {
+    
+    // Frame dimensions
+    private static final int FRAME_WIDTH = 370;
+    private static final int FRAME_HEIGHT = 750;
+    private static final int CORNER_RADIUS = 120;
+    
     private Point dragStartPoint;
-    private JLabel Iphoneframe;
+    private JLabel iphoneFrame;
     public Phone() {
-
         setUndecorated(true);
-        initComponents();
-        setSize(350, 750);
+        setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
+        
+        // Add curved edges to the frame
+        setShape(new RoundRectangle2D.Double(0, 0, FRAME_WIDTH, FRAME_HEIGHT, CORNER_RADIUS, CORNER_RADIUS));
+        
+        initComponents();
         setAppIcon();
         addEscapeKeyListener();
         makeDraggable();
-        
-        // Add curved edges to the frame
-        setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 350, 750, 120, 120));
         
         // Refresh ticket counters when Phone frame is created
         try {
@@ -35,25 +41,23 @@ public class Phone extends javax.swing.JFrame {
         }
 
         // Start with loading screen panel
-        switchPanel(new cephra.Phone.Intro());
+        switchPanel(new cephra.Phone.Loading_Screen());
         
         // Create and setup phone frame overlay to always appear on top
-        PhoneFrame();
-        }
+        setupPhoneFrame();
+        
+        // Start the time display timer
+        startTimeTimer();
+    }
 
+    /**
+     * Sets the application icon from resources.
+     */
     private void setAppIcon() {
         try {
-            // Try different resource paths to find the icon
             java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/lod.png");
-            if (iconUrl == null) {
-                iconUrl = getClass().getClassLoader().getResource("cephra/Cephra Images/lod.png");
-            }
-            if (iconUrl == null) {
-                iconUrl = getClass().getResource("/cephra/Photos/lod.png");
-            }
-            
             if (iconUrl != null) {
-                setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
+                setIconImage(new ImageIcon(iconUrl).getImage());
                 System.out.println("App icon loaded successfully from: " + iconUrl);
             } else {
                 System.err.println("Could not find app icon: lod.png");
@@ -63,6 +67,9 @@ public class Phone extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Adds escape key listener to close the application.
+     */
     private void addEscapeKeyListener() {
         addKeyListener(new KeyAdapter() {
             @Override
@@ -75,6 +82,9 @@ public class Phone extends javax.swing.JFrame {
         setFocusable(true);
     }
 
+    /**
+     * Makes the frame draggable by adding mouse listeners.
+     */
     private void makeDraggable() {
         addMouseListener(new MouseAdapter() {
             @Override
@@ -97,51 +107,48 @@ public class Phone extends javax.swing.JFrame {
         });
     }
 
-    private void PhoneFrame() {
-        Iphoneframe = new JLabel();
-        Iphoneframe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PHONEFRAME.png")));
-        Iphoneframe.setBounds(-30, 0, 405, 750); // center top
-        Iphoneframe.setHorizontalAlignment(SwingConstants.CENTER);
-        Iphoneframe.setOpaque(false); // Make sure it's transparent
+    /**
+     * Sets up the phone frame overlay that appears on top of content.
+     */
+    private void setupPhoneFrame() {
+        iphoneFrame = new JLabel();
+        iphoneFrame.setIcon(new ImageIcon(getClass().getResource("/cephra/Cephra Images/PHONEFRAME.png")));
+        iphoneFrame.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+        iphoneFrame.setHorizontalAlignment(SwingConstants.CENTER);
+        iphoneFrame.setOpaque(false);
         
-        // Add to the root pane's layered pane to ensure it's always on top
-        // Using DRAG_LAYER which is higher than POPUP_LAYER to ensure iPhone frame is always on top
-        getRootPane().getLayeredPane().add(Iphoneframe, JLayeredPane.DRAG_LAYER);
-        
-        // Add the time label to a higher layer so it appears above the phone frame
+        // Add to layered pane to ensure it's always on top
+        getRootPane().getLayeredPane().add(iphoneFrame, JLayeredPane.DRAG_LAYER);
         getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.MODAL_LAYER);
         
-        // Make sure it's visible and on top
-        Iphoneframe.setVisible(true);
+        // Ensure visibility
+        iphoneFrame.setVisible(true);
         jLabel1.setVisible(true);
-        getRootPane().getLayeredPane().moveToFront(Iphoneframe);
+        getRootPane().getLayeredPane().moveToFront(iphoneFrame);
         getRootPane().getLayeredPane().moveToFront(jLabel1);
     }
 
-    public void switchPanel(javax.swing.JPanel newPanel) {
+    /**
+     * Switches the current panel to a new panel.
+     * @param newPanel the panel to switch to
+     */
+    public void switchPanel(JPanel newPanel) {
         getContentPane().removeAll();
-        // Add padding to move panel up a few pixels
         newPanel.setLocation(0, -10); // Move up 10 pixels
         getContentPane().add(newPanel);
         revalidate();
         repaint();
         
-        // Ensure iPhone frame and time label stay on top after panel switch
-        if (Iphoneframe != null) {
-            getRootPane().getLayeredPane().moveToFront(Iphoneframe);
-        }
-        if (jLabel1 != null) {
-            getRootPane().getLayeredPane().moveToFront(jLabel1);
-        }
+        // Ensure overlay stays on top
+        ensureIphoneFrameOnTop();
     }
 
     /**
-     * Ensures the iPhone frame and time label are always on top of all other components
-     * This should be called after adding any new components to the layered pane
+     * Ensures the iPhone frame overlay stays on top of all content.
      */
     public void ensureIphoneFrameOnTop() {
-        if (Iphoneframe != null) {
-            getRootPane().getLayeredPane().moveToFront(Iphoneframe);
+        if (iphoneFrame != null) {
+            getRootPane().getLayeredPane().moveToFront(iphoneFrame);
         }
         if (jLabel1 != null) {
             getRootPane().getLayeredPane().moveToFront(jLabel1);
@@ -149,22 +156,21 @@ public class Phone extends javax.swing.JFrame {
     }
     
     /**
-     * Updates the time label with current time in 12-hour format
+     * Updates the time display on the status bar.
      */
     private void updateTime() {
         if (jLabel1 != null) {
-            java.time.LocalTime now = java.time.LocalTime.now();
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("h:mm a");
-            String timeString = now.format(formatter);
-            jLabel1.setText(timeString);
+            LocalTime now = LocalTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+            jLabel1.setText(now.format(formatter));
         }
     }
     
     /**
-     * Starts a timer to update the time every minute
+     * Starts the timer to update the time display every minute.
      */
     private void startTimeTimer() {
-        javax.swing.Timer timer = new javax.swing.Timer(60000, _ -> updateTime()); // Update every minute
+        Timer timer = new Timer(60000, _ -> updateTime());
         timer.setRepeats(true);
         timer.start();
     }
@@ -175,26 +181,27 @@ public class Phone extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
-        jLabel1.setForeground(java.awt.Color.BLACK); // Make text black
-        jLabel1.setBounds(28, 21, 55, 20); // Set absolute positioning
-        
-        // Set initial time and start timer
-        updateTime();
-        startTimeTimer();
+        jLabel1.setText("12:24");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 350, Short.MAX_VALUE)
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(287, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 750, Short.MAX_VALUE)
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addComponent(jLabel1)
+                .addContainerGap(713, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

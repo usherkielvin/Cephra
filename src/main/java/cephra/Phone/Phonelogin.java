@@ -12,8 +12,8 @@ public class Phonelogin extends javax.swing.JPanel {
    
    public Phonelogin() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         username.setOpaque(false);
         username.setBackground(new Color(0, 0, 0, 0));
         pass.setOpaque(false);
@@ -47,8 +47,8 @@ public class Phonelogin extends javax.swing.JPanel {
         loginhome = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
@@ -60,7 +60,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(270, 360, 50, 30);
+        See.setBounds(290, 360, 50, 30);
 
         reghere.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
@@ -76,7 +76,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(reghere);
-        reghere.setBounds(220, 667, 80, 30);
+        reghere.setBounds(240, 667, 80, 30);
 
         forgotpass.setForeground(new java.awt.Color(0, 204, 204));
         forgotpass.setText("Forgot password?");
@@ -91,7 +91,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(forgotpass);
-        forgotpass.setBounds(210, 390, 120, 30);
+        forgotpass.setBounds(230, 390, 120, 30);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
@@ -101,7 +101,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(70, 360, 210, 30);
+        pass.setBounds(90, 360, 210, 30);
 
         username.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         username.setBorder(null);
@@ -111,9 +111,9 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(70, 300, 230, 35);
+        username.setBounds(90, 300, 230, 35);
         add(cooldownLabel);
-        cooldownLabel.setBounds(40, 440, 160, 20);
+        cooldownLabel.setBounds(60, 440, 160, 20);
 
         loginhome.setBorder(null);
         loginhome.setBorderPainted(false);
@@ -125,18 +125,18 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(loginhome);
-        loginhome.setBounds(40, 430, 290, 40);
+        loginhome.setBounds(60, 430, 290, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 360, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
 

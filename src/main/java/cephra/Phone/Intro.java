@@ -9,8 +9,8 @@ public class Intro extends javax.swing.JPanel {
 
     public Intro() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         
            new Timer(8000, _ -> {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Intro.this);

@@ -7,8 +7,8 @@ public class link extends javax.swing.JPanel {
 
     public link() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         setupLabelPosition(); // Set label position
         
         // Check if car is already linked and user has a battery level
@@ -51,8 +51,8 @@ public class link extends javax.swing.JPanel {
         termscondition = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         Linkcar.setBorder(null);
@@ -64,7 +64,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(Linkcar);
-        Linkcar.setBounds(50, 560, 240, 50);
+        Linkcar.setBounds(70, 560, 240, 50);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -76,7 +76,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(40, 670, 50, 60);
+        charge.setBounds(60, 670, 50, 60);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -88,7 +88,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(230, 653, 50, 100);
+        historybutton.setBounds(250, 653, 50, 100);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);

@@ -7,8 +7,8 @@ public class payment extends javax.swing.JPanel {
 
     public payment() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
     }
 
 

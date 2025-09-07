@@ -10,8 +10,8 @@ public class home extends javax.swing.JPanel {
 
     public home() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
         
@@ -69,8 +69,8 @@ public class home extends javax.swing.JPanel {
         LoggedName = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         profilebutton.setBorder(null);
@@ -83,7 +83,7 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 670, 50, 50);
+        profilebutton.setBounds(280, 670, 50, 50);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -95,7 +95,7 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(200, 680, 50, 40);
+        historybutton.setBounds(220, 680, 50, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -107,7 +107,7 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 50, 40);
+        linkbutton.setBounds(110, 680, 50, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -119,23 +119,23 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(30, 680, 50, 40);
+        charge.setBounds(50, 680, 50, 40);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 32)); // NOI18N
         LoggedName.setText("Hi Dizon!");
         add(LoggedName);
-        LoggedName.setBounds(20, 62, 220, 50);
+        LoggedName.setBounds(40, 62, 220, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home Page - not charging vid.gif"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
 

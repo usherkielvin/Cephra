@@ -8,8 +8,8 @@ public class ChargingOption extends javax.swing.JPanel {
 
     public ChargingOption() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
         
@@ -64,8 +64,8 @@ public class ChargingOption extends javax.swing.JPanel {
         homebutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(350, 750));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setMaximumSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         normalcharge.setBorder(null);
@@ -77,7 +77,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(normalcharge);
-        normalcharge.setBounds(30, 380, 280, 120);
+        normalcharge.setBounds(50, 380, 280, 120);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -89,7 +89,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 680, 50, 40);
+        profilebutton.setBounds(280, 680, 50, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -101,7 +101,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(210, 680, 40, 40);
+        historybutton.setBounds(230, 680, 40, 40);
 
         fastcharge.setBorder(null);
         fastcharge.setBorderPainted(false);
@@ -112,7 +112,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(fastcharge);
-        fastcharge.setBounds(30, 243, 280, 120);
+        fastcharge.setBounds(50, 243, 280, 120);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -124,7 +124,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 40, 40);
+        linkbutton.setBounds(110, 680, 40, 40);
 
         homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
@@ -136,18 +136,18 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(homebutton);
-        homebutton.setBounds(150, 680, 40, 40);
+        homebutton.setBounds(170, 680, 40, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/fast.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
 

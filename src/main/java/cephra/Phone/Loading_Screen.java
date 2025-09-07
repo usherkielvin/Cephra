@@ -9,8 +9,8 @@ import java.awt.event.MouseMotionAdapter;
 public class Loading_Screen extends javax.swing.JPanel {
     public Loading_Screen() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+        setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         
         // Make the panel draggable
         makeDraggable();

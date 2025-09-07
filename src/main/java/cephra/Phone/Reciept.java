@@ -12,8 +12,8 @@ public class Reciept extends javax.swing.JPanel {
   
     public Reciept() {
         initComponents();
-         setPreferredSize(new java.awt.Dimension(350, 750));
-        setSize(350, 750);
+         setPreferredSize(new java.awt.Dimension(370, 750));
+        setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
         populateAmounts();
@@ -22,7 +22,7 @@ public class Reciept extends javax.swing.JPanel {
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
      private void makeDraggable() {
