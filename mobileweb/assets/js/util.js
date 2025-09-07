@@ -94,9 +94,20 @@
 
 			}, userConfig);
 
-			// Expand "target" if it's not a jQuery object already.
-				if (typeof config.target != 'jQuery')
+			// Expand and sanitize "target" if it's not a jQuery object already.
+				if (!config.target || typeof config.target === 'string') {
+					var sel = String(config.target || '');
+					// Only allow simple ID selectors (e.g., "#panel"). Fallback to this panel.
+					if (/^#[A-Za-z][\w:-]*$/.test(sel)) {
+						var el = document.getElementById(sel.slice(1));
+						config.target = el ? $(el) : $this;
+					} else {
+						config.target = $this;
+					}
+				}
+				else if (!config.target.jquery) {
 					config.target = $(config.target);
+				}
 
 		// Panel.
 
