@@ -349,6 +349,7 @@ public class BayManagement extends javax.swing.JPanel {
      * Checks if toggle states have been loaded from database
      * @return true if toggle states are loaded, false otherwise
      */
+    @SuppressWarnings("unused")
     private static boolean areToggleStatesLoaded() {
         return toggleStatesLoaded;
     }
@@ -2033,11 +2034,7 @@ public class BayManagement extends javax.swing.JPanel {
     /**
      * Sets some bays to maintenance for testing purposes
      */
-    private static void setTestMaintenanceBays() {
-        System.out.println("*** setTestMaintenanceBays() DISABLED to prevent toggle reset ***");
-        // Method disabled to prevent toggle states from being reset
-        // This method was setting Bay-2 and Bay-5 to Maintenance mode every time the panel loaded
-    }
+  
     
     
     /**

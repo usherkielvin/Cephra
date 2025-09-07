@@ -109,6 +109,23 @@ public final class QueueFlow {
     public static List<Entry> getEntries() {
         return entries;
     }
+
+    // Returns the next ticket id that would be used for the given service, without mutating counters
+    public static String previewNextTicketIdForService(String serviceName) {
+        String s = serviceName == null ? "" : serviceName.toLowerCase();
+        if (s.contains("fast")) {
+            return formatTicket("FCH", nextFastNumber);
+        }
+        if (s.contains("normal")) {
+            return formatTicket("NCH", nextNormalNumber);
+        }
+        return "";
+    }
+
+    // Returns the next ticket id for the currently selected service, without mutating counters
+    public static String previewNextTicketId() {
+        return previewNextTicketIdForService(currentServiceName);
+    }
     
     // Method to refresh counters from database (useful after application restart or manual refresh)
     public static void refreshCountersFromDatabase() {

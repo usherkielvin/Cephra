@@ -184,13 +184,9 @@ public class QueueTicket extends javax.swing.JPanel {
                 // Apply selected ticket/service to labels
                 String s = cephra.Phone.QueueFlow.getCurrentServiceName();
                 String t = cephra.Phone.QueueFlow.getCurrentTicketId();
-                // If ticket is not assigned yet, preview the next based on service
                 if (t == null || t.length() == 0) {
-                    if (s != null && s.toLowerCase().contains("fast")) {
-                        QTicket.setText("FCH" + String.format("%03d",  cephra.Phone.QueueFlow.getEntries().size() + 1));
-                    } else if (s != null && s.toLowerCase().contains("normal")) {
-                        QTicket.setText("NCH" + String.format("%03d",  cephra.Phone.QueueFlow.getEntries().size() + 1));
-                    }
+                    // Preview exact next ticket from QueueFlow counters
+                    QTicket.setText(cephra.Phone.QueueFlow.previewNextTicketIdForService(s));
                 } else {
                     QTicket.setText(t);
                 }

@@ -11,8 +11,8 @@ public class PayPop extends javax.swing.JPanel {
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
-    // Constants for popup dimensions (match background image size exactly)
-    private static final int POPUP_WIDTH = 260;
+    // Popup dimensions (centered in phone frame)
+    private static final int POPUP_WIDTH = 270;
     private static final int POPUP_HEIGHT = 280;
     private static final int PHONE_WIDTH = 350; // fallback if frame size not yet realized
     private static final int PHONE_HEIGHT = 750; // fallback if frame size not yet realized
@@ -102,6 +102,16 @@ public class PayPop extends javax.swing.JPanel {
             currentInstance = new PayPop();
             currentTicketId = ticketId;
             isShowing = true;
+            // Push ticket id to UI immediately (fallback to admin queue model if needed)
+            try {
+                String resolved = ticketId;
+                if (resolved == null || resolved.trim().isEmpty()) {
+                    String currentUser = cephra.CephraDB.getCurrentUsername();
+                    resolved = currentInstance.findLatestTicketForUserFromAdminModel(currentUser);
+                }
+                currentInstance.setTicketOnUi(resolved);
+                currentInstance.ensureTicketLabelVisible();
+            } catch (Exception ignore) {}
             
             // Determine phone content size (fallback to constants if not realized yet)
             int containerW = phoneFrame.getContentPane() != null ? phoneFrame.getContentPane().getWidth() : 0;
@@ -150,6 +160,65 @@ public class PayPop extends javax.swing.JPanel {
         }
     }
 
+    // Sets the ticket number on the UI label immediately (safe call)
+    private void setTicketOnUi(String ticketId) {
+        try {
+            if (TICKETNUMBER != null && ticketId != null && !ticketId.trim().isEmpty()) {
+                TICKETNUMBER.setText(ticketId);
+                TICKETNUMBER.repaint();
+            }
+        } catch (Exception ignore) {}
+    }
+
+    // Force ticket label to be visible and on top
+    private void ensureTicketLabelVisible() {
+        try {
+            if (TICKETNUMBER != null) {
+                TICKETNUMBER.setVisible(true);
+                TICKETNUMBER.setOpaque(false);
+                TICKETNUMBER.setForeground(java.awt.Color.BLACK);
+                TICKETNUMBER.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                setComponentZOrder(TICKETNUMBER, 0);
+                TICKETNUMBER.repaint();
+            }
+            // Keep background behind
+            sendBackgroundToBack();
+        } catch (Exception ignore) {}
+    }
+
+    // Read the latest ticket for the current user directly from Admin Queue table model
+    private String findLatestTicketForUserFromAdminModel(String username) {
+        try {
+            if (username == null || username.trim().isEmpty()) return null;
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel)
+                cephra.Admin.QueueBridge.class.getDeclaredField("model").get(null);
+            if (model == null) return null;
+
+            final int colCount = model.getColumnCount();
+            int ticketCol = 0; // usually 0
+            int customerCol = Math.min(1, colCount - 1);
+            int statusCol = Math.min(3, colCount - 1);
+            int paymentCol = Math.min(4, colCount - 1);
+
+            String fallback = null;
+            for (int i = model.getRowCount() - 1; i >= 0; i--) { // scan latest first
+                String customer = String.valueOf(model.getValueAt(i, customerCol));
+                if (customer != null && username.equalsIgnoreCase(customer.trim())) {
+                    String t = String.valueOf(model.getValueAt(i, ticketCol));
+                    String status = String.valueOf(model.getValueAt(i, statusCol));
+                    String payment = String.valueOf(model.getValueAt(i, paymentCol));
+                    if ("Pending".equalsIgnoreCase(payment) || "Complete".equalsIgnoreCase(status)) {
+                        return t;
+                    }
+                    if (fallback == null) fallback = t;
+                }
+            }
+            return fallback;
+        } catch (Throwable ignore) {
+            return null;
+        }
+    }
+
     /**
      * Constructor for PayPop
      */
@@ -167,24 +236,50 @@ public class PayPop extends javax.swing.JPanel {
         setSize(POPUP_WIDTH, POPUP_HEIGHT);
         setOpaque(false);
         setupLabelPosition();
+        // Ensure background image stays behind the other components
+        sendBackgroundToBack();
         setupCloseButton();
+        bringDataLabelsToFront();
         
         // Update labels with actual ticket data after components are initialized
         SwingUtilities.invokeLater(this::updateTextWithAmount);
         
-        // Set username if available
-        String username = cephra.CephraDB.getCurrentUsername();
-        if (LoggedName != null && username != null && !username.isEmpty()) {
-            LoggedName.setText(username);
-        }
+        // Set username if available (optional display label removed)
+    }
+
+    /**
+     * Ensures the background label is behind other controls
+     */
+    private void sendBackgroundToBack() {
+        try {
+            if (jLabel1 != null && jLabel1.getParent() == this) {
+                setComponentZOrder(jLabel1, getComponentCount() - 1);
+                revalidate();
+                repaint();
+            }
+        } catch (Exception ignore) {}
+    }
+
+    /**
+     * Ensures ticket and amount labels are above the background image
+     */
+    private void bringDataLabelsToFront() {
+        try {
+            if (TICKETNUMBER != null) setComponentZOrder(TICKETNUMBER, 0);
+            if (ChargingDue != null) setComponentZOrder(ChargingDue, 0);
+            if (kWh != null) setComponentZOrder(kWh, 0);
+            if (TotalBill != null) setComponentZOrder(TotalBill, 0);
+            revalidate();
+            repaint();
+        } catch (Exception ignore) {}
     }
     /**
      * Sets up label position to prevent NetBeans from changing it
      * CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
      */
     private void setupLabelPosition() {
-        if (ticketNo != null) {
-            ticketNo.setBounds(-15, 0, 398, 750);
+        if (TICKETNUMBER != null) {
+            TICKETNUMBER.setBounds(-15, 0, 398, 750);
         }
     }
     /**
@@ -210,7 +305,15 @@ public class PayPop extends javax.swing.JPanel {
      */
     private void updateTextWithAmount() {
         try {
-            String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
+            // Resolve ticket strictly from Admin Queue table if not provided
+            String ticket = currentTicketId;
+            if (ticket == null || ticket.isEmpty()) {
+                String currentUser = cephra.CephraDB.getCurrentUsername();
+                ticket = findLatestTicketForUserFromAdminModel(currentUser);
+            }
+            if (ticket == null || ticket.isEmpty()) {
+                ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
+            }
             if (ticket == null || ticket.isEmpty()) {
                 System.err.println("PayPop: No current ticket found");
                 return;
@@ -226,6 +329,7 @@ public class PayPop extends javax.swing.JPanel {
             
             // Update UI labels
             updateLabels(ticket, amount, usedKWh);
+            ensureTicketLabelVisible();
             
             // Log summary for debugging
             logPaymentSummary(ticket, amount, usedKWh, commission, net);
@@ -258,8 +362,9 @@ public class PayPop extends javax.swing.JPanel {
      * @param usedKWh the energy usage
      */
     private void updateLabels(String ticket, double amount, double usedKWh) {
-        if (ticketNo != null) {
-            ticketNo.setText(ticket);
+        if (TICKETNUMBER != null) {
+            TICKETNUMBER.setText(ticket);
+            TICKETNUMBER.repaint();
         }
         if (ChargingDue != null) {
             ChargingDue.setText(String.format("₱%.2f", amount));
@@ -269,12 +374,6 @@ public class PayPop extends javax.swing.JPanel {
         }
         if (TotalBill != null) {
             TotalBill.setText(String.format("₱%.2f", amount));
-        }
-        if (name != null) {
-            String username = cephra.CephraDB.getCurrentUsername();
-            if (username != null && !username.isEmpty()) {
-                name.setText(username);
-            }
         }
     }
     
@@ -301,34 +400,23 @@ public class PayPop extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        TICKETNUMBER = new javax.swing.JLabel();
         ChargingDue = new javax.swing.JLabel();
-        ticketNo = new javax.swing.JLabel();
         kWh = new javax.swing.JLabel();
         TotalBill = new javax.swing.JLabel();
         Cash = new javax.swing.JButton();
         payonline = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        name = new javax.swing.JLabel();
-        LoggedName = new javax.swing.JLabel();
 
         setLayout(null);
-
-        ChargingDue.setText("jLabel1");
+        add(TICKETNUMBER);
+        TICKETNUMBER.setBounds(110, 40, 130, 50);
         add(ChargingDue);
-        ChargingDue.setBounds(160, 100, 90, 16);
-
-        ticketNo.setText("jLabel1");
-        add(ticketNo);
-        ticketNo.setBounds(160, 80, 90, 16);
-
-        kWh.setText("jLabel1");
+        ChargingDue.setBounds(150, 100, 90, 20);
         add(kWh);
-        kWh.setBounds(160, 120, 80, 16);
-
-        TotalBill.setText("jLabel1");
+        kWh.setBounds(150, 120, 80, 20);
         add(TotalBill);
-        TotalBill.setBounds(70, 170, 90, 16);
+        TotalBill.setBounds(160, 160, 90, 20);
 
         Cash.setBorder(null);
         Cash.setContentAreaFilled(false);
@@ -338,7 +426,7 @@ public class PayPop extends javax.swing.JPanel {
             }
         });
         add(Cash);
-        Cash.setBounds(10, 210, 110, 50);
+        Cash.setBounds(10, 210, 120, 50);
 
         payonline.setBorder(null);
         payonline.setBorderPainted(false);
@@ -351,43 +439,9 @@ public class PayPop extends javax.swing.JPanel {
         add(payonline);
         payonline.setBounds(140, 210, 110, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/paypop.png"))); // NOI18N
-        jLabel1.setText("jLabel1");
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/CASH.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(160, 30, 380, 280);
-
-        jPanel1.setBackground(new java.awt.Color(255, 0, 51));
-        jPanel1.setOpaque(false);
-
-        name.setText("jLabel1");
-
-        LoggedName.setText("jLabel1");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(85, 85, 85)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(LoggedName)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(151, 151, 151)
-                        .addComponent(name)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(76, 76, 76)
-                .addComponent(name)
-                .addGap(46, 46, 46)
-                .addComponent(LoggedName)
-                .addContainerGap(116, Short.MAX_VALUE))
-        );
-
-        add(jPanel1);
-        jPanel1.setBounds(0, 0, 260, 270);
+        jLabel1.setBounds(0, 0, 280, 280);
     }// </editor-fold>//GEN-END:initComponents
 
     /**
@@ -572,13 +626,10 @@ public class PayPop extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Cash;
     private javax.swing.JLabel ChargingDue;
-    private javax.swing.JLabel LoggedName;
+    private javax.swing.JLabel TICKETNUMBER;
     private javax.swing.JLabel TotalBill;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel kWh;
-    private javax.swing.JLabel name;
     private javax.swing.JButton payonline;
-    private javax.swing.JLabel ticketNo;
     // End of variables declaration//GEN-END:variables
 }
