@@ -212,8 +212,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             JOptionPane.INFORMATION_MESSAGE);
                     }
                 } else if ("Waiting".equalsIgnoreCase(status)) {
+                    System.out.println("Queue: Processing 'Waiting' status for ticket " + ticket);
                     boolean isFast = ticket.startsWith("FCH");
+                    System.out.println("Queue: Ticket " + ticket + " is " + (isFast ? "Fast" : "Normal") + " charging");
                     boolean assigned = isFast ? assignToFastSlot(ticket) : assignToNormalSlot(ticket);
+                    System.out.println("Queue: Assignment result for ticket " + ticket + ": " + assigned);
                     if (assigned) {
                         queTab.setValueAt("Charging", editingRow, statusColumnIndex);
                         // Update database status
@@ -765,6 +768,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
 
     private boolean assignToNormalSlot(String ticket) {
+        System.out.println("Queue: assignToNormalSlot called for ticket " + ticket);
         // Check if there's capacity for normal charging
         if (!cephra.Admin.BayManagement.hasChargingCapacity(false)) {
             System.out.println("Queue: No available normal charging bays (all offline or occupied). Cannot assign ticket " + ticket);
@@ -773,6 +777,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         
         // Find next available normal charging bay (skips offline bays)
         int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(false); // false = normal charging
+        System.out.println("Queue: Found available normal charging bay: " + bayNumber + " for ticket " + ticket);
         
         if (bayNumber > 0) {
             // Move ticket from waiting grid to charging bay
@@ -791,6 +796,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
 
     private boolean assignToFastSlot(String ticket) {
+        System.out.println("Queue: assignToFastSlot called for ticket " + ticket);
         // Check if there's capacity for fast charging
         if (!cephra.Admin.BayManagement.hasChargingCapacity(true)) {
             System.out.println("Queue: No available fast charging bays (all offline or occupied). Cannot assign ticket " + ticket);
@@ -799,6 +805,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         
         // Find next available fast charging bay (skips offline bays)
         int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(true); // true = fast charging
+        System.out.println("Queue: Found available fast charging bay: " + bayNumber + " for ticket " + ticket);
         
         if (bayNumber > 0) {
             // Move ticket from waiting grid to charging bay

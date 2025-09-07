@@ -332,11 +332,28 @@ public final class QueueBridge {
                     });
                 } else {
                     System.err.println("QueueBridge: Failed to process payment transaction for ticket " + ticket);
+                    // Revert the payment status in the records array
+                    for (Object[] r : records) {
+                        if (r != null && ticket.equals(String.valueOf(r[0]))) {
+                            r[5] = "Pending"; // Revert payment status
+                            r[1] = ""; // Clear reference number
+                            break;
+                        }
+                    }
                 }
                 
             } catch (Throwable t) {
                 System.err.println("QueueBridge: Error processing payment completion: " + t.getMessage());
                 t.printStackTrace();
+                
+                // Revert any changes made to the records array
+                for (Object[] r : records) {
+                    if (r != null && ticket.equals(String.valueOf(r[0]))) {
+                        r[5] = "Pending"; // Revert payment status
+                        r[1] = ""; // Clear reference number
+                        break;
+                    }
+                }
             }
         }
         

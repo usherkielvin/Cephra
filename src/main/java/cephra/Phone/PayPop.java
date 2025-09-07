@@ -408,9 +408,33 @@ public class PayPop extends javax.swing.JPanel {
                     // Also update the local queue flow entries
                     cephra.Phone.QueueFlow.updatePaymentStatus(currentTicket, "Paid");
                     System.out.println("GCash payment marked as paid for ticket: " + currentTicket);
+                    
+                    // Show success message to user
+                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            javax.swing.JOptionPane.showMessageDialog(
+                                PayPop.this,
+                                "GCash payment processed successfully!\nTicket: " + currentTicket,
+                                "Payment Success",
+                                javax.swing.JOptionPane.INFORMATION_MESSAGE
+                            );
+                        }
+                    });
                 } catch (Exception e) {
                     System.err.println("Error updating payment status: " + e.getMessage());
                     e.printStackTrace();
+                    
+                    // Show error message to user
+                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            javax.swing.JOptionPane.showMessageDialog(
+                                PayPop.this,
+                                "Failed to process GCash payment.\nError: " + e.getMessage() + "\nPlease try again or contact support.",
+                                "Payment Error",
+                                javax.swing.JOptionPane.ERROR_MESSAGE
+                            );
+                        }
+                    });
                 }
                 
                 // Hide PayPop first

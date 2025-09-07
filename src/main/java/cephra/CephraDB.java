@@ -2,14 +2,32 @@ package cephra;
 
 import java.sql.*;
 import java.util.*;
+import java.time.*;
+import java.time.format.*;
+import java.awt.*;
+import javax.swing.*;
 
+/**
+ * CephraDB - Main database management class for the Cephra charging station system.
+ * 
+ * This class provides comprehensive database operations including:
+ * - User authentication and management
+ * - Battery level tracking
+ * - Queue ticket management
+ * - Charging history and payment processing
+ * - Staff management
+ * - System settings
+ * 
+ * All database operations are performed using prepared statements for security
+ * and the class includes comprehensive error handling and logging.
+ */
 public class CephraDB {
 
-    @SuppressWarnings("unused")
     private static class User {
-        String username;
-        String email;
-        String password;
+        final String username;
+        final String email;
+        @SuppressWarnings("unused")
+        final String password;
 
         public User(String username, String email, String password) {
             this.username = username;
@@ -56,6 +74,12 @@ public class CephraDB {
             
             // Clean up admin users from users table (they should be in staff_records)
             cleanupAdminFromUsersTable();
+            
+            // Synchronize bay status with database
+            cephra.Admin.BayManagement.synchronizeBayStatusWithDatabase();
+            
+            // Print current bay status for debugging
+            cephra.Admin.BayManagement.printCurrentBayStatus();
             
             // Verify database connection and basic functionality
             verifyDatabaseConnection(conn);
@@ -126,47 +150,33 @@ public class CephraDB {
     
     // Method to get the current logged-in user's firstname (phone user)
     public static String getCurrentFirstname() {
-        if (currentPhoneUser == null || currentPhoneUser.username == null) {
-            return "";
-        }
-        
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT firstname FROM users WHERE username = ?")) {
-            
-            stmt.setString(1, currentPhoneUser.username);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("firstname");
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting current user's firstname: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return "";
+        return getCurrentUserField("firstname");
     }
     
     // Method to get the current logged-in user's lastname (phone user)
     public static String getCurrentLastname() {
+        return getCurrentUserField("lastname");
+    }
+    
+    // Helper method to get a specific field from the current user
+    private static String getCurrentUserField(String fieldName) {
         if (currentPhoneUser == null || currentPhoneUser.username == null) {
             return "";
         }
         
         try (Connection conn = cephra.db.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT lastname FROM users WHERE username = ?")) {
+                     "SELECT " + fieldName + " FROM users WHERE username = ?")) {
             
             stmt.setString(1, currentPhoneUser.username);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString("lastname");
+                    return rs.getString(fieldName);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error getting current user's lastname: " + e.getMessage());
+            System.err.println("Error getting current user's " + fieldName + ": " + e.getMessage());
             e.printStackTrace();
         }
         return "";
@@ -475,19 +485,7 @@ public class CephraDB {
                     int count = rs.getInt(1);
                     if (count > 1) {
                         System.err.println("CephraDB: WARNING - Found " + count + " battery level entries for user " + username);
-                        
-                        // Show all entries for this user
-                        try (PreparedStatement detailStmt = conn.prepareStatement(
-                                "SELECT id, battery_level, initial_battery_level FROM battery_levels WHERE username = ? ORDER BY id")) {
-                            detailStmt.setString(1, username);
-                            try (ResultSet detailRs = detailStmt.executeQuery()) {
-                                while (detailRs.next()) {
-                                    System.err.println("CephraDB: Entry ID " + detailRs.getInt("id") + 
-                                                     " - battery_level: " + detailRs.getInt("battery_level") + 
-                                                     "%, initial_battery_level: " + detailRs.getInt("initial_battery_level") + "%");
-                                }
-                            }
-                        }
+                        logBatteryLevelDetails(conn, username);
                     } else {
                         System.out.println("CephraDB: Found " + count + " battery level entry for user " + username);
                     }
@@ -498,11 +496,44 @@ public class CephraDB {
         }
     }
     
+    // Helper method to log battery level details
+    private static void logBatteryLevelDetails(Connection conn, String username) {
+        try (PreparedStatement detailStmt = conn.prepareStatement(
+                "SELECT id, battery_level, initial_battery_level FROM battery_levels WHERE username = ? ORDER BY id")) {
+            detailStmt.setString(1, username);
+            try (ResultSet detailRs = detailStmt.executeQuery()) {
+                while (detailRs.next()) {
+                    System.err.println("CephraDB: Entry ID " + detailRs.getInt("id") + 
+                                     " - battery_level: " + detailRs.getInt("battery_level") + 
+                                     "%, initial_battery_level: " + detailRs.getInt("initial_battery_level") + "%");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error logging battery level details: " + e.getMessage());
+        }
+    }
+    
     // Method to clean up duplicate battery level entries
     public static void cleanupDuplicateBatteryLevels() {
+        cleanupBatteryLevels(false);
+    }
+    
+    // Method to clean up all duplicate battery level entries for all users
+    public static void cleanupAllDuplicateBatteryLevels() {
+        cleanupBatteryLevels(true);
+    }
+    
+    // Consolidated method to clean up battery level duplicates
+    private static void cleanupBatteryLevels(boolean allUsers) {
         try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
-            // Delete duplicate entries, keeping only the most recent one for each user
-            String cleanupSQL = 
+            String cleanupSQL = allUsers ? 
+                "DELETE b1 FROM battery_levels b1 " +
+                "LEFT JOIN (" +
+                "    SELECT username, MAX(id) as max_id " +
+                "    FROM battery_levels " +
+                "    GROUP BY username" +
+                ") b2 ON b1.username = b2.username AND b1.id = b2.max_id " +
+                "WHERE b2.max_id IS NULL" :
                 "DELETE b1 FROM battery_levels b1 " +
                 "INNER JOIN battery_levels b2 " +
                 "WHERE b1.id > b2.id AND b1.username = b2.username";
@@ -510,7 +541,10 @@ public class CephraDB {
             try (PreparedStatement stmt = conn.prepareStatement(cleanupSQL)) {
                 int deletedRows = stmt.executeUpdate();
                 if (deletedRows > 0) {
-                    System.out.println("Cleaned up " + deletedRows + " duplicate battery level entries");
+                    String message = allUsers ? 
+                        "Cleaned up " + deletedRows + " old duplicate battery level entries for all users" :
+                        "Cleaned up " + deletedRows + " duplicate battery level entries";
+                    System.out.println(message);
                 }
             }
         } catch (SQLException e) {
@@ -519,54 +553,31 @@ public class CephraDB {
         }
     }
     
-    // Method to clean up all duplicate battery level entries for all users
-    public static void cleanupAllDuplicateBatteryLevels() {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
-            // Keep only the most recent battery level entry for each user
-            String cleanupSQL = 
-                "DELETE b1 FROM battery_levels b1 " +
-                "LEFT JOIN (" +
-                "    SELECT username, MAX(id) as max_id " +
-                "    FROM battery_levels " +
-                "    GROUP BY username" +
-                ") b2 ON b1.username = b2.username AND b1.id = b2.max_id " +
-                "WHERE b2.max_id IS NULL";
-            
-            try (PreparedStatement stmt = conn.prepareStatement(cleanupSQL)) {
-                int deletedRows = stmt.executeUpdate();
-                if (deletedRows > 0) {
-                    System.out.println("Cleaned up " + deletedRows + " old duplicate battery level entries for all users");
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error cleaning up all duplicate battery levels: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
     // Active ticket management methods
     public static boolean hasActiveTicket(String username) {
+        return executeActiveTicketQuery(username, "SELECT ticket_id FROM active_tickets WHERE username = ?") != null;
+    }
+    
+    // Helper method for active ticket queries
+    private static String executeActiveTicketQuery(String username, String query) {
         try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
-            // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
                 printDatabaseInitInstructions();
-                return false; // No active tickets if table doesn't exist
+                return null;
             }
             
-            try (PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT ticket_id FROM active_tickets WHERE username = ?")) {
-                
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, username);
                 
                 try (ResultSet rs = stmt.executeQuery()) {
-                    return rs.next(); // If there's a result, user has an active ticket
+                    return rs.next() ? rs.getString("ticket_id") : null;
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error checking active ticket: " + e.getMessage());
+            System.err.println("Error executing active ticket query: " + e.getMessage());
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
     
@@ -694,30 +705,7 @@ public class CephraDB {
     }
     
     public static String getActiveTicket(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
-            // First check if the active_tickets table exists
-            if (!tableExists(conn, "active_tickets")) {
-                System.err.println("Warning: active_tickets table does not exist.");
-                printDatabaseInitInstructions();
-                return null; // No active ticket if table doesn't exist
-            }
-            
-            try (PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT ticket_id FROM active_tickets WHERE username = ?")) {
-                
-                stmt.setString(1, username);
-                
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getString("ticket_id");
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting active ticket: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
+        return executeActiveTicketQuery(username, "SELECT ticket_id FROM active_tickets WHERE username = ?");
     }
     
     // Queue ticket management methods
@@ -890,8 +878,8 @@ public class CephraDB {
         }
     }
     
-    public static List<Object[]> getChargingHistoryForUser(String username) {
-        List<Object[]> history = new ArrayList<>();
+    public static java.util.List<Object[]> getChargingHistoryForUser(String username) {
+        java.util.List<Object[]> history = new ArrayList<>();
         try (Connection conn = cephra.db.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
@@ -922,8 +910,8 @@ public class CephraDB {
         return history;
     }
     
-    public static List<Object[]> getAllChargingHistory() {
-        List<Object[]> history = new ArrayList<>();
+    public static java.util.List<Object[]> getAllChargingHistory() {
+        java.util.List<Object[]> history = new ArrayList<>();
         try (Connection conn = cephra.db.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
@@ -952,8 +940,8 @@ public class CephraDB {
         return history;
     }
     
-    public static List<Object[]> getAllQueueTickets() {
-        List<Object[]> tickets = new ArrayList<>();
+    public static java.util.List<Object[]> getAllQueueTickets() {
+        java.util.List<Object[]> tickets = new ArrayList<>();
         try (Connection conn = cephra.db.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id, reference_number, username, service_type, status, payment_status " +
@@ -1184,27 +1172,7 @@ public class CephraDB {
             }
             
             // 4. Add to admin history (if HistoryBridge is available)
-            try {
-                // Get the actual admin username who is currently logged in
-                String adminUsername = getCurrentAdminUsername();
-                if (adminUsername == null || adminUsername.trim().isEmpty()) {
-                    adminUsername = "Admin"; // Fallback if no admin logged in
-                }
-                
-                Object[] historyRow = new Object[] {
-                    ticketId,
-                    username,
-                    String.format("%.2f", (totalAmount / 100.0) * 40.0), // kWh calculation
-                    String.format("%.2f", totalAmount),
-                    adminUsername, // Use actual admin username instead of hardcoded "Admin"
-                    java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")),
-                    referenceNumber != null ? referenceNumber : ""
-                };
-                cephra.Admin.HistoryBridge.addRecord(historyRow);
-            } catch (Throwable t) {
-                // Ignore if HistoryBridge is not available
-                System.out.println("Note: Could not add to admin history: " + t.getMessage());
-            }
+            addToAdminHistory(ticketId, username, totalAmount, referenceNumber);
             
             conn.commit(); // Commit transaction
             System.out.println("CephraDB: Successfully committed payment transaction for ticket " + ticketId);
@@ -1240,43 +1208,7 @@ public class CephraDB {
             }
             
             // Refresh Porsche screen to show updated 100% battery level
-            try {
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    java.awt.Window[] windows = java.awt.Window.getWindows();
-                    for (java.awt.Window window : windows) {
-                        if (window instanceof cephra.Frame.Phone) {
-                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            if (phoneFrame.isVisible()) {
-                                java.awt.Component[] components = phoneFrame.getContentPane().getComponents();
-                                for (java.awt.Component comp : components) {
-                                    if (comp instanceof cephra.Phone.PorscheTaycan) {
-                                        cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) comp;
-                                        porschePanel.refreshBatteryDisplay();
-                                        System.out.println("CephraDB: Refreshed Porsche screen to show 100% battery for user " + username);
-                                        return;
-                                    }
-                                }
-                                
-                                // If PorscheTaycan is not found in current components, try to find it recursively
-                                try {
-                                    java.awt.Component currentPanel = findPorscheTaycanPanel(phoneFrame.getContentPane());
-                                    if (currentPanel instanceof cephra.Phone.PorscheTaycan) {
-                                        cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) currentPanel;
-                                        porschePanel.refreshBatteryDisplay();
-                                        System.out.println("CephraDB: Refreshed Porsche screen (found recursively) to show 100% battery for user " + username);
-                                        return;
-                                    }
-                                } catch (Exception panelEx) {
-                                    System.err.println("CephraDB: Could not refresh current panel: " + panelEx.getMessage());
-                                }
-                            }
-                        }
-                    }
-                    System.out.println("CephraDB: Porsche screen not found for refresh - user may not be on Porsche screen");
-                });
-            } catch (Exception e) {
-                System.err.println("CephraDB: Error refreshing Porsche screen: " + e.getMessage());
-            }
+            refreshPorscheScreen(username);
             
             return true;
             
@@ -1325,8 +1257,8 @@ public class CephraDB {
         }
     }
     
-    public static List<Object[]> getAllStaff() {
-        List<Object[]> staff = new ArrayList<>();
+    public static java.util.List<Object[]> getAllStaff() {
+        java.util.List<Object[]> staff = new ArrayList<>();
         try (Connection conn = cephra.db.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT name, username, email, status, password FROM staff_records ORDER BY name")) {
@@ -1565,14 +1497,79 @@ public class CephraDB {
         }
     }
     
+    // Helper method to add record to admin history
+    private static void addToAdminHistory(String ticketId, String username, double totalAmount, String referenceNumber) {
+        try {
+            String adminUsername = getCurrentAdminUsername();
+            if (adminUsername == null || adminUsername.trim().isEmpty()) {
+                adminUsername = "Admin"; // Fallback if no admin logged in
+            }
+            
+            Object[] historyRow = new Object[] {
+                ticketId,
+                username,
+                String.format("%.2f", (totalAmount / 100.0) * 40.0), // kWh calculation
+                String.format("%.2f", totalAmount),
+                adminUsername,
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")),
+                referenceNumber != null ? referenceNumber : ""
+            };
+            cephra.Admin.HistoryBridge.addRecord(historyRow);
+        } catch (Throwable t) {
+            // Ignore if HistoryBridge is not available
+            System.out.println("Note: Could not add to admin history: " + t.getMessage());
+        }
+    }
+    
+    // Helper method to refresh Porsche screen
+    private static void refreshPorscheScreen(String username) {
+        try {
+            SwingUtilities.invokeLater(() -> {
+                Window[] windows = Window.getWindows();
+                for (Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        if (phoneFrame.isVisible()) {
+                            Component[] components = phoneFrame.getContentPane().getComponents();
+                            for (Component comp : components) {
+                                if (comp instanceof cephra.Phone.PorscheTaycan) {
+                                    cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) comp;
+                                    porschePanel.refreshBatteryDisplay();
+                                    System.out.println("CephraDB: Refreshed Porsche screen to show 100% battery for user " + username);
+                                    return;
+                                }
+                            }
+                            
+                            // If PorscheTaycan is not found in current components, try to find it recursively
+                            try {
+                                Component currentPanel = findPorscheTaycanPanel(phoneFrame.getContentPane());
+                                if (currentPanel instanceof cephra.Phone.PorscheTaycan) {
+                                    cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) currentPanel;
+                                    porschePanel.refreshBatteryDisplay();
+                                    System.out.println("CephraDB: Refreshed Porsche screen (found recursively) to show 100% battery for user " + username);
+                                    return;
+                                }
+                            } catch (Exception panelEx) {
+                                System.err.println("CephraDB: Could not refresh current panel: " + panelEx.getMessage());
+                            }
+                        }
+                    }
+                }
+                System.out.println("CephraDB: Porsche screen not found for refresh - user may not be on Porsche screen");
+            });
+        } catch (Exception e) {
+            System.err.println("CephraDB: Error refreshing Porsche screen: " + e.getMessage());
+        }
+    }
+    
     // Helper method to find PorscheTaycan panel recursively in a container
-    private static java.awt.Component findPorscheTaycanPanel(java.awt.Container container) {
-        for (java.awt.Component comp : container.getComponents()) {
+    private static Component findPorscheTaycanPanel(Container container) {
+        for (Component comp : container.getComponents()) {
             if (comp instanceof cephra.Phone.PorscheTaycan) {
                 return comp;
             }
-            if (comp instanceof java.awt.Container) {
-                java.awt.Component found = findPorscheTaycanPanel((java.awt.Container) comp);
+            if (comp instanceof Container) {
+                Component found = findPorscheTaycanPanel((Container) comp);
                 if (found != null) {
                     return found;
                 }

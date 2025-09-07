@@ -1,5 +1,4 @@
 package cephra;
-
 import java.awt.GraphicsEnvironment;
 
 public final class Launcher {
@@ -16,7 +15,6 @@ public final class Launcher {
             System.err.println("Database connection failed!");
             System.err.println("Error: " + e.getMessage());
             System.err.println("Continuing without database for API testing...");
-            // Don't exit - let the API server start for testing
         }
 
         System.out.println("Basic Java functionality test passed!");
@@ -48,6 +46,5 @@ public final class Launcher {
             phone.requestFocus();
         });
     }
-
     private Launcher() {}
 }
