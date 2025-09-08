@@ -5,11 +5,11 @@ import javax.swing.*;
 
 public class NotificationPop extends javax.swing.JPanel {
 
-    private Timer animationTimer;
-    private Timer hideTimer;
-    private int yPosition = -110; // Start position (hidden above the screen)
+    public Timer animationTimer;
+    public Timer hideTimer;
+    public int yPosition = -110; // Start position (hidden above the screen)
     private int targetY = 0; // Target position when fully shown
-    private boolean isShowing = false;
+    public boolean isShowing = false;
     private static final int ANIMATION_SPEED = 5; // Pixels to move per step
     private static final int ANIMATION_DELAY = 10; // Milliseconds between steps
     private static final int DISPLAY_DURATION = 3000; // Display for 3 seconds
@@ -77,6 +77,18 @@ private void cephraemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
      */
     public void showNotification() {
         if (isShowing) return; // Prevent multiple show animations
+        
+        // Record this notification in history
+        try {
+            String currentUser = cephra.CephraDB.getCurrentUsername();
+            if (currentUser != null) {
+                String otpText = otpPreviewLabel != null ? otpPreviewLabel.getText() : "N/A";
+                NotificationHistoryManager.addEmailNotification(currentUser, otpText);
+            }
+        } catch (Exception e) {
+            System.err.println("Error recording email notification: " + e.getMessage());
+        }
+        
         isShowing = true;
         setVisible(true);
         yPosition = -110;

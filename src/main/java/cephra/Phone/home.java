@@ -29,8 +29,6 @@ public class home extends javax.swing.JPanel {
         }
         
         // Background is moved up by 3 pixels via bounds
-
-
     }
 
     private void makeDraggable() {
@@ -64,6 +62,7 @@ public class home extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        checkpop = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
@@ -75,6 +74,15 @@ public class home extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
+        checkpop.setText("Notifications");
+        checkpop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkpopActionPerformed(evt);
+            }
+        });
+        add(checkpop);
+        checkpop.setBounds(220, 70, 75, 23);
+
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
         profilebutton.setContentAreaFilled(false);
@@ -85,7 +93,7 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(280, 670, 50, 50);
+        profilebutton.setBounds(260, 670, 50, 50);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -97,7 +105,7 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(220, 680, 50, 40);
+        historybutton.setBounds(200, 680, 50, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -109,7 +117,7 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(110, 680, 50, 40);
+        linkbutton.setBounds(90, 680, 50, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -121,16 +129,16 @@ public class home extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(50, 680, 50, 40);
+        charge.setBounds(30, 680, 50, 40);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 32)); // NOI18N
         LoggedName.setText("Hi Dizon!");
         add(LoggedName);
-        LoggedName.setBounds(40, 62, 220, 50);
+        LoggedName.setBounds(20, 62, 220, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home Page - not charging vid.gif"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 750);
+        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -200,11 +208,46 @@ public class home extends javax.swing.JPanel {
             }
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
+    
+    private void notificationbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notificationbuttonActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        NotificationHistory notificationHistory = new NotificationHistory();
+                        notificationHistory.setPreviousPanel(new cephra.Phone.home());
+                        phoneFrame.switchPanel(notificationHistory);
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_notificationbuttonActionPerformed
+
+    private void checkpopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkpopActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        NotificationHistory notificationHistory = new NotificationHistory();
+                        notificationHistory.setPreviousPanel(new cephra.Phone.home());
+                        phoneFrame.switchPanel(notificationHistory);
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_checkpopActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel LoggedName;
     private javax.swing.JButton charge;
+    private javax.swing.JButton checkpop;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;

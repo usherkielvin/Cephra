@@ -190,6 +190,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         // Update database status
                         cephra.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
                         
+                        // Trigger notification for customer that their ticket is now waiting
+                        triggerNotificationForCustomer(customer, "TICKET_WAITING", ticket, null);
+                        
                         // Add ticket to waiting grid database
                         int slotNumber = cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customer, serviceName, batteryLevel);
                         if (slotNumber > 0) {
@@ -230,9 +233,16 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         cephra.CephraDB.updateQueueTicketStatus(ticket, "Charging");
                         removeTicketFromGrid(ticket);
                         
+                        // Get customer and bay information for notification
+                        String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                        String bayNumber = determineBayNumber(ticket, isFast);
+                        
+                        // Trigger "My Turn" notification for customer
+                        triggerNotificationForCustomer(customer, "MY_TURN", ticket, bayNumber);
+                        
                                                  // Create active ticket when charging starts
                          try {
-                             String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                       //      String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
                              int serviceCol = getColumnIndex("Service");
                              String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
                              
@@ -240,7 +250,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                              int initialBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
                              
                              // Determine bay number based on assignment
-                             String bayNumber = "";
+                           //  String bayNumber = "";
                              if (isFast) {
                                  // Find the first available fast charging bay that's not in use
                                  for (int i = 0; i < 3; i++) {
@@ -330,6 +340,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
                     // Update database status
                     cephra.CephraDB.updateQueueTicketStatus(ticket, "Complete");
+                    
+                    // Trigger "Full Charge" notification for customer
+                    triggerNotificationForCustomer(customer, "FULL_CHARGE", ticket, null);
                     if (paymentCol >= 0) {
                         // Upon completion, payment becomes Pending
                         queTab.setValueAt("Pending", editingRow, paymentCol);
@@ -1697,5 +1710,199 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             System.err.println("Error initializing waiting grid from database: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Triggers notifications for customers when admin updates queue status
+     * @param customer The username of the customer to notify
+     * @param notificationType The type of notification (TICKET_WAITING, MY_TURN, FULL_CHARGE, etc.)
+     * @param ticketId The ticket ID
+     * @param bayNumber The bay number (for MY_TURN notifications)
+     */
+    private void triggerNotificationForCustomer(String customer, String notificationType, String ticketId, String bayNumber) {
+        if (customer == null || customer.trim().isEmpty()) {
+            System.out.println("Queue: Cannot trigger notification - customer is null or empty");
+            return;
+        }
+        
+        System.out.println("Queue: Triggering " + notificationType + " notification for customer " + customer + " with ticket " + ticketId);
+        
+        try {
+            // Add notification to history first
+            switch (notificationType) {
+                case "TICKET_WAITING":
+                    cephra.Phone.NotificationHistoryManager.addTicketWaitingNotification(customer, ticketId);
+                    break;
+                case "TICKET_PENDING":
+                    cephra.Phone.NotificationHistoryManager.addTicketPendingNotification(customer, ticketId);
+                    break;
+                case "MY_TURN":
+                    cephra.Phone.NotificationHistoryManager.addMyTurnNotification(customer, ticketId, bayNumber);
+                    break;
+                case "FULL_CHARGE":
+                    cephra.Phone.NotificationHistoryManager.addFullChargeNotification(customer, ticketId);
+                    break;
+                default:
+                    System.out.println("Queue: Unknown notification type: " + notificationType);
+                    return;
+            }
+            
+            // Show visual notification on phone screen
+            showVisualNotification(customer, notificationType, ticketId, bayNumber);
+            
+        } catch (Exception e) {
+            System.err.println("Error triggering notification for customer " + customer + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Shows the actual visual notification on the phone screen
+     */
+    private void showVisualNotification(String customer, String notificationType, String ticketId, String bayNumber) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Find the phone frame
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                cephra.Frame.Phone phoneFrame = null;
+                
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        phoneFrame = (cephra.Frame.Phone) window;
+                        break;
+                    }
+                }
+                
+                if (phoneFrame == null) {
+                    System.out.println("Queue: Phone frame not found - cannot show visual notification");
+                    return;
+                }
+                
+                // Check if the current user matches the notification recipient
+                String currentUser = cephra.CephraDB.getCurrentUsername();
+                if (currentUser == null || !currentUser.equals(customer)) {
+                    System.out.println("Queue: Current user (" + currentUser + ") doesn't match notification recipient (" + customer + ") - skipping visual notification");
+                    return;
+                }
+                
+                System.out.println("Queue: Showing visual notification for " + notificationType + " to user " + customer);
+                
+                // Show the appropriate notification based on type
+                switch (notificationType) {
+                    case "TICKET_WAITING":
+                        cephra.Phone.NotifTicketWaiting waitingNotif = new cephra.Phone.NotifTicketWaiting();
+                        // Update the ticket number in the notification text
+                        if (ticketId != null) {
+                            try {
+                                java.lang.reflect.Field statusField = waitingNotif.getClass().getDeclaredField("Statuswaiting");
+                                statusField.setAccessible(true);
+                                javax.swing.JLabel statusLabel = (javax.swing.JLabel) statusField.get(waitingNotif);
+                                statusLabel.setText("Your ticket \"" + ticketId + "\" is now waiting");
+                            } catch (Exception ex) {
+                                System.err.println("Could not update ticket ID in waiting notification: " + ex.getMessage());
+                            }
+                        }
+                        waitingNotif.addToFrame(phoneFrame);
+                        waitingNotif.showNotification();
+                        System.out.println("Queue: Showed TICKET_WAITING notification for ticket " + ticketId);
+                        break;
+                        
+                    case "TICKET_PENDING":
+                        cephra.Phone.NotifTicketPending pendingNotif = new cephra.Phone.NotifTicketPending();
+                        // Update the ticket number in the notification text
+                        if (ticketId != null) {
+                            try {
+                                java.lang.reflect.Field statusField = pendingNotif.getClass().getDeclaredField("Statuspending");
+                                statusField.setAccessible(true);
+                                javax.swing.JLabel statusLabel = (javax.swing.JLabel) statusField.get(pendingNotif);
+                                statusLabel.setText("Your ticket \"" + ticketId + "\" is now pending");
+                            } catch (Exception ex) {
+                                System.err.println("Could not update ticket ID in pending notification: " + ex.getMessage());
+                            }
+                        }
+                        pendingNotif.addToFrame(phoneFrame);
+                        pendingNotif.showNotification();
+                        System.out.println("Queue: Showed TICKET_PENDING notification for ticket " + ticketId);
+                        break;
+                        
+                    case "MY_TURN":
+                        cephra.Phone.Myturn myTurnNotif = new cephra.Phone.Myturn();
+                        // Update the bay number text if available
+                        if (bayNumber != null) {
+                            // Use reflection to update the StatusGo label text
+                            try {
+                                java.lang.reflect.Field statusGoField = myTurnNotif.getClass().getDeclaredField("StatusGo");
+                                statusGoField.setAccessible(true);
+                                javax.swing.JLabel statusGoLabel = (javax.swing.JLabel) statusGoField.get(myTurnNotif);
+                                statusGoLabel.setText("Please go to your bay \"" + bayNumber + "\" now");
+                            } catch (Exception ex) {
+                                System.err.println("Could not update bay number in MyTurn notification: " + ex.getMessage());
+                            }
+                        }
+                        myTurnNotif.addToFrame(phoneFrame);
+                        myTurnNotif.showNotification();
+                        System.out.println("Queue: Showed MY_TURN notification for bay " + bayNumber);
+                        break;
+                        
+                    case "FULL_CHARGE":
+                        // Use the correct Fullnotif class for full charge notifications
+                        cephra.Phone.Fullnotif fullChargeNotif = new cephra.Phone.Fullnotif();
+                        
+                        // The Fullnotif already has the proper text "Ur car is now fullcharge"
+                        // No need to modify the text as it's already appropriate
+                        
+                        fullChargeNotif.addToFrame(phoneFrame);
+                        fullChargeNotif.showNotification();
+                        System.out.println("Queue: Showed FULL_CHARGE notification using Fullnotif");
+                        break;
+                        
+                    default:
+                        System.out.println("Queue: Unknown notification type for visual display: " + notificationType);
+                        break;
+                }
+                
+            } catch (Exception e) {
+                System.err.println("Error showing visual notification: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+    
+    /**
+     * Determines the bay number for a ticket based on its assignment
+     */
+    private String determineBayNumber(String ticket, boolean isFast) {
+        if (ticket == null || ticket.trim().isEmpty()) {
+            return "Unknown";
+        }
+        
+        try {
+            if (isFast) {
+                // Check fast charging slots
+                if (ticket.equals(fastslot1.getText())) return "Bay-1";
+                if (ticket.equals(fastslot2.getText())) return "Bay-2";
+                if (ticket.equals(fastslot3.getText())) return "Bay-3";
+                
+                // If not found in current display, try to determine from ticket type
+                // Fast charging bays are typically Bay-1, Bay-2, Bay-3
+                return "Bay-1"; // Default to first fast charging bay
+            } else {
+                // Check normal charging slots
+                if (ticket.equals(normalcharge1.getText())) return "Bay-4";
+                if (ticket.equals(normalcharge2.getText())) return "Bay-5";
+                if (ticket.equals(normalcharge3.getText())) return "Bay-6";
+                if (ticket.equals(normalcharge4.getText())) return "Bay-7";
+                if (ticket.equals(normalcharge5.getText())) return "Bay-8";
+                
+                // If not found in current display, try to determine from ticket type
+                // Normal charging bays are typically Bay-4, Bay-5, Bay-6, Bay-7, Bay-8
+                return "Bay-4"; // Default to first normal charging bay
+            }
+        } catch (Exception e) {
+            System.err.println("Error determining bay number for ticket " + ticket + ": " + e.getMessage());
+        }
+        
+        // Default fallback based on ticket type
+        return isFast ? "Bay-1" : "Bay-4";
     }
 }
