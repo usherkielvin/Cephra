@@ -209,22 +209,7 @@ public class home extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
     
-    private void notificationbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notificationbuttonActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        NotificationHistory notificationHistory = new NotificationHistory();
-                        notificationHistory.setPreviousPanel(new cephra.Phone.home());
-                        phoneFrame.switchPanel(notificationHistory);
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_notificationbuttonActionPerformed
+   //GEN-LAST:event_notificationbuttonActionPerformed
 
     private void checkpopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkpopActionPerformed
         SwingUtilities.invokeLater(new Runnable() {

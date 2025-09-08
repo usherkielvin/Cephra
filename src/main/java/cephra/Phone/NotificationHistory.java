@@ -35,7 +35,11 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         NotificationHistoryManager.addNotificationUpdateListener(this);
         
         // Add close button
-        closeButton.addActionListener(e -> goBackToPreviousPanel());
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                goBackToPreviousPanel();
+            }
+        });
         
         // Load notification entries
         loadNotificationEntries();
