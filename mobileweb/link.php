@@ -85,38 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#062635" />
-    <link rel="stylesheet" href="assets/css/main.css" />
-    <style>
-        .link-container {
-            text-align: center;
-            padding: 20px;
-            position: relative;
-            z-index: 200;
-        }
-        .link-button {
-            background: #4CAF50;
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 20px 0;
-        }
-        .link-button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-        .terms-checkbox {
-            margin: 20px 0;
-            font-size: 14px;
-        }
-        
-        .error-message {
-            color: red;
-            margin: 10px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/pages/link.css" />
 </head>
 <body class="homepage is-preload">
     <div id="page-wrapper">

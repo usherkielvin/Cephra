@@ -30,16 +30,8 @@ if ($conn) {
 		<link rel="apple-touch-icon" href="images/logo.png?v=2" />
 		<link rel="manifest" href="manifest.webmanifest" />
 		<meta name="theme-color" content="#062635" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<style>
-			.history-list { background: #fff; border-radius: 8px; padding: 10px; }
-			.history-item { border-bottom: 1px solid #eee; padding: 10px 5px; }
-			.history-item:last-child { border-bottom: 0; }
-			.history-meta { font-size: 0.9em; color: #666; }
-			.panel-nav { display:flex; gap:12px; justify-content:center; margin-top:16px; }
-			.panel-nav .button { min-width: 110px; text-align:center; }
-
-		</style>
+		<link rel="stylesheet" href="css/main.css" />
+		<link rel="stylesheet" href="css/pages/history.css" />
 	</head>
 	<body class="homepage is-preload">
 		<div id="page-wrapper">

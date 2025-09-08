@@ -2075,7 +2075,11 @@ public class BayManagement extends javax.swing.JPanel {
     public static int addTicketToWaitingGrid(String ticketId, String username, String serviceType, int batteryLevel) {
         try {
             // Check if there's charging capacity for this service type
-            boolean isFastCharging = "Fast".equals(serviceType);
+            boolean isFastCharging = false;
+            if (serviceType != null) {
+                String svc = serviceType.trim().toLowerCase();
+                isFastCharging = svc.contains("fast");
+            }
             if (!hasChargingCapacity(isFastCharging)) {
                 System.out.println("No available charging bays for " + serviceType + " service. Ticket " + ticketId + " cannot be added to waiting grid.");
                 return -1;

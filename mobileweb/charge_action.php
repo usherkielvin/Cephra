@@ -119,20 +119,8 @@ if (!$stmt->execute()) {
     exit();
 }
 
-// Also create an active_tickets entry used by the charging flow
-$stmt = $conn->prepare("INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status, bay_number) VALUES (:username, :ticket_id, :service_type, :battery_level, :battery_level, 'Pending', :bay_number)");
-$stmt->bindParam(':username', $username);
-$stmt->bindParam(':ticket_id', $ticketId);
-$stmt->bindParam(':service_type', $serviceType);  // Fix: bind correct serviceType, not bayType
-$stmt->bindParam(':battery_level', $batteryLevel);
-$stmt->bindParam(':bay_number', $bayNumber);
-
-if (!$stmt->execute()) {
-    $errorInfo = $stmt->errorInfo();
-    http_response_code(500);
-    echo json_encode(['error' => 'Failed to create queue ticket', 'db_error' => $errorInfo[2]]);
-    exit();
-}
+// Do NOT create an active_tickets entry at ticket creation time.
+// Active ticket should be created only by Admin when assigning to a bay (Queue flow)
 
 // Set current service in session
 $_SESSION['currentService'] = $serviceType;
