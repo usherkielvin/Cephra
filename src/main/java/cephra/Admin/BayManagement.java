@@ -378,6 +378,13 @@ public class BayManagement extends javax.swing.JPanel {
         setSize(1000, 750);
         setupDateTimeTimer();
         
+        // Add hover effects to navigation buttons
+        ButtonHoverEffect.addHoverEffect(quebutton);
+        ButtonHoverEffect.addHoverEffect(staffbutton);
+        ButtonHoverEffect.addHoverEffect(businessbutton);
+        ButtonHoverEffect.addHoverEffect(historybutton);
+        
+        
         // Load toggle states from database ONLY ONCE - never reload
         loadToggleStates();
         

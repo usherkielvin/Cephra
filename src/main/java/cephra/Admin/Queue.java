@@ -65,6 +65,13 @@ public class Queue extends javax.swing.JPanel {
         
         // Register this Queue instance with BayManagement for real-time updates
         cephra.Admin.BayManagement.registerQueueInstance(this);
+
+        // Add hover effects to navigation buttons
+        ButtonHoverEffect.addHoverEffect(Baybutton);
+        ButtonHoverEffect.addHoverEffect(businessbutton);
+        ButtonHoverEffect.addHoverEffect(exitlogin);
+        ButtonHoverEffect.addHoverEffect(staffbutton);
+        ButtonHoverEffect.addHoverEffect(historybutton);
     }
 
     private void updateStatusCounters() {

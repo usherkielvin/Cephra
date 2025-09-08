@@ -66,11 +66,18 @@ public class Business_Overview extends javax.swing.JPanel {
 
 
         
+        // Add hover effects to navigation buttons
+        ButtonHoverEffect.addHoverEffect(quebutton);
+        ButtonHoverEffect.addHoverEffect(Baybutton);
+        ButtonHoverEffect.addHoverEffect(historybutton);
+        ButtonHoverEffect.addHoverEffect(staffbutton);
+        
+
         //Spinner setHorizontalAlignment
         JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) MinfeeSpinner.getEditor();
         javax.swing.JFormattedTextField textfield = editor.getTextField();
         textfield.setHorizontalAlignment(JTextField.CENTER);
-        
+
         JSpinner.DefaultEditor editor1 = (JSpinner.DefaultEditor) RPHSpinner.getEditor();
         javax.swing.JFormattedTextField textfield1 = editor1.getTextField();
         textfield1.setHorizontalAlignment(JTextField.CENTER);

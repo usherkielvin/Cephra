@@ -56,7 +56,14 @@ public class StaffRecord extends javax.swing.JPanel {
         
         // Add action listener to passReset button
         passReset.addActionListener(_ -> resetSelectedStaffPassword());
-        
+
+        // Add hover effects to navigation buttons
+        ButtonHoverEffect.addHoverEffect(quebutton);
+        ButtonHoverEffect.addHoverEffect(Baybutton);
+        ButtonHoverEffect.addHoverEffect(historybutton);
+        ButtonHoverEffect.addHoverEffect(businessbutton);
+        ButtonHoverEffect.addHoverEffect(exitlogin);
+
         refreshStaffTable();
     }
 

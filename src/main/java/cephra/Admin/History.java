@@ -16,6 +16,15 @@ public class History extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         setupDateTimeTimer();
+        
+        // Add hover effects to navigation buttons
+        ButtonHoverEffect.addHoverEffect(Baybutton);
+        ButtonHoverEffect.addHoverEffect(staffbutton);
+        ButtonHoverEffect.addHoverEffect(businessbutton);
+        ButtonHoverEffect.addHoverEffect(quebutton);
+        ButtonHoverEffect.addHoverEffect(exitlogin);
+        
+        
         // Register history table model so other modules can add rows
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
