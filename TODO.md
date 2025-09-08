@@ -13,11 +13,12 @@ In History.java, line 58: `jScrollPane1.setLayout(new BorderLayout());` is incor
 
 ## Summary
 ✅ **FIXED**: Removed the incorrect `jScrollPane1.setLayout(new BorderLayout());` line from History.java
-✅ **FIXED**: Changed table auto-resize mode from `AUTO_RESIZE_ALL_COLUMNS` to `AUTO_RESIZE_OFF` to allow horizontal scrolling
-✅ **FIXED**: Enabled vertical scrollbar (`VERTICAL_SCROLLBAR_AS_NEEDED`) to show all records
-✅ **FIXED**: Updated table preferred size to match scrollpane dimensions (980x550)
+✅ **FIXED**: Disabled vertical scrollbar (`VERTICAL_SCROLLBAR_NEVER`) to match staff table behavior
+✅ **FIXED**: Disabled horizontal scrollbar (`HORIZONTAL_SCROLLBAR_NEVER`) to match staff table behavior
+✅ **FIXED**: Set table auto-resize mode to `AUTO_RESIZE_ALL_COLUMNS` to match staff table behavior
+✅ **FIXED**: Disabled auto-scrolling (`setAutoscrolls(false)`) to match staff table behavior
 ✅ **TESTED**: History panel now opens without ClassCastException
-✅ **VERIFIED**: History table displays all charging history data with proper scrolling
+✅ **VERIFIED**: History table now behaves consistently with staff table (no scrollbars, fits content)
 
 ## Files to Edit
 - src/main/java/cephra/Admin/History.java

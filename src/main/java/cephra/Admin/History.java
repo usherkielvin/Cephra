@@ -1,7 +1,7 @@
 
 package cephra.Admin;
 
-import java.awt.BorderLayout;
+//import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Window;
@@ -35,6 +35,9 @@ public class History extends javax.swing.JPanel {
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
         jScrollPane1.setViewportView(jTable1);
+
+        // Ensure vertical lines are hidden like staff table
+       
        
         
         
@@ -52,8 +55,9 @@ public class History extends javax.swing.JPanel {
             }
         });
         
-        // Enable vertical scrollbar for scrolling through history records
-        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        // Disable vertical and horizontal scrollbars like staff table
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   
         
         JTableHeader header = jTable1.getTableHeader();
@@ -138,8 +142,8 @@ public class History extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF); // Allow horizontal scrolling
-        jTable1.setAutoscrolls(true); // Enable auto-scrolling
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS); // Disable horizontal scrolling
+        jTable1.setAutoscrolls(false); // Disable auto-scrolling
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
         jTable1.setPreferredSize(new java.awt.Dimension(980, 550)); // Match scrollpane size
