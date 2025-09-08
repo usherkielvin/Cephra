@@ -3,74 +3,37 @@ package cephra.Phone;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class NotificationPop extends javax.swing.JPanel {
+public class NotifTicketWaiting extends javax.swing.JPanel {
 
-    public Timer animationTimer;
-    public Timer hideTimer;
-    public int yPosition = -110; // Start position (hidden above the screen)
+    private Timer animationTimer;
+    private Timer hideTimer;
+    private int yPosition = -110; // Start position (hidden above the screen)
     private int targetY = 0; // Target position when fully shown
-    public boolean isShowing = false;
+    private boolean isShowing = false;
     private static final int ANIMATION_SPEED = 5; // Pixels to move per step
     private static final int ANIMATION_DELAY = 10; // Milliseconds between steps
     private static final int DISPLAY_DURATION = 3000; // Display for 3 seconds
     
-    public NotificationPop() {
+    public NotifTicketWaiting() {
         initComponents();
         setVisible(false); // Start hidden
     }
     
   
-    public NotificationPop(String otp) {
-        this();
-        otpPreviewLabel.setText(otp);
-    }
+   
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        otpPreviewLabel = new javax.swing.JLabel();
-        cephraemail = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        Statuswaiting = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 0, 0));
-        setOpaque(false);
         setLayout(null);
 
-        otpPreviewLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        otpPreviewLabel.setText("99999");
-        add(otpPreviewLabel);
-        otpPreviewLabel.setBounds(220, 140, 120, 30);
-
-        cephraemail.setBorder(null);
-        cephraemail.setBorderPainted(false);
-        cephraemail.setContentAreaFilled(false);
-        cephraemail.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cephraemailActionPerformed(evt);
-            }
-        });
-        add(cephraemail);
-        cephraemail.setBounds(-60, 0, 390, 170);
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Notif.png"))); // NOI18N
-        jLabel1.setText("jLabel1");
-        add(jLabel1);
-        jLabel1.setBounds(-20, 0, 380, 189);
+        Statuswaiting.setForeground(new java.awt.Color(0, 102, 102));
+        Statuswaiting.setText("Your ticket \"ticketnumber\" is now waiting");
+        add(Statuswaiting);
+        Statuswaiting.setBounds(40, 130, 250, 16);
     }// </editor-fold>//GEN-END:initComponents
-
-private void cephraemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cephraemailActionPerformed
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.PasswordEmail());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_cephraemailActionPerformed
 
     /**
      * Shows the notification with animation sliding down from the top
@@ -78,16 +41,8 @@ private void cephraemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     public void showNotification() {
         if (isShowing) return; // Prevent multiple show animations
         
-        // Record this notification in history
-        try {
-            String currentUser = cephra.CephraDB.getCurrentUsername();
-            if (currentUser != null) {
-                String otpText = otpPreviewLabel != null ? otpPreviewLabel.getText() : "N/A";
-                NotificationHistoryManager.addEmailNotification(currentUser, otpText);
-            }
-        } catch (Exception e) {
-            System.err.println("Error recording email notification: " + e.getMessage());
-        }
+        // History recording is now handled by the Queue class with proper ticket ID
+        // No need to record duplicate history here
         
         isShowing = true;
         setVisible(true);
@@ -169,9 +124,7 @@ private void cephraemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     /**
      * Update the OTP text
      */
-    public void updateOTP(String otp) {
-        otpPreviewLabel.setText(otp);
-    }
+    
     
     /**
      * Add this notification to a parent JFrame
@@ -187,8 +140,6 @@ private void cephraemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cephraemail;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel otpPreviewLabel;
+    private javax.swing.JLabel Statuswaiting;
     // End of variables declaration//GEN-END:variables
 }
