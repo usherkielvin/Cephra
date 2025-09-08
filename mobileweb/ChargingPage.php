@@ -37,7 +37,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 		<link rel="apple-touch-icon" href="images/logo.png?v=2" />
 		<link rel="manifest" href="manifest.webmanifest" />
 		<meta name="theme-color" content="#062635" />
-		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="css/main.css" />
 	</head>
 	<body class="homepage is-preload">
 		<div id="page-wrapper">

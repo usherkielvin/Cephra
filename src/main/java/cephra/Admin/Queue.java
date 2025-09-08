@@ -177,7 +177,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     int batteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
                     
                     // Check if there's charging capacity for this service type
-                    boolean isFastCharging = "Fast".equals(serviceName);
+                    boolean isFastCharging = false;
+                    if (serviceName != null) {
+                        String svc = serviceName.trim().toLowerCase();
+                        isFastCharging = svc.contains("fast");
+                    }
                     if (!cephra.Admin.BayManagement.hasChargingCapacity(isFastCharging)) {
                         System.out.println("Queue: No available charging bays for " + serviceName + " service. Cannot move ticket " + ticket + " to waiting.");
                         // Keep status as Pending
@@ -561,45 +565,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void nextNormalTicket() {
         String ticket = findNextTicketByType("NCH");
         if (ticket != null) {
-            // Check if there's an available slot in normal charge grid
-            boolean slotAvailable = false;
-            
-            if (normalcharge1.getText().isEmpty() || normalcharge1.getText().equals("jButton11")) {
-                normalcharge1.setText(ticket);
-                normalcharge1.setVisible(true);
-                slotAvailable = true;
-            } else if (normalcharge2.getText().isEmpty() || normalcharge2.getText().equals("jButton11")) {
-                normalcharge2.setText(ticket);
-                normalcharge2.setVisible(true);
-                slotAvailable = true;
-            } else if (normalcharge3.getText().isEmpty() || normalcharge3.getText().equals("jButton12")) {
-                normalcharge3.setText(ticket);
-                normalcharge3.setVisible(true);
-                slotAvailable = true;
-            } else if (normalcharge4.getText().isEmpty() || normalcharge4.getText().equals("jButton13")) {
-                normalcharge4.setText(ticket);
-                normalcharge4.setVisible(true);
-                slotAvailable = true;
-            } else if (normalcharge5.getText().isEmpty() || normalcharge5.getText().equals("jButton14")) {
-                normalcharge5.setText(ticket);
-                normalcharge5.setVisible(true);
-                slotAvailable = true;
-            }
-            
-                         // Only remove from waiting grid if a slot was available
-             if (slotAvailable) {
+            // Assign via BayManagement so grids update correctly
+            boolean assigned = assignToNormalSlot(ticket);
+            if (assigned) {
                 setTableStatusToChargingByTicket(ticket);
-                 removeTicketFromGrid(ticket);
-                 // Update Monitor normal grid display
-                 updateMonitorNormalGrid();
-             } else {
-                 // Show message that all normal charge bays are full
-                 JOptionPane.showMessageDialog(this,
-                     "Normal Charge Bays 1-5 are full!\nTicket " + ticket + " remains in waiting queue.",
-                     "Normal Charge Bays Full",
-                     JOptionPane.INFORMATION_MESSAGE);
-             }
-             // All slots full - ticket remains in waiting grid
+                removeTicketFromGrid(ticket);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Normal Charge Bays 1-5 are full!\nTicket " + ticket + " remains in waiting queue.",
+                    "Normal Charge Bays Full",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
         }
         updateStatusCounters();
     }
@@ -607,37 +583,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void nextFastTicket() {
         String ticket = findNextTicketByType("FCH");
         if (ticket != null) {
-            // Check if there's an available slot in fast panel
-            boolean slotAvailable = false;
-            
-            if (fastslot1.getText().isEmpty() || fastslot1.getText().equals("jButton11")) {
-                fastslot1.setText(ticket);
-                fastslot1.setVisible(true);
-                slotAvailable = true;
-            } else if (fastslot2.getText().isEmpty() || fastslot2.getText().equals("jButton12")) {
-                fastslot2.setText(ticket);
-                fastslot2.setVisible(true);
-                slotAvailable = true;
-            } else if (fastslot3.getText().isEmpty() || fastslot3.getText().equals("jButton13")) {
-                fastslot3.setText(ticket);
-                fastslot3.setVisible(true);
-                slotAvailable = true;
-            }
-            
-                         // Only remove from waiting grid if a slot was available
-             if (slotAvailable) {
+            // Assign via BayManagement so grids update correctly
+            boolean assigned = assignToFastSlot(ticket);
+            if (assigned) {
                 setTableStatusToChargingByTicket(ticket);
-                 removeTicketFromGrid(ticket);
-                 // Update Monitor fast grid display
-                 updateMonitorFastGrid();
-             } else {
-                 // Show message that all fast charge bays are full
-                 JOptionPane.showMessageDialog(this,
-                     "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue.",
-                     "Fast Charge Bays Full",
-                     JOptionPane.INFORMATION_MESSAGE);
-             }
-             // All slots full - ticket remains in waiting grid
+                removeTicketFromGrid(ticket);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue.",
+                    "Fast Charge Bays Full",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
         }
         updateStatusCounters();
     }

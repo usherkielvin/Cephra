@@ -204,13 +204,7 @@ public class Login extends javax.swing.JPanel {
         javax.swing.JOptionPane.showMessageDialog(this, "Please contact the administrator to reset your password.", "Forgot Password", javax.swing.JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // Close the Admin frame when back/close is pressed
-        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Login.this);
-        if (w instanceof cephra.Frame.Admin) {
-            ((cephra.Frame.Admin) w).dispose();
-        }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    
 
     private void attemptLogin() {
     // Check if in cooldown period

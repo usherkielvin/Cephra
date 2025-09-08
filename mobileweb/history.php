@@ -30,17 +30,8 @@ if ($conn) {
 		<link rel="apple-touch-icon" href="images/logo.png?v=2" />
 		<link rel="manifest" href="manifest.webmanifest" />
 		<meta name="theme-color" content="#062635" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<style>
-			.history-list { background: #fff; border-radius: 8px; padding: 10px; }
-			.history-item { border-bottom: 1px solid #eee; padding: 10px 5px; }
-			.history-item:last-child { border-bottom: 0; }
-			.history-meta { font-size: 0.9em; color: #666; }
-			.panel-nav { display:flex; gap:12px; justify-content:center; margin-top:16px; }
-			.panel-nav .button { min-width: 110px; text-align:center; }
-			.nav-buttons { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
-			.nav-button { width: 50px; height: 50px; border-radius: 50%; border: none; background: #007bff; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-		</style>
+		<link rel="stylesheet" href="css/main.css" />
+		<link rel="stylesheet" href="css/pages/history.css" />
 	</head>
 	<body class="homepage is-preload">
 		<div id="page-wrapper">
@@ -96,11 +87,7 @@ if ($conn) {
 								<a class="button alt" href="link.php">Prev: Link</a>
 								<a class="button" href="profile.php">Next: Profile</a>
 							</div>
-							<div class="nav-buttons">
-								<button class="nav-button" onclick="window.location.href='dashboard.php'" title="Home">🏠</button>
-								<button class="nav-button" onclick="window.location.href='ChargingPage.php'" title="Charge">🔋</button>
-								<button class="nav-button" onclick="window.location.href='profile.php'" title="Profile">👤</button>
-							</div>
+
 						</section>
 					</div>
 				</div>
