@@ -138,26 +138,29 @@ public class PayPop extends javax.swing.JPanel {
      * Hides the PayPop and cleans up resources
      */
     public static void hidePayPop() {
-        if (currentInstance != null && isShowing) {
-            SwingUtilities.invokeLater(() -> {
-                if (currentInstance.getParent() != null) {
-                    currentInstance.getParent().remove(currentInstance);
+    if (currentInstance != null && isShowing) {
+        // Capture a local reference to avoid race conditions
+        PayPop instance = currentInstance;
+
+        SwingUtilities.invokeLater(() -> {
+            if (instance.getParent() != null) {
+                instance.getParent().remove(instance);
+            }
+            currentInstance = null;
+            currentTicketId = null;
+            isShowing = false;
+
+            // Repaint the phone frame
+            for (Window window : Window.getWindows()) {
+                if (window instanceof cephra.Frame.Phone) {
+                    window.repaint();
+                    break;
                 }
-                currentInstance = null;
-                currentTicketId = null;
-                isShowing = false;
-                
-                // Repaint the phone frame
-                Window[] windows = Window.getWindows();
-                for (Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        window.repaint();
-                        break;
-                    }
-                }
-            });
-        }
+            }
+        });
     }
+}
+
 
     // Sets the ticket number on the UI label immediately (safe call)
     private void setTicketOnUi(String ticketId) {
