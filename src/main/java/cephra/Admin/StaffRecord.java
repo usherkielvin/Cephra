@@ -75,6 +75,7 @@ public class StaffRecord extends javax.swing.JPanel {
     private void initComponents() {
 
         exitlogin = new javax.swing.JButton();
+        STAFFtEXT = new javax.swing.JLabel();
         businessbutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         Baybutton = new javax.swing.JButton();
@@ -104,6 +105,14 @@ public class StaffRecord extends javax.swing.JPanel {
         add(exitlogin);
         exitlogin.setBounds(930, 0, 70, 60);
 
+        STAFFtEXT.setForeground(new java.awt.Color(4, 167, 182));
+        STAFFtEXT.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        STAFFtEXT.setText("STAFF RECORDS");
+        add(STAFFtEXT);
+        STAFFtEXT.setBounds(505, 26, 96, 15);
+
+        businessbutton.setForeground(new java.awt.Color(255, 255, 255));
+        businessbutton.setText("BUSINESS OVERVIEW");
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
@@ -113,8 +122,10 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         });
         add(businessbutton);
-        businessbutton.setBounds(620, 10, 140, 40);
+        businessbutton.setBounds(617, 26, 136, 15);
 
+        historybutton.setForeground(new java.awt.Color(255, 255, 255));
+        historybutton.setText("HISTORY");
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
@@ -124,8 +135,10 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(430, 10, 60, 40);
+        historybutton.setBounds(433, 26, 57, 15);
 
+        Baybutton.setForeground(new java.awt.Color(255, 255, 255));
+        Baybutton.setText("BAYS");
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
         Baybutton.setContentAreaFilled(false);
@@ -135,8 +148,10 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         });
         add(Baybutton);
-        Baybutton.setBounds(380, 10, 40, 40);
+        Baybutton.setBounds(385, 26, 33, 15);
 
+        quebutton.setForeground(new java.awt.Color(255, 255, 255));
+        quebutton.setText("QUEUE LIST");
         quebutton.setBorder(null);
         quebutton.setBorderPainted(false);
         quebutton.setContentAreaFilled(false);
@@ -146,7 +161,7 @@ public class StaffRecord extends javax.swing.JPanel {
             }
         });
         add(quebutton);
-        quebutton.setBounds(280, 10, 90, 40);
+        quebutton.setBounds(289, 26, 80, 15);
 
         profRemove.setBorderPainted(false);
         profRemove.setContentAreaFilled(false);
@@ -406,6 +421,7 @@ public class StaffRecord extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BTNsearch;
     private javax.swing.JButton Baybutton;
+    private javax.swing.JLabel STAFFtEXT;
     private javax.swing.JButton businessbutton;
     private javax.swing.JLabel datetimeStaff;
     private javax.swing.JButton exitlogin;

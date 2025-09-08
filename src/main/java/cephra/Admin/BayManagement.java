@@ -449,6 +449,7 @@ public class BayManagement extends javax.swing.JPanel {
         exitlogin = new javax.swing.JButton();
         labelStaff = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -527,6 +528,8 @@ public class BayManagement extends javax.swing.JPanel {
         add(datetime);
         datetime.setBounds(820, 40, 170, 20);
 
+        quebutton.setForeground(new java.awt.Color(255, 255, 255));
+        quebutton.setText("QUEUE LIST");
         quebutton.setBorder(null);
         quebutton.setBorderPainted(false);
         quebutton.setContentAreaFilled(false);
@@ -536,8 +539,10 @@ public class BayManagement extends javax.swing.JPanel {
             }
         });
         add(quebutton);
-        quebutton.setBounds(270, 10, 100, 40);
+        quebutton.setBounds(289, 26, 80, 15);
 
+        staffbutton.setForeground(new java.awt.Color(255, 255, 255));
+        staffbutton.setText("STAFF RECORDS");
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
         staffbutton.setContentAreaFilled(false);
@@ -547,8 +552,10 @@ public class BayManagement extends javax.swing.JPanel {
             }
         });
         add(staffbutton);
-        staffbutton.setBounds(500, 20, 110, 40);
+        staffbutton.setBounds(505, 26, 96, 15);
 
+        businessbutton.setForeground(new java.awt.Color(255, 255, 255));
+        businessbutton.setText("BUSINESS OVERVIEW");
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
@@ -558,8 +565,10 @@ public class BayManagement extends javax.swing.JPanel {
             }
         });
         add(businessbutton);
-        businessbutton.setBounds(610, 10, 140, 40);
+        businessbutton.setBounds(617, 26, 136, 15);
 
+        historybutton.setForeground(new java.awt.Color(255, 255, 255));
+        historybutton.setText("HISTORY");
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
@@ -569,7 +578,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(430, 10, 60, 40);
+        historybutton.setBounds(433, 26, 57, 15);
 
         exitlogin.setBorder(null);
         exitlogin.setBorderPainted(false);
@@ -593,6 +602,11 @@ public class BayManagement extends javax.swing.JPanel {
         jLabel3.setText("Hello,");
         add(jLabel3);
         jLabel3.setBounds(820, 10, 50, 30);
+
+        jLabel2.setForeground(new java.awt.Color(4, 167, 182));
+        jLabel2.setText("BAYS");
+        add(jLabel2);
+        jLabel2.setBounds(385, 26, 33, 15);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Bay.png"))); // NOI18N
         add(jLabel1);
@@ -678,6 +692,7 @@ public class BayManagement extends javax.swing.JPanel {
     private javax.swing.JButton exitlogin;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel labelStaff;
     private javax.swing.JButton quebutton;

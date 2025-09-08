@@ -1067,11 +1067,14 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         datetimeStaff = new javax.swing.JLabel();
         labelStaff = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         MainIcon = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
+        Baybutton.setForeground(new java.awt.Color(255, 255, 255));
+        Baybutton.setText("BAYS");
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
         Baybutton.setContentAreaFilled(false);
@@ -1081,8 +1084,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         add(Baybutton);
-        Baybutton.setBounds(380, 10, 40, 40);
+        Baybutton.setBounds(385, 26, 33, 15);
 
+        businessbutton.setForeground(new java.awt.Color(255, 255, 255));
+        businessbutton.setText("BUSINESS OVERVIEW");
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
@@ -1092,7 +1097,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         add(businessbutton);
-        businessbutton.setBounds(610, 10, 140, 40);
+        businessbutton.setBounds(617, 26, 136, 15);
 
         exitlogin.setBorder(null);
         exitlogin.setBorderPainted(false);
@@ -1105,6 +1110,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         add(exitlogin);
         exitlogin.setBounds(930, 0, 70, 60);
 
+        staffbutton.setForeground(new java.awt.Color(255, 255, 255));
+        staffbutton.setText("STAFF RECORDS");
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
         staffbutton.setContentAreaFilled(false);
@@ -1114,8 +1121,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         add(staffbutton);
-        staffbutton.setBounds(500, 10, 110, 40);
+        staffbutton.setBounds(505, 26, 96, 15);
 
+        historybutton.setForeground(new java.awt.Color(255, 255, 255));
+        historybutton.setText("HISTORY");
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
@@ -1125,7 +1134,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         });
         add(historybutton);
-        historybutton.setBounds(430, 10, 60, 40);
+        historybutton.setBounds(433, 26, 57, 15);
 
         jTabbedPane1.setBackground(new java.awt.Color(4, 38, 55));
         jTabbedPane1.setForeground(new java.awt.Color(255, 255, 255));
@@ -1440,6 +1449,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         add(jLabel3);
         jLabel3.setBounds(820, 10, 50, 30);
 
+        jLabel1.setForeground(new java.awt.Color(4, 167, 182));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("QUEUE LIST");
+        add(jLabel1);
+        jLabel1.setBounds(289, 26, 80, 15);
+
         MainIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Tab Pane.png"))); // NOI18N
         add(MainIcon);
         MainIcon.setBounds(0, -10, 1000, 770);
@@ -1522,6 +1537,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;

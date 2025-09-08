@@ -70,7 +70,6 @@ public class Login extends javax.swing.JPanel {
         passfield = new javax.swing.JPasswordField();
         cooldownlabel = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1000, 750));
@@ -110,7 +109,7 @@ public class Login extends javax.swing.JPanel {
         add(loginbutton);
         loginbutton.setBounds(565, 600, 240, 60);
 
-        passfield.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        passfield.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         passfield.setBorder(null);
         passfield.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -119,11 +118,8 @@ public class Login extends javax.swing.JPanel {
         });
         add(passfield);
         passfield.setBounds(540, 433, 320, 45);
-        cooldownlabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        cooldownlabel.setForeground(new java.awt.Color(255, 0, 0));
-        cooldownlabel.setText("Cooldown");
         add(cooldownlabel);
-        cooldownlabel.setBounds(520, 510, 160, 30);
+        cooldownlabel.setBounds(520, 510, 160, 0);
 
         jButton1.setText("Forgot Password?");
         jButton1.setBorder(null);
@@ -137,16 +133,6 @@ public class Login extends javax.swing.JPanel {
         });
         add(jButton1);
         jButton1.setBounds(740, 490, 200, 30);
-
-        jButton2.setBorderPainted(false);
-        jButton2.setContentAreaFilled(false);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        add(jButton2);
-        jButton2.setBounds(935, 10, 50, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN PANEL.png"))); // NOI18N
         add(jLabel1);
@@ -263,6 +249,8 @@ public class Login extends javax.swing.JPanel {
     } else {
         // Increment failed login attempts
         loginAttempts++;
+
+        Toolkit.getDefaultToolkit().beep();
         
         if (loginAttempts >= MAX_ATTEMPTS) {
             // Start cooldown timer
@@ -319,7 +307,6 @@ private void startCooldownTimer() {
     private javax.swing.JButton See;
     private javax.swing.JLabel cooldownlabel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginbutton;
     private javax.swing.JPasswordField passfield;
@@ -344,6 +331,10 @@ private void startCooldownTimer() {
             if (username && !string.matches("[A-Za-z0-9_]*")) return;
             if ((fb.getDocument().getLength() + string.length()) <= max) {
                 super.insertString(fb, offset, string, attr);
+                if (fb.getDocument().getLength() == max) {
+                    java.awt.Toolkit.getDefaultToolkit().beep();
+                    System.out.println("Beep played for max characters");
+                }
             } else {
                 java.awt.Toolkit.getDefaultToolkit().beep();
             }
@@ -355,6 +346,10 @@ private void startCooldownTimer() {
             if (username && !text.matches("[A-Za-z0-9_]*")) return;
             if ((fb.getDocument().getLength() - length + text.length()) <= max) {
                 super.replace(fb, offset, length, text, attrs);
+                if (fb.getDocument().getLength() == max) {
+                    java.awt.Toolkit.getDefaultToolkit().beep();
+                    System.out.println("Beep played for max characters");
+                }
             } else {
                 java.awt.Toolkit.getDefaultToolkit().beep();
             }
