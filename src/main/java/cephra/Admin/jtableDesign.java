@@ -21,6 +21,9 @@ public class jtableDesign {
         table.setSelectionBackground(new Color(6, 163, 185));
         table.setSelectionForeground(Color.WHITE);
 
+        // Fill empty space with background
+        table.setFillsViewportHeight(true);
+
         // Keep header opaque and with normal background
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
@@ -38,35 +41,43 @@ public class jtableDesign {
 
                 if (c instanceof JLabel) {
                     ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
-                    }
+                }
+
                 if (isSelected) {
                     c.setBackground(table.getSelectionBackground());
                     ((JComponent) c).setOpaque(true);
                 } else {
-                   if (value != null && !value.toString().trim().isEmpty()) {
-                    c.setBackground(Color.WHITE);
-                    ((JComponent) c).setOpaque(true);
+                    if (value != null && !value.toString().trim().isEmpty()) {
+                        c.setBackground(Color.WHITE);
+                        ((JComponent) c).setOpaque(true);
                     } else {
-                       ((JComponent) c).setOpaque(false);
-                       c.setBackground(new Color(0,0,0));
-                   }
+                        ((JComponent) c).setOpaque(false);
+                        c.setBackground(new Color(0,0,0,0));
+                    }
                 }
+
                 // Remove all borders from cells
                 ((JComponent) c).setBorder(BorderFactory.createEmptyBorder());
                 return c;
             }
         });
 
-        // Remove all borders from the table
+        // Remove all borders from the table itself
         table.setBorder(BorderFactory.createEmptyBorder());
     }
 
-    // Call this method if your JTable is inside a JScrollPane to make viewport transparent
+    // Make JScrollPane transparent and borderless
     public static void makeScrollPaneTransparent(JScrollPane scrollPane) {
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        // Make scrollbars transparent
+        if (scrollPane.getHorizontalScrollBar() != null) {
+            scrollPane.getHorizontalScrollBar().setOpaque(false);
+        }
+        if (scrollPane.getVerticalScrollBar() != null) {
+            scrollPane.getVerticalScrollBar().setOpaque(false);
+        }
     }
 }
-
-
-

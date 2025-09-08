@@ -1,28 +1,23 @@
-# Cleanup Cephra/mobileweb Folder
+# History Panel Fix
+
+## Issue
+Exception in thread "AWT-EventQueue-0" java.lang.ClassCastException: layout of JScrollPane must be a ScrollPaneLayout
+
+## Root Cause
+In History.java, line 58: `jScrollPane1.setLayout(new BorderLayout());` is incorrect because JScrollPane requires ScrollPaneLayout.
 
 ## Tasks
-- [x] Remove test file: test-api-integration.js
-- [x] Remove unused images: images/header.jpg, images/pic01.jpg, images/pic02.jpg, images/pic03.jpg, images/pic04.jpg, images/pic05.jpg, images/pic06.jpg, images/pic07.jpg, images/pic08.jpg
-- [x] Remove SASS source files: assets/sass/ and all contents
+- [x] Remove incorrect JScrollPane layout setting in History.java
+- [x] Test that History panel opens without errors
+- [x] Verify History table displays data correctly
 
-## Information Gathered
-- Used files identified from reading PHP and JS files:
-  - index.php, dashboard.php, Register_Panel.php
-  - css/styles.css (for login/register)
-  - script.js, register_script.js
-  - assets/css/main.css (for dashboard)
-  - assets/css/fontawesome-all.min.css (for icons)
-  - images/logo.png, images/ads.png
-  - assets/css/images/bg01.png, bg02.png, bg03.png, bg04.png (backgrounds in main.css)
-  - assets/js/jquery.min.js, jquery.dropotron.min.js, browser.min.js, breakpoints.min.js, util.js, main.js
-  - assets/webfonts/* (FontAwesome fonts)
-- Unused files:
-  - test-api-integration.js (test file)
-  - images/header.jpg, pic01-08.jpg (no references)
-  - assets/sass/main.scss and libs/ (source files, compiled CSS exists)
+## Summary
+✅ **FIXED**: Removed the incorrect `jScrollPane1.setLayout(new BorderLayout());` line from History.java
+✅ **FIXED**: Changed table auto-resize mode from `AUTO_RESIZE_ALL_COLUMNS` to `AUTO_RESIZE_OFF` to allow horizontal scrolling
+✅ **FIXED**: Enabled vertical scrollbar (`VERTICAL_SCROLLBAR_AS_NEEDED`) to show all records
+✅ **FIXED**: Updated table preferred size to match scrollpane dimensions (980x550)
+✅ **TESTED**: History panel now opens without ClassCastException
+✅ **VERIFIED**: History table displays all charging history data with proper scrolling
 
-## Dependent Files
-- None, as removals don't affect other files.
-
-## Followup Steps
-- Verify the mobileweb still functions after cleanup.
+## Files to Edit
+- src/main/java/cephra/Admin/History.java

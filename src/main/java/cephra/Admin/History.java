@@ -1,9 +1,11 @@
 
 package cephra.Admin;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Window;
+
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -26,8 +28,17 @@ public class History extends javax.swing.JPanel {
         
         
         // Register history table model so other modules can add rows
+       /* jtableDesign.apply(jTable1);
+        jtableDesign.makeScrollPaneTransparent(jScrollPane1);*/
+        
+        
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
+        jScrollPane1.setViewportView(jTable1);
+       
+        
+        
+        
         adminHistorySRCH.setOpaque(false);
         adminHistorySRCH.setBackground(new Color(0, 0, 0, 0));
         adminHistorySRCH.setBorder(null);
@@ -41,8 +52,8 @@ public class History extends javax.swing.JPanel {
             }
         });
         
-        // Hide the vertical scrollbar on the history table
-        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        // Enable vertical scrollbar for scrolling through history records
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
   
         
         JTableHeader header = jTable1.getTableHeader();
@@ -127,11 +138,11 @@ public class History extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        jTable1.setAutoscrolls(false);
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF); // Allow horizontal scrolling
+        jTable1.setAutoscrolls(true); // Enable auto-scrolling
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
-        jTable1.setPreferredSize(new java.awt.Dimension(525, 139));
+        jTable1.setPreferredSize(new java.awt.Dimension(980, 550)); // Match scrollpane size
         jTable1.setRequestFocusEnabled(false);
         jTable1.setShowHorizontalLines(true);
         jTable1.getTableHeader().setResizingAllowed(false);
