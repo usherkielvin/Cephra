@@ -22,6 +22,11 @@
 			window.setTimeout(function() {
 				$body.removeClass('is-preload');
 			}, 100);
+
+			// Register Service Worker for PWA
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('sw.js').catch(function(e){ console.warn('SW reg failed', e); });
+			}
 		});
 
 	// Dropdowns.

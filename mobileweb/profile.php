@@ -41,7 +41,10 @@ if ($conn) {
 		<title>Profile - Cephra</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="icon" type="image/png" href="images/logo.png" />
+		<link rel="icon" type="image/png" href="images/logo.png?v=2" />
+		<link rel="apple-touch-icon" href="images/logo.png?v=2" />
+		<link rel="manifest" href="manifest.webmanifest" />
+		<meta name="theme-color" content="#062635" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<style>
 			.profile-card { background:#fff; border-radius:8px; padding:16px; }
