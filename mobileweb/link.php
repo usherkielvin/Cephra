@@ -111,28 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 20px 0;
             font-size: 14px;
         }
-        .nav-buttons {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 20px;
-            z-index: 100;
-        }
-        .nav-button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            background: #007bff;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
+        
         .error-message {
             color: red;
             margin: 10px 0;
@@ -202,12 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <!-- Navigation Buttons -->
-        <div class="nav-buttons">
-            <button class="nav-button" onclick="window.location.href='dashboard.php'" title="Home">🏠</button>
-            <button class="nav-button" onclick="window.location.href='ChargingPage.php'" title="Charge">🔋</button>
-            <button class="nav-button" onclick="window.location.href='profile.php'" title="Profile">👤</button>
-        </div>
+        
     </div>
 
     <!-- Scripts -->
