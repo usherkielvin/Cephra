@@ -4,16 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class PayPop extends javax.swing.JPanel {
+public class LinkFirst extends javax.swing.JPanel {
     
     // Static state management to prevent multiple instances
-    private static PayPop currentInstance = null;
+    private static LinkFirst currentInstance = null;
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
     // Popup dimensions (centered in phone frame)
-    private static final int POPUP_WIDTH = 270;
-    private static final int POPUP_HEIGHT = 280;
+    private static final int POPUP_WIDTH = 280;
+    private static final int POPUP_HEIGHT = 140;
     private static final int PHONE_WIDTH = 350; // fallback if frame size not yet realized
     private static final int PHONE_HEIGHT = 750; // fallback if frame size not yet realized
     
@@ -41,7 +41,7 @@ public class PayPop extends javax.swing.JPanel {
         // Allow reappearing - if already showing, hide first then show again
         if (isShowing) {
             System.out.println("PayPop: Already showing, will hide and reshow");
-            hidePayPop();
+            hidepop();
         }
         
         // Validate user is logged in
@@ -99,7 +99,7 @@ public class PayPop extends javax.swing.JPanel {
      */
     private static void showCenteredPayPop(cephra.Frame.Phone phoneFrame, String ticketId) {
         SwingUtilities.invokeLater(() -> {
-            currentInstance = new PayPop();
+            currentInstance = new LinkFirst();
             currentTicketId = ticketId;
             isShowing = true;
             // Push ticket id to UI immediately (fallback to admin queue model if needed)
@@ -137,10 +137,10 @@ public class PayPop extends javax.swing.JPanel {
     /**
      * Hides the PayPop and cleans up resources
      */
-    public static void hidePayPop() {
+    public static void hidepop() {
     if (currentInstance != null && isShowing) {
         // Capture a local reference to avoid race conditions
-        PayPop instance = currentInstance;
+        LinkFirst instance = currentInstance;
 
         SwingUtilities.invokeLater(() -> {
             if (instance.getParent() != null) {
@@ -164,12 +164,7 @@ public class PayPop extends javax.swing.JPanel {
 
     // Sets the ticket number on the UI label immediately (safe call)
     private void setTicketOnUi(String ticketId) {
-        try {
-            if (TICKETNUMBER != null && ticketId != null && !ticketId.trim().isEmpty()) {
-                TICKETNUMBER.setText(ticketId);
-                TICKETNUMBER.repaint();
-            }
-        } catch (Exception ignore) {}
+      
     }
 
     // ensureTicketLabelVisible: removed; form manages visual properties
@@ -210,7 +205,7 @@ public class PayPop extends javax.swing.JPanel {
     /**
      * Constructor for PayPop
      */
-    public PayPop() {
+    public LinkFirst() {
         initComponents();
         initializePayPop();
     }
@@ -248,7 +243,7 @@ public class PayPop extends javax.swing.JPanel {
             @Override
             public void keyPressed(KeyEvent evt) {
                 if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    hidePayPop();
+                    hidepop();
                 }
             }
         });
@@ -318,19 +313,7 @@ public class PayPop extends javax.swing.JPanel {
      * @param usedKWh the energy usage
      */
     private void updateLabels(String ticket, double amount, double usedKWh) {
-        if (TICKETNUMBER != null) {
-            TICKETNUMBER.setText(ticket);
-            TICKETNUMBER.repaint();
-        }
-        if (ChargingDue != null) {
-            ChargingDue.setText(String.format("₱%.2f", amount));
-        }
-        if (kWh != null) {
-            kWh.setText(String.format("%.1f kWh", usedKWh));
-        }
-        if (TotalBill != null) {
-            TotalBill.setText(String.format("₱%.2f", amount));
-        }
+       
     }
     
     /**
@@ -356,51 +339,43 @@ public class PayPop extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        TICKETNUMBER = new javax.swing.JLabel();
-        ChargingDue = new javax.swing.JLabel();
-        kWh = new javax.swing.JLabel();
-        TotalBill = new javax.swing.JLabel();
-        Cash = new javax.swing.JButton();
-        payonline = new javax.swing.JButton();
+        Golink = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
 
-        TICKETNUMBER.setText("9999");
-        add(TICKETNUMBER);
-        TICKETNUMBER.setBounds(150, 70, 60, 30);
-        add(ChargingDue);
-        ChargingDue.setBounds(150, 100, 90, 20);
-        add(kWh);
-        kWh.setBounds(150, 120, 80, 20);
-        add(TotalBill);
-        TotalBill.setBounds(140, 170, 90, 20);
-
-        Cash.setBorder(null);
-        Cash.setContentAreaFilled(false);
-        Cash.addActionListener(new java.awt.event.ActionListener() {
+        Golink.setText("Ok");
+        Golink.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CashActionPerformed(evt);
+                GolinkActionPerformed(evt);
             }
         });
-        add(Cash);
-        Cash.setBounds(10, 210, 120, 50);
+        add(Golink);
+        Golink.setBounds(80, 90, 100, 30);
 
-        payonline.setBorder(null);
-        payonline.setBorderPainted(false);
-        payonline.setContentAreaFilled(false);
-        payonline.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                payonlineActionPerformed(evt);
-            }
-        });
-        add(payonline);
-        payonline.setBounds(140, 210, 110, 50);
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/CASH.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Plslink.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 280, 280);
+        jLabel1.setBounds(0, 0, 280, 140);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void GolinkActionPerformed(java.awt.event.ActionEvent evt) {
+        System.out.println("LinkFirst Ok button clicked - navigating to link panel");
+        
+        // Hide this popup first
+        hidepop();
+        
+        // Navigate to link.java panel
+        SwingUtilities.invokeLater(() -> {
+            java.awt.Window[] windows = java.awt.Window.getWindows();
+            for (java.awt.Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    phoneFrame.switchPanel(new cephra.Phone.link());
+                    break;
+                }
+            }
+        });
+    }
 
     /**
      * Handles cash payment action
@@ -417,7 +392,7 @@ public class PayPop extends javax.swing.JPanel {
         System.out.println("Processing cash payment for user: " + currentUser);
         
         // Hide PayPop and navigate to home
-        hidePayPop();
+        hidepop();
         navigateToHome();
     }
 
@@ -441,7 +416,7 @@ public class PayPop extends javax.swing.JPanel {
             } catch (Exception e) {
                 handlePaymentError(e);
             } finally {
-                hidePayPop();
+                hidepop();
                 navigateToReceipt();
             }
         });
@@ -454,7 +429,7 @@ public class PayPop extends javax.swing.JPanel {
     private boolean validateUserLoggedIn() {
         if (!cephra.CephraDB.isUserLoggedIn()) {
             System.err.println("Payment blocked: No user is logged in");
-            hidePayPop();
+            hidepop();
             return false;
         }
         return true;
@@ -582,12 +557,7 @@ public class PayPop extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Cash;
-    private javax.swing.JLabel ChargingDue;
-    private javax.swing.JLabel TICKETNUMBER;
-    private javax.swing.JLabel TotalBill;
+    private javax.swing.JButton Golink;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel kWh;
-    private javax.swing.JButton payonline;
     // End of variables declaration//GEN-END:variables
 }

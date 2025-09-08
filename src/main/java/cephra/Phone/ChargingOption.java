@@ -215,24 +215,21 @@ public class ChargingOption extends javax.swing.JPanel {
        // Check if user already has an active ticket
        String username = cephra.CephraDB.getCurrentUsername();
        if (cephra.CephraDB.hasActiveTicket(username)) {
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                "You already have an active charging ticket. Please complete your current session first.", 
-                "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
+            // Show custom AlreadyTicket panel instead of JOptionPane
+            cephra.Phone.AlreadyTicket.showPayPop(null, username);
             return;
         }
         // Check if car is linked
         if (!cephra.Phone.AppState.isCarLinked) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Please link your car first before charging.",
-                "Car Not Linked", javax.swing.JOptionPane.WARNING_MESSAGE);
+            // Show custom LinkFirst panel instead of JOptionPane
+            cephra.Phone.LinkFirst.showPayPop(null, username);
             return;
         }
         // Prevent charging if battery is already full
         int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
         if (batteryLevel >= 100) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Your battery is already 100%.",
-                "Battery Full", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            // Show custom AlreadyFull panel instead of JOptionPane
+            cephra.Phone.AlreadyFull.showPayPop(null, username);
             return;
         }
         
@@ -264,24 +261,21 @@ public class ChargingOption extends javax.swing.JPanel {
         // Check if user already has an active ticket
         String username = cephra.CephraDB.getCurrentUsername();
         if (cephra.CephraDB.hasActiveTicket(username)) {
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                "You already have an active charging ticket.", 
-                "Active Ticket", javax.swing.JOptionPane.WARNING_MESSAGE);
+            // Show custom AlreadyTicket panel instead of JOptionPane
+            cephra.Phone.AlreadyTicket.showPayPop(null, username);
             return;
         }
         // Check if car is linked
         if (!cephra.Phone.AppState.isCarLinked) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Please link your car first before charging.",
-                "Car Not Linked", javax.swing.JOptionPane.WARNING_MESSAGE);
+            // Show custom LinkFirst panel instead of JOptionPane
+            cephra.Phone.LinkFirst.showPayPop(null, username);
             return;
         }
         // Prevent charging if battery is already full
         int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
         if (batteryLevel >= 100) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Your battery is already 100%.",
-                "Battery Full", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            // Show custom AlreadyFull panel instead of JOptionPane
+            cephra.Phone.AlreadyFull.showPayPop(null, username);
             return;
         }
         
