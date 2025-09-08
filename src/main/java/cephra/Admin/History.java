@@ -26,21 +26,15 @@ public class History extends javax.swing.JPanel {
         ButtonHoverEffect.addHoverEffect(quebutton);
         ButtonHoverEffect.addHoverEffect(exitlogin);
         
-        
         // Register history table model so other modules can add rows
        /* jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);*/
-        
         
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
         jScrollPane1.setViewportView(jTable1);
 
         // Ensure vertical lines are hidden like staff table
-       
-       
-        
-        
         
         adminHistorySRCH.setOpaque(false);
         adminHistorySRCH.setBackground(new Color(0, 0, 0, 0));
