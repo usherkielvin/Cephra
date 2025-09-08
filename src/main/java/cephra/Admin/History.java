@@ -131,6 +131,7 @@ public class History extends javax.swing.JPanel {
         jTable1.setAutoscrolls(false);
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
+        jTable1.setPreferredSize(new java.awt.Dimension(525, 139));
         jTable1.setRequestFocusEnabled(false);
         jTable1.setShowHorizontalLines(true);
         jTable1.getTableHeader().setResizingAllowed(false);
@@ -146,6 +147,7 @@ public class History extends javax.swing.JPanel {
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
         Baybutton.setContentAreaFilled(false);
+        Baybutton.setFocusPainted(false);
         Baybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BaybuttonActionPerformed(evt);
@@ -159,6 +161,7 @@ public class History extends javax.swing.JPanel {
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
         staffbutton.setContentAreaFilled(false);
+        staffbutton.setFocusPainted(false);
         staffbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 staffbuttonActionPerformed(evt);
@@ -172,6 +175,7 @@ public class History extends javax.swing.JPanel {
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
+        businessbutton.setFocusPainted(false);
         businessbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 businessbuttonActionPerformed(evt);
@@ -196,6 +200,7 @@ public class History extends javax.swing.JPanel {
         quebutton.setBorder(null);
         quebutton.setBorderPainted(false);
         quebutton.setContentAreaFilled(false);
+        quebutton.setFocusPainted(false);
         quebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 quebuttonActionPerformed(evt);

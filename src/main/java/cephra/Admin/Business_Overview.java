@@ -141,6 +141,7 @@ public class Business_Overview extends javax.swing.JPanel {
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
         staffbutton.setContentAreaFilled(false);
+        staffbutton.setFocusPainted(false);
         staffbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 staffbuttonActionPerformed(evt);
@@ -154,6 +155,7 @@ public class Business_Overview extends javax.swing.JPanel {
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
+        historybutton.setFocusPainted(false);
         historybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 historybuttonActionPerformed(evt);
@@ -167,6 +169,7 @@ public class Business_Overview extends javax.swing.JPanel {
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
         Baybutton.setContentAreaFilled(false);
+        Baybutton.setFocusPainted(false);
         Baybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BaybuttonActionPerformed(evt);
@@ -180,6 +183,7 @@ public class Business_Overview extends javax.swing.JPanel {
         quebutton.setBorder(null);
         quebutton.setBorderPainted(false);
         quebutton.setContentAreaFilled(false);
+        quebutton.setFocusPainted(false);
         quebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 quebuttonActionPerformed(evt);

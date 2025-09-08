@@ -1085,6 +1085,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
         Baybutton.setContentAreaFilled(false);
+        Baybutton.setFocusPainted(false);
         Baybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BaybuttonActionPerformed(evt);
@@ -1098,6 +1099,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
+        businessbutton.setFocusPainted(false);
         businessbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 businessbuttonActionPerformed(evt);
@@ -1122,6 +1124,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
         staffbutton.setContentAreaFilled(false);
+        staffbutton.setFocusPainted(false);
         staffbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 staffbuttonActionPerformed(evt);
@@ -1135,6 +1138,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
+        historybutton.setFocusPainted(false);
         historybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 historybuttonActionPerformed(evt);

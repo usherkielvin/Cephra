@@ -123,6 +123,7 @@ public class StaffRecord extends javax.swing.JPanel {
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
+        businessbutton.setFocusPainted(false);
         businessbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 businessbuttonActionPerformed(evt);
@@ -136,6 +137,7 @@ public class StaffRecord extends javax.swing.JPanel {
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
+        historybutton.setFocusPainted(false);
         historybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 historybuttonActionPerformed(evt);
@@ -149,6 +151,7 @@ public class StaffRecord extends javax.swing.JPanel {
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
         Baybutton.setContentAreaFilled(false);
+        Baybutton.setFocusPainted(false);
         Baybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BaybuttonActionPerformed(evt);
@@ -162,6 +165,7 @@ public class StaffRecord extends javax.swing.JPanel {
         quebutton.setBorder(null);
         quebutton.setBorderPainted(false);
         quebutton.setContentAreaFilled(false);
+        quebutton.setFocusPainted(false);
         quebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 quebuttonActionPerformed(evt);

@@ -48,7 +48,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 								<!-- Logo -->
 									<h1>
 									
-									<a href="dashboard.php" id="logo">Cephra</a>
+									<a href="dashboard.php" id="logo" style="display:inline-flex;align-items:center;gap:8px;"><img src="images/logo.png" alt="Cephra" style="width:28px;height:28px;border-radius:6px;object-fit:cover;vertical-align:middle;" /><span>Cephra</span></a>
 									</h1>
 
 								<!-- Nav -->
@@ -290,15 +290,6 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                     };
                 });
             </script>
-
-            <style>
-                .nav-buttons { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
-                .nav-button { width: 50px; height: 50px; border-radius: 50%; border: none; background: #007bff; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-            </style>
-            <div class="nav-buttons">
-                <button class="nav-button" onclick="window.location.href='dashboard.php'" title="Home">🏠</button>
-                <button class="nav-button" onclick="window.location.href='ChargingPage.php'" title="Charge">🔋</button>
-                <button class="nav-button" onclick="window.location.href='profile.php'" title="Profile">👤</button>
-            </div>
-        </body>
-        </html>
+			
+		</body>
+		</html>

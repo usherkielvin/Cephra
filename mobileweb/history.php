@@ -44,7 +44,7 @@ if ($conn) {
 			<div id="header-wrapper">
 				<header id="header">
 					<div class="inner">
-						<h1><a href="dashboard.php" id="logo">Cephra</a></h1>
+						<h1><a href="dashboard.php" id="logo" style="display:inline-flex;align-items:center;gap:8px;"><img src="images/logo.png" alt="Cephra" style="width:28px;height:28px;border-radius:6px;object-fit:cover;vertical-align:middle;" /><span>Cephra</span></a></h1>
 						<nav id="nav">
 							<ul>
 								<li><a href="dashboard.php">Home</a></li>

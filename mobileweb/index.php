@@ -4,7 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cephra Login</title>
-    <link rel="icon" type="image/png" href="images/logo.png" />
+    <link rel="icon" type="image/png" href="images/logo.png?v=2" />
+    <link rel="apple-touch-icon" href="images/logo.png?v=2" />
+    <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png?v=2" />
+    <link rel="icon" type="image/png" sizes="16x16" href="images/logo.png?v=2" />
+    <link rel="shortcut icon" href="images/logo.png?v=2" />
+    <meta name="theme-color" content="#062635" />
     <link rel="stylesheet" href="css/index.css" />
 </head>
 <body class="auth-page">

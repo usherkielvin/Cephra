@@ -48,7 +48,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 								<!-- Logo -->
 									<h1>
 									
-									<a href="dashboard.php" id="logo">Cephra</a>
+									<a href="dashboard.php" id="logo" style="display:inline-flex;align-items:center;gap:8px;"><img src="images/logo.png" alt="Cephra" style="width:28px;height:28px;border-radius:6px;object-fit:cover;vertical-align:middle;" /><span>Cephra</span></a>
 									</h1>
 
 								<!-- Nav -->
@@ -208,13 +208,13 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 						e.preventDefault();
 						processChargeRequest('Normal Charging');
 					});
-
+					
 					// Fast Charge Button Click Handler
 					$('#fastChargeBtn').click(function(e) {
 						e.preventDefault();
 						processChargeRequest('Fast Charging');
 					});
-
+					
 					function processChargeRequest(serviceType) {
 						// Force exact service type strings expected by backend
 						let serviceTypeMapped = '';
@@ -225,10 +225,10 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 						} else {
 							serviceTypeMapped = serviceType; // fallback
 						}
-
+						
 						// Disable buttons during processing
 						$('#normalChargeBtn, #fastChargeBtn').prop('disabled', true);
-
+						
 						$.ajax({
 							url: 'charge_action.php',
 							type: 'POST',
@@ -252,13 +252,13 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 							}
 						});
 					}
-
+					
 					function showQueueTicketPopup(response) {
 						if (response.success) {
 							var ticketId = response.ticketId;
 							var serviceType = response.serviceType;
 							var batteryLevel = response.batteryLevel;
-
+							
 							// Create popup HTML
 							var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 300px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
 							popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Your Queue Ticket</h2>';
@@ -268,27 +268,18 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 							popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
 							popupHtml += '<button onclick="closePopup()" style="display: block; margin: 15px auto 0; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>';
 							popupHtml += '</div>';
-
+							
 							// Append to body
 							$('body').append(popupHtml);
 						}
 					}
-
+					
 					// Function to close popup (defined globally)
 					window.closePopup = function() {
 						$('#queuePopup').remove();
 					};
 				});
 			</script>
-
-			<style>
-				.nav-buttons { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
-				.nav-button { width: 50px; height: 50px; border-radius: 50%; border: none; background: #007bff; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-			</style>
-			<div class="nav-buttons">
-				<button class="nav-button" onclick="window.location.href='dashboard.php'" title="Home">🏠</button>
-				<button class="nav-button" onclick="window.location.href='ChargingPage.php'" title="Charge">🔋</button>
-				<button class="nav-button" onclick="window.location.href='profile.php'" title="Profile">👤</button>
-			</div>
- 	</body>
- </html>
+			
+		</body>
+ 	</html>

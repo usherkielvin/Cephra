@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="inner">
                     <!-- Logo -->
                     <h1>
-                        <a href="dashboard.php" id="logo">Cephra</a>
+                        <a href="dashboard.php" id="logo" style="display:inline-flex;align-items:center;gap:8px;"><img src="images/logo.png" alt="Cephra" style="width:28px;height:28px;border-radius:6px;object-fit:cover;vertical-align:middle;" /><span>Cephra</span></a>
                     </h1>
                     <!-- Nav -->
                     <nav id="nav">

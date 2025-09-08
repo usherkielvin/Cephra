@@ -540,6 +540,7 @@ public class BayManagement extends javax.swing.JPanel {
         quebutton.setBorder(null);
         quebutton.setBorderPainted(false);
         quebutton.setContentAreaFilled(false);
+        quebutton.setFocusPainted(false);
         quebutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 quebuttonActionPerformed(evt);
@@ -553,6 +554,7 @@ public class BayManagement extends javax.swing.JPanel {
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
         staffbutton.setContentAreaFilled(false);
+        staffbutton.setFocusPainted(false);
         staffbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 staffbuttonActionPerformed(evt);
@@ -566,6 +568,7 @@ public class BayManagement extends javax.swing.JPanel {
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
+        businessbutton.setFocusPainted(false);
         businessbutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 businessbuttonActionPerformed(evt);
@@ -579,6 +582,7 @@ public class BayManagement extends javax.swing.JPanel {
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
+        historybutton.setFocusPainted(false);
         historybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 historybuttonActionPerformed(evt);
@@ -590,6 +594,7 @@ public class BayManagement extends javax.swing.JPanel {
         exitlogin.setBorder(null);
         exitlogin.setBorderPainted(false);
         exitlogin.setContentAreaFilled(false);
+        exitlogin.setFocusPainted(false);
         exitlogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exitloginActionPerformed(evt);
