@@ -34,11 +34,8 @@ public class NotificationPop extends javax.swing.JPanel {
         setBackground(new java.awt.Color(255, 0, 0));
         setOpaque(false);
         setLayout(null);
-
-        otpPreviewLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        otpPreviewLabel.setText("99999");
         add(otpPreviewLabel);
-        otpPreviewLabel.setBounds(220, 140, 120, 30);
+        otpPreviewLabel.setBounds(200, 141, 120, 20);
 
         cephraemail.setBorder(null);
         cephraemail.setBorderPainted(false);
