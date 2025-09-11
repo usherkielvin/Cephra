@@ -130,14 +130,9 @@ public class Wallet extends javax.swing.JPanel {
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void HideBalanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HideBalanceActionPerformed
-        // Toggle the balance visibility state
+    private void HideBalanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HideBalanceActionPerformed     
         balanceHidden = !balanceHidden;
-        
-        // Update the display
-        updateBalanceDisplay();
-        
-        // Update the button text
+        updateBalanceDisplay();      
         if (balanceHidden) {
          //   HideBalance.setText("Show");
             HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
@@ -147,9 +142,6 @@ public class Wallet extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_HideBalanceActionPerformed
 
-    /**
-     * Loads wallet data from database and updates UI
-     */
     private void loadWalletData() {
         try {
             String currentUser = cephra.CephraDB.getCurrentUsername();
@@ -172,10 +164,7 @@ public class Wallet extends javax.swing.JPanel {
             clearTransactionHistory();
         }
     }
-    
-    /**
-     * Updates the balance display based on current state
-     */
+ 
     private void updateBalanceDisplay() {
         if (balanceHidden) {
             Balancetxt.setText("******");
@@ -184,9 +173,6 @@ public class Wallet extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Loads and displays wallet transaction history
-     */
     private void loadTransactionHistory() {
         try {
             String currentUser = cephra.CephraDB.getCurrentUsername();
