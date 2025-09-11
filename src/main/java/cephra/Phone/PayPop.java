@@ -437,14 +437,14 @@ public class PayPop extends javax.swing.JPanel {
         
         SwingUtilities.invokeLater(() -> {
             try {
-                processOnlinePayment();
-                // QueueBridge.markPaymentPaidOnline already handles all UI refresh mechanisms
-                // No need for additional refresh here
+                boolean success = processOnlinePayment();
+                if (success) {
+                    // Only hide and navigate to receipt on success
+                    hidePayPop();
+                    navigateToReceipt();
+                }
             } catch (Exception e) {
                 handlePaymentError(e);
-            } finally {
-                hidePayPop();
-                navigateToReceipt();
             }
         });
     }
@@ -466,11 +466,11 @@ public class PayPop extends javax.swing.JPanel {
      * Processes online payment
      * @throws Exception if payment processing fails
      */
-    private void processOnlinePayment() throws Exception {
+    private boolean processOnlinePayment() throws Exception {
         // Check if there's an active ticket
         if (!cephra.Phone.QueueFlow.hasActiveTicket()) {
             showErrorMessage("No active ticket found for payment.\nPlease get a ticket first.");
-            return;
+            return false;
         }
         
         String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
@@ -478,14 +478,14 @@ public class PayPop extends javax.swing.JPanel {
         // Validate ticket is ready for payment
         if (!isTicketValidForPayment(currentTicket)) {
             showErrorMessage("Ticket is not ready for payment.");
-            return;
+            return false;
         }
         
         // Get current user
         String currentUser = cephra.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
             showErrorMessage("No user is currently logged in.");
-            return;
+            return false;
         }
         
         // Calculate payment amount
@@ -494,7 +494,7 @@ public class PayPop extends javax.swing.JPanel {
         // Check wallet balance first
         if (!cephra.CephraDB.hasSufficientWalletBalance(currentUser, paymentAmount)) {
             showInsufficientBalanceMessage(paymentAmount);
-            return;
+            return false;
         }
         
         // Process wallet payment
@@ -502,7 +502,7 @@ public class PayPop extends javax.swing.JPanel {
         
         if (!walletPaymentSuccess) {
             showErrorMessage("Failed to process wallet payment.\nPlease try again or check your balance.");
-            return;
+            return false;
         }
         
         // Process payment through existing system - markPaymentPaidOnline already handles everything
@@ -517,6 +517,7 @@ public class PayPop extends javax.swing.JPanel {
         // - UI refresh
         
         // No need to show success message - receipt panel will display the information
+        return true;
     }
     
     /**
