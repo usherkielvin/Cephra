@@ -38,6 +38,209 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 		<link rel="manifest" href="manifest.webmanifest" />
 		<meta name="theme-color" content="#062635" />
 		<link rel="stylesheet" href="css/main.css" />
+		<style>
+			/* Green Points Popup Styles */
+			.popup-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.7);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 10000;
+				padding: 20px;
+			}
+			
+			.popup-content {
+				background: #1A3647;
+				border-radius: 20px;
+				width: 90%;
+				max-width: 400px;
+				position: relative;
+				overflow: hidden;
+				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+				border: none;
+			}
+			
+			.close-btn {
+				position: absolute;
+				top: 15px;
+				right: 15px;
+				background: #000;
+				color: white;
+				border: none;
+				border-radius: 50%;
+				width: 30px;
+				height: 30px;
+				font-size: 18px;
+				cursor: pointer;
+				z-index: 10001;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: bold;
+			}
+			
+			.popup-header {
+				text-align: center;
+				padding: 20px 20px 10px;
+			}
+			
+			.logo-section {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 10px;
+			}
+			
+			.porsche-logo {
+				font-size: 40px;
+				margin-bottom: 5px;
+			}
+			
+			.brand-name {
+				color: white;
+				font-size: 24px;
+				font-weight: bold;
+				margin: 0;
+				letter-spacing: 2px;
+				font-family: 'Arial', sans-serif;
+				text-transform: uppercase;
+			}
+			
+			.popup-body {
+				padding: 20px;
+				text-align: center;
+			}
+			
+			.main-headline {
+				color: white;
+				font-size: 32px;
+				font-weight: bold;
+				margin: 20px 0;
+				line-height: 1.2;
+				font-family: 'Arial', sans-serif;
+				text-transform: uppercase;
+			}
+			
+			.reward-section {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 15px;
+				margin: 30px 0;
+			}
+			
+			.hexagon {
+				width: 50px;
+				height: 50px;
+				background: #00C2CE;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 8px;
+				transform: rotate(45deg);
+				box-shadow: 0 2px 8px rgba(0, 194, 206, 0.3);
+			}
+			
+			.leaf-icon {
+				transform: rotate(-45deg);
+				font-size: 20px;
+			}
+			
+			.reward-value {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+			
+			.points-number {
+				color: white;
+				font-size: 48px;
+				font-weight: bold;
+				line-height: 1;
+				font-family: 'Arial', sans-serif;
+			}
+			
+			.points-label {
+				color: #00C2CE;
+				font-size: 14px;
+				font-weight: 500;
+				margin-top: 5px;
+				font-family: 'Arial', sans-serif;
+				text-transform: uppercase;
+			}
+			
+			.car-section {
+				position: relative;
+				margin: 40px 0;
+				height: 80px;
+			}
+			
+			.floating-leaves {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 100%;
+			}
+			
+			.leaf {
+				position: absolute;
+				top: 10px;
+				font-size: 24px;
+			}
+			
+			.leaf.left {
+				left: 20%;
+			}
+			
+			.leaf.right {
+				right: 20%;
+			}
+			
+			.electric-car {
+				position: absolute;
+				bottom: 0;
+				left: 50%;
+				transform: translateX(-50%);
+				font-size: 50px;
+				filter: hue-rotate(180deg) saturate(1.5);
+			}
+			
+			.legal-text {
+				margin-top: 30px;
+				padding-top: 20px;
+				border-top: 1px solid rgba(255, 255, 255, 0.2);
+			}
+			
+			.legal-text p {
+				color: white;
+				font-size: 10px;
+				margin: 5px 0;
+				line-height: 1.3;
+				font-family: 'Arial', sans-serif;
+			}
+			
+			/* Animation for popup appearance */
+			.popup-content {
+				animation: popupSlideIn 0.3s ease-out;
+			}
+			
+			@keyframes popupSlideIn {
+				from {
+					opacity: 0;
+					transform: scale(0.8) translateY(-50px);
+				}
+				to {
+					opacity: 1;
+					transform: scale(1) translateY(0);
+				}
+			}
+		</style>
 	</head>
 	<body class="homepage is-preload">
 		<div id="page-wrapper">
@@ -181,6 +384,49 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 		</div>
 
+		<!-- Green Points Popup Ad -->
+		<div id="greenPointsPopup" class="popup-overlay" style="display: none;">
+			<div class="popup-content">
+				<button class="close-btn" onclick="closeGreenPointsPopup()">×</button>
+				
+				<div class="popup-header">
+					<div class="logo-section">
+						<div class="porsche-logo">🏎️</div>
+						<h1 class="brand-name">CEPHRA</h1>
+					</div>
+				</div>
+				
+				<div class="popup-body">
+					<h2 class="main-headline">GO GREEN<br>EARN POINT</h2>
+					
+					<div class="reward-section">
+						<div class="reward-icon">
+							<div class="hexagon">
+								<span class="leaf-icon">🌿</span>
+							</div>
+						</div>
+						<div class="reward-value">
+							<span class="points-number">500</span>
+							<span class="points-label">GREEN POINT</span>
+						</div>
+					</div>
+					
+					<div class="car-section">
+						<div class="floating-leaves">
+							<div class="leaf left">🌿</div>
+							<div class="leaf right">🌿</div>
+						</div>
+						<div class="electric-car">🏎️</div>
+					</div>
+					
+					<div class="legal-text">
+						<p>To comply with DTI Fair Trade Permit No. FTEB:-227229 Series of 2024</p>
+						<p>Duration: 04 Jun-30 Aug, 2025</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Scripts -->
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.dropotron.min.js"></script>
@@ -215,7 +461,23 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                     document.body.appendChild(overlay);
                 }
 
+                // Function to show Green Points popup
+                function showGreenPointsPopup() {
+                    document.getElementById('greenPointsPopup').style.display = 'flex';
+                }
+                
+                // Function to close Green Points popup
+                function closeGreenPointsPopup() {
+                    document.getElementById('greenPointsPopup').style.display = 'none';
+                }
+                
+                // Show popup after page loads (with delay)
                 $(document).ready(function() {
+                    // Show Green Points popup after 2 seconds
+                    setTimeout(function() {
+                        showGreenPointsPopup();
+                    }, 2000);
+                    
                     // Normal Charge Button Click Handler
                     $('#normalChargeBtn').click(function(e) {
                         e.preventDefault();
