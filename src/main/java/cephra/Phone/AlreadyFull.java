@@ -344,7 +344,8 @@ public class AlreadyFull extends javax.swing.JPanel {
 
         setLayout(null);
 
-        Golink.setText("Ok");
+        Golink.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        Golink.setText("OK");
         Golink.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 GolinkActionPerformed(evt);
@@ -366,9 +367,9 @@ public class AlreadyFull extends javax.swing.JPanel {
     }//GEN-LAST:event_GolinkActionPerformed
     
 
-// Variables declaration - do not modify//GEN-BEGIN:variables
-private javax.swing.JButton Golink;
-private javax.swing.JLabel jLabel1;
-// End of variables declaration//GEN-END:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Golink;
+    private javax.swing.JLabel jLabel1;
+    // End of variables declaration//GEN-END:variables
 
 }

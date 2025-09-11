@@ -70,11 +70,10 @@ public class PasswordEmail extends javax.swing.JPanel {
         add(Return);
         Return.setBounds(85, 500, 200, 40);
 
-        otpLabel.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        otpLabel.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         otpLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        otpLabel.setText("123456");
         add(otpLabel);
-        otpLabel.setBounds(82, 436, 190, 51);
+        otpLabel.setBounds(82, 436, 210, 51);
 
         jLabel1.setForeground(new java.awt.Color(255, 0, 51));
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ResetPass.png"))); // NOI18N

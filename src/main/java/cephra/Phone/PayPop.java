@@ -366,15 +366,21 @@ public class PayPop extends javax.swing.JPanel {
 
         setLayout(null);
 
-        TICKETNUMBER.setText("9999");
+        TICKETNUMBER.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         add(TICKETNUMBER);
-        TICKETNUMBER.setBounds(150, 70, 60, 30);
+        TICKETNUMBER.setBounds(150, 75, 90, 20);
+
+        ChargingDue.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         add(ChargingDue);
         ChargingDue.setBounds(150, 100, 90, 20);
+
+        kWh.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         add(kWh);
         kWh.setBounds(150, 120, 80, 20);
+
+        TotalBill.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         add(TotalBill);
-        TotalBill.setBounds(140, 170, 90, 20);
+        TotalBill.setBounds(150, 165, 90, 20);
 
         Cash.setBorder(null);
         Cash.setContentAreaFilled(false);

@@ -64,9 +64,10 @@ public class PasswordVerify extends javax.swing.JPanel {
         cephramail.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         cephramail.setText("dizon@cephra.com");
         add(cephramail);
-        cephramail.setBounds(185, 251, 190, 20);
+        cephramail.setBounds(200, 251, 160, 20);
 
         code6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        code6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         code6.setText("1");
         code6.setBorder(null);
         code6.addActionListener(new java.awt.event.ActionListener() {
@@ -78,6 +79,7 @@ public class PasswordVerify extends javax.swing.JPanel {
         code6.setBounds(300, 310, 30, 50);
 
         code5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        code5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         code5.setText("1");
         code5.setBorder(null);
         code5.addActionListener(new java.awt.event.ActionListener() {
@@ -86,9 +88,10 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code5);
-        code5.setBounds(250, 310, 40, 50);
+        code5.setBounds(248, 310, 30, 50);
 
         code4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        code4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         code4.setText("1");
         code4.setBorder(null);
         code4.addActionListener(new java.awt.event.ActionListener() {
@@ -97,9 +100,10 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code4);
-        code4.setBounds(190, 310, 40, 50);
+        code4.setBounds(197, 310, 30, 50);
 
         code3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        code3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         code3.setText("1");
         code3.setBorder(null);
         code3.addActionListener(new java.awt.event.ActionListener() {
@@ -108,9 +112,10 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code3);
-        code3.setBounds(140, 310, 50, 50);
+        code3.setBounds(145, 310, 30, 50);
 
         code2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        code2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         code2.setText("1");
         code2.setBorder(null);
         code2.addActionListener(new java.awt.event.ActionListener() {
@@ -119,9 +124,10 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code2);
-        code2.setBounds(80, 310, 50, 50);
+        code2.setBounds(93, 310, 30, 50);
 
         code1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        code1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         code1.setText("1");
         code1.setBorder(null);
         code1.addActionListener(new java.awt.event.ActionListener() {
@@ -130,7 +136,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code1);
-        code1.setBounds(30, 310, 50, 50);
+        code1.setBounds(40, 310, 30, 50);
 
         resend.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         resend.setForeground(new java.awt.Color(0, 204, 204));
@@ -146,7 +152,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(resend);
-        resend.setBounds(212, 431, 120, 40);
+        resend.setBounds(230, 430, 90, 40);
 
         Back.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         Back.setForeground(new java.awt.Color(0, 204, 204));

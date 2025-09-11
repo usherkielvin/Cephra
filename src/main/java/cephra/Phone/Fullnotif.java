@@ -26,15 +26,15 @@ public class Fullnotif extends javax.swing.JPanel {
 
         StatusGo = new javax.swing.JLabel();
 
-        setBackground(new java.awt.Color(255, 0, 0));
+        setBackground(new java.awt.Color(255, 255, 255));
         setLayout(null);
 
         StatusGo.setBackground(new java.awt.Color(0, 0, 0));
         StatusGo.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         StatusGo.setForeground(new java.awt.Color(255, 255, 102));
-        StatusGo.setText("Ur car is now fullcharge");
+        StatusGo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/FullChargePOP.png"))); // NOI18N
         add(StatusGo);
-        StatusGo.setBounds(30, 110, 270, 50);
+        StatusGo.setBounds(0, -2, 330, 70);
     }// </editor-fold>//GEN-END:initComponents
 
     /**

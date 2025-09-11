@@ -26,14 +26,14 @@ public class Myturn extends javax.swing.JPanel {
 
         StatusGo = new javax.swing.JLabel();
 
-        setBackground(new java.awt.Color(255, 0, 0));
+        setBackground(new java.awt.Color(255, 255, 255));
         setLayout(null);
 
         StatusGo.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         StatusGo.setForeground(new java.awt.Color(255, 0, 255));
-        StatusGo.setText("Please go to your bay \"baynumber\" now");
+        StatusGo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifProceedBAY.png"))); // NOI18N
         add(StatusGo);
-        StatusGo.setBounds(40, 120, 250, 40);
+        StatusGo.setBounds(0, -2, 340, 70);
     }// </editor-fold>//GEN-END:initComponents
 
     /**

@@ -344,20 +344,24 @@ public class LinkFirst extends javax.swing.JPanel {
 
         setLayout(null);
 
-        Golink.setText("Ok");
+        Golink.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        Golink.setBorder(null);
+        Golink.setBorderPainted(false);
+        Golink.setContentAreaFilled(false);
         Golink.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 GolinkActionPerformed(evt);
             }
         });
         add(Golink);
-        Golink.setBounds(80, 90, 100, 30);
+        Golink.setBounds(80, 140, 110, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Plslink.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 280, 140);
+        jLabel1.setBounds(0, 0, 280, 200);
     }// </editor-fold>//GEN-END:initComponents
 
+    
     private void GolinkActionPerformed(java.awt.event.ActionEvent evt) {
         System.out.println("LinkFirst Ok button clicked - navigating to link panel");
         
