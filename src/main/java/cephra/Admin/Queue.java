@@ -178,13 +178,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             stopCellEditing();
             if (editingRow < 0) return;
             String ticket = String.valueOf(queTab.getValueAt(editingRow, 0));
+            int paymentCol = getColumnIndex("Payment");
 
             // Crash-recovery: if payment not Paid, force/reset to Pending so flow can continue
             try {
-                int paymentCol = -1;
-                for (int c = 0; c < queTab.getColumnCount(); c++) {
-                    if ("Payment".equalsIgnoreCase(queTab.getColumnName(c))) { paymentCol = c; break; }
-                }
                 String payVal = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
                 if (ticket != null && !ticket.trim().isEmpty() && (payVal == null || payVal.trim().isEmpty() || "Pending".equalsIgnoreCase(payVal) || "TopupRequired".equalsIgnoreCase(payVal))) {
                     ensurePaymentPending(ticket);
@@ -255,7 +252,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         
                         System.out.println("Queue: Payment not yet processed, proceeding with payment transaction for ticket " + ticket);
                         
-                        final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                        final String customerName = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
                         // Get reference number from QueueBridge to ensure consistency
                         final String reference = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
                         
@@ -276,7 +273,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             // Get battery info for calculations
                             cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
                             if (batteryInfo == null) {
-                                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customerName);
                                 batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
                             }
                             
@@ -290,7 +287,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             
                             // Process the payment transaction (this will add to charging history)
                             boolean success = cephra.CephraDB.processPaymentTransaction(
-                                ticket, customer, serviceName, 
+                                ticket, customerName, serviceName, 
                                 batteryInfo.initialPercent, chargingTimeMinutes, 
                                 amount, "Cash", reference
                             );
@@ -339,9 +336,28 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         }
                     }
                 }
+            } catch (Throwable t) {
+                System.err.println("Queue: Error in proceed action: " + t.getMessage());
             }
             // Keep counters in sync after any action
             updateStatusCounters();
+        }
+    }
+
+    private void ensurePaymentPending(String ticket) {
+        try {
+            int paymentCol = getColumnIndex("Payment");
+            int ticketCol = getColumnIndex("Ticket");
+            if (paymentCol < 0 || ticketCol < 0) return;
+            for (int row = 0; row < queTab.getRowCount(); row++) {
+                Object v = queTab.getValueAt(row, ticketCol);
+                if (v != null && ticket.equals(String.valueOf(v).trim())) {
+                    queTab.setValueAt("Pending", row, paymentCol);
+                    break;
+                }
+            }
+        } catch (Throwable t) {
+            System.err.println("Queue: ensurePaymentPending failed for ticket " + ticket + ": " + t.getMessage());
         }
     }
 

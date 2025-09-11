@@ -3,7 +3,6 @@ package cephra.Phone;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -163,7 +162,7 @@ public class WalletHistory extends javax.swing.JPanel {
         double amount = (Double) transaction[1];
         double newBalance = (Double) transaction[2];
         String description = (String) transaction[3];
-        String referenceId = (String) transaction[4];
+        
         java.sql.Timestamp timestamp = (java.sql.Timestamp) transaction[5];
         
         // Create a panel for a single transaction item
@@ -371,7 +370,7 @@ public class WalletHistory extends javax.swing.JPanel {
         // Add OK button
         JButton okButton = new JButton("OK");
         okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        okButton.addActionListener(e -> closeDetailsPanel());
+        okButton.addActionListener(_ -> closeDetailsPanel());
         detailsPanel.add(okButton);
         
         // Add the details panel to the phone frame

@@ -502,7 +502,6 @@ public class PayPop extends javax.swing.JPanel {
         System.out.println("Processing online payment for user: " + currentUser);
         
         SwingUtilities.invokeLater(() -> {
-            boolean paymentSuccessful = false;
             try {
                 processOnlinePayment();
                 // QueueBridge.markPaymentPaidOnline already handles all UI refresh mechanisms
@@ -589,6 +588,7 @@ public class PayPop extends javax.swing.JPanel {
         // - UI refresh
         
         // No need to show success message - receipt panel will display the information
+        return true;
     }
     
     /**
