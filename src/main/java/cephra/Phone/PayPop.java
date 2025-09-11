@@ -481,10 +481,34 @@ public class PayPop extends javax.swing.JPanel {
             return;
         }
         
-        // Process payment - markPaymentPaidOnline already handles everything
+        // Get current user
+        String currentUser = cephra.CephraDB.getCurrentUsername();
+        if (currentUser == null || currentUser.trim().isEmpty()) {
+            showErrorMessage("No user is currently logged in.");
+            return;
+        }
+        
+        // Calculate payment amount
+        double paymentAmount = cephra.Admin.QueueBridge.computeAmountDue(currentTicket);
+        
+        // Check wallet balance first
+        if (!cephra.CephraDB.hasSufficientWalletBalance(currentUser, paymentAmount)) {
+            showInsufficientBalanceMessage(paymentAmount);
+            return;
+        }
+        
+        // Process wallet payment
+        boolean walletPaymentSuccess = cephra.CephraDB.processWalletPayment(currentUser, currentTicket, paymentAmount);
+        
+        if (!walletPaymentSuccess) {
+            showErrorMessage("Failed to process wallet payment.\nPlease try again or check your balance.");
+            return;
+        }
+        
+        // Process payment through existing system - markPaymentPaidOnline already handles everything
         cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
         
-        System.out.println("GCash payment marked as paid for ticket: " + currentTicket);
+        System.out.println("Wallet payment processed successfully for ticket: " + currentTicket + ", Amount: ₱" + paymentAmount);
         
         // Note: markPaymentPaidOnline already handles:
         // - Payment processing and database updates
@@ -538,6 +562,41 @@ public class PayPop extends javax.swing.JPanel {
         });
     }
     
+    /**
+     * Shows insufficient balance message with option to top-up
+     * @param requiredAmount the amount required for payment
+     */
+    private void showInsufficientBalanceMessage(double requiredAmount) {
+        String currentUser = cephra.CephraDB.getCurrentUsername();
+        double currentBalance = cephra.CephraDB.getUserWalletBalance(currentUser);
+        
+        SwingUtilities.invokeLater(() -> {
+            String message = String.format(
+                "Insufficient wallet balance!\n\n" +
+                "Current Balance: ₱%.2f\n" +
+                "Required Amount: ₱%.2f\n" +
+                "Shortage: ₱%.2f\n\n" +
+                "Please top up your wallet to proceed with payment.",
+                currentBalance, requiredAmount, (requiredAmount - currentBalance)
+            );
+            
+            int option = JOptionPane.showOptionDialog(
+                this,
+                message,
+                "Insufficient Balance",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                new String[]{"Top Up Wallet", "Cancel"},
+                "Top Up Wallet"
+            );
+            
+            if (option == 0) { // Top Up Wallet selected
+                navigateToTopUp();
+            }
+        });
+    }
+    
     
     /**
      * Handles payment errors
@@ -576,6 +635,23 @@ public class PayPop extends javax.swing.JPanel {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
                     phoneFrame.switchPanel(new cephra.Phone.Reciept());
+                    break;
+                }
+            }
+        });
+    }
+    
+    /**
+     * Navigates to TopUp screen
+     */
+    private void navigateToTopUp() {
+        SwingUtilities.invokeLater(() -> {
+            hidePayPop(); // Hide the current PayPop
+            Window[] windows = Window.getWindows();
+            for (Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    phoneFrame.switchPanel(new cephra.Phone.TopUppanel());
                     break;
                 }
             }
