@@ -438,6 +438,8 @@ public class PayPop extends javax.swing.JPanel {
         SwingUtilities.invokeLater(() -> {
             try {
                 processOnlinePayment();
+                // QueueBridge.markPaymentPaidOnline already handles all UI refresh mechanisms
+                // No need for additional refresh here
             } catch (Exception e) {
                 handlePaymentError(e);
             } finally {
@@ -479,14 +481,16 @@ public class PayPop extends javax.swing.JPanel {
             return;
         }
         
-        // Process payment
+        // Process payment - markPaymentPaidOnline already handles everything
         cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
-        cephra.Phone.QueueFlow.updatePaymentStatus(currentTicket, "Paid");
         
         System.out.println("GCash payment marked as paid for ticket: " + currentTicket);
         
-        // Clear charging bay and grid after successful payment
-        cephra.Admin.BayManagement.clearChargingBayForCompletedTicket(currentTicket);
+        // Note: markPaymentPaidOnline already handles:
+        // - Payment processing and database updates
+        // - Charging bay and grid clearing
+        // - History addition
+        // - UI refresh
         
         // No need to show success message - receipt panel will display the information
     }
@@ -577,6 +581,7 @@ public class PayPop extends javax.swing.JPanel {
             }
         });
     }
+    
 
 
 

@@ -842,6 +842,27 @@ public class CephraDB {
         }
     }
     
+    /** Check if ticket is already in charging history (already processed) */
+    public static boolean isTicketInChargingHistory(String ticketId) {
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT COUNT(*) FROM charging_history WHERE ticket_id = ?")) {
+            
+            stmt.setString(1, ticketId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error checking if ticket is in charging history: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
     // Charging history methods
     public static boolean addChargingHistory(String ticketId, String username, String serviceType,
                                            int initialBatteryLevel, int chargingTimeMinutes, 

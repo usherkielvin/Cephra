@@ -79,6 +79,12 @@ public final class QueueBridge {
             e.printStackTrace();
         }
     }
+    
+    /** Public method to reload queue from database (for hard refresh) */
+    public static void reloadFromDatabase() {
+        System.out.println("QueueBridge: Reloading queue from database");
+        loadQueueFromDatabase();
+    }
 
     /** Add a ticket with hidden random reference number */
     public static void addTicket(String ticket, String customer, String service, String status, String payment, String action) {
@@ -243,6 +249,10 @@ public final class QueueBridge {
                 foundInRecords = true;
                 customerName = String.valueOf(r[2]);
                 serviceName = String.valueOf(r[3]);
+                
+                // Note: We don't update the table model here anymore
+                // The database operation will remove the ticket entirely, so no need to set "Paid" status
+                // The proceed button will disappear when the ticket is removed from the table
                 break;
             }
         }
@@ -305,6 +315,25 @@ public final class QueueBridge {
                             System.err.println("QueueBridge: Failed to close PayPop: " + t.getMessage());
                         }
                     });
+                    
+                    // COPY THE SAME APPROACH AS MANUAL "MARK AS PAID":
+                    // Add a longer delay to ensure database operations complete before UI updates
+                    javax.swing.Timer refreshTimer = new javax.swing.Timer(200, _ -> {
+                        try {
+                            // Remove ticket from queue (same as manual payment)
+                            removeTicket(ticket);
+                            System.out.println("QueueBridge: Successfully removed ticket " + ticket + " via removeTicket (same as manual payment)");
+                            
+                            // Trigger multiple refresh approaches to ensure UI updates
+                            triggerHardRefresh();
+                            triggerPanelSwitchRefresh();
+                            System.out.println("QueueBridge: Triggered multiple refresh approaches (same as manual payment)");
+                        } catch (Throwable t) {
+                            System.err.println("QueueBridge: Error removing ticket after online payment: " + t.getMessage());
+                        }
+                    });
+                    refreshTimer.setRepeats(false);
+                    refreshTimer.start();
                 } else {
                     System.err.println("QueueBridge: Failed to process payment transaction for ticket " + ticket);
                     // Revert the payment status in the records array
@@ -332,24 +361,122 @@ public final class QueueBridge {
             }
         }
         
-        // Update JTable if present
-        if (model != null) {
-            SwingUtilities.invokeLater(() -> {
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    Object v = model.getValueAt(i, 0);
-                    if (ticket.equals(String.valueOf(v))) {
-                        model.setValueAt("Paid", i, 4); // Payment col index = 4 in visible table
-                        break;
-                    }
-                }
-            });
-        }
+        // Note: Table model is now updated BEFORE database operations in updateTableModelForPayment()
     }
     
     private static String generateReference() {
         // Generate 8-digit number (10000000 to 99999999)
         int number = 10000000 + new Random().nextInt(90000000);
         return String.valueOf(number);
+    }
+    
+    
+    /**
+     * Triggers a hard refresh by finding the Queue panel and calling its hard refresh method
+     */
+    private static void triggerHardRefresh() {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Find the Queue panel in the current window
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Admin) {
+                        cephra.Frame.Admin adminFrame = (cephra.Frame.Admin) window;
+                        
+                        // Look for Queue panel in the admin frame
+                        cephra.Admin.Queue queuePanel = findQueuePanel(adminFrame);
+                        if (queuePanel != null) {
+                            // Find and refresh any tabbed panes that might contain the queue
+                            refreshTabbedPanes(adminFrame);
+                            
+                            // Trigger hard refresh
+                            queuePanel.hardRefreshTable();
+                            System.out.println("QueueBridge: Triggered HARD refresh");
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("QueueBridge: Error triggering hard refresh: " + e.getMessage());
+            }
+        });
+    }
+    
+    /**
+     * Triggers a panel switch refresh that mimics switching panels and coming back
+     */
+    private static void triggerPanelSwitchRefresh() {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Find the Admin frame
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Admin) {
+                        cephra.Frame.Admin adminFrame = (cephra.Frame.Admin) window;
+                        
+                        // Look for Queue panel in the admin frame
+                        cephra.Admin.Queue queuePanel = findQueuePanel(adminFrame);
+                        if (queuePanel != null) {
+                            // Find and refresh any tabbed panes that might contain the queue
+                            refreshTabbedPanes(adminFrame);
+                            
+                            // Mimic what happens when switching panels: revalidate and repaint
+                            adminFrame.revalidate();
+                            adminFrame.repaint();
+                            
+                            // Also force the queue panel to refresh
+                            queuePanel.revalidate();
+                            queuePanel.repaint();
+                            
+                            // Force table refresh
+                            queuePanel.hardRefreshTable();
+                            
+                            System.out.println("QueueBridge: Triggered panel switch refresh (mimics switching panels)");
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("QueueBridge: Error triggering panel switch refresh: " + e.getMessage());
+            }
+        });
+    }
+    
+    /**
+     * Helper method to refresh any tabbed panes in the container hierarchy
+     */
+    private static void refreshTabbedPanes(java.awt.Container container) {
+        if (container instanceof javax.swing.JTabbedPane) {
+            javax.swing.JTabbedPane tabbedPane = (javax.swing.JTabbedPane) container;
+            tabbedPane.revalidate();
+            tabbedPane.repaint();
+            System.out.println("QueueBridge: Refreshed tabbed pane");
+        }
+        
+        for (java.awt.Component component : container.getComponents()) {
+            if (component instanceof java.awt.Container) {
+                refreshTabbedPanes((java.awt.Container) component);
+            }
+        }
+    }
+    
+    /**
+     * Helper method to find the Queue panel in the admin frame
+     */
+    private static cephra.Admin.Queue findQueuePanel(java.awt.Container container) {
+        if (container instanceof cephra.Admin.Queue) {
+            return (cephra.Admin.Queue) container;
+        }
+        
+        for (java.awt.Component component : container.getComponents()) {
+            if (component instanceof java.awt.Container) {
+                cephra.Admin.Queue found = findQueuePanel((java.awt.Container) component);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
     
     /** Get ticket service name (e.g., Fast Charging / Normal Charging) */
@@ -484,14 +611,22 @@ public final class QueueBridge {
             return;
         }
 
-        try {
-            // Remove from database first
-            boolean dbRemoved = cephra.CephraDB.removeQueueTicket(ticket);
-            if (!dbRemoved) {
-                System.err.println("QueueBridge: Failed to remove ticket " + ticket + " from database");
+        // Check if ticket is already processed (moved to history)
+        // If it's already processed, just remove from UI without database operation
+        boolean isAlreadyProcessed = isTicketInHistory(ticket);
+        
+        if (!isAlreadyProcessed) {
+            try {
+                // Remove from database only if not already processed
+                boolean dbRemoved = cephra.CephraDB.removeQueueTicket(ticket);
+                if (!dbRemoved) {
+                    System.err.println("QueueBridge: Failed to remove ticket " + ticket + " from database");
+                }
+            } catch (Exception e) {
+                System.err.println("QueueBridge: Error removing ticket from database: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("QueueBridge: Error removing ticket from database: " + e.getMessage());
+        } else {
+            System.out.println("QueueBridge: Ticket " + ticket + " already processed, removing from UI only");
         }
 
         // Remove from memory records
@@ -514,11 +649,18 @@ public final class QueueBridge {
             try {
                 SwingUtilities.invokeLater(() -> {
                     try {
-                        for (int i = model.getRowCount() - 1; i >= 0; i--) {
-                            Object v = model.getValueAt(i, 0);
-                            if (v != null && ticket.equals(String.valueOf(v))) {
-                                model.removeRow(i);
-                                break;
+                        int rowCount = model.getRowCount();
+                        for (int i = rowCount - 1; i >= 0; i--) {
+                            if (i < model.getRowCount()) { // Double-check row still exists
+                                Object v = model.getValueAt(i, 0);
+                                if (v != null && ticket.equals(String.valueOf(v))) {
+                                    model.removeRow(i);
+                                    System.out.println("QueueBridge: Successfully removed ticket " + ticket + " from table model at row " + i);
+                                    
+                                    // Force table model to fire change events
+                                    model.fireTableDataChanged();
+                                    break;
+                                }
                             }
                         }
                     } catch (Exception e) {
@@ -530,4 +672,16 @@ public final class QueueBridge {
             }
         }
     }
+    
+    /** Check if ticket is already in charging history (already processed) */
+    private static boolean isTicketInHistory(String ticket) {
+        try {
+            // Check if ticket exists in charging_history table
+            return cephra.CephraDB.isTicketInChargingHistory(ticket);
+        } catch (Exception e) {
+            System.err.println("QueueBridge: Error checking if ticket is in history: " + e.getMessage());
+            return false;
+        }
+    }
+    
 }

@@ -53,8 +53,14 @@ public class Queue extends javax.swing.JPanel {
         // Setup next buttons
         setupNextButtons();
 
-        // Listen to table changes to keep counters in sync
-        queTab.getModel().addTableModelListener(_ -> updateStatusCounters());
+        // Listen to table changes to keep counters in sync and auto-remove paid rows
+        queTab.getModel().addTableModelListener(e -> {
+            updateStatusCounters();
+            // Auto-remove rows when payment status becomes "Paid"
+            if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
+                checkAndRemovePaidRows();
+            }
+        });
         updateStatusCounters();
         
         // Initialize grid displays with maintenance status from BayManagement
@@ -105,7 +111,7 @@ public class Queue extends javax.swing.JPanel {
         final int statusCol = getColumnIndex("Status");
         if (actionCol < 0 || statusCol < 0) return;
 
-        // Renderer: show Proceed on any row that has a real ticket
+        // Renderer: show Proceed only on rows that have a real ticket AND are not paid
         queTab.getColumnModel().getColumn(actionCol).setCellRenderer(new TableCellRenderer() {
             private final JButton button = createFlatButton();
             private final JLabel empty = new JLabel("");
@@ -114,7 +120,18 @@ public class Queue extends javax.swing.JPanel {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
                 boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
-                if (hasTicket) {
+                
+                // Also check payment status - don't show proceed button for paid tickets
+                int paymentCol = getColumnIndex("Payment");
+                boolean isPaid = false;
+                if (paymentCol >= 0 && hasTicket) {
+                    Object paymentVal = table.getValueAt(row, paymentCol);
+                    String paymentStatus = paymentVal == null ? "" : String.valueOf(paymentVal).trim();
+                    isPaid = "Paid".equalsIgnoreCase(paymentStatus);
+                }
+                
+                // Only show proceed button if there's a ticket AND it's not paid
+                if (hasTicket && !isPaid) {
                     button.setText("Proceed");
                     button.setForeground(new java.awt.Color(255, 255, 255)); // Ensure white text color
                     button.setBackground(new java.awt.Color(0, 120, 215)); // Ensure visible background
@@ -409,29 +426,24 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     System.out.println("Queue: Processing Complete ticket " + ticket + " with payment status: " + payment);
                     
                     if ("Paid".equalsIgnoreCase(payment)) {
-                        final int rowToRemove = editingRow;
-                        
                         // Check if payment has already been processed to prevent duplicates
                         boolean alreadyProcessed = cephra.CephraDB.isPaymentAlreadyProcessed(ticket);
                         System.out.println("Queue: Checking if payment already processed for ticket " + ticket + ": " + alreadyProcessed);
                         
                         if (alreadyProcessed) {
                             System.out.println("Queue: Payment already processed for ticket " + ticket + ", removing from queue directly");
-                            // Remove from table and queue bridge without processing payment again
-                            try {
-                                if (rowToRemove >= 0 && rowToRemove < queTab.getRowCount()) {
-                                    ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
-                                    System.out.println("Queue: Successfully removed row " + rowToRemove + " from table");
-                                }
-                            } catch (Throwable t) {
-                                System.err.println("Error removing row from table: " + t.getMessage());
-                            }
+                            // Stop cell editing immediately
+                            stopCellEditing();
                             
+                            // Use QueueBridge.removeTicket() for consistent removal
                             try {
                                 cephra.Admin.QueueBridge.removeTicket(ticket);
-                                System.out.println("Queue: Successfully removed ticket " + ticket + " from queue bridge");
+                                System.out.println("Queue: Successfully removed ticket " + ticket + " via QueueBridge");
+                                
+                                // Hard refresh entire panel after payment
+                                hardRefreshTable();
                             } catch (Throwable t) {
-                                System.err.println("Error removing ticket from queue bridge: " + t.getMessage());
+                                System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
                             }
                             return; // Exit early since payment was already processed
                         }
@@ -487,21 +499,18 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                     System.err.println("Error clearing active ticket: " + ex.getMessage());
                                 }
                                 
-                                // Remove from table and queue bridge immediately after successful payment
-                                try {
-                                    if (rowToRemove >= 0 && rowToRemove < queTab.getRowCount()) {
-                                        ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
-                                        System.out.println("Queue: Successfully removed row " + rowToRemove + " from table");
-                                    }
-                                } catch (Throwable t) {
-                                    System.err.println("Error removing row from table: " + t.getMessage());
-                                }
+                                // Stop cell editing immediately
+                                stopCellEditing();
                                 
+                                // Use QueueBridge.removeTicket() for consistent removal
                                 try {
                                     cephra.Admin.QueueBridge.removeTicket(ticket);
-                                    System.out.println("Queue: Successfully removed ticket " + ticket + " from queue bridge");
+                                    System.out.println("Queue: Successfully removed ticket " + ticket + " via QueueBridge");
+                                    
+                                    // Refresh entire panel after payment
+                                    refreshEntirePanel();
                                 } catch (Throwable t) {
-                                    System.err.println("Error removing ticket from queue bridge: " + t.getMessage());
+                                    System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
                                 }
                             } else {
                                 System.err.println("Failed to process payment transaction for ticket: " + ticket);
@@ -528,7 +537,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
             // Keep counters in sync after any action
             updateStatusCounters();
-            stopCellEditing();
         }
 }
 
@@ -553,6 +561,148 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             }
         }
         return -1;
+    }
+    
+    /**
+     * Checks for rows with "Paid" payment status and automatically removes them
+     */
+    private void checkAndRemovePaidRows() {
+        // Add a small delay to ensure payment processing is complete
+        SwingUtilities.invokeLater(() -> {
+            // Use a timer to delay the check slightly
+            javax.swing.Timer timer = new javax.swing.Timer(500, _ -> {
+                int paymentCol = getColumnIndex("Payment");
+                int ticketCol = getColumnIndex("Ticket");
+                
+                if (paymentCol < 0 || ticketCol < 0) return;
+                
+                // Check all rows for "Paid" status
+                for (int i = queTab.getRowCount() - 1; i >= 0; i--) {
+                    Object paymentVal = queTab.getValueAt(i, paymentCol);
+                    String paymentStatus = paymentVal == null ? "" : String.valueOf(paymentVal).trim();
+                    
+                    if ("Paid".equalsIgnoreCase(paymentStatus)) {
+                        // Get ticket information before removing
+                        Object ticketVal = queTab.getValueAt(i, ticketCol);
+                        String ticket = ticketVal == null ? "" : String.valueOf(ticketVal).trim();
+                        
+                        System.out.println("Queue: Auto-removing row with Paid status for ticket: " + ticket);
+                        
+                        // Use QueueBridge.removeTicket() for consistent removal
+                        if (!ticket.isEmpty()) {
+                            try {
+                                cephra.Admin.QueueBridge.removeTicket(ticket);
+                                System.out.println("Queue: Successfully auto-removed ticket " + ticket + " via QueueBridge");
+                                
+                                // Hard refresh entire panel after payment
+                                hardRefreshTable();
+                                
+                            } catch (Throwable t) {
+                                System.err.println("Error auto-removing ticket via QueueBridge: " + t.getMessage());
+                            }
+                        }
+                    }
+                }
+            });
+            timer.setRepeats(false); // Only run once
+            timer.start();
+        });
+    }
+    
+    
+    
+    /**
+     * Refreshes the entire queue panel when a ticket is paid
+     */
+    public void refreshEntirePanel() {
+        SwingUtilities.invokeLater(() -> {
+            System.out.println("Queue: Refreshing entire panel after payment");
+            
+            // Force complete panel refresh
+            this.repaint();
+            this.revalidate();
+            
+            // Force table refresh
+            queTab.repaint();
+            queTab.revalidate();
+            
+            // Force scroll pane refresh
+            if (jScrollPane1 != null) {
+                jScrollPane1.repaint();
+                jScrollPane1.revalidate();
+            }
+            
+            // Force parent container refresh
+            if (this.getParent() != null) {
+                this.getParent().repaint();
+                this.getParent().revalidate();
+            }
+            
+            // Update status counters
+            updateStatusCounters();
+            
+            System.out.println("Queue: Complete panel refresh completed");
+        });
+    }
+    
+    /**
+     * Performs a hard refresh by completely reloading the table from database
+     */
+    public void hardRefreshTable() {
+        SwingUtilities.invokeLater(() -> {
+            System.out.println("Queue: Performing HARD refresh - reloading table from database");
+            
+            try {
+                // Stop any active cell editing safely
+                if (queTab.isEditing() && queTab.getRowCount() > 0) {
+                    try {
+                        queTab.getCellEditor().stopCellEditing();
+                    } catch (Exception e) {
+                        // Ignore cell editing errors during refresh
+                        System.out.println("Queue: Ignored cell editing error during refresh: " + e.getMessage());
+                    }
+                }
+                
+                // Clear the current table completely
+                ((DefaultTableModel) queTab.getModel()).setRowCount(0);
+                
+                // Force QueueBridge to reload from database
+                cephra.Admin.QueueBridge.reloadFromDatabase();
+                
+                // Force complete UI refresh
+                queTab.clearSelection();
+                queTab.repaint();
+                queTab.revalidate();
+                
+                // Force table to refresh all cell renderers
+                queTab.updateUI();
+                
+                // Force complete renderer refresh by temporarily changing table model
+                DefaultTableModel currentModel = (DefaultTableModel) queTab.getModel();
+                queTab.setModel(new DefaultTableModel());
+                queTab.setModel(currentModel);
+                
+                // Re-setup action column to ensure renderers are fresh
+                setupActionColumn();
+                
+                // Force scroll pane refresh
+                jScrollPane1.repaint();
+                jScrollPane1.revalidate();
+                
+                // Force panel refresh
+                this.repaint();
+                this.revalidate();
+                
+                // Update status counters
+                updateStatusCounters();
+                
+                System.out.println("Queue: HARD refresh completed - table reloaded from database");
+                
+            } catch (Exception e) {
+                System.err.println("Queue: Error during hard refresh: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
 
 
@@ -917,22 +1067,18 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             boolean alreadyProcessed = cephra.CephraDB.isPaymentAlreadyProcessed(ticket);
                             if (alreadyProcessed) {
                                 System.out.println("Queue: Payment already processed for ticket " + ticket + ", removing from queue directly");
-                                // Remove from table and queue bridge since payment is already processed
-                                final int rowToRemove = editingRow;
-                                try {
-                                    if (rowToRemove >= 0 && rowToRemove < queTab.getRowCount()) {
-                                        ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
-                                        System.out.println("Queue: Successfully removed row " + rowToRemove + " from table");
-                                    }
-                                } catch (Throwable t) {
-                                    System.err.println("Error removing row from table: " + t.getMessage());
-                                }
+                                // Stop cell editing immediately
+                                stopCellEditing();
                                 
+                                // Use QueueBridge.removeTicket() for consistent removal
                                 try {
                                     cephra.Admin.QueueBridge.removeTicket(ticket);
-                                    System.out.println("Queue: Successfully removed ticket " + ticket + " from queue bridge");
+                                    System.out.println("Queue: Successfully removed ticket " + ticket + " via QueueBridge");
+                                    
+                                    // Refresh entire panel after payment
+                                    refreshEntirePanel();
                                 } catch (Throwable t) {
-                                    System.err.println("Error removing ticket from queue bridge: " + t.getMessage());
+                                    System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
                                 }
                             } else {
                                 // Get customer and service information for payment processing
@@ -948,22 +1094,18 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                 cephra.Admin.QueueBridge.markPaymentPaid(ticket);
                                 System.out.println("Queue: Completed markPaymentPaid for ticket " + ticket);
                                 
-                                // Remove from table and queue bridge after successful payment
-                                final int rowToRemove = editingRow;
-                                try {
-                                    if (rowToRemove >= 0 && rowToRemove < queTab.getRowCount()) {
-                                        ((DefaultTableModel) queTab.getModel()).removeRow(rowToRemove);
-                                        System.out.println("Queue: Successfully removed row " + rowToRemove + " from table");
-                                    }
-                                } catch (Throwable t) {
-                                    System.err.println("Error removing row from table: " + t.getMessage());
-                                }
+                                // Stop cell editing immediately
+                                stopCellEditing();
                                 
+                                // Use QueueBridge.removeTicket() for consistent removal
                                 try {
                                     cephra.Admin.QueueBridge.removeTicket(ticket);
-                                    System.out.println("Queue: Successfully removed ticket " + ticket + " from queue bridge");
+                                    System.out.println("Queue: Successfully removed ticket " + ticket + " via QueueBridge");
+                                    
+                                    // Refresh entire panel after payment
+                                    refreshEntirePanel();
                                 } catch (Throwable t) {
-                                    System.err.println("Error removing ticket from queue bridge: " + t.getMessage());
+                                    System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
                                 }
                             }
                         }
