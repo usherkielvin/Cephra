@@ -150,7 +150,7 @@ public class Home extends javax.swing.JPanel {
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 32)); // NOI18N
         LoggedName.setText("Hi Dizon!");
         add(LoggedName);
-        LoggedName.setBounds(20, 62, 220, 50);
+        LoggedName.setBounds(30, 62, 240, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home Page - not charging vid.gif"))); // NOI18N
         add(jLabel1);
