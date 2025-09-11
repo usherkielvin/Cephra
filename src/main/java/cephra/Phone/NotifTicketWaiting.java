@@ -24,16 +24,11 @@ public class NotifTicketWaiting extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        Statuswaiting = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        Statuswaiting = new javax.swing.JLabel();
 
-        setBackground(new java.awt.Color(255, 0, 0));
+        setBackground(new java.awt.Color(255, 255, 255));
         setLayout(null);
-
-        Statuswaiting.setForeground(new java.awt.Color(0, 102, 102));
-        Statuswaiting.setText("Your ticket \"ticketnumber\" is now waiting");
-        add(Statuswaiting);
-        Statuswaiting.setBounds(50, 80, 250, 16);
 
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -43,7 +38,12 @@ public class NotifTicketWaiting extends javax.swing.JPanel {
             }
         });
         add(jButton1);
-        jButton1.setBounds(0, 0, 320, 110);
+        jButton1.setBounds(0, 0, 330, 60);
+
+        Statuswaiting.setForeground(new java.awt.Color(0, 102, 102));
+        Statuswaiting.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifWaitingBay.png"))); // NOI18N
+        add(Statuswaiting);
+        Statuswaiting.setBounds(0, -10, 330, 70);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
