@@ -67,6 +67,7 @@ public class home extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
+        wallet = new javax.swing.JButton();
         LoggedName = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -74,7 +75,7 @@ public class home extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
-        checkpop.setText("Notifications");
+        checkpop.setText("jButton1");
         checkpop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkpopActionPerformed(evt);
@@ -130,6 +131,15 @@ public class home extends javax.swing.JPanel {
         });
         add(charge);
         charge.setBounds(30, 680, 50, 40);
+
+        wallet.setText("Walletd");
+        wallet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                walletActionPerformed(evt);
+            }
+        });
+        add(wallet);
+        wallet.setBounds(210, 610, 72, 23);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 32)); // NOI18N
         LoggedName.setText("Hi Dizon!");
@@ -209,7 +219,7 @@ public class home extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
     
-   //GEN-LAST:event_notificationbuttonActionPerformed
+                                                     
 
     private void checkpopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkpopActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
@@ -228,6 +238,21 @@ public class home extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_checkpopActionPerformed
 
+    private void walletActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_walletActionPerformed
+         SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Wallet());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_walletActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel LoggedName;
@@ -237,6 +262,7 @@ public class home extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JButton wallet;
     // End of variables declaration//GEN-END:variables
 
     @Override
