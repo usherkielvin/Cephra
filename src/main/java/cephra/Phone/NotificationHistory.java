@@ -107,7 +107,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
                         if (previousPanel != null) {
                             phoneFrame.switchPanel(previousPanel);
                         } else {
-                            phoneFrame.switchPanel(new cephra.Phone.home());
+                            phoneFrame.switchPanel(new cephra.Phone.Home());
                         }
                         break;
                     }
@@ -545,7 +545,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.home());
+                        phoneFrame.switchPanel(new cephra.Phone.Home());
                         break;
                     }
                 }

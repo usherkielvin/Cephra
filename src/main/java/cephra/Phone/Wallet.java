@@ -1,12 +1,9 @@
-
 package cephra.Phone;
-
 import javax.swing.SwingUtilities;
-
 public class Wallet extends javax.swing.JPanel {
 
      private static float balance = 1000.0f;
-    // Add a boolean flag to track the visibility state
+    
     private boolean balanceHidden = false; 
     public Wallet() {
         initComponents();
@@ -15,14 +12,14 @@ public class Wallet extends javax.swing.JPanel {
         loadWalletData();
         HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
         
-        // Check if there's a pending PayPop to restore after top-up
+        
         SwingUtilities.invokeLater(() -> {
             if (cephra.Phone.PayPop.hasPendingPayPop()) {
                 System.out.println("Wallet: Detected pending PayPop, restoring after top-up");
                 cephra.Phone.PayPop.restorePayPopAfterTopUp();
             }
             
-            // Refresh wallet data in case of recent transactions
+            
             refreshWalletData();
         });
     }

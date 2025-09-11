@@ -2,11 +2,11 @@ package cephra.Admin;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.font.*;
+import java.awt.font.TextAttribute;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.text.*; // Add this import
+import javax.swing.text.*;
 
 public class Login extends javax.swing.JPanel {
     private int loginAttempts = 0;

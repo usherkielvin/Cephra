@@ -482,7 +482,7 @@ public class PayPop extends javax.swing.JPanel {
             // Clear any pending PayPop state since payment is completed
             clearPendingState();
             
-            // Hide PayPop and navigate to home
+            // Hide PayPop and navigate to Home
             hidePayPop();
             navigateToHome();
             
@@ -688,7 +688,7 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Navigates to home screen
+     * Navigates to Home screen
      */
     private void navigateToHome() {
         SwingUtilities.invokeLater(() -> {
@@ -696,7 +696,7 @@ public class PayPop extends javax.swing.JPanel {
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.home());
+                    phoneFrame.switchPanel(new cephra.Phone.Home());
                     break;
                 }
             }

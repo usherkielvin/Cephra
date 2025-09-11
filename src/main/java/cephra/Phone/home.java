@@ -6,9 +6,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
 
-public class home extends javax.swing.JPanel {
+public class Home extends javax.swing.JPanel {
 
-    public home() {
+    public Home() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -45,7 +45,7 @@ public class home extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(home.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(Home.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -75,7 +75,10 @@ public class home extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
-        checkpop.setText("Notifications");
+        checkpop.setBorder(null);
+        checkpop.setBorderPainted(false);
+        checkpop.setContentAreaFilled(false);
+        checkpop.setFocusPainted(false);
         checkpop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkpopActionPerformed(evt);
@@ -132,14 +135,17 @@ public class home extends javax.swing.JPanel {
         add(charge);
         charge.setBounds(30, 680, 50, 40);
 
-        wallet.setText("Walletd");
+        wallet.setBorder(null);
+        wallet.setBorderPainted(false);
+        wallet.setContentAreaFilled(false);
+        wallet.setFocusPainted(false);
         wallet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 walletActionPerformed(evt);
             }
         });
         add(wallet);
-        wallet.setBounds(210, 610, 72, 23);
+        wallet.setBounds(172, 590, 160, 60);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 32)); // NOI18N
         LoggedName.setText("Hi Dizon!");
@@ -229,7 +235,7 @@ public class home extends javax.swing.JPanel {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
                         NotificationHistory notificationHistory = new NotificationHistory();
-                        notificationHistory.setPreviousPanel(new cephra.Phone.home());
+                        notificationHistory.setPreviousPanel(new cephra.Phone.Home());
                         phoneFrame.switchPanel(notificationHistory);
                         break;
                     }
@@ -271,6 +277,12 @@ public class home extends javax.swing.JPanel {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setupLabelPosition();
+                // Ensure background stays behind controls so edited buttons are visible
+                if (jLabel1 != null) {
+                    setComponentZOrder(jLabel1, getComponentCount() - 1);
+                    revalidate();
+                    repaint();
+                }
             }
         });
     }

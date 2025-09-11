@@ -239,6 +239,12 @@ public class TopUppanel extends javax.swing.JPanel {
                 return;
             }
 
+            // Enforce minimum top-up amount
+            if (amount < 200.0) {
+                showErrorMessage("Minimum top-up amount is ₱200.00");
+                return;
+            }
+
             if (amount > 50000) {
                 showErrorMessage("Maximum top-up amount is ₱50,000.00");
                 return;
