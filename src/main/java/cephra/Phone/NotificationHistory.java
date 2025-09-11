@@ -441,7 +441,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(50, 150, 240, 520);
+        historyScrollPane.setBounds(20, 150, 300, 520);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -457,7 +457,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
 
         closeButton.setText("jButton1");
         add(closeButton);
-        closeButton.setBounds(240, 130, 75, 23);
+        closeButton.setBounds(240, 120, 75, 23);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);

@@ -424,7 +424,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     // If paid, move to History and remove from Queue
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
                     System.out.println("Queue: Processing Complete ticket " + ticket + " with payment status: " + payment);
-                    
+                    ////
                     if ("Paid".equalsIgnoreCase(payment)) {
                         // Check if payment has already been processed to prevent duplicates
                         boolean alreadyProcessed = cephra.CephraDB.isPaymentAlreadyProcessed(ticket);

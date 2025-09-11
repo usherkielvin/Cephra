@@ -7,7 +7,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class NotificationHistory extends javax.swing.JPanel implements NotificationHistoryManager.NotificationUpdateListener {
+public class WalletHistory extends javax.swing.JPanel {
     
     
     
@@ -15,7 +15,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
     private String currentUsername;
     private JPanel previousPanel; // To store the previous panel for back navigation
 
-    public NotificationHistory() {
+    public WalletHistory() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -31,9 +31,6 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         // Create and add history panel with scroll pane
         createHistoryPanel();
         
-        // Register as listener for notification updates
-        NotificationHistoryManager.addNotificationUpdateListener(this);
-        
         // Add close button
         closeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -41,8 +38,8 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
             }
         });
         
-        // Load notification entries
-        loadNotificationEntries();
+        // Load wallet transaction entries
+        loadWalletTransactions();
         
         // Add component listener to refresh when panel becomes visible
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -86,10 +83,10 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         historyScrollPane.putClientProperty("JScrollPane.fastWheelScrolling", Boolean.TRUE);
     }
     
-    private void loadNotificationEntries() {
-        // Get current user's notifications
+    private void loadWalletTransactions() {
+        // Get current user's wallet transactions
         currentUsername = cephra.CephraDB.getCurrentUsername();
-        System.out.println("NotificationHistory: Loaded notifications for user: " + currentUsername);
+        System.out.println("WalletHistory: Loading wallet transactions for user: " + currentUsername);
         refreshHistoryDisplay();
     }
     
@@ -117,29 +114,29 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
     }
     
     public void refreshHistoryDisplay() {
-        // Clear existing notification items
+        // Clear existing transaction items
         historyPanel.removeAll();
         
-        // Get current user's notifications
-        List<NotificationHistoryManager.NotificationEntry> entries = NotificationHistoryManager.getNotificationsForUser(currentUsername);
+        // Get ALL wallet transactions for complete history
+        java.util.List<Object[]> transactions = cephra.CephraDB.getAllWalletTransactionHistory(currentUsername);
         
         // Debug information
-        System.out.println("NotificationHistory: Found " + entries.size() + " notification entries");
+        System.out.println("WalletHistory: Found " + transactions.size() + " wallet transactions");
         
-        if (entries.isEmpty()) {
-            // Show "No notifications" message
+        if (transactions.isEmpty()) {
+            // Show "No transactions" message
             JPanel noHistoryPanel = new JPanel(new BorderLayout());
             noHistoryPanel.setBackground(Color.WHITE);
-            JLabel noHistoryLabel = new JLabel("No notifications found");
+            JLabel noHistoryLabel = new JLabel("No wallet transactions found");
             noHistoryLabel.setFont(new Font("Arial", Font.BOLD, 14));
             noHistoryLabel.setForeground(Color.GRAY);
             noHistoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
             noHistoryPanel.add(noHistoryLabel, BorderLayout.CENTER);
             historyPanel.add(noHistoryPanel);
         } else {
-            // Add notification entries
-            for (NotificationHistoryManager.NotificationEntry entry : entries) {
-                addNotificationItem(entry);
+            // Add wallet transaction entries
+            for (Object[] transaction : transactions) {
+                addTransactionItem(transaction);
             }
         }
         
@@ -153,42 +150,46 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         });
     }
     
-    @Override
-    public void onNotificationAdded(NotificationHistoryManager.NotificationEntry entry) {
-        // This is called when a new notification is added
-        // We'll update the display in onNotificationHistoryUpdated
+    /**
+     * Public method to refresh wallet history when called externally
+     */
+    public void refreshWalletHistory() {
+        SwingUtilities.invokeLater(this::refreshHistoryDisplay);
     }
     
-    @Override
-    public void onNotificationHistoryUpdated(String username) {
-        System.out.println("NotificationHistory: onNotificationHistoryUpdated called for username: " + username + ", currentUsername: " + currentUsername);
-        if (username != null && username.equals(currentUsername)) {
-            System.out.println("NotificationHistory: Username matches, refreshing notification display");
-            SwingUtilities.invokeLater(this::refreshHistoryDisplay);
-        } else {
-            System.out.println("NotificationHistory: Username does not match, ignoring update");
-        }
-    }
-    
-    private void addNotificationItem(final NotificationHistoryManager.NotificationEntry entry) {
-        // Create a panel for a single notification item
-        JPanel notificationItemPanel = new JPanel();
-        notificationItemPanel.setLayout(new BorderLayout(5, 0));
-        notificationItemPanel.setBackground(Color.WHITE);
-        notificationItemPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
-        notificationItemPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    private void addTransactionItem(final Object[] transaction) {
+        // Transaction data structure: [transaction_type, amount, new_balance, description, reference_id, transaction_date]
+        String transactionType = (String) transaction[0];
+        double amount = (Double) transaction[1];
+        double newBalance = (Double) transaction[2];
+        String description = (String) transaction[3];
+        String referenceId = (String) transaction[4];
+        java.sql.Timestamp timestamp = (java.sql.Timestamp) transaction[5];
+        
+        // Create a panel for a single transaction item
+        JPanel transactionItemPanel = new JPanel();
+        transactionItemPanel.setLayout(new BorderLayout(5, 0));
+        transactionItemPanel.setBackground(Color.WHITE);
+        transactionItemPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
+        transactionItemPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         // Set cursor to hand to indicate clickable
-        notificationItemPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        transactionItemPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        // Set a fixed preferred and maximum height for each notification item panel
-        int itemHeight = 70; // Increased height for better visibility
+        // Set a fixed preferred and maximum height for each transaction item panel
+        int itemHeight = 80; // Increased height for better visibility
         int itemWidth = 290; // Width of the scroll pane
-        notificationItemPanel.setPreferredSize(new Dimension(itemWidth, itemHeight));
-        notificationItemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, itemHeight));
+        transactionItemPanel.setPreferredSize(new Dimension(itemWidth, itemHeight));
+        transactionItemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, itemHeight));
 
+        // Format date and time
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
+        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm");
+        String dateStr = dateFormat.format(timestamp);
+        String timeStr = timeFormat.format(timestamp);
+        
         // Date label at top
-        JLabel dateLabel = new JLabel(entry.getFormattedDate());
+        JLabel dateLabel = new JLabel(dateStr);
         dateLabel.setFont(new Font("Arial", Font.BOLD, 12));
         dateLabel.setForeground(new Color(70, 70, 70));
 
@@ -198,78 +199,121 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         leftPanel.setBackground(Color.WHITE);
 
         // Time
-        JLabel timeLabel = new JLabel(entry.getFormattedTime());
+        JLabel timeLabel = new JLabel(timeStr);
         timeLabel.setFont(new Font("Arial", Font.PLAIN, 11));
         timeLabel.setForeground(Color.DARK_GRAY);
         timeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Notification type
-        JLabel typeLabel = new JLabel(entry.getType().getDisplayName());
-        typeLabel.setFont(new Font("Arial", Font.BOLD, 11));
-        typeLabel.setForeground(new Color(50, 100, 150));
+        // Transaction type with color coding
+        String typeDisplay = getTransactionTypeDisplay(transactionType);
+        JLabel typeLabel = new JLabel(typeDisplay);
+        typeLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        typeLabel.setForeground(getTransactionTypeColor(transactionType));
         typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Message preview (first 25 chars + ...)
-        String messagePreview = entry.getMessage();
-        if (messagePreview.length() > 25) {
-            messagePreview = messagePreview.substring(0, 25) + "...";
+        // Description preview (first 30 chars + ...)
+        String descriptionPreview = description != null ? description : "";
+        if (descriptionPreview.length() > 30) {
+            descriptionPreview = descriptionPreview.substring(0, 30) + "...";
         }
-        JLabel messageLabel = new JLabel(messagePreview);
-        messageLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-        messageLabel.setForeground(new Color(50, 50, 50));
-        messageLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel descriptionLabel = new JLabel(descriptionPreview);
+        descriptionLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+        descriptionLabel.setForeground(new Color(80, 80, 80));
+        descriptionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         leftPanel.add(timeLabel);
         leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
         leftPanel.add(typeLabel);
         leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
-        leftPanel.add(messageLabel);
+        leftPanel.add(descriptionLabel);
 
-        // Right panel for ticket ID if available
+        // Right panel for amount and balance
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         rightPanel.setBackground(Color.WHITE);
 
-        // Only add ticket info if there's a ticket ID
-        if (entry.getTicketId() != null && !entry.getTicketId().isEmpty()) {
-            // Ticket ID
-            JLabel ticketLabel = new JLabel("Ticket: " + entry.getTicketId());
-            ticketLabel.setFont(new Font("Arial", Font.BOLD, 11));
-            ticketLabel.setForeground(new Color(50, 50, 50));
-            ticketLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            rightPanel.add(ticketLabel);
-        }
-
-        // Bay number if available
-        if (entry.getBayNumber() != null && !entry.getBayNumber().isEmpty()) {
-            JLabel bayLabel = new JLabel("Bay: " + entry.getBayNumber());
-            bayLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-            bayLabel.setForeground(new Color(80, 80, 80));
-            bayLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            rightPanel.add(bayLabel);
-        }
-
-        notificationItemPanel.add(dateLabel, BorderLayout.NORTH);
-        notificationItemPanel.add(leftPanel, BorderLayout.WEST);
-        if (rightPanel.getComponentCount() > 0) {
-            notificationItemPanel.add(rightPanel, BorderLayout.EAST);
-        }
+        // Amount with proper formatting
+        String amountText = formatTransactionAmount(transactionType, amount);
+        JLabel amountLabel = new JLabel(amountText);
+        amountLabel.setFont(new Font("Arial", Font.BOLD, 13));
+        amountLabel.setForeground(getAmountColor(transactionType));
+        amountLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        rightPanel.add(amountLabel);
         
-        // Add click listener to show details when clicked
-        notificationItemPanel.addMouseListener(new MouseAdapter() {
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        
+        // New balance
+        JLabel balanceLabel = new JLabel("Balance: ₱" + String.format("%.2f", newBalance));
+        balanceLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+        balanceLabel.setForeground(new Color(100, 100, 100));
+        balanceLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        rightPanel.add(balanceLabel);
+
+        transactionItemPanel.add(dateLabel, BorderLayout.NORTH);
+        transactionItemPanel.add(leftPanel, BorderLayout.WEST);
+        transactionItemPanel.add(rightPanel, BorderLayout.EAST);
+        
+        // Add click listener to show transaction details
+        transactionItemPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showNotificationDetails(entry);
+                showTransactionDetails(transaction);
             }
         });
 
-        historyPanel.add(notificationItemPanel);
+        historyPanel.add(transactionItemPanel);
+    }
+    
+    /**
+     * Gets display name for transaction type
+     */
+    private String getTransactionTypeDisplay(String transactionType) {
+        switch (transactionType) {
+            case "TOP_UP": return "Top Up";
+            case "PAYMENT": return "Payment";
+            default: return transactionType;
+        }
+    }
+    
+    /**
+     * Gets color for transaction type
+     */
+    private Color getTransactionTypeColor(String transactionType) {
+        switch (transactionType) {
+            case "TOP_UP": return new Color(0, 150, 0); // Green for income
+            case "PAYMENT": return new Color(200, 0, 0); // Red for payment
+            default: return new Color(50, 100, 150); // Blue for others
+        }
+    }
+    
+    /**
+     * Formats transaction amount with proper sign
+     */
+    private String formatTransactionAmount(String transactionType, double amount) {
+        String sign = transactionType.equals("TOP_UP") ? "+" : "-";
+        return sign + String.format("₱%.2f", Math.abs(amount));
+    }
+    
+    /**
+     * Gets color for amount display
+     */
+    private Color getAmountColor(String transactionType) {
+        return transactionType.equals("TOP_UP") ? 
+               new Color(0, 150, 0) : new Color(200, 0, 0);
     }
 /////
     private JPanel detailsPanel;
    
     
-    private void showNotificationDetails(NotificationHistoryManager.NotificationEntry entry) {
+    private void showTransactionDetails(Object[] transaction) {
+        // Transaction data: [transaction_type, amount, new_balance, description, reference_id, transaction_date]
+        String transactionType = (String) transaction[0];
+        double amount = (Double) transaction[1];
+        double newBalance = (Double) transaction[2];
+        String description = (String) transaction[3];
+        String referenceId = (String) transaction[4];
+        java.sql.Timestamp timestamp = (java.sql.Timestamp) transaction[5];
+        
         // If details panel already exists, remove it first
         if (detailsPanel != null) {
             remove(detailsPanel);
@@ -286,7 +330,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         detailsPanel.setBounds(50, 150, 290, 450);
         
         // Add header
-        JLabel headerLabel = new JLabel("Notification Details");
+        JLabel headerLabel = new JLabel("Transaction Details");
         headerLabel.setFont(new Font("Arial", Font.BOLD, 18));
         headerLabel.setForeground(new Color(50, 50, 50));
         headerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -294,40 +338,40 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         
         detailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         
-        // Add notification type
-        addDetailRow(detailsPanel, "Type", entry.getType().getDisplayName());
+        // Add transaction type
+        addDetailRow(detailsPanel, "Type", getTransactionTypeDisplay(transactionType));
         
-        // Add message
-        addDetailRow(detailsPanel, "Message", entry.getMessage());
+        // Add amount
+        addDetailRow(detailsPanel, "Amount", formatTransactionAmount(transactionType, amount));
         
-        // Add details
-        if (entry.getDetails() != null && !entry.getDetails().isEmpty()) {
-            addDetailRow(detailsPanel, "Details", entry.getDetails());
+        // Add description
+        if (description != null && !description.isEmpty()) {
+            addDetailRow(detailsPanel, "Description", description);
         }
         
-        // Add ticket ID if available
-        if (entry.getTicketId() != null && !entry.getTicketId().isEmpty()) {
-            addDetailRow(detailsPanel, "Ticket", entry.getTicketId());
+        // Add reference ID if available
+        if (referenceId != null && !referenceId.isEmpty()) {
+            addDetailRow(detailsPanel, "Reference", referenceId);
         }
         
-        // Add bay number if available
-        if (entry.getBayNumber() != null && !entry.getBayNumber().isEmpty()) {
-            addDetailRow(detailsPanel, "Bay Number", entry.getBayNumber());
-        }
+        // Add new balance after transaction
+        addDetailRow(detailsPanel, "New Balance", String.format("₱%.2f", newBalance));
         
         // Add username
-        addDetailRow(detailsPanel, "User", entry.getUsername());
+        addDetailRow(detailsPanel, "User", currentUsername != null ? currentUsername : "Unknown");
         
         // Add date and time
-        addDetailRow(detailsPanel, "Date", entry.getFormattedDate());
-        addDetailRow(detailsPanel, "Time", entry.getFormattedTime());
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
+        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm:ss");
+        addDetailRow(detailsPanel, "Date", dateFormat.format(timestamp));
+        addDetailRow(detailsPanel, "Time", timeFormat.format(timestamp));
         
         detailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         
         // Add OK button
         JButton okButton = new JButton("OK");
         okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        okButton.addActionListener(_ -> closeDetailsPanel());
+        okButton.addActionListener(e -> closeDetailsPanel());
         detailsPanel.add(okButton);
         
         // Add the details panel to the phone frame
@@ -403,7 +447,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(NotificationHistory.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(WalletHistory.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -441,7 +485,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(50, 150, 240, 520);
+        historyScrollPane.setBounds(20, 150, 300, 520);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -457,7 +501,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
 
         closeButton.setText("jButton1");
         add(closeButton);
-        closeButton.setBounds(240, 130, 75, 23);
+        closeButton.setBounds(240, 120, 75, 23);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -598,8 +642,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
     
     @Override
     public void removeNotify() {
-        // Unregister as listener when panel is removed
-        NotificationHistoryManager.removeNotificationUpdateListener(this);
+        // Clean up resources when panel is removed
         super.removeNotify();
     }
 }
