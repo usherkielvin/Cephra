@@ -6,55 +6,6 @@ import java.awt.event.*;
 
 public class BayManagement extends javax.swing.JPanel {
     
-    /**
-     * Ensures all grid slots are properly initialized in the database
-     */
-    
-    public static void ensureGridSlotsExist() {
-        // Cleaned: no-op helper retained for compatibility
-    }
-    
-    
-    /**
-     * Runs the init.sql script to reset database tables
-     */
-    
-    public static void runInitSqlScript() {
-        // Cleaned: no-op helper retained for compatibility
-    }
-    
-    /**
-     * Remakes all database tables with complete 1-8 bays and 1-10 waiting slots
-     */
-    
-    public static void remakeDatabaseTables() {
-        // Cleaned: no-op helper retained for compatibility
-    }
-    
-    /**
-     * Tests database connection and checks charging_grid table data
-     */
-    
-    public static void testChargingGridDatabase() {
-        // Cleaned: no-op helper retained for compatibility
-    }
-    
-    /**
-     * Displays the current bay numbering system status
-     */
-    
-    public static void displayBayNumberingStatus() {
-        // Cleaned: no-op helper retained for compatibility
-    }
-    
-    /**
-     * Verifies and displays the current state of all grid slots
-     */
-    
-    public static void verifyGridSlots() {
-        // Cleaned: no-op helper retained for compatibility
-    }
-    
     // Static variables to track available bays - ALL SET TO AVAILABLE
     public static boolean[] fastChargingAvailable = {true, true, true}; // Bays 1-3 - ALL AVAILABLE
     public static boolean[] normalChargingAvailable = {true, true, true, true, true}; // Bays 4-8 - ALL AVAILABLE
@@ -77,7 +28,7 @@ public class BayManagement extends javax.swing.JPanel {
     private static void logInfo(String msg)  { if (VERBOSE) System.out.println(msg); }
     private static void logWarn(String msg)  { System.out.println(msg); }
     private static void logError(String msg) { System.err.println(msg); }
-    private static void logError(String msg, Throwable t) { System.err.println(msg); if (VERBOSE && t != null) t.printStackTrace(); }
+    private static void logError(String msg, Throwable t) { System.err.println(msg); if (t != null) t.printStackTrace(); }
     
     /**
      * Registers a Queue instance for real-time updates
@@ -463,16 +414,7 @@ public class BayManagement extends javax.swing.JPanel {
             updateAllBayLabelsFromDatabase();
         });
 
-        // No-op compatibility hooks (referenced to satisfy static analyzers)
-        // These calls do nothing but indicate intentional retention of legacy APIs
-        try {
-            ensureGridSlotsExist();
-            runInitSqlScript();
-            remakeDatabaseTables();
-            testChargingGridDatabase();
-            displayBayNumberingStatus();
-            verifyGridSlots();
-        } catch (Throwable ignore) { }
+        // Compatibility hooks removed: legacy no-op calls eliminated
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
