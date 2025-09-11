@@ -504,20 +504,15 @@ public class PayPop extends javax.swing.JPanel {
         SwingUtilities.invokeLater(() -> {
             boolean paymentSuccessful = false;
             try {
-                paymentSuccessful = processOnlinePayment();
-                
-                if (paymentSuccessful) {
-                    System.out.println("Payment successful, navigating to receipt");
-                    hidePayPop();
-                    navigateToReceipt();
-                } else {
-                    System.out.println("Payment failed or cancelled, keeping PayPop open");
-                    // Don't hide PayPop or navigate anywhere - let user try again or fix issues
-                }
+                processOnlinePayment();
+                // QueueBridge.markPaymentPaidOnline already handles all UI refresh mechanisms
+                // No need for additional refresh here
             } catch (Exception e) {
                 System.out.println("Payment error occurred, keeping PayPop open");
                 handlePaymentError(e);
-                // Don't hide PayPop - let user try again
+            } finally {
+                hidePayPop();
+                navigateToReceipt();
             }
         });
     }
@@ -593,8 +588,7 @@ public class PayPop extends javax.swing.JPanel {
         // - History addition
         // - UI refresh
         
-        // Payment completed successfully
-        return true;
+        // No need to show success message - receipt panel will display the information
     }
     
     /**

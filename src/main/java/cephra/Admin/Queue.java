@@ -35,8 +35,8 @@ public class Queue extends javax.swing.JPanel {
         
         // Create a single instance of Monitor
         if (monitorInstance == null) {
-            monitorInstance = new cephra.Frame.Monitor();
-            monitorInstance.setVisible(true);
+           // monitorInstance = new cephra.Frame.Monitor();
+           // monitorInstance.setVisible(true);
         }
         
         // Initialize grid buttons
@@ -157,15 +157,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
 
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        public Component getTableCellEditorComponent(javax.swing.JTable table, Object value, boolean isSelected, int row, int column) {
             editingRow = row;
-            Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
+            Object ticketVal = queTab.getValueAt(row, 0);
             boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
             if (hasTicket) {
                 button.setText("Proceed");
                 return button;
             }
-        return new JLabel("");
+            return new JLabel("");
         }
 
         @Override
@@ -175,247 +175,52 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         @Override
         public void actionPerformed(java.awt.event.ActionEvent e) {
-            if (editingRow >= 0 && editingRow < queTab.getRowCount()) {
-                Object statusVal = queTab.getValueAt(editingRow, statusColumnIndex);
-                String status = statusVal == null ? "" : String.valueOf(statusVal).trim();
-                int paymentCol = getColumnIndex("Payment");
-                int ticketCol = getColumnIndex("Ticket");
-                int customerCol = getColumnIndex("Customer");
-            
-            // Get ticket value for grid button functionality
-            Object ticketVal = queTab.getValueAt(editingRow, ticketCol);
-            String ticket = ticketVal != null ? String.valueOf(ticketVal).trim() : "";
-            
-                if ("Pending".equalsIgnoreCase(status)) {
-                    // Get ticket details
-                    String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                    int serviceCol = getColumnIndex("Service");
-                    String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
-                    int batteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
-                    
-                    // Check if there's charging capacity for this service type
-                    boolean isFastCharging = false;
-                    if (serviceName != null) {
-                        String svc = serviceName.trim().toLowerCase();
-                        isFastCharging = svc.contains("fast");
+            stopCellEditing();
+            if (editingRow < 0) return;
+            String ticket = String.valueOf(queTab.getValueAt(editingRow, 0));
+
+            // Crash-recovery: if payment not Paid, force/reset to Pending so flow can continue
+            try {
+                int paymentCol = -1;
+                for (int c = 0; c < queTab.getColumnCount(); c++) {
+                    if ("Payment".equalsIgnoreCase(queTab.getColumnName(c))) { paymentCol = c; break; }
+                }
+                String payVal = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
+                if (ticket != null && !ticket.trim().isEmpty() && (payVal == null || payVal.trim().isEmpty() || "Pending".equalsIgnoreCase(payVal) || "TopupRequired".equalsIgnoreCase(payVal))) {
+                    ensurePaymentPending(ticket);
+                    if (paymentCol >= 0) {
+                        queTab.setValueAt("Pending", editingRow, paymentCol);
                     }
-                    if (!cephra.Admin.BayManagement.hasChargingCapacity(isFastCharging)) {
-                        System.out.println("Queue: No available charging bays for " + serviceName + " service. Cannot move ticket " + ticket + " to waiting.");
-                        // Keep status as Pending
-                        return;
-                    }
-                    
-                    // Only move to Waiting if there is capacity in the waiting grid
-                    if (!ticket.isEmpty() && buttonCount < 10) {
-                        queTab.setValueAt("Waiting", editingRow, statusColumnIndex);
-                        // Update database status
-                        cephra.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
-                        
-                        // Trigger notification for customer that their ticket is now waiting
-                        triggerNotificationForCustomer(customer, "TICKET_WAITING", ticket, null);
-                        
-                        // Add ticket to waiting grid database
-                        int slotNumber = cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customer, serviceName, batteryLevel);
-                        if (slotNumber > 0) {
-                        gridButtons[buttonCount].setText(ticket);
-                        gridButtons[buttonCount].setVisible(true);
-                        buttonCount++;
-                        updateMonitorDisplay();
-                        }
-                        
-                        // Update battery level when ticket moves to waiting
-                        try {
-                            if (!customer.isEmpty()) {
-                                int currentBattery = cephra.CephraDB.getUserBatteryLevel(customer);
-                                // Slightly decrease battery level while waiting (simulate idle drain)
-                                int newBattery = Math.max(1, currentBattery - 1);
-                                cephra.CephraDB.setUserBatteryLevel(customer, newBattery);
-                                System.out.println("Queue: Updated battery level for " + customer + " to " + newBattery + "% (waiting)");
-                            }
-                        } catch (Exception batteryEx) {
-                            System.err.println("Error updating battery level: " + batteryEx.getMessage());
-                        }
-                    } else {
-                        // Keep status as Pending and inform user that waiting grid is full
-                        JOptionPane.showMessageDialog(Queue.this,
-                            "Waiting grid is full! Ticket remains Pending.",
-                            "Waiting Grid Full",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else if ("Waiting".equalsIgnoreCase(status)) {
-                    System.out.println("Queue: Processing 'Waiting' status for ticket " + ticket);
-                    boolean isFast = ticket.startsWith("FCH");
-                    System.out.println("Queue: Ticket " + ticket + " is " + (isFast ? "Fast" : "Normal") + " charging");
-                    boolean assigned = isFast ? assignToFastSlot(ticket) : assignToNormalSlot(ticket);
-                    System.out.println("Queue: Assignment result for ticket " + ticket + ": " + assigned);
-                    if (assigned) {
-                        queTab.setValueAt("Charging", editingRow, statusColumnIndex);
-                        // Update database status
-                        cephra.CephraDB.updateQueueTicketStatus(ticket, "Charging");
-                        removeTicketFromGrid(ticket);
-                        
-                        // Get customer and bay information for notification
-                        String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                        String bayNumber = determineBayNumber(ticket, isFast);
-                        
-                        // Trigger "My Turn" notification for customer
-                        triggerNotificationForCustomer(customer, "MY_TURN", ticket, bayNumber);
-                        
-                                                 // Create active ticket when charging starts
-                         try {
-                       //      String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                             int serviceCol = getColumnIndex("Service");
-                             String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
-                             
-                             // Get user's current battery level (this is the initial battery level)
-                             int initialBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
-                             
-                             // Determine bay number based on assignment
-                           //  String bayNumber = "";
-                             if (isFast) {
-                                 // Find the first available fast charging bay that's not in use
-                                 for (int i = 0; i < 3; i++) {
-                                     int bayNum = i + 1;
-                                     String currentBay = "Bay-" + bayNum;
-                                     // Check if bay is available and not currently in use by another active ticket
-                                     if (cephra.Admin.BayManagement.isBayAvailableForCharging(bayNum)) {
-                                         bayNumber = currentBay;
-                                         break;
-                                     }
-                                 }
-                                 
-                                 // If no bay was found, use the original assignment logic as fallback
-                                 if (bayNumber.isEmpty()) {
-                                     if (ticket.equals(fastslot1.getText())) bayNumber = "Bay-1";
-                                     else if (ticket.equals(fastslot2.getText())) bayNumber = "Bay-2";
-                                     else if (ticket.equals(fastslot3.getText())) bayNumber = "Bay-3";
-                                 }
-                             } else {
-                                 // Find the first available normal charging bay that's not in use
-                                 for (int i = 0; i < 5; i++) {
-                                     int bayNum = i + 4;
-                                     String currentBay = "Bay-" + bayNum;
-                                     // Check if bay is available and not currently in use by another active ticket
-                                     if (cephra.Admin.BayManagement.isBayAvailableForCharging(bayNum)) {
-                                         bayNumber = currentBay;
-                                         break;
-                                     }
-                                 }
-                                 
-                                 // If no bay was found, use the original assignment logic as fallback
-                                 if (bayNumber.isEmpty()) {
-                                     if (ticket.equals(normalcharge1.getText())) bayNumber = "Bay-4";
-                                     else if (ticket.equals(normalcharge2.getText())) bayNumber = "Bay-5";
-                                     else if (ticket.equals(normalcharge3.getText())) bayNumber = "Bay-6";
-                                     else if (ticket.equals(normalcharge4.getText())) bayNumber = "Bay-7";
-                                     else if (ticket.equals(normalcharge5.getText())) bayNumber = "Bay-8";
-                                 }
-                             }
-                             
-                             // Create active ticket with initial battery level (save the starting point)
-                             cephra.CephraDB.setActiveTicket(customer, ticket, serviceName, initialBatteryLevel, bayNumber);
-                             System.out.println("Created active ticket: " + ticket + " for customer: " + customer + " in bay: " + bayNumber + " with initial battery: " + initialBatteryLevel + "%");
-                             
-                             // Store initial battery level in QueueBridge for later calculations
-                             cephra.Admin.QueueBridge.setTicketBatteryInfo(ticket, initialBatteryLevel, 40.0);
-                             System.out.println("Queue: Saved initial battery level " + initialBatteryLevel + "% for ticket " + ticket);
-                         } catch (Exception ex) {
-                             System.err.println("Error setting up active ticket: " + ex.getMessage());
-                         }
-                    } else {
-                        String msg = isFast ?
-                            "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue." :
-                            "Normal Charge Bays 1-5 are full!\nTicket " + ticket + " remains in waiting queue.";
-                        String title = isFast ? "Fast Charge Bays Full" : "Normal Charge Bays Full";
-                        JOptionPane.showMessageDialog(Queue.this, msg, title, JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else if ("Charging".equalsIgnoreCase(status)) {
-                    // FIRST: Validate if PayPop can be shown BEFORE completing charging
-                    String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                }
+            } catch (Exception ignore) {}
+
+            int customerCol = Math.min(1, queTab.getColumnCount() - 1);
+            String status = String.valueOf(queTab.getValueAt(editingRow, statusColumnIndex));
+            String customer = String.valueOf(queTab.getValueAt(editingRow, customerCol));
+
+            // Preserve existing flow below
+            try {
+                if ("Charging".equalsIgnoreCase(status)) {
                     boolean canShowPayPop = false;
-                    
                     try {
-                        // Check if PayPop can be shown without actually showing it
                         canShowPayPop = cephra.Phone.PayPop.canShowPayPop(ticket, customer);
                         System.out.println("Queue: Checking if PayPop can be shown for ticket " + ticket + " and customer " + customer + ": " + canShowPayPop);
                     } catch (Throwable t) {
                         System.err.println("Error checking PayPop availability: " + t.getMessage());
                         canShowPayPop = false;
                     }
-                    
                     if (!canShowPayPop) {
-                        // PayPop cannot be shown - don't complete charging, just set payment to Pending
                         System.out.println("Queue: Cannot show PayPop for ticket " + ticket + " - setting payment to Pending");
-                        
-                        // Set payment status to Pending without completing charging
-                        if (paymentCol >= 0) {
-                            queTab.setValueAt("Pending", editingRow, paymentCol);
-                        }
-                        
-                        return; // Exit without completing charging
+                        try { ensurePaymentPending(ticket); } catch (Exception ex) { System.err.println("Failed to set pending: " + ex.getMessage()); }
+                        return;
                     }
-                    
-                    // ONLY complete charging if PayPop can be shown
                     System.out.println("Queue: PayPop can be shown - completing charging for ticket " + ticket);
-                    
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
-                    // Update database status
-                    cephra.CephraDB.updateQueueTicketStatus(ticket, "Complete");
-                    
-                    // Trigger "Full Charge" notification for customer
-                    triggerNotificationForCustomer(customer, "FULL_CHARGE", ticket, null);
-                    if (paymentCol >= 0) {
-                        // Upon completion, payment becomes Pending
-                        queTab.setValueAt("Pending", editingRow, paymentCol);
-                    }
-                    // Clear charging bay and grid for completed ticket
-                    cephra.Admin.BayManagement.clearChargingBayForCompletedTicket(ticket);
-                    
-                    // Set battery level to 100% when charging is completed
-                    try {
-                        if (!customer.isEmpty()) {
-                            cephra.CephraDB.setUserBatteryLevel(customer, 100);
-                            System.out.println("Queue: Charging completed for " + customer + ", battery level set to 100%");
-                        }
-                    } catch (Exception ex) {
-                        System.err.println("Error setting battery to 100%: " + ex.getMessage());
-                    }
-
-                    // Set current ticket context for phone and mark payment pending
-                    try {
-                        int serviceCol = getColumnIndex("Service");
-                        String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
-                        cephra.Phone.QueueFlow.setCurrent(ticket, serviceName);
-                        cephra.Phone.QueueFlow.updatePaymentStatus(ticket, "Pending");
-                    } catch (Throwable t) {
-                        // Ignore errors
-                    }
-
-                    // Compute amount due and kWh based on actual battery level
-                    try {
-                        double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
-                        // Get actual battery info for kWh calculation
-                        cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-                        if (batteryInfo == null) {
-                            // Get from user's actual battery level
-                            String customerForBattery = String.valueOf(queTab.getValueAt(editingRow, getColumnIndex("Customer")));
-                            int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customerForBattery);
-                            batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
-                        }
-                        double usedKWh = (100.0 - batteryInfo.initialPercent) / 100.0 * batteryInfo.capacityKWh;
-                        System.out.println("Amount due for " + ticket + ": " + String.format("%.2f", amount) + ", kWh: " + String.format("%.1f", usedKWh));
-                    } catch (Throwable t) {
-                        // Ignore compute errors
-                    }
-
-                    // NOW show the PayPop (we already validated it can be shown)
+                }
+                if ("Complete".equalsIgnoreCase(status) || "Charging".equalsIgnoreCase(status)) {
                     try {
                         boolean success = cephra.Phone.PayPop.showPayPop(ticket, customer);
-                        if (success) {
-                            System.out.println("PayPop successfully shown for ticket " + ticket + " and user " + customer);
-                        } else {
-                            System.err.println("Unexpected: PayPop validation passed but showing failed for ticket " + ticket);
-                        }
+                        if (!success) { System.err.println("Queue: PayPop failed to open for ticket " + ticket); }
                     } catch (Throwable t) {
                         System.err.println("Error showing PayPop: " + t.getMessage());
                     }
@@ -424,7 +229,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     // If paid, move to History and remove from Queue
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
                     System.out.println("Queue: Processing Complete ticket " + ticket + " with payment status: " + payment);
-                    ////
+                    
                     if ("Paid".equalsIgnoreCase(payment)) {
                         // Check if payment has already been processed to prevent duplicates
                         boolean alreadyProcessed = cephra.CephraDB.isPaymentAlreadyProcessed(ticket);
@@ -538,7 +343,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             // Keep counters in sync after any action
             updateStatusCounters();
         }
-}
+    }
 
     private static JButton createFlatButton() {
         JButton b = new JButton();
@@ -1817,6 +1622,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
      * @param ticketId The ticket ID
      * @param bayNumber The bay number (for MY_TURN notifications)
      */
+    @SuppressWarnings("unused")
     private void triggerNotificationForCustomer(String customer, String notificationType, String ticketId, String bayNumber) {
         if (customer == null || customer.trim().isEmpty()) {
             System.out.println("Queue: Cannot trigger notification - customer is null or empty");
@@ -1966,9 +1772,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         });
     }
     
-    /**
-     * Determines the bay number for a ticket based on its assignment
-     */
+    @SuppressWarnings("unused")
     private String determineBayNumber(String ticket, boolean isFast) {
         if (ticket == null || ticket.trim().isEmpty()) {
             return "Unknown";

@@ -185,6 +185,8 @@ public class AdminRegister extends javax.swing.JPanel {
 
     private void ConPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConPassActionPerformed
        
+        // Pressing Enter in confirm password triggers registration
+        RegisterBTNActionPerformed(evt);
     }//GEN-LAST:event_ConPassActionPerformed
 
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {
@@ -232,13 +234,11 @@ public class AdminRegister extends javax.swing.JPanel {
         }
     }
     
-    private void SeeActionPerformed(java.awt.event.ActionEvent evt) {
-        // Toggle password visibility for pass field
+    private void SeeActionPerformed(java.awt.event.ActionEvent evt) { 
         togglePasswordVisibility(pass, See);
     }
     
-    private void See1ActionPerformed(java.awt.event.ActionEvent evt) {
-        // Toggle password visibility for ConPass field
+    private void See1ActionPerformed(java.awt.event.ActionEvent evt) {  
         togglePasswordVisibility(ConPass, See1);
     }
     
@@ -254,28 +254,21 @@ public class AdminRegister extends javax.swing.JPanel {
         });
     }
 
-    // Setup text field properties
-    private void setupTextFields() {
-        // Add auto-capitalization to name fields
+    private void setupTextFields() {      
         setupAutoCapitalization(Firstname);
-        setupAutoCapitalization(LastName);
-        
-        // Add auto-fill functionality
+        setupAutoCapitalization(LastName);             
         setupAutoFillUsername();
-        setupEmailDomainCompletion();
-        
-        // Add backspace focus navigation
+        setupEmailDomainCompletion();  
         setupBackspaceNavigation();
     }
     
-    // Setup auto-capitalization for text fields
     private void setupAutoCapitalization(javax.swing.JTextField textField) {
         textField.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyReleased(java.awt.event.KeyEvent e) {
-                // Don't process if user is still typing (avoid interfering with spaces)
+               
                 if (e.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
-                    return; // Let space be added naturally
+                    return; 
                 }
                 
                 String text = textField.getText();
@@ -298,12 +291,12 @@ public class AdminRegister extends javax.swing.JPanel {
                         }
                     }
                     
-                    // Only update if the text has actually changed to avoid cursor jumping
+                    
                     String newText = capitalized.toString();
                     if (!newText.equals(text)) {
                         int caretPos = textField.getCaretPosition();
                         textField.setText(newText);
-                        // Maintain cursor position or move to end if at end
+                       
                         if (caretPos >= newText.length()) {
                             textField.setCaretPosition(newText.length());
                         } else {
@@ -315,7 +308,7 @@ public class AdminRegister extends javax.swing.JPanel {
         });
     }
     
-    // Setup auto-fill username from first name + last name
+   
     private void setupAutoFillUsername() {
         // Add focus listener to last name field to auto-fill username
         LastName.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -384,11 +377,6 @@ public class AdminRegister extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Toggles password visibility for a password field
-     * @param passwordField the password field to toggle
-     * @param toggleButton the button that triggers the toggle
-     */
     private void togglePasswordVisibility(javax.swing.JPasswordField passwordField, javax.swing.JButton toggleButton) {
         if (passwordField.getEchoChar() == '\u0000') {
             // Currently visible, hide it
