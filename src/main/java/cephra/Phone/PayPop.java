@@ -11,6 +11,11 @@ public class PayPop extends javax.swing.JPanel {
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
+    // PayPop persistence state for top-up flow
+    private static boolean isPendingTopUpReturn = false;
+    private static String pendingTicketId = null;
+    private static String pendingCustomerUsername = null;
+    
     // Popup dimensions (centered in phone frame)
     private static final int POPUP_WIDTH = 270;
     private static final int POPUP_HEIGHT = 280;
@@ -24,6 +29,45 @@ public class PayPop extends javax.swing.JPanel {
      */
     public static boolean isShowingForTicket(String ticketId) {
         return isShowing && ticketId != null && ticketId.equals(currentTicketId);
+    }
+    
+    /**
+     * Checks if there's a PayPop pending to be restored after top-up
+     * @return true if PayPop should be restored
+     */
+    public static boolean hasPendingPayPop() {
+        return isPendingTopUpReturn && pendingTicketId != null && pendingCustomerUsername != null;
+    }
+    
+    /**
+     * Restores PayPop after returning from top-up if there was a pending payment
+     * @return true if PayPop was restored successfully
+     */
+    public static boolean restorePayPopAfterTopUp() {
+        if (!hasPendingPayPop()) {
+            return false;
+        }
+        
+        System.out.println("PayPop: Restoring PayPop after top-up for ticket: " + pendingTicketId);
+        
+        // Store the pending values
+        String ticketId = pendingTicketId;
+        String username = pendingCustomerUsername;
+        
+        // Clear the pending state
+        clearPendingState();
+        
+        // Show the PayPop again
+        return showPayPop(ticketId, username);
+    }
+    
+    /**
+     * Clears the pending PayPop state
+     */
+    private static void clearPendingState() {
+        isPendingTopUpReturn = false;
+        pendingTicketId = null;
+        pendingCustomerUsername = null;
     }
     
     /**
@@ -416,9 +460,31 @@ public class PayPop extends javax.swing.JPanel {
         String currentUser = cephra.CephraDB.getCurrentUsername();
         System.out.println("Processing cash payment for user: " + currentUser);
         
-        // Hide PayPop and navigate to home
-        hidePayPop();
-        navigateToHome();
+        try {
+            // Get current ticket ID
+            String currentTicket = currentTicketId;
+            if (currentTicket == null || currentTicket.isEmpty()) {
+                currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+            }
+            
+            if (currentTicket != null && !currentTicket.isEmpty()) {
+                // Mark payment as cash payment in the system
+                cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
+                System.out.println("Cash payment recorded for ticket: " + currentTicket);
+            }
+            
+            // Clear any pending PayPop state since payment is completed
+            clearPendingState();
+            
+            // Hide PayPop and navigate to home
+            hidePayPop();
+            navigateToHome();
+            
+        } catch (Exception e) {
+            System.err.println("Error processing cash payment: " + e.getMessage());
+            e.printStackTrace();
+            showErrorMessage("Failed to process cash payment.\nError: " + e.getMessage() + "\nPlease try again.");
+        }
     }
 
     /**
@@ -436,15 +502,17 @@ public class PayPop extends javax.swing.JPanel {
         System.out.println("Processing online payment for user: " + currentUser);
         
         SwingUtilities.invokeLater(() -> {
+            boolean paymentSuccessful = false;
             try {
-                boolean success = processOnlinePayment();
-                if (success) {
-                    // Only hide and navigate to receipt on success
-                    hidePayPop();
-                    navigateToReceipt();
-                }
+                processOnlinePayment();
+                // QueueBridge.markPaymentPaidOnline already handles all UI refresh mechanisms
+                // No need for additional refresh here
             } catch (Exception e) {
+                System.out.println("Payment error occurred, keeping PayPop open");
                 handlePaymentError(e);
+            } finally {
+                hidePayPop();
+                navigateToReceipt();
             }
         });
     }
@@ -464,6 +532,7 @@ public class PayPop extends javax.swing.JPanel {
     
     /**
      * Processes online payment
+     * @return true if payment was successful, false otherwise
      * @throws Exception if payment processing fails
      */
     private boolean processOnlinePayment() throws Exception {
@@ -508,6 +577,9 @@ public class PayPop extends javax.swing.JPanel {
         // Process payment through existing system - markPaymentPaidOnline already handles everything
         cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
         
+        // Clear any pending PayPop state since payment is completed successfully
+        clearPendingState();
+        
         System.out.println("Wallet payment processed successfully for ticket: " + currentTicket + ", Amount: ₱" + paymentAmount);
         
         // Note: markPaymentPaidOnline already handles:
@@ -517,7 +589,6 @@ public class PayPop extends javax.swing.JPanel {
         // - UI refresh
         
         // No need to show success message - receipt panel will display the information
-        return true;
     }
     
     /**
@@ -643,10 +714,19 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Navigates to TopUp screen
+     * Navigates to TopUp screen while preserving PayPop state
      */
     private void navigateToTopUp() {
         SwingUtilities.invokeLater(() -> {
+            // Store the current PayPop state before hiding
+            String currentUser = cephra.CephraDB.getCurrentUsername();
+            if (currentUser != null && currentTicketId != null) {
+                isPendingTopUpReturn = true;
+                pendingTicketId = currentTicketId;
+                pendingCustomerUsername = currentUser;
+                System.out.println("PayPop: Storing payment state for ticket " + currentTicketId + " before top-up");
+            }
+            
             hidePayPop(); // Hide the current PayPop
             Window[] windows = Window.getWindows();
             for (Window window : windows) {

@@ -1828,8 +1828,8 @@ public class CephraDB {
                 transStmt.executeUpdate();
             }
             
-            // Maintain only 5 most recent transactions per user
-            maintainTransactionHistoryLimit(conn, username, 5);
+            // Note: No automatic transaction limit - preserve all wallet history
+            // The Wallet panel preview uses LIMIT 5 in query, but WalletHistory shows all
             
             conn.commit(); // Commit transaction
             System.out.println("Wallet balance updated successfully for " + username + ": " + currentBalance + " → " + newBalance);
@@ -1858,35 +1858,51 @@ public class CephraDB {
         }
     }
     
+    // History retention: We no longer auto-delete wallet transactions here.
+    // If retention is needed in the future, implement an archival strategy instead.
+    
     /**
-     * Maintains wallet transaction history limit by keeping only the N most recent transactions
-     * @param conn the database connection
+     * Gets ALL wallet transactions for a user (for WalletHistory panel)
      * @param username the username
-     * @param maxTransactions the maximum number of transactions to keep
+     * @return list of all wallet transaction records
      */
-    private static void maintainTransactionHistoryLimit(Connection conn, String username, int maxTransactions) {
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM wallet_transactions WHERE username = ? AND id NOT IN " +
-                "(SELECT id FROM (SELECT id FROM wallet_transactions WHERE username = ? " +
-                "ORDER BY transaction_date DESC LIMIT ?) AS keep_transactions)")) {
+    public static java.util.List<Object[]> getAllWalletTransactionHistory(String username) {
+        java.util.List<Object[]> transactions = new ArrayList<>();
+        
+        if (username == null || username.trim().isEmpty()) {
+            return transactions;
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT transaction_type, amount, new_balance, description, reference_id, transaction_date " +
+                     "FROM wallet_transactions WHERE username = ? ORDER BY transaction_date DESC")) {
             
             stmt.setString(1, username);
-            stmt.setString(2, username);
-            stmt.setInt(3, maxTransactions);
             
-            int deletedRows = stmt.executeUpdate();
-            if (deletedRows > 0) {
-                System.out.println("Cleaned up " + deletedRows + " old wallet transactions for " + username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getString("transaction_type"),
+                        rs.getDouble("amount"),
+                        rs.getDouble("new_balance"),
+                        rs.getString("description"),
+                        rs.getString("reference_id"),
+                        rs.getTimestamp("transaction_date")
+                    };
+                    transactions.add(row);
+                }
             }
-            
         } catch (SQLException e) {
-            System.err.println("Error maintaining transaction history limit: " + e.getMessage());
+            System.err.println("Error getting all wallet transaction history: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        return transactions;
     }
     
     /**
-     * Gets the latest wallet transactions for a user (up to 5)
+     * Gets the latest wallet transactions for a user (up to 5 for Wallet panel preview)
      * @param username the username
      * @return list of wallet transaction records
      */

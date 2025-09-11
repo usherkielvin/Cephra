@@ -13,7 +13,18 @@ public class Wallet extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
         loadWalletData();
-         HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
+        HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
+        
+        // Check if there's a pending PayPop to restore after top-up
+        SwingUtilities.invokeLater(() -> {
+            if (cephra.Phone.PayPop.hasPendingPayPop()) {
+                System.out.println("Wallet: Detected pending PayPop, restoring after top-up");
+                cephra.Phone.PayPop.restorePayPopAfterTopUp();
+            }
+            
+            // Refresh wallet data in case of recent transactions
+            refreshWalletData();
+        });
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -54,7 +65,7 @@ public class Wallet extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(160, 310, 50, 40);
+        historybutton.setBounds(210, 680, 50, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -115,7 +126,7 @@ public class Wallet extends javax.swing.JPanel {
             }
         });
         add(historybutton1);
-        historybutton1.setBounds(200, 680, 50, 40);
+        historybutton1.setBounds(160, 320, 50, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Wallet.png"))); // NOI18N
         add(jLabel1);
@@ -388,7 +399,20 @@ public class Wallet extends javax.swing.JPanel {
     }//GEN-LAST:event_chargeActionPerformed
 
     private void historybutton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybutton1ActionPerformed
-       
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        cephra.Phone.WalletHistory walletHistory = new cephra.Phone.WalletHistory();
+                        walletHistory.setPreviousPanel(Wallet.this); // Set current wallet panel as previous
+                        phoneFrame.switchPanel(walletHistory);
+                        break;
+                    }
+                }
+            }
+        });
     }//GEN-LAST:event_historybutton1ActionPerformed
 
     private void TopupbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TopupbtnActionPerformed

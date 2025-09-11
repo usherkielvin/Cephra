@@ -224,24 +224,124 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     } catch (Throwable t) {
                         System.err.println("Error showing PayPop: " + t.getMessage());
                     }
+                } else if ("Complete".equalsIgnoreCase(status)) {
+                
+                    // If paid, move to History and remove from Queue
+                    String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
+                    System.out.println("Queue: Processing Complete ticket " + ticket + " with payment status: " + payment);
+                    
+                    if ("Paid".equalsIgnoreCase(payment)) {
+                        // Check if payment has already been processed to prevent duplicates
+                        boolean alreadyProcessed = cephra.CephraDB.isPaymentAlreadyProcessed(ticket);
+                        System.out.println("Queue: Checking if payment already processed for ticket " + ticket + ": " + alreadyProcessed);
+                        
+                        if (alreadyProcessed) {
+                            System.out.println("Queue: Payment already processed for ticket " + ticket + ", removing from queue directly");
+                            // Stop cell editing immediately
+                            stopCellEditing();
+                            
+                            // Use QueueBridge.removeTicket() for consistent removal
+                            try {
+                                cephra.Admin.QueueBridge.removeTicket(ticket);
+                                System.out.println("Queue: Successfully removed ticket " + ticket + " via QueueBridge");
+                                
+                                // Hard refresh entire panel after payment
+                                hardRefreshTable();
+                            } catch (Throwable t) {
+                                System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
+                            }
+                            return; // Exit early since payment was already processed
+                        }
+                        
+                        System.out.println("Queue: Payment not yet processed, proceeding with payment transaction for ticket " + ticket);
+                        
+                        final String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
+                        // Get reference number from QueueBridge to ensure consistency
+                        final String reference = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
+                        
+                        // Process payment transaction immediately
+                        double amount = 0.0;
+                        try {
+                            // Centralized calculation for total amount
+                            amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                        } catch (Throwable t) {
+                            System.err.println("Error computing amount for ticket " + ticket + ": " + t.getMessage());
+                        }
+                        
+                        // Process payment transaction to move ticket to charging history
+                        try {
+                            int serviceCol = getColumnIndex("Service");
+                            String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
+                            
+                            // Get battery info for calculations
+                            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                            if (batteryInfo == null) {
+                                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                                batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
+                            }
+                            
+                            // Calculate charging time based on service type
+                            int chargingTimeMinutes = 0;
+                            if (serviceName != null && serviceName.contains("Fast")) {
+                                chargingTimeMinutes = (int)((100.0 - batteryInfo.initialPercent) * 0.8); // 0.8 min per 1%
+                            } else {
+                                chargingTimeMinutes = (int)((100.0 - batteryInfo.initialPercent) * 1.6); // 1.6 min per 1%
+                            }
+                            
+                            // Process the payment transaction (this will add to charging history)
+                            boolean success = cephra.CephraDB.processPaymentTransaction(
+                                ticket, customer, serviceName, 
+                                batteryInfo.initialPercent, chargingTimeMinutes, 
+                                amount, "Cash", reference
+                            );
+                            
+                            if (success) {
+                                System.out.println("Successfully processed payment transaction for ticket: " + ticket);
+                                // Clear the active ticket since it's now in history
+                                try {
+                                    cephra.CephraDB.clearActiveTicketByTicketId(ticket);
+                                } catch (Exception ex) {
+                                    System.err.println("Error clearing active ticket: " + ex.getMessage());
+                                }
+                                
+                                // Stop cell editing immediately
+                                stopCellEditing();
+                                
+                                // Use QueueBridge.removeTicket() for consistent removal
+                                try {
+                                    cephra.Admin.QueueBridge.removeTicket(ticket);
+                                    System.out.println("Queue: Successfully removed ticket " + ticket + " via QueueBridge");
+                                    
+                                    // Refresh entire panel after payment
+                                    refreshEntirePanel();
+                                } catch (Throwable t) {
+                                    System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
+                                }
+                            } else {
+                                System.err.println("Failed to process payment transaction for ticket: " + ticket);
+                                // Show error message to user
+                                SwingUtilities.invokeLater(() -> {
+                                    JOptionPane.showMessageDialog(Queue.this,
+                                        "Failed to process payment for ticket " + ticket + ".\nPlease try again.",
+                                        "Payment Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                                });
+                            }
+                        } catch (Exception ex) {
+                            System.err.println("Error processing payment transaction: " + ex.getMessage());
+                            // Show error message to user
+                            SwingUtilities.invokeLater(() -> {
+                                JOptionPane.showMessageDialog(Queue.this,
+                                    "Error processing payment for ticket " + ticket + ".\nPlease try again.",
+                                    "Payment Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            });
+                        }
+                    }
                 }
-            } catch (Exception ex) {
-                System.err.println("Queue Proceed error: " + ex.getMessage());
             }
-        }
-    }
-
-    // Ensure queue_tickets.payment_status = 'Pending' (idempotent) for crash recovery
-    private static void ensurePaymentPending(String ticketId) {
-        if (ticketId == null || ticketId.trim().isEmpty()) return;
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
-             java.sql.PreparedStatement ps = conn.prepareStatement(
-                 "UPDATE queue_tickets SET payment_status='Pending' WHERE ticket_id=? AND (payment_status IS NULL OR payment_status='' OR payment_status<>'Paid')")) {
-            ps.setString(1, ticketId);
-            int n = ps.executeUpdate();
-            System.out.println("Queue: ensurePaymentPending updated rows=" + n + " for ticket " + ticketId);
-        } catch (Exception e) {
-            System.err.println("Queue: ensurePaymentPending failed: " + e.getMessage());
+            // Keep counters in sync after any action
+            updateStatusCounters();
         }
     }
 
