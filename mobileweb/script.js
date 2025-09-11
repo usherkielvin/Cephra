@@ -46,7 +46,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         formData.append('username', username);
         formData.append('password', password);
 
-        const response = await fetch('../api/mobile.php', {
+        const response = await fetch('api/mobile.php', {
             method: 'POST',
             body: formData
         });

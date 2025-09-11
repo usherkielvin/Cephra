@@ -31,11 +31,11 @@
         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="ff" green="0" red="0" type="rgb"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Your ticket &quot;ticketnumber&quot; is now pending"/>
+        <Property name="text" type="java.lang.String" value="VRDLpd07ZT5oH ticket &quot;ticketnumber&quot; is now pending"/>
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="40" y="130" width="270" height="-1"/>
+          <AbsoluteConstraints x="40" y="130" width="220" height="-1"/>
         </Constraint>
       </Constraints>
     </Component>

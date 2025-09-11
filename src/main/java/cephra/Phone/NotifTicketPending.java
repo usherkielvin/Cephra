@@ -31,9 +31,9 @@ public class NotifTicketPending extends javax.swing.JPanel {
 
         Statuspending.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         Statuspending.setForeground(new java.awt.Color(0, 0, 255));
-        Statuspending.setText("Your ticket \"ticketnumber\" is now pending");
+        Statuspending.setText("VRDLpd07ZT5oH ticket \"ticketnumber\" is now pending");
         add(Statuspending);
-        Statuspending.setBounds(40, 130, 270, 20);
+        Statuspending.setBounds(40, 130, 220, 20);
     }// </editor-fold>//GEN-END:initComponents
 
     /**

@@ -52,7 +52,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         formData.append('email', email);
         formData.append('password', password);
 
-        const response = await fetch('../api/mobile.php', {
+        const response = await fetch('api/mobile.php', {
             method: 'POST',
             body: formData
         });

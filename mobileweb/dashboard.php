@@ -4,7 +4,7 @@ if (!isset($_SESSION['username'])) {
     header("Location: index.php");
     exit();
 }
-require_once '../config/database.php';
+require_once 'config/database.php';
 $db = new Database();
 $conn = $db->getConnection();
 if ($conn) {

@@ -8,6 +8,7 @@
 </head>
 <body>
 <!-- From Uiverse.io by ammarsaa --> 
+<div class="auth-wrapper">
 <form class="form" id="registerForm">
     <p class="title">Register </p>
     <p class="message">Signup now and get full access to our app. </p>
@@ -42,6 +43,7 @@
     <button class="submit" type="submit">Submit</button>
     <p class="signin">Already have an acount ? <a href="index.php">Login</a> </p>
 </form>
+</div>
 
          
 

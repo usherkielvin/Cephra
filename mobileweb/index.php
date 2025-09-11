@@ -8,6 +8,23 @@
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#062635" />
+    
+    <!-- Open Graph meta tags for social media previews -->
+    <meta property="og:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
+    <meta property="og:description" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
+    <meta property="og:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://cephra.ct.ws" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Cephra" />
+    
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
+    <meta name="twitter:description" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
+    <meta name="twitter:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
+    
     <link rel="stylesheet" href="css/index.css" />
 </head>
 <body class="auth-page">
