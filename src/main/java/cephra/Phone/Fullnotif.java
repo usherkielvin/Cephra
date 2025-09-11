@@ -27,15 +27,26 @@ public class Fullnotif extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setBackground(new java.awt.Color(255, 0, 0));
+        setBackground(new java.awt.Color(255, 255, 255));
+        setOpaque(false);
         setLayout(null);
 
-        StatusGo.setBackground(new java.awt.Color(0, 0, 0));
-        StatusGo.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        StatusGo.setForeground(new java.awt.Color(255, 255, 102));
-        StatusGo.setText("Ur car is now fullcharge");
-        add(StatusGo);
-        StatusGo.setBounds(30, 110, 270, 50);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        add(jButton1);
+        jButton1.setBounds(0, 0, 330, 70);
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 102));
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Done.png"))); // NOI18N
+        jLabel1.setText("Ur car is now fullcharge");
+        add(jLabel1);
+        jLabel1.setBounds(0, 0, 330, 70);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
