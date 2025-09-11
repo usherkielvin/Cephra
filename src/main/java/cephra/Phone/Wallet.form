@@ -130,7 +130,7 @@
     <Container class="javax.swing.JPanel" name="Latestranscat">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="40" y="430" width="290" height="240"/>
+          <AbsoluteConstraints x="50" y="430" width="290" height="240"/>
         </Constraint>
       </Constraints>
 
