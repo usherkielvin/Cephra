@@ -6,6 +6,15 @@ import javax.swing.*;
 
 public class Monitor extends javax.swing.JFrame {
  private JButton[] displayButtons;
+ // Responsive layout base and scaling
+ private static final int BASE_W = 1000;
+ private static final int BASE_H = 750;
+ private static final Rectangle ORIG_WAITING = new Rectangle(30, 330, 300, 370);
+ private static final Rectangle ORIG_NORMAL = new Rectangle(412, 540, 540, 170);
+ private static final Rectangle ORIG_FAST = new Rectangle(412, 320, 405, 180);
+ private static final Rectangle ORIG_B1 = new Rectangle(840, 320, 110, 180);
+ private static final Rectangle ORIG_BG = new Rectangle(-3, -4, 1010, 760);
+ private static final int BASE_FONT = 18;
 //dis means display ok
         public Monitor() {
         System.out.println("Monitor constructor called");
@@ -14,6 +23,14 @@ public class Monitor extends javax.swing.JFrame {
         setAppIcon();
         addEscapeKeyListener();
         makeDraggable();
+        setResizable(true);
+        setMinimumSize(new Dimension(600, 450));
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                applyScale();
+            }
+        });
         
         // Initialize displayButtons array AFTER initComponents() so buttons exist
         displayButtons = new JButton[] {
@@ -34,6 +51,8 @@ public class Monitor extends javax.swing.JFrame {
         
         // Register this Monitor instance with BayManagement for real-time updates
         cephra.Admin.BayManagement.registerMonitorInstance(this);
+        // Apply initial scale once visible
+        java.awt.EventQueue.invokeLater(this::applyScale);
     }
     
 
@@ -274,9 +293,8 @@ public class Monitor extends javax.swing.JFrame {
         IconTV = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(1000, 750));
-        setResizable(false);
-
+        setMaximumSize(new java.awt.Dimension(10000, 7500));
+        
         Monitor.setMaximumSize(new java.awt.Dimension(1000, 750));
         Monitor.setPreferredSize(new java.awt.Dimension(1000, 750));
         Monitor.setLayout(null);
@@ -604,5 +622,42 @@ public class Monitor extends javax.swing.JFrame {
             System.err.println("Error initializing Monitor grid displays: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void applyScale() {
+        try {
+            Dimension size = getContentPane().getSize();
+            if (size.width <= 0 || size.height <= 0) return;
+            double sx = size.width / (double) BASE_W;
+            double sy = size.height / (double) BASE_H;
+            double s = Math.min(sx, sy);
+            // Scale and set bounds
+            setScaledBounds(WaitingGrid, ORIG_WAITING, s);
+            setScaledBounds(jPanel2, ORIG_NORMAL, s);
+            setScaledBounds(jPanel1, ORIG_FAST, s);
+            setScaledBounds(b1, ORIG_B1, s);
+            setScaledBounds(IconTV, ORIG_BG, s);
+            // Scale fonts
+            int fs = Math.max(12, (int)Math.round(BASE_FONT * s));
+            setFontSize(f1, fs); setFontSize(f2, fs); setFontSize(f3, fs);
+            setFontSize(b1, fs); setFontSize(b2, fs); setFontSize(b3, fs); setFontSize(b4, fs); setFontSize(b5, fs);
+            setFontSize(jButton1, fs); setFontSize(jButton2, fs); setFontSize(jButton3, fs); setFontSize(jButton4, fs); setFontSize(jButton5, fs);
+            setFontSize(jButton6, fs); setFontSize(jButton7, fs); setFontSize(jButton8, fs); setFontSize(jButton9, fs); setFontSize(jButton10, fs);
+            Monitor.revalidate();
+            Monitor.repaint();
+        } catch (Exception ignore) {}
+    }
+
+    private void setScaledBounds(Component c, Rectangle orig, double s) {
+        int x = (int)Math.round(orig.x * s);
+        int y = (int)Math.round(orig.y * s);
+        int w = (int)Math.round(orig.width * s);
+        int h = (int)Math.round(orig.height * s);
+        c.setBounds(x, y, w, h);
+    }
+
+    private void setFontSize(JComponent comp, int size) {
+        Font f = comp.getFont();
+        if (f != null && f.getSize() != size) comp.setFont(f.deriveFont((float)size));
     }
 }

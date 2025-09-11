@@ -25,6 +25,7 @@ public class NotifTicketPending extends javax.swing.JPanel {
     private void initComponents() {
 
         Statuspending = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 0, 0));
         setLayout(null);
@@ -33,8 +34,26 @@ public class NotifTicketPending extends javax.swing.JPanel {
         Statuspending.setForeground(new java.awt.Color(0, 0, 255));
         Statuspending.setText("VRDLpd07ZT5oH ticket \"ticketnumber\" is now pending");
         add(Statuspending);
-        Statuspending.setBounds(0, 70, 360, 20);
+        Statuspending.setBounds(40, 130, 220, 20);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.NotificationHistory());
+                        break;
+                    }
+                }
+            }
+        });
+
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * Shows the notification with animation sliding down from the top
@@ -142,5 +161,6 @@ public class NotifTicketPending extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Statuspending;
+    private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
 }

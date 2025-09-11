@@ -147,11 +147,28 @@ try {
             }
             break;
 
+        case 'monitor':
+            // Public snapshot for web monitor (no admin key required)
+            if ($method === 'GET') {
+                // Bays snapshot
+                $baysStmt = $db->query("SELECT bay_number, bay_type, status, current_ticket_id, current_username, start_time FROM charging_bays ORDER BY bay_number");
+                $bays = $baysStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Waiting queue snapshot (top 20)
+                $queueStmt = $db->query("SELECT ticket_id, username, service_type, status, payment_status, created_at FROM queue_tickets WHERE status='Waiting' ORDER BY created_at ASC LIMIT 20");
+                $queue = $queueStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                echo json_encode(['bays' => $bays, 'queue' => $queue]);
+            } else {
+                echo json_encode(['error' => 'Method not allowed']);
+            }
+            break;
+
         default:
             // Show available actions
             echo json_encode([
                 'message' => 'Cephra Database API',
-                'available_actions' => ['login', 'register', 'queue', 'create-ticket', 'admin-list-bays', 'admin-list-queue', 'admin-set-bay', 'admin-close-ticket'],
+                'available_actions' => ['login', 'register', 'queue', 'create-ticket', 'monitor', 'admin-list-bays', 'admin-list-queue', 'admin-set-bay', 'admin-close-ticket'],
                 'usage' => 'Add ?action=ACTION or POST action=ACTION'
             ]);
             break;

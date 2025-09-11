@@ -24,18 +24,37 @@ public class Fullnotif extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        StatusGo = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
-        setBackground(new java.awt.Color(255, 255, 255));
+        setBackground(new java.awt.Color(255, 0, 0));
         setLayout(null);
 
         StatusGo.setBackground(new java.awt.Color(0, 0, 0));
         StatusGo.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         StatusGo.setForeground(new java.awt.Color(255, 255, 102));
-        StatusGo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/FullChargePOP.png"))); // NOI18N
+        StatusGo.setText("Ur car is now fullcharge");
         add(StatusGo);
-        StatusGo.setBounds(0, -2, 330, 70);
+        StatusGo.setBounds(30, 110, 270, 50);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+      
+        
+          SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.NotificationHistory());
+                        break;
+                    }
+                }
+            }
+        });
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * Shows the notification with animation sliding down from the top
@@ -142,6 +161,7 @@ public class Fullnotif extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel StatusGo;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

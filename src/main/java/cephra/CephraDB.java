@@ -1632,7 +1632,8 @@ public class CephraDB {
             String[] requiredTables = {
                 "users", "battery_levels", "active_tickets", "otp_codes",
                 "queue_tickets", "charging_history", "staff_records", 
-                "charging_bays", "payment_transactions", "system_settings"
+                "charging_bays", "payment_transactions", "system_settings",
+                "wallet_balance", "wallet_transactions"
             };
             
             boolean allTablesExist = true;
@@ -1702,6 +1703,282 @@ public class CephraDB {
             System.err.println("❌ Error validating database integrity: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    // ========================= WALLET METHODS =========================
+    
+    /**
+     * Gets the current wallet balance for a user
+     * @param username the username to get balance for
+     * @return the current balance, or 0.00 if user not found
+     */
+    public static double getUserWalletBalance(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return 0.00;
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT balance FROM wallet_balance WHERE username = ?")) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("balance");
+                } else {
+                    // Create wallet balance entry if it doesn't exist
+                    createWalletBalanceEntry(username, 0.00);
+                    return 0.00;
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error getting user wallet balance: " + e.getMessage());
+            e.printStackTrace();
+            return 0.00;
+        }
+    }
+    
+    /**
+     * Creates a wallet balance entry for a new user
+     * @param username the username
+     * @param initialBalance the initial balance (default 0.00)
+     * @return true if successful
+     */
+    private static boolean createWalletBalanceEntry(String username, double initialBalance) {
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT IGNORE INTO wallet_balance (username, balance) VALUES (?, ?)")) {
+            
+            stmt.setString(1, username);
+            stmt.setDouble(2, initialBalance);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error creating wallet balance entry: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Updates user wallet balance and adds transaction record
+     * @param username the username
+     * @param amount the amount to add (positive) or deduct (negative)
+     * @param transactionType the type of transaction (TOP_UP, PAYMENT, REFUND)
+     * @param description the transaction description
+     * @param referenceId the reference ID (ticket ID for payments, transaction ID for topups)
+     * @return true if successful
+     */
+    public static boolean updateWalletBalance(String username, double amount, String transactionType, 
+                                            String description, String referenceId) {
+        if (username == null || username.trim().isEmpty()) {
+            System.err.println("Invalid username for wallet balance update");
+            return false;
+        }
+        
+        Connection conn = null;
+        try {
+            conn = cephra.db.DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+            
+            // Get current balance
+            double currentBalance = getUserWalletBalance(username);
+            double newBalance = currentBalance + amount;
+            
+            if (newBalance < 0 && transactionType.equals("PAYMENT")) {
+                System.err.println("Insufficient wallet balance for payment. Current: " + currentBalance + ", Required: " + Math.abs(amount));
+                return false;
+            }
+            
+            // Update wallet balance
+            try (PreparedStatement updateStmt = conn.prepareStatement(
+                    "UPDATE wallet_balance SET balance = ?, updated_at = CURRENT_TIMESTAMP WHERE username = ?")) {
+                
+                updateStmt.setDouble(1, newBalance);
+                updateStmt.setString(2, username);
+                
+                int rowsUpdated = updateStmt.executeUpdate();
+                if (rowsUpdated == 0) {
+                    // Create wallet balance entry if it doesn't exist
+                    try (PreparedStatement insertStmt = conn.prepareStatement(
+                            "INSERT INTO wallet_balance (username, balance) VALUES (?, ?)")) {
+                        insertStmt.setString(1, username);
+                        insertStmt.setDouble(2, newBalance);
+                        insertStmt.executeUpdate();
+                    }
+                }
+            }
+            
+            // Add wallet transaction record
+            try (PreparedStatement transStmt = conn.prepareStatement(
+                    "INSERT INTO wallet_transactions (username, transaction_type, amount, previous_balance, new_balance, description, reference_id) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                
+                transStmt.setString(1, username);
+                transStmt.setString(2, transactionType);
+                transStmt.setDouble(3, amount);
+                transStmt.setDouble(4, currentBalance);
+                transStmt.setDouble(5, newBalance);
+                transStmt.setString(6, description);
+                transStmt.setString(7, referenceId);
+                
+                transStmt.executeUpdate();
+            }
+            
+            // Note: No automatic transaction limit - preserve all wallet history
+            // The Wallet panel preview uses LIMIT 5 in query, but WalletHistory shows all
+            
+            conn.commit(); // Commit transaction
+            System.out.println("Wallet balance updated successfully for " + username + ": " + currentBalance + " → " + newBalance);
+            return true;
+            
+        } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback(); // Rollback on error
+                }
+            } catch (SQLException rollbackEx) {
+                System.err.println("Error rolling back wallet transaction: " + rollbackEx.getMessage());
+            }
+            System.err.println("Error updating wallet balance: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true); // Reset auto-commit
+                    conn.close();
+                }
+            } catch (SQLException closeEx) {
+                System.err.println("Error closing connection: " + closeEx.getMessage());
+            }
+        }
+    }
+    
+    // History retention: We no longer auto-delete wallet transactions here.
+    // If retention is needed in the future, implement an archival strategy instead.
+    
+    /**
+     * Gets ALL wallet transactions for a user (for WalletHistory panel)
+     * @param username the username
+     * @return list of all wallet transaction records
+     */
+    public static java.util.List<Object[]> getAllWalletTransactionHistory(String username) {
+        java.util.List<Object[]> transactions = new ArrayList<>();
+        
+        if (username == null || username.trim().isEmpty()) {
+            return transactions;
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT transaction_type, amount, new_balance, description, reference_id, transaction_date " +
+                     "FROM wallet_transactions WHERE username = ? ORDER BY transaction_date DESC")) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getString("transaction_type"),
+                        rs.getDouble("amount"),
+                        rs.getDouble("new_balance"),
+                        rs.getString("description"),
+                        rs.getString("reference_id"),
+                        rs.getTimestamp("transaction_date")
+                    };
+                    transactions.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting all wallet transaction history: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return transactions;
+    }
+    
+    /**
+     * Gets the latest wallet transactions for a user (up to 5 for Wallet panel preview)
+     * @param username the username
+     * @return list of wallet transaction records
+     */
+    public static java.util.List<Object[]> getWalletTransactionHistory(String username) {
+        java.util.List<Object[]> transactions = new ArrayList<>();
+        
+        if (username == null || username.trim().isEmpty()) {
+            return transactions;
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT transaction_type, amount, new_balance, description, reference_id, transaction_date " +
+                     "FROM wallet_transactions WHERE username = ? ORDER BY transaction_date DESC LIMIT 5")) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getString("transaction_type"),
+                        rs.getDouble("amount"),
+                        rs.getDouble("new_balance"),
+                        rs.getString("description"),
+                        rs.getString("reference_id"),
+                        rs.getTimestamp("transaction_date")
+                    };
+                    transactions.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting wallet transaction history: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return transactions;
+    }
+    
+    /**
+     * Checks if user has sufficient wallet balance for a payment
+     * @param username the username
+     * @param amount the amount required
+     * @return true if balance is sufficient
+     */
+    public static boolean hasSufficientWalletBalance(String username, double amount) {
+        double currentBalance = getUserWalletBalance(username);
+        return currentBalance >= amount;
+    }
+    
+    /**
+     * Processes wallet payment for a ticket
+     * @param username the username
+     * @param ticketId the ticket ID
+     * @param amount the payment amount
+     * @return true if payment successful
+     */
+    public static boolean processWalletPayment(String username, String ticketId, double amount) {
+        if (!hasSufficientWalletBalance(username, amount)) {
+            return false;
+        }
+        
+        String description = "Payment for ticket " + ticketId;
+        return updateWalletBalance(username, -amount, "PAYMENT", description, ticketId);
+    }
+    
+    /**
+     * Processes wallet top-up
+     * @param username the username
+     * @param amount the top-up amount
+     * @param method the top-up method (e.g., "Quick Amount A", "Custom Amount")
+     * @return true if top-up successful
+     */
+    public static boolean processWalletTopUp(String username, double amount, String method) {
+        String description = "Wallet top-up via " + method;
+        String referenceId = "TOPUP_" + System.currentTimeMillis();
+        return updateWalletBalance(username, amount, "TOP_UP", description, referenceId);
     }
 
 }
