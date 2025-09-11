@@ -25,15 +25,9 @@
   </Layout>
   <SubComponents>
     <Component class="javax.swing.JLabel" name="otpPreviewLabel">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Segoe UI" size="12" style="1"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="99999"/>
-      </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="220" y="140" width="120" height="30"/>
+          <AbsoluteConstraints x="200" y="141" width="120" height="20"/>
         </Constraint>
       </Constraints>
     </Component>
