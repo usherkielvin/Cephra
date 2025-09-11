@@ -2,7 +2,6 @@
 package cephra.Phone;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -130,11 +129,11 @@ public class TopUppanel extends javax.swing.JPanel {
     }//GEN-LAST:event_ProceedActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        // TODO add your handling code here:
+     
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void bckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bckActionPerformed
-        // TODO add your handling code here:
+       
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();

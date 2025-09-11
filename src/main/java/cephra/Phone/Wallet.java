@@ -388,11 +388,11 @@ public class Wallet extends javax.swing.JPanel {
     }//GEN-LAST:event_chargeActionPerformed
 
     private void historybutton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybutton1ActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_historybutton1ActionPerformed
 
     private void TopupbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TopupbtnActionPerformed
-        // TODO add your handling code here:
+       
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
