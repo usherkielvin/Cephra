@@ -29,6 +29,7 @@
           <Image iconType="3" name="/cephra/Cephra Images/EyeClose.png"/>
         </Property>
         <Property name="borderPainted" type="boolean" value="false"/>
+        <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
       </Properties>
       <Events>
@@ -36,7 +37,7 @@
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="930" y="460" width="-1" height="40"/>
+          <AbsoluteConstraints x="930" y="460" width="50" height="40"/>
         </Constraint>
       </Constraints>
     </Component>
@@ -46,6 +47,7 @@
           <Image iconType="3" name="/cephra/Cephra Images/EyeClose.png"/>
         </Property>
         <Property name="borderPainted" type="boolean" value="false"/>
+        <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
       </Properties>
       <Events>
@@ -53,7 +55,7 @@
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="630" y="460" width="-1" height="40"/>
+          <AbsoluteConstraints x="620" y="460" width="50" height="40"/>
         </Constraint>
       </Constraints>
     </Component>

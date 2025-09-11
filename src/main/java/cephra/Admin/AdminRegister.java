@@ -20,15 +20,15 @@ public class AdminRegister extends javax.swing.JPanel {
         pass.setOpaque(false);
         pass.setBackground(new Color(0, 0, 0, 0));
         ConPass.setOpaque(false);
-        ConPass.setBackground(new Color(0, 0, 0, 0));
-        
-        
-        
+        ConPass.setBackground(new Color(0, 0, 0, 0));     
+        setupTextFields();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        See1 = new javax.swing.JButton();
+        See = new javax.swing.JButton();
         username = new javax.swing.JTextField();
         email = new javax.swing.JTextField();
         RegisterBTN = new javax.swing.JButton();
@@ -43,6 +43,30 @@ public class AdminRegister extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setLayout(null);
 
+        See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
+        See1.setBorderPainted(false);
+        See1.setContentAreaFilled(false);
+        See1.setFocusPainted(false);
+        See1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                See1ActionPerformed(evt);
+            }
+        });
+        add(See1);
+        See1.setBounds(930, 460, 50, 40);
+
+        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
+        See.setBorderPainted(false);
+        See.setContentAreaFilled(false);
+        See.setFocusPainted(false);
+        See.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SeeActionPerformed(evt);
+            }
+        });
+        add(See);
+        See.setBounds(620, 460, 50, 40);
+
         username.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
@@ -51,7 +75,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(388, 364, 260, 37);
+        username.setBounds(388, 362, 260, 37);
 
         email.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         email.setBorder(null);
@@ -61,7 +85,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(388, 452, 260, 37);
+        email.setBounds(700, 360, 260, 37);
 
         RegisterBTN.setBorderPainted(false);
         RegisterBTN.setContentAreaFilled(false);
@@ -81,22 +105,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(700, 276, 220, 37);
-        
-        // Add show/hide password button for pass field
-        showPassBtn = new javax.swing.JButton();
-        showPassBtn.setText("👁");
-        showPassBtn.setFont(new java.awt.Font("Segoe UI", 0, 16));
-        showPassBtn.setBorder(null);
-        showPassBtn.setContentAreaFilled(false);
-        showPassBtn.setFocusPainted(false);
-        showPassBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                togglePasswordVisibility(pass, showPassBtn);
-            }
-        });
-        add(showPassBtn);
-        showPassBtn.setBounds(920, 276, 40, 37);
+        pass.setBounds(390, 460, 260, 37);
 
         ConPass.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         ConPass.setBorder(null);
@@ -106,22 +115,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(ConPass);
-        ConPass.setBounds(700, 362, 220, 38);
-        
-        // Add show/hide password button for ConPass field
-        showConPassBtn = new javax.swing.JButton();
-        showConPassBtn.setText("👁");
-        showConPassBtn.setFont(new java.awt.Font("Segoe UI", 0, 16));
-        showConPassBtn.setBorder(null);
-        showConPassBtn.setContentAreaFilled(false);
-        showConPassBtn.setFocusPainted(false);
-        showConPassBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                togglePasswordVisibility(ConPass, showConPassBtn);
-            }
-        });
-        add(showConPassBtn);
-        showConPassBtn.setBounds(920, 362, 40, 38);
+        ConPass.setBounds(700, 460, 260, 38);
 
         log.setBorderPainted(false);
         log.setContentAreaFilled(false);
@@ -152,12 +146,17 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(Firstname);
-        Firstname.setBounds(388, 276, 120, 37);
+        Firstname.setBounds(390, 263, 120, 37);
 
         LastName.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         LastName.setBorder(null);
+        LastName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LastNameActionPerformed(evt);
+            }
+        });
         add(LastName);
-        LastName.setBounds(533, 276, 120, 37);
+        LastName.setBounds(533, 263, 120, 37);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ADMINregister.png"))); // NOI18N
         add(jLabel1);
@@ -165,8 +164,12 @@ public class AdminRegister extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void FirstnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FirstnameActionPerformed
-        username.requestFocus();
+        LastName.requestFocus();
     }//GEN-LAST:event_FirstnameActionPerformed
+
+    private void LastNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LastNameActionPerformed
+        username.requestFocus();
+    }//GEN-LAST:event_LastNameActionPerformed
 
     private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed
         email.requestFocus();
@@ -229,6 +232,158 @@ public class AdminRegister extends javax.swing.JPanel {
         }
     }
     
+    private void SeeActionPerformed(java.awt.event.ActionEvent evt) {
+        // Toggle password visibility for pass field
+        togglePasswordVisibility(pass, See);
+    }
+    
+    private void See1ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Toggle password visibility for ConPass field
+        togglePasswordVisibility(ConPass, See1);
+    }
+    
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (Firstname != null) {
+                    Firstname.requestFocusInWindow();
+                }
+            }
+        });
+    }
+
+    // Setup text field properties
+    private void setupTextFields() {
+        // Add auto-capitalization to name fields
+        setupAutoCapitalization(Firstname);
+        setupAutoCapitalization(LastName);
+        
+        // Add auto-fill functionality
+        setupAutoFillUsername();
+        setupEmailDomainCompletion();
+        
+        // Add backspace focus navigation
+        setupBackspaceNavigation();
+    }
+    
+    // Setup auto-capitalization for text fields
+    private void setupAutoCapitalization(javax.swing.JTextField textField) {
+        textField.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                // Don't process if user is still typing (avoid interfering with spaces)
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+                    return; // Let space be added naturally
+                }
+                
+                String text = textField.getText();
+                if (!text.isEmpty()) {
+                    // Capitalize first letter of each word (supports multiple names)
+                    String[] words = text.split("\\s+");
+                    StringBuilder capitalized = new StringBuilder();
+                    for (int i = 0; i < words.length; i++) {
+                        if (!words[i].isEmpty()) {
+                            // Capitalize first letter of each word
+                            capitalized.append(words[i].substring(0, 1).toUpperCase());
+                            if (words[i].length() > 1) {
+                                // Make rest of the word lowercase
+                                capitalized.append(words[i].substring(1).toLowerCase());
+                            }
+                        }
+                        // Add space between words (except after the last word)
+                        if (i < words.length - 1) {
+                            capitalized.append(" ");
+                        }
+                    }
+                    
+                    // Only update if the text has actually changed to avoid cursor jumping
+                    String newText = capitalized.toString();
+                    if (!newText.equals(text)) {
+                        int caretPos = textField.getCaretPosition();
+                        textField.setText(newText);
+                        // Maintain cursor position or move to end if at end
+                        if (caretPos >= newText.length()) {
+                            textField.setCaretPosition(newText.length());
+                        } else {
+                            textField.setCaretPosition(caretPos);
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Setup auto-fill username from first name + last name
+    private void setupAutoFillUsername() {
+        // Add focus listener to last name field to auto-fill username
+        LastName.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                String firstName = Firstname.getText().trim();
+                String lastName = LastName.getText().trim();
+                
+                if (!firstName.isEmpty() && !lastName.isEmpty()) {
+                    // Combine first name + last name in lowercase (removes spaces)
+                    String suggestedUsername = (firstName + lastName).replaceAll("\\s+", "").toLowerCase();
+                    username.setText(suggestedUsername);
+                }
+            }
+        });
+    }
+    
+    // Setup email domain auto-completion
+    private void setupEmailDomainCompletion() {
+        email.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                String text = email.getText();
+                int caretPos = email.getCaretPosition();
+                
+                // Check if user typed @g and suggest gmail.com
+                if (text.endsWith("@g") && caretPos == text.length()) {
+                    email.setText(text + "mail.com");
+                    email.setCaretPosition(email.getText().length()); // Position cursor at end
+                }
+                // Check if user typed @c and suggest cephra.com
+                else if (text.endsWith("@c") && caretPos == text.length()) {
+                    email.setText(text + "ephra.com");
+                    email.setCaretPosition(email.getText().length()); // Position cursor at end
+                }
+            }
+        });
+    }
+    
+    // Setup backspace navigation to move focus to previous field
+    private void setupBackspaceNavigation() {
+        // Define the field order for navigation
+        javax.swing.JTextField[] fields = {Firstname, LastName, username, email, pass, ConPass};
+        
+        for (int i = 0; i < fields.length; i++) {
+            final int currentIndex = i;
+            final javax.swing.JTextField currentField = fields[i];
+            
+            currentField.addKeyListener(new java.awt.event.KeyAdapter() {
+                @Override
+                public void keyPressed(java.awt.event.KeyEvent e) {
+                    // Only handle backspace key when field is empty
+                    if (e.getKeyCode() == java.awt.event.KeyEvent.VK_BACK_SPACE && currentField.getText().isEmpty()) {
+                        // Prevent default backspace behavior and move to previous field
+                        e.consume();
+                        if (currentIndex > 0) {
+                            fields[currentIndex - 1].requestFocusInWindow();
+                            // Move cursor to end of previous field
+                            javax.swing.SwingUtilities.invokeLater(() -> {
+                                fields[currentIndex - 1].setCaretPosition(fields[currentIndex - 1].getText().length());
+                            });
+                        }
+                    }
+                }
+            });
+        }
+    }
+    
     /**
      * Toggles password visibility for a password field
      * @param passwordField the password field to toggle
@@ -252,12 +407,12 @@ public class AdminRegister extends javax.swing.JPanel {
     private javax.swing.JTextField Firstname;
     private javax.swing.JTextField LastName;
     private javax.swing.JButton RegisterBTN;
+    private javax.swing.JButton See;
+    private javax.swing.JButton See1;
     private javax.swing.JTextField email;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton log;
     private javax.swing.JPasswordField pass;
-    private javax.swing.JButton showConPassBtn;
-    private javax.swing.JButton showPassBtn;
     private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
 }
