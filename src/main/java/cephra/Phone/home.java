@@ -74,14 +74,15 @@ public class home extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
-        checkpop.setText("Notifications");
+        checkpop.setBorderPainted(false);
+        checkpop.setContentAreaFilled(false);
         checkpop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkpopActionPerformed(evt);
             }
         });
         add(checkpop);
-        checkpop.setBounds(220, 70, 75, 23);
+        checkpop.setBounds(285, 70, 50, 40);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -138,7 +139,7 @@ public class home extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home Page - not charging vid.gif"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(-12, 0, 410, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -209,7 +210,7 @@ public class home extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
     
-   //GEN-LAST:event_notificationbuttonActionPerformed
+                                                     
 
     private void checkpopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkpopActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
