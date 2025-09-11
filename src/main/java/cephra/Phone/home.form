@@ -28,14 +28,15 @@
   <SubComponents>
     <Component class="javax.swing.JButton" name="checkpop">
       <Properties>
-        <Property name="text" type="java.lang.String" value="jButton1"/>
+        <Property name="borderPainted" type="boolean" value="false"/>
+        <Property name="contentAreaFilled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkpopActionPerformed"/>
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="220" y="70" width="-1" height="-1"/>
+          <AbsoluteConstraints x="285" y="70" width="50" height="40"/>
         </Constraint>
       </Constraints>
     </Component>
@@ -145,7 +146,7 @@
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="-15" y="0" width="398" height="750"/>
+          <AbsoluteConstraints x="-12" y="0" width="410" height="750"/>
         </Constraint>
       </Constraints>
     </Component>

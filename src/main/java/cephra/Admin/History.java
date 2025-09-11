@@ -137,10 +137,10 @@ public class History extends javax.swing.JPanel {
             }
         });
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS); // Disable horizontal scrolling
-        jTable1.setAutoscrolls(false); // Disable auto-scrolling
+        jTable1.setAutoscrolls(true); // Enable auto-scrolling for mouse wheel
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
-        jTable1.setPreferredSize(new java.awt.Dimension(980, 550)); // Match scrollpane size
+        // jTable1.setPreferredSize(new java.awt.Dimension(980, 550)); // Match scrollpane size - removed to allow proper scrolling
         jTable1.setRequestFocusEnabled(false);
         jTable1.setShowHorizontalLines(true);
         jTable1.getTableHeader().setResizingAllowed(false);

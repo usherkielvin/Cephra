@@ -1,0 +1,14 @@
+{
+  "name": "Cephra",
+  "short_name": "Cephra",
+  "start_url": "dashboard.php",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#062635",
+  "theme_color": "#062635",
+  "icons": [
+    { "src": "images/logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "images/logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
+

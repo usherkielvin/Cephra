@@ -10,9 +10,9 @@ public class AdminRegister extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
-        email.setText(""); // Plain email field
-        Fullname.setOpaque(false);
-        Fullname.setBackground(new Color(0, 0, 0, 0));
+        Firstname.setOpaque(false);
+        Firstname.setBackground(new Color(0, 0, 0, 0));  LastName.setOpaque(false);
+        LastName.setBackground(new Color(0, 0, 0, 0));
         email.setOpaque(false);
         email.setBackground(new Color(0, 0, 0, 0));
         username.setOpaque(false);
@@ -21,8 +21,6 @@ public class AdminRegister extends javax.swing.JPanel {
         pass.setBackground(new Color(0, 0, 0, 0));
         ConPass.setOpaque(false);
         ConPass.setBackground(new Color(0, 0, 0, 0));
-        LastNameAdminReg.setOpaque(false);
-        LastNameAdminReg.setBackground(new Color(0, 0, 0, 0));
         
         
         
@@ -38,8 +36,8 @@ public class AdminRegister extends javax.swing.JPanel {
         ConPass = new javax.swing.JPasswordField();
         log = new javax.swing.JButton();
         AdminBTN = new javax.swing.JButton();
-        Fullname = new javax.swing.JTextField();
-        LastNameAdminReg = new javax.swing.JTextField();
+        Firstname = new javax.swing.JTextField();
+        LastName = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1000, 750));
@@ -83,7 +81,22 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(700, 276, 260, 37);
+        pass.setBounds(700, 276, 220, 37);
+        
+        // Add show/hide password button for pass field
+        showPassBtn = new javax.swing.JButton();
+        showPassBtn.setText("👁");
+        showPassBtn.setFont(new java.awt.Font("Segoe UI", 0, 16));
+        showPassBtn.setBorder(null);
+        showPassBtn.setContentAreaFilled(false);
+        showPassBtn.setFocusPainted(false);
+        showPassBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                togglePasswordVisibility(pass, showPassBtn);
+            }
+        });
+        add(showPassBtn);
+        showPassBtn.setBounds(920, 276, 40, 37);
 
         ConPass.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         ConPass.setBorder(null);
@@ -93,7 +106,22 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(ConPass);
-        ConPass.setBounds(700, 362, 260, 38);
+        ConPass.setBounds(700, 362, 220, 38);
+        
+        // Add show/hide password button for ConPass field
+        showConPassBtn = new javax.swing.JButton();
+        showConPassBtn.setText("👁");
+        showConPassBtn.setFont(new java.awt.Font("Segoe UI", 0, 16));
+        showConPassBtn.setBorder(null);
+        showConPassBtn.setContentAreaFilled(false);
+        showConPassBtn.setFocusPainted(false);
+        showConPassBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                togglePasswordVisibility(ConPass, showConPassBtn);
+            }
+        });
+        add(showConPassBtn);
+        showConPassBtn.setBounds(920, 362, 40, 38);
 
         log.setBorderPainted(false);
         log.setContentAreaFilled(false);
@@ -116,29 +144,29 @@ public class AdminRegister extends javax.swing.JPanel {
         add(AdminBTN);
         AdminBTN.setBounds(870, 73, 110, 30);
 
-        Fullname.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        Fullname.setBorder(null);
-        Fullname.addActionListener(new java.awt.event.ActionListener() {
+        Firstname.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        Firstname.setBorder(null);
+        Firstname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                FullnameActionPerformed(evt);
+                FirstnameActionPerformed(evt);
             }
         });
-        add(Fullname);
-        Fullname.setBounds(388, 276, 120, 37);
+        add(Firstname);
+        Firstname.setBounds(388, 276, 120, 37);
 
-        LastNameAdminReg.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        LastNameAdminReg.setBorder(null);
-        add(LastNameAdminReg);
-        LastNameAdminReg.setBounds(533, 276, 120, 37);
+        LastName.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        LastName.setBorder(null);
+        add(LastName);
+        LastName.setBounds(533, 276, 120, 37);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ADMINregister.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 1000, 750);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void FullnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FullnameActionPerformed
+    private void FirstnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FirstnameActionPerformed
         username.requestFocus();
-    }//GEN-LAST:event_FullnameActionPerformed
+    }//GEN-LAST:event_FirstnameActionPerformed
 
     private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed
         email.requestFocus();
@@ -157,7 +185,7 @@ public class AdminRegister extends javax.swing.JPanel {
     }//GEN-LAST:event_ConPassActionPerformed
 
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {
-        String name = Fullname.getText().trim();
+        String name = Firstname.getText().trim();
         String usernameVal = username.getText().trim();
         String emailVal = email.getText().trim();
         String password = new String(pass.getPassword()).trim();
@@ -180,7 +208,7 @@ public class AdminRegister extends javax.swing.JPanel {
         cephra.Admin.StaffData.addStaff(name, usernameVal, emailVal, password);
 
         javax.swing.JOptionPane.showMessageDialog(this, "Admin registration successful", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        Fullname.setText("");
+        Firstname.setText("");
         username.setText("");
         email.setText("");
         pass.setText("");
@@ -200,17 +228,36 @@ public class AdminRegister extends javax.swing.JPanel {
             ((cephra.Frame.Admin) w).switchPanel(new StaffRecord());
         }
     }
+    
+    /**
+     * Toggles password visibility for a password field
+     * @param passwordField the password field to toggle
+     * @param toggleButton the button that triggers the toggle
+     */
+    private void togglePasswordVisibility(javax.swing.JPasswordField passwordField, javax.swing.JButton toggleButton) {
+        if (passwordField.getEchoChar() == '\u0000') {
+            // Currently visible, hide it
+            passwordField.setEchoChar('•');
+            toggleButton.setText("👁");
+        } else {
+            // Currently hidden, show it
+            passwordField.setEchoChar('\u0000');
+            toggleButton.setText("🙈");
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AdminBTN;
     private javax.swing.JPasswordField ConPass;
-    private javax.swing.JTextField Fullname;
-    private javax.swing.JTextField LastNameAdminReg;
+    private javax.swing.JTextField Firstname;
+    private javax.swing.JTextField LastName;
     private javax.swing.JButton RegisterBTN;
     private javax.swing.JTextField email;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton log;
     private javax.swing.JPasswordField pass;
+    private javax.swing.JButton showConPassBtn;
+    private javax.swing.JButton showPassBtn;
     private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
 }
