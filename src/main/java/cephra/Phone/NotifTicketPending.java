@@ -25,7 +25,6 @@ public class NotifTicketPending extends javax.swing.JPanel {
     private void initComponents() {
 
         Statuspending = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 0, 0));
         setLayout(null);
@@ -37,32 +36,8 @@ public class NotifTicketPending extends javax.swing.JPanel {
         Statuspending.setBounds(40, 130, 220, 20);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.NotificationHistory());
-                        break;
-                    }
-                }
-            }
-        });
-
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    /**
-     * Shows the notification with animation sliding down from the top
-     */
     public void showNotification() {
-        if (isShowing) return; // Prevent multiple show animations
-        
-        // History recording is now handled by the Queue class with proper ticket ID
-        // No need to record duplicate history here
+        if (isShowing) return; 
         
         isShowing = true;
         setVisible(true);
@@ -161,6 +136,5 @@ public class NotifTicketPending extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Statuspending;
-    private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
 }
