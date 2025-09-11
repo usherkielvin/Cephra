@@ -510,8 +510,13 @@ public class PayPop extends javax.swing.JPanel {
         SwingUtilities.invokeLater(() -> {
             try {
                 processOnlinePayment();
-                // QueueBridge.markPaymentPaidOnline already handles all UI refresh mechanisms
-                // No need for additional refresh here
+                // After successful wallet payment, ensure admin queue marks as paid and removes the ticket
+                try {
+                    String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+                    if (currentTicket != null && !currentTicket.isEmpty()) {
+                        cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
+                    }
+                } catch (Throwable ignore) {}
             } catch (Exception e) {
                 System.out.println("Payment error occurred, keeping PayPop open");
                 handlePaymentError(e);

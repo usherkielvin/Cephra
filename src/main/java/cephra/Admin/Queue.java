@@ -179,11 +179,16 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             if (editingRow < 0) return;
             String ticket = String.valueOf(queTab.getValueAt(editingRow, 0));
             int paymentCol = getColumnIndex("Payment");
+            String status = String.valueOf(queTab.getValueAt(editingRow, statusColumnIndex));
 
             // Crash-recovery: if payment not Paid, force/reset to Pending so flow can continue
             try {
                 String payVal = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
-                if (ticket != null && !ticket.trim().isEmpty() && (payVal == null || payVal.trim().isEmpty() || "Pending".equalsIgnoreCase(payVal) || "TopupRequired".equalsIgnoreCase(payVal))) {
+                if ("Complete".equalsIgnoreCase(status)
+                    && ticket != null && !ticket.trim().isEmpty()
+                    && (payVal == null || payVal.trim().isEmpty()
+                        || "Pending".equalsIgnoreCase(payVal)
+                        || "TopupRequired".equalsIgnoreCase(payVal))) {
                     ensurePaymentPending(ticket);
                     if (paymentCol >= 0) {
                         queTab.setValueAt("Pending", editingRow, paymentCol);
@@ -192,11 +197,41 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             } catch (Exception ignore) {}
 
             int customerCol = Math.min(1, queTab.getColumnCount() - 1);
-            String status = String.valueOf(queTab.getValueAt(editingRow, statusColumnIndex));
             String customer = String.valueOf(queTab.getValueAt(editingRow, customerCol));
 
             // Preserve existing flow below
             try {
+                if ("Pending".equalsIgnoreCase(status)) {
+                    // Promote Pending -> Waiting on first proceed
+                    int statusCol = getColumnIndex("Status");
+                    if (statusCol >= 0) {
+                        queTab.setValueAt("Waiting", editingRow, statusCol);
+                        try {
+                            cephra.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
+                            // Also place into waiting grid
+                            int svcCol = getColumnIndex("Service");
+                            String serviceName = svcCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, svcCol)) : "";
+                            String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
+                            int battery = cephra.CephraDB.getUserBatteryLevel(customerName);
+                            cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customerName, serviceName, battery);
+                            // Refresh waiting grid view
+                            initializeWaitingGridFromDatabase();
+                        } catch (Throwable ignore) {}
+                    }
+                    // Do not open PayPop yet when still Waiting
+                    updateStatusCounters();
+                    return;
+                }
+                if ("Waiting".equalsIgnoreCase(status)) {
+                    // Try to assign to a charging bay; if assigned, status becomes Charging
+                    boolean assigned = false;
+                    try { assigned = tryAssignToAnyAvailableBay(ticket); } catch (Throwable t) { System.err.println("Queue: assign attempt failed: " + t.getMessage()); }
+                    if (assigned) {
+                        setTableStatusToChargingByTicket(ticket);
+                    }
+                    updateStatusCounters();
+                    return;
+                }
                 if ("Charging".equalsIgnoreCase(status)) {
                     boolean canShowPayPop = false;
                     try {
@@ -768,6 +803,28 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             System.out.println("Queue: No available fast charging bays for ticket " + ticket);
         }
         return false;
+    }
+
+    private boolean tryAssignToAnyAvailableBay(String ticket) {
+        String service = null;
+        try {
+            service = cephra.Admin.QueueBridge.getTicketService(ticket);
+        } catch (Throwable ignore) {}
+
+        boolean prefersFast = false;
+        if (service != null) {
+            prefersFast = service.toLowerCase().contains("fast");
+        } else if (ticket != null) {
+            prefersFast = ticket.toUpperCase().startsWith("FCH");
+        }
+
+        if (prefersFast) {
+            if (assignToFastSlot(ticket)) return true;
+            return assignToNormalSlot(ticket);
+        } else {
+            if (assignToNormalSlot(ticket)) return true;
+            return assignToFastSlot(ticket);
+        }
     }
 
 

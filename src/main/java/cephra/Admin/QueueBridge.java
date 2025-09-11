@@ -268,7 +268,12 @@ public final class QueueBridge {
             try {
                 // Check if payment already exists in database to prevent duplicates
                 if (cephra.CephraDB.isPaymentAlreadyProcessed(ticket)) {
-                    System.out.println("QueueBridge: Payment already exists in database for ticket " + ticket + ", skipping duplicate");
+                    System.out.println("QueueBridge: Payment already exists in database for ticket " + ticket + ", ensuring UI cleanup");
+                    try {
+                        removeTicket(ticket);
+                        triggerHardRefresh();
+                        triggerPanelSwitchRefresh();
+                    } catch (Throwable ignore) {}
                     return;
                 }
                 
