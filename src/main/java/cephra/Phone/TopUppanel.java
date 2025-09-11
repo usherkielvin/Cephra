@@ -248,7 +248,7 @@ public class TopUppanel extends javax.swing.JPanel {
             String topUpMethod = "Custom Amount";
             for (int i = 0; i < QUICK_AMOUNTS.length; i++) {
                 if (Math.abs(amount - QUICK_AMOUNTS[i]) < 0.01) {
-                    topUpMethod = "Quick Amount " + (char)('A' + i);
+                    topUpMethod = "Quick Amount ";
                     break;
                 }
             }

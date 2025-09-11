@@ -103,7 +103,7 @@ public class Wallet extends javax.swing.JPanel {
         add(HideBalance);
         HideBalance.setBounds(270, 210, 70, 60);
         add(Latestranscat);
-        Latestranscat.setBounds(40, 430, 290, 240);
+        Latestranscat.setBounds(50, 430, 290, 240);
 
         historybutton1.setBorder(null);
         historybutton1.setBorderPainted(false);
@@ -293,7 +293,7 @@ public class Wallet extends javax.swing.JPanel {
         switch (transactionType) {
             case "TOP_UP": return "Top Up";
             case "PAYMENT": return "Payment";
-            case "REFUND": return "Refund";
+           
             default: return transactionType;
         }
     }
@@ -305,12 +305,12 @@ public class Wallet extends javax.swing.JPanel {
     }
     
     private String formatTransactionAmount(String transactionType, double amount) {
-        String sign = transactionType.equals("TOP_UP") || transactionType.equals("REFUND") ? "+" : "-";
+        String sign = transactionType.equals("TOP_UP") ? "+" : "-";
         return sign + String.format("₱%.2f", Math.abs(amount));
     }
     
     private java.awt.Color getAmountColor(String transactionType) {
-        return transactionType.equals("TOP_UP") || transactionType.equals("REFUND") ? 
+        return transactionType.equals("TOP_UP") ? 
                new java.awt.Color(0, 150, 0) : new java.awt.Color(200, 0, 0);
     }
     
