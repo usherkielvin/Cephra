@@ -2,8 +2,8 @@
 -- Run this script in your local XAMPP MySQL to create the required tables
 
 -- Create database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS cephra_db;
-USE cephra_db;
+CREATE DATABASE IF NOT EXISTS cephradb;
+USE cephradb;
 
 -- Users table for authentication
 CREATE TABLE IF NOT EXISTS users (
