@@ -42,19 +42,176 @@
         .ts { font-size: 12px; color:var(--muted); margin-left:8px; }
         .toolbar { margin-left:auto; display:flex; gap:8px; align-items:center; }
         .btn { background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.25); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; }
+        .toolbar label { display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px; }
+        .toolbar label input[type="checkbox"] { margin:0; }
         .pager { display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap: wrap; }
         .pager .btn { padding:4px 8px; }
         
         /* Fullscreen styles */
-        .fullscreen-mode { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1000; background: var(--bg); padding: 20px; overflow-y: auto; }
-        .fullscreen-mode h1 { margin-bottom: 20px; }
+        .fullscreen-mode { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            z-index: 1000; 
+            background: var(--bg); 
+            padding: 10px; 
+            overflow-y: auto; 
+            box-sizing: border-box;
+        }
+        .fullscreen-mode h1 { 
+            margin-bottom: 10px; 
+            font-size: 18px;
+            flex-wrap: wrap;
+        }
+        .fullscreen-mode .toolbar {
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .fullscreen-mode .toolbar .btn {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        .fullscreen-mode .toolbar label {
+            display: none;
+        }
         .fullscreen-mode .row { display: none; }
-        .fullscreen-mode .grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(250px, auto)); gap: 20px; }
-        .fullscreen-mode .bay { padding: 20px; font-size: 16px; height: 250px; }
-        .fullscreen-mode .bay h3 { font-size: 24px; margin-bottom: 12px; }
-        .fullscreen-mode .badge { padding: 10px 16px; font-size: 16px; }
-        .fullscreen-mode .available { font-size: 20px; font-weight: bold; padding: 12px 18px; }
-        .fullscreen-mode .muted { font-size: 14px; margin-top: 10px; }
+        .fullscreen-mode .grid { 
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(2, 1fr); 
+            gap: 30px; 
+            padding: 25px;
+            height: calc(100vh - 80px);
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .fullscreen-mode .bay { 
+            padding: 20px; 
+            font-size: 16px; 
+            height: 100%; 
+            width: 100%;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-radius: 15px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .fullscreen-mode .bay h3 { 
+            font-size: 18px; 
+            margin-bottom: 8px; 
+        }
+        .fullscreen-mode .badge { 
+            padding: 6px 10px; 
+            font-size: 14px; 
+        }
+        .fullscreen-mode .available { 
+            font-size: 16px; 
+            font-weight: bold; 
+            padding: 8px 12px; 
+        }
+        .fullscreen-mode .muted { 
+            font-size: 12px; 
+            margin-top: 8px; 
+        }
+        
+        /* Fullscreen responsive styles */
+        @media (max-width: 480px) {
+            .fullscreen-mode { padding: 10px; }
+            .fullscreen-mode h1 { font-size: 16px; margin-bottom: 8px; }
+            .fullscreen-mode .toolbar .btn { padding: 3px 6px; font-size: 10px; }
+            .fullscreen-mode .toolbar label { 
+                display: none;
+            }
+            .fullscreen-mode .grid { 
+                grid-template-columns: repeat(2, 1fr); 
+                grid-template-rows: repeat(4, 1fr);
+                gap: 20px; 
+                padding: 20px;
+                height: calc(100vh - 60px);
+            }
+            .fullscreen-mode .bay { 
+                padding: 15px; 
+                font-size: 14px;
+                margin: 0;
+                border-radius: 12px;
+            }
+            .fullscreen-mode .bay h3 { font-size: 16px; margin-bottom: 8px; }
+            .fullscreen-mode .badge { padding: 8px 12px; font-size: 12px; }
+            .fullscreen-mode .available { font-size: 14px; padding: 10px 14px; }
+            .fullscreen-mode .muted { font-size: 10px; margin-top: 8px; }
+        }
+        
+        @media (min-width: 481px) and (max-width: 768px) {
+            .fullscreen-mode .grid { 
+                grid-template-columns: repeat(3, 1fr); 
+                grid-template-rows: repeat(3, 1fr);
+                gap: 25px;
+                padding: 22px;
+                height: calc(100vh - 70px);
+            }
+            .fullscreen-mode .bay { 
+                font-size: 15px;
+                padding: 18px;
+                margin: 0;
+                border-radius: 14px;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .fullscreen-mode .grid { 
+                grid-template-columns: repeat(4, 1fr); 
+                grid-template-rows: repeat(2, 1fr);
+                gap: 28px;
+                padding: 24px;
+                height: calc(100vh - 75px);
+            }
+            .fullscreen-mode .bay { 
+                font-size: 16px;
+                padding: 20px;
+                margin: 0;
+                border-radius: 15px;
+            }
+        }
+        
+        @media (min-width: 1025px) {
+            .fullscreen-mode .grid { 
+                grid-template-columns: repeat(4, 1fr); 
+                grid-template-rows: repeat(2, 1fr);
+                gap: 30px;
+                padding: 25px;
+                height: calc(100vh - 80px);
+            }
+            .fullscreen-mode .bay { 
+                font-size: 16px;
+                padding: 20px;
+                margin: 0;
+                border-radius: 15px;
+            }
+        }
+        
+        /* Large screens - full expansion */
+        @media (min-width: 1400px) {
+            .fullscreen-mode .grid { 
+                grid-template-columns: repeat(4, 1fr); 
+                grid-template-rows: repeat(2, 1fr);
+                gap: 35px;
+                padding: 30px;
+                height: calc(100vh - 80px);
+            }
+            .fullscreen-mode .bay { 
+                font-size: 18px;
+                padding: 25px;
+                margin: 0;
+                border-radius: 18px;
+            }
+            .fullscreen-mode .bay h3 { font-size: 22px; margin-bottom: 12px; }
+            .fullscreen-mode .badge { padding: 12px 18px; font-size: 16px; }
+            .fullscreen-mode .available { font-size: 20px; padding: 14px 20px; }
+        }
         
         @media (max-width: 420px) {
             body { padding: 8px; }
