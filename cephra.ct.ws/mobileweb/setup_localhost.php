@@ -10,7 +10,7 @@ echo "<h2>Cephra Mobile Web - Localhost Database Setup</h2>";
 $host = 'localhost';
 $username = 'root';
 $password = '';
-$database = 'cephra_db';
+$database = 'cephradb';
 
 try {
     // Connect to MySQL server (without database)

@@ -8,12 +8,12 @@ class Database {
     private $conn;
     
     public function __construct() {
-        // CephraDomain folder - ALWAYS use production settings
-        // This folder is specifically for domain deployment
-        $this->host = 'sql210.infinityfree.com';
-        $this->db_name = 'if0_39905578_cephradb';
-        $this->username = 'if0_39905578';
-        $this->password = 'VRDLpd07ZT5oH';
+        // Main mobileweb folder - ALWAYS use localhost settings
+        // This is for local development only
+        $this->host = 'localhost';
+        $this->db_name = 'cephradb';
+        $this->username = 'root';
+        $this->password = '';
     }
     
     private function isLocalhost() {
@@ -53,11 +53,11 @@ class Database {
     
     public function getEnvironmentInfo() {
         return [
-            'environment' => 'domain_production',
+            'environment' => 'localhost_development',
             'host' => $this->host,
             'database' => $this->db_name,
             'username' => $this->username,
-            'note' => 'CephraDomain folder - always uses production settings'
+            'note' => 'Main mobileweb folder - always uses localhost for development'
         ];
     }
 }

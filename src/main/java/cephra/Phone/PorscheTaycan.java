@@ -132,10 +132,10 @@ public class PorscheTaycan extends javax.swing.JPanel {
         jPanel1.setOpaque(false);
         jPanel1.setLayout(null);
         jPanel1.add(jLabel2);
-        jLabel2.setBounds(0, 0, 370, 270);
+        jLabel2.setBounds(0, -80, 350, 270);
 
         add(jPanel1);
-        jPanel1.setBounds(0, 160, 370, 270);
+        jPanel1.setBounds(0, 160, 350, 270);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -147,7 +147,7 @@ public class PorscheTaycan extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(280, 670, 50, 50);
+        profilebutton.setBounds(260, 670, 50, 50);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -159,7 +159,7 @@ public class PorscheTaycan extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(220, 680, 50, 40);
+        historybutton.setBounds(200, 680, 50, 40);
 
         homebutton2.setBorder(null);
         homebutton2.setBorderPainted(false);
@@ -171,7 +171,7 @@ public class PorscheTaycan extends javax.swing.JPanel {
             }
         });
         add(homebutton2);
-        homebutton2.setBounds(170, 680, 40, 40);
+        homebutton2.setBounds(150, 680, 40, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -183,7 +183,7 @@ public class PorscheTaycan extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(110, 680, 50, 40);
+        linkbutton.setBounds(90, 680, 50, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -195,21 +195,21 @@ public class PorscheTaycan extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(50, 680, 50, 40);
+        charge.setBounds(30, 680, 50, 40);
 
         batterypercent.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         batterypercent.setText("25 %");
         add(batterypercent);
-        batterypercent.setBounds(40, 455, 210, 30);
+        batterypercent.setBounds(20, 455, 210, 30);
 
         km.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         km.setText("400 km");
         add(km);
-        km.setBounds(40, 515, 130, 30);
+        km.setBounds(20, 515, 130, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/linked.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/hyundai.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 750);
+        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profilebuttonActionPerformed
