@@ -109,7 +109,7 @@ public class Phone extends javax.swing.JFrame {
                     jLabel1.setOpaque(false);
                     jLabel1.setForeground(Color.BLACK);
                     jLabel1.setVisible(true);
-                    jLabel1.setBounds(36, 21, 55, 20);
+                    jLabel1.setBounds(0, 0, 55, 20);
                     getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.MODAL_LAYER);
                     getRootPane().getLayeredPane().moveToFront(jLabel1);
                     getRootPane().revalidate();
@@ -172,16 +172,14 @@ public class Phone extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(267, Short.MAX_VALUE))
+                .addContainerGap(315, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(21, 21, 21)
                 .addComponent(jLabel1)
-                .addContainerGap(713, Short.MAX_VALUE))
+                .addContainerGap(730, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

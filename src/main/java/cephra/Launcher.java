@@ -16,11 +16,6 @@ public final class Launcher {
 			System.err.println("Error: " + e.getMessage());
 			System.err.println("Continuing without database for API testing...");
 		}
-
-		System.out.println("Basic Java functionality test passed!");
-		
-		System.out.println("Java Swing application starting...");
-
 		javax.swing.SwingUtilities.invokeLater(() -> {
 			java.awt.Rectangle screenBounds = GraphicsEnvironment
 				.getLocalGraphicsEnvironment()

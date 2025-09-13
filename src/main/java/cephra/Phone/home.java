@@ -15,16 +15,16 @@ public class Home extends javax.swing.JPanel {
         setupLabelPosition(); // Set label position
         makeDraggable();
         
-        // Get current user's firstname and display only the first word
+        // Get current user's firstname and display welcome message
         if (LoggedName != null) {
             String firstname = cephra.CephraDB.getCurrentFirstname();
             String safeFirstname = firstname != null ? firstname.trim() : "";
             if (safeFirstname.isEmpty()) {
-                LoggedName.setText("Hi !");
+                LoggedName.setText("Welcome to Cephra!");
             } else {
                 // Get only the first word of the firstname
                 String firstWord = safeFirstname.split("\\s+")[0];
-                LoggedName.setText("Hi " + firstWord + "!");
+                LoggedName.setText("Welcome to Cephra, " + firstWord + "!");
             }
         }
         
@@ -62,7 +62,7 @@ public class Home extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        checkpop = new javax.swing.JButton();
+        Notifications = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
@@ -76,17 +76,17 @@ public class Home extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
-        checkpop.setBorder(null);
-        checkpop.setBorderPainted(false);
-        checkpop.setContentAreaFilled(false);
-        checkpop.setFocusPainted(false);
-        checkpop.addActionListener(new java.awt.event.ActionListener() {
+        Notifications.setBorder(null);
+        Notifications.setBorderPainted(false);
+        Notifications.setContentAreaFilled(false);
+        Notifications.setFocusPainted(false);
+        Notifications.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkpopActionPerformed(evt);
+                NotificationsActionPerformed(evt);
             }
         });
-        add(checkpop);
-        checkpop.setBounds(285, 70, 50, 40);
+        add(Notifications);
+        Notifications.setBounds(300, 50, 40, 40);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -160,14 +160,16 @@ public class Home extends javax.swing.JPanel {
         add(rewards);
         rewards.setBounds(10, 590, 160, 60);
 
-        LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 32)); // NOI18N
-        LoggedName.setText("Hi Dizon!");
+        LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        LoggedName.setForeground(new java.awt.Color(0, 204, 204));
+        LoggedName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        LoggedName.setText("Welcome to Cephra, Dizon");
         add(LoggedName);
-        LoggedName.setBounds(30, 62, 240, 50);
+        LoggedName.setBounds(40, 80, 290, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home Page - not charging vid.gif"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/HOME.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-12, 0, 410, 750);
+        jLabel1.setBounds(-12, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
@@ -240,7 +242,7 @@ public class Home extends javax.swing.JPanel {
     
                                                      
 
-    private void checkpopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkpopActionPerformed
+    private void NotificationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NotificationsActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -255,7 +257,7 @@ public class Home extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_checkpopActionPerformed
+    }//GEN-LAST:event_NotificationsActionPerformed
 
     private void walletActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_walletActionPerformed
          SwingUtilities.invokeLater(new Runnable() {
@@ -290,8 +292,8 @@ public class Home extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel LoggedName;
+    private javax.swing.JButton Notifications;
     private javax.swing.JButton charge;
-    private javax.swing.JButton checkpop;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
