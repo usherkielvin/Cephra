@@ -118,10 +118,10 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <i class="fas fa-dollar-sign"></i>
+                            <i class="fas fa-peso-sign"></i>
                         </div>
                         <div class="stat-content">
-                            <h3 id="revenue-today">$0</h3>
+                            <h3 id="revenue-today">₱0</h3>
                             <p>Today's Revenue</p>
                         </div>
                     </div>
@@ -134,23 +134,6 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                             <div class="activity-item">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <span>Loading recent activity...</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dashboard-card">
-                        <h3>System Status</h3>
-                        <div class="system-status">
-                            <div class="status-item">
-                                <span class="status-label">Database</span>
-                                <span class="status-value online">Online</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">API Server</span>
-                                <span class="status-value online">Online</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">Web Interface</span>
-                                <span class="status-value online">Online</span>
                             </div>
                         </div>
                     </div>
@@ -294,12 +277,12 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                         <h3>Pricing Configuration</h3>
                         <div class="settings-form">
                             <div class="form-group">
-                                <label for="fast-charge-price">Fast Charging Price ($)</label>
-                                <input type="number" id="fast-charge-price" step="0.01" min="0" />
+                                <label for="fast-charge-price">Fast Charging Price (₱)</label>
+                                <input type="number" id="fast-charge-price" step="1" min="0" />
                             </div>
                             <div class="form-group">
-                                <label for="normal-charge-price">Normal Charging Price ($)</label>
-                                <input type="number" id="normal-charge-price" step="0.01" min="0" />
+                                <label for="normal-charge-price">Normal Charging Price (₱)</label>
+                                <input type="number" id="normal-charge-price" step="1" min="0" />
                             </div>
                             <button class="btn btn-primary" onclick="savePricingSettings()">
                                 <i class="fas fa-save"></i> Save Settings
@@ -365,6 +348,6 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
         </div>
     </div>
 
-    <script src="js/admin.js"></script>
+    <script src="js/admin.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

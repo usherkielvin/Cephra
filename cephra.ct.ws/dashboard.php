@@ -264,6 +264,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 											<li><a href="link.php">Link</a></li>
 											<li><a href="history.php">History</a></li>
 											<li><a href="profile.php">Profile</a></li>
+											<li><a href="#" onclick="openMonitorWeb(); return false;" style="background: #3498db; color: white; border-radius: 4px; padding: 8px 12px;">📺 Monitor</a></li>
 										</ul>
 									</nav>
 
@@ -554,6 +555,12 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                         $('#queuePopup').remove();
                     };
                 });
+                
+                // Function to open Monitor Web in new tab
+                window.openMonitorWeb = function() {
+                    const monitorUrl = 'monitor/';
+                    window.open(monitorUrl, '_blank', 'noopener,noreferrer');
+                };
             </script>
 			
 		</body>

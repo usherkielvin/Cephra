@@ -11,6 +11,7 @@ class AdminPanel {
         this.updateCurrentTime();
         this.loadDashboardData();
         this.startAutoRefresh();
+        this.startTimeUpdate();
     }
 
     setupEventListeners() {
@@ -24,9 +25,29 @@ class AdminPanel {
 
         // Sidebar toggle for mobile
         const sidebarToggle = document.querySelector('.sidebar-toggle');
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => {
-                document.querySelector('.sidebar').classList.toggle('active');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('active');
+            });
+        }
+        
+        // Close sidebar when clicking on main content background
+        if (mainContent && sidebar) {
+            mainContent.addEventListener('click', () => {
+                if (sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        }
+        
+        // Prevent sidebar clicks from closing the sidebar
+        if (sidebar) {
+            sidebar.addEventListener('click', (e) => {
+                e.stopPropagation();
             });
         }
 
@@ -127,7 +148,7 @@ class AdminPanel {
         document.getElementById('total-users').textContent = stats.total_users || 0;
         document.getElementById('queue-count').textContent = stats.queue_count || 0;
         document.getElementById('active-bays').textContent = stats.active_bays || 0;
-        document.getElementById('revenue-today').textContent = `$${stats.revenue_today || 0}`;
+        document.getElementById('revenue-today').textContent = `₱${Math.round(stats.revenue_today || 0)}`;
     }
 
     updateRecentActivity(activities) {
@@ -300,8 +321,8 @@ class AdminPanel {
             const data = await response.json();
 
             if (data.success) {
-                document.getElementById('fast-charge-price').value = data.settings.fast_charge_price || 0;
-                document.getElementById('normal-charge-price').value = data.settings.normal_charge_price || 0;
+                document.getElementById('fast-charge-price').value = Math.round(data.settings.fast_charge_price || 0);
+                document.getElementById('normal-charge-price').value = Math.round(data.settings.normal_charge_price || 0);
             }
         } catch (error) {
             console.error('Error loading settings data:', error);
@@ -479,11 +500,11 @@ class AdminPanel {
     }
 
     async savePricingSettings() {
-        const fastPrice = document.getElementById('fast-charge-price').value;
-        const normalPrice = document.getElementById('normal-charge-price').value;
+        const fastPrice = Math.round(document.getElementById('fast-charge-price').value);
+        const normalPrice = Math.round(document.getElementById('normal-charge-price').value);
 
-        if (!fastPrice || !normalPrice) {
-            this.showError('Please enter both pricing values');
+        if (!fastPrice || !normalPrice || fastPrice <= 0 || normalPrice <= 0) {
+            this.showError('Please enter valid pricing values (whole numbers only)');
             return;
         }
 
@@ -498,7 +519,7 @@ class AdminPanel {
             const data = await response.json();
 
             if (data.success) {
-                this.showSuccess('Settings saved successfully');
+                this.showSuccess('Pricing settings saved successfully');
             } else {
                 this.showError(data.message || 'Failed to save settings');
             }
@@ -591,9 +612,29 @@ class AdminPanel {
         const timeElement = document.getElementById('current-time');
         if (timeElement) {
             const now = new Date();
-            timeElement.textContent = now.toLocaleString();
+            // Format: "HH:MM AM/PM" (12-hour format, no seconds, no date)
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            // Convert to 12-hour format
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 should be 12
+            
+            // Format with leading zeros
+            const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+            timeElement.textContent = formattedTime;
         }
     }
+
+    startTimeUpdate() {
+        // Update time every minute (60000ms)
+        setInterval(() => {
+            this.updateCurrentTime();
+        }, 60000);
+    }
+
+
 
     startAutoRefresh() {
         // Refresh current panel data every 30 seconds
@@ -617,7 +658,22 @@ class AdminPanel {
 
     formatDateTime(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleString();
+        // Format: "MM/DD/YYYY HH:MM AM/PM" (no seconds)
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const year = date.getFullYear();
+        
+        let hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        
+        // Convert to 12-hour format
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 should be 12
+        
+        const formatted = `${month}/${day}/${year}, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        console.log('formatDateTime:', dateString, '->', formatted); // Debug log
+        return formatted;
     }
 }
 

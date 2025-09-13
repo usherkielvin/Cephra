@@ -301,8 +301,8 @@ try {
         case 'settings':
             // Get current settings (placeholder)
             $settings = [
-                'fast_charge_price' => 5.00,
-                'normal_charge_price' => 3.00
+                'fast_charge_price' => 5,
+                'normal_charge_price' => 3
             ];
             
             echo json_encode([
@@ -328,6 +328,7 @@ try {
             // Save settings (placeholder - you might want to create a settings table)
             echo json_encode(['success' => true, 'message' => 'Settings saved successfully']);
             break;
+
 
         default:
             echo json_encode([

@@ -26,8 +26,8 @@
         h1 { margin: 0 0 12px; font-size: 22px; display:flex; align-items:center; gap:8px; flex-wrap: wrap; }
         .logo { width:32px; height:32px; border-radius:4px; overflow:hidden; display:inline-block; background:transparent; }
         .logo img { width:100%; height:100%; object-fit:contain; object-position:center; display:block; background:transparent; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-        .bay { background:var(--card); border-radius: 12px; padding: 12px; border:1px solid rgba(255,255,255,0.08); min-width: 0; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); gap: 12px; }
+        .bay { background:var(--card); border-radius: 12px; padding: 12px; border:1px solid rgba(255,255,255,0.08); min-width: 0; height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
         .bay h3 { margin: 0 0 8px; font-size: 18px; color:var(--accent); word-break: break-word; }
         .badge { display:inline-block; padding:6px 10px; border-radius: 999px; font-size: 13px; }
         .available { background:var(--avail); color:var(--availText); }
@@ -45,15 +45,34 @@
         .pager { display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap: wrap; }
         .pager .btn { padding:4px 8px; }
         
+        /* Fullscreen styles */
+        .fullscreen-mode { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1000; background: var(--bg); padding: 20px; overflow-y: auto; }
+        .fullscreen-mode h1 { margin-bottom: 20px; }
+        .fullscreen-mode .row { display: none; }
+        .fullscreen-mode .grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(250px, auto)); gap: 20px; }
+        .fullscreen-mode .bay { padding: 20px; font-size: 16px; height: 250px; }
+        .fullscreen-mode .bay h3 { font-size: 24px; margin-bottom: 12px; }
+        .fullscreen-mode .badge { padding: 10px 16px; font-size: 16px; }
+        .fullscreen-mode .muted { font-size: 14px; margin-top: 10px; }
+        
         @media (max-width: 420px) {
             body { padding: 8px; }
-            .grid { gap: 10px; grid-template-columns: 1fr; }
-            .bay { padding:10px; }
+            .grid { gap: 10px; grid-template-columns: 1fr; grid-template-rows: repeat(auto-fit, minmax(180px, auto)); }
+            .bay { padding:10px; height: 180px; }
             .bay h3 { font-size: 16px; }
             th, td { font-size: 13px; }
         }
         @media (min-width: 421px) and (max-width: 640px) {
-            .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(auto-fit, minmax(190px, auto)); }
+            .bay { height: 190px; }
+        }
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
+            .bay { height: 200px; }
+        }
+        @media (min-width: 1025px) {
+            .grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
+            .bay { height: 200px; }
         }
     </style>
 </head>
@@ -62,8 +81,11 @@
         <span class="logo"><img src="../images/MONU.png" alt="Cephra" /></span>
         Cephra Live Monitor <span id="ts" class="ts"></span>
         <div class="toolbar">
+            <button class="btn" id="fullscreenBtn">Fullscreen Bays</button>
             <button class="btn" id="themeBtn">Toggle Theme</button>
             <label class="muted"><input type="checkbox" id="soundChk" /> Sound alerts</label>
+            <label class="muted"><input type="checkbox" id="waitingSoundChk" /> Waiting alerts</label>
+            <label class="muted"><input type="checkbox" id="ttsChk" /> Voice announcements</label>
             <button class="btn" id="installBtn" style="display:none;">Install</button>
         </div>
     </h1>
@@ -97,6 +119,11 @@
     <audio id="beep" preload="auto">
         <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYBAGFhYWFhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="audio/wav">
     </audio>
+    
+    <audio id="waitingSound" preload="auto">
+        <source src="../../AUDIO/WAITING.wav" type="audio/wav">
+        <source src="../../AUDIO/WAITING.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         // PWA install and SW registration
@@ -119,6 +146,8 @@
 
         let currentQueue = [];
         let lastBays = {};
+        let lastQueueCount = 0;
+        let lastQueueTopTicket = '';
         let page = 1;
         const pageSize = 10;
 
@@ -127,6 +156,14 @@
         }
 
         document.getElementById('themeBtn').onclick = () => setTheme(!document.body.classList.contains('light'));
+        
+        // Fullscreen functionality
+        let isFullscreen = false;
+        document.getElementById('fullscreenBtn').onclick = () => {
+            isFullscreen = !isFullscreen;
+            document.body.classList.toggle('fullscreen-mode', isFullscreen);
+            document.getElementById('fullscreenBtn').textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Bays';
+        };
 
         async function fetchSnapshot() {
             try {
@@ -197,22 +234,131 @@
         function handleAlerts(data) {
             const bays = data.bays || [];
             let changeDetected = false;
+            const currentQueue = data.queue || [];
+            
+            // Check for bay status changes and announce them
             bays.forEach(b => {
                 const key = b.bay_number;
                 const prev = lastBays[key];
-                const now = (b.status || '') + '|' + (b.current_ticket_id || '');
-                if (prev && prev !== now) changeDetected = true;
+                const now = (b.status || '') + '|' + (b.current_ticket_id || '') + '|' + (b.current_username || '');
+                
+                if (prev !== now) {
+                    changeDetected = true;
+                    
+                    // Parse previous state for TTS announcement
+                    let prevStatus = '';
+                    let newStatus = b.status || '';
+                    let newTicketId = b.current_ticket_id || '';
+                    let newUsername = b.current_username || '';
+                    
+                    if (prev) {
+                        const prevParts = prev.split('|');
+                        prevStatus = prevParts[0] || '';
+                    }
+                    
+                    // Only announce if we have a previous state and status actually changed
+                    if (prev && prevStatus !== newStatus) {
+                        announceBayChange(b.bay_number, prevStatus, newStatus, newTicketId, newUsername);
+                    }
+                }
                 lastBays[key] = now;
             });
+            
+            // Check for queue changes
             const prevTop = currentQueue[0]?.ticket_id;
             const newTop = (data.queue || [])[0]?.ticket_id;
             if (prevTop && newTop && prevTop !== newTop) changeDetected = true;
+            
+            // Handle waiting queue sound alerts
+            const currentQueueCount = currentQueue.length;
+            if (document.getElementById('waitingSoundChk').checked && currentQueueCount > 0 && currentQueueCount > lastQueueCount) {
+                playWaitingSound();
+            }
+            
+            // Handle waiting queue TTS announcements
+            if (currentQueueCount !== lastQueueCount || (newTop && newTop !== lastQueueTopTicket)) {
+                announceQueueChange(currentQueueCount, newTop, currentQueue[0]?.username);
+            }
+            
             if (document.getElementById('soundChk').checked && changeDetected) beep();
+            
+            lastQueueCount = currentQueueCount;
+            lastQueueTopTicket = newTop;
         }
 
         function beep() {
             const el = document.getElementById('beep');
             try { el.currentTime = 0; el.play(); } catch (e) {}
+        }
+        
+        function playWaitingSound() {
+            const el = document.getElementById('waitingSound');
+            try { el.currentTime = 0; el.play(); } catch (e) {}
+        }
+        
+        function speak(text) {
+            if (document.getElementById('ttsChk').checked && 'speechSynthesis' in window) {
+                // Stop any current speech
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.8;
+                utterance.pitch = 1.0;
+                utterance.volume = 0.7;
+                
+                // Try to use a female voice if available
+                const voices = speechSynthesis.getVoices();
+                const femaleVoice = voices.find(voice => 
+                    voice.name.includes('Female') || 
+                    voice.name.includes('female') || 
+                    voice.name.includes('Zira') ||
+                    voice.name.includes('Susan') ||
+                    voice.name.includes('Karen')
+                );
+                if (femaleVoice) {
+                    utterance.voice = femaleVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+        
+        function announceBayChange(bayNumber, oldStatus, newStatus, ticketId, username) {
+            const statusMap = {
+                'available': 'available',
+                'occupied': 'occupied',
+                'maintenance': 'under maintenance'
+            };
+            
+            let message = '';
+            if (oldStatus && newStatus && oldStatus !== newStatus) {
+                const newStatusText = statusMap[newStatus.toLowerCase()] || newStatus;
+                message = `Bay ${bayNumber} is now ${newStatusText}`;
+                
+                if (newStatus.toLowerCase() === 'occupied' && username) {
+                    message += ` by ${username}`;
+                }
+                if (ticketId && newStatus.toLowerCase() !== 'available') {
+                    message += ` with ticket ${ticketId}`;
+                }
+                
+                // Debug log to help troubleshoot
+                console.log('Bay announcement:', message, {bayNumber, oldStatus, newStatus, ticketId, username});
+                
+                speak(message);
+            }
+        }
+        
+        function announceQueueChange(queueCount, topTicket, username) {
+            if (queueCount > 0) {
+                if (queueCount === 1) {
+                    speak(`One customer is waiting for service`);
+                } else {
+                    speak(`${queueCount} customers are waiting for service`);
+                }
+            } else if (queueCount === 0 && lastQueueCount > 0) {
+                speak('Waiting queue is now empty');
+            }
         }
 
         fetchSnapshot();
