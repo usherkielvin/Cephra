@@ -1213,7 +1213,19 @@ public class CephraDB {
                 System.out.println("CephraDB: Verified battery level after update: " + verifyBattery + "% for user " + username);
             }
             
-            // 4. Add to admin history (if HistoryBridge is available)
+            // 4. Add reward points for all payments (1 PHP = 0.05 points)
+            if (totalAmount > 0) {
+                try {
+                    // Use static method to add points globally
+                    cephra.Phone.Rewards.addPointsForPaymentGlobally(totalAmount);
+                    System.out.println("CephraDB: Added points for payment of " + totalAmount + " PHP to user " + username);
+                } catch (Exception pointsEx) {
+                    System.err.println("CephraDB: Error adding points for payment: " + pointsEx.getMessage());
+                    // Don't fail the transaction if points addition fails
+                }
+            }
+            
+            // 5. Add to admin history (if HistoryBridge is available)
             addToAdminHistory(ticketId, username, totalAmount, referenceNumber);
             
             conn.commit(); // Commit transaction

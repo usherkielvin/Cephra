@@ -68,6 +68,7 @@ public class Home extends javax.swing.JPanel {
         linkbutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         wallet = new javax.swing.JButton();
+        rewards = new javax.swing.JButton();
         LoggedName = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -145,7 +146,19 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(wallet);
-        wallet.setBounds(172, 590, 160, 60);
+        wallet.setBounds(180, 590, 160, 60);
+
+        rewards.setBorder(null);
+        rewards.setBorderPainted(false);
+        rewards.setContentAreaFilled(false);
+        rewards.setFocusPainted(false);
+        rewards.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rewardsActionPerformed(evt);
+            }
+        });
+        add(rewards);
+        rewards.setBounds(10, 590, 160, 60);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         LoggedName.setForeground(new java.awt.Color(0, 204, 204));
@@ -261,6 +274,21 @@ public class Home extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_walletActionPerformed
 
+    private void rewardsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rewardsActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Rewards());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_rewardsActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel LoggedName;
@@ -270,6 +298,7 @@ public class Home extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JButton rewards;
     private javax.swing.JButton wallet;
     // End of variables declaration//GEN-END:variables
 
