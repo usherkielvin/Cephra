@@ -108,11 +108,20 @@ public final class QueueFlow {
         try {
             String currentUser = cephra.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.trim().isEmpty()) {
+                // Check active_tickets table first
                 String activeTicket = cephra.CephraDB.getActiveTicket(currentUser);
                 if (activeTicket != null && !activeTicket.trim().isEmpty()) {
                     // Update the in-memory current ticket ID to match database
                     currentTicketId = activeTicket;
                     return activeTicket;
+                }
+                
+                // If no active ticket, check queue_tickets table for pending tickets
+                String queueTicket = cephra.CephraDB.getQueueTicketForUser(currentUser);
+                if (queueTicket != null && !queueTicket.trim().isEmpty()) {
+                    // Update the in-memory current ticket ID to match queue ticket
+                    currentTicketId = queueTicket;
+                    return queueTicket;
                 }
             }
         } catch (Exception e) {
@@ -188,10 +197,19 @@ public final class QueueFlow {
         try {
             String currentUser = cephra.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.trim().isEmpty()) {
+                // Check active_tickets table first
                 String activeTicket = cephra.CephraDB.getActiveTicket(currentUser);
                 if (activeTicket != null && !activeTicket.trim().isEmpty()) {
                     // Update the in-memory current ticket ID to match database
                     currentTicketId = activeTicket;
+                    return true;
+                }
+                
+                // If no active ticket, check queue_tickets table for pending tickets
+                String queueTicket = cephra.CephraDB.getQueueTicketForUser(currentUser);
+                if (queueTicket != null && !queueTicket.trim().isEmpty()) {
+                    // Update the in-memory current ticket ID to match queue ticket
+                    currentTicketId = queueTicket;
                     return true;
                 }
             }

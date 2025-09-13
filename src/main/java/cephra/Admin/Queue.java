@@ -857,15 +857,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 String v = value == null ? "" : String.valueOf(value).trim();
-                int statusCol = getColumnIndex("Status");
-                String status = statusCol >= 0 ? String.valueOf(table.getValueAt(row, statusCol)) : "";
-                if ("Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(v)) {
+                
+                // Show button for all payment statuses
+                if ("Pending".equalsIgnoreCase(v)) {
                     btn.setText("Pending");
-                    btn.setForeground(new java.awt.Color(255, 255, 255)); // Ensure white text color
+                    btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
                     btn.setBackground(new java.awt.Color(255, 140, 0)); // Orange background for pending
                     btn.setOpaque(true); // Ensure button is opaque
                     return btn;
-                } else if ("Complete".equalsIgnoreCase(status) && "Paid".equalsIgnoreCase(v)) {
+                } else if ("Paid".equalsIgnoreCase(v)) {
                     btn.setText("Paid");
                     btn.setBackground(new java.awt.Color(34, 139, 34)); // Green background for paid
                     btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
@@ -895,15 +895,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             editingRow = row;
             String v = value == null ? "" : String.valueOf(value).trim();
             editorValue = v;
-            int statusCol = getColumnIndex("Status");
-            String status = statusCol >= 0 ? String.valueOf(table.getValueAt(row, statusCol)) : "";
-            if ("Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(v)) {
+            
+            // Show button for all payment statuses
+            if ("Pending".equalsIgnoreCase(v)) {
                 btn.setText("Pending");
                 btn.setBackground(new java.awt.Color(255, 140, 0)); // Orange background for pending
                 btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
                 btn.setOpaque(true); // Ensure button is opaque
                 return btn;
-            } else if ("Complete".equalsIgnoreCase(status) && "Paid".equalsIgnoreCase(v)) {
+            } else if ("Paid".equalsIgnoreCase(v)) {
                 btn.setText("Paid");
                 btn.setBackground(new java.awt.Color(34, 139, 34)); // Green background for paid
                 btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
@@ -922,6 +922,41 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         @Override
         public void actionPerformed(java.awt.event.ActionEvent e) {
             if (editingRow >= 0 && editingRow < queTab.getRowCount()) {
+                // Check if charging is complete before allowing payment
+                int statusCol = getColumnIndex("Status");
+                String status = statusCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, statusCol)) : "";
+                
+                if (!"Complete".equalsIgnoreCase(status)) {
+                    JOptionPane.showMessageDialog(
+                        Queue.this,
+                        "Cannot mark as paid until charging is complete.\nCurrent status: " + status,
+                        "Payment Not Ready",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    stopCellEditing();
+                    return;
+                }
+                
+                // Check if payment method is Cash
+                int ticketCol = getColumnIndex("Ticket");
+                if (ticketCol >= 0) {
+                    Object v = queTab.getValueAt(editingRow, ticketCol);
+                    String ticket = v == null ? "" : String.valueOf(v).trim();
+                    if (!ticket.isEmpty()) {
+                        String paymentMethod = cephra.CephraDB.getQueueTicketPaymentMethod(ticket);
+                        if (!"Cash".equalsIgnoreCase(paymentMethod)) {
+                            JOptionPane.showMessageDialog(
+                                Queue.this,
+                                "This ticket is not marked for cash payment.\nPayment method: " + paymentMethod + "\nOnly cash payments can be marked as paid by admin.",
+                                "Payment Method Mismatch",
+                                JOptionPane.WARNING_MESSAGE
+                            );
+                            stopCellEditing();
+                            return;
+                        }
+                    }
+                }
+                
                 Object[] options = new Object[] { "Mark as Paid", "Cancel" };
                 int choice = JOptionPane.showOptionDialog(
                     Queue.this,
@@ -936,7 +971,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 if (choice == 0) {
                     editorValue = "Paid";
                     // Sync cumulative paid counter and table via QueueBridge
-                    int ticketCol = getColumnIndex("Ticket");
                     if (ticketCol >= 0) {
                         Object v = queTab.getValueAt(editingRow, ticketCol);
                         String ticket = v == null ? "" : String.valueOf(v).trim();

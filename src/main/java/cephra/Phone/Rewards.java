@@ -71,7 +71,7 @@ public class Rewards extends javax.swing.JPanel {
         // This ensures consistency without needing to search for active instances
         System.out.println("Points updated globally. All Rewards instances will sync when accessed.");
     }
-    
+    @SuppressWarnings("unused")
     private static void updateRewardsDisplay(cephra.Frame.Phone phoneFrame) {
         // The global points system will automatically update all instances
         // when they are accessed, so we don't need to actively search for them
@@ -206,7 +206,7 @@ public class Rewards extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
-    
+    @SuppressWarnings("unused")
     // Points system methods
     private void loadPoints() {
         try {

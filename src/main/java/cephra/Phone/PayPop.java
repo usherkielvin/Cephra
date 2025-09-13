@@ -474,6 +474,10 @@ public class PayPop extends javax.swing.JPanel {
             }
             
             if (currentTicket != null && !currentTicket.isEmpty()) {
+                // Set payment method to Cash in the database
+                cephra.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Cash");
+                System.out.println("Cash payment method set for ticket: " + currentTicket);
+                
                 // Mark payment as cash payment in the system
                 cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
                 System.out.println("Cash payment recorded for ticket: " + currentTicket);
@@ -516,6 +520,10 @@ public class PayPop extends javax.swing.JPanel {
                     try {
                         String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
                         if (currentTicket != null && !currentTicket.isEmpty()) {
+                            // Set payment method to Online in the database
+                            cephra.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Online");
+                            System.out.println("Online payment method set for ticket: " + currentTicket);
+                            
                             cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
                         }
                     } catch (Throwable ignore) {}

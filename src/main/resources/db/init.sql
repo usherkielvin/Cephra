@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS queue_tickets (
     initial_battery_level INT NOT NULL CHECK (initial_battery_level >= 0 AND initial_battery_level <= 100),
     status VARCHAR(20) NOT NULL DEFAULT 'Pending', -- 'Pending', 'In Progress', 'Completed', 'Cancelled'
     payment_status VARCHAR(20) NOT NULL DEFAULT 'Pending', -- 'Pending', 'Paid'
+    payment_method VARCHAR(20) DEFAULT 'Cash', -- 'Cash', 'Online'
     reference_number VARCHAR(20),
     priority INT DEFAULT 0, -- For queue ordering
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

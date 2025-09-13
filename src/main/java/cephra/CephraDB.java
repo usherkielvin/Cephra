@@ -708,6 +708,29 @@ public class CephraDB {
         return executeActiveTicketQuery(username, "SELECT ticket_id FROM active_tickets WHERE username = ?");
     }
     
+    // Method to get queue ticket for a user (pending tickets)
+    public static String getQueueTicketForUser(String username) {
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            if (!tableExists(conn, "queue_tickets")) {
+                System.err.println("Warning: queue_tickets table does not exist.");
+                return null;
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT ticket_id FROM queue_tickets WHERE username = ? AND status IN ('Pending', 'Waiting') ORDER BY created_at DESC LIMIT 1")) {
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    return rs.next() ? rs.getString("ticket_id") : null;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting queue ticket for user: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
     // Queue ticket management methods
     public static boolean addQueueTicket(String ticketId, String username, String serviceType, 
                                        String status, String paymentStatus, int initialBatteryLevel) {
@@ -803,6 +826,93 @@ public class CephraDB {
             System.err.println("Error updating queue ticket status: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    /**
+     * Updates the payment method of a queue ticket
+     * @param ticketId the ticket ID to update
+     * @param paymentMethod the payment method ('Cash' or 'Online')
+     * @return true if successful, false otherwise
+     */
+    public static boolean updateQueueTicketPaymentMethod(String ticketId, String paymentMethod) {
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid ticket ID for payment method update");
+            return false;
+        }
+        if (paymentMethod == null || paymentMethod.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid payment method for ticket " + ticketId);
+            return false;
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            if (conn == null) {
+                System.err.println("CephraDB: Could not establish database connection for payment method update");
+                return false;
+            }
+            
+            // Update the payment method
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE queue_tickets SET payment_method = ? WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, paymentMethod);
+                stmt.setString(2, ticketId);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("CephraDB: Successfully updated payment method to '" + paymentMethod + "' for ticket " + ticketId);
+                    return true;
+                } else {
+                    System.err.println("CephraDB: No rows affected when updating payment method for ticket " + ticketId);
+                    return false;
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error updating queue ticket payment method: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Gets the payment method of a queue ticket
+     * @param ticketId the ticket ID to check
+     * @return the payment method ('Cash' or 'Online'), or null if not found
+     */
+    public static String getQueueTicketPaymentMethod(String ticketId) {
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid ticket ID for payment method query");
+            return null;
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            if (conn == null) {
+                System.err.println("CephraDB: Could not establish database connection for payment method query");
+                return null;
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT payment_method FROM queue_tickets WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String paymentMethod = rs.getString("payment_method");
+                        System.out.println("CephraDB: Retrieved payment method '" + paymentMethod + "' for ticket " + ticketId);
+                        return paymentMethod;
+                    } else {
+                        System.err.println("CephraDB: Ticket " + ticketId + " not found in queue_tickets table");
+                        return null;
+                    }
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error retrieving queue ticket payment method: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
     
