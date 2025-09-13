@@ -508,21 +508,30 @@ public class PayPop extends javax.swing.JPanel {
         System.out.println("Processing online payment for user: " + currentUser);
         
         SwingUtilities.invokeLater(() -> {
+            boolean paymentSuccess = false;
             try {
-                processOnlinePayment();
+                paymentSuccess = processOnlinePayment();
                 // After successful wallet payment, ensure admin queue marks as paid and removes the ticket
-                try {
-                    String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
-                    if (currentTicket != null && !currentTicket.isEmpty()) {
-                        cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
-                    }
-                } catch (Throwable ignore) {}
+                if (paymentSuccess) {
+                    try {
+                        String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+                        if (currentTicket != null && !currentTicket.isEmpty()) {
+                            cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
+                        }
+                    } catch (Throwable ignore) {}
+                }
             } catch (Exception e) {
                 System.out.println("Payment error occurred, keeping PayPop open");
                 handlePaymentError(e);
             } finally {
                 hidePayPop();
-                navigateToReceipt();
+                // Only navigate to receipt if payment was successful
+                if (paymentSuccess) {
+                    navigateToReceipt();
+                } else {
+                    // If payment failed (e.g., insufficient balance), navigate back to home
+                    navigateToHome();
+                }
             }
         });
     }

@@ -99,7 +99,27 @@ public final class QueueFlow {
     }
 
     public static String getCurrentTicketId() {
-        return currentTicketId;
+        // If we have an in-memory ticket, return it
+        if (currentTicketId != null && !currentTicketId.trim().isEmpty()) {
+            return currentTicketId;
+        }
+        
+        // Otherwise, try to get from database
+        try {
+            String currentUser = cephra.CephraDB.getCurrentUsername();
+            if (currentUser != null && !currentUser.trim().isEmpty()) {
+                String activeTicket = cephra.CephraDB.getActiveTicket(currentUser);
+                if (activeTicket != null && !activeTicket.trim().isEmpty()) {
+                    // Update the in-memory current ticket ID to match database
+                    currentTicketId = activeTicket;
+                    return activeTicket;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting current ticket ID from database: " + e.getMessage());
+        }
+        
+        return currentTicketId; // Return empty string if nothing found
     }
 
     public static String getCurrentServiceName() {
@@ -159,7 +179,27 @@ public final class QueueFlow {
     }
     
     public static boolean hasActiveTicket() {
-        return currentTicketId != null && !currentTicketId.trim().isEmpty();
+        // First check in-memory current ticket
+        if (currentTicketId != null && !currentTicketId.trim().isEmpty()) {
+            return true;
+        }
+        
+        // If no in-memory ticket, check database for current user's active ticket
+        try {
+            String currentUser = cephra.CephraDB.getCurrentUsername();
+            if (currentUser != null && !currentUser.trim().isEmpty()) {
+                String activeTicket = cephra.CephraDB.getActiveTicket(currentUser);
+                if (activeTicket != null && !activeTicket.trim().isEmpty()) {
+                    // Update the in-memory current ticket ID to match database
+                    currentTicketId = activeTicket;
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking active ticket in database: " + e.getMessage());
+        }
+        
+        return false;
     }
     
     public static Entry getCurrentTicketEntry() {
