@@ -472,6 +472,100 @@ public class CephraDB {
         setUserBatteryLevel(username, 100);
     }
     
+    // Car index management methods
+    public static int getUserCarIndex(String username) {
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            // First check if car_index column exists in users table
+            if (!columnExists(conn, "users", "car_index")) {
+                // Add the column if it doesn't exist
+                addCarIndexColumn(conn);
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT car_index FROM users WHERE username = ?")) {
+                
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int carIndex = rs.getInt("car_index");
+                        if (rs.wasNull()) {
+                            // NULL value means no car assigned yet
+                            System.out.println("CephraDB: No car index found for " + username + " - returning -1");
+                            return -1;
+                        }
+                        System.out.println("CephraDB: Retrieved car index for " + username + ": " + carIndex);
+                        return carIndex;
+                    } else {
+                        System.out.println("CephraDB: User " + username + " not found - returning -1");
+                        return -1;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting car index: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    
+    public static void setUserCarIndex(String username, int carIndex) {
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            // First check if car_index column exists in users table
+            if (!columnExists(conn, "users", "car_index")) {
+                // Add the column if it doesn't exist
+                addCarIndexColumn(conn);
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE users SET car_index = ? WHERE username = ?")) {
+                
+                stmt.setInt(1, carIndex);
+                stmt.setString(2, username);
+                
+                int rowsAffected = stmt.executeUpdate();
+                System.out.println("CephraDB: Set car index for " + username + " to " + carIndex + " (rows affected: " + rowsAffected + ")");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error setting car index: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    // Helper method to check if a column exists in a table
+    private static boolean columnExists(Connection conn, String tableName, String columnName) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?")) {
+            stmt.setString(1, tableName);
+            stmt.setString(2, columnName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking if column exists: " + e.getMessage());
+        }
+        return false;
+    }
+    
+    // Helper method to add car_index column to users table
+    private static void addCarIndexColumn(Connection conn) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "ALTER TABLE users ADD COLUMN car_index INT DEFAULT NULL")) {
+            stmt.executeUpdate();
+            System.out.println("CephraDB: Added car_index column to users table");
+        } catch (SQLException e) {
+            // Column might already exist, check error message
+            if (e.getMessage().contains("Duplicate column name")) {
+                System.out.println("CephraDB: car_index column already exists");
+            } else {
+                System.err.println("Error adding car_index column: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+    
     // Method to check for duplicate battery level entries for a user
     public static void checkDuplicateBatteryLevels(String username) {
         try (Connection conn = cephra.db.DatabaseConnection.getConnection();
@@ -1699,8 +1793,8 @@ public class CephraDB {
                         if (phoneFrame.isVisible()) {
                             Component[] components = phoneFrame.getContentPane().getComponents();
                             for (Component comp : components) {
-                                if (comp instanceof cephra.Phone.PorscheTaycan) {
-                                    cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) comp;
+                                if (comp instanceof cephra.Phone.LinkedCar) {
+                                    cephra.Phone.LinkedCar porschePanel = (cephra.Phone.LinkedCar) comp;
                                     porschePanel.refreshBatteryDisplay();
                                     System.out.println("CephraDB: Refreshed Porsche screen to show 100% battery for user " + username);
                                     return;
@@ -1710,8 +1804,8 @@ public class CephraDB {
                             // If PorscheTaycan is not found in current components, try to find it recursively
                             try {
                                 Component currentPanel = findPorscheTaycanPanel(phoneFrame.getContentPane());
-                                if (currentPanel instanceof cephra.Phone.PorscheTaycan) {
-                                    cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) currentPanel;
+                                if (currentPanel instanceof cephra.Phone.LinkedCar) {
+                                    cephra.Phone.LinkedCar porschePanel = (cephra.Phone.LinkedCar) currentPanel;
                                     porschePanel.refreshBatteryDisplay();
                                     System.out.println("CephraDB: Refreshed Porsche screen (found recursively) to show 100% battery for user " + username);
                                     return;
@@ -1732,7 +1826,7 @@ public class CephraDB {
     // Helper method to find PorscheTaycan panel recursively in a container
     private static Component findPorscheTaycanPanel(Container container) {
         for (Component comp : container.getComponents()) {
-            if (comp instanceof cephra.Phone.PorscheTaycan) {
+            if (comp instanceof cephra.Phone.LinkedCar) {
                 return comp;
             }
             if (comp instanceof Container) {

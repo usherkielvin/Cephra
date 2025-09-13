@@ -1,16 +1,32 @@
 
 package cephra.Phone;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import java.util.Random;
 
-public class PorscheTaycan extends javax.swing.JPanel {
+public class LinkedCar extends javax.swing.JPanel {
 
+    // Array of car image paths (c1.png to c10.png)
+    private final String[] carImages = {
+        "/cephra/Cephra Images/c1.png",
+        "/cephra/Cephra Images/c2.png",
+        "/cephra/Cephra Images/c3.png",
+        "/cephra/Cephra Images/c4.png",
+        "/cephra/Cephra Images/c5.png",
+        "/cephra/Cephra Images/c6.png",
+        "/cephra/Cephra Images/c7.png",
+        "/cephra/Cephra Images/c8.png",
+        "/cephra/Cephra Images/c9.png",
+        "/cephra/Cephra Images/c10.png"
+    };
 
-    public PorscheTaycan() {
+    public LinkedCar() {
         initComponents();
          setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -19,6 +35,9 @@ public class PorscheTaycan extends javax.swing.JPanel {
         
         // Update battery percentage from user's stored level
         refreshBatteryDisplay();
+        
+        // Set random car image for user
+        setRandomCarImage();
         
         // Add a focus listener to refresh battery display when panel becomes visible
         addFocusListener(new java.awt.event.FocusAdapter() {
@@ -64,6 +83,9 @@ public class PorscheTaycan extends javax.swing.JPanel {
                     int rangeKm = (int)(batteryLevel * 8);
                     km.setText(rangeKm + " km");
                     
+                    // Rotate car based on battery percentage (0% = 0°, 50% = 90°, 100% = 180°)
+                    updateCarRotation(batteryLevel);
+                    
                     // Keep charge button always enabled - full battery handling is done in action listener with JDialog
                     charge.setEnabled(true);
                     charge.setToolTipText(null);
@@ -100,7 +122,7 @@ public class PorscheTaycan extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(PorscheTaycan.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(LinkedCar.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -112,12 +134,53 @@ public class PorscheTaycan extends javax.swing.JPanel {
             }
         });
     }
+    
+    // Method to rotate the car icon based on degrees
+    private ImageIcon rotateIcon(ImageIcon icon, double degrees) {
+        int w = icon.getIconWidth();
+        int h = icon.getIconHeight();
+        
+        java.awt.image.BufferedImage rotated = new java.awt.image.BufferedImage(w, h, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = rotated.createGraphics();
+        g2d.rotate(Math.toRadians(degrees), w/2, h/2);
+        g2d.drawImage(icon.getImage(), 0, 0, null);
+        g2d.dispose();
+        
+        return new ImageIcon(rotated);
+    }
+    
+    // Method to update car rotation based on battery percentage
+    private void updateCarRotation(int batteryLevel) {
+        try {
+            // Calculate rotation: 0% -> 0°, 50% -> 90°, 100% -> 180°
+            double degrees = (batteryLevel / 100.0) * 180.0;
+            
+            // Get the current car icon and rotate it
+            if (car.getIcon() != null && car.getIcon() instanceof ImageIcon) {
+                // Get the original car image path based on current user
+                String username = cephra.CephraDB.getCurrentUsername();
+                if (username != null && !username.isEmpty()) {
+                    int carIndex = cephra.CephraDB.getUserCarIndex(username);
+                    if (carIndex >= 0 && carIndex < carImages.length) {
+                        // Create fresh icon from resource to avoid cumulative rotation
+                        ImageIcon originalIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/Bar.png"));
+                        ImageIcon rotatedIcon = rotateIcon(originalIcon, degrees);
+                        bar.setIcon(rotatedIcon);
+                        
+                        System.out.println("LinkedCar: Rotated car to " + degrees + "° for battery level " + batteryLevel + "%");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error rotating car icon: " + e.getMessage());
+        }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        car = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
@@ -125,17 +188,20 @@ public class PorscheTaycan extends javax.swing.JPanel {
         charge = new javax.swing.JButton();
         batterypercent = new javax.swing.JLabel();
         km = new javax.swing.JLabel();
+        cover = new javax.swing.JLabel();
+        bar = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
 
+        car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c10.png"))); // NOI18N
+        add(car);
+        car.setBounds(10, 90, 340, 270);
+
         jPanel1.setOpaque(false);
         jPanel1.setLayout(null);
-        jPanel1.add(jLabel2);
-        jLabel2.setBounds(0, -80, 350, 270);
-
         add(jPanel1);
-        jPanel1.setBounds(0, 160, 350, 270);
+        jPanel1.setBounds(20, 50, 140, 100);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -200,12 +266,22 @@ public class PorscheTaycan extends javax.swing.JPanel {
         batterypercent.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         batterypercent.setText("25 %");
         add(batterypercent);
-        batterypercent.setBounds(20, 455, 210, 30);
+        batterypercent.setBounds(140, 500, 150, 30);
 
         km.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         km.setText("400 km");
         add(km);
-        km.setBounds(20, 515, 130, 30);
+        km.setBounds(110, 560, 130, 30);
+
+        cover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Cover.png"))); // NOI18N
+        cover.setText("Bar");
+        add(cover);
+        cover.setBounds(60, 410, 230, 210);
+
+        bar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Bar.png"))); // NOI18N
+        bar.setText("Bar");
+        add(bar);
+        bar.setBounds(60, 410, 230, 210);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/hyundai.png"))); // NOI18N
         add(jLabel1);
@@ -289,22 +365,55 @@ public class PorscheTaycan extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel bar;
     private javax.swing.JLabel batterypercent;
+    private javax.swing.JLabel car;
     private javax.swing.JButton charge;
+    private javax.swing.JLabel cover;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel km;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
     
+    // Method to set random car image for the current user
+    private void setRandomCarImage() {
+        try {
+            String username = cephra.CephraDB.getCurrentUsername();
+            if (username != null && !username.isEmpty()) {
+                // Get user's car index from database
+                int carIndex = cephra.CephraDB.getUserCarIndex(username);
+                
+                // If no car assigned yet, assign a random one
+                if (carIndex == -1) {
+                    carIndex = new Random().nextInt(carImages.length);
+                    cephra.CephraDB.setUserCarIndex(username, carIndex);
+                    System.out.println("LinkedCar: Assigned car " + (carIndex + 1) + " to user " + username);
+                }
+                
+                // Set the car image
+                if (carIndex >= 0 && carIndex < carImages.length) {
+                    car.setIcon(new javax.swing.ImageIcon(getClass().getResource(carImages[carIndex])));
+                    System.out.println("LinkedCar: Set car image to " + carImages[carIndex] + " for user " + username);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error setting car image: " + e.getMessage());
+            // Fallback to default car image
+            car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c1.png")));
+        }
+    }
+    
     @Override
     public void addNotify() {
         super.addNotify();
         // Refresh battery display when panel becomes visible
-        SwingUtilities.invokeLater(() -> refreshBatteryDisplay());
+        SwingUtilities.invokeLater(() -> {
+            refreshBatteryDisplay();
+            setRandomCarImage(); // Also refresh car image
+        });
     }
 }

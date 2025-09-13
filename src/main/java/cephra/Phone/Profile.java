@@ -258,8 +258,8 @@ public class Profile extends javax.swing.JPanel {
                                             // Find and refresh any PorscheTaycan panel
                                             java.awt.Component[] components = phoneFrame.getContentPane().getComponents();
                                             for (java.awt.Component comp : components) {
-                                                if (comp instanceof cephra.Phone.PorscheTaycan) {
-                                                    cephra.Phone.PorscheTaycan porschePanel = (cephra.Phone.PorscheTaycan) comp;
+                                                if (comp instanceof cephra.Phone.LinkedCar) {
+                                                    cephra.Phone.LinkedCar porschePanel = (cephra.Phone.LinkedCar) comp;
                                                     porschePanel.refreshBatteryDisplay();
                                                     System.out.println("Profile: Refreshed Porsche panel to show new battery level: " + newBatteryLevel + "%");
                                                     break;
