@@ -8,10 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cephra Monitor</title>
     <link rel="manifest" href="monitor.webmanifest" />
-    <link rel="icon" type="image/png" href="../images/MONU.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="../images/MONU.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="../images/MONU.png" />
-    <link rel="apple-touch-icon" sizes="167x167" href="../images/MONU.png" />
+    <link rel="icon" type="image/png" href="../Admin/images/MONU.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../Admin/images/MONU.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="../Admin/images/MONU.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="../Admin/images/MONU.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Monitor" />
@@ -30,7 +30,7 @@
         .bay { background:var(--card); border-radius: 12px; padding: 12px; border:1px solid rgba(255,255,255,0.08); min-width: 0; height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
         .bay h3 { margin: 0 0 8px; font-size: 18px; color:var(--accent); word-break: break-word; }
         .badge { display:inline-block; padding:6px 10px; border-radius: 999px; font-size: 13px; }
-        .available { background:var(--avail); color:var(--availText); }
+        .available { background:var(--avail); color:var(--availText); font-size: 16px; font-weight: bold; padding: 8px 12px; }
         .occupied { background:var(--occ); color:var(--occText); }
         .maintenance { background:var(--maint); color:var(--maintText); }
         .row { margin-top: 16px; display:flex; gap:12px; align-items:flex-start; flex-wrap: wrap; }
@@ -53,6 +53,7 @@
         .fullscreen-mode .bay { padding: 20px; font-size: 16px; height: 250px; }
         .fullscreen-mode .bay h3 { font-size: 24px; margin-bottom: 12px; }
         .fullscreen-mode .badge { padding: 10px 16px; font-size: 16px; }
+        .fullscreen-mode .available { font-size: 20px; font-weight: bold; padding: 12px 18px; }
         .fullscreen-mode .muted { font-size: 14px; margin-top: 10px; }
         
         @media (max-width: 420px) {
@@ -60,32 +61,34 @@
             .grid { gap: 10px; grid-template-columns: 1fr; grid-template-rows: repeat(auto-fit, minmax(180px, auto)); }
             .bay { padding:10px; height: 180px; }
             .bay h3 { font-size: 16px; }
+            .available { font-size: 14px; font-weight: bold; padding: 6px 10px; }
             th, td { font-size: 13px; }
         }
         @media (min-width: 421px) and (max-width: 640px) {
             .grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(auto-fit, minmax(190px, auto)); }
             .bay { height: 190px; }
+            .available { font-size: 15px; font-weight: bold; padding: 7px 11px; }
         }
         @media (min-width: 641px) and (max-width: 1024px) {
             .grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
             .bay { height: 200px; }
+            .available { font-size: 16px; font-weight: bold; padding: 8px 12px; }
         }
         @media (min-width: 1025px) {
             .grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
             .bay { height: 200px; }
+            .available { font-size: 16px; font-weight: bold; padding: 8px 12px; }
         }
     </style>
 </head>
 <body>
     <h1>
-        <span class="logo"><img src="../images/MONU.png" alt="Cephra" /></span>
+        <span class="logo"><img src="../Admin/images/MONU.png" alt="Cephra" /></span>
         Cephra Live Monitor <span id="ts" class="ts"></span>
         <div class="toolbar">
             <button class="btn" id="fullscreenBtn">Fullscreen Bays</button>
             <button class="btn" id="themeBtn">Toggle Theme</button>
-            <label class="muted"><input type="checkbox" id="soundChk" /> Sound alerts</label>
-            <label class="muted"><input type="checkbox" id="waitingSoundChk" /> Waiting alerts</label>
-            <label class="muted"><input type="checkbox" id="ttsChk" /> Voice announcements</label>
+            <label class="muted"><input type="checkbox" id="announcerChk" checked /> Bay Announcer</label>
             <button class="btn" id="installBtn" style="display:none;">Install</button>
         </div>
     </h1>
@@ -116,14 +119,6 @@
         </div>
     </div>
 
-    <audio id="beep" preload="auto">
-        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYBAGFhYWFhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="audio/wav">
-    </audio>
-    
-    <audio id="waitingSound" preload="auto">
-        <source src="../../AUDIO/WAITING.wav" type="audio/wav">
-        <source src="../../AUDIO/WAITING.mp3" type="audio/mpeg">
-    </audio>
 
     <script>
         // PWA install and SW registration
@@ -141,13 +136,12 @@
             };
         });
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('../sw.js').catch(()=>{});
+            navigator.serviceWorker.register('../User/sw.js').catch(()=>{});
         }
 
         let currentQueue = [];
         let lastBays = {};
-        let lastQueueCount = 0;
-        let lastQueueTopTicket = '';
+        let lastQueueTickets = new Set(); // Track tickets that were already announced
         let page = 1;
         const pageSize = 10;
 
@@ -167,7 +161,7 @@
 
         async function fetchSnapshot() {
             try {
-                const res = await fetch('../api/mobile.php?action=monitor', { cache: 'no-store' });
+                const res = await fetch('api/monitor.php', { cache: 'no-store' });
                 const data = await res.json();
                 if (data && !data.error) {
                     handleAlerts(data);
@@ -233,7 +227,6 @@
 
         function handleAlerts(data) {
             const bays = data.bays || [];
-            let changeDetected = false;
             const currentQueue = data.queue || [];
             
             // Check for bay status changes and announce them
@@ -243,8 +236,6 @@
                 const now = (b.status || '') + '|' + (b.current_ticket_id || '') + '|' + (b.current_username || '');
                 
                 if (prev !== now) {
-                    changeDetected = true;
-                    
                     // Parse previous state for TTS announcement
                     let prevStatus = '';
                     let newStatus = b.status || '';
@@ -264,47 +255,34 @@
                 lastBays[key] = now;
             });
             
-            // Check for queue changes
-            const prevTop = currentQueue[0]?.ticket_id;
-            const newTop = (data.queue || [])[0]?.ticket_id;
-            if (prevTop && newTop && prevTop !== newTop) changeDetected = true;
+            // Check for new waiting tickets
+            currentQueue.forEach(ticket => {
+                const ticketId = ticket.ticket_id;
+                if (ticketId && !lastQueueTickets.has(ticketId)) {
+                    // New ticket in waiting queue
+                    announceWaitingTicket(ticketId);
+                    lastQueueTickets.add(ticketId);
+                }
+            });
             
-            // Handle waiting queue sound alerts
-            const currentQueueCount = currentQueue.length;
-            if (document.getElementById('waitingSoundChk').checked && currentQueueCount > 0 && currentQueueCount > lastQueueCount) {
-                playWaitingSound();
+            // Clean up tickets that are no longer in waiting queue
+            const currentTicketIds = new Set(currentQueue.map(t => t.ticket_id).filter(id => id));
+            for (let ticketId of lastQueueTickets) {
+                if (!currentTicketIds.has(ticketId)) {
+                    lastQueueTickets.delete(ticketId);
+                }
             }
-            
-            // Handle waiting queue TTS announcements
-            if (currentQueueCount !== lastQueueCount || (newTop && newTop !== lastQueueTopTicket)) {
-                announceQueueChange(currentQueueCount, newTop, currentQueue[0]?.username);
-            }
-            
-            if (document.getElementById('soundChk').checked && changeDetected) beep();
-            
-            lastQueueCount = currentQueueCount;
-            lastQueueTopTicket = newTop;
         }
 
-        function beep() {
-            const el = document.getElementById('beep');
-            try { el.currentTime = 0; el.play(); } catch (e) {}
-        }
-        
-        function playWaitingSound() {
-            const el = document.getElementById('waitingSound');
-            try { el.currentTime = 0; el.play(); } catch (e) {}
-        }
-        
         function speak(text) {
-            if (document.getElementById('ttsChk').checked && 'speechSynthesis' in window) {
+            if (document.getElementById('announcerChk').checked && 'speechSynthesis' in window) {
                 // Stop any current speech
                 speechSynthesis.cancel();
                 
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.8;
                 utterance.pitch = 1.0;
-                utterance.volume = 0.7;
+                utterance.volume = 0.8;
                 
                 // Try to use a female voice if available
                 const voices = speechSynthesis.getVoices();
@@ -313,7 +291,8 @@
                     voice.name.includes('female') || 
                     voice.name.includes('Zira') ||
                     voice.name.includes('Susan') ||
-                    voice.name.includes('Karen')
+                    voice.name.includes('Karen') ||
+                    voice.name.includes('Microsoft Zira')
                 );
                 if (femaleVoice) {
                     utterance.voice = femaleVoice;
@@ -324,6 +303,9 @@
         }
         
         function announceBayChange(bayNumber, oldStatus, newStatus, ticketId, username) {
+            // Only announce for bays 1-8
+            if (bayNumber < 1 || bayNumber > 8) return;
+            
             const statusMap = {
                 'available': 'available',
                 'occupied': 'occupied',
@@ -333,13 +315,20 @@
             let message = '';
             if (oldStatus && newStatus && oldStatus !== newStatus) {
                 const newStatusText = statusMap[newStatus.toLowerCase()] || newStatus;
-                message = `Bay ${bayNumber} is now ${newStatusText}`;
                 
-                if (newStatus.toLowerCase() === 'occupied' && username) {
-                    message += ` by ${username}`;
-                }
-                if (ticketId && newStatus.toLowerCase() !== 'available') {
-                    message += ` with ticket ${ticketId}`;
+                // Create clear announcements for each status change
+                if (newStatus.toLowerCase() === 'available') {
+                    message = `Bay ${bayNumber} is now available`;
+                } else if (newStatus.toLowerCase() === 'occupied') {
+                    message = `Bay ${bayNumber} is now occupied`;
+                    if (username) {
+                        message += ` by ${username}`;
+                    }
+                    if (ticketId) {
+                        message += ` with ticket ${ticketId}`;
+                    }
+                } else if (newStatus.toLowerCase() === 'maintenance') {
+                    message = `Bay ${bayNumber} is now under maintenance`;
                 }
                 
                 // Debug log to help troubleshoot
@@ -349,17 +338,16 @@
             }
         }
         
-        function announceQueueChange(queueCount, topTicket, username) {
-            if (queueCount > 0) {
-                if (queueCount === 1) {
-                    speak(`One customer is waiting for service`);
-                } else {
-                    speak(`${queueCount} customers are waiting for service`);
-                }
-            } else if (queueCount === 0 && lastQueueCount > 0) {
-                speak('Waiting queue is now empty');
-            }
+        function announceWaitingTicket(ticketId) {
+            // Simple announcement: just the ticket number
+            const message = `Ticket ${ticketId}`;
+            
+            // Debug log to help troubleshoot
+            console.log('Waiting ticket announcement:', message, {ticketId});
+            
+            speak(message);
         }
+        
 
         fetchSnapshot();
         setInterval(fetchSnapshot, 3000);

@@ -1,71 +1,187 @@
-# 🌐 Cephra Appweb Structure
+# 🌐 Cephra Web Application
 
-## 📁 New Folder Organization
+## 📁 Clean Production Structure
 
-The appweb has been reorganized into three main sections:
+```
+Appweb/
+├── Admin/           # Admin Dashboard
+│   ├── api/         # Admin APIs
+│   │   ├── admin.php           # Main admin API (with auth)
+│   │   ├── admin-clean.php     # Clean admin API (no auth)
+│   │   └── admin-complete.php  # Complete admin API (all features)
+│   ├── config/      # Database configuration
+│   ├── css/         # Admin stylesheets
+│   ├── images/      # Admin images (logo, etc.)
+│   ├── js/          # Admin JavaScript
+│   ├── index.php    # Admin dashboard
+│   ├── login.php    # Admin login
+│   └── logout.php   # Admin logout
+├── User/            # User Interface
+│   ├── api/         # User APIs
+│   ├── assets/      # User assets (CSS, JS, fonts)
+│   ├── config/      # Database configuration
+│   ├── css/         # User stylesheets
+│   ├── images/      # User images
+│   ├── *.php        # User pages (index, profile, history, etc.)
+│   ├── *.js         # User scripts
+│   └── sw.js        # Service worker (PWA)
+├── Monitor/         # Live Monitor
+│   ├── api/         # Monitor API
+│   │   └── monitor.php         # Monitor data API
+│   ├── index.php    # Monitor interface
+│   └── monitor.webmanifest
+└── README.md        # This file
+```
 
-### 🔧 **Appweb/Admin**
-Contains all administrative interface files:
-- **Admin Interface:** `index.php`, `login.php`, `logout.php`
-- **API Files:** `api/admin.php`, `api/admin-clean.php`, `api/admin-test.php`
-- **Tools:** Database fixers, API testers, connection tools
-- **Assets:** CSS, JavaScript files for admin interface
-- **Config:** Database configuration
+## 🚀 Quick Access URLs
 
-**Key Files:**
-- `index.php` - Main admin dashboard
-- `api/admin-clean.php` - Clean API without authentication
-- `database-fixer.php` - Database connection fixer
-- `api-tester.php` - API endpoint tester
+### **Admin Interface**
+- **Login:** `http://localhost/Cephra/Appweb/Admin/login.php`
+- **Dashboard:** `http://localhost/Cephra/Appweb/Admin/index.php`
 
-### 👥 **Appweb/User**
-Contains all user-facing website files:
-- **User Interface:** `index.php`, `profile.php`, `history.php`
-- **Charging:** `ChargingPage.php`, `queue_ticket_popup.php`
-- **Registration:** `Register_Panel.php`, `register_script.js`
-- **Assets:** CSS, JavaScript, images, webfonts
-- **Config:** Database configuration
+### **User Interface**
+- **Home:** `http://localhost/Cephra/Appweb/User/index.php`
+- **Dashboard:** `http://localhost/Cephra/Appweb/User/dashboard.php`
 
-**Key Files:**
-- `index.php` - Main user dashboard
-- `profile.php` - User profile management
-- `history.php` - Charging history
-- `ChargingPage.php` - Charging interface
+### **Monitor Interface**
+- **Live Monitor:** `http://localhost/Cephra/Appweb/Monitor/index.php`
 
-### 📊 **Appweb/Monitor**
-Contains monitoring interface files:
-- **Monitor Interface:** `index.php`
-- **Monitor Manifest:** `monitor.webmanifest`
+## 🔧 Setup Instructions
 
-## 🔗 **Access URLs**
+1. **Start XAMPP:**
+   - Start Apache and MySQL services
+   - Ensure MySQL is running on port 3306
 
-### Admin Interface
-- **Main Admin:** `http://localhost/Cephra/Appweb/Admin/`
-- **API Test:** `http://localhost/Cephra/Appweb/Admin/api-tester.php`
-- **Database Fix:** `http://localhost/Cephra/Appweb/Admin/database-fixer.php`
+2. **Database Setup:**
+   - Database will be created automatically when first accessed
+   - Tables will be created by the APIs as needed
 
-### User Interface
-- **Main User:** `http://localhost/Cephra/Appweb/User/`
-- **Profile:** `http://localhost/Cephra/Appweb/User/profile.php`
-- **History:** `http://localhost/Cephra/Appweb/User/history.php`
+3. **Access Applications:**
+   - Use the URLs above to access each interface
+   - Admin login: username=`admin`, password=`admin123`
 
-### Monitor Interface
-- **Monitor:** `http://localhost/Cephra/Appweb/Monitor/`
+## 📋 Default Credentials
 
-## 🔧 **Configuration**
+### **Admin Login**
+- **Username:** `admin`
+- **Password:** `admin123`
 
-Each folder has its own `config/database.php` file for database connections.
+### **User Registration**
+- Users can register through the User interface
+- No default user credentials (registration required)
 
-## 📋 **Migration Notes**
+## 🛠️ Core Features
 
-- All files have been copied (not moved) from the original `mobileweb` folder
-- Original `mobileweb` folder remains intact for backup
-- File paths in PHP files may need updating for the new structure
-- Database connections should work with the new config files
+### **Admin Dashboard**
+- ✅ Dashboard with real-time statistics
+- ✅ Queue management with ticket processing
+- ✅ Bay management (Available/Occupied/Maintenance)
+- ✅ User management (add/delete users)
+- ✅ Settings configuration (pricing)
+- ✅ Monitor button (opens Monitor web in new tab)
+- ✅ Auto-refresh every 30 seconds
 
-## 🚀 **Next Steps**
+### **User Interface**
+- ✅ User registration and login
+- ✅ Dashboard with personal statistics
+- ✅ Queue ticket creation
+- ✅ Charging bay booking
+- ✅ History tracking
+- ✅ Profile management
+- ✅ PWA support (installable)
 
-1. Test all interfaces with the new URLs
-2. Update any hardcoded file paths in PHP files
-3. Test database connections in each folder
-4. Remove original `mobileweb` folder if everything works correctly
+### **Monitor Interface**
+- ✅ Live bay status monitoring (8 bays)
+- ✅ Real-time queue display
+- ✅ Bay announcer (voice announcements)
+- ✅ Fullscreen mode
+- ✅ Theme switching (light/dark)
+- ✅ Auto-refresh every 3 seconds
+
+## 🔌 API Endpoints
+
+### **Admin APIs**
+- `Admin/api/admin.php` - Main admin API (with authentication)
+- `Admin/api/admin-clean.php` - Clean admin API (no authentication)
+- `Admin/api/admin-complete.php` - Complete admin API (all features)
+
+### **User APIs**
+- `User/api/mobile.php` - Mobile user API
+
+### **Monitor APIs**
+- `Monitor/api/monitor.php` - Monitor data API (bays + queue)
+
+## 🗣️ Bay Announcer Features
+
+### **Voice Announcements**
+- **Bay Status Changes:** "Bay X is now available/occupied/maintenance"
+- **Waiting Tickets:** "Ticket TKT001" (simple announcement)
+- **Bay Range:** Only announces bays 1-8
+- **One-time:** Each ticket announced only once
+- **Female Voice:** Optimized speech settings
+
+### **Announcer Controls**
+- Single "Bay Announcer" checkbox (checked by default)
+- Controls all voice announcements
+- Real-time updates every 3 seconds
+
+## 📱 Mobile Support
+
+- ✅ Responsive design for all interfaces
+- ✅ PWA support for User interface
+- ✅ Touch-friendly controls
+- ✅ Mobile-optimized layouts
+- ✅ Service worker for offline functionality
+
+## 🎨 Themes
+
+- ✅ Dark theme (default)
+- ✅ Light theme (toggle available in Monitor)
+- ✅ Consistent styling across all interfaces
+- ✅ Enhanced "Available" status (larger, bold text)
+
+## 🔄 Real-time Updates
+
+- ✅ **Admin:** Auto-refresh every 30 seconds
+- ✅ **Monitor:** Auto-refresh every 3 seconds
+- ✅ **User:** Real-time updates as needed
+- ✅ Live status updates
+- ✅ Voice announcements for changes
+
+## 🚨 Troubleshooting
+
+### **Common Issues**
+1. **Database Connection Failed**
+   - Check XAMPP MySQL service is running
+   - Verify MySQL is on port 3306
+
+2. **Admin Login Issues**
+   - Use: username=`admin`, password=`admin123`
+   - Check database has `staff_records` table
+
+3. **Monitor Not Showing Data**
+   - Check Monitor API is accessible
+   - Verify database has `charging_bays` table
+
+4. **Bay Announcer Not Working**
+   - Check browser supports Web Speech API
+   - Ensure "Bay Announcer" checkbox is checked
+   - Check browser console for errors
+
+### **File Structure**
+- All unnecessary test files and checkers have been removed
+- Only essential flow files remain
+- Clean, production-ready structure
+
+## 📞 Support
+
+For technical support:
+1. Check the troubleshooting section above
+2. Verify XAMPP services are running
+3. Check browser console for errors
+4. Ensure all URLs are accessible
+
+---
+
+**Last Updated:** December 2024  
+**Version:** 2.0.0 (Clean Production Version)

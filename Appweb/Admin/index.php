@@ -352,7 +352,6 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
         </div>
     </div>
 
-    <script src="js/admin.js?v=<?php echo time(); ?>"></script>
-    <script src="js/debug-admin.js?v=<?php echo time(); ?>"></script>
+    <script src="js/admin-fixed.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

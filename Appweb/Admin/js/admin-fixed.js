@@ -1,4 +1,4 @@
-// Admin Panel JavaScript
+// Fixed Admin Panel JavaScript with Proper API Connections
 class AdminPanel {
     constructor() {
         this.currentPanel = 'dashboard';
@@ -50,14 +50,6 @@ class AdminPanel {
                 e.stopPropagation();
             });
         }
-    }
-    
-    // Open Monitor Web in new tab
-    window.openMonitorWeb = function() {
-        // Open monitor web in new tab
-        const monitorUrl = '../monitor/';
-        window.open(monitorUrl, '_blank', 'noopener,noreferrer');
-    }
 
         // Modal close buttons
         document.querySelectorAll('.modal-close').forEach(btn => {
@@ -89,6 +81,7 @@ class AdminPanel {
     }
 
     switchPanel(panelName) {
+        
         // Update sidebar active state
         document.querySelectorAll('.sidebar-menu li').forEach(item => {
             item.classList.remove('active');
@@ -139,16 +132,8 @@ class AdminPanel {
 
     async loadDashboardData() {
         try {
-            // Try main API first
-            let response = await fetch('../api/admin.php?action=dashboard');
-            let data = await response.json();
-
-            // If main API fails (401 unauthorized), try test API
-            if (!data.success && (data.error === 'Unauthorized access' || response.status === 401)) {
-                console.log('Main API unauthorized, trying test API...');
-                response = await fetch('../api/admin-test.php?action=dashboard');
-                data = await response.json();
-            }
+            const response = await fetch('api/admin-clean.php?action=dashboard');
+            const data = await response.json();
 
             if (data.success) {
                 this.updateDashboardStats(data.stats);
@@ -187,16 +172,8 @@ class AdminPanel {
 
     async loadQueueData() {
         try {
-            // Try main API first
-            let response = await fetch('../api/admin.php?action=queue');
-            let data = await response.json();
-
-            // If main API fails (401 unauthorized), try test API
-            if (!data.success && (data.error === 'Unauthorized access' || response.status === 401)) {
-                console.log('Main API unauthorized, trying test API...');
-                response = await fetch('../api/admin-test.php?action=queue');
-                data = await response.json();
-            }
+            const response = await fetch('api/admin-clean.php?action=queue');
+            const data = await response.json();
 
             if (data.success) {
                 this.updateQueueTable(data.queue);
@@ -240,15 +217,17 @@ class AdminPanel {
 
     async loadBaysData() {
         try {
-            const response = await fetch('../api/admin.php?action=bays');
+            const response = await fetch('api/admin-clean.php?action=bays');
             const data = await response.json();
 
             if (data.success) {
                 this.updateBaysGrid(data.bays);
+            } else {
+                this.showError(data.error || 'Failed to load bays data');
             }
         } catch (error) {
             console.error('Error loading bays data:', error);
-            this.showError('Failed to load bays data');
+            this.showError('Failed to load bays data - check console for details');
         }
     }
 
@@ -285,11 +264,11 @@ class AdminPanel {
                 </div>
                 <div class="bay-actions" style="margin-top: 15px;">
                     ${bay.status === 'Available' ? `
-                        <button class="btn btn-warning btn-sm" onclick="adminPanel.setBayMaintenance(${bay.bay_number})">
+                        <button class="btn btn-warning btn-sm" onclick="adminPanel.setBayMaintenance('${bay.bay_number}')">
                             <i class="fas fa-tools"></i> Maintenance
                         </button>
                     ` : bay.status === 'Maintenance' ? `
-                        <button class="btn btn-success btn-sm" onclick="adminPanel.setBayAvailable(${bay.bay_number})">
+                        <button class="btn btn-success btn-sm" onclick="adminPanel.setBayAvailable('${bay.bay_number}')">
                             <i class="fas fa-check"></i> Available
                         </button>
                     ` : ''}
@@ -300,15 +279,17 @@ class AdminPanel {
 
     async loadUsersData() {
         try {
-            const response = await fetch('../api/admin.php?action=users');
+            const response = await fetch('api/admin-clean.php?action=users');
             const data = await response.json();
 
             if (data.success) {
                 this.updateUsersTable(data.users);
+            } else {
+                this.showError(data.error || 'Failed to load users data');
             }
         } catch (error) {
             console.error('Error loading users data:', error);
-            this.showError('Failed to load users data');
+            this.showError('Failed to load users data - check console for details');
         }
     }
 
@@ -340,12 +321,11 @@ class AdminPanel {
 
     async loadAnalyticsData() {
         // Placeholder for analytics data
-        console.log('Loading analytics data...');
     }
 
     async loadSettingsData() {
         try {
-            const response = await fetch('../api/admin.php?action=settings');
+            const response = await fetch('api/admin-clean.php?action=settings');
             const data = await response.json();
 
             if (data.success) {
@@ -359,7 +339,7 @@ class AdminPanel {
 
     async viewTicket(ticketId) {
         try {
-            const response = await fetch(`../api/admin.php?action=ticket-details&ticket_id=${ticketId}`);
+            const response = await fetch(`api/admin-clean.php?action=ticket-details&ticket_id=${ticketId}`);
             const data = await response.json();
 
             if (data.success) {
@@ -407,7 +387,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('../api/admin.php', {
+            const response = await fetch('api/admin-clean.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -434,7 +414,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('../api/admin.php', {
+            const response = await fetch('api/admin-clean.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -461,7 +441,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('../api/admin.php', {
+            const response = await fetch('api/admin-clean.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -488,9 +468,6 @@ class AdminPanel {
     }
 
     async addUser() {
-        const form = document.getElementById('add-user-form');
-        const formData = new FormData(form);
-        
         const userData = {
             username: document.getElementById('new-username').value,
             firstname: document.getElementById('new-firstname').value,
@@ -505,7 +482,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('../api/admin.php', {
+            const response = await fetch('api/admin-clean.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -537,7 +514,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('../api/admin.php', {
+            const response = await fetch('api/admin-clean.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -636,36 +613,29 @@ class AdminPanel {
         }, 3000);
     }
 
-
-
     updateCurrentTime() {
         const timeElement = document.getElementById('current-time');
         if (timeElement) {
             const now = new Date();
-            // Format: "HH:MM AM/PM" (12-hour format, no seconds, no date)
             let hours = now.getHours();
             const minutes = now.getMinutes();
             const ampm = hours >= 12 ? 'PM' : 'AM';
             
-            // Convert to 12-hour format
             hours = hours % 12;
-            hours = hours ? hours : 12; // 0 should be 12
+            hours = hours ? hours : 12;
             
-            // Format with leading zeros
             const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
             timeElement.textContent = formattedTime;
         }
     }
 
     startTimeUpdate() {
-        // Update time every minute (60000ms)
         setInterval(() => {
             this.updateCurrentTime();
         }, 60000);
     }
 
     startAutoRefresh() {
-        // Refresh current panel data every 30 seconds
         this.refreshInterval = setInterval(() => {
             switch (this.currentPanel) {
                 case 'dashboard':
@@ -686,7 +656,6 @@ class AdminPanel {
 
     formatDateTime(dateString) {
         const date = new Date(dateString);
-        // Format: "MM/DD/YYYY HH:MM AM/PM" (no seconds)
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
         const year = date.getFullYear();
@@ -695,14 +664,17 @@ class AdminPanel {
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? 'PM' : 'AM';
         
-        // Convert to 12-hour format
         hours = hours % 12;
-        hours = hours ? hours : 12; // 0 should be 12
+        hours = hours ? hours : 12;
         
-        const formatted = `${month}/${day}/${year}, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-        console.log('formatDateTime:', dateString, '->', formatted); // Debug log
-        return formatted;
+        return `${month}/${day}/${year}, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
     }
+}
+
+// Open Monitor Web in new tab
+function openMonitorWeb() {
+    const monitorUrl = '../Monitor/';
+    window.open(monitorUrl, '_blank', 'noopener,noreferrer');
 }
 
 // Global functions for button onclick handlers
@@ -719,7 +691,6 @@ function refreshUsers() {
 }
 
 function processNextTicket() {
-    // Find the first waiting ticket and process it
     const waitingRows = document.querySelectorAll('#queue-tbody tr');
     for (let row of waitingRows) {
         if (row.style.display !== 'none' && row.cells[3].textContent.trim() === 'Waiting') {
