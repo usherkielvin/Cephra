@@ -48,7 +48,7 @@ public final class QueueBridge {
     private static void loadQueueFromDatabase() {
         try {
             // Get all queue tickets from database
-            List<Object[]> dbTickets = cephra.CephraDB.getAllQueueTickets();
+            List<Object[]> dbTickets = cephra.Database.CephraDB.getAllQueueTickets();
             records.clear(); // Clear existing records
             
             for (Object[] dbTicket : dbTickets) {
@@ -94,21 +94,21 @@ public final class QueueBridge {
         records.add(0, fullRecord);
 
         // Store battery info for this ticket
-        int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+        int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
         ticketBattery.put(ticket, new BatteryInfo(userBatteryLevel, 40.0)); // 40kWh capacity
         
         // Set this as the user's active ticket with correct service type
-        cephra.CephraDB.setActiveTicket(customer, ticket, service, userBatteryLevel, "");
+        cephra.Database.CephraDB.setActiveTicket(customer, ticket, service, userBatteryLevel, "");
         
         // Add to database for persistent storage
-        boolean dbSuccess = cephra.CephraDB.addQueueTicket(ticket, customer, service, status, payment, userBatteryLevel);
+        boolean dbSuccess = cephra.Database.CephraDB.addQueueTicket(ticket, customer, service, status, payment, userBatteryLevel);
         
         if (!dbSuccess) {
             System.err.println("Failed to add ticket " + ticket + " to database. It may already exist.");
             // Remove from memory records since database insertion failed
             records.remove(0);
             ticketBattery.remove(ticket);
-            cephra.CephraDB.clearActiveTicket(customer);
+            cephra.Database.CephraDB.clearActiveTicket(customer);
         }
 
         if (model != null) {
@@ -161,7 +161,7 @@ public final class QueueBridge {
             // Get actual user battery level from the ticket customer
             String customer = getTicketCustomer(ticket);
             if (customer != null && !customer.isEmpty()) {
-                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
                 info = new BatteryInfo(userBatteryLevel, 40.0);
             } else {
                 info = new BatteryInfo(18, 40.0); // fallback default
@@ -267,7 +267,7 @@ public final class QueueBridge {
         if (foundInRecords) {
             try {
                 // Check if payment already exists in database to prevent duplicates
-                if (cephra.CephraDB.isPaymentAlreadyProcessed(ticket)) {
+                if (cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket)) {
                     System.out.println("QueueBridge: Payment already exists in database for ticket " + ticket + ", ensuring UI cleanup");
                     try {
                         removeTicket(ticket);
@@ -287,7 +287,7 @@ public final class QueueBridge {
                 System.out.println("QueueBridge: About to process payment transaction for ticket " + ticket + 
                                  ", customer: " + customerName + ", service: " + serviceName + 
                                  ", amount: " + totalAmount + ", method: " + paymentMethod);
-                boolean dbSuccess = cephra.CephraDB.processPaymentTransaction(
+                boolean dbSuccess = cephra.Database.CephraDB.processPaymentTransaction(
                     ticket, customerName, serviceName, initialBatteryLevel, 
                     chargingTimeMinutes, totalAmount, paymentMethod, referenceNumber
                 );
@@ -314,7 +314,7 @@ public final class QueueBridge {
                     // Close PayPop on the phone if it is currently showing
                     SwingUtilities.invokeLater(() -> {
                         try {
-                            cephra.Phone.PayPop.hidePayPop();
+                            cephra.Phone.Popups.PayPop.hidePayPop();
                             System.out.println("QueueBridge: Closed PayPop on phone after marking ticket as Paid: " + ticket);
                         } catch (Throwable t) {
                             System.err.println("QueueBridge: Failed to close PayPop: " + t.getMessage());
@@ -502,7 +502,7 @@ public final class QueueBridge {
             // fallback: try reconstruct from customer
             String customer = getTicketCustomer(ticket);
             if (customer != null) {
-                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customer);
+                int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
                 info = new BatteryInfo(userBatteryLevel, 40.0);
             } else {
                 info = new BatteryInfo(18, 40.0);
@@ -569,35 +569,35 @@ public final class QueueBridge {
     private static void loadSettingsFromDatabase() {
         try {
             // Load minimum fee from database
-            String minFeeStr = cephra.CephraDB.getSystemSetting("minimum_fee");
+            String minFeeStr = cephra.Database.CephraDB.getSystemSetting("minimum_fee");
             if (minFeeStr != null && !minFeeStr.trim().isEmpty()) {
                 MINIMUM_FEE = Double.parseDouble(minFeeStr);
                 System.out.println("QueueBridge: Loaded minimum fee from database: ₱" + MINIMUM_FEE);
             } else {
                 // Set default if not found in database
-                cephra.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(MINIMUM_FEE));
+                cephra.Database.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(MINIMUM_FEE));
                 System.out.println("QueueBridge: Set default minimum fee: ₱" + MINIMUM_FEE);
             }
             
             // Load rate per kWh from database
-            String rateStr = cephra.CephraDB.getSystemSetting("rate_per_kwh");
+            String rateStr = cephra.Database.CephraDB.getSystemSetting("rate_per_kwh");
             if (rateStr != null && !rateStr.trim().isEmpty()) {
                 RATE_PER_KWH = Double.parseDouble(rateStr);
                 System.out.println("QueueBridge: Loaded rate per kWh from database: ₱" + RATE_PER_KWH);
             } else {
                 // Set default if not found in database
-                cephra.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RATE_PER_KWH));
+                cephra.Database.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RATE_PER_KWH));
                 System.out.println("QueueBridge: Set default rate per kWh: ₱" + RATE_PER_KWH);
             }
             
             // Load fast multiplier from database
-            String multiplierStr = cephra.CephraDB.getSystemSetting("fast_multiplier");
+            String multiplierStr = cephra.Database.CephraDB.getSystemSetting("fast_multiplier");
             if (multiplierStr != null && !multiplierStr.trim().isEmpty()) {
                 FAST_MULTIPLIER = Double.parseDouble(multiplierStr);
                 System.out.println("QueueBridge: Loaded fast multiplier from database: " + String.format("%.0f%%", (FAST_MULTIPLIER - 1) * 100));
             } else {
                 // Set default if not found in database
-                cephra.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(FAST_MULTIPLIER));
+                cephra.Database.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(FAST_MULTIPLIER));
                 System.out.println("QueueBridge: Set default fast multiplier: " + String.format("%.0f%%", (FAST_MULTIPLIER - 1) * 100));
             }
             
@@ -623,7 +623,7 @@ public final class QueueBridge {
         if (!isAlreadyProcessed) {
             try {
                 // Remove from database only if not already processed
-                boolean dbRemoved = cephra.CephraDB.removeQueueTicket(ticket);
+                boolean dbRemoved = cephra.Database.CephraDB.removeQueueTicket(ticket);
                 if (!dbRemoved) {
                     System.err.println("QueueBridge: Failed to remove ticket " + ticket + " from database");
                 }
@@ -682,7 +682,7 @@ public final class QueueBridge {
     private static boolean isTicketInHistory(String ticket) {
         try {
             // Check if ticket exists in charging_history table
-            return cephra.CephraDB.isTicketInChargingHistory(ticket);
+            return cephra.Database.CephraDB.isTicketInChargingHistory(ticket);
         } catch (Exception e) {
             System.err.println("QueueBridge: Error checking if ticket is in history: " + e.getMessage());
             return false;

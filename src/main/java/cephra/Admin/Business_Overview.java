@@ -297,7 +297,7 @@ public class Business_Overview extends javax.swing.JPanel {
         Min = (Integer) MinfeeSpinner.getValue();
         
         // Save to database
-        boolean saved = cephra.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(Min));
+        boolean saved = cephra.Database.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(Min));
         if (saved) {
             // Update QueueBridge with new minimum fee
             cephra.Admin.QueueBridge.setMinimumFee(Min);
@@ -311,7 +311,7 @@ public class Business_Overview extends javax.swing.JPanel {
         RPH = (Integer) RPHSpinner.getValue();
         
         // Save to database
-        boolean saved = cephra.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RPH));
+        boolean saved = cephra.Database.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RPH));
         if (saved) {
             // Update QueueBridge with new rate
             cephra.Admin.QueueBridge.setRatePerKWh(RPH);
@@ -396,35 +396,35 @@ public class Business_Overview extends javax.swing.JPanel {
     private void loadSettingsFromDatabase() {
         try {
             // Load minimum fee from database
-            String minFeeStr = cephra.CephraDB.getSystemSetting("minimum_fee");
+            String minFeeStr = cephra.Database.CephraDB.getSystemSetting("minimum_fee");
             if (minFeeStr != null && !minFeeStr.trim().isEmpty()) {
                 Min = Integer.parseInt(minFeeStr);
                 System.out.println("Dashboard: Loaded minimum fee from database: ₱" + Min);
             } else {
                 // Set default if not found in database
-                cephra.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(Min));
+                cephra.Database.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(Min));
                 System.out.println("Dashboard: Set default minimum fee: ₱" + Min);
             }
             
             // Load rate per kWh from database
-            String rateStr = cephra.CephraDB.getSystemSetting("rate_per_kwh");
+            String rateStr = cephra.Database.CephraDB.getSystemSetting("rate_per_kwh");
             if (rateStr != null && !rateStr.trim().isEmpty()) {
                 RPH = Integer.parseInt(rateStr);
                 System.out.println("Dashboard: Loaded rate per kWh from database: ₱" + RPH);
             } else {
                 // Set default if not found in database
-                cephra.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RPH));
+                cephra.Database.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RPH));
                 System.out.println("Dashboard: Set default rate per kWh: ₱" + RPH);
             }
             
             // Load fast multiplier from database
-            String multiplierStr = cephra.CephraDB.getSystemSetting("fast_multiplier");
+            String multiplierStr = cephra.Database.CephraDB.getSystemSetting("fast_multiplier");
             if (multiplierStr != null && !multiplierStr.trim().isEmpty()) {
                 fastMultiplier = Double.parseDouble(multiplierStr);
                 System.out.println("Dashboard: Loaded fast multiplier from database: " + String.format("%.0f%%", (fastMultiplier - 1) * 100));
             } else {
                 // Set default if not found in database
-                cephra.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(fastMultiplier));
+                cephra.Database.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(fastMultiplier));
                 System.out.println("Dashboard: Set default fast multiplier: " + String.format("%.0f%%", (fastMultiplier - 1) * 100));
             }
             
@@ -446,7 +446,7 @@ public class Business_Overview extends javax.swing.JPanel {
     private void loadDashboardStats() {
         try {
             // Get all charging history records
-            List<Object[]> historyRecords = cephra.CephraDB.getAllChargingHistory();
+            List<Object[]> historyRecords = cephra.Database.CephraDB.getAllChargingHistory();
             
             // Calculate total charge sessions count
             int totalSessions = historyRecords.size();

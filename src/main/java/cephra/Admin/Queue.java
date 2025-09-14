@@ -11,7 +11,7 @@ public class Queue extends javax.swing.JPanel {
     private int buttonCount = 0;
     
     // Static notification instance to allow updates
-    private static cephra.Phone.UnifiedNotification staticNotification = null;
+    private static cephra.Phone.Popups.UnifiedNotification staticNotification = null;
 
     public Queue() {
         initComponents();
@@ -210,12 +210,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     if (statusCol >= 0) {
                         queTab.setValueAt("Waiting", editingRow, statusCol);
                         try {
-                            cephra.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
+                            cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
                             // Also place into waiting grid
                             int svcCol = getColumnIndex("Service");
                             String serviceName = svcCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, svcCol)) : "";
                             String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
-                            int battery = cephra.CephraDB.getUserBatteryLevel(customerName);
+                            int battery = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
                             cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customerName, serviceName, battery);
                             // Refresh waiting grid view
                             initializeWaitingGridFromDatabase();
@@ -241,7 +241,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 if ("Charging".equalsIgnoreCase(status)) {
                     boolean canShowPayPop = false;
                     try {
-                        canShowPayPop = cephra.Phone.PayPop.canShowPayPop(ticket, customer);
+                        canShowPayPop = cephra.Phone.Popups.PayPop.canShowPayPop(ticket, customer);
                         System.out.println("Queue: Checking if PayPop can be shown for ticket " + ticket + " and customer " + customer + ": " + canShowPayPop);
                     } catch (Throwable t) {
                         System.err.println("Error checking PayPop availability: " + t.getMessage());
@@ -260,7 +260,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 }
                 if ("Complete".equalsIgnoreCase(status) || "Charging".equalsIgnoreCase(status)) {
                     try {
-                        boolean success = cephra.Phone.PayPop.showPayPop(ticket, customer);
+                        boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticket, customer);
                         if (!success) { System.err.println("Queue: PayPop failed to open for ticket " + ticket); }
                     } catch (Throwable t) {
                         System.err.println("Error showing PayPop: " + t.getMessage());
@@ -273,7 +273,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     
                     if ("Paid".equalsIgnoreCase(payment)) {
                         // Check if payment has already been processed to prevent duplicates
-                        boolean alreadyProcessed = cephra.CephraDB.isPaymentAlreadyProcessed(ticket);
+                        boolean alreadyProcessed = cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket);
                         System.out.println("Queue: Checking if payment already processed for ticket " + ticket + ": " + alreadyProcessed);
                         
                         if (alreadyProcessed) {
@@ -317,7 +317,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             // Get battery info for calculations
                             cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
                             if (batteryInfo == null) {
-                                int userBatteryLevel = cephra.CephraDB.getUserBatteryLevel(customerName);
+                                int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
                                 batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
                             }
                             
@@ -330,7 +330,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             }
                             
                             // Process the payment transaction (this will add to charging history)
-                            boolean success = cephra.CephraDB.processPaymentTransaction(
+                            boolean success = cephra.Database.CephraDB.processPaymentTransaction(
                                 ticket, customerName, serviceName, 
                                 batteryInfo.initialPercent, chargingTimeMinutes, 
                                 amount, "Cash", reference
@@ -340,7 +340,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                 System.out.println("Successfully processed payment transaction for ticket: " + ticket);
                                 // Clear the active ticket since it's now in history
                                 try {
-                                    cephra.CephraDB.clearActiveTicketByTicketId(ticket);
+                                    cephra.Database.CephraDB.clearActiveTicketByTicketId(ticket);
                                 } catch (Exception ex) {
                                     System.err.println("Error clearing active ticket: " + ex.getMessage());
                                 }
@@ -587,7 +587,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 removeTicketFromGrid(ticket);
                 
                 // Get customer name and bay number for notification
-                String customerName = cephra.CephraDB.getCustomerByTicket(ticket);
+                String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
                     triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
@@ -612,7 +612,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 removeTicketFromGrid(ticket);
                 
                 // Get customer name and bay number for notification
-                String customerName = cephra.CephraDB.getCustomerByTicket(ticket);
+                String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
                     triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
@@ -660,7 +660,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         for (int i = 0; i < buttonCount; i++) {
             if (gridButtons[i].getText().equals(ticket)) {
                 // Remove from database waiting grid
-                try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+                try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                      java.sql.PreparedStatement pstmt = conn.prepareStatement(
                          "UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?")) {
                     pstmt.setString(1, ticket);
@@ -860,10 +860,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             if (val != null && ticket.equals(String.valueOf(val).trim())) {
                 queTab.setValueAt("Charging", row, statusCol);
                 // Update database status
-                cephra.CephraDB.updateQueueTicketStatus(ticket, "Charging");
+                cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Charging");
                 
                 // Get customer name and bay number for MY_TURN notification
-                String customerName = cephra.CephraDB.getCustomerByTicket(ticket);
+                String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
                     triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
@@ -973,7 +973,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     Object v = queTab.getValueAt(editingRow, ticketCol);
                     String ticket = v == null ? "" : String.valueOf(v).trim();
                     if (!ticket.isEmpty()) {
-                        String paymentMethod = cephra.CephraDB.getQueueTicketPaymentMethod(ticket);
+                        String paymentMethod = cephra.Database.CephraDB.getQueueTicketPaymentMethod(ticket);
                         if (!"Cash".equalsIgnoreCase(paymentMethod)) {
                             JOptionPane.showMessageDialog(
                                 Queue.this,
@@ -1006,7 +1006,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         String ticket = v == null ? "" : String.valueOf(v).trim();
                         if (!ticket.isEmpty()) {
                             // Check if payment already processed to prevent duplicates
-                            boolean alreadyProcessed = cephra.CephraDB.isPaymentAlreadyProcessed(ticket);
+                            boolean alreadyProcessed = cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket);
                             if (alreadyProcessed) {
                                 System.out.println("Queue: Payment already processed for ticket " + ticket + ", removing from queue directly");
                                 // Stop cell editing immediately
@@ -1756,9 +1756,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     /**
      * Get or create the static unified notification instance
      */
-    private static cephra.Phone.UnifiedNotification getOrCreateUnifiedNotification(cephra.Frame.Phone phoneFrame) {
+    private static cephra.Phone.Popups.UnifiedNotification getOrCreateUnifiedNotification(cephra.Frame.Phone phoneFrame) {
         if (staticNotification == null) {
-            staticNotification = new cephra.Phone.UnifiedNotification();
+            staticNotification = new cephra.Phone.Popups.UnifiedNotification();
             staticNotification.addToFrame(phoneFrame);
         }
         return staticNotification;
@@ -1776,16 +1776,16 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             // Add notification to history first
             switch (notificationType) {
                 case "TICKET_WAITING":
-                    cephra.Phone.Utilities.NotificationHistoryManager.addTicketWaitingNotification(customer, ticketId);
+                    cephra.Phone.Utilities.NotificationManager.addTicketWaitingNotification(customer, ticketId);
                     break;
                 case "TICKET_PENDING":
-                    cephra.Phone.Utilities.NotificationHistoryManager.addTicketPendingNotification(customer, ticketId);
+                    cephra.Phone.Utilities.NotificationManager.addTicketPendingNotification(customer, ticketId);
                     break;
                 case "MY_TURN":
-                    cephra.Phone.Utilities.NotificationHistoryManager.addMyTurnNotification(customer, ticketId, bayNumber);
+                    cephra.Phone.Utilities.NotificationManager.addMyTurnNotification(customer, ticketId, bayNumber);
                     break;
                 case "FULL_CHARGE":
-                    cephra.Phone.Utilities.NotificationHistoryManager.addFullChargeNotification(customer, ticketId);
+                    cephra.Phone.Utilities.NotificationManager.addFullChargeNotification(customer, ticketId);
                     break;
                 default:
                     System.out.println("Queue: Unknown notification type: " + notificationType);
@@ -1824,7 +1824,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 }
                 
                 // Check if the current user matches the notification recipient
-                String currentUser = cephra.CephraDB.getCurrentUsername();
+                String currentUser = cephra.Database.CephraDB.getCurrentUsername();
                 if (currentUser == null || !currentUser.equals(customer)) {
                     System.out.println("Queue: Current user (" + currentUser + ") doesn't match notification recipient (" + customer + ") - skipping visual notification");
                     return;
@@ -1833,27 +1833,27 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 System.out.println("Queue: Showing visual notification for " + notificationType + " to user " + customer);
                 
                 // Get or create the unified notification instance (static to allow updates)
-                cephra.Phone.UnifiedNotification unifiedNotif = getOrCreateUnifiedNotification(phoneFrame);
+                cephra.Phone.Popups.UnifiedNotification unifiedNotif = getOrCreateUnifiedNotification(phoneFrame);
                 
                 // Update and show the notification (this will override any current notification)
                 switch (notificationType) {
                     case "TICKET_WAITING":
-                        unifiedNotif.updateAndShowNotification(cephra.Phone.UnifiedNotification.TYPE_WAITING, ticketId, bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_WAITING, ticketId, bayNumber);
                         System.out.println("Queue: Updated to TICKET_WAITING notification for ticket " + ticketId);
                         break;
                         
                     case "TICKET_PENDING":
-                        unifiedNotif.updateAndShowNotification(cephra.Phone.UnifiedNotification.TYPE_PENDING, ticketId, bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_PENDING, ticketId, bayNumber);
                         System.out.println("Queue: Updated to TICKET_PENDING notification for ticket " + ticketId);
                         break;
                         
                     case "MY_TURN":
-                        unifiedNotif.updateAndShowNotification(cephra.Phone.UnifiedNotification.TYPE_MY_TURN, ticketId, bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_MY_TURN, ticketId, bayNumber);
                         System.out.println("Queue: Updated to MY_TURN notification for bay " + bayNumber);
                         break;
                         
                     case "FULL_CHARGE":
-                        unifiedNotif.updateAndShowNotification(cephra.Phone.UnifiedNotification.TYPE_DONE, ticketId, bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_DONE, ticketId, bayNumber);
                         System.out.println("Queue: Updated to FULL_CHARGE notification using unified system");
                         break;
                         

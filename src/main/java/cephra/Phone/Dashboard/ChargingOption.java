@@ -158,7 +158,7 @@ public class ChargingOption extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.phonehistory());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargeHistory());
                         break;
                     }
                 }
@@ -188,7 +188,7 @@ public class ChargingOption extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.link());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.LinkConnect());
                         break;
                     }
                 }
@@ -213,23 +213,23 @@ public class ChargingOption extends javax.swing.JPanel {
 
     private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
        // Check if user already has an active ticket
-       String username = cephra.CephraDB.getCurrentUsername();
-       if (cephra.CephraDB.hasActiveTicket(username)) {
+       String username = cephra.Database.CephraDB.getCurrentUsername();
+       if (cephra.Database.CephraDB.hasActiveTicket(username)) {
             // Show custom AlreadyTicket panel instead of JOptionPane
-            cephra.Phone.AlreadyTicket.showPayPop(null, username);
+            cephra.Phone.Popups.AlreadyTicket.showPayPop(null, username);
             return;
         }
         // Check if car is linked
         if (!cephra.Phone.Utilities.AppState.isCarLinked) {
             // Show custom LinkFirst panel instead of JOptionPane
-            cephra.Phone.LinkFirst.showPayPop(null, username);
+            cephra.Phone.Popups.LinkFirst.showPayPop(null, username);
             return;
         }
         // Prevent charging if battery is already full
-        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+        int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
         if (batteryLevel >= 100) {
             // Show custom AlreadyFull panel instead of JOptionPane
-            cephra.Phone.AlreadyFull.showPayPop(null, username);
+            cephra.Phone.Popups.AlreadyFull.showPayPop(null, username);
             return;
         }
         
@@ -242,14 +242,14 @@ public class ChargingOption extends javax.swing.JPanel {
         }
        
        // Set Fast Charging service before switching to QueueTicket panel
-       cephra.Phone.QueueFlow.setCurrentServiceOnly("Fast Charging");
+       cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Fast Charging");
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.QueueTicket());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.QueueTicket());
                         break;
                     }
                 }
@@ -259,23 +259,23 @@ public class ChargingOption extends javax.swing.JPanel {
 
     private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
         // Check if user already has an active ticket
-        String username = cephra.CephraDB.getCurrentUsername();
-        if (cephra.CephraDB.hasActiveTicket(username)) {
+        String username = cephra.Database.CephraDB.getCurrentUsername();
+        if (cephra.Database.CephraDB.hasActiveTicket(username)) {
             // Show custom AlreadyTicket panel instead of JOptionPane
-            cephra.Phone.AlreadyTicket.showPayPop(null, username);
+            cephra.Phone.Popups.AlreadyTicket.showPayPop(null, username);
             return;
         }
         // Check if car is linked
         if (!cephra.Phone.Utilities.AppState.isCarLinked) {
             // Show custom LinkFirst panel instead of JOptionPane
-            cephra.Phone.LinkFirst.showPayPop(null, username);
+            cephra.Phone.Popups.LinkFirst.showPayPop(null, username);
             return;
         }
         // Prevent charging if battery is already full
-        int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+        int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
         if (batteryLevel >= 100) {
             // Show custom AlreadyFull panel instead of JOptionPane
-            cephra.Phone.AlreadyFull.showPayPop(null, username);
+            cephra.Phone.Popups.AlreadyFull.showPayPop(null, username);
             return;
         }
         
@@ -288,14 +288,14 @@ public class ChargingOption extends javax.swing.JPanel {
         }
         
         // Set Normal Charging service before switching to QueueTicket panel
-        cephra.Phone.QueueFlow.setCurrentServiceOnly("Normal Charging");
+        cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Normal Charging");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.QueueTicket());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.QueueTicket());
                         break;
                     }
                 }

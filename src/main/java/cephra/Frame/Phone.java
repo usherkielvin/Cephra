@@ -25,13 +25,13 @@ public class Phone extends javax.swing.JFrame {
         
         // Refresh ticket counters when Phone frame is created
         try {
-            cephra.Phone.QueueFlow.refreshCountersFromDatabase();
+            cephra.Phone.Utilities.QueueFlow.refreshCountersFromDatabase();
         } catch (Exception e) {
             System.err.println("Error refreshing ticket counters: " + e.getMessage());
         }
 
         // Start with loading screen panel
-        switchPanel(new cephra.Phone.Loading_Screen());
+        switchPanel(new cephra.Phone.UserProfile.Loading_Screen());
         
         // Create and setup phone frame overlay to always appear on top
         PhoneFrame();
@@ -108,7 +108,7 @@ public class Phone extends javax.swing.JFrame {
                     jLabel1.setOpaque(false);
                     jLabel1.setForeground(Color.BLACK);
                     jLabel1.setVisible(true);
-                    jLabel1.setBounds(0, 0, 55, 20);
+                    jLabel1.setBounds(39, 21, 55, 20);
                     getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.MODAL_LAYER);
                     getRootPane().getLayeredPane().moveToFront(jLabel1);
                     getRootPane().revalidate();
@@ -120,8 +120,16 @@ public class Phone extends javax.swing.JFrame {
         // Ensure visibility
         Iphoneframe.setVisible(true);
         jLabel1.setVisible(true);
+        jLabel1.setForeground(Color.BLACK);
+        jLabel1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12));
         getRootPane().getLayeredPane().moveToFront(jLabel1);
         getRootPane().getLayeredPane().moveToFront(Iphoneframe);
+        
+        // Force repaint to ensure visibility
+        SwingUtilities.invokeLater(() -> {
+            getRootPane().revalidate();
+            getRootPane().repaint();
+        });
     }
 
     public void switchPanel(javax.swing.JPanel newPanel) {
@@ -149,11 +157,18 @@ public class Phone extends javax.swing.JFrame {
             java.time.LocalTime now = java.time.LocalTime.now();
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("h:mm a");
             jLabel1.setText(now.format(formatter));
+            // Debug: ensure label is visible and positioned correctly
+            if (!jLabel1.isVisible()) {
+                jLabel1.setVisible(true);
+                System.out.println("Time label was not visible - made visible");
+            }
+        } else {
+            System.err.println("Time label (jLabel1) is null!");
         }
     }
     
     private void startTimeTimer() {
-        javax.swing.Timer timer = new javax.swing.Timer(60000, _ -> updateTime());
+        javax.swing.Timer timer = new javax.swing.Timer(1000, _ -> updateTime()); // Update every second
         timer.setRepeats(true);
         timer.start();
     }

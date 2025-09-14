@@ -21,7 +21,7 @@ public class RewardSystem {
             return 0;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("RewardSystem: Could not establish database connection");
                 return 0;
@@ -66,7 +66,7 @@ public class RewardSystem {
             return false;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("RewardSystem: Could not establish database connection");
                 return false;
@@ -187,7 +187,7 @@ public class RewardSystem {
             return false;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("RewardSystem: Could not establish database connection");
                 return false;
@@ -278,7 +278,7 @@ public class RewardSystem {
             return transactions;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("RewardSystem: Could not establish database connection");
                 return transactions;
@@ -321,7 +321,7 @@ public class RewardSystem {
      * @return true if successful, false otherwise
      */
     private static boolean createUserPointsEntry(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("RewardSystem: Could not establish database connection");
                 return false;
@@ -356,7 +356,7 @@ public class RewardSystem {
             return stats;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("RewardSystem: Could not establish database connection");
                 return stats;
