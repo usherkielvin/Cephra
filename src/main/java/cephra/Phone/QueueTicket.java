@@ -317,7 +317,7 @@ public class QueueTicket extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.QueueStatus());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                         break;
                     }
                 }
