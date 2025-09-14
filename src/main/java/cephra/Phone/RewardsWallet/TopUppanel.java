@@ -1,12 +1,9 @@
 
 package cephra.Phone.RewardsWallet;
 
-import java.awt.Color;
+import java.awt.*;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import javax.swing.Timer;
+import java.awt.event.*;
 
 public class TopUppanel extends javax.swing.JPanel {
 
@@ -229,18 +226,12 @@ public class TopUppanel extends javax.swing.JPanel {
         jRadioButton1.setBounds(20, 330, 310, 50);
 
         buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
-        jRadioButton3.setContentAreaFilled(false);
-        jRadioButton3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jRadioButton3.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jRadioButton3.setText("Exness");
         Method.add(jRadioButton3);
         jRadioButton3.setBounds(20, 265, 310, 50);
 
         buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
-        jRadioButton2.setContentAreaFilled(false);
-        jRadioButton2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jRadioButton2.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jRadioButton2.setText("Glangs");
         Method.add(jRadioButton2);
         jRadioButton2.setBounds(20, 195, 310, 50);
 
