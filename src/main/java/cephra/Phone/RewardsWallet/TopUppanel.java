@@ -152,7 +152,7 @@ public class TopUppanel extends javax.swing.JPanel {
 
         add(jPanel1);
         jPanel1.setBounds(0, 0, 370, 750);
-<<<<<<< HEAD:src/main/java/cephra/Phone/TopUppanel.java
+
 
         Method.setBackground(new java.awt.Color(255, 102, 102));
         Method.setLayout(null);
@@ -193,8 +193,7 @@ public class TopUppanel extends javax.swing.JPanel {
 
         add(Method);
         Method.setBounds(0, 750, 370, 330);
-=======
->>>>>>> 3cb1d7f6bb79caa216c98f79c2d55ee7fb59854f:src/main/java/cephra/Phone/RewardsWallet/TopUppanel.java
+
     }// </editor-fold>//GEN-END:initComponents
 
     private void ProceedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedActionPerformed
