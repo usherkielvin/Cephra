@@ -223,17 +223,23 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         Method.add(jRadioButton1);
-        jRadioButton1.setBounds(20, 330, 310, 50);
+        jRadioButton1.setBounds(30, 260, 310, 50);
 
         buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setText("Exness");
+        jRadioButton3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
+        jRadioButton3.setContentAreaFilled(false);
+        jRadioButton3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton3.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         Method.add(jRadioButton3);
-        jRadioButton3.setBounds(20, 265, 310, 50);
+        jRadioButton3.setBounds(30, 190, 310, 50);
 
         buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setText("Glangs");
+        jRadioButton2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
+        jRadioButton2.setContentAreaFilled(false);
+        jRadioButton2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton2.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         Method.add(jRadioButton2);
-        jRadioButton2.setBounds(20, 195, 310, 50);
+        jRadioButton2.setBounds(30, 120, 310, 50);
 
         buttonGroup1.add(jRadioButton4);
         jRadioButton4.setContentAreaFilled(false);
@@ -245,15 +251,15 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         Method.add(jRadioButton4);
-        jRadioButton4.setBounds(29, 130, 300, 40);
+        jRadioButton4.setBounds(40, 60, 300, 40);
 
         jLabel1.setBackground(new java.awt.Color(204, 204, 204));
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/METHO.png"))); // NOI18N
         Method.add(jLabel1);
-        jLabel1.setBounds(0, 70, 370, 350);
+        jLabel1.setBounds(0, 0, 370, 350);
 
         add(Method);
-        Method.setBounds(0, 680, 370, 430);
+        Method.setBounds(0, 680, 370, 450);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ProceedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedActionPerformed
@@ -492,23 +498,23 @@ public class TopUppanel extends javax.swing.JPanel {
             boolean success = cephra.Database.CephraDB.processWalletTopUp(currentUser, amount, topUpMethod);
 
             if (success) {
-                showSuccessMessage(String.format("Successfully topped up ₱ %.2f to your wallet via %s!", amount, selectedPaymentMethod));
                 loadCurrentBalance(); // Refresh balance display
                 Customamount.setText("0.00"); // Reset amount field
                 clearPaymentMethodSelection(); // Clear radio button selection
                 
-                  SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Wallet());
-                        break;
+                // Show the topup receipt immediately without success dialog
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        java.awt.Window[] windows = java.awt.Window.getWindows();
+                        for (java.awt.Window window : windows) {
+                            if (window instanceof cephra.Frame.Phone) {
+                                cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                                phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.WalletReciept1());
+                                break;
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
             } else {
                 showErrorMessage("Failed to process top-up. Please try again.");
             }
@@ -607,7 +613,7 @@ public class TopUppanel extends javax.swing.JPanel {
         System.out.println("slideMethodPanelUp starting...");
         isMethodPanelVisible = true;
         final int startY = 750; // Off-screen at bottom
-        final int endY = 420;   // Final position (750 - 330 = 420 to show full panel)
+        final int endY = 320;   // Final position (750 - 330 = 420 to show full panel)
         final int currentY = Method.getY();
         
         System.out.println("Animation: startY=" + startY + ", endY=" + endY + ", currentY=" + currentY);
