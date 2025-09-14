@@ -5,11 +5,18 @@ import java.awt.Color;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import javax.swing.Timer;
 
 public class TopUppanel extends javax.swing.JPanel {
 
     // Quick transaction amounts - updated to match the button values
     private static final double[] QUICK_AMOUNTS = {500.0, 1000.0, 1500.0, 2000.0, 3000.0, 5000.0};
+    
+    // Method panel animation state
+    private boolean isMethodPanelVisible = false;
+    private final int PANEL_ANIMATION_DELAY = 10; // milliseconds
+    private final int PANEL_SLIDE_SPEED = 15; // pixels per step
 
     public TopUppanel() {
         initComponents();
@@ -18,9 +25,12 @@ public class TopUppanel extends javax.swing.JPanel {
         setupQuickAmountButtons();
         loadCurrentBalance();
         initializeCustomAmount();
+        setupPanelClickListener();
+        initializeMethodPanel();
+        initializeMethodSelectedLabel();
         
         Customamount.setOpaque(false);
-        Customamount.setBackground(new Color(0, 0, 0, 0));  
+        Customamount.setBackground(new Color(0, 0, 0, 0));
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -29,6 +39,7 @@ public class TopUppanel extends javax.swing.JPanel {
         buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         Currentbalance = new javax.swing.JLabel();
+        methodselected = new javax.swing.JLabel();
         A = new javax.swing.JButton();
         B = new javax.swing.JButton();
         C = new javax.swing.JButton();
@@ -37,13 +48,15 @@ public class TopUppanel extends javax.swing.JPanel {
         F = new javax.swing.JButton();
         Proceed = new javax.swing.JButton();
         Customamount = new javax.swing.JTextField();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
         bck = new javax.swing.JButton();
         morePayMethod = new javax.swing.JButton();
         topUpIcon = new javax.swing.JLabel();
+        Method = new javax.swing.JPanel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton3 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jRadioButton4 = new javax.swing.JRadioButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
 
@@ -56,10 +69,14 @@ public class TopUppanel extends javax.swing.JPanel {
         jPanel1.add(Currentbalance);
         Currentbalance.setBounds(80, 145, 240, 60);
 
+        methodselected.setText("jLabel2");
+        jPanel1.add(methodselected);
+        methodselected.setBounds(50, 580, 180, 16);
+
         A.setBorderPainted(false);
         A.setContentAreaFilled(false);
         jPanel1.add(A);
-        A.setBounds(40, 230, 75, 30);
+        A.setBounds(40, 250, 75, 30);
 
         B.setBorderPainted(false);
         B.setContentAreaFilled(false);
@@ -69,27 +86,27 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(B);
-        B.setBounds(150, 230, 75, 30);
+        B.setBounds(150, 250, 75, 30);
 
         C.setBorderPainted(false);
         C.setContentAreaFilled(false);
         jPanel1.add(C);
-        C.setBounds(260, 230, 75, 30);
+        C.setBounds(260, 250, 75, 30);
 
         D.setBorderPainted(false);
         D.setContentAreaFilled(false);
         jPanel1.add(D);
-        D.setBounds(40, 290, 75, 30);
+        D.setBounds(40, 310, 75, 30);
 
         E.setBorderPainted(false);
         E.setContentAreaFilled(false);
         jPanel1.add(E);
-        E.setBounds(150, 290, 75, 30);
+        E.setBounds(150, 310, 75, 30);
 
         F.setBorderPainted(false);
         F.setContentAreaFilled(false);
         jPanel1.add(F);
-        F.setBounds(260, 290, 75, 30);
+        F.setBounds(260, 310, 75, 30);
 
         Proceed.setBorderPainted(false);
         Proceed.setContentAreaFilled(false);
@@ -99,7 +116,7 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(Proceed);
-        Proceed.setBounds(20, 600, 330, 30);
+        Proceed.setBounds(20, 620, 330, 30);
 
         Customamount.setBorder(null);
         Customamount.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -108,37 +125,7 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(Customamount);
-        Customamount.setBounds(70, 356, 255, 30);
-
-        buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setText("Earnest Bank");
-        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jRadioButton1);
-        jRadioButton1.setBounds(70, 390, 90, 21);
-
-        buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setText("Glangs");
-        jPanel1.add(jRadioButton2);
-        jRadioButton2.setBounds(70, 430, 90, 21);
-
-        buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setText("Exness");
-        jPanel1.add(jRadioButton3);
-        jRadioButton3.setBounds(70, 410, 120, 21);
-
-        buttonGroup1.add(jRadioButton4);
-        jRadioButton4.setText("Kalapati");
-        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton4ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jRadioButton4);
-        jRadioButton4.setBounds(70, 450, 100, 21);
+        Customamount.setBounds(70, 370, 255, 30);
 
         bck.setBorderPainted(false);
         bck.setContentAreaFilled(false);
@@ -151,15 +138,60 @@ public class TopUppanel extends javax.swing.JPanel {
         bck.setBounds(20, 33, 72, 30);
 
         morePayMethod.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        morePayMethod.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                morePayMethodActionPerformed(evt);
+            }
+        });
         jPanel1.add(morePayMethod);
-        morePayMethod.setBounds(290, 554, 40, 30);
+        morePayMethod.setBounds(290, 570, 40, 30);
 
         topUpIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/topUpIcon.png"))); // NOI18N
         jPanel1.add(topUpIcon);
-        topUpIcon.setBounds(0, 0, 360, 720);
+        topUpIcon.setBounds(0, 0, 370, 750);
 
         add(jPanel1);
-        jPanel1.setBounds(0, 0, 360, 720);
+        jPanel1.setBounds(0, 0, 370, 750);
+
+        Method.setBackground(new java.awt.Color(255, 102, 102));
+        Method.setLayout(null);
+
+        buttonGroup1.add(jRadioButton1);
+        jRadioButton1.setText("Earnest Bank");
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
+        Method.add(jRadioButton1);
+        jRadioButton1.setBounds(130, 90, 90, 21);
+
+        buttonGroup1.add(jRadioButton3);
+        jRadioButton3.setText("Exness");
+        Method.add(jRadioButton3);
+        jRadioButton3.setBounds(130, 110, 120, 21);
+
+        buttonGroup1.add(jRadioButton2);
+        jRadioButton2.setText("Glangs");
+        Method.add(jRadioButton2);
+        jRadioButton2.setBounds(130, 130, 90, 21);
+
+        buttonGroup1.add(jRadioButton4);
+        jRadioButton4.setText("Kalapati");
+        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton4ActionPerformed(evt);
+            }
+        });
+        Method.add(jRadioButton4);
+        jRadioButton4.setBounds(120, 190, 100, 21);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/METHO.png"))); // NOI18N
+        Method.add(jLabel1);
+        jLabel1.setBounds(0, 0, 370, 270);
+
+        add(Method);
+        Method.setBounds(0, 750, 370, 330);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ProceedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedActionPerformed
@@ -168,7 +200,8 @@ public class TopUppanel extends javax.swing.JPanel {
     }//GEN-LAST:event_ProceedActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-     
+        updateMethodSelectedLabel("Earnest Bank");
+        slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void bckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bckActionPerformed
@@ -188,8 +221,19 @@ public class TopUppanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bckActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-       
+        updateMethodSelectedLabel("Kalapati");
+        slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton4ActionPerformed
+
+    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+        updateMethodSelectedLabel("Glangs");
+        slideMethodPanelDown(); // Auto-hide panel after selection
+    }//GEN-LAST:event_jRadioButton2ActionPerformed
+
+    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+        updateMethodSelectedLabel("Exness");
+        slideMethodPanelDown(); // Auto-hide panel after selection
+    }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void BActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BActionPerformed
       
@@ -202,6 +246,11 @@ public class TopUppanel extends javax.swing.JPanel {
             evt.consume(); // Ignore non-digit input
 }
     }//GEN-LAST:event_CustomamountKeyTyped
+
+    private void morePayMethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_morePayMethodActionPerformed
+        System.out.println("morePayMethod button clicked! Current panel visible: " + isMethodPanelVisible);
+        toggleMethodPanel();
+    }//GEN-LAST:event_morePayMethodActionPerformed
 
     /**
      * Sets up the quick amount buttons with action listeners
@@ -406,6 +455,159 @@ public class TopUppanel extends javax.swing.JPanel {
      */
     private void clearPaymentMethodSelection() {
         buttonGroup1.clearSelection();
+        // Reset the methodselected label to initial state
+        methodselected.setText("Select a payment method");
+        methodselected.setFont(new java.awt.Font("Segoe UI", 0, 12));
+        methodselected.setForeground(new Color(100, 100, 100)); // Gray color
+        methodselected.repaint();
+    }
+    
+    /**
+     * Toggles the visibility of the Method panel with animation
+     */
+    private void toggleMethodPanel() {
+        System.out.println("toggleMethodPanel called - isMethodPanelVisible: " + isMethodPanelVisible);
+        System.out.println("Method panel current position: " + Method.getBounds());
+        
+        if (isMethodPanelVisible) {
+            System.out.println("Sliding panel down...");
+            slideMethodPanelDown();
+        } else {
+            System.out.println("Sliding panel up...");
+            slideMethodPanelUp();
+        }
+    }
+    
+    /**
+     * Slides the Method panel up from the bottom with animation
+     */
+    private void slideMethodPanelUp() {
+        System.out.println("slideMethodPanelUp starting...");
+        isMethodPanelVisible = true;
+        final int startY = 750; // Off-screen at bottom
+        final int endY = 420;   // Final position (750 - 330 = 420 to show full panel)
+        final int currentY = Method.getY();
+        
+        System.out.println("Animation: startY=" + startY + ", endY=" + endY + ", currentY=" + currentY);
+        
+        Timer slideUpTimer = new Timer(PANEL_ANIMATION_DELAY, null);
+        slideUpTimer.addActionListener(new ActionListener() {
+            int step = 0;
+            int totalSteps = (startY - endY) / PANEL_SLIDE_SPEED;
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (step <= totalSteps) {
+                    int newY = startY - (step * PANEL_SLIDE_SPEED);
+                    if (newY <= endY) {
+                        newY = endY;
+                    }
+                    Method.setBounds(0, newY, 370, 330);
+                    Method.repaint();
+                    step++;
+                    
+                    if (newY <= endY) {
+                        slideUpTimer.stop();
+                        System.out.println("slideMethodPanelUp completed at position: " + Method.getBounds());
+                    }
+                } else {
+                    slideUpTimer.stop();
+                    System.out.println("slideMethodPanelUp completed at position: " + Method.getBounds());
+                }
+            }
+        });
+        slideUpTimer.start();
+    }
+    
+    /**
+     * Slides the Method panel down to hide it with animation
+     */
+    private void slideMethodPanelDown() {
+        isMethodPanelVisible = false;
+        final int startY = Method.getY(); // Current position
+        final int endY = 750;   // Off-screen at bottom
+        
+        Timer slideDownTimer = new Timer(PANEL_ANIMATION_DELAY, null);
+        slideDownTimer.addActionListener(new ActionListener() {
+            int step = 0;
+            int totalSteps = (endY - startY) / PANEL_SLIDE_SPEED;
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (step <= totalSteps) {
+                    int newY = startY + (step * PANEL_SLIDE_SPEED);
+                    if (newY >= endY) {
+                        newY = endY;
+                    }
+                    Method.setBounds(0, newY, 370, 330);
+                    Method.repaint();
+                    step++;
+                    
+                    if (newY >= endY) {
+                        slideDownTimer.stop();
+                    }
+                } else {
+                    slideDownTimer.stop();
+                }
+            }
+        });
+        slideDownTimer.start();
+    }
+    
+    /**
+     * Sets up click listener to hide Method panel when clicking outside of it
+     */
+    private void setupPanelClickListener() {
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (isMethodPanelVisible) {
+                    // Check if click is outside the Method panel area
+                    int methodPanelY = Method.getY();
+                    if (evt.getY() < methodPanelY) {
+                        slideMethodPanelDown();
+                    }
+                }
+            }
+        });
+    }
+    
+    /**
+     * Initializes the Method panel for proper popup functionality
+     */
+    private void initializeMethodPanel() {
+        // Ensure Method panel is properly positioned off-screen initially
+        Method.setBounds(0, 750, 370, 330);
+        Method.setVisible(true);
+        
+        // Bring Method panel to front to ensure it appears above other components
+        SwingUtilities.invokeLater(() -> {
+            Method.getParent().setComponentZOrder(Method, 0);
+            Method.getParent().repaint();
+        });
+        
+        System.out.println("Method panel initialized at position: " + Method.getBounds());
+    }
+    
+    /**
+     * Initializes the methodselected label
+     */
+    private void initializeMethodSelectedLabel() {
+        methodselected.setText("Select a payment method");
+        methodselected.setFont(new java.awt.Font("Segoe UI", 0, 12));
+        methodselected.setForeground(new Color(100, 100, 100)); // Gray color
+    }
+    
+    /**
+     * Updates the methodselected label with the chosen payment method
+     * @param methodName the name of the selected payment method
+     */
+    private void updateMethodSelectedLabel(String methodName) {
+        methodselected.setText("Method: " + methodName);
+        methodselected.setFont(new java.awt.Font("Segoe UI", 1, 12)); // Bold
+        methodselected.setForeground(new Color(0, 120, 0)); // Green color
+        methodselected.repaint();
+        System.out.println("Payment method selected: " + methodName);
     }
 
 
@@ -418,14 +620,17 @@ public class TopUppanel extends javax.swing.JPanel {
     private javax.swing.JButton D;
     private javax.swing.JButton E;
     private javax.swing.JButton F;
+    private javax.swing.JPanel Method;
     private javax.swing.JButton Proceed;
     private javax.swing.JButton bck;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JLabel methodselected;
     private javax.swing.JButton morePayMethod;
     private javax.swing.JLabel topUpIcon;
     // End of variables declaration//GEN-END:variables
