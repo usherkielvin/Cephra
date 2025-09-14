@@ -155,7 +155,7 @@ public class Rewards extends javax.swing.JPanel {
     private String getCurrentUser() {
         // Get current logged-in user from CephraDB
         try {
-            return cephra.db.CephraDB.getCurrentPhoneUsername();
+            return cephra.Database.CephraDB.getCurrentPhoneUsername();
         } catch (Exception e) {
             System.out.println("Could not get current user: " + e.getMessage());
             return null;

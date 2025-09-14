@@ -306,7 +306,7 @@ public class PasswordVerify extends javax.swing.JPanel {
         // Handle verification code submission
         String enteredOTP = code1.getText() + code2.getText() + code3.getText() + 
                            code4.getText() + code5.getText() + code6.getText();
-        String correctOTP = cephra.db.CephraDB.getGeneratedOTP();
+        String correctOTP = cephra.Database.CephraDB.getGeneratedOTP();
 
         if (enteredOTP.equals(correctOTP)) {
             javax.swing.JOptionPane.showMessageDialog(this, "Verification code submitted successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
@@ -369,7 +369,7 @@ public class PasswordVerify extends javax.swing.JPanel {
 
         private void resendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resendActionPerformed
         // Generate a new OTP
-        cephra.db.CephraDB.generateAndStoreOTP();
+        cephra.Database.CephraDB.generateAndStoreOTP();
         
         // Update the OTP label with the new OTP
     //    otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
@@ -387,7 +387,7 @@ public class PasswordVerify extends javax.swing.JPanel {
         cephra.Phone.Utilities.AppSessionState.showOtpNotification = true;
         
         // Show new notification with updated OTP instead of dialog
-        showOTPNotification(cephra.db.CephraDB.getGeneratedOTP());
+        showOTPNotification(cephra.Database.CephraDB.getGeneratedOTP());
     }//GEN-LAST:event_resendActionPerformed
 
     private void code1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_code1ActionPerformed
@@ -509,7 +509,7 @@ public class PasswordVerify extends javax.swing.JPanel {
                 
                 // Show notification with OTP only if the flag is set (coming from PasswordForgot or resending)
                 if (cephra.Phone.Utilities.AppSessionState.showOtpNotification) {
-                    showOTPNotification(cephra.db.CephraDB.getGeneratedOTP());
+                    showOTPNotification(cephra.Database.CephraDB.getGeneratedOTP());
                     // Reset the flag after showing the notification
                     cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
                 }

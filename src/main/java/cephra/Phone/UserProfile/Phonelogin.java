@@ -155,7 +155,7 @@ public class Phonelogin extends javax.swing.JPanel {
         String password = new String(pass.getPassword());
 
         // Validate login using the CephraDB
-        if (cephra.db.CephraDB.validateLogin(usernameText, password)) {
+        if (cephra.Database.CephraDB.validateLogin(usernameText, password)) {
             // Login successful, reset attempts
             loginAttempts = 0;
             SwingUtilities.invokeLater(new Runnable() {

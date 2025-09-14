@@ -210,12 +210,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     if (statusCol >= 0) {
                         queTab.setValueAt("Waiting", editingRow, statusCol);
                         try {
-                            cephra.db.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
+                            cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
                             // Also place into waiting grid
                             int svcCol = getColumnIndex("Service");
                             String serviceName = svcCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, svcCol)) : "";
                             String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
-                            int battery = cephra.db.CephraDB.getUserBatteryLevel(customerName);
+                            int battery = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
                             cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customerName, serviceName, battery);
                             // Refresh waiting grid view
                             initializeWaitingGridFromDatabase();
@@ -273,7 +273,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     
                     if ("Paid".equalsIgnoreCase(payment)) {
                         // Check if payment has already been processed to prevent duplicates
-                        boolean alreadyProcessed = cephra.db.CephraDB.isPaymentAlreadyProcessed(ticket);
+                        boolean alreadyProcessed = cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket);
                         System.out.println("Queue: Checking if payment already processed for ticket " + ticket + ": " + alreadyProcessed);
                         
                         if (alreadyProcessed) {
@@ -317,7 +317,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             // Get battery info for calculations
                             cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
                             if (batteryInfo == null) {
-                                int userBatteryLevel = cephra.db.CephraDB.getUserBatteryLevel(customerName);
+                                int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
                                 batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
                             }
                             
@@ -330,7 +330,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             }
                             
                             // Process the payment transaction (this will add to charging history)
-                            boolean success = cephra.db.CephraDB.processPaymentTransaction(
+                            boolean success = cephra.Database.CephraDB.processPaymentTransaction(
                                 ticket, customerName, serviceName, 
                                 batteryInfo.initialPercent, chargingTimeMinutes, 
                                 amount, "Cash", reference
@@ -340,7 +340,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                 System.out.println("Successfully processed payment transaction for ticket: " + ticket);
                                 // Clear the active ticket since it's now in history
                                 try {
-                                    cephra.db.CephraDB.clearActiveTicketByTicketId(ticket);
+                                    cephra.Database.CephraDB.clearActiveTicketByTicketId(ticket);
                                 } catch (Exception ex) {
                                     System.err.println("Error clearing active ticket: " + ex.getMessage());
                                 }
@@ -587,7 +587,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 removeTicketFromGrid(ticket);
                 
                 // Get customer name and bay number for notification
-                String customerName = cephra.db.CephraDB.getCustomerByTicket(ticket);
+                String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
                     triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
@@ -612,7 +612,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 removeTicketFromGrid(ticket);
                 
                 // Get customer name and bay number for notification
-                String customerName = cephra.db.CephraDB.getCustomerByTicket(ticket);
+                String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
                     triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
@@ -660,7 +660,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         for (int i = 0; i < buttonCount; i++) {
             if (gridButtons[i].getText().equals(ticket)) {
                 // Remove from database waiting grid
-                try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+                try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                      java.sql.PreparedStatement pstmt = conn.prepareStatement(
                          "UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?")) {
                     pstmt.setString(1, ticket);
@@ -860,10 +860,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             if (val != null && ticket.equals(String.valueOf(val).trim())) {
                 queTab.setValueAt("Charging", row, statusCol);
                 // Update database status
-                cephra.db.CephraDB.updateQueueTicketStatus(ticket, "Charging");
+                cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Charging");
                 
                 // Get customer name and bay number for MY_TURN notification
-                String customerName = cephra.db.CephraDB.getCustomerByTicket(ticket);
+                String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
                     triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
@@ -973,7 +973,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     Object v = queTab.getValueAt(editingRow, ticketCol);
                     String ticket = v == null ? "" : String.valueOf(v).trim();
                     if (!ticket.isEmpty()) {
-                        String paymentMethod = cephra.db.CephraDB.getQueueTicketPaymentMethod(ticket);
+                        String paymentMethod = cephra.Database.CephraDB.getQueueTicketPaymentMethod(ticket);
                         if (!"Cash".equalsIgnoreCase(paymentMethod)) {
                             JOptionPane.showMessageDialog(
                                 Queue.this,
@@ -1006,7 +1006,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         String ticket = v == null ? "" : String.valueOf(v).trim();
                         if (!ticket.isEmpty()) {
                             // Check if payment already processed to prevent duplicates
-                            boolean alreadyProcessed = cephra.db.CephraDB.isPaymentAlreadyProcessed(ticket);
+                            boolean alreadyProcessed = cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket);
                             if (alreadyProcessed) {
                                 System.out.println("Queue: Payment already processed for ticket " + ticket + ", removing from queue directly");
                                 // Stop cell editing immediately
@@ -1824,7 +1824,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 }
                 
                 // Check if the current user matches the notification recipient
-                String currentUser = cephra.db.CephraDB.getCurrentUsername();
+                String currentUser = cephra.Database.CephraDB.getCurrentUsername();
                 if (currentUser == null || !currentUser.equals(customer)) {
                     System.out.println("Queue: Current user (" + currentUser + ") doesn't match notification recipient (" + customer + ") - skipping visual notification");
                     return;

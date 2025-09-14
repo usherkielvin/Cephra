@@ -1,22 +1,18 @@
 package cephra;
 import java.awt.GraphicsEnvironment;
 
-import cephra.db.CephraDB;
+import cephra.Database.CephraDB;
 
 public final class Launcher {
 
 	public static void main(String[] args) {
 		
 		try {
-			System.out.println("Attempting to initialize database...");
 			CephraDB.initializeDatabase();
-			System.out.println("Database connection successful!");		  
 			CephraDB.validateDatabaseIntegrity();
 			cephra.Phone.Utilities.QueueFlow.refreshCountersFromDatabase();
 		} catch (Exception e) {
-			System.err.println("Database connection failed!");
-			System.err.println("Error: " + e.getMessage());
-			System.err.println("Continuing without database for API testing...");
+			System.err.println("Database connection failed: " + e.getMessage());
 		}
 		javax.swing.SwingUtilities.invokeLater(() -> {
 			java.awt.Rectangle screenBounds = GraphicsEnvironment

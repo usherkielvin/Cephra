@@ -52,7 +52,7 @@ public final class QueueFlow {
             int maxNormalNumber = 0;
             
             // Get all existing queue tickets from database
-            List<Object[]> existingTickets = cephra.db.CephraDB.getAllQueueTickets();
+            List<Object[]> existingTickets = cephra.Database.CephraDB.getAllQueueTickets();
             for (Object[] ticket : existingTickets) {
                 String ticketId = String.valueOf(ticket[0]); // ticket_id is at index 0
                 if (ticketId.startsWith("FCH")) {
@@ -65,7 +65,7 @@ public final class QueueFlow {
             }
             
             // Also check charging history for completed tickets
-            List<Object[]> completedTickets = cephra.db.CephraDB.getAllChargingHistory();
+            List<Object[]> completedTickets = cephra.Database.CephraDB.getAllChargingHistory();
             for (Object[] ticket : completedTickets) {
                 String ticketId = String.valueOf(ticket[0]); // ticket_id is at index 0
                 if (ticketId.startsWith("FCH")) {
@@ -81,7 +81,6 @@ public final class QueueFlow {
             nextFastNumber = maxFastNumber + 1;
             nextNormalNumber = maxNormalNumber + 1;
             
-            System.out.println("QueueFlow: Initialized counters from database and history - Fast: " + nextFastNumber + ", Normal: " + nextNormalNumber);
         } catch (Exception e) {
             System.err.println("Error initializing counters from database: " + e.getMessage());
             // Keep default values if database access fails
@@ -106,10 +105,10 @@ public final class QueueFlow {
         
         // Otherwise, try to get from database
         try {
-            String currentUser = cephra.db.CephraDB.getCurrentUsername();
+            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.trim().isEmpty()) {
                 // Check active_tickets table first
-                String activeTicket = cephra.db.CephraDB.getActiveTicket(currentUser);
+                String activeTicket = cephra.Database.CephraDB.getActiveTicket(currentUser);
                 if (activeTicket != null && !activeTicket.trim().isEmpty()) {
                     // Update the in-memory current ticket ID to match database
                     currentTicketId = activeTicket;
@@ -117,7 +116,7 @@ public final class QueueFlow {
                 }
                 
                 // If no active ticket, check queue_tickets table for pending tickets
-                String queueTicket = cephra.db.CephraDB.getQueueTicketForUser(currentUser);
+                String queueTicket = cephra.Database.CephraDB.getQueueTicketForUser(currentUser);
                 if (queueTicket != null && !queueTicket.trim().isEmpty()) {
                     // Update the in-memory current ticket ID to match queue ticket
                     currentTicketId = queueTicket;
@@ -195,10 +194,10 @@ public final class QueueFlow {
         
         // If no in-memory ticket, check database for current user's active ticket
         try {
-            String currentUser = cephra.db.CephraDB.getCurrentUsername();
+            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.trim().isEmpty()) {
                 // Check active_tickets table first
-                String activeTicket = cephra.db.CephraDB.getActiveTicket(currentUser);
+                String activeTicket = cephra.Database.CephraDB.getActiveTicket(currentUser);
                 if (activeTicket != null && !activeTicket.trim().isEmpty()) {
                     // Update the in-memory current ticket ID to match database
                     currentTicketId = activeTicket;
@@ -206,7 +205,7 @@ public final class QueueFlow {
                 }
                 
                 // If no active ticket, check queue_tickets table for pending tickets
-                String queueTicket = cephra.db.CephraDB.getQueueTicketForUser(currentUser);
+                String queueTicket = cephra.Database.CephraDB.getQueueTicketForUser(currentUser);
                 if (queueTicket != null && !queueTicket.trim().isEmpty()) {
                     // Update the in-memory current ticket ID to match queue ticket
                     currentTicketId = queueTicket;
@@ -247,7 +246,7 @@ public final class QueueFlow {
         final String payment = "";
         final String action = "";
         // Get actual user battery level from CephraDB
-        final int initialBatteryPercent = cephra.db.CephraDB.getUserBatteryLevel(customerName);
+        final int initialBatteryPercent = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
         final double batteryCapacityKWh = 40.0; // 40kWh capacity
 
         // Store in memory list

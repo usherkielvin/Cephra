@@ -230,7 +230,7 @@ public class Login extends javax.swing.JPanel {
     }
 
     // Validate staff login using the database
-    if (cephra.db.CephraDB.validateStaffLogin(username, password)) {
+    if (cephra.Database.CephraDB.validateStaffLogin(username, password)) {
         // Reset login attempts on successful login
         loginAttempts = 0;
         java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);

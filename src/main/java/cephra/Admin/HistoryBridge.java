@@ -51,7 +51,7 @@ public final class HistoryBridge {
     private static void loadAllHistoryFromDatabase() {
         try {
             // Get all charging history records from database
-            List<Object[]> dbRecords = cephra.db.CephraDB.getAllChargingHistory();
+            List<Object[]> dbRecords = cephra.Database.CephraDB.getAllChargingHistory();
             records.clear(); // Clear existing records
             
             for (Object[] record : dbRecords) {
@@ -63,11 +63,11 @@ public final class HistoryBridge {
                 double kwhUsed = usedFraction * batteryCapacityKWh;
                 
                 // Get payment method from payment transactions table
-                String paymentMethod = cephra.db.CephraDB.getPaymentMethodForTicket((String) record[0]);
+                String paymentMethod = cephra.Database.CephraDB.getPaymentMethodForTicket((String) record[0]);
                 if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
                 
                 // Get the admin username who served this transaction
-                String servedBy = cephra.db.CephraDB.getCurrentAdminUsername();
+                String servedBy = cephra.Database.CephraDB.getCurrentAdminUsername();
                 if (servedBy == null || servedBy.trim().isEmpty()) {
                     servedBy = "Admin"; // Fallback if no admin logged in
                 }
@@ -136,7 +136,7 @@ public final class HistoryBridge {
         List<Object[]> userRecords = new ArrayList<>();
         
         // Get records from database (single source of truth)
-        List<Object[]> dbRecords = cephra.db.CephraDB.getChargingHistoryForUser(username);
+        List<Object[]> dbRecords = cephra.Database.CephraDB.getChargingHistoryForUser(username);
         for (Object[] record : dbRecords) {
             // Calculate kWh used based on battery levels
             int initialBatteryLevel = (Integer) record[3]; // initial_battery_level (index 3)
@@ -146,11 +146,11 @@ public final class HistoryBridge {
             double kwhUsed = usedFraction * batteryCapacityKWh;
             
             // Get payment method from payment transactions table
-            String paymentMethod = cephra.db.CephraDB.getPaymentMethodForTicket((String) record[0]);
+            String paymentMethod = cephra.Database.CephraDB.getPaymentMethodForTicket((String) record[0]);
             if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
             
             // Get the admin username who served this transaction
-            String servedBy = cephra.db.CephraDB.getCurrentAdminUsername();
+            String servedBy = cephra.Database.CephraDB.getCurrentAdminUsername();
             if (servedBy == null || servedBy.trim().isEmpty()) {
                 servedBy = "Admin"; // Fallback if no admin logged in
             }
@@ -183,7 +183,7 @@ public final class HistoryBridge {
         System.out.println("HistoryBridge Debug Info:");
         System.out.println("- Model registered: " + (model != null));
         System.out.println("- Records in memory: " + records.size());
-        System.out.println("- Database records: " + cephra.db.CephraDB.getAllChargingHistory().size());
+        System.out.println("- Database records: " + cephra.Database.CephraDB.getAllChargingHistory().size());
         
         if (model != null) {
             System.out.println("- Table rows: " + model.getRowCount());

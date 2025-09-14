@@ -75,7 +75,7 @@ public class Reciept extends javax.swing.JPanel {
             // If not found in queue, try admin history
             if (refNumber.isEmpty()) {
                 try {
-                    List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.db.CephraDB.getCurrentUsername());
+                    List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
                     if (adminRecords != null) {
                         for (Object[] record : adminRecords) {
                             if (record.length >= 7 && ticket.equals(String.valueOf(record[0]))) {

@@ -405,7 +405,7 @@ public class Register extends javax.swing.JPanel {
     }
 
     // Call the database method to add the new user
-    if (cephra.db.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
+    if (cephra.Database.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
         // Registration successful
         JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
 

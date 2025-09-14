@@ -88,7 +88,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     
     private void loadNotificationEntries() {
         // Get current user's notifications
-        currentUsername = cephra.db.CephraDB.getCurrentUsername();
+        currentUsername = cephra.Database.CephraDB.getCurrentUsername();
         System.out.println("NotificationHistory: Loaded notifications for user: " + currentUsername);
         refreshHistoryDisplay();
     }

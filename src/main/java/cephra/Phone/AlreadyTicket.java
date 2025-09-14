@@ -45,13 +45,13 @@ public class AlreadyTicket extends javax.swing.JPanel {
         }
         
         // Validate user is logged in
-        if (!cephra.db.CephraDB.isUserLoggedIn()) {
+        if (!cephra.Database.CephraDB.isUserLoggedIn()) {
             System.out.println("PayPop: No user is currently logged in");
             return false;
         }
         
         // Get and validate current user
-        String currentUser = cephra.db.CephraDB.getCurrentUsername();
+        String currentUser = cephra.Database.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
             System.out.println("PayPop: Current user is null or empty");
             return false;
@@ -106,7 +106,7 @@ public class AlreadyTicket extends javax.swing.JPanel {
             try {
                 String resolved = ticketId;
                 if (resolved == null || resolved.trim().isEmpty()) {
-                    String currentUser = cephra.db.CephraDB.getCurrentUsername();
+                    String currentUser = cephra.Database.CephraDB.getCurrentUsername();
                     resolved = currentInstance.findLatestTicketForUserFromAdminModel(currentUser);
                 }
                 currentInstance.setTicketOnUi(resolved);
@@ -260,7 +260,7 @@ public class AlreadyTicket extends javax.swing.JPanel {
             // Resolve ticket strictly from Admin Queue table if not provided
             String ticket = currentTicketId;
             if (ticket == null || ticket.isEmpty()) {
-                String currentUser = cephra.db.CephraDB.getCurrentUsername();
+                String currentUser = cephra.Database.CephraDB.getCurrentUsername();
                 ticket = findLatestTicketForUserFromAdminModel(currentUser);
             }
             if (ticket == null || ticket.isEmpty()) {

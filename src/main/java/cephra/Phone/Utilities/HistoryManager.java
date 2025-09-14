@@ -100,7 +100,7 @@ public class HistoryManager {
         }
         
         // Get charging history from database (this is the single source of truth)
-        List<Object[]> dbHistory = cephra.db.CephraDB.getChargingHistoryForUser(username);
+        List<Object[]> dbHistory = cephra.Database.CephraDB.getChargingHistoryForUser(username);
         List<HistoryEntry> historyEntries = new ArrayList<>();
         
         for (Object[] record : dbHistory) {
@@ -115,7 +115,7 @@ public class HistoryManager {
             LocalDateTime localDateTime = timestamp.toLocalDateTime();
             
             // Get payment method from database
-            String paymentMethod = cephra.db.CephraDB.getPaymentMethodForTicket(ticketId);
+            String paymentMethod = cephra.Database.CephraDB.getPaymentMethodForTicket(ticketId);
             if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
             
             HistoryEntry entry = new HistoryEntry(

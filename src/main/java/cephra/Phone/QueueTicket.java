@@ -291,8 +291,8 @@ public class QueueTicket extends javax.swing.JPanel {
 
     private void cancelticketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelticketActionPerformed
        // Clear the active ticket when user cancels
-       String username = cephra.db.CephraDB.getCurrentUsername();
-       cephra.db.CephraDB.clearActiveTicket(username);
+       String username = cephra.Database.CephraDB.getCurrentUsername();
+       cephra.Database.CephraDB.clearActiveTicket(username);
        
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -312,7 +312,7 @@ public class QueueTicket extends javax.swing.JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // Push current selection to Admin and store in memory list
-                cephra.Phone.Utilities.QueueFlow.addCurrentToAdminAndStore(cephra.db.CephraDB.getCurrentUsername());
+                cephra.Phone.Utilities.QueueFlow.addCurrentToAdminAndStore(cephra.Database.CephraDB.getCurrentUsername());
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
@@ -344,8 +344,8 @@ public class QueueTicket extends javax.swing.JPanel {
     
     private void updateBatteryDisplay() {
         try {
-            String username = cephra.db.CephraDB.getCurrentUsername();
-            int batteryLevel = cephra.db.CephraDB.getUserBatteryLevel(username);
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
             String status = batteryLevel <= 20 ? " (LOW)" : batteryLevel <= 50 ? " (MED)" : " (OK)";
             batterypercent.setText(batteryLevel + "%" + status);
         } catch (Exception e) {
@@ -357,8 +357,8 @@ public class QueueTicket extends javax.swing.JPanel {
         try {
             String ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
             String service = cephra.Phone.Utilities.QueueFlow.getCurrentServiceName();
-            String username = cephra.db.CephraDB.getCurrentUsername();
-            int start = cephra.db.CephraDB.getUserBatteryLevel(username);
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            int start = cephra.Database.CephraDB.getUserBatteryLevel(username);
             int minutes;
             if (ticket != null && !ticket.isEmpty()) {
                 minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(ticket);

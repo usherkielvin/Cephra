@@ -87,7 +87,7 @@ public class BayManagement extends javax.swing.JPanel {
     public static boolean isBayAvailableForCharging(int bayNumber) {
         try {
             // Check database for real-time status
-            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.PreparedStatement pstmt = conn.prepareStatement(
                      "SELECT cb.status, cg.ticket_id FROM charging_bays cb LEFT JOIN charging_grid cg ON cb.bay_number = cg.bay_number WHERE cb.bay_number = ?")) {
                 
@@ -887,7 +887,7 @@ public class BayManagement extends javax.swing.JPanel {
         try {
             System.out.println("Clearing waiting grid of any existing tickets...");
             
-            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.Statement stmt = conn.createStatement()) {
                 
                 // Clear all waiting grid slots
@@ -956,7 +956,7 @@ public class BayManagement extends javax.swing.JPanel {
      * Creates the bay_toggle_states table if it doesn't exist
      */
     private static void createToggleStatesTable() {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.Statement stmt = conn.createStatement()) {
             
             String createTableSQL = """
@@ -994,7 +994,7 @@ public class BayManagement extends javax.swing.JPanel {
      * Loads toggle states from the database
      */
     private static void loadToggleStatesFromDatabase() {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.Statement stmt = conn.createStatement()) {
             
             // First, try to load from bay_toggle_states table
@@ -1059,7 +1059,7 @@ public class BayManagement extends javax.swing.JPanel {
      * Saves toggle states to the database
      */
     private static void saveToggleStatesToDatabase() {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             
             // Update bay_toggle_states table
             try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
@@ -1117,7 +1117,7 @@ public class BayManagement extends javax.swing.JPanel {
      * Updates bay assignment in the database
      */
     private static void updateBayAssignmentInDatabase(String ticketId, String username, int bayNumber) {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
                  "UPDATE charging_bays SET status = 'Occupied', current_ticket_id = ?, current_username = ?, start_time = NOW() WHERE bay_number = ?")) {
             
@@ -1142,7 +1142,7 @@ public class BayManagement extends javax.swing.JPanel {
      * Updates bay release in the database
      */
     private static void updateBayReleaseInDatabase(int bayNumber) {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
                  "UPDATE charging_bays SET status = 'Available', current_ticket_id = NULL, current_username = NULL, start_time = NULL WHERE bay_number = ?")) {
             
@@ -1202,7 +1202,7 @@ public class BayManagement extends javax.swing.JPanel {
      * @return bay number (1-8) or -1 if not assigned
      */
     public static int getTicketBayAssignment(String ticketId) {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
                  "SELECT bay_number FROM charging_bays WHERE current_ticket_id = ?")) {
             
@@ -1227,7 +1227,7 @@ public class BayManagement extends javax.swing.JPanel {
      * @return username or null if no user assigned
      */
     public static String getBayUser(int bayNumber) {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
                  "SELECT current_username FROM charging_bays WHERE bay_number = ?")) {
             
@@ -1251,7 +1251,7 @@ public class BayManagement extends javax.swing.JPanel {
      * @return ticket ID or null if no ticket assigned
      */
     public static String getBayTicket(int bayNumber) {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
                  "SELECT current_ticket_id FROM charging_bays WHERE bay_number = ?")) {
             
@@ -1378,7 +1378,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
             // Read directly from charging_grid table for real-time ticket status
-            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.PreparedStatement pstmt = conn.prepareStatement(
                      "SELECT cg.ticket_id, cb.status FROM charging_grid cg LEFT JOIN charging_bays cb ON cg.bay_number = cb.bay_number WHERE cg.bay_number = ?")) {
                 
@@ -1435,7 +1435,7 @@ public class BayManagement extends javax.swing.JPanel {
     public static java.awt.Color getGridSlotColor(int bayNumber) {
         try {
             // Read directly from database for real-time status
-            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.PreparedStatement pstmt = conn.prepareStatement(
                      "SELECT cb.status, cg.ticket_id, cg.service_type " +
                      "FROM charging_bays cb LEFT JOIN charging_grid cg ON cb.bay_number = cg.bay_number " +
@@ -1557,7 +1557,7 @@ public class BayManagement extends javax.swing.JPanel {
      * Loads bay occupation status from database on startup
      */
     public static void loadBayOccupationFromDatabase() {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.Statement stmt = conn.createStatement();
              java.sql.ResultSet rs = stmt.executeQuery("SELECT bay_number, status, current_ticket_id, current_username FROM charging_bays ORDER BY bay_number")) {
             
@@ -1598,7 +1598,7 @@ public class BayManagement extends javax.swing.JPanel {
     private static void initializeGridDisplays() {
         try {
             // Ensure database connection is established
-            if (!cephra.db.DatabaseConnection.testConnection()) {
+            if (!cephra.Database.DatabaseConnection.testConnection()) {
                 logError("Database connection failed during grid initialization");
                 return;
             }
@@ -1621,7 +1621,7 @@ public class BayManagement extends javax.swing.JPanel {
      * Loads maintenance status from database and ensures permanent display
      */
     private static void loadMaintenanceStatusFromDatabase() {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.Statement stmt = conn.createStatement();
              java.sql.ResultSet rs = stmt.executeQuery("SELECT bay_number, status FROM charging_bays ORDER BY bay_number")) {
             
@@ -1687,7 +1687,7 @@ public class BayManagement extends javax.swing.JPanel {
      * @return true if bay is permanently in maintenance, false otherwise
      */
     public static boolean isBayPermanentlyInMaintenance(int bayNumber) {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
                  "SELECT status FROM charging_bays WHERE bay_number = ?")) {
             
@@ -1712,7 +1712,7 @@ public class BayManagement extends javax.swing.JPanel {
      * @param status the new status ("Available", "Occupied", "Maintenance")
      */
     private static void updateBayStatusInDatabase(int bayNumber, String status) {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
                  "UPDATE charging_bays SET status = ? WHERE bay_number = ?")) {
             
@@ -1748,7 +1748,7 @@ public class BayManagement extends javax.swing.JPanel {
             return null;
         }
         
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 logError("Could not establish database connection for bay number lookup");
                 return null;
@@ -1808,7 +1808,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
             // If no direct assignment possible, add to waiting grid
-            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.PreparedStatement pstmt = conn.prepareStatement(
                      "UPDATE waiting_grid SET ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, position_in_queue = ? WHERE slot_number = ? AND ticket_id IS NULL")) {
                 
@@ -1845,7 +1845,7 @@ public class BayManagement extends javax.swing.JPanel {
      * @return slot number (1-10) or -1 if no slots available
      */
     private static int findNextAvailableWaitingSlot() {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.Statement stmt = conn.createStatement();
              java.sql.ResultSet rs = stmt.executeQuery("SELECT slot_number FROM waiting_grid WHERE ticket_id IS NULL ORDER BY slot_number LIMIT 1")) {
             
@@ -1868,7 +1868,7 @@ public class BayManagement extends javax.swing.JPanel {
      */
     public static boolean moveTicketFromWaitingToCharging(String ticketId, int bayNumber) {
         logDebug("BayManagement: Starting moveTicketFromWaitingToCharging for ticket " + ticketId + " to Bay-" + bayNumber);
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
             
             try {
@@ -1951,7 +1951,7 @@ public class BayManagement extends javax.swing.JPanel {
      */
     public static String[] getWaitingGridTickets() {
         String[] tickets = new String[10];
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.Statement stmt = conn.createStatement();
              java.sql.ResultSet rs = stmt.executeQuery("SELECT slot_number, ticket_id FROM waiting_grid ORDER BY slot_number")) {
             
@@ -1985,7 +1985,7 @@ public class BayManagement extends javax.swing.JPanel {
      */
     public static String[] getChargingGridTickets() {
         String[] tickets = new String[8];
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.Statement stmt = conn.createStatement();
              java.sql.ResultSet rs = stmt.executeQuery("SELECT bay_number, ticket_id FROM charging_grid ORDER BY bay_number")) {
             
@@ -2062,7 +2062,7 @@ public class BayManagement extends javax.swing.JPanel {
      */
     public static int countOccupiedBays(boolean isFastCharging) {
         int count = 0;
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
                  "SELECT COUNT(*) as count FROM charging_grid cg " +
                  "JOIN charging_bays cb ON cg.bay_number = cb.bay_number " +
@@ -2127,7 +2127,7 @@ public class BayManagement extends javax.swing.JPanel {
             logInfo("Auto-assigning waiting tickets to available bays...");
             
             // Get all waiting tickets
-            try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection();
+            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.Statement stmt = conn.createStatement();
                  java.sql.ResultSet rs = stmt.executeQuery("SELECT ticket_id, service_type FROM waiting_grid WHERE ticket_id IS NOT NULL ORDER BY position_in_queue")) {
                 
@@ -2167,7 +2167,7 @@ public class BayManagement extends javax.swing.JPanel {
     public static boolean clearChargingBayForCompletedTicket(String ticketId) {
         logInfo("BayManagement: Clearing charging bay for completed ticket " + ticketId);
         
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
             
             try {
@@ -2224,7 +2224,7 @@ public class BayManagement extends javax.swing.JPanel {
      *      * Release any charging_bays holding the ticket (set Available)
      */
     private static void recoverStalePendingPaymentTickets() {
-        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 // Get candidate tickets

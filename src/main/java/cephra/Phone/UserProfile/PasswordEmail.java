@@ -15,7 +15,7 @@ public class PasswordEmail extends javax.swing.JPanel {
         setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
-        otpLabel.setText(cephra.db.CephraDB.getGeneratedOTP());
+        otpLabel.setText(cephra.Database.CephraDB.getGeneratedOTP());
     }
      private void setupLabelPosition() {
         if (jLabel1 != null) {

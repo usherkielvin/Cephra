@@ -213,8 +213,8 @@ public class ChargingOption extends javax.swing.JPanel {
 
     private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
        // Check if user already has an active ticket
-       String username = cephra.db.CephraDB.getCurrentUsername();
-       if (cephra.db.CephraDB.hasActiveTicket(username)) {
+       String username = cephra.Database.CephraDB.getCurrentUsername();
+       if (cephra.Database.CephraDB.hasActiveTicket(username)) {
             // Show custom AlreadyTicket panel instead of JOptionPane
             cephra.Phone.AlreadyTicket.showPayPop(null, username);
             return;
@@ -226,7 +226,7 @@ public class ChargingOption extends javax.swing.JPanel {
             return;
         }
         // Prevent charging if battery is already full
-        int batteryLevel = cephra.db.CephraDB.getUserBatteryLevel(username);
+        int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
         if (batteryLevel >= 100) {
             // Show custom AlreadyFull panel instead of JOptionPane
             cephra.Phone.AlreadyFull.showPayPop(null, username);
@@ -259,8 +259,8 @@ public class ChargingOption extends javax.swing.JPanel {
 
     private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
         // Check if user already has an active ticket
-        String username = cephra.db.CephraDB.getCurrentUsername();
-        if (cephra.db.CephraDB.hasActiveTicket(username)) {
+        String username = cephra.Database.CephraDB.getCurrentUsername();
+        if (cephra.Database.CephraDB.hasActiveTicket(username)) {
             // Show custom AlreadyTicket panel instead of JOptionPane
             cephra.Phone.AlreadyTicket.showPayPop(null, username);
             return;
@@ -272,7 +272,7 @@ public class ChargingOption extends javax.swing.JPanel {
             return;
         }
         // Prevent charging if battery is already full
-        int batteryLevel = cephra.db.CephraDB.getUserBatteryLevel(username);
+        int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
         if (batteryLevel >= 100) {
             // Show custom AlreadyFull panel instead of JOptionPane
             cephra.Phone.AlreadyFull.showPayPop(null, username);

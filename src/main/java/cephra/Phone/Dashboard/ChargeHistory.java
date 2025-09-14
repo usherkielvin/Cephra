@@ -82,7 +82,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     
     private void loadHistoryEntries() {
         // Get current user's history
-        currentUsername = cephra.db.CephraDB.getCurrentUsername();
+        currentUsername = cephra.Database.CephraDB.getCurrentUsername();
         System.out.println("PhoneHistory: Loaded history for user: " + currentUsername);
         refreshHistoryDisplay();
     }
@@ -110,7 +110,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             
             // Debug: Check if there are any charging history records in database
             try {
-                List<Object[]> dbHistory = cephra.db.CephraDB.getChargingHistoryForUser(currentUsername);
+                List<Object[]> dbHistory = cephra.Database.CephraDB.getChargingHistoryForUser(currentUsername);
                 System.out.println("PhoneHistory: Database has " + dbHistory.size() + " charging history records for user: " + currentUsername);
                 if (!dbHistory.isEmpty()) {
                     System.out.println("PhoneHistory: First record - Ticket: " + dbHistory.get(0)[0] + ", Service: " + dbHistory.get(0)[2]);
@@ -270,7 +270,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         
         // Add ticket information
         addDetailRow(detailsPanel, "Ticket", entry.getTicketId());
-        addDetailRow(detailsPanel, "Customer", cephra.db.CephraDB.getCurrentUsername());
+        addDetailRow(detailsPanel, "Customer", cephra.Database.CephraDB.getCurrentUsername());
         
         // Add service type (Fast Charge or Normal Charge)
         addDetailRow(detailsPanel, "Service", entry.getServiceType());
@@ -278,7 +278,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         // Add kWh detail (get from admin history record)
         String kWh = "32.80"; // Default value
         try {
-            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.db.CephraDB.getCurrentUsername());
+            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
             if (adminRecords != null) {
                 for (Object[] record : adminRecords) {
                     if (record.length >= 7 && entry.getTicketId().equals(String.valueOf(record[0]))) {
@@ -301,7 +301,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         // Add served by with correct value
         String servedBy = "Admin"; // Default fallback
         try {
-            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.db.CephraDB.getCurrentUsername());
+            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
             if (adminRecords != null) {
                 for (Object[] record : adminRecords) {
                     if (record.length >= 5 && entry.getTicketId().equals(String.valueOf(record[0]))) {

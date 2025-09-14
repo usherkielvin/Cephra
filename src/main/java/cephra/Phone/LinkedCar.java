@@ -66,9 +66,9 @@ public class LinkedCar extends javax.swing.JPanel {
     // Method to refresh battery display with current values from database
     public void refreshBatteryDisplay() {
         try {
-            String username = cephra.db.CephraDB.getCurrentUsername();
+            String username = cephra.Database.CephraDB.getCurrentUsername();
             if (username != null && !username.isEmpty()) {
-                int batteryLevel = cephra.db.CephraDB.getUserBatteryLevel(username);
+                int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
                 
                 if (batteryLevel == -1) {
                     // No battery initialized yet - show "Link Car" message
@@ -161,9 +161,9 @@ public class LinkedCar extends javax.swing.JPanel {
             // Get the current car icon and rotate it
             if (car.getIcon() != null && car.getIcon() instanceof ImageIcon) {
                 // Get the original car image path based on current user
-                String username = cephra.db.CephraDB.getCurrentUsername();
+                String username = cephra.Database.CephraDB.getCurrentUsername();
                 if (username != null && !username.isEmpty()) {
-                    int carIndex = cephra.db.CephraDB.getUserCarIndex(username);
+                    int carIndex = cephra.Database.CephraDB.getUserCarIndex(username);
                     if (carIndex >= 0 && carIndex < carImages.length) {
                         // Create fresh icon from resource to avoid cumulative rotation
                         ImageIcon originalIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/Bar.png"));
@@ -386,15 +386,15 @@ public class LinkedCar extends javax.swing.JPanel {
     // Method to set random car image for the current user
     private void setRandomCarImage() {
         try {
-            String username = cephra.db.CephraDB.getCurrentUsername();
+            String username = cephra.Database.CephraDB.getCurrentUsername();
             if (username != null && !username.isEmpty()) {
                 // Get user's car index from database
-                int carIndex = cephra.db.CephraDB.getUserCarIndex(username);
+                int carIndex = cephra.Database.CephraDB.getUserCarIndex(username);
                 
                 // If no car assigned yet, assign a random one
                 if (carIndex == -1) {
                     carIndex = new Random().nextInt(carImages.length);
-                    cephra.db.CephraDB.setUserCarIndex(username, carIndex);
+                    cephra.Database.CephraDB.setUserCarIndex(username, carIndex);
                     System.out.println("LinkedCar: Assigned car " + (carIndex + 1) + " to user " + username);
                 }
                 
@@ -430,9 +430,9 @@ public class LinkedCar extends javax.swing.JPanel {
         // From form: x="34" y="130" width="-1" height="-1" preferredSize="301, 226"
         // Special case for c2.png: increase height by 2 pixels to show full image (228 instead of 226)
         try {
-            String username = cephra.db.CephraDB.getCurrentUsername();
+            String username = cephra.Database.CephraDB.getCurrentUsername();
             if (username != null && !username.isEmpty()) {
-                int carIndex = cephra.db.CephraDB.getUserCarIndex(username);
+                int carIndex = cephra.Database.CephraDB.getUserCarIndex(username);
                 if (carIndex == 1) { // c2.png is at index 1
                     car.setBounds(34, 130, 301, 228); // Height increased from 226 to 228
                     car.setPreferredSize(new java.awt.Dimension(301, 228));

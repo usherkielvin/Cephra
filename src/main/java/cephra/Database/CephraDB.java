@@ -1,4 +1,4 @@
-package cephra.db;
+package cephra.Database;
 
 import java.sql.*;
 import java.util.*;
@@ -39,9 +39,7 @@ public class CephraDB {
     private static User currentAdminUser;
     
     public static void initializeDatabase() {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
-            System.out.println("Initializing Cephra Database...");
-            
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // Check if all required tables exist
             String[] requiredTables = {
                 "users", "battery_levels", "active_tickets", "otp_codes",
@@ -59,8 +57,6 @@ public class CephraDB {
             
             if (!allTablesExist) {
                 printDatabaseInitInstructions();
-            } else {
-                System.out.println("All  database tables are present.");
             }
             
             // Clean up any existing duplicate battery level entries
@@ -78,13 +74,8 @@ public class CephraDB {
             // Synchronize bay status with database
             cephra.Admin.BayManagement.synchronizeBayStatusWithDatabase();
             
-            // Print current bay status for debugging
-            cephra.Admin.BayManagement.printCurrentBayStatus();
-            
             // Verify database connection and basic functionality
             verifyDatabaseConnection(conn);
-            
-            System.out.println("Cephra MySQL database connected successfully.");
         } catch (SQLException e) {
             System.err.println("Failed to initialize database: " + e.getMessage());
             System.err.println("Please ensure:");
@@ -113,7 +104,7 @@ public class CephraDB {
 
     // Method to check if the given credentials are valid (for phone users)
     public static boolean validateLogin(String username, String password) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT username, email, password FROM users WHERE username = ? AND password = ?")) {
             
@@ -169,7 +160,7 @@ public class CephraDB {
             return "";
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT " + fieldName + " FROM users WHERE username = ?")) {
             
@@ -210,7 +201,7 @@ public class CephraDB {
 
     // Method to add a new user to the database
     public static boolean addUser(String firstname, String lastname, String username, String email, String password) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)")) {
             
@@ -237,7 +228,7 @@ public class CephraDB {
     
     // Method to check if a user exists
     public static boolean userExists(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT username FROM users WHERE username = ?")) {
             
@@ -255,7 +246,7 @@ public class CephraDB {
     
     // Method to find a user by email
     public static User findUserByEmail(String email) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT username, email, password FROM users WHERE email = ?")) {
             
@@ -279,7 +270,7 @@ public class CephraDB {
     
     // Method to update a user's password
     public static boolean updateUserPassword(String email, String newPassword) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE users SET password = ? WHERE email = ?")) {
             
@@ -298,7 +289,7 @@ public class CephraDB {
     
     // Method to get a user's current password by email
     public static String getUserPasswordByEmail(String email) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT password FROM users WHERE email = ?")) {
             
@@ -331,7 +322,7 @@ public class CephraDB {
         
         // Store OTP in database if we have an email
         if (emailToUse != null) {
-            try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+            try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  PreparedStatement findUserStmt = conn.prepareStatement(
                          "SELECT username FROM users WHERE email = ?")) {
                 
@@ -383,7 +374,7 @@ public class CephraDB {
             return null;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First find username from email
             PreparedStatement findUserStmt = conn.prepareStatement(
                     "SELECT username FROM users WHERE email = ?");
@@ -415,7 +406,7 @@ public class CephraDB {
     
     // Battery management methods
     public static int getUserBatteryLevel(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT battery_level FROM battery_levels WHERE username = ? ORDER BY id DESC LIMIT 1")) {
             
@@ -442,7 +433,7 @@ public class CephraDB {
     }
     
     public static void setUserBatteryLevel(String username, int batteryLevel) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First, delete ALL existing battery level entries for this user
             try (PreparedStatement deleteStmt = conn.prepareStatement(
                     "DELETE FROM battery_levels WHERE username = ?")) {
@@ -479,7 +470,7 @@ public class CephraDB {
     
     // Car index management methods
     public static int getUserCarIndex(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First check if car_index column exists in users table
             if (!columnExists(conn, "users", "car_index")) {
                 // Add the column if it doesn't exist
@@ -515,7 +506,7 @@ public class CephraDB {
     }
     
     public static void setUserCarIndex(String username, int carIndex) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First check if car_index column exists in users table
             if (!columnExists(conn, "users", "car_index")) {
                 // Add the column if it doesn't exist
@@ -573,7 +564,7 @@ public class CephraDB {
     
     // Method to check for duplicate battery level entries for a user
     public static void checkDuplicateBatteryLevels(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT COUNT(*) FROM battery_levels WHERE username = ?")) {
             
@@ -624,7 +615,7 @@ public class CephraDB {
     
     // Consolidated method to clean up battery level duplicates
     private static void cleanupBatteryLevels(boolean allUsers) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             String cleanupSQL = allUsers ? 
                 "DELETE b1 FROM battery_levels b1 " +
                 "LEFT JOIN (" +
@@ -659,7 +650,7 @@ public class CephraDB {
     
     // Helper method for active ticket queries
     private static String executeActiveTicketQuery(String username, String query) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
                 printDatabaseInitInstructions();
@@ -681,7 +672,7 @@ public class CephraDB {
     }
     
     public static void setActiveTicket(String username, String ticketId) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
@@ -718,7 +709,7 @@ public class CephraDB {
     
     // Overloaded method to set active ticket with full details
     public static void setActiveTicket(String username, String ticketId, String serviceType, int initialBatteryLevel, String bayNumber) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
@@ -755,7 +746,7 @@ public class CephraDB {
     }
     
     public static void clearActiveTicket(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
@@ -777,7 +768,7 @@ public class CephraDB {
     
     // Method to clear active ticket by ticket ID
     public static void clearActiveTicketByTicketId(String ticketId) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
@@ -809,7 +800,7 @@ public class CephraDB {
     
     // Method to get queue ticket for a user (pending tickets)
     public static String getQueueTicketForUser(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (!tableExists(conn, "queue_tickets")) {
                 System.err.println("Warning: queue_tickets table does not exist.");
                 return null;
@@ -833,7 +824,7 @@ public class CephraDB {
     // Queue ticket management methods
     public static boolean addQueueTicket(String ticketId, String username, String serviceType, 
                                        String status, String paymentStatus, int initialBatteryLevel) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // First, ensure the user exists in the users table
             if (!userExists(username)) {
                 // Create a temporary user if they don't exist
@@ -886,7 +877,7 @@ public class CephraDB {
             return false;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("CephraDB: Could not establish database connection for status update");
                 return false;
@@ -944,7 +935,7 @@ public class CephraDB {
             return false;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("CephraDB: Could not establish database connection for payment method update");
                 return false;
@@ -984,7 +975,7 @@ public class CephraDB {
             return null;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("CephraDB: Could not establish database connection for customer lookup");
                 return null;
@@ -1031,7 +1022,7 @@ public class CephraDB {
             return null;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
                 System.err.println("CephraDB: Could not establish database connection for payment method query");
                 return null;
@@ -1062,7 +1053,7 @@ public class CephraDB {
     }
     
     public static boolean updateQueueTicketPayment(String ticketId, String paymentStatus, String referenceNumber) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE queue_tickets SET payment_status = ?, reference_number = ? WHERE ticket_id = ?")) {
             
@@ -1081,7 +1072,7 @@ public class CephraDB {
     }
     
     public static boolean removeQueueTicket(String ticketId) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "DELETE FROM queue_tickets WHERE ticket_id = ?")) {
             
@@ -1099,7 +1090,7 @@ public class CephraDB {
     
     /** Check if ticket is already in charging history (already processed) */
     public static boolean isTicketInChargingHistory(String ticketId) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT COUNT(*) FROM charging_history WHERE ticket_id = ?")) {
             
@@ -1122,7 +1113,7 @@ public class CephraDB {
     public static boolean addChargingHistory(String ticketId, String username, String serviceType,
                                            int initialBatteryLevel, int chargingTimeMinutes, 
                                            double totalAmount, String referenceNumber) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO charging_history (ticket_id, username, service_type, " +
                      "initial_battery_level, final_battery_level, charging_time_minutes, total_amount, reference_number, served_by) " +
@@ -1156,7 +1147,7 @@ public class CephraDB {
     
     public static java.util.List<Object[]> getChargingHistoryForUser(String username) {
         java.util.List<Object[]> history = new ArrayList<>();
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
                      "total_amount, reference_number, completed_at FROM charging_history " +
@@ -1188,7 +1179,7 @@ public class CephraDB {
     
     public static java.util.List<Object[]> getAllChargingHistory() {
         java.util.List<Object[]> history = new ArrayList<>();
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
                      "total_amount, reference_number, completed_at FROM charging_history " +
@@ -1218,7 +1209,7 @@ public class CephraDB {
     
     public static java.util.List<Object[]> getAllQueueTickets() {
         java.util.List<Object[]> tickets = new ArrayList<>();
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id, reference_number, username, service_type, status, payment_status " +
                      "FROM queue_tickets ORDER BY created_at DESC")) {
@@ -1246,7 +1237,7 @@ public class CephraDB {
     // Payment transaction methods
         public static boolean addPaymentTransaction(String ticketId, String username, double amount, 
                                                String paymentMethod, String referenceNumber) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO payment_transactions (ticket_id, username, amount, " +
                      "payment_method, reference_number) VALUES (?, ?, ?, ?, ?)")) {
@@ -1269,7 +1260,7 @@ public class CephraDB {
     
     // Method to get payment method for a specific ticket
     public static String getPaymentMethodForTicket(String ticketId) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT payment_method FROM payment_transactions WHERE ticket_id = ?")) {
             
@@ -1289,7 +1280,7 @@ public class CephraDB {
     
     // Method to check if payment has already been processed for a ticket
     public static boolean isPaymentAlreadyProcessed(String ticketId) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT COUNT(*) FROM charging_history WHERE ticket_id = ?")) {
             
@@ -1332,7 +1323,7 @@ public class CephraDB {
         
         Connection conn = null;
         try {
-            conn = cephra.db.DatabaseConnection.getConnection();
+            conn = cephra.Database.DatabaseConnection.getConnection();
             if (conn == null) {
                 System.err.println("CephraDB: Could not establish database connection for payment transaction");
                 return false;
@@ -1518,7 +1509,6 @@ public class CephraDB {
             // Refresh admin history table to show the new completed ticket
             try {
                 cephra.Admin.HistoryBridge.refreshHistoryTable();
-                System.out.println("CephraDB: Refreshed admin history table after payment completion");
             } catch (Exception e) {
                 System.err.println("CephraDB: Error refreshing admin history table: " + e.getMessage());
             }
@@ -1554,7 +1544,7 @@ public class CephraDB {
     
     // Staff management methods
     public static boolean addStaff(String name, String username, String email, String password) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO staff_records (name, username, email, password) VALUES (?, ?, ?, ?)")) {
             
@@ -1575,7 +1565,7 @@ public class CephraDB {
     
     public static java.util.List<Object[]> getAllStaff() {
         java.util.List<Object[]> staff = new ArrayList<>();
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT name, username, email, status, password FROM staff_records ORDER BY name")) {
             
@@ -1599,7 +1589,7 @@ public class CephraDB {
     }
     
     public static boolean removeStaff(String username) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "DELETE FROM staff_records WHERE username = ?")) {
             
@@ -1616,7 +1606,7 @@ public class CephraDB {
     }
     
     public static boolean resetStaffPassword(String username, String newPassword) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE staff_records SET password = ? WHERE username = ?")) {
             
@@ -1635,7 +1625,7 @@ public class CephraDB {
     
     // Method to validate staff login credentials
     public static boolean validateStaffLogin(String username, String password) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT username, email, password FROM staff_records WHERE username = ? AND password = ? AND status = 'Active'")) {
             
@@ -1662,7 +1652,7 @@ public class CephraDB {
     
     // System settings methods
     public static String getSystemSetting(String settingKey) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT setting_value FROM system_settings WHERE setting_key = ?")) {
             
@@ -1681,7 +1671,7 @@ public class CephraDB {
     }
     
     public static boolean updateSystemSetting(String settingKey, String settingValue) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE system_settings SET setting_value = ? WHERE setting_key = ?")) {
             
@@ -1715,7 +1705,6 @@ public class CephraDB {
                     "SELECT username FROM staff_records WHERE username = 'admin'")) {
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (!rs.next()) {
-                        System.out.println("Creating default admin staff...");
                         addStaff("Admin User", "admin", "admin@cephra.com", "admin123");
                     }
                 }
@@ -1746,7 +1735,7 @@ public class CephraDB {
     
     // Method to clean up orphaned queue tickets (tickets in queue but already in history)
     private static void cleanupOrphanedQueueTickets() {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "DELETE qt FROM queue_tickets qt " +
                      "INNER JOIN charging_history ch ON qt.ticket_id = ch.ticket_id " +
@@ -1763,33 +1752,27 @@ public class CephraDB {
     
     // Method to clean up admin users from users table (they should be in staff_records)
     private static void cleanupAdminFromUsersTable() {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             // Remove admin and testuser from users table
             try (PreparedStatement stmt = conn.prepareStatement(
                     "DELETE FROM users WHERE username IN ('admin', 'testuser')")) {
                 
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
-                    System.out.println("Cleaned up " + rowsAffected + " admin/testuser entries from users table.");
-                }
+                stmt.executeUpdate();
             }
             
             // Also remove any admin users with old password (1234) from staff_records
             try (PreparedStatement stmt = conn.prepareStatement(
                     "DELETE FROM staff_records WHERE username = 'admin' AND password = '1234'")) {
                 
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
-                    System.out.println("Cleaned up " + rowsAffected + " admin entries with old password from staff_records.");
-                }
+                stmt.executeUpdate();
             }
             
             // Ensure admin exists in staff_records with correct password
             try (PreparedStatement checkStmt = conn.prepareStatement(
-                    "SELECT username FROM staff_records WHERE username = 'admin' AND password = 'admin123'")) {
+                    "SELECT username FROM staff_records WHERE username = 'admin'")) {
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (!rs.next()) {
-                        // Admin doesn't exist with correct password, create it
+                        // Admin doesn't exist, create it
                         try (PreparedStatement insertStmt = conn.prepareStatement(
                                 "INSERT INTO staff_records (name, username, email, status, password) VALUES (?, ?, ?, ?, ?)")) {
                             
@@ -1799,10 +1782,19 @@ public class CephraDB {
                             insertStmt.setString(4, "Active");
                             insertStmt.setString(5, "admin123");
                             
-                            int rowsAffected = insertStmt.executeUpdate();
-                            if (rowsAffected > 0) {
-                                System.out.println("Created admin user with correct password in staff_records.");
+                            insertStmt.executeUpdate();
+                        } catch (SQLException insertException) {
+                            // Check if it's a duplicate key error
+                            if (!insertException.getMessage().contains("Duplicate entry")) {
+                                System.err.println("Error creating admin user: " + insertException.getMessage());
                             }
+                        }
+                    } else {
+                        // Admin exists, check if password needs updating
+                        try (PreparedStatement updateStmt = conn.prepareStatement(
+                                "UPDATE staff_records SET password = 'admin123' WHERE username = 'admin' AND password != 'admin123'")) {
+                            
+                            updateStmt.executeUpdate();
                         }
                     }
                 }
@@ -1833,7 +1825,6 @@ public class CephraDB {
             cephra.Admin.HistoryBridge.addRecord(historyRow);
         } catch (Throwable t) {
             // Ignore if HistoryBridge is not available
-            System.out.println("Note: Could not add to admin history: " + t.getMessage());
         }
     }
     
@@ -1896,7 +1887,7 @@ public class CephraDB {
     
     // Method to validate and ensure database integrity
     public static void validateDatabaseIntegrity() {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             System.out.println("Validating database integrity...");
             
             // Check if all required tables exist
@@ -1988,7 +1979,7 @@ public class CephraDB {
             return 0.00;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT balance FROM wallet_balance WHERE username = ?")) {
             
@@ -2018,7 +2009,7 @@ public class CephraDB {
      * @return true if successful
      */
     private static boolean createWalletBalanceEntry(String username, double initialBalance) {
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT IGNORE INTO wallet_balance (username, balance) VALUES (?, ?)")) {
             
@@ -2053,7 +2044,7 @@ public class CephraDB {
         
         Connection conn = null;
         try {
-            conn = cephra.db.DatabaseConnection.getConnection();
+            conn = cephra.Database.DatabaseConnection.getConnection();
             conn.setAutoCommit(false); // Start transaction
             
             // Get current balance
@@ -2144,7 +2135,7 @@ public class CephraDB {
             return transactions;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT transaction_type, amount, new_balance, description, reference_id, transaction_date " +
                      "FROM wallet_transactions WHERE username = ? ORDER BY transaction_date DESC")) {
@@ -2184,7 +2175,7 @@ public class CephraDB {
             return transactions;
         }
         
-        try (Connection conn = cephra.db.DatabaseConnection.getConnection();
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT transaction_type, amount, new_balance, description, reference_id, transaction_date " +
                      "FROM wallet_transactions WHERE username = ? ORDER BY transaction_date DESC LIMIT 5")) {

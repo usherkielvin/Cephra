@@ -1,4 +1,4 @@
-package cephra.db;
+package cephra.Database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
