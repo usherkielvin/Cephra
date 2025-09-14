@@ -58,7 +58,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         if (historyScrollPane == null) {
             historyScrollPane = new JScrollPane(historyPanel);
             historyScrollPane.setBorder(null);
-            historyScrollPane.setBounds(50, 150, 290, 480);
+            historyScrollPane.setBounds(50, 150, 280, 480);
             add(historyScrollPane);
         } else {
             // Just update the viewport with the new history panel
@@ -444,7 +444,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(30, 150, 320, 520);
+        historyScrollPane.setBounds(40, 150, 285, 520);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -456,7 +456,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(280, 680, 40, 40);
+        profilebutton.setBounds(260, 680, 40, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -468,7 +468,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
         add(charge);
-        charge.setBounds(50, 680, 50, 50);
+        charge.setBounds(30, 680, 50, 50);
 
         homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
@@ -480,7 +480,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
         add(homebutton);
-        homebutton.setBounds(180, 680, 60, 40);
+        homebutton.setBounds(150, 680, 40, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -492,11 +492,11 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(110, 680, 60, 40);
+        linkbutton.setBounds(90, 680, 60, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/HISTORY - if none.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 750);
+        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved

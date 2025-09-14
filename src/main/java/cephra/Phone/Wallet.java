@@ -36,6 +36,7 @@ public class Wallet extends javax.swing.JPanel {
         HideBalance = new javax.swing.JButton();
         Latestranscat = new javax.swing.JPanel();
         historybutton1 = new javax.swing.JButton();
+        bckToHome = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -112,7 +113,7 @@ public class Wallet extends javax.swing.JPanel {
             }
         });
         add(HideBalance);
-        HideBalance.setBounds(270, 190, 70, 60);
+        HideBalance.setBounds(250, 190, 90, 90);
 
         Latestranscat.setOpaque(false);
         add(Latestranscat);
@@ -129,6 +130,16 @@ public class Wallet extends javax.swing.JPanel {
         });
         add(historybutton1);
         historybutton1.setBounds(160, 320, 50, 40);
+
+        bckToHome.setBorderPainted(false);
+        bckToHome.setContentAreaFilled(false);
+        bckToHome.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bckToHomeActionPerformed(evt);
+            }
+        });
+        add(bckToHome);
+        bckToHome.setBounds(170, 680, 30, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Wallet.png"))); // NOI18N
         add(jLabel1);
@@ -421,6 +432,21 @@ public class Wallet extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_TopupbtnActionPerformed
 
+    private void bckToHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bckToHomeActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Home());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_bckToHomeActionPerformed
+
    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -428,6 +454,7 @@ public class Wallet extends javax.swing.JPanel {
     private javax.swing.JButton HideBalance;
     private javax.swing.JPanel Latestranscat;
     private javax.swing.JButton Topupbtn;
+    private javax.swing.JButton bckToHome;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton historybutton1;

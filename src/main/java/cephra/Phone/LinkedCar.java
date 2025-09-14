@@ -196,7 +196,7 @@ public class LinkedCar extends javax.swing.JPanel {
 
         car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c10.png"))); // NOI18N
         add(car);
-        car.setBounds(10, 90, 340, 270);
+        car.setBounds(10, 90, 340, 240);
 
         jPanel1.setOpaque(false);
         jPanel1.setLayout(null);

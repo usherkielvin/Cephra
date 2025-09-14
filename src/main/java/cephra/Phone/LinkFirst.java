@@ -123,11 +123,13 @@ public class LinkFirst extends javax.swing.JPanel {
     private void initComponents() {
 
         Golink = new javax.swing.JButton();
+        notLink = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
 
         Golink.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        Golink.setToolTipText("Go to car link");
         Golink.setBorder(null);
         Golink.setBorderPainted(false);
         Golink.setContentAreaFilled(false);
@@ -139,10 +141,25 @@ public class LinkFirst extends javax.swing.JPanel {
         add(Golink);
         Golink.setBounds(80, 140, 110, 40);
 
+        notLink.setBorderPainted(false);
+        notLink.setContentAreaFilled(false);
+        notLink.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                notLinkActionPerformed(evt);
+            }
+        });
+        add(notLink);
+        notLink.setBounds(245, 3, 20, 20);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Plslink.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 280, 200);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void notLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notLinkActionPerformed
+        hidepop();
+        
+    }//GEN-LAST:event_notLinkActionPerformed
 
     
     private void GolinkActionPerformed(java.awt.event.ActionEvent evt) {
@@ -169,5 +186,6 @@ public class LinkFirst extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Golink;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton notLink;
     // End of variables declaration//GEN-END:variables
 }
