@@ -98,7 +98,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 670, 50, 50);
+        profilebutton.setBounds(280, 680, 30, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -110,7 +110,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(200, 680, 50, 40);
+        historybutton.setBounds(220, 680, 40, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -122,7 +122,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 50, 40);
+        linkbutton.setBounds(110, 680, 30, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
