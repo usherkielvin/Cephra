@@ -498,9 +498,19 @@ public class WalletHistory extends javax.swing.JPanel {
         add(profilebutton);
         profilebutton.setBounds(260, 680, 40, 40);
 
-        closeButton.setText("jButton1");
+        closeButton.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        closeButton.setText("←");
+        closeButton.setToolTipText("Back to Wallet");
+        closeButton.setBorder(null);
+        closeButton.setBorderPainted(false);
+        closeButton.setContentAreaFilled(false);
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeButtonActionPerformed(evt);
+            }
+        });
         add(closeButton);
-        closeButton.setBounds(240, 120, 75, 23);
+        closeButton.setBounds(10, 110, 75, 23);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -610,6 +620,10 @@ public class WalletHistory extends javax.swing.JPanel {
             }
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
+
+    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_closeButtonActionPerformed
 
 
    

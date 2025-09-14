@@ -293,8 +293,9 @@ public class Monitor extends javax.swing.JFrame {
         IconTV = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(10000, 7500));
-        
+        setMaximumSize(new java.awt.Dimension(1000, 750));
+        setResizable(false);
+
         Monitor.setMaximumSize(new java.awt.Dimension(1000, 750));
         Monitor.setPreferredSize(new java.awt.Dimension(1000, 750));
         Monitor.setLayout(null);
