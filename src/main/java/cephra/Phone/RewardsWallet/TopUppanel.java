@@ -1,12 +1,9 @@
 
 package cephra.Phone.RewardsWallet;
 
-import java.awt.Color;
+import java.awt.*;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import javax.swing.Timer;
+import java.awt.event.*;
 
 public class TopUppanel extends javax.swing.JPanel {
 
@@ -169,11 +166,21 @@ public class TopUppanel extends javax.swing.JPanel {
 
         buttonGroup1.add(jRadioButton3);
         jRadioButton3.setText("Exness");
+        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton3ActionPerformed(evt);
+            }
+        });
         Method.add(jRadioButton3);
         jRadioButton3.setBounds(130, 110, 120, 21);
 
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText("Glangs");
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
         Method.add(jRadioButton2);
         jRadioButton2.setBounds(130, 130, 90, 21);
 
