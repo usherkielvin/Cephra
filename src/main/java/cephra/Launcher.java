@@ -1,6 +1,8 @@
 package cephra;
 import java.awt.GraphicsEnvironment;
 
+import cephra.db.CephraDB;
+
 public final class Launcher {
 
 	public static void main(String[] args) {
@@ -10,7 +12,7 @@ public final class Launcher {
 			CephraDB.initializeDatabase();
 			System.out.println("Database connection successful!");		  
 			CephraDB.validateDatabaseIntegrity();
-			cephra.Phone.QueueFlow.refreshCountersFromDatabase();
+			cephra.Phone.Utilities.QueueFlow.refreshCountersFromDatabase();
 		} catch (Exception e) {
 			System.err.println("Database connection failed!");
 			System.err.println("Error: " + e.getMessage());

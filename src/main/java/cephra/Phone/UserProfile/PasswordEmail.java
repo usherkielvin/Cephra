@@ -1,5 +1,4 @@
-
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -16,7 +15,7 @@ public class PasswordEmail extends javax.swing.JPanel {
         setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
-        otpLabel.setText(cephra.CephraDB.getGeneratedOTP());
+        otpLabel.setText(cephra.db.CephraDB.getGeneratedOTP());
     }
      private void setupLabelPosition() {
         if (jLabel1 != null) {
@@ -91,7 +90,7 @@ public class PasswordEmail extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.PasswordVerify());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordVerify());
                         break;
                     }
                 }

@@ -14,9 +14,9 @@ public class link extends javax.swing.JPanel {
         // Check if car is already linked and user has a battery level
         if (cephra.Phone.Utilities.AppState.isCarLinked) {
             try {
-                String username = cephra.CephraDB.getCurrentUsername();
+                String username = cephra.db.CephraDB.getCurrentUsername();
                 if (username != null && !username.isEmpty()) {
-                    int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+                    int batteryLevel = cephra.db.CephraDB.getUserBatteryLevel(username);
                     if (batteryLevel != -1) {
                         // Car is linked and battery is initialized - go to Porsche
                         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -204,15 +204,15 @@ public class link extends javax.swing.JPanel {
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // Generate and set battery level for current user when linking car
-                String username = cephra.CephraDB.getCurrentUsername();
+                String username = cephra.db.CephraDB.getCurrentUsername();
                 if (username != null && !username.isEmpty()) {
                             // Initialize battery to random level (15-50%) only if not already initialized
-        int currentBattery = cephra.CephraDB.getUserBatteryLevel(username);
+        int currentBattery = cephra.db.CephraDB.getUserBatteryLevel(username);
         if (currentBattery == -1) {
             // No battery initialized yet - create new random battery
             java.util.Random random = new java.util.Random();
             int batteryLevel = 15 + random.nextInt(36); // 15 to 50
-            cephra.CephraDB.setUserBatteryLevel(username, batteryLevel);
+            cephra.db.CephraDB.setUserBatteryLevel(username, batteryLevel);
             System.out.println("Link: Initialized battery level for " + username + " to " + batteryLevel + "% when linking car");
                 } else {
             // Battery already exists - keep the current level

@@ -364,7 +364,7 @@ public class StaffRecord extends javax.swing.JPanel {
         
         if (result == javax.swing.JOptionPane.YES_OPTION) {
             // Reset password in database
-            boolean reset = cephra.CephraDB.resetStaffPassword(staffUsername, "123456");
+            boolean reset = cephra.db.CephraDB.resetStaffPassword(staffUsername, "123456");
             if (reset) {
                 javax.swing.JOptionPane.showMessageDialog(
                     this,
@@ -406,7 +406,7 @@ public class StaffRecord extends javax.swing.JPanel {
         
         if (result == javax.swing.JOptionPane.YES_OPTION) {
             // Remove from database
-            boolean removed = cephra.CephraDB.removeStaff(staffUsername);
+            boolean removed = cephra.db.CephraDB.removeStaff(staffUsername);
             if (removed) {
                 javax.swing.JOptionPane.showMessageDialog(
                     this,

@@ -160,10 +160,10 @@ public class Wallet extends javax.swing.JPanel {
 
     private void loadWalletData() {
         try {
-            String currentUser = cephra.CephraDB.getCurrentUsername();
+            String currentUser = cephra.db.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.isEmpty()) {
                 // Load balance from database
-                balance = (float) cephra.CephraDB.getUserWalletBalance(currentUser);
+                balance = (float) cephra.db.CephraDB.getUserWalletBalance(currentUser);
                 updateBalanceDisplay();
                 loadTransactionHistory();
             } else {
@@ -191,13 +191,13 @@ public class Wallet extends javax.swing.JPanel {
     
     private void loadTransactionHistory() {
         try {
-            String currentUser = cephra.CephraDB.getCurrentUsername();
+            String currentUser = cephra.db.CephraDB.getCurrentUsername();
             if (currentUser == null || currentUser.isEmpty()) {
                 clearTransactionHistory();
                 return;
             }
             
-            java.util.List<Object[]> transactions = cephra.CephraDB.getWalletTransactionHistory(currentUser);
+            java.util.List<Object[]> transactions = cephra.db.CephraDB.getWalletTransactionHistory(currentUser);
             displayTransactionHistory(transactions);
             
         } catch (Exception e) {

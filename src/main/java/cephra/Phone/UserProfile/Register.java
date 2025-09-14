@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -371,7 +371,7 @@ public class Register extends javax.swing.JPanel {
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                    phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
                     break;
                 }
             }
@@ -405,7 +405,7 @@ public class Register extends javax.swing.JPanel {
     }
 
     // Call the database method to add the new user
-    if (cephra.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
+    if (cephra.db.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
         // Registration successful
         JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
@@ -415,7 +415,7 @@ public class Register extends javax.swing.JPanel {
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                    phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
                     break;
                 }
             }
@@ -598,4 +598,3 @@ public class Register extends javax.swing.JPanel {
     private javax.swing.JCheckBox termscondition;
     // End of variables declaration//GEN-END:variables
 }
-

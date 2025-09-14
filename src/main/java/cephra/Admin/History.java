@@ -328,7 +328,7 @@ public class History extends javax.swing.JPanel {
         }
 
         // Get all history records from database for searching
-        java.util.List<Object[]> allRecords = cephra.CephraDB.getAllChargingHistory();
+        java.util.List<Object[]> allRecords = cephra.db.CephraDB.getAllChargingHistory();
         for (Object[] record : allRecords) {
             boolean match = false;
             // Search through all fields in the record
@@ -348,11 +348,11 @@ public class History extends javax.swing.JPanel {
                 double kwhUsed = usedFraction * batteryCapacityKWh;
 
                 // Get payment method from payment transactions table
-                String paymentMethod = cephra.CephraDB.getPaymentMethodForTicket((String) record[0]);
+                String paymentMethod = cephra.db.CephraDB.getPaymentMethodForTicket((String) record[0]);
                 if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
 
                 // Get the admin username who served this transaction
-                String servedBy = cephra.CephraDB.getCurrentAdminUsername();
+                String servedBy = cephra.db.CephraDB.getCurrentAdminUsername();
                 if (servedBy == null || servedBy.trim().isEmpty()) {
                     servedBy = "Admin"; // Fallback if no admin logged in
                 }

@@ -8,12 +8,12 @@ public class StaffData {
     
     public static void addStaff(String name, String username, String email, String password) {
         // Add to database instead of in-memory list
-        cephra.CephraDB.addStaff(name, username, email, password);
+        cephra.db.CephraDB.addStaff(name, username, email, password);
     }
     
     public static List<String[]> getStaffList() {
         // Get from database instead of in-memory list
-        List<Object[]> dbStaff = cephra.CephraDB.getAllStaff();
+        List<Object[]> dbStaff = cephra.db.CephraDB.getAllStaff();
         List<String[]> staffList = new ArrayList<>();
         
         for (Object[] staff : dbStaff) {

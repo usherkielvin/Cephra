@@ -17,7 +17,7 @@ public class Home extends javax.swing.JPanel {
         
         // Get current user's firstname and display welcome message
         if (LoggedName != null) {
-            String firstname = cephra.CephraDB.getCurrentFirstname();
+            String firstname = cephra.db.CephraDB.getCurrentFirstname();
             String safeFirstname = firstname != null ? firstname.trim() : "";
             if (safeFirstname.isEmpty()) {
                 LoggedName.setText("Welcome to Cephra!");

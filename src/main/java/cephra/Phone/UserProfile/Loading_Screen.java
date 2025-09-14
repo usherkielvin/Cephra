@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 import javax.swing.SwingUtilities;
 import java.awt.Point;

@@ -1,5 +1,4 @@
-
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 import javax.swing.SwingUtilities;
 
@@ -167,10 +166,10 @@ public class PasswordForgot extends javax.swing.JPanel {
 
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
         String emailText = email.getText().trim();
-if (cephra.CephraDB.findUserByEmail(emailText) != null) {
+if (cephra.db.CephraDB.findUserByEmail(emailText) != null) {
     cephra.Phone.Utilities.AppSessionState.userEmailForReset = emailText; // Add this line
     cephra.Phone.Utilities.AppSessionState.showOtpNotification = true; // Show notification when coming from PasswordForgot
-    cephra.CephraDB.generateAndStoreOTP();
+    cephra.db.CephraDB.generateAndStoreOTP();
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -178,7 +177,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.PasswordVerify());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordVerify());
                         break;
                     }
                 }
@@ -200,7 +199,7 @@ if (cephra.CephraDB.findUserByEmail(emailText) != null) {
                     for (java.awt.Window window : windows) {
                         if (window instanceof cephra.Frame.Phone) {
                             cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                            phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
                             break;
                         }
                     }

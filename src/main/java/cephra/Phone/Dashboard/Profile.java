@@ -16,9 +16,9 @@ public class Profile extends javax.swing.JPanel {
         makeDraggable();
         
         // Get current user's email, firstname, and lastname
-        String email = cephra.CephraDB.getCurrentEmail();
-        String firstname = cephra.CephraDB.getCurrentFirstname();
-        String lastname = cephra.CephraDB.getCurrentLastname();
+        String email = cephra.db.CephraDB.getCurrentEmail();
+        String firstname = cephra.db.CephraDB.getCurrentFirstname();
+        String lastname = cephra.db.CephraDB.getCurrentLastname();
         
         // Set the labels
         if (gmailProf != null) {
@@ -216,9 +216,9 @@ public class Profile extends javax.swing.JPanel {
             public void run() {
                 // Only reset battery to random level on logout when battery is 100%
                 try {
-                    String username = cephra.CephraDB.getCurrentUsername();
+                    String username = cephra.db.CephraDB.getCurrentUsername();
                     if (username != null && !username.isEmpty()) {
-                        int currentBatteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+                        int currentBatteryLevel = cephra.db.CephraDB.getUserBatteryLevel(username);
                         
                                                 // Only reset battery if it's 100%
                         if (currentBatteryLevel >= 100) {
@@ -227,15 +227,15 @@ public class Profile extends javax.swing.JPanel {
                             int newBatteryLevel = 15 + random.nextInt(36); // 15 to 50
                             
                             // Save to database first
-                            cephra.CephraDB.setUserBatteryLevel(username, newBatteryLevel);
+                            cephra.db.CephraDB.setUserBatteryLevel(username, newBatteryLevel);
                             System.out.println("Profile: Reset battery level for " + username + " from " + currentBatteryLevel + "% to " + newBatteryLevel + "% on logout");
                             
                             // Check for duplicate battery level entries
-                            cephra.CephraDB.checkDuplicateBatteryLevels(username);
+                            cephra.db.CephraDB.checkDuplicateBatteryLevels(username);
                             
                             // Verify the database update worked
                             try {
-                                int verifyBattery = cephra.CephraDB.getUserBatteryLevel(username);
+                                int verifyBattery = cephra.db.CephraDB.getUserBatteryLevel(username);
                                 System.out.println("Profile: Verified database update - battery level is now " + verifyBattery + "%");
                                 if (verifyBattery != newBatteryLevel) {
                                     System.err.println("Profile: WARNING - Database update failed! Expected " + newBatteryLevel + "% but got " + verifyBattery + "%");
@@ -280,14 +280,14 @@ public class Profile extends javax.swing.JPanel {
                 }
                 
                 // Properly logout the current user
-                cephra.CephraDB.logoutCurrentUser();
+                cephra.db.CephraDB.logoutCurrentUser();
                 System.out.println("Profile: User has been logged out");
                 
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
                         break;
                     }
                 }

@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 import javax.swing.SwingUtilities;
 
@@ -207,7 +207,7 @@ public class PasswordNew extends javax.swing.JPanel {
             String userEmail = cephra.Phone.Utilities.AppSessionState.userEmailForReset;
             
             // Check if new password is the same as old password
-            String oldPassword = cephra.CephraDB.getUserPasswordByEmail(userEmail);
+            String oldPassword = cephra.db.CephraDB.getUserPasswordByEmail(userEmail);
             if (oldPassword != null && password.equals(oldPassword)) {
                 javax.swing.JOptionPane.showMessageDialog(this, 
                     "New password cannot be the same as the old password!", 
@@ -219,7 +219,7 @@ public class PasswordNew extends javax.swing.JPanel {
                 return;
             }
             
-            if (userEmail != null && cephra.CephraDB.updateUserPassword(userEmail, password)) {
+            if (userEmail != null && cephra.db.CephraDB.updateUserPassword(userEmail, password)) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
                 // Reset the email for the next session
                 cephra.Phone.Utilities.AppSessionState.userEmailForReset = null;
@@ -230,7 +230,7 @@ public class PasswordNew extends javax.swing.JPanel {
                         for (java.awt.Window window : windows) {
                             if (window instanceof cephra.Frame.Phone) {
                                 cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                                phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                                phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
                                 break;
                             }
                         }
@@ -256,7 +256,7 @@ public class PasswordNew extends javax.swing.JPanel {
                     for (java.awt.Window window : windows) {
                         if (window instanceof cephra.Frame.Phone) {
                             cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                            phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
                             break;
                         }
                     }
@@ -306,7 +306,7 @@ public class PasswordNew extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Phonelogin());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
                         break;
                     }
                 }

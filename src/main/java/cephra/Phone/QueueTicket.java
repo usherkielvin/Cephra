@@ -136,7 +136,7 @@ public class QueueTicket extends javax.swing.JPanel {
         QTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         QTicket.setText("FCPOO5");
         add(QTicket);
-        QTicket.setBounds(70, 190, 200, 40);
+        QTicket.setBounds(85, 190, 200, 40);
 
         typeofcharge.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         typeofcharge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -158,7 +158,7 @@ public class QueueTicket extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ServiceFast.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
@@ -182,11 +182,11 @@ public class QueueTicket extends javax.swing.JPanel {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // Apply selected ticket/service to labels
-                String s = cephra.Phone.QueueFlow.getCurrentServiceName();
-                String t = cephra.Phone.QueueFlow.getCurrentTicketId();
+                String s = cephra.Phone.Utilities.QueueFlow.getCurrentServiceName();
+                String t = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
                 if (t == null || t.length() == 0) {
                     // Preview exact next ticket from QueueFlow counters
-                    QTicket.setText(cephra.Phone.QueueFlow.previewNextTicketIdForService(s));
+                    QTicket.setText(cephra.Phone.Utilities.QueueFlow.previewNextTicketIdForService(s));
                 } else {
                     QTicket.setText(t);
                 }
@@ -200,7 +200,7 @@ public class QueueTicket extends javax.swing.JPanel {
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
      private void makeDraggable() {
@@ -291,8 +291,8 @@ public class QueueTicket extends javax.swing.JPanel {
 
     private void cancelticketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelticketActionPerformed
        // Clear the active ticket when user cancels
-       String username = cephra.CephraDB.getCurrentUsername();
-       cephra.CephraDB.clearActiveTicket(username);
+       String username = cephra.db.CephraDB.getCurrentUsername();
+       cephra.db.CephraDB.clearActiveTicket(username);
        
        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -312,7 +312,7 @@ public class QueueTicket extends javax.swing.JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // Push current selection to Admin and store in memory list
-                cephra.Phone.QueueFlow.addCurrentToAdminAndStore(cephra.CephraDB.getCurrentUsername());
+                cephra.Phone.Utilities.QueueFlow.addCurrentToAdminAndStore(cephra.db.CephraDB.getCurrentUsername());
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
@@ -344,8 +344,8 @@ public class QueueTicket extends javax.swing.JPanel {
     
     private void updateBatteryDisplay() {
         try {
-            String username = cephra.CephraDB.getCurrentUsername();
-            int batteryLevel = cephra.CephraDB.getUserBatteryLevel(username);
+            String username = cephra.db.CephraDB.getCurrentUsername();
+            int batteryLevel = cephra.db.CephraDB.getUserBatteryLevel(username);
             String status = batteryLevel <= 20 ? " (LOW)" : batteryLevel <= 50 ? " (MED)" : " (OK)";
             batterypercent.setText(batteryLevel + "%" + status);
         } catch (Exception e) {
@@ -355,10 +355,10 @@ public class QueueTicket extends javax.swing.JPanel {
 
     private void updateEstimatedTime() {
         try {
-            String ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
-            String service = cephra.Phone.QueueFlow.getCurrentServiceName();
-            String username = cephra.CephraDB.getCurrentUsername();
-            int start = cephra.CephraDB.getUserBatteryLevel(username);
+            String ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
+            String service = cephra.Phone.Utilities.QueueFlow.getCurrentServiceName();
+            String username = cephra.db.CephraDB.getCurrentUsername();
+            int start = cephra.db.CephraDB.getUserBatteryLevel(username);
             int minutes;
             if (ticket != null && !ticket.isEmpty()) {
                 minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(ticket);

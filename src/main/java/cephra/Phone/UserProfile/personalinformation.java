@@ -1,5 +1,4 @@
-
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 
 public class personalinformation extends javax.swing.JPanel {

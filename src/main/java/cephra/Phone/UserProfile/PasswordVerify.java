@@ -1,5 +1,4 @@
-
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -7,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
+import cephra.Phone.UnifiedNotification;
 
 public class PasswordVerify extends javax.swing.JPanel {
 
@@ -306,7 +306,7 @@ public class PasswordVerify extends javax.swing.JPanel {
         // Handle verification code submission
         String enteredOTP = code1.getText() + code2.getText() + code3.getText() + 
                            code4.getText() + code5.getText() + code6.getText();
-        String correctOTP = cephra.CephraDB.getGeneratedOTP();
+        String correctOTP = cephra.db.CephraDB.getGeneratedOTP();
 
         if (enteredOTP.equals(correctOTP)) {
             javax.swing.JOptionPane.showMessageDialog(this, "Verification code submitted successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
@@ -318,7 +318,7 @@ public class PasswordVerify extends javax.swing.JPanel {
                     for (java.awt.Window window : windows) {
                         if (window instanceof cephra.Frame.Phone) {
                             cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            phoneFrame.switchPanel(new cephra.Phone.PasswordNew());
+                            phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordNew());
                             break;
                         }
                     }
@@ -354,7 +354,7 @@ public class PasswordVerify extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.PasswordForgot());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordForgot());
                         break;
                     }
                 }
@@ -369,7 +369,7 @@ public class PasswordVerify extends javax.swing.JPanel {
 
         private void resendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resendActionPerformed
         // Generate a new OTP
-        cephra.CephraDB.generateAndStoreOTP();
+        cephra.db.CephraDB.generateAndStoreOTP();
         
         // Update the OTP label with the new OTP
     //    otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
@@ -387,7 +387,7 @@ public class PasswordVerify extends javax.swing.JPanel {
         cephra.Phone.Utilities.AppSessionState.showOtpNotification = true;
         
         // Show new notification with updated OTP instead of dialog
-        showOTPNotification(cephra.CephraDB.getGeneratedOTP());
+        showOTPNotification(cephra.db.CephraDB.getGeneratedOTP());
     }//GEN-LAST:event_resendActionPerformed
 
     private void code1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_code1ActionPerformed
@@ -509,7 +509,7 @@ public class PasswordVerify extends javax.swing.JPanel {
                 
                 // Show notification with OTP only if the flag is set (coming from PasswordForgot or resending)
                 if (cephra.Phone.Utilities.AppSessionState.showOtpNotification) {
-                    showOTPNotification(cephra.CephraDB.getGeneratedOTP());
+                    showOTPNotification(cephra.db.CephraDB.getGeneratedOTP());
                     // Reset the flag after showing the notification
                     cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
                 }

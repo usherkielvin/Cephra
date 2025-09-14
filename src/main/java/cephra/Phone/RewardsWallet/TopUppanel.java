@@ -228,9 +228,9 @@ public class TopUppanel extends javax.swing.JPanel {
      */
     private void loadCurrentBalance() {
         try {
-            String currentUser = cephra.CephraDB.getCurrentUsername();
+            String currentUser = cephra.db.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.isEmpty()) {
-                double balance = cephra.CephraDB.getUserWalletBalance(currentUser);
+                double balance = cephra.db.CephraDB.getUserWalletBalance(currentUser);
                 Currentbalance.setText(String.format("₱%.2f", balance));
             } else {
                 Currentbalance.setText("₱0.00");
@@ -261,7 +261,7 @@ public class TopUppanel extends javax.swing.JPanel {
      */
     private void processTopUp() {
         try {
-            String currentUser = cephra.CephraDB.getCurrentUsername();
+            String currentUser = cephra.db.CephraDB.getCurrentUsername();
             if (currentUser == null || currentUser.isEmpty()) {
                 showErrorMessage("No user is currently logged in.");
                 return;
@@ -318,7 +318,7 @@ public class TopUppanel extends javax.swing.JPanel {
             topUpMethod += " via " + selectedPaymentMethod;
 
             // Process the top-up
-            boolean success = cephra.CephraDB.processWalletTopUp(currentUser, amount, topUpMethod);
+            boolean success = cephra.db.CephraDB.processWalletTopUp(currentUser, amount, topUpMethod);
 
             if (success) {
                 showSuccessMessage(String.format("Successfully topped up ₱%.2f to your wallet via %s!", amount, selectedPaymentMethod));

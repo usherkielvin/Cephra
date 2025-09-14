@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 import java.awt.*;
 import javax.swing.*;
@@ -155,7 +155,7 @@ public class Phonelogin extends javax.swing.JPanel {
         String password = new String(pass.getPassword());
 
         // Validate login using the CephraDB
-        if (cephra.CephraDB.validateLogin(usernameText, password)) {
+        if (cephra.db.CephraDB.validateLogin(usernameText, password)) {
             // Login successful, reset attempts
             loginAttempts = 0;
             SwingUtilities.invokeLater(new Runnable() {
@@ -235,7 +235,7 @@ public class Phonelogin extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Register());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.Register());
                         break;
                     }
                 }
@@ -250,7 +250,7 @@ public class Phonelogin extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.PasswordForgot());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordForgot());
                         break;
                     }
                 }
@@ -264,6 +264,7 @@ public class Phonelogin extends javax.swing.JPanel {
     }//GEN-LAST:event_passActionPerformed
 
     private void SeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeActionPerformed
+        
         
         
         

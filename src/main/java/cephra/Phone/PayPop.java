@@ -89,13 +89,13 @@ public class PayPop extends javax.swing.JPanel {
         }
         
         // Validate user is logged in
-        if (!cephra.CephraDB.isUserLoggedIn()) {
+        if (!cephra.db.CephraDB.isUserLoggedIn()) {
             System.out.println("PayPop: No user is currently logged in");
             return false;
         }
         
         // Get and validate current user
-        String currentUser = cephra.CephraDB.getCurrentUsername();
+        String currentUser = cephra.db.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
             System.out.println("PayPop: Current user is null or empty");
             return false;
@@ -150,7 +150,7 @@ public class PayPop extends javax.swing.JPanel {
             try {
                 String resolved = ticketId;
                 if (resolved == null || resolved.trim().isEmpty()) {
-                    String currentUser = cephra.CephraDB.getCurrentUsername();
+                    String currentUser = cephra.db.CephraDB.getCurrentUsername();
                     resolved = currentInstance.findLatestTicketForUserFromAdminModel(currentUser);
                 }
                 currentInstance.setTicketOnUi(resolved);
@@ -309,11 +309,11 @@ public class PayPop extends javax.swing.JPanel {
             // Resolve ticket strictly from Admin Queue table if not provided
             String ticket = currentTicketId;
             if (ticket == null || ticket.isEmpty()) {
-                String currentUser = cephra.CephraDB.getCurrentUsername();
+                String currentUser = cephra.db.CephraDB.getCurrentUsername();
                 ticket = findLatestTicketForUserFromAdminModel(currentUser);
             }
             if (ticket == null || ticket.isEmpty()) {
-                ticket = cephra.Phone.QueueFlow.getCurrentTicketId();
+                ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
             }
             if (ticket == null || ticket.isEmpty()) {
                 System.err.println("PayPop: No current ticket found");
@@ -463,19 +463,19 @@ public class PayPop extends javax.swing.JPanel {
             return;
         }
         
-        String currentUser = cephra.CephraDB.getCurrentUsername();
+        String currentUser = cephra.db.CephraDB.getCurrentUsername();
         System.out.println("Processing cash payment for user: " + currentUser);
         
         try {
             // Get current ticket ID
             String currentTicket = currentTicketId;
             if (currentTicket == null || currentTicket.isEmpty()) {
-                currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+                currentTicket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
             }
             
             if (currentTicket != null && !currentTicket.isEmpty()) {
                 // Set payment method to Cash in the database
-                cephra.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Cash");
+                cephra.db.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Cash");
                 System.out.println("Cash payment method set for ticket: " + currentTicket);
                 
                 // Mark payment as cash payment in the system
@@ -508,7 +508,7 @@ public class PayPop extends javax.swing.JPanel {
             return;
         }
         
-        String currentUser = cephra.CephraDB.getCurrentUsername();
+        String currentUser = cephra.db.CephraDB.getCurrentUsername();
         System.out.println("Processing online payment for user: " + currentUser);
         
         SwingUtilities.invokeLater(() -> {
@@ -518,10 +518,10 @@ public class PayPop extends javax.swing.JPanel {
                 // After successful wallet payment, ensure admin queue marks as paid and removes the ticket
                 if (paymentSuccess) {
                     try {
-                        String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+                        String currentTicket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
                         if (currentTicket != null && !currentTicket.isEmpty()) {
                             // Set payment method to Online in the database
-                            cephra.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Online");
+                            cephra.db.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Online");
                             System.out.println("Online payment method set for ticket: " + currentTicket);
                             
                             cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
@@ -549,7 +549,7 @@ public class PayPop extends javax.swing.JPanel {
      * @return true if user is logged in, false otherwise
      */
     private boolean validateUserLoggedIn() {
-        if (!cephra.CephraDB.isUserLoggedIn()) {
+        if (!cephra.db.CephraDB.isUserLoggedIn()) {
             System.err.println("Payment blocked: No user is logged in");
             hidePayPop();
             return false;
@@ -564,12 +564,12 @@ public class PayPop extends javax.swing.JPanel {
      */
     private boolean processOnlinePayment() throws Exception {
         // Check if there's an active ticket
-        if (!cephra.Phone.QueueFlow.hasActiveTicket()) {
+        if (!cephra.Phone.Utilities.QueueFlow.hasActiveTicket()) {
             showErrorMessage("No active ticket found for payment.\nPlease get a ticket first.");
             return false;
         }
         
-        String currentTicket = cephra.Phone.QueueFlow.getCurrentTicketId();
+        String currentTicket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
         
         // Validate ticket is ready for payment
         if (!isTicketValidForPayment(currentTicket)) {
@@ -578,7 +578,7 @@ public class PayPop extends javax.swing.JPanel {
         }
         
         // Get current user
-        String currentUser = cephra.CephraDB.getCurrentUsername();
+        String currentUser = cephra.db.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
             showErrorMessage("No user is currently logged in.");
             return false;
@@ -588,13 +588,13 @@ public class PayPop extends javax.swing.JPanel {
         double paymentAmount = cephra.Admin.QueueBridge.computeAmountDue(currentTicket);
         
         // Check wallet balance first
-        if (!cephra.CephraDB.hasSufficientWalletBalance(currentUser, paymentAmount)) {
+        if (!cephra.db.CephraDB.hasSufficientWalletBalance(currentUser, paymentAmount)) {
             showInsufficientBalanceMessage(paymentAmount);
             return false;
         }
         
         // Process wallet payment
-        boolean walletPaymentSuccess = cephra.CephraDB.processWalletPayment(currentUser, currentTicket, paymentAmount);
+        boolean walletPaymentSuccess = cephra.db.CephraDB.processWalletPayment(currentUser, currentTicket, paymentAmount);
         
         if (!walletPaymentSuccess) {
             showErrorMessage("Failed to process wallet payment.\nPlease try again or check your balance.");
@@ -667,8 +667,8 @@ public class PayPop extends javax.swing.JPanel {
      * @param requiredAmount the amount required for payment
      */
     private void showInsufficientBalanceMessage(double requiredAmount) {
-        String currentUser = cephra.CephraDB.getCurrentUsername();
-        double currentBalance = cephra.CephraDB.getUserWalletBalance(currentUser);
+        String currentUser = cephra.db.CephraDB.getCurrentUsername();
+        double currentBalance = cephra.db.CephraDB.getUserWalletBalance(currentUser);
         
         SwingUtilities.invokeLater(() -> {
             String message = String.format(
@@ -747,7 +747,7 @@ public class PayPop extends javax.swing.JPanel {
     private void navigateToTopUp() {
         SwingUtilities.invokeLater(() -> {
             // Store the current PayPop state before hiding
-            String currentUser = cephra.CephraDB.getCurrentUsername();
+            String currentUser = cephra.db.CephraDB.getCurrentUsername();
             if (currentUser != null && currentTicketId != null) {
                 isPendingTopUpReturn = true;
                 pendingTicketId = currentTicketId;

@@ -84,7 +84,7 @@ public class WalletHistory extends javax.swing.JPanel {
     
     private void loadWalletTransactions() {
         // Get current user's wallet transactions
-        currentUsername = cephra.CephraDB.getCurrentUsername();
+        currentUsername = cephra.db.CephraDB.getCurrentUsername();
         System.out.println("WalletHistory: Loading wallet transactions for user: " + currentUsername);
         refreshHistoryDisplay();
     }
@@ -117,7 +117,7 @@ public class WalletHistory extends javax.swing.JPanel {
         historyPanel.removeAll();
         
         // Get ALL wallet transactions for complete history
-        java.util.List<Object[]> transactions = cephra.CephraDB.getAllWalletTransactionHistory(currentUsername);
+        java.util.List<Object[]> transactions = cephra.db.CephraDB.getAllWalletTransactionHistory(currentUsername);
         
         // Debug information
         System.out.println("WalletHistory: Found " + transactions.size() + " wallet transactions");

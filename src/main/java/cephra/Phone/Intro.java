@@ -15,7 +15,7 @@ public class Intro extends javax.swing.JPanel {
            new Timer(8000, _ -> {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Intro.this);
         if (w instanceof cephra.Frame.Phone) {
-            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Loading_Screen());
+            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.UserProfile.Loading_Screen());
         }
                
              

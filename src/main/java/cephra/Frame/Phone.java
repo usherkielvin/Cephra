@@ -25,13 +25,13 @@ public class Phone extends javax.swing.JFrame {
         
         // Refresh ticket counters when Phone frame is created
         try {
-            cephra.Phone.QueueFlow.refreshCountersFromDatabase();
+            cephra.Phone.Utilities.QueueFlow.refreshCountersFromDatabase();
         } catch (Exception e) {
             System.err.println("Error refreshing ticket counters: " + e.getMessage());
         }
 
         // Start with loading screen panel
-        switchPanel(new cephra.Phone.Loading_Screen());
+        switchPanel(new cephra.Phone.UserProfile.Loading_Screen());
         
         // Create and setup phone frame overlay to always appear on top
         PhoneFrame();
