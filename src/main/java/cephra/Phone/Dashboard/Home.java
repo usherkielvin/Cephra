@@ -248,7 +248,7 @@ public class Home extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        cephra.Phone.NotificationHistory notificationHistory = new cephra.Phone.NotificationHistory();
+                        cephra.Phone.Dashboard.NotificationHistory notificationHistory = new cephra.Phone.Dashboard.NotificationHistory();
                         notificationHistory.setPreviousPanel(new cephra.Phone.Dashboard.Home());
                         phoneFrame.switchPanel(notificationHistory);
                         break;
@@ -265,7 +265,7 @@ public class Home extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Wallet());
+                        phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Wallet());
                         break;
                     }
                 }
@@ -280,7 +280,7 @@ public class Home extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Rewards());
+                        phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Rewards());
                         break;
                     }
                 }

@@ -1,5 +1,5 @@
 
-package cephra.Phone;
+package cephra.Phone.Dashboard;
 
 import java.awt.*;
 import java.awt.event.*;

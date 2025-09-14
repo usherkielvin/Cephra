@@ -760,7 +760,7 @@ public class PayPop extends javax.swing.JPanel {
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.TopUppanel());
+                    phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.TopUppanel());
                     break;
                 }
             }

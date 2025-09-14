@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.RewardsWallet;
 import javax.swing.SwingUtilities;
 public class Wallet extends javax.swing.JPanel {
 
@@ -406,7 +406,7 @@ public class Wallet extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        cephra.Phone.WalletHistory walletHistory = new cephra.Phone.WalletHistory();
+                        cephra.Phone.RewardsWallet.WalletHistory walletHistory = new cephra.Phone.RewardsWallet.WalletHistory();
                         walletHistory.setPreviousPanel(Wallet.this); // Set current wallet panel as previous
                         phoneFrame.switchPanel(walletHistory);
                         break;
@@ -424,7 +424,7 @@ public class Wallet extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.TopUppanel());
+                        phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.TopUppanel());
                         break;
                     }
                 }

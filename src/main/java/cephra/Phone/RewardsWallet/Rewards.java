@@ -1,5 +1,5 @@
 
-package cephra.Phone;
+package cephra.Phone.RewardsWallet;
 
 import javax.swing.SwingUtilities;
 
@@ -404,7 +404,7 @@ public class Rewards extends javax.swing.JPanel {
         );
 
         add(jPanel1);
-        jPanel1.setBounds(9, 129, 370, 485);
+        jPanel1.setBounds(9, 129, 370, 0);
 
         a1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_1.png"))); // NOI18N
         a1.addActionListener(new java.awt.event.ActionListener() {
@@ -484,7 +484,6 @@ public class Rewards extends javax.swing.JPanel {
         jLabel4.setBounds(20, 50, 260, 50);
 
         jLabel5.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
         jLabel5.setText("Points :");
         add(jLabel5);
         jLabel5.setBounds(260, 90, 50, 16);

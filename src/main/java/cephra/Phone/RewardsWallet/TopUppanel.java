@@ -1,5 +1,5 @@
 
-package cephra.Phone;
+package cephra.Phone.RewardsWallet;
 
 import java.awt.Color;
 import javax.swing.*;
@@ -156,10 +156,10 @@ public class TopUppanel extends javax.swing.JPanel {
 
         topUpIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/topUpIcon.png"))); // NOI18N
         jPanel1.add(topUpIcon);
-        topUpIcon.setBounds(0, 0, 360, 720);
+        topUpIcon.setBounds(0, 0, 370, 750);
 
         add(jPanel1);
-        jPanel1.setBounds(0, 0, 360, 720);
+        jPanel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ProceedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedActionPerformed
@@ -179,7 +179,7 @@ public class TopUppanel extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Wallet());
+                        phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Wallet());
                         break;
                     }
                 }
@@ -332,7 +332,7 @@ public class TopUppanel extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Wallet());
+                        phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Wallet());
                         break;
                     }
                 }
