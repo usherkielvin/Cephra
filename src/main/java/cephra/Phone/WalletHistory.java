@@ -484,7 +484,7 @@ public class WalletHistory extends javax.swing.JPanel {
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(20, 150, 300, 520);
+        historyScrollPane.setBounds(30, 150, 310, 520);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);

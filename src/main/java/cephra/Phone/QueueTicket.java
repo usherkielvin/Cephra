@@ -53,7 +53,7 @@ public class QueueTicket extends javax.swing.JPanel {
             }
         });
         add(checkstatus);
-        checkstatus.setBounds(50, 500, 280, 40);
+        checkstatus.setBounds(30, 500, 280, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -65,7 +65,7 @@ public class QueueTicket extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(50, 680, 50, 40);
+        charge.setBounds(30, 680, 50, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -77,7 +77,7 @@ public class QueueTicket extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(110, 680, 50, 40);
+        linkbutton.setBounds(90, 680, 50, 40);
 
         cancelticket.setBorder(null);
         cancelticket.setBorderPainted(false);
@@ -88,7 +88,7 @@ public class QueueTicket extends javax.swing.JPanel {
             }
         });
         add(cancelticket);
-        cancelticket.setBounds(50, 543, 280, 40);
+        cancelticket.setBounds(30, 543, 280, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
