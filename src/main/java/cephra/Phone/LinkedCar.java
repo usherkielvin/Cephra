@@ -39,6 +39,9 @@ public class LinkedCar extends javax.swing.JPanel {
         // Set random car image for user
         setRandomCarImage();
         
+        // Ensure car positioning follows NetBeans form settings
+        ensureCarPositioning();
+        
         // Add a focus listener to refresh battery display when panel becomes visible
         addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
@@ -194,9 +197,10 @@ public class LinkedCar extends javax.swing.JPanel {
 
         setLayout(null);
 
-        car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c10.png"))); // NOI18N
+        car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.png"))); // NOI18N
+        car.setPreferredSize(new java.awt.Dimension(301, 226));
         add(car);
-        car.setBounds(10, 90, 340, 240);
+        car.setBounds(34, 130, 301, 226);
 
         jPanel1.setOpaque(false);
         jPanel1.setLayout(null);
@@ -283,7 +287,7 @@ public class LinkedCar extends javax.swing.JPanel {
         add(bar);
         bar.setBounds(60, 410, 230, 210);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/hyundai.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/linked.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -394,16 +398,55 @@ public class LinkedCar extends javax.swing.JPanel {
                     System.out.println("LinkedCar: Assigned car " + (carIndex + 1) + " to user " + username);
                 }
                 
-                // Set the car image
+                // Set the car image while preserving the form positioning (x=34, y=130, size=301x226)
+                // Special sizing for c2.png: increase height by 2 pixels to show full image (228 instead of 226)
                 if (carIndex >= 0 && carIndex < carImages.length) {
                     car.setIcon(new javax.swing.ImageIcon(getClass().getResource(carImages[carIndex])));
-                    System.out.println("LinkedCar: Set car image to " + carImages[carIndex] + " for user " + username);
+                    
+                    // Special case for c2.png - increase height by 2 pixels to show cut-off part
+                    if (carIndex == 1) { // c2.png is at index 1 (c1=0, c2=1, c3=2, etc.)
+                        car.setBounds(34, 130, 301, 228); // Height increased from 226 to 228
+                        car.setPreferredSize(new java.awt.Dimension(301, 228));
+                        System.out.println("LinkedCar: Set c2.png car image with increased height (301x228) to show full image");
+                    } else {
+                        car.setBounds(34, 130, 301, 226);
+                        car.setPreferredSize(new java.awt.Dimension(301, 226));
+                        System.out.println("LinkedCar: Set car image to " + carImages[carIndex] + " for user " + username + " at position (34, 130)");
+                    }
                 }
             }
         } catch (Exception e) {
             System.err.println("Error setting car image: " + e.getMessage());
-            // Fallback to default car image
+            // Fallback to default car image with preserved positioning
             car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c1.png")));
+            car.setBounds(34, 130, 301, 226);
+            car.setPreferredSize(new java.awt.Dimension(301, 226));
+        }
+    }
+    
+    // Method to ensure car positioning follows NetBeans form settings
+    private void ensureCarPositioning() {
+        // Set car position and size according to NetBeans form settings
+        // From form: x="34" y="130" width="-1" height="-1" preferredSize="301, 226"
+        // Special case for c2.png: increase height by 2 pixels to show full image (228 instead of 226)
+        try {
+            String username = cephra.CephraDB.getCurrentUsername();
+            if (username != null && !username.isEmpty()) {
+                int carIndex = cephra.CephraDB.getUserCarIndex(username);
+                if (carIndex == 1) { // c2.png is at index 1
+                    car.setBounds(34, 130, 301, 228); // Height increased from 226 to 228
+                    car.setPreferredSize(new java.awt.Dimension(301, 228));
+                } else {
+                    car.setBounds(34, 130, 301, 226);
+                    car.setPreferredSize(new java.awt.Dimension(301, 226));
+                }
+            } else {
+                car.setBounds(34, 130, 301, 226);
+                car.setPreferredSize(new java.awt.Dimension(301, 226));
+            }
+        } catch (Exception e) {
+            car.setBounds(34, 130, 301, 226);
+            car.setPreferredSize(new java.awt.Dimension(301, 226));
         }
     }
     
@@ -414,6 +457,7 @@ public class LinkedCar extends javax.swing.JPanel {
         SwingUtilities.invokeLater(() -> {
             refreshBatteryDisplay();
             setRandomCarImage(); // Also refresh car image
+            ensureCarPositioning(); // Ensure positioning is maintained
         });
     }
 }

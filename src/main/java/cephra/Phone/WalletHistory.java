@@ -622,7 +622,7 @@ public class WalletHistory extends javax.swing.JPanel {
     }//GEN-LAST:event_linkbuttonActionPerformed
 
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_closeButtonActionPerformed
 
 
