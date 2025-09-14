@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>24</maven.compiler.source>
         <maven.compiler.target>24</maven.compiler.target>
-        <exec.mainClass>cephra.MainFrame</exec.mainClass>
+        <exec.mainClass>cephra.Launcher</exec.mainClass>
     </properties>
 
     <!-- Dependencies -->
@@ -81,7 +81,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>cephra.MainFrame</mainClass>
+                    <mainClass>cephra.Launcher</mainClass>
                 </configuration>
             </plugin>
             
@@ -93,7 +93,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>cephra.MainFrame</mainClass>
+                            <mainClass>cephra.Launcher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
