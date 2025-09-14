@@ -39,7 +39,6 @@ public class Admin extends javax.swing.JFrame {
             
             if (iconUrl != null) {
                 setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
-                System.out.println("Admin app icon loaded successfully from: " + iconUrl);
             } else {
                 System.err.println("Could not find admin app icon: lod.png");
             }

@@ -143,6 +143,11 @@ public class CephraDB {
         return currentPhoneUser != null ? currentPhoneUser.username : "";
     }
     
+    // Alias method for compatibility with Rewards system
+    public static String getCurrentPhoneUsername() {
+        return getCurrentUsername();
+    }
+    
     // Method to get the current logged-in user's email (phone user)
     public static String getCurrentEmail() {
         return currentPhoneUser != null ? currentPhoneUser.email : "";
@@ -970,6 +975,52 @@ public class CephraDB {
     }
     
     /**
+     * Gets the customer name for a given ticket ID from charging bays
+     * @param ticketId the ticket ID to look up
+     * @return the customer username, or null if not found
+     */
+    public static String getCustomerByTicket(String ticketId) {
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            return null;
+        }
+        
+        try (Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            if (conn == null) {
+                System.err.println("CephraDB: Could not establish database connection for customer lookup");
+                return null;
+            }
+            
+            // First try to get from charging_bays table
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT current_username FROM charging_bays WHERE current_ticket_id = ?")) {
+                stmt.setString(1, ticketId);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("current_username");
+                    }
+                }
+            }
+            
+            // If not found in charging_bays, try queue_tickets table
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT username FROM queue_tickets WHERE ticket_id = ?")) {
+                stmt.setString(1, ticketId);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("username");
+                    }
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error getting customer by ticket: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null;
+    }
+    
+    /**
      * Gets the payment method of a queue ticket
      * @param ticketId the ticket ID to check
      * @return the payment method ('Cash' or 'Online'), or null if not found
@@ -1420,9 +1471,13 @@ public class CephraDB {
             // 4. Add reward points for all payments (1 PHP = 0.05 points)
             if (totalAmount > 0) {
                 try {
-                    // Use static method to add points globally
-                    cephra.Phone.Rewards.addPointsForPaymentGlobally(totalAmount);
-                    System.out.println("CephraDB: Added points for payment of " + totalAmount + " PHP to user " + username);
+                    // Use RewardSystem to add points to database
+                    boolean pointsSuccess = cephra.RewardSystem.addPointsForPayment(username, totalAmount, ticketId);
+                    if (pointsSuccess) {
+                        System.out.println("CephraDB: Successfully added points for payment of ₱" + totalAmount + " to user " + username);
+                    } else {
+                        System.err.println("CephraDB: Failed to add points for payment of ₱" + totalAmount + " to user " + username);
+                    }
                 } catch (Exception pointsEx) {
                     System.err.println("CephraDB: Error adding points for payment: " + pointsEx.getMessage());
                     // Don't fail the transaction if points addition fails

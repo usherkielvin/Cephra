@@ -15,7 +15,7 @@ public class PasswordVerify extends javax.swing.JPanel {
     // Flag to prevent multiple verification attempts
     private boolean verificationInProgress = false;
     // Notification popup instance
-    private NotificationPop notificationPop;
+    private UnifiedNotification notificationPop;
    
     public PasswordVerify() {
         initComponents();
@@ -546,7 +546,8 @@ public class PasswordVerify extends javax.swing.JPanel {
                 }
                 
                 // Create new notification
-                notificationPop = new NotificationPop(otp);
+                notificationPop = new UnifiedNotification();
+                notificationPop.setNotificationType(UnifiedNotification.TYPE_OTP, otp, null);
                 notificationPop.addToFrame(phoneFrame);
                 notificationPop.showNotification();
                 break;

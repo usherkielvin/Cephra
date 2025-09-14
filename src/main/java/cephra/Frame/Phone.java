@@ -46,7 +46,6 @@ public class Phone extends javax.swing.JFrame {
             java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/lod.png");
             if (iconUrl != null) {
                 setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
-                System.out.println("App icon loaded successfully from: " + iconUrl);
             } else {
                 System.err.println("Could not find app icon: lod.png");
             }

@@ -169,7 +169,7 @@ public class Home extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/HOME.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-12, 0, 370, 750);
+        jLabel1.setBounds(0, 0, 350, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved

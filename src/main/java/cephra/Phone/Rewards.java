@@ -11,71 +11,14 @@ public class Rewards extends javax.swing.JPanel {
     private final int[] ITEM_PRICES = {50, 35, 70, 100, 10, 10, 5, 5}; // a1-a8 prices
     private final String[] ITEM_NAMES = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8"};
     
-    // Static points management for global access
-    private static int globalPoints = 0;
-    private static final String POINTS_FILE = "user_points.txt";
+    // Current user for database operations
+    private String currentUsername = null;
     
-    // Static methods for global points management
-    public static void addPointsGlobally(int pointsToAdd) {
-        globalPoints += pointsToAdd;
-        savePointsGlobally();
-        updateAllRewardsInstances();
-        System.out.println("Global points added: " + pointsToAdd + ". Total: " + globalPoints);
-    }
-    
-    public static void addPointsForPaymentGlobally(double amountPaid) {
-        // Every 1 PHP = 0.05 points
-        double pointsEarnedDecimal = amountPaid * 0.05;
-        int pointsEarned = (int) Math.round(pointsEarnedDecimal);
-        
-        if (pointsEarned > 0) {
-            addPointsGlobally(pointsEarned);
-            // Show notification to user
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                javax.swing.JOptionPane.showMessageDialog(null, 
-                    "You earned " + pointsEarned + " points for your ₱" + String.format("%.2f", amountPaid) + " payment!\n" +
-                    "(Rate: 0.05 points per PHP)",
-                    "Points Earned", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            });
+    // Static methods for database-connected points management
+    public static void addPointsForPaymentGlobally(String username, double amountPaid, String ticketId) {
+        if (username != null && !username.trim().isEmpty()) {
+            cephra.RewardSystem.addPointsForPayment(username, amountPaid, ticketId);
         }
-    }
-    
-    private static void loadPointsGlobally() {
-        try {
-            java.io.File file = new java.io.File(POINTS_FILE);
-            if (file.exists()) {
-                java.util.Scanner scanner = new java.util.Scanner(file);
-                if (scanner.hasNextInt()) {
-                    globalPoints = scanner.nextInt();
-                }
-                scanner.close();
-            }
-        } catch (Exception e) {
-            System.out.println("Could not load global points: " + e.getMessage());
-            globalPoints = 0;
-        }
-    }
-    
-    private static void savePointsGlobally() {
-        try {
-            java.io.FileWriter writer = new java.io.FileWriter(POINTS_FILE);
-            writer.write(String.valueOf(globalPoints));
-            writer.close();
-        } catch (Exception e) {
-            System.out.println("Could not save global points: " + e.getMessage());
-        }
-    }
-    
-    private static void updateAllRewardsInstances() {
-        // The points will be automatically synced when Rewards panels are accessed
-        // This ensures consistency without needing to search for active instances
-        System.out.println("Points updated globally. All Rewards instances will sync when accessed.");
-    }
-    @SuppressWarnings("unused")
-    private static void updateRewardsDisplay(cephra.Frame.Phone phoneFrame) {
-        // The global points system will automatically update all instances
-        // when they are accessed, so we don't need to actively search for them
-        // This method can be simplified or removed if not needed
     }
 
 
@@ -84,9 +27,11 @@ public class Rewards extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
         
-        // Initialize global points system
-        loadPointsGlobally();
-        syncWithGlobalPoints();
+        // Get current user from session
+        currentUsername = getCurrentUser();
+        
+        // Load points from database
+        loadPointsFromDatabase();
         
         // Setup scroll pane content - this won't be overwritten by NetBeans
         // Use SwingUtilities.invokeLater to ensure everything is ready
@@ -206,32 +151,26 @@ public class Rewards extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
-    @SuppressWarnings("unused")
-    // Points system methods
-    private void loadPoints() {
+    // Database-connected points system methods
+    private String getCurrentUser() {
+        // Get current logged-in user from CephraDB
         try {
-            java.io.File file = new java.io.File(POINTS_FILE);
-            if (file.exists()) {
-                java.util.Scanner scanner = new java.util.Scanner(file);
-                if (scanner.hasNextInt()) {
-                    currentPoints = scanner.nextInt();
-                }
-                scanner.close();
-            }
+            return cephra.CephraDB.getCurrentPhoneUsername();
         } catch (Exception e) {
-            System.out.println("Could not load points: " + e.getMessage());
-            currentPoints = 0;
+            System.out.println("Could not get current user: " + e.getMessage());
+            return null;
         }
     }
     
-    private void savePoints() {
-        try {
-            java.io.FileWriter writer = new java.io.FileWriter(POINTS_FILE);
-            writer.write(String.valueOf(currentPoints));
-            writer.close();
-        } catch (Exception e) {
-            System.out.println("Could not save points: " + e.getMessage());
+    private void loadPointsFromDatabase() {
+        if (currentUsername != null && !currentUsername.trim().isEmpty()) {
+            currentPoints = cephra.RewardSystem.getUserPoints(currentUsername);
+            System.out.println("Loaded " + currentPoints + " points from database for user: " + currentUsername);
+        } else {
+            currentPoints = 0;
+            System.out.println("No current user, points set to 0");
         }
+        updatePointsDisplay();
     }
     
     private void updatePointsDisplay() {
@@ -239,55 +178,75 @@ public class Rewards extends javax.swing.JPanel {
         this.repaint();
     }
     
-    public void addPoints(int pointsToAdd) {
-        currentPoints += pointsToAdd;
-        updatePointsDisplay();
-        savePoints();
-        System.out.println("Added " + pointsToAdd + " points. Total: " + currentPoints);
+    public void addPoints(int pointsToAdd, String description, String referenceId) {
+        if (currentUsername != null && !currentUsername.trim().isEmpty()) {
+            boolean success = cephra.RewardSystem.addPoints(currentUsername, pointsToAdd, description, referenceId);
+            if (success) {
+                loadPointsFromDatabase(); // Reload from database
+                System.out.println("Added " + pointsToAdd + " points to " + currentUsername + ". Total: " + currentPoints);
+            }
+        } else {
+            System.out.println("No current user to add points to");
+        }
     }
     
-    public void addPointsForPayment(double amountPaid) {
-        // Every 1 PHP = 0.05 points (use global method instead)
-        addPointsForPaymentGlobally(amountPaid);
+    public void addPointsForPayment(double amountPaid, String ticketId) {
+        if (currentUsername != null && !currentUsername.trim().isEmpty()) {
+            addPointsForPaymentGlobally(currentUsername, amountPaid, ticketId);
+        }
     }
     
-    public void syncWithGlobalPoints() {
-        currentPoints = globalPoints;
-        updatePointsDisplay();
+    public void syncWithDatabase() {
+        loadPointsFromDatabase();
     }
     
     @Override
     public void setVisible(boolean visible) {
         if (visible) {
-            // Sync with global points whenever the panel becomes visible
-            syncWithGlobalPoints();
+            // Sync with database whenever the panel becomes visible
+            currentUsername = getCurrentUser(); // Refresh current user
+            syncWithDatabase();
         }
         super.setVisible(visible);
     }
     
     private boolean purchaseItem(int itemIndex) {
+        if (currentUsername == null || currentUsername.trim().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Please log in to make purchases.",
+                "Login Required", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        
         int price = ITEM_PRICES[itemIndex];
         String itemName = ITEM_NAMES[itemIndex];
         
-        // Sync with global points before purchase
-        syncWithGlobalPoints();
+        // Sync with database before purchase
+        syncWithDatabase();
         
         if (currentPoints >= price) {
-            // Deduct from global points
-            globalPoints -= price;
-            currentPoints = globalPoints;
-            updatePointsDisplay();
-            savePointsGlobally();
-            updateAllRewardsInstances();
+            // Spend points using database
+            String description = "Purchased " + itemName + " (Item " + (itemIndex + 1) + ")";
+            boolean success = cephra.RewardSystem.spendPoints(currentUsername, price, description, "ITEM_" + (itemIndex + 1));
             
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Thank you for purchasing " + itemName + "!\n" +
-                "Points used: " + price + "\n" +
-                "Remaining points: " + currentPoints,
-                "Purchase Successful", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            
-            System.out.println("Purchased " + itemName + " for " + price + " points. Remaining: " + currentPoints);
-            return true;
+            if (success) {
+                // Reload points from database
+                loadPointsFromDatabase();
+                
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Thank you for purchasing " + itemName + "!\n" +
+                    "Points used: " + price + "\n" +
+                    "Remaining points: " + currentPoints,
+                    "Purchase Successful", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                
+                System.out.println("Purchased " + itemName + " for " + price + " points. Remaining: " + currentPoints);
+                return true;
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Purchase failed. Please try again.",
+                    "Purchase Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
         } else {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "Insufficient points!\n" +

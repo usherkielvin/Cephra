@@ -1739,6 +1739,44 @@ public class BayManagement extends javax.swing.JPanel {
     
     
     /**
+     * Gets the bay number for a given ticket ID
+     * @param ticketId the ticket ID to look up
+     * @return the bay number (1-8), or null if not found
+     */
+    public static String getBayNumberByTicket(String ticketId) {
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            return null;
+        }
+        
+        try (java.sql.Connection conn = cephra.db.DatabaseConnection.getConnection()) {
+            if (conn == null) {
+                logError("Could not establish database connection for bay number lookup");
+                return null;
+            }
+            
+            try (java.sql.PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT bay_number FROM charging_bays WHERE current_ticket_id = ?")) {
+                stmt.setString(1, ticketId);
+                try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String bayNumberStr = rs.getString("bay_number");
+                        // Extract just the number from "Bay-X" format
+                        if (bayNumberStr != null && bayNumberStr.startsWith("Bay-")) {
+                            return bayNumberStr.replace("Bay-", "");
+                        }
+                        return bayNumberStr;
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            logError("Error getting bay number by ticket: " + e.getMessage(), e);
+        }
+        
+        return null;
+    }
+    
+    /**
      * Adds a ticket to the waiting grid database
      * @param ticketId the ticket ID
      * @param username the username

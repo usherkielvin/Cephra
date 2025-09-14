@@ -188,11 +188,11 @@ public class TopUppanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bckActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void BActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BActionPerformed
-        // TODO add your handling code here:
+      
     }//GEN-LAST:event_BActionPerformed
 
     private void CustomamountKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CustomamountKeyTyped

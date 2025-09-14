@@ -2,6 +2,8 @@
 -- This script creates all necessary tables for the Cephra charging station management system
 
 -- Drop existing tables if they exist (for clean initialization)
+DROP TABLE IF EXISTS reward_transactions;
+DROP TABLE IF EXISTS user_points;
 DROP TABLE IF EXISTS payment_transactions;
 DROP TABLE IF EXISTS charging_history;
 DROP TABLE IF EXISTS queue_tickets;
@@ -221,6 +223,10 @@ CREATE INDEX idx_wallet_balance_username ON wallet_balance(username);
 CREATE INDEX idx_wallet_transactions_username ON wallet_transactions(username);
 CREATE INDEX idx_wallet_transactions_type ON wallet_transactions(transaction_type);
 CREATE INDEX idx_wallet_transactions_date ON wallet_transactions(transaction_date);
+CREATE INDEX idx_user_points_username ON user_points(username);
+CREATE INDEX idx_reward_transactions_username ON reward_transactions(username);
+CREATE INDEX idx_reward_transactions_type ON reward_transactions(transaction_type);
+CREATE INDEX idx_reward_transactions_date ON reward_transactions(transaction_date);
 
 -- Create triggers for automatic updates
 DELIMITER //
@@ -300,6 +306,36 @@ INSERT IGNORE INTO battery_levels (username, battery_level, initial_battery_leve
 INSERT IGNORE INTO wallet_balance (username, balance) VALUES
 ('dizon', 1000.00),
 ('earnest', 500.00);
+
+-- User points table for reward system
+CREATE TABLE IF NOT EXISTS user_points (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    total_points INT NOT NULL DEFAULT 0,
+    lifetime_earned INT NOT NULL DEFAULT 0,
+    lifetime_spent INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+);
+
+-- Reward transactions table for tracking point activities
+CREATE TABLE IF NOT EXISTS reward_transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    transaction_type VARCHAR(20) NOT NULL, -- 'EARNED', 'SPENT', 'EXPIRED', 'BONUS'
+    points_change INT NOT NULL, -- Positive for earned, negative for spent
+    total_points_after INT NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    reference_id VARCHAR(50), -- ticket_id for payment-based points, item_id for purchases
+    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+);
+
+-- Insert initial user points for demo users
+INSERT IGNORE INTO user_points (username, total_points, lifetime_earned, lifetime_spent) VALUES
+('dizon', 69, 69, 0),
+('earnest', 0, 0, 0);
 
 -- Insert demo queue ticket (using INSERT IGNORE to prevent duplicates)
 -- INSERT IGNORE INTO queue_tickets (ticket_id, username, service_type, initial_battery_level, status, payment_status, priority) VALUES

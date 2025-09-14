@@ -9,6 +9,9 @@ public class Queue extends javax.swing.JPanel {
     private static Monitor monitorInstance;
     private JButton[] gridButtons;
     private int buttonCount = 0;
+    
+    // Static notification instance to allow updates
+    private static cephra.Phone.UnifiedNotification staticNotification = null;
 
     public Queue() {
         initComponents();
@@ -216,6 +219,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customerName, serviceName, battery);
                             // Refresh waiting grid view
                             initializeWaitingGridFromDatabase();
+                            
+                            // Trigger notification for the customer
+                            triggerNotificationForCustomer(customerName, "TICKET_WAITING", ticket, null);
                         } catch (Throwable ignore) {}
                     }
                     // Do not open PayPop yet when still Waiting
@@ -248,6 +254,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     }
                     System.out.println("Queue: PayPop can be shown - completing charging for ticket " + ticket);
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
+                    
+                    // Trigger FULL_CHARGE notification for the customer
+                    triggerNotificationForCustomer(customer, "FULL_CHARGE", ticket, null);
                 }
                 if ("Complete".equalsIgnoreCase(status) || "Charging".equalsIgnoreCase(status)) {
                     try {
@@ -576,6 +585,13 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             if (assigned) {
                 setTableStatusToChargingByTicket(ticket);
                 removeTicketFromGrid(ticket);
+                
+                // Get customer name and bay number for notification
+                String customerName = cephra.CephraDB.getCustomerByTicket(ticket);
+                String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
+                if (customerName != null) {
+                    triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
+                }
             } else {
                 JOptionPane.showMessageDialog(this,
                     "Normal Charge Bays 1-5 are full!\nTicket " + ticket + " remains in waiting queue.",
@@ -594,6 +610,13 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             if (assigned) {
                 setTableStatusToChargingByTicket(ticket);
                 removeTicketFromGrid(ticket);
+                
+                // Get customer name and bay number for notification
+                String customerName = cephra.CephraDB.getCustomerByTicket(ticket);
+                String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
+                if (customerName != null) {
+                    triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
+                }
             } else {
                 JOptionPane.showMessageDialog(this,
                     "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue.",
@@ -838,6 +861,13 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 queTab.setValueAt("Charging", row, statusCol);
                 // Update database status
                 cephra.CephraDB.updateQueueTicketStatus(ticket, "Charging");
+                
+                // Get customer name and bay number for MY_TURN notification
+                String customerName = cephra.CephraDB.getCustomerByTicket(ticket);
+                String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
+                if (customerName != null) {
+                    triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
+                }
                 break;
             }
         }
@@ -1722,14 +1752,18 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
     
+  
     /**
-     * Triggers notifications for customers when admin updates queue status
-     * @param customer The username of the customer to notify
-     * @param notificationType The type of notification (TICKET_WAITING, MY_TURN, FULL_CHARGE, etc.)
-     * @param ticketId The ticket ID
-     * @param bayNumber The bay number (for MY_TURN notifications)
+     * Get or create the static unified notification instance
      */
-    @SuppressWarnings("unused")
+    private static cephra.Phone.UnifiedNotification getOrCreateUnifiedNotification(cephra.Frame.Phone phoneFrame) {
+        if (staticNotification == null) {
+            staticNotification = new cephra.Phone.UnifiedNotification();
+            staticNotification.addToFrame(phoneFrame);
+        }
+        return staticNotification;
+    }
+    
     private void triggerNotificationForCustomer(String customer, String notificationType, String ticketId, String bayNumber) {
         if (customer == null || customer.trim().isEmpty()) {
             System.out.println("Queue: Cannot trigger notification - customer is null or empty");
@@ -1798,73 +1832,29 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 
                 System.out.println("Queue: Showing visual notification for " + notificationType + " to user " + customer);
                 
-                // Show the appropriate notification based on type
+                // Get or create the unified notification instance (static to allow updates)
+                cephra.Phone.UnifiedNotification unifiedNotif = getOrCreateUnifiedNotification(phoneFrame);
+                
+                // Update and show the notification (this will override any current notification)
                 switch (notificationType) {
                     case "TICKET_WAITING":
-                        cephra.Phone.NotifTicketWaiting waitingNotif = new cephra.Phone.NotifTicketWaiting();
-                        // Update the ticket number in the notification text
-                        if (ticketId != null) {
-                            try {
-                                java.lang.reflect.Field statusField = waitingNotif.getClass().getDeclaredField("Statuswaiting");
-                                statusField.setAccessible(true);
-                                javax.swing.JLabel statusLabel = (javax.swing.JLabel) statusField.get(waitingNotif);
-                                statusLabel.setText("Your ticket \"" + ticketId + "\" is now waiting");
-                            } catch (Exception ex) {
-                                System.err.println("Could not update ticket ID in waiting notification: " + ex.getMessage());
-                            }
-                        }
-                        waitingNotif.addToFrame(phoneFrame);
-                        waitingNotif.showNotification();
-                        System.out.println("Queue: Showed TICKET_WAITING notification for ticket " + ticketId);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.UnifiedNotification.TYPE_WAITING, ticketId, bayNumber);
+                        System.out.println("Queue: Updated to TICKET_WAITING notification for ticket " + ticketId);
                         break;
                         
                     case "TICKET_PENDING":
-                        cephra.Phone.NotifTicketPending pendingNotif = new cephra.Phone.NotifTicketPending();
-                        // Update the ticket number in the notification text
-                        if (ticketId != null) {
-                            try {
-                                java.lang.reflect.Field statusField = pendingNotif.getClass().getDeclaredField("Statuspending");
-                                statusField.setAccessible(true);
-                                javax.swing.JLabel statusLabel = (javax.swing.JLabel) statusField.get(pendingNotif);
-                                statusLabel.setText("Your ticket \"" + ticketId + "\" is now pending");
-                            } catch (Exception ex) {
-                                System.err.println("Could not update ticket ID in pending notification: " + ex.getMessage());
-                            }
-                        }
-                        pendingNotif.addToFrame(phoneFrame);
-                        pendingNotif.showNotification();
-                        System.out.println("Queue: Showed TICKET_PENDING notification for ticket " + ticketId);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.UnifiedNotification.TYPE_PENDING, ticketId, bayNumber);
+                        System.out.println("Queue: Updated to TICKET_PENDING notification for ticket " + ticketId);
                         break;
                         
                     case "MY_TURN":
-                        cephra.Phone.Myturn myTurnNotif = new cephra.Phone.Myturn();
-                        // Update the bay number text if available
-                        if (bayNumber != null) {
-                            // Use reflection to update the StatusGo label text
-                            try {
-                                java.lang.reflect.Field statusGoField = myTurnNotif.getClass().getDeclaredField("StatusGo");
-                                statusGoField.setAccessible(true);
-                                javax.swing.JLabel statusGoLabel = (javax.swing.JLabel) statusGoField.get(myTurnNotif);
-                                statusGoLabel.setText("Please go to your bay \"" + bayNumber + "\" now");
-                            } catch (Exception ex) {
-                                System.err.println("Could not update bay number in MyTurn notification: " + ex.getMessage());
-                            }
-                        }
-                        myTurnNotif.addToFrame(phoneFrame);
-                        myTurnNotif.showNotification();
-                        System.out.println("Queue: Showed MY_TURN notification for bay " + bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.UnifiedNotification.TYPE_MY_TURN, ticketId, bayNumber);
+                        System.out.println("Queue: Updated to MY_TURN notification for bay " + bayNumber);
                         break;
                         
                     case "FULL_CHARGE":
-                        // Use the correct Fullnotif class for full charge notifications
-                        cephra.Phone.Fullnotif fullChargeNotif = new cephra.Phone.Fullnotif();
-                        
-                        // The Fullnotif already has the proper text "Ur car is now fullcharge"
-                        // No need to modify the text as it's already appropriate
-                        
-                        fullChargeNotif.addToFrame(phoneFrame);
-                        fullChargeNotif.showNotification();
-                        System.out.println("Queue: Showed FULL_CHARGE notification using Fullnotif");
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.UnifiedNotification.TYPE_DONE, ticketId, bayNumber);
+                        System.out.println("Queue: Updated to FULL_CHARGE notification using unified system");
                         break;
                         
                     default:

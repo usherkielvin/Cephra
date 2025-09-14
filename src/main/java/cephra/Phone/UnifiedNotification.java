@@ -1,0 +1,269 @@
+package cephra.Phone;
+
+import java.awt.event.*;
+import javax.swing.*;
+
+public class UnifiedNotification extends javax.swing.JPanel {
+
+    private Timer animationTimer;
+    private Timer hideTimer;
+    private int yPosition = -110; // Start position (hidden above the screen)
+    private int targetY = 80; // Target position when fully shown (lower down for better visibility)
+    private boolean isShowing = false;
+    private static final int ANIMATION_SPEED = 5; // Pixels to move per step
+    private static final int ANIMATION_DELAY = 10; // Milliseconds between steps
+    private static final int DISPLAY_DURATION = 3000; // Display for 3 seconds
+    
+    // Notification types
+    public static final String TYPE_WAITING = "WAITING";
+    public static final String TYPE_PENDING = "PENDING";
+    public static final String TYPE_MY_TURN = "MY_TURN";
+    public static final String TYPE_DONE = "DONE";
+    public static final String TYPE_OTP = "OTP";
+    
+    private String currentNotificationType = TYPE_WAITING;
+    private String ticketId = "";
+    private String bayNumber = "";
+    
+    public UnifiedNotification() {
+        initComponents();
+        setOpaque(false);
+        setVisible(false); // Start hidden
+    }
+    
+    public void setNotificationType(String type, String ticketId, String bayNumber) {
+        this.currentNotificationType = type;
+        this.ticketId = ticketId != null ? ticketId : "";
+        this.bayNumber = bayNumber != null ? bayNumber : "";
+        
+        updateNotificationDisplay();
+    }
+    
+    /**
+     * Updates the notification display based on the current type
+     */
+    private void updateNotificationDisplay() {
+        switch (currentNotificationType) {
+            case TYPE_WAITING:
+                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifWaitingBay.png")));
+                statusLabel.setText("Your ticket \"" + ticketId + "\" is now waiting");
+                statusLabel.setForeground(new java.awt.Color(0, 102, 102));
+                break;
+                
+            case TYPE_PENDING:
+                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifPendingBay.png")));
+                statusLabel.setText("Your ticket \"" + ticketId + "\" is now pending");
+                statusLabel.setForeground(new java.awt.Color(255, 0, 0));
+                break;
+                
+            case TYPE_MY_TURN:
+                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifProceedBay.png")));
+                statusLabel.setText("Please go to your bay \"" + bayNumber + "\" now");
+                statusLabel.setForeground(new java.awt.Color(0, 150, 0));
+                break;
+                
+            case TYPE_DONE:
+                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Done.png")));
+                statusLabel.setText("Your ticket \"" + ticketId + "\" is now fullcharge");
+                statusLabel.setForeground(new java.awt.Color(255, 255, 102));
+                break;
+                
+            case TYPE_OTP:
+                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifWaitingBay.png")));
+                statusLabel.setText("Your verification code: " + ticketId);
+                statusLabel.setForeground(new java.awt.Color(0, 102, 102));
+                break;
+                
+            default:
+                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifWaitingBay.png")));
+                statusLabel.setText("Notification");
+                statusLabel.setForeground(new java.awt.Color(0, 102, 102));
+                break;
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jButton1 = new javax.swing.JButton();
+        statusLabel = new javax.swing.JLabel();
+
+        setBackground(new java.awt.Color(255, 255, 255));
+        setOpaque(false);
+        setLayout(null);
+
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        add(jButton1);
+        jButton1.setBounds(0, 0, 330, 60);
+
+        statusLabel.setForeground(new java.awt.Color(0, 102, 102));
+        statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifWaitingBay.png"))); // NOI18N
+        add(statusLabel);
+        statusLabel.setBounds(0, -10, 330, 70);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.NotificationHistory());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * Force re-show the notification (useful for charging alerts)
+     */
+    public void forceShowNotification() {
+        // Reset any existing state and show again
+        isShowing = false;
+        showNotification();
+    }
+    
+    /**
+     * Update the current notification content and re-show it
+     */
+    public void updateAndShowNotification(String type, String ticketId, String bayNumber) {
+        // Update the notification content
+        setNotificationType(type, ticketId, bayNumber);
+        
+        // If currently showing, restart the animation from the top
+        if (isShowing) {
+            yPosition = -110;
+            setLocation(23, yPosition);
+            
+            // Cancel existing timers
+            if (animationTimer != null && animationTimer.isRunning()) {
+                animationTimer.stop();
+            }
+            if (hideTimer != null && hideTimer.isRunning()) {
+                hideTimer.stop();
+            }
+            
+            // Restart the show animation
+            showNotificationAnimation();
+        } else {
+            // If not showing, just show normally
+            showNotification();
+        }
+    }
+    
+    /**
+     * Internal method to start the show animation
+     */
+    private void showNotificationAnimation() {
+        animationTimer = new Timer(ANIMATION_DELAY, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (yPosition < targetY) {
+                    yPosition += ANIMATION_SPEED;
+                    setLocation(23, yPosition);
+                    
+                    // Ensure iPhone frame stays on top during animation
+                    java.awt.Window[] windows = java.awt.Window.getWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof cephra.Frame.Phone) {
+                            ((cephra.Frame.Phone) window).ensureIphoneFrameOnTop();
+                            break;
+                        }
+                    }
+                } else {
+                    // Animation completed
+                    animationTimer.stop();
+                    
+                    // Schedule hide after duration
+                    hideTimer = new Timer(DISPLAY_DURATION, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            hideNotification();
+                        }
+                    });
+                    hideTimer.setRepeats(false);
+                    hideTimer.start();
+                }
+            }
+        });
+        animationTimer.start();
+    }
+    
+    /**
+     * Shows the notification with animation sliding down from the top
+     */
+    public void showNotification() {
+        // Allow re-showing notifications (especially for charging alerts)
+        // Cancel any existing timers first
+        if (animationTimer != null && animationTimer.isRunning()) {
+            animationTimer.stop();
+        }
+        if (hideTimer != null && hideTimer.isRunning()) {
+            hideTimer.stop();
+        }
+        
+        isShowing = true;
+        setVisible(true);
+        yPosition = -110;
+        setLocation(23, yPosition); // Start off-screen, centered horizontally
+        
+        // Start the show animation
+        showNotificationAnimation();
+    }
+    
+    /**
+     * Hides the notification with animation sliding up
+     */
+    public void hideNotification() {
+        if (!isShowing) return; // Only hide if showing
+        
+        // Cancel existing animation if running
+        if (animationTimer != null && animationTimer.isRunning()) {
+            animationTimer.stop();
+        }
+        
+        // Create and start the hide animation
+        animationTimer = new Timer(ANIMATION_DELAY, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (yPosition > -110) {
+                    yPosition -= ANIMATION_SPEED;
+                    setLocation(23, yPosition);
+                } else {
+                    // Animation completed
+                    animationTimer.stop();
+                    setVisible(false);
+                    isShowing = false;
+                }
+            }
+        });
+        animationTimer.start();
+    }
+    
+    /**
+     * Add this notification to a parent JFrame
+     * @param frame The parent Phone frame
+     */
+    public void addToFrame(cephra.Frame.Phone frame) {
+        this.setBounds(23, -110, 330, 70); // Initial position off-screen, centered horizontally
+        frame.getRootPane().getLayeredPane().add(this, JLayeredPane.POPUP_LAYER);
+        frame.getRootPane().getLayeredPane().moveToFront(this);
+        
+        // Ensure iPhone frame stays on top of the notification
+        frame.ensureIphoneFrameOnTop();
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel statusLabel;
+    private javax.swing.JButton jButton1;
+    // End of variables declaration//GEN-END:variables
+}
