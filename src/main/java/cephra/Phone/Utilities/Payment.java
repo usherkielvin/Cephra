@@ -1,11 +1,10 @@
-
-package cephra.Phone;
-
-
-public class payment extends javax.swing.JPanel {
+package cephra.Phone.Utilities;
 
 
-    public payment() {
+public class Payment extends javax.swing.JPanel {
+
+
+    public Payment() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);

@@ -80,7 +80,7 @@ public class Loading_Screen extends javax.swing.JPanel {
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
         java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Loading_Screen.this);
         if (w instanceof cephra.Frame.Phone) {
-            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Transition());
+            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Utilities.Transition());
         }
     }//GEN-LAST:event_exitloginActionPerformed
 

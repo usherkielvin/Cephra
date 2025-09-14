@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.Utilities;
 
 public final class AppState {
     private AppState() {}

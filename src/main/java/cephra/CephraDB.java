@@ -325,8 +325,8 @@ public class CephraDB {
         String emailToUse = null;
         if (currentPhoneUser != null) {
             emailToUse = currentPhoneUser.email;
-        } else if (cephra.Phone.AppSessionState.userEmailForReset != null) {
-            emailToUse = cephra.Phone.AppSessionState.userEmailForReset;
+        } else if (cephra.Phone.Utilities.AppSessionState.userEmailForReset != null) {
+            emailToUse = cephra.Phone.Utilities.AppSessionState.userEmailForReset;
         }
         
         // Store OTP in database if we have an email
@@ -375,8 +375,8 @@ public class CephraDB {
         String emailToUse = null;
         if (currentPhoneUser != null) {
             emailToUse = currentPhoneUser.email;
-        } else if (cephra.Phone.AppSessionState.userEmailForReset != null) {
-            emailToUse = cephra.Phone.AppSessionState.userEmailForReset;
+        } else if (cephra.Phone.Utilities.AppSessionState.userEmailForReset != null) {
+            emailToUse = cephra.Phone.Utilities.AppSessionState.userEmailForReset;
         }
         
         if (emailToUse == null) {
@@ -1472,7 +1472,7 @@ public class CephraDB {
             if (totalAmount > 0) {
                 try {
                     // Use RewardSystem to add points to database
-                    boolean pointsSuccess = cephra.RewardSystem.addPointsForPayment(username, totalAmount, ticketId);
+                    boolean pointsSuccess = cephra.Phone.Utilities.RewardSystem.addPointsForPayment(username, totalAmount, ticketId);
                     if (pointsSuccess) {
                         System.out.println("CephraDB: Successfully added points for payment of ₱" + totalAmount + " to user " + username);
                     } else {
@@ -1509,7 +1509,7 @@ public class CephraDB {
             
             // Notify phone history that a new entry has been added
             try {
-                cephra.Phone.UserHistoryManager.notifyHistoryUpdate(username);
+                cephra.Phone.Utilities.UserHistoryManager.notifyHistoryUpdate(username);
                 System.out.println("CephraDB: Notified phone history for user: " + username);
             } catch (Exception e) {
                 System.err.println("CephraDB: Error notifying phone history: " + e.getMessage());

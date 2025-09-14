@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.Dashboard;
 
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -187,7 +187,7 @@ public class Home extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Profile());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Profile());
                         break;
                     }
                 }
@@ -202,7 +202,7 @@ public class Home extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.phonehistory());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.phonehistory());
                         break;
                     }
                 }
@@ -217,7 +217,7 @@ public class Home extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.ChargingOption());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
                         break;
                     }
                 }
@@ -240,8 +240,7 @@ public class Home extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
     
-                                                     
-
+                                                    
     private void NotificationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NotificationsActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -249,8 +248,8 @@ public class Home extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        NotificationHistory notificationHistory = new NotificationHistory();
-                        notificationHistory.setPreviousPanel(new cephra.Phone.Home());
+                        cephra.Phone.NotificationHistory notificationHistory = new cephra.Phone.NotificationHistory();
+                        notificationHistory.setPreviousPanel(new cephra.Phone.Dashboard.Home());
                         phoneFrame.switchPanel(notificationHistory);
                         break;
                     }

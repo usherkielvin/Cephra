@@ -7,7 +7,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class NotificationHistory extends javax.swing.JPanel implements NotificationHistoryManager.NotificationUpdateListener {
+public class NotificationHistory extends javax.swing.JPanel implements cephra.Phone.Utilities.NotificationHistoryManager.NotificationUpdateListener {
     
     
     
@@ -32,7 +32,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         createHistoryPanel();
         
         // Register as listener for notification updates
-        NotificationHistoryManager.addNotificationUpdateListener(this);
+        cephra.Phone.Utilities.NotificationHistoryManager.addNotificationUpdateListener(this);
         
         // Add close button
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -107,7 +107,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
                         if (previousPanel != null) {
                             phoneFrame.switchPanel(previousPanel);
                         } else {
-                            phoneFrame.switchPanel(new cephra.Phone.Home());
+                            phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                         }
                         break;
                     }
@@ -121,7 +121,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         historyPanel.removeAll();
         
         // Get current user's notifications
-        List<NotificationHistoryManager.NotificationEntry> entries = NotificationHistoryManager.getNotificationsForUser(currentUsername);
+        List<cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry> entries = cephra.Phone.Utilities.NotificationHistoryManager.getNotificationsForUser(currentUsername);
         
         // Debug information
         System.out.println("NotificationHistory: Found " + entries.size() + " notification entries");
@@ -138,7 +138,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
             historyPanel.add(noHistoryPanel);
         } else {
             // Add notification entries
-            for (NotificationHistoryManager.NotificationEntry entry : entries) {
+            for (cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry entry : entries) {
                 addNotificationItem(entry);
             }
         }
@@ -154,7 +154,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
     }
     
     @Override
-    public void onNotificationAdded(NotificationHistoryManager.NotificationEntry entry) {
+    public void onNotificationAdded(cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry entry) {
         // This is called when a new notification is added
         // We'll update the display in onNotificationHistoryUpdated
     }
@@ -170,7 +170,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
         }
     }
     
-    private void addNotificationItem(final NotificationHistoryManager.NotificationEntry entry) {
+    private void addNotificationItem(final cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry entry) {
         // Create a panel for a single notification item
         JPanel notificationItemPanel = new JPanel();
         notificationItemPanel.setLayout(new BorderLayout(5, 0));
@@ -269,7 +269,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
     private JPanel detailsPanel;
    
     
-    private void showNotificationDetails(NotificationHistoryManager.NotificationEntry entry) {
+    private void showNotificationDetails(cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry entry) {
         // If details panel already exists, remove it first
         if (detailsPanel != null) {
             remove(detailsPanel);
@@ -515,7 +515,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.ChargingOption());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
                         break;
                     }
                 }
@@ -530,7 +530,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Profile());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Profile());
                         break;
                     }
                 }
@@ -545,7 +545,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Home());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                         break;
                     }
                 }
@@ -599,7 +599,7 @@ public class NotificationHistory extends javax.swing.JPanel implements Notificat
     @Override
     public void removeNotify() {
         // Unregister as listener when panel is removed
-        NotificationHistoryManager.removeNotificationUpdateListener(this);
+        cephra.Phone.Utilities.NotificationHistoryManager.removeNotificationUpdateListener(this);
         super.removeNotify();
     }
 }

@@ -204,7 +204,7 @@ public class PasswordNew extends javax.swing.JPanel {
         String password2 = new String(pass1.getPassword());
 
         if (password.equals(password2) && !password.isEmpty()) {
-            String userEmail = cephra.Phone.AppSessionState.userEmailForReset;
+            String userEmail = cephra.Phone.Utilities.AppSessionState.userEmailForReset;
             
             // Check if new password is the same as old password
             String oldPassword = cephra.CephraDB.getUserPasswordByEmail(userEmail);
@@ -222,7 +222,7 @@ public class PasswordNew extends javax.swing.JPanel {
             if (userEmail != null && cephra.CephraDB.updateUserPassword(userEmail, password)) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
                 // Reset the email for the next session
-                cephra.Phone.AppSessionState.userEmailForReset = null;
+                cephra.Phone.Utilities.AppSessionState.userEmailForReset = null;
                 // Navigate to Phonelogin after OK is clicked
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     public void run() {

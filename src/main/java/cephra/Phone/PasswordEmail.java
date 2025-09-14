@@ -83,7 +83,7 @@ public class PasswordEmail extends javax.swing.JPanel {
 
     private void ReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReturnActionPerformed
         // Don't show notification when returning from PasswordEmail
-        cephra.Phone.AppSessionState.showOtpNotification = false;
+        cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
         
          javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {

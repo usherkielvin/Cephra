@@ -168,7 +168,7 @@ public class QueueTicket extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.ChargingOption());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
                         break;
                     }
                 }
@@ -251,7 +251,7 @@ public class QueueTicket extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.phonehistory());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.phonehistory());
                         break;
                     }
                 }
@@ -266,7 +266,7 @@ public class QueueTicket extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Profile());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Profile());
                         break;
                     }
                 }
@@ -281,7 +281,7 @@ public class QueueTicket extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Home());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                         break;
                     }
                 }
@@ -300,7 +300,7 @@ public class QueueTicket extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.ChargingOption());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
                         break;
                     }
                 }

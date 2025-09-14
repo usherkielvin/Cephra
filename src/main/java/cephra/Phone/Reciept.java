@@ -228,7 +228,7 @@ public class Reciept extends javax.swing.JPanel {
         for (java.awt.Window window : windows) {
             if (window instanceof cephra.Frame.Phone) {
                 cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                phoneFrame.switchPanel(new cephra.Phone.Home());
+                phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                 break;
             }
         }

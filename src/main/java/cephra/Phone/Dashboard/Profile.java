@@ -1,5 +1,4 @@
-
-package cephra.Phone;
+package cephra.Phone.Dashboard;
 
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -189,7 +188,7 @@ public class Profile extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.ChargingOption());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
                         break;
                     }
                 }
@@ -204,7 +203,7 @@ public class Profile extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.phonehistory());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.phonehistory());
                         break;
                     }
                 }
@@ -246,7 +245,7 @@ public class Profile extends javax.swing.JPanel {
                             }
                             
                             // Keep car linked - users only link once
-                            // cephra.Phone.AppState.isCarLinked = false; // Removed - keep car linked
+                            // cephra.Phone.Utilities.AppState.isCarLinked = false; // Removed - keep car linked
                          
                             // Refresh any visible Porsche panel to show the new battery level
                             try {
@@ -303,7 +302,7 @@ public class Profile extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Home());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                         break;
                     }
                 }

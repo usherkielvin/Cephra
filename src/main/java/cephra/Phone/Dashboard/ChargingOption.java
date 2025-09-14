@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.Dashboard;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -158,7 +158,7 @@ public class ChargingOption extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.phonehistory());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.phonehistory());
                         break;
                     }
                 }
@@ -173,7 +173,7 @@ public class ChargingOption extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Profile());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Profile());
                         break;
                     }
                 }
@@ -203,7 +203,7 @@ public class ChargingOption extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Home());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                         break;
                     }
                 }
@@ -220,7 +220,7 @@ public class ChargingOption extends javax.swing.JPanel {
             return;
         }
         // Check if car is linked
-        if (!cephra.Phone.AppState.isCarLinked) {
+        if (!cephra.Phone.Utilities.AppState.isCarLinked) {
             // Show custom LinkFirst panel instead of JOptionPane
             cephra.Phone.LinkFirst.showPayPop(null, username);
             return;
@@ -266,7 +266,7 @@ public class ChargingOption extends javax.swing.JPanel {
             return;
         }
         // Check if car is linked
-        if (!cephra.Phone.AppState.isCarLinked) {
+        if (!cephra.Phone.Utilities.AppState.isCarLinked) {
             // Show custom LinkFirst panel instead of JOptionPane
             cephra.Phone.LinkFirst.showPayPop(null, username);
             return;

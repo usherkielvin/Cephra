@@ -384,7 +384,7 @@ public class PasswordVerify extends javax.swing.JPanel {
         code1.requestFocusInWindow();
         
         // Set flag to show notification for resend
-        cephra.Phone.AppSessionState.showOtpNotification = true;
+        cephra.Phone.Utilities.AppSessionState.showOtpNotification = true;
         
         // Show new notification with updated OTP instead of dialog
         showOTPNotification(cephra.CephraDB.getGeneratedOTP());
@@ -495,8 +495,8 @@ public class PasswordVerify extends javax.swing.JPanel {
                 setupButtons(); // Setup buttons when panel is added to container
                 
                 // Set the user's email dynamically
-                if (cephra.Phone.AppSessionState.userEmailForReset != null) {
-                    cephramail.setText(cephra.Phone.AppSessionState.userEmailForReset);
+                if (cephra.Phone.Utilities.AppSessionState.userEmailForReset != null) {
+                    cephramail.setText(cephra.Phone.Utilities.AppSessionState.userEmailForReset);
                 }
                 
                 if (code1 != null) {
@@ -508,10 +508,10 @@ public class PasswordVerify extends javax.swing.JPanel {
                 }
                 
                 // Show notification with OTP only if the flag is set (coming from PasswordForgot or resending)
-                if (cephra.Phone.AppSessionState.showOtpNotification) {
+                if (cephra.Phone.Utilities.AppSessionState.showOtpNotification) {
                     showOTPNotification(cephra.CephraDB.getGeneratedOTP());
                     // Reset the flag after showing the notification
-                    cephra.Phone.AppSessionState.showOtpNotification = false;
+                    cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
                 }
                 
                 // Enter key functionality is already set up in setupButtons() method

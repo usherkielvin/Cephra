@@ -168,8 +168,8 @@ public class PasswordForgot extends javax.swing.JPanel {
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
         String emailText = email.getText().trim();
 if (cephra.CephraDB.findUserByEmail(emailText) != null) {
-    cephra.Phone.AppSessionState.userEmailForReset = emailText; // Add this line
-    cephra.Phone.AppSessionState.showOtpNotification = true; // Show notification when coming from PasswordForgot
+    cephra.Phone.Utilities.AppSessionState.userEmailForReset = emailText; // Add this line
+    cephra.Phone.Utilities.AppSessionState.showOtpNotification = true; // Show notification when coming from PasswordForgot
     cephra.CephraDB.generateAndStoreOTP();
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {

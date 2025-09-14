@@ -17,7 +17,7 @@ public class Rewards extends javax.swing.JPanel {
     // Static methods for database-connected points management
     public static void addPointsForPaymentGlobally(String username, double amountPaid, String ticketId) {
         if (username != null && !username.trim().isEmpty()) {
-            cephra.RewardSystem.addPointsForPayment(username, amountPaid, ticketId);
+            cephra.Phone.Utilities.RewardSystem.addPointsForPayment(username, amountPaid, ticketId);
         }
     }
 
@@ -164,7 +164,7 @@ public class Rewards extends javax.swing.JPanel {
     
     private void loadPointsFromDatabase() {
         if (currentUsername != null && !currentUsername.trim().isEmpty()) {
-            currentPoints = cephra.RewardSystem.getUserPoints(currentUsername);
+            currentPoints = cephra.Phone.Utilities.RewardSystem.getUserPoints(currentUsername);
             System.out.println("Loaded " + currentPoints + " points from database for user: " + currentUsername);
         } else {
             currentPoints = 0;
@@ -180,7 +180,7 @@ public class Rewards extends javax.swing.JPanel {
     
     public void addPoints(int pointsToAdd, String description, String referenceId) {
         if (currentUsername != null && !currentUsername.trim().isEmpty()) {
-            boolean success = cephra.RewardSystem.addPoints(currentUsername, pointsToAdd, description, referenceId);
+            boolean success = cephra.Phone.Utilities.RewardSystem.addPoints(currentUsername, pointsToAdd, description, referenceId);
             if (success) {
                 loadPointsFromDatabase(); // Reload from database
                 System.out.println("Added " + pointsToAdd + " points to " + currentUsername + ". Total: " + currentPoints);
@@ -227,7 +227,7 @@ public class Rewards extends javax.swing.JPanel {
         if (currentPoints >= price) {
             // Spend points using database
             String description = "Purchased " + itemName + " (Item " + (itemIndex + 1) + ")";
-            boolean success = cephra.RewardSystem.spendPoints(currentUsername, price, description, "ITEM_" + (itemIndex + 1));
+            boolean success = cephra.Phone.Utilities.RewardSystem.spendPoints(currentUsername, price, description, "ITEM_" + (itemIndex + 1));
             
             if (success) {
                 // Reload points from database
@@ -598,7 +598,7 @@ public class Rewards extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Home());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                         break;
                     }
                 }
@@ -613,7 +613,7 @@ public class Rewards extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Profile());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Profile());
                         break;
                     }
                 }
@@ -643,7 +643,7 @@ public class Rewards extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.ChargingOption());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
                         break;
                     }
                 }
@@ -658,7 +658,7 @@ public class Rewards extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.phonehistory());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.phonehistory());
                         break;
                     }
                 }

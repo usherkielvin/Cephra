@@ -1,20 +1,9 @@
-package cephra;
+package cephra.Phone.Utilities;
 
 import java.sql.*;
 import java.util.*;
 
-/**
- * RewardSystem - Database-connected reward points management system
- * 
- * This class provides comprehensive reward points operations including:
- * - User points management (earn, spend, get balance)
- * - Transaction history tracking
- * - Payment-based point rewards (0.05 points per PHP)
- * - Purchase tracking and validation
- * 
- * All operations use prepared statements for security and include
- * comprehensive error handling and logging.
- */
+
 public class RewardSystem {
     
     // Reward system configuration
