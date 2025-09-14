@@ -10,7 +10,7 @@ import javax.swing.SwingUtilities;
  * Manages notification history for the phone app
  * Records notifications from various sources (admin updates, status changes, etc.)
  */
-public class NotificationHistoryManager {
+public class NotificationManager {
     
     public enum NotificationType {
         FULL_CHARGE("Full Charge", "Your car is now fully charged"),

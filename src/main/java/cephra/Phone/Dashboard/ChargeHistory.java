@@ -6,14 +6,14 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class phonehistory extends javax.swing.JPanel implements cephra.Phone.Utilities.UserHistoryManager.HistoryUpdateListener {
+public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Utilities.HistoryManager.HistoryUpdateListener {
     
     
     
    
     private String currentUsername;
 
-    public phonehistory() {
+    public ChargeHistory() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -33,7 +33,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         createHistoryPanel();
         
         // Register as listener for history updates
-        cephra.Phone.Utilities.UserHistoryManager.addHistoryUpdateListener(this);
+        cephra.Phone.Utilities.HistoryManager.addHistoryUpdateListener(this);
         
         // Load history entries
         loadHistoryEntries();
@@ -92,7 +92,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         historyPanel.removeAll();
         
         // Get current user's history (now includes admin history entries)
-        List<cephra.Phone.Utilities.UserHistoryManager.HistoryEntry> entries = cephra.Phone.Utilities.UserHistoryManager.getUserHistory(currentUsername);
+        List<cephra.Phone.Utilities.HistoryManager.HistoryEntry> entries = cephra.Phone.Utilities.HistoryManager.getUserHistory(currentUsername);
         
         // Debug information
         System.out.println("PhoneHistory: Found " + entries.size() + " history entries");
@@ -120,7 +120,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         } else {
             // Add history entries
-            for (cephra.Phone.Utilities.UserHistoryManager.HistoryEntry entry : entries) {
+            for (cephra.Phone.Utilities.HistoryManager.HistoryEntry entry : entries) {
                 addHistoryItem(entry);
             }
         }
@@ -146,7 +146,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         }
     }
     
-    private void addHistoryItem(final cephra.Phone.Utilities.UserHistoryManager.HistoryEntry entry) {
+    private void addHistoryItem(final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
         // Create a panel for a single history item
         JPanel historyItemPanel = new JPanel();
         historyItemPanel.setLayout(new BorderLayout(5, 0));
@@ -243,7 +243,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     private JPanel detailsPanel;
    
     
-    private void showHistoryDetails(cephra.Phone.Utilities.UserHistoryManager.HistoryEntry entry) {
+    private void showHistoryDetails(cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
         // If details panel already exists, remove it first
         if (detailsPanel != null) {
             remove(detailsPanel);
@@ -406,7 +406,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(phonehistory.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(ChargeHistory.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -594,7 +594,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     @Override
     public void removeNotify() {
         // Unregister as listener when panel is removed
-        cephra.Phone.Utilities.UserHistoryManager.removeHistoryUpdateListener(this);
+        cephra.Phone.Utilities.HistoryManager.removeHistoryUpdateListener(this);
         super.removeNotify();
     }
 }

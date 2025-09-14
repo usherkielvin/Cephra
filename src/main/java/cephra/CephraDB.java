@@ -1509,7 +1509,7 @@ public class CephraDB {
             
             // Notify phone history that a new entry has been added
             try {
-                cephra.Phone.Utilities.UserHistoryManager.notifyHistoryUpdate(username);
+                cephra.Phone.Utilities.HistoryManager.notifyHistoryUpdate(username);
                 System.out.println("CephraDB: Notified phone history for user: " + username);
             } catch (Exception e) {
                 System.err.println("CephraDB: Error notifying phone history: " + e.getMessage());

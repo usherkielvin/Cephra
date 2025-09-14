@@ -1776,16 +1776,16 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             // Add notification to history first
             switch (notificationType) {
                 case "TICKET_WAITING":
-                    cephra.Phone.Utilities.NotificationHistoryManager.addTicketWaitingNotification(customer, ticketId);
+                    cephra.Phone.Utilities.NotificationManager.addTicketWaitingNotification(customer, ticketId);
                     break;
                 case "TICKET_PENDING":
-                    cephra.Phone.Utilities.NotificationHistoryManager.addTicketPendingNotification(customer, ticketId);
+                    cephra.Phone.Utilities.NotificationManager.addTicketPendingNotification(customer, ticketId);
                     break;
                 case "MY_TURN":
-                    cephra.Phone.Utilities.NotificationHistoryManager.addMyTurnNotification(customer, ticketId, bayNumber);
+                    cephra.Phone.Utilities.NotificationManager.addMyTurnNotification(customer, ticketId, bayNumber);
                     break;
                 case "FULL_CHARGE":
-                    cephra.Phone.Utilities.NotificationHistoryManager.addFullChargeNotification(customer, ticketId);
+                    cephra.Phone.Utilities.NotificationManager.addFullChargeNotification(customer, ticketId);
                     break;
                 default:
                     System.out.println("Queue: Unknown notification type: " + notificationType);

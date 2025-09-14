@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class UserHistoryManager {
+public class HistoryManager {
     private static final List<HistoryUpdateListener> listeners = new CopyOnWriteArrayList<>();
     
     public interface HistoryUpdateListener {

@@ -7,7 +7,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class NotificationHistory extends javax.swing.JPanel implements cephra.Phone.Utilities.NotificationHistoryManager.NotificationUpdateListener {
+public class NotificationHistory extends javax.swing.JPanel implements cephra.Phone.Utilities.NotificationManager.NotificationUpdateListener {
     
     
     
@@ -32,7 +32,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         createHistoryPanel();
         
         // Register as listener for notification updates
-        cephra.Phone.Utilities.NotificationHistoryManager.addNotificationUpdateListener(this);
+        cephra.Phone.Utilities.NotificationManager.addNotificationUpdateListener(this);
         
         // Add close button
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -121,7 +121,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         historyPanel.removeAll();
         
         // Get current user's notifications
-        List<cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry> entries = cephra.Phone.Utilities.NotificationHistoryManager.getNotificationsForUser(currentUsername);
+        List<cephra.Phone.Utilities.NotificationManager.NotificationEntry> entries = cephra.Phone.Utilities.NotificationManager.getNotificationsForUser(currentUsername);
         
         // Debug information
         System.out.println("NotificationHistory: Found " + entries.size() + " notification entries");
@@ -138,7 +138,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             historyPanel.add(noHistoryPanel);
         } else {
             // Add notification entries
-            for (cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry entry : entries) {
+            for (cephra.Phone.Utilities.NotificationManager.NotificationEntry entry : entries) {
                 addNotificationItem(entry);
             }
         }
@@ -154,7 +154,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     }
     
     @Override
-    public void onNotificationAdded(cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry entry) {
+    public void onNotificationAdded(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
         // This is called when a new notification is added
         // We'll update the display in onNotificationHistoryUpdated
     }
@@ -170,7 +170,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         }
     }
     
-    private void addNotificationItem(final cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry entry) {
+    private void addNotificationItem(final cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
         // Create a panel for a single notification item
         JPanel notificationItemPanel = new JPanel();
         notificationItemPanel.setLayout(new BorderLayout(5, 0));
@@ -269,7 +269,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     private JPanel detailsPanel;
    
     
-    private void showNotificationDetails(cephra.Phone.Utilities.NotificationHistoryManager.NotificationEntry entry) {
+    private void showNotificationDetails(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
         // If details panel already exists, remove it first
         if (detailsPanel != null) {
             remove(detailsPanel);
@@ -599,7 +599,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     @Override
     public void removeNotify() {
         // Unregister as listener when panel is removed
-        cephra.Phone.Utilities.NotificationHistoryManager.removeNotificationUpdateListener(this);
+        cephra.Phone.Utilities.NotificationManager.removeNotificationUpdateListener(this);
         super.removeNotify();
     }
 }
