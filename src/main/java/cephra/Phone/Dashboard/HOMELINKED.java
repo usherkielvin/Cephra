@@ -28,6 +28,9 @@ public class HOMELINKED extends javax.swing.JPanel {
         loadWalletBalance();
         loadRewardPoints();
         
+        // Load logged name
+        loadLoggedName();
+        
         // Set car image to match the linked car
         setLinkedCarImage();
         
@@ -84,6 +87,28 @@ public class HOMELINKED extends javax.swing.JPanel {
     }
     
     /**
+     * Load logged name from database
+     */
+    private void loadLoggedName() {
+        try {
+            if (LoggedName != null) {
+                String firstname = cephra.Database.CephraDB.getCurrentFirstname();
+                String safeFirstname = firstname != null ? firstname.trim() : "";
+                if (safeFirstname.isEmpty()) {
+                    LoggedName.setText("Welcome to Cephra!");
+                } else {
+                    // Get only the first word of the firstname
+                    String firstWord = safeFirstname.split("\\s+")[0];
+                    LoggedName.setText("Welcome to Cephra, " + firstWord + "!");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading logged name: " + e.getMessage());
+            LoggedName.setText("Welcome to Cephra!");
+        }
+    }
+    
+    /**
      * Set car image to match the user's linked car from database
      */
     private void setLinkedCarImage() {
@@ -115,6 +140,7 @@ public class HOMELINKED extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        LoggedName = new javax.swing.JLabel();
         CAR = new javax.swing.JLabel();
         Notifications = new javax.swing.JButton();
         charge = new javax.swing.JButton();
@@ -129,7 +155,14 @@ public class HOMELINKED extends javax.swing.JPanel {
 
         setLayout(null);
 
-        // Car image will be set dynamically in setLinkedCarImage() method
+        LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        LoggedName.setForeground(new java.awt.Color(0, 204, 204));
+        LoggedName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        LoggedName.setText("Welcome to Cephra, Dizon");
+        add(LoggedName);
+        LoggedName.setBounds(30, 100, 300, 50);
+
+        CAR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/C9.1.png"))); // NOI18N
         add(CAR);
         CAR.setBounds(31, 173, 307, 209);
 
@@ -348,6 +381,7 @@ public class HOMELINKED extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel CAR;
+    private javax.swing.JLabel LoggedName;
     private javax.swing.JButton Notifications;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
