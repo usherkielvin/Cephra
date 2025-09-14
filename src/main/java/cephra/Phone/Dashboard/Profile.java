@@ -257,8 +257,8 @@ public class Profile extends javax.swing.JPanel {
                                             // Find and refresh any PorscheTaycan panel
                                             java.awt.Component[] components = phoneFrame.getContentPane().getComponents();
                                             for (java.awt.Component comp : components) {
-                                                if (comp instanceof cephra.Phone.LinkedCar) {
-                                                    cephra.Phone.LinkedCar porschePanel = (cephra.Phone.LinkedCar) comp;
+                                                if (comp instanceof cephra.Phone.Dashboard.LinkedCar) {
+                                                    cephra.Phone.Dashboard.LinkedCar porschePanel = (cephra.Phone.Dashboard.LinkedCar) comp;
                                                     porschePanel.refreshBatteryDisplay();
                                                     System.out.println("Profile: Refreshed Porsche panel to show new battery level: " + newBatteryLevel + "%");
                                                     break;
@@ -317,7 +317,7 @@ public class Profile extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.LinkConnect());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.LinkConnect());
                         break;
                     }
                 }

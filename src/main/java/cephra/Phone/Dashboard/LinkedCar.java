@@ -1,5 +1,5 @@
 
-package cephra.Phone;
+package cephra.Phone.Dashboard;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -344,7 +344,7 @@ public class LinkedCar extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.LinkConnect());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.LinkConnect());
                         break;
                     }
                 }

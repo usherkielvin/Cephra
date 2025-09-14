@@ -1839,8 +1839,8 @@ public class CephraDB {
                         if (phoneFrame.isVisible()) {
                             Component[] components = phoneFrame.getContentPane().getComponents();
                             for (Component comp : components) {
-                                if (comp instanceof cephra.Phone.LinkedCar) {
-                                    cephra.Phone.LinkedCar porschePanel = (cephra.Phone.LinkedCar) comp;
+                                if (comp instanceof cephra.Phone.Dashboard.LinkedCar) {
+                                    cephra.Phone.Dashboard.LinkedCar porschePanel = (cephra.Phone.Dashboard.LinkedCar) comp;
                                     porschePanel.refreshBatteryDisplay();
                                     System.out.println("CephraDB: Refreshed Porsche screen to show 100% battery for user " + username);
                                     return;
@@ -1850,8 +1850,8 @@ public class CephraDB {
                             // If PorscheTaycan is not found in current components, try to find it recursively
                             try {
                                 Component currentPanel = findPorscheTaycanPanel(phoneFrame.getContentPane());
-                                if (currentPanel instanceof cephra.Phone.LinkedCar) {
-                                    cephra.Phone.LinkedCar porschePanel = (cephra.Phone.LinkedCar) currentPanel;
+                                if (currentPanel instanceof cephra.Phone.Dashboard.LinkedCar) {
+                                    cephra.Phone.Dashboard.LinkedCar porschePanel = (cephra.Phone.Dashboard.LinkedCar) currentPanel;
                                     porschePanel.refreshBatteryDisplay();
                                     System.out.println("CephraDB: Refreshed Porsche screen (found recursively) to show 100% battery for user " + username);
                                     return;
@@ -1872,7 +1872,7 @@ public class CephraDB {
     // Helper method to find PorscheTaycan panel recursively in a container
     private static Component findPorscheTaycanPanel(Container container) {
         for (Component comp : container.getComponents()) {
-            if (comp instanceof cephra.Phone.LinkedCar) {
+            if (comp instanceof cephra.Phone.Dashboard.LinkedCar) {
                 return comp;
             }
             if (comp instanceof Container) {

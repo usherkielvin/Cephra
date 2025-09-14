@@ -1,5 +1,5 @@
 
-package cephra.Phone;
+package cephra.Phone.Dashboard;
 
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -136,7 +136,7 @@ public class QueueTicket extends javax.swing.JPanel {
         QTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         QTicket.setText("FCPOO5");
         add(QTicket);
-        QTicket.setBounds(85, 190, 200, 40);
+        QTicket.setBounds(70, 190, 200, 40);
 
         typeofcharge.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         typeofcharge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -158,7 +158,7 @@ public class QueueTicket extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ServiceFast.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 750);
+        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
@@ -236,7 +236,7 @@ public class QueueTicket extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.LinkConnect());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.LinkConnect());
                         break;
                     }
                 }
