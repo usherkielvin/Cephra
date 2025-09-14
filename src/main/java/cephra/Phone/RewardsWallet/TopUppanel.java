@@ -28,6 +28,8 @@ public class TopUppanel extends javax.swing.JPanel {
         
         Customamount.setOpaque(false);
         Customamount.setBackground(new Color(0, 0, 0, 0));
+        
+       
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -47,7 +49,11 @@ public class TopUppanel extends javax.swing.JPanel {
         Customamount = new javax.swing.JTextField();
         bck = new javax.swing.JButton();
         morePayMethod = new javax.swing.JButton();
+        charge = new javax.swing.JButton();
+        linkbutton = new javax.swing.JButton();
         topUpIcon = new javax.swing.JLabel();
+        historybutton = new javax.swing.JButton();
+        profilebutton = new javax.swing.JButton();
         Method = new javax.swing.JPanel();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
@@ -64,11 +70,11 @@ public class TopUppanel extends javax.swing.JPanel {
         Currentbalance.setForeground(new java.awt.Color(255, 255, 255));
         Currentbalance.setText("xxxxxxx");
         jPanel1.add(Currentbalance);
-        Currentbalance.setBounds(80, 145, 240, 60);
+        Currentbalance.setBounds(80, 160, 240, 60);
 
-        methodselected.setText("jLabel2");
+        methodselected.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jPanel1.add(methodselected);
-        methodselected.setBounds(50, 580, 180, 16);
+        methodselected.setBounds(50, 569, 220, 30);
 
         A.setBorderPainted(false);
         A.setContentAreaFilled(false);
@@ -113,8 +119,9 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(Proceed);
-        Proceed.setBounds(20, 620, 330, 30);
+        Proceed.setBounds(40, 615, 290, 30);
 
+        Customamount.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         Customamount.setBorder(null);
         Customamount.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -122,7 +129,7 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(Customamount);
-        Customamount.setBounds(70, 370, 255, 30);
+        Customamount.setBounds(70, 371, 255, 30);
 
         bck.setBorderPainted(false);
         bck.setContentAreaFilled(false);
@@ -132,9 +139,12 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(bck);
-        bck.setBounds(20, 33, 72, 30);
+        bck.setBounds(20, 50, 72, 30);
 
         morePayMethod.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        morePayMethod.setBorder(null);
+        morePayMethod.setBorderPainted(false);
+        morePayMethod.setContentAreaFilled(false);
         morePayMethod.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 morePayMethodActionPerformed(evt);
@@ -143,64 +153,107 @@ public class TopUppanel extends javax.swing.JPanel {
         jPanel1.add(morePayMethod);
         morePayMethod.setBounds(290, 570, 40, 30);
 
+        charge.setBorder(null);
+        charge.setBorderPainted(false);
+        charge.setContentAreaFilled(false);
+        charge.setFocusPainted(false);
+        charge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chargeActionPerformed(evt);
+            }
+        });
+        jPanel1.add(charge);
+        charge.setBounds(50, 680, 40, 40);
+
+        linkbutton.setBorder(null);
+        linkbutton.setBorderPainted(false);
+        linkbutton.setContentAreaFilled(false);
+        linkbutton.setFocusPainted(false);
+        linkbutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                linkbuttonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(linkbutton);
+        linkbutton.setBounds(110, 680, 30, 40);
+
         topUpIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/topUpIcon.png"))); // NOI18N
         jPanel1.add(topUpIcon);
         topUpIcon.setBounds(0, 0, 370, 750);
 
+        historybutton.setBorder(null);
+        historybutton.setBorderPainted(false);
+        historybutton.setContentAreaFilled(false);
+        historybutton.setFocusPainted(false);
+        historybutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                historybuttonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(historybutton);
+        historybutton.setBounds(220, 680, 40, 40);
+
+        profilebutton.setBorder(null);
+        profilebutton.setBorderPainted(false);
+        profilebutton.setContentAreaFilled(false);
+        profilebutton.setFocusPainted(false);
+        profilebutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                profilebuttonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(profilebutton);
+        profilebutton.setBounds(280, 680, 30, 40);
+
         add(jPanel1);
         jPanel1.setBounds(0, 0, 370, 750);
 
-
-        Method.setBackground(new java.awt.Color(255, 102, 102));
+        Method.setBackground(new java.awt.Color(204, 204, 204));
         Method.setLayout(null);
 
         buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setText("Earnest Bank");
+        jRadioButton1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
+        jRadioButton1.setText("                                                      ");
+        jRadioButton1.setContentAreaFilled(false);
+        jRadioButton1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton1ActionPerformed(evt);
             }
         });
         Method.add(jRadioButton1);
-        jRadioButton1.setBounds(130, 90, 90, 21);
+        jRadioButton1.setBounds(20, 330, 310, 50);
 
         buttonGroup1.add(jRadioButton3);
         jRadioButton3.setText("Exness");
-        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton3ActionPerformed(evt);
-            }
-        });
         Method.add(jRadioButton3);
-        jRadioButton3.setBounds(130, 110, 120, 21);
+        jRadioButton3.setBounds(20, 265, 310, 50);
 
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText("Glangs");
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton2ActionPerformed(evt);
-            }
-        });
         Method.add(jRadioButton2);
-        jRadioButton2.setBounds(130, 130, 90, 21);
+        jRadioButton2.setBounds(20, 195, 310, 50);
 
         buttonGroup1.add(jRadioButton4);
-        jRadioButton4.setText("Kalapati");
+        jRadioButton4.setContentAreaFilled(false);
+        jRadioButton4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton4.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton4ActionPerformed(evt);
             }
         });
         Method.add(jRadioButton4);
-        jRadioButton4.setBounds(120, 190, 100, 21);
+        jRadioButton4.setBounds(29, 130, 300, 40);
 
+        jLabel1.setBackground(new java.awt.Color(204, 204, 204));
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/METHO.png"))); // NOI18N
         Method.add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 270);
+        jLabel1.setBounds(0, 70, 370, 350);
 
         add(Method);
-        Method.setBounds(0, 750, 370, 330);
-
+        Method.setBounds(0, 680, 370, 430);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ProceedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedActionPerformed
@@ -230,17 +283,17 @@ public class TopUppanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bckActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        updateMethodSelectedLabel("Kalapati");
+        updateMethodSelectedLabel("GCash");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        updateMethodSelectedLabel("Glangs");
+        updateMethodSelectedLabel("PayMaya");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        updateMethodSelectedLabel("Exness");
+        updateMethodSelectedLabel("VISA");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
@@ -260,6 +313,66 @@ public class TopUppanel extends javax.swing.JPanel {
         System.out.println("morePayMethod button clicked! Current panel visible: " + isMethodPanelVisible);
         toggleMethodPanel();
     }//GEN-LAST:event_morePayMethodActionPerformed
+
+    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_chargeActionPerformed
+
+    private void linkbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkbuttonActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.LinkConnect());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_linkbuttonActionPerformed
+
+    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargeHistory());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_historybuttonActionPerformed
+
+    private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profilebuttonActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Profile());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_profilebuttonActionPerformed
 
     /**
      * Sets up the quick amount buttons with action listeners
@@ -291,11 +404,11 @@ public class TopUppanel extends javax.swing.JPanel {
                 double balance = cephra.Database.CephraDB.getUserWalletBalance(currentUser);
                 Currentbalance.setText(String.format("₱%.2f", balance));
             } else {
-                Currentbalance.setText("₱0.00");
+                Currentbalance.setText("₱ 0.00");
             }
         } catch (Exception e) {
             System.err.println("Error loading current balance: " + e.getMessage());
-            Currentbalance.setText("₱0.00");
+            Currentbalance.setText("₱ 0.00");
         }
     }
 
@@ -379,7 +492,7 @@ public class TopUppanel extends javax.swing.JPanel {
             boolean success = cephra.Database.CephraDB.processWalletTopUp(currentUser, amount, topUpMethod);
 
             if (success) {
-                showSuccessMessage(String.format("Successfully topped up ₱%.2f to your wallet via %s!", amount, selectedPaymentMethod));
+                showSuccessMessage(String.format("Successfully topped up ₱ %.2f to your wallet via %s!", amount, selectedPaymentMethod));
                 loadCurrentBalance(); // Refresh balance display
                 Customamount.setText("0.00"); // Reset amount field
                 clearPaymentMethodSelection(); // Clear radio button selection
@@ -450,11 +563,11 @@ public class TopUppanel extends javax.swing.JPanel {
         if (jRadioButton1.isSelected()) {
             return "Earnest Bank";
         } else if (jRadioButton2.isSelected()) {
-            return "Glangs";
+            return "VISA";
         } else if (jRadioButton3.isSelected()) {
-            return "Exness";
+            return "Maya";
         } else if (jRadioButton4.isSelected()) {
-            return "Kalapati";
+            return "Gcash";
         }
         return null; // No radio button selected
     }
@@ -633,14 +746,18 @@ public class TopUppanel extends javax.swing.JPanel {
     private javax.swing.JButton Proceed;
     private javax.swing.JButton bck;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton charge;
+    private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JButton linkbutton;
     private javax.swing.JLabel methodselected;
     private javax.swing.JButton morePayMethod;
+    private javax.swing.JButton profilebutton;
     private javax.swing.JLabel topUpIcon;
     // End of variables declaration//GEN-END:variables
 }
