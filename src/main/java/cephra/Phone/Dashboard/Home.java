@@ -160,12 +160,12 @@ public class Home extends javax.swing.JPanel {
         add(rewards);
         rewards.setBounds(10, 590, 160, 60);
 
-        LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         LoggedName.setForeground(new java.awt.Color(0, 204, 204));
         LoggedName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         LoggedName.setText("Welcome to Cephra, Dizon");
         add(LoggedName);
-        LoggedName.setBounds(40, 80, 290, 50);
+        LoggedName.setBounds(30, 100, 300, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/HOME.png"))); // NOI18N
         add(jLabel1);
