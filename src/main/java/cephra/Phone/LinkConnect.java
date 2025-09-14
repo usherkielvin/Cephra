@@ -3,9 +3,9 @@ package cephra.Phone;
 
 import javax.swing.SwingUtilities;
 
-public class link extends javax.swing.JPanel {
+public class LinkConnect extends javax.swing.JPanel {
 
-    public link() {
+    public LinkConnect() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -64,7 +64,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(Linkcar);
-        Linkcar.setBounds(70, 560, 240, 50);
+        Linkcar.setBounds(50, 560, 240, 50);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -76,7 +76,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(60, 670, 50, 60);
+        charge.setBounds(40, 670, 50, 60);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -88,7 +88,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(250, 653, 50, 100);
+        historybutton.setBounds(230, 653, 50, 100);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -112,7 +112,7 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(homebutton);
-        homebutton.setBounds(170, 680, 40, 40);
+        homebutton.setBounds(150, 680, 40, 40);
 
         termscondition.setBackground(new java.awt.Color(255, 255, 255));
         termscondition.setText("By linking, I agree to the Terms & Conditions ");
@@ -125,11 +125,11 @@ public class link extends javax.swing.JPanel {
             }
         });
         add(termscondition);
-        termscondition.setBounds(60, 620, 310, 30);
+        termscondition.setBounds(40, 620, 310, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ConnectCar.gif"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 750);
+        jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved

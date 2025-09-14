@@ -1,9 +1,9 @@
 
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
-public class language extends javax.swing.JPanel {
+public class Profile_Language extends javax.swing.JPanel {
 
-    public language() {
+    public Profile_Language() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);

@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.Popups;
 
 import javax.swing.*;
 import java.awt.*;
@@ -734,7 +734,7 @@ public class PayPop extends javax.swing.JPanel {
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.Reciept());
+                    phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Reciept());
                     break;
                 }
             }

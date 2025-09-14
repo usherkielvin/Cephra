@@ -1,11 +1,11 @@
 
-package cephra.Phone;
+package cephra.Phone.UserProfile;
 
 
-public class helpcenter extends javax.swing.JPanel {
+public class Help_Center extends javax.swing.JPanel {
 
   
-    public helpcenter() {
+    public Help_Center() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -144,7 +144,7 @@ public class helpcenter extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.link());
+                        phoneFrame.switchPanel(new cephra.Phone.LinkConnect());
                         break;
                     }
                 }

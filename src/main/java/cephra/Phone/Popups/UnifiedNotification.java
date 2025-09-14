@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.Popups;
 
 import java.awt.event.*;
 import javax.swing.*;
@@ -89,7 +89,8 @@ public class UnifiedNotification extends javax.swing.JPanel {
         statusLabel = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
-        setOpaque(false);
+        setMaximumSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         jButton1.setBorderPainted(false);
@@ -263,7 +264,7 @@ public class UnifiedNotification extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel statusLabel;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
 }

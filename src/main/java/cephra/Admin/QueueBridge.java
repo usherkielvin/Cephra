@@ -314,7 +314,7 @@ public final class QueueBridge {
                     // Close PayPop on the phone if it is currently showing
                     SwingUtilities.invokeLater(() -> {
                         try {
-                            cephra.Phone.PayPop.hidePayPop();
+                            cephra.Phone.Popups.PayPop.hidePayPop();
                             System.out.println("QueueBridge: Closed PayPop on phone after marking ticket as Paid: " + ticket);
                         } catch (Throwable t) {
                             System.err.println("QueueBridge: Failed to close PayPop: " + t.getMessage());

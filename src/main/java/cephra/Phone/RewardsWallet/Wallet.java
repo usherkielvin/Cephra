@@ -14,9 +14,9 @@ public class Wallet extends javax.swing.JPanel {
         
         
         SwingUtilities.invokeLater(() -> {
-            if (cephra.Phone.PayPop.hasPendingPayPop()) {
+            if (cephra.Phone.Popups.PayPop.hasPendingPayPop()) {
                 System.out.println("Wallet: Detected pending PayPop, restoring after top-up");
-                cephra.Phone.PayPop.restorePayPopAfterTopUp();
+                cephra.Phone.Popups.PayPop.restorePayPopAfterTopUp();
             }
             
             
@@ -376,7 +376,7 @@ public class Wallet extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.link());
+                        phoneFrame.switchPanel(new cephra.Phone.LinkConnect());
                         break;
                     }
                 }

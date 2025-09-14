@@ -105,7 +105,7 @@ public class personalinformation extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.link());
+                        phoneFrame.switchPanel(new cephra.Phone.LinkConnect());
                         break;
                     }
                 }

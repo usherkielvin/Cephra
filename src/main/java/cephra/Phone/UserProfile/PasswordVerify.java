@@ -6,7 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
-import cephra.Phone.UnifiedNotification;
+import cephra.Phone.Popups.UnifiedNotification;
 
 public class PasswordVerify extends javax.swing.JPanel {
 

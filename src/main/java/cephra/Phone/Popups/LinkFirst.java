@@ -1,4 +1,4 @@
-package cephra.Phone;
+package cephra.Phone.Popups;
 
 import javax.swing.*;
 import java.awt.*;
@@ -168,13 +168,13 @@ public class LinkFirst extends javax.swing.JPanel {
         // Hide this popup first
         hidepop();
         
-        // Navigate to link.java panel
+        // Navigate to LinkConnect.java panel
         SwingUtilities.invokeLater(() -> {
             java.awt.Window[] windows = java.awt.Window.getWindows();
             for (java.awt.Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.link());
+                    phoneFrame.switchPanel(new cephra.Phone.LinkConnect());
                     break;
                 }
             }
