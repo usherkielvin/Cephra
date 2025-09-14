@@ -192,7 +192,7 @@ public class LinkConnect extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
+                        phoneFrame.switchPanel(cephra.Phone.Dashboard.Home.getAppropriateHomePanel());
                         break;
                     }
                 }
@@ -224,6 +224,20 @@ public class LinkConnect extends javax.swing.JPanel {
                         Thread.sleep(100); // Small delay to ensure database update is complete
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
+                    }
+                }
+                
+                // Assign a car to the user when linking (if not already assigned)
+                if (username != null && !username.isEmpty()) {
+                    int currentCarIndex = cephra.Database.CephraDB.getUserCarIndex(username);
+                    if (currentCarIndex == -1) {
+                        // No car assigned yet - assign a random one
+                        java.util.Random random = new java.util.Random();
+                        int carIndex = random.nextInt(10); // 0-9 for c1-c10
+                        cephra.Database.CephraDB.setUserCarIndex(username, carIndex);
+                        System.out.println("LinkConnect: Assigned car " + (carIndex + 1) + " to user " + username + " when linking");
+                    } else {
+                        System.out.println("LinkConnect: User " + username + " already has car " + (currentCarIndex + 1) + " assigned");
                     }
                 }
                 

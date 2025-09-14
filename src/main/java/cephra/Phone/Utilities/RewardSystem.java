@@ -37,9 +37,9 @@ public class RewardSystem {
                         System.out.println("RewardSystem: Retrieved " + points + " points for user " + username);
                         return points;
                     } else {
-                        // User not found in points table, create entry
+                        // User not found in user_points table, create entry
                         createUserPointsEntry(username);
-                        System.out.println("RewardSystem: Created new points entry for user " + username);
+                        System.out.println("RewardSystem: Created new user points entry for user " + username);
                         return 0;
                     }
                 }
@@ -81,12 +81,12 @@ public class RewardSystem {
                 
                 // Update user_points table
                 try (PreparedStatement stmt = conn.prepareStatement(
-                        "INSERT INTO user_points (username, total_points, lifetime_earned, lifetime_spent) " +
-                        "VALUES (?, ?, ?, 0) " +
+                        "INSERT INTO user_points (username, total_points, lifetime_earned) " +
+                        "VALUES (?, ?, ?) " +
                         "ON DUPLICATE KEY UPDATE " +
                         "total_points = total_points + ?, " +
                         "lifetime_earned = lifetime_earned + ?, " +
-                        "updated_at = CURRENT_TIMESTAMP")) {
+                        "last_updated = CURRENT_TIMESTAMP")) {
                     
                     stmt.setString(1, username);
                     stmt.setInt(2, pointsToAdd);
@@ -316,7 +316,7 @@ public class RewardSystem {
     }
     
     /**
-     * Create a new user points entry if it doesn't exist
+     * Create a new wallet balance entry if it doesn't exist
      * @param username The username to create entry for
      * @return true if successful, false otherwise
      */
@@ -363,16 +363,14 @@ public class RewardSystem {
             }
             
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "SELECT total_points, lifetime_earned, lifetime_spent, created_at " +
-                    "FROM user_points WHERE username = ?")) {
+                    "SELECT points, created_at " +
+                    "FROM wallet_balance WHERE username = ?")) {
                 
                 stmt.setString(1, username);
                 
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        stats.put("total_points", rs.getInt("total_points"));
-                        stats.put("lifetime_earned", rs.getInt("lifetime_earned"));
-                        stats.put("lifetime_spent", rs.getInt("lifetime_spent"));
+                        stats.put("total_points", rs.getInt("points"));
                         stats.put("member_since", rs.getTimestamp("created_at"));
                     }
                 }

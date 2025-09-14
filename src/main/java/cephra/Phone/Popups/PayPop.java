@@ -626,25 +626,13 @@ public class PayPop extends javax.swing.JPanel {
      */
     private boolean isTicketValidForPayment(String ticketId) {
         try {
-            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) 
-                cephra.Admin.QueueBridge.class.getDeclaredField("model").get(null);
-            
-            if (model != null) {
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    Object ticketValue = model.getValueAt(i, 0);
-                    if (ticketId.equals(String.valueOf(ticketValue))) {
-                        String status = String.valueOf(model.getValueAt(i, 3));
-                        String payment = String.valueOf(model.getValueAt(i, 4));
-                        return "Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(payment);
-                    }
-                }
-            }
+            // Use the public method from QueueBridge instead of reflection
+            return cephra.Admin.QueueBridge.isTicketValidForPayment(ticketId);
         } catch (Exception e) {
             System.err.println("Error validating ticket for payment: " + e.getMessage());
             // If validation fails, allow payment to proceed
             return true;
         }
-        return false;
     }
     
     /**
@@ -718,7 +706,7 @@ public class PayPop extends javax.swing.JPanel {
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
+                    phoneFrame.switchPanel(cephra.Phone.Dashboard.Home.getAppropriateHomePanel());
                     break;
                 }
             }

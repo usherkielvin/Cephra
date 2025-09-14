@@ -1462,12 +1462,42 @@ public class CephraDB {
             // 4. Add reward points for all payments (1 PHP = 0.05 points)
             if (totalAmount > 0) {
                 try {
-                    // Use RewardSystem to add points to database
-                    boolean pointsSuccess = cephra.Phone.Utilities.RewardSystem.addPointsForPayment(username, totalAmount, ticketId);
-                    if (pointsSuccess) {
-                        System.out.println("CephraDB: Successfully added points for payment of ₱" + totalAmount + " to user " + username);
-                    } else {
-                        System.err.println("CephraDB: Failed to add points for payment of ₱" + totalAmount + " to user " + username);
+                    // Calculate points (1 PHP = 0.05 points)
+                    int pointsToAdd = (int) Math.round(totalAmount * 0.05);
+                    
+                    // Direct SQL to update user_points table
+                    try (PreparedStatement pointsStmt = conn.prepareStatement(
+                            "INSERT INTO user_points (username, total_points, lifetime_earned, lifetime_spent) " +
+                            "VALUES (?, ?, ?, 0) " +
+                            "ON DUPLICATE KEY UPDATE " +
+                            "total_points = total_points + ?, " +
+                            "lifetime_earned = lifetime_earned + ?")) {
+                        
+                        pointsStmt.setString(1, username);
+                        pointsStmt.setInt(2, pointsToAdd);
+                        pointsStmt.setInt(3, pointsToAdd);
+                        pointsStmt.setInt(4, pointsToAdd);
+                        pointsStmt.setInt(5, pointsToAdd);
+                        
+                        int pointsResult = pointsStmt.executeUpdate();
+                        
+                        if (pointsResult > 0) {
+                            System.out.println("CephraDB: Successfully added " + pointsToAdd + " points for payment of ₱" + totalAmount + " to user " + username);
+                            
+                            // Record the transaction in reward_transactions table
+                            try (PreparedStatement rewardStmt = conn.prepareStatement(
+                                    "INSERT INTO reward_transactions (username, transaction_type, points_change, total_points_after, description, reference_id) " +
+                                    "VALUES (?, 'payment', ?, (SELECT total_points FROM user_points WHERE username = ?), 'Payment reward for ticket', ?)")) {
+                                
+                                rewardStmt.setString(1, username);
+                                rewardStmt.setInt(2, pointsToAdd);
+                                rewardStmt.setString(3, username);
+                                rewardStmt.setString(4, ticketId);
+                                
+                                rewardStmt.executeUpdate();
+                                System.out.println("CephraDB: Recorded reward transaction for " + pointsToAdd + " points to user " + username);
+                            }
+                        }
                     }
                 } catch (Exception pointsEx) {
                     System.err.println("CephraDB: Error adding points for payment: " + pointsEx.getMessage());
@@ -1700,11 +1730,12 @@ public class CephraDB {
                 }
             }
             
-            // Check if admin staff exists in staff_records, create if not
+            // Check if admin staff exists in staff_records, create if not (but don't override existing password)
             try (PreparedStatement checkStmt = conn.prepareStatement(
                     "SELECT username FROM staff_records WHERE username = 'admin'")) {
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (!rs.next()) {
+                        // Only create admin if it doesn't exist at all
                         addStaff("Admin User", "admin", "admin@cephra.com", "admin123");
                     }
                 }
@@ -1760,19 +1791,15 @@ public class CephraDB {
                 stmt.executeUpdate();
             }
             
-            // Also remove any admin users with old password (1234) from staff_records
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "DELETE FROM staff_records WHERE username = 'admin' AND password = '1234'")) {
-                
-                stmt.executeUpdate();
-            }
+            // Note: Removed automatic deletion of admin users with old passwords
+            // This was causing admin password changes to be reverted on Java app startup
             
-            // Ensure admin exists in staff_records with correct password
+            // Ensure admin exists in staff_records (but don't override existing password)
             try (PreparedStatement checkStmt = conn.prepareStatement(
                     "SELECT username FROM staff_records WHERE username = 'admin'")) {
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (!rs.next()) {
-                        // Admin doesn't exist, create it
+                        // Admin doesn't exist, create it with default password
                         try (PreparedStatement insertStmt = conn.prepareStatement(
                                 "INSERT INTO staff_records (name, username, email, status, password) VALUES (?, ?, ?, ?, ?)")) {
                             
@@ -1790,12 +1817,8 @@ public class CephraDB {
                             }
                         }
                     } else {
-                        // Admin exists, check if password needs updating
-                        try (PreparedStatement updateStmt = conn.prepareStatement(
-                                "UPDATE staff_records SET password = 'admin123' WHERE username = 'admin' AND password != 'admin123'")) {
-                            
-                            updateStmt.executeUpdate();
-                        }
+                        // Admin exists - do NOT update password to preserve user changes
+                        System.out.println("Admin user already exists in staff_records - preserving existing password");
                     }
                 }
             }

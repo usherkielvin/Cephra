@@ -689,4 +689,34 @@ public final class QueueBridge {
         }
     }
     
+    /** 
+     * Validates if a ticket is ready for payment
+     * @param ticketId the ticket ID to validate
+     * @return true if ticket is valid for payment, false otherwise
+     */
+    public static boolean isTicketValidForPayment(String ticketId) {
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            return false;
+        }
+        
+        try {
+            if (model != null) {
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    Object ticketValue = model.getValueAt(i, 0);
+                    if (ticketId.equals(String.valueOf(ticketValue))) {
+                        String status = String.valueOf(model.getValueAt(i, 3));
+                        String payment = String.valueOf(model.getValueAt(i, 4));
+                        return "Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(payment);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("QueueBridge: Error validating ticket for payment: " + e.getMessage());
+            // If validation fails, allow payment to proceed
+            return true;
+        }
+        
+        return false;
+    }
+    
 }

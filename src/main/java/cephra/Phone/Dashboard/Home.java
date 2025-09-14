@@ -8,12 +8,63 @@ import javax.swing.SwingUtilities;
 
 public class Home extends javax.swing.JPanel {
 
+    /**
+     * Static utility method to get the appropriate home panel based on car linking status
+     * @return Home panel if car not linked, HomeLinked panel if car is linked
+     */
+    public static javax.swing.JPanel getAppropriateHomePanel() {
+        if (cephra.Phone.Utilities.AppState.isCarLinked) {
+            try {
+                String username = cephra.Database.CephraDB.getCurrentUsername();
+                if (username != null && !username.isEmpty()) {
+                    int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                    if (batteryLevel != -1) {
+                        // Car is linked and battery is initialized - return HomeLinked
+                        return new cephra.Phone.Dashboard.HOMELINKED();
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error checking battery level for home panel: " + e.getMessage());
+            }
+        }
+        // Car not linked or no battery - return regular Home
+        return new cephra.Phone.Dashboard.Home();
+    }
+
     public Home() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        
+        // Check if car is linked and switch to HomeLinked if needed
+        if (cephra.Phone.Utilities.AppState.isCarLinked) {
+            try {
+                String username = cephra.Database.CephraDB.getCurrentUsername();
+                if (username != null && !username.isEmpty()) {
+                    int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                    if (batteryLevel != -1) {
+                        // Car is linked and battery is initialized - go to HomeLinked
+                        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                java.awt.Window[] windows = java.awt.Window.getWindows();
+                                for (java.awt.Window window : windows) {
+                                    if (window instanceof cephra.Frame.Phone) {
+                                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.HOMELINKED());
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                        return; // Exit early since we're switching to HomeLinked
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error checking battery level in Home constructor: " + e.getMessage());
+            }
+        }
         
         // Get current user's firstname and display welcome message
         if (LoggedName != null) {
@@ -27,6 +78,10 @@ public class Home extends javax.swing.JPanel {
                 LoggedName.setText("Welcome to Cephra, " + firstWord + "!");
             }
         }
+        
+        // Load wallet balance and reward points
+        loadWalletBalance();
+        loadRewardPoints();
         
         // Background is moved up by 3 pixels via bounds
     }
@@ -62,6 +117,9 @@ public class Home extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        rewardbalance = new javax.swing.JLabel();
+        pesobalance = new javax.swing.JLabel();
+        LinkVehicle = new javax.swing.JButton();
         Notifications = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
@@ -76,6 +134,36 @@ public class Home extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
+        rewardbalance.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        rewardbalance.setForeground(new java.awt.Color(255, 255, 255));
+        rewardbalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        rewardbalance.setText("500");
+        add(rewardbalance);
+        rewardbalance.setBounds(270, 67, 40, 20);
+
+        pesobalance.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        pesobalance.setForeground(new java.awt.Color(255, 255, 255));
+        pesobalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        pesobalance.setText("500");
+        add(pesobalance);
+        pesobalance.setBounds(191, 68, 80, 20);
+
+        LinkVehicle.setBackground(new java.awt.Color(255, 0, 0));
+        LinkVehicle.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
+        LinkVehicle.setForeground(new java.awt.Color(255, 255, 255));
+        LinkVehicle.setText("No Vehicle Linked");
+        LinkVehicle.setBorder(null);
+        LinkVehicle.setBorderPainted(false);
+        LinkVehicle.setFocusPainted(false);
+        LinkVehicle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        LinkVehicle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LinkVehicleActionPerformed(evt);
+            }
+        });
+        add(LinkVehicle);
+        LinkVehicle.setBounds(30, 400, 310, 40);
+
         Notifications.setBorder(null);
         Notifications.setBorderPainted(false);
         Notifications.setContentAreaFilled(false);
@@ -86,7 +174,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(Notifications);
-        Notifications.setBounds(300, 50, 40, 40);
+        Notifications.setBounds(310, 50, 40, 50);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -98,7 +186,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 670, 50, 50);
+        profilebutton.setBounds(280, 670, 40, 50);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -110,7 +198,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(200, 680, 50, 40);
+        historybutton.setBounds(220, 680, 40, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -122,7 +210,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 50, 40);
+        linkbutton.setBounds(110, 680, 40, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -134,7 +222,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(30, 680, 50, 40);
+        charge.setBounds(50, 680, 40, 40);
 
         wallet.setBorder(null);
         wallet.setBorderPainted(false);
@@ -146,7 +234,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(wallet);
-        wallet.setBounds(180, 590, 160, 60);
+        wallet.setBounds(190, 590, 150, 60);
 
         rewards.setBorder(null);
         rewards.setBorderPainted(false);
@@ -249,7 +337,7 @@ public class Home extends javax.swing.JPanel {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
                         cephra.Phone.Dashboard.NotificationHistory notificationHistory = new cephra.Phone.Dashboard.NotificationHistory();
-                        notificationHistory.setPreviousPanel(new cephra.Phone.Dashboard.Home());
+                        notificationHistory.setPreviousPanel(getAppropriateHomePanel());
                         phoneFrame.switchPanel(notificationHistory);
                         break;
                     }
@@ -288,15 +376,77 @@ public class Home extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_rewardsActionPerformed
 
+    private void LinkVehicleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LinkVehicleActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.LinkConnect());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_LinkVehicleActionPerformed
+
+    /**
+     * Loads and displays the current wallet balance
+     */
+    private void loadWalletBalance() {
+        try {
+            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
+            if (currentUser != null && !currentUser.isEmpty()) {
+                double balance = cephra.Database.CephraDB.getUserWalletBalance(currentUser);
+                pesobalance.setText(String.format("%.2f", balance));
+            } else {
+                pesobalance.setText("0.00");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading wallet balance: " + e.getMessage());
+            pesobalance.setText("0.00");
+        }
+    }
+
+    /**
+     * Loads and displays the current reward points
+     */
+    private void loadRewardPoints() {
+        try {
+            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
+            if (currentUser != null && !currentUser.isEmpty()) {
+                int points = cephra.Phone.Utilities.RewardSystem.getUserPoints(currentUser);
+                rewardbalance.setText(String.valueOf(points));
+            } else {
+                rewardbalance.setText("0");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading reward points: " + e.getMessage());
+            rewardbalance.setText("0");
+        }
+    }
+
+    /**
+     * Public method to refresh both wallet balance and reward points when returning to this screen
+     */
+    public void refreshBalances() {
+        loadWalletBalance();
+        loadRewardPoints();
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton LinkVehicle;
     private javax.swing.JLabel LoggedName;
     private javax.swing.JButton Notifications;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JLabel pesobalance;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JLabel rewardbalance;
     private javax.swing.JButton rewards;
     private javax.swing.JButton wallet;
     // End of variables declaration//GEN-END:variables
@@ -313,6 +463,8 @@ public class Home extends javax.swing.JPanel {
                     revalidate();
                     repaint();
                 }
+                // Refresh balances when panel becomes visible
+                refreshBalances();
             }
         });
     }

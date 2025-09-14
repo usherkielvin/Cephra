@@ -201,12 +201,13 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         rightPanel.setBackground(Color.WHITE);
+        rightPanel.setBorder(new EmptyBorder(0, 0, 0, 15)); // Add 15px right margin
 
         // Ticket ID
         JLabel ticketLabel = new JLabel("Ticket: " + entry.getTicketId());
         ticketLabel.setFont(new Font("Arial", Font.BOLD, 11));
         ticketLabel.setForeground(new Color(50, 50, 50));
-        ticketLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        ticketLabel.setAlignmentX(Component.LEFT_ALIGNMENT); // Change to LEFT_ALIGNMENT
 
         // Reference number
         String refNumber = entry.getReferenceNumber();
@@ -219,7 +220,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         JLabel referenceLabel = new JLabel("Ref: " + refNumber);
         referenceLabel.setFont(new Font("Arial", Font.PLAIN, 10));
         referenceLabel.setForeground(Color.GRAY);
-        referenceLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        referenceLabel.setAlignmentX(Component.LEFT_ALIGNMENT); // Change to LEFT_ALIGNMENT
 
         rightPanel.add(ticketLabel);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 2)));
@@ -543,7 +544,7 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
+                        phoneFrame.switchPanel(cephra.Phone.Dashboard.Home.getAppropriateHomePanel());
                         break;
                     }
                 }

@@ -257,8 +257,9 @@ public class Profile extends javax.swing.JPanel {
                                 System.err.println("Profile: Error verifying battery level update: " + verifyEx.getMessage());
                             }
                             
-                            // Keep car linked - users only LinkConnect once
-                            // cephra.Phone.Utilities.AppState.isCarLinked = false; // Removed - keep car linked
+                            // RESET CAR LINKING STATUS - User will see regular Home panel on next login
+                            cephra.Phone.Utilities.AppState.isCarLinked = false;
+                            System.out.println("Profile: Reset car linking status to false - user will see regular Home panel on next login");
                          
                             // Refresh any visible Porsche panel to show the new battery level
                             try {
@@ -315,7 +316,7 @@ public class Profile extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
+                        phoneFrame.switchPanel(cephra.Phone.Dashboard.Home.getAppropriateHomePanel());
                         break;
                     }
                 }
