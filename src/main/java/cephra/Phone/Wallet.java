@@ -98,20 +98,25 @@ public class Wallet extends javax.swing.JPanel {
         add(charge);
         charge.setBounds(30, 680, 50, 40);
 
-        Balancetxt.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        Balancetxt.setFont(new java.awt.Font("Segoe UI Semibold", 1, 40)); // NOI18N
+        Balancetxt.setForeground(new java.awt.Color(255, 255, 255));
         Balancetxt.setText("1000.00");
         add(Balancetxt);
-        Balancetxt.setBounds(100, 200, 100, 40);
+        Balancetxt.setBounds(80, 200, 200, 60);
 
+        HideBalance.setBorderPainted(false);
+        HideBalance.setContentAreaFilled(false);
         HideBalance.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 HideBalanceActionPerformed(evt);
             }
         });
         add(HideBalance);
-        HideBalance.setBounds(270, 210, 70, 60);
+        HideBalance.setBounds(270, 190, 70, 60);
+
+        Latestranscat.setOpaque(false);
         add(Latestranscat);
-        Latestranscat.setBounds(50, 430, 290, 240);
+        Latestranscat.setBounds(40, 430, 300, 240);
 
         historybutton1.setBorder(null);
         historybutton1.setBorderPainted(false);
@@ -130,7 +135,7 @@ public class Wallet extends javax.swing.JPanel {
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void HideBalanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HideBalanceActionPerformed     
+    private void HideBalanceActionPerformed(java.awt.event.ActionEvent evt) {                                                 
         balanceHidden = !balanceHidden;
         updateBalanceDisplay();      
         if (balanceHidden) {
@@ -140,7 +145,7 @@ public class Wallet extends javax.swing.JPanel {
           //  HideBalance.setText("Hide");
                HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
         }
-    }//GEN-LAST:event_HideBalanceActionPerformed
+    }                                           
 
     private void loadWalletData() {
         try {
@@ -203,10 +208,12 @@ public class Wallet extends javax.swing.JPanel {
             javax.swing.JLabel noTransactionsLabel = new javax.swing.JLabel("No recent transactions");
             noTransactionsLabel.setFont(new java.awt.Font("Segoe UI", 0, 12));
             noTransactionsLabel.setForeground(java.awt.Color.GRAY);
+            noTransactionsLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
          //  noTransactionsLabel.setAlignmentX(javax.swing.CENTER_ALIGNMENT);
-            Latestranscat.add(javax.swing.Box.createVerticalGlue());
-            Latestranscat.add(noTransactionsLabel);
-            Latestranscat.add(javax.swing.Box.createVerticalGlue());
+            Latestranscat.setLayout(new java.awt.BorderLayout());
+            Latestranscat.add(javax.swing.Box.createVerticalGlue(), java.awt.BorderLayout.NORTH);
+            Latestranscat.add(noTransactionsLabel, java.awt.BorderLayout.CENTER);
+            Latestranscat.add(javax.swing.Box.createVerticalGlue(), java.awt.BorderLayout.SOUTH);
         } else {
             // Add title
            

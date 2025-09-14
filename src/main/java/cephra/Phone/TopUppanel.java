@@ -1,6 +1,7 @@
 
 package cephra.Phone;
 
+import java.awt.Color;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,7 +9,7 @@ import java.awt.event.ActionListener;
 public class TopUppanel extends javax.swing.JPanel {
 
     // Quick transaction amounts - updated to match the button values
-    private static final double[] QUICK_AMOUNTS = {500.0, 1000.0, 2500.0, 5000.0, 10000.0, 20000.0};
+    private static final double[] QUICK_AMOUNTS = {500.0, 1000.0, 1500.0, 2000.0, 3000.0, 5000.0};
 
     public TopUppanel() {
         initComponents();
@@ -17,6 +18,9 @@ public class TopUppanel extends javax.swing.JPanel {
         setupQuickAmountButtons();
         loadCurrentBalance();
         initializeCustomAmount();
+        
+        Customamount.setOpaque(false);
+        Customamount.setBackground(new Color(0, 0, 0, 0));  
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -38,52 +42,73 @@ public class TopUppanel extends javax.swing.JPanel {
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
         bck = new javax.swing.JButton();
+        morePayMethod = new javax.swing.JButton();
+        topUpIcon = new javax.swing.JLabel();
 
         setLayout(null);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(null);
 
+        Currentbalance.setFont(new java.awt.Font("Segoe UI Semibold", 1, 40)); // NOI18N
+        Currentbalance.setForeground(new java.awt.Color(255, 255, 255));
         Currentbalance.setText("xxxxxxx");
         jPanel1.add(Currentbalance);
-        Currentbalance.setBounds(120, 100, 70, 30);
+        Currentbalance.setBounds(80, 145, 240, 60);
 
-        A.setText("500");
+        A.setBorderPainted(false);
+        A.setContentAreaFilled(false);
         jPanel1.add(A);
-        A.setBounds(40, 190, 72, 23);
+        A.setBounds(40, 230, 75, 30);
 
-        B.setText("1000");
+        B.setBorderPainted(false);
+        B.setContentAreaFilled(false);
+        B.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BActionPerformed(evt);
+            }
+        });
         jPanel1.add(B);
-        B.setBounds(150, 190, 72, 23);
+        B.setBounds(150, 230, 75, 30);
 
-        C.setText("2500");
+        C.setBorderPainted(false);
+        C.setContentAreaFilled(false);
         jPanel1.add(C);
-        C.setBounds(260, 190, 72, 23);
+        C.setBounds(260, 230, 75, 30);
 
-        D.setText("5000");
+        D.setBorderPainted(false);
+        D.setContentAreaFilled(false);
         jPanel1.add(D);
-        D.setBounds(40, 260, 72, 23);
+        D.setBounds(40, 290, 75, 30);
 
-        E.setText("10000");
+        E.setBorderPainted(false);
+        E.setContentAreaFilled(false);
         jPanel1.add(E);
-        E.setBounds(150, 260, 72, 23);
+        E.setBounds(150, 290, 75, 30);
 
-        F.setText("20000");
+        F.setBorderPainted(false);
+        F.setContentAreaFilled(false);
         jPanel1.add(F);
-        F.setBounds(260, 260, 75, 23);
+        F.setBounds(260, 290, 75, 30);
 
-        Proceed.setText("Procceed");
+        Proceed.setBorderPainted(false);
+        Proceed.setContentAreaFilled(false);
         Proceed.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ProceedActionPerformed(evt);
             }
         });
         jPanel1.add(Proceed);
-        Proceed.setBounds(80, 500, 190, 70);
+        Proceed.setBounds(20, 600, 330, 30);
 
-        Customamount.setText("xxxxxx");
+        Customamount.setBorder(null);
+        Customamount.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                CustomamountKeyTyped(evt);
+            }
+        });
         jPanel1.add(Customamount);
-        Customamount.setBounds(110, 300, 130, 22);
+        Customamount.setBounds(70, 356, 255, 30);
 
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setText("Earnest Bank");
@@ -93,31 +118,45 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(jRadioButton1);
-        jRadioButton1.setBounds(140, 360, 90, 21);
+        jRadioButton1.setBounds(70, 390, 90, 21);
 
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText("Glangs");
         jPanel1.add(jRadioButton2);
-        jRadioButton2.setBounds(140, 380, 90, 21);
+        jRadioButton2.setBounds(70, 430, 90, 21);
 
         buttonGroup1.add(jRadioButton3);
         jRadioButton3.setText("Exness");
         jPanel1.add(jRadioButton3);
-        jRadioButton3.setBounds(140, 420, 120, 21);
+        jRadioButton3.setBounds(70, 410, 120, 21);
 
         buttonGroup1.add(jRadioButton4);
         jRadioButton4.setText("Kalapati");
+        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton4ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jRadioButton4);
-        jRadioButton4.setBounds(140, 400, 100, 21);
+        jRadioButton4.setBounds(70, 450, 100, 21);
 
-        bck.setText("Back");
+        bck.setBorderPainted(false);
+        bck.setContentAreaFilled(false);
         bck.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bckActionPerformed(evt);
             }
         });
         jPanel1.add(bck);
-        bck.setBounds(30, 40, 72, 23);
+        bck.setBounds(20, 33, 72, 30);
+
+        morePayMethod.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jPanel1.add(morePayMethod);
+        morePayMethod.setBounds(290, 554, 40, 30);
+
+        topUpIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/topUpIcon.png"))); // NOI18N
+        jPanel1.add(topUpIcon);
+        topUpIcon.setBounds(0, 0, 360, 720);
 
         add(jPanel1);
         jPanel1.setBounds(0, 0, 360, 720);
@@ -147,6 +186,22 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
     }//GEN-LAST:event_bckActionPerformed
+
+    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jRadioButton4ActionPerformed
+
+    private void BActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_BActionPerformed
+
+    private void CustomamountKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CustomamountKeyTyped
+        char c = evt.getKeyChar();
+            if (!Character.isDigit(c) && c != '\b') {
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            evt.consume(); // Ignore non-digit input
+}
+    }//GEN-LAST:event_CustomamountKeyTyped
 
     /**
      * Sets up the quick amount buttons with action listeners
@@ -371,5 +426,7 @@ public class TopUppanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JButton morePayMethod;
+    private javax.swing.JLabel topUpIcon;
     // End of variables declaration//GEN-END:variables
 }

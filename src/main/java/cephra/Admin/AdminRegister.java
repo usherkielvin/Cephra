@@ -10,8 +10,10 @@ public class AdminRegister extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
+        
         Firstname.setOpaque(false);
-        Firstname.setBackground(new Color(0, 0, 0, 0));  LastName.setOpaque(false);
+        Firstname.setBackground(new Color(0, 0, 0, 0));  
+        LastName.setOpaque(false);
         LastName.setBackground(new Color(0, 0, 0, 0));
         email.setOpaque(false);
         email.setBackground(new Color(0, 0, 0, 0));
