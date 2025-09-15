@@ -424,6 +424,7 @@ public class Rewards extends javax.swing.JPanel {
         a1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_1.png"))); // NOI18N
         a1.setBorder(null);
         a1.setBorderPainted(false);
+        a1.setContentAreaFilled(false);
         a1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a1ActionPerformed(evt);
@@ -435,6 +436,7 @@ public class Rewards extends javax.swing.JPanel {
         a2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_2.png"))); // NOI18N
         a2.setBorder(null);
         a2.setBorderPainted(false);
+        a2.setContentAreaFilled(false);
         a2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a2ActionPerformed(evt);
