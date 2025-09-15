@@ -44,11 +44,11 @@ public class ImageCropDialog extends JDialog {
         
         JButton cropButton = new JButton("Crop");
         cropButton.setPreferredSize(new Dimension(100, 30));
-        cropButton.addActionListener(e -> performCrop());
+        cropButton.addActionListener(_ -> performCrop());
         
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setPreferredSize(new Dimension(100, 30));
-        cancelButton.addActionListener(e -> dispose());
+        cancelButton.addActionListener(_ -> dispose());
         
         buttonPanel.add(cropButton);
         buttonPanel.add(cancelButton);

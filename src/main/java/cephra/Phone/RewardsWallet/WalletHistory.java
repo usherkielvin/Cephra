@@ -183,7 +183,7 @@ public class WalletHistory extends javax.swing.JPanel {
 
         // Format date and time
         java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
-        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm");
+        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
         String dateStr = dateFormat.format(timestamp);
         String timeStr = timeFormat.format(timestamp);
         

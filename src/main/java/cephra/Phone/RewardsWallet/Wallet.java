@@ -105,8 +105,11 @@ public class Wallet extends javax.swing.JPanel {
         add(Balancetxt);
         Balancetxt.setBounds(80, 200, 200, 60);
 
+        HideBalance.setForeground(new java.awt.Color(255, 255, 255));
+        HideBalance.setBorder(null);
         HideBalance.setBorderPainted(false);
         HideBalance.setContentAreaFilled(false);
+        HideBalance.setFocusPainted(false);
         HideBalance.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 HideBalanceActionPerformed(evt);
@@ -183,9 +186,11 @@ public class Wallet extends javax.swing.JPanel {
  
     private void updateBalanceDisplay() {
         if (balanceHidden) {
-            Balancetxt.setText("******");
+            Balancetxt.setText("●●●●●●");
+            Balancetxt.setFont(new java.awt.Font("Segoe UI Semibold", 1, 40)); // Same font as original
         } else {
             Balancetxt.setText(String.format("%.2f", balance));
+            Balancetxt.setFont(new java.awt.Font("Segoe UI Semibold", 1, 40)); // Same font as original
         }
     }
     
@@ -328,7 +333,7 @@ public class Wallet extends javax.swing.JPanel {
     
     private String formatTransactionDate(java.sql.Timestamp timestamp) {
         if (timestamp == null) return "";
-        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd HH:mm");
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd hh:mm a");
         return dateFormat.format(timestamp);
     }
     

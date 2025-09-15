@@ -15,10 +15,7 @@ public class EditProfile extends javax.swing.JPanel {
       
         makeDraggable();
         
-        // Get current user's email, firstname, and lastname
-        String email = cephra.Database.CephraDB.getCurrentEmail();
-        String firstname = cephra.Database.CephraDB.getCurrentFirstname();
-        String lastname = cephra.Database.CephraDB.getCurrentLastname();
+       
         
         // Set the labels
         
@@ -252,8 +249,7 @@ public class EditProfile extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void addpicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addpicActionPerformed
-        // TODO add your handling code here:
-          // Handle profile picture selection and cropping
+       
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
