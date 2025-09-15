@@ -292,12 +292,12 @@ public class TopUppanel extends javax.swing.JPanel {
         updateMethodSelectedLabel("GCash");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton4ActionPerformed
-
+@SuppressWarnings("unused")
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
         updateMethodSelectedLabel("PayMaya");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton2ActionPerformed
-
+@SuppressWarnings("unused")
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
         updateMethodSelectedLabel("VISA");
         slideMethodPanelDown(); // Auto-hide panel after selection
@@ -540,19 +540,6 @@ public class TopUppanel extends javax.swing.JPanel {
         });
     }
 
-    /**
-     * Shows a success message to the user
-     */
-    private void showSuccessMessage(String message) {
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(
-                this,
-                message,
-                "Top-Up Successful",
-                JOptionPane.INFORMATION_MESSAGE
-            );
-        });
-    }
 
     /**
      * Public method to refresh balance when returning to this screen

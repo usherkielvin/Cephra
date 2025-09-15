@@ -18,6 +18,9 @@ public class HOMELINKED extends javax.swing.JPanel {
         "/cephra/Cephra Images/c9.1.png",
         "/cephra/Cephra Images/c10.1.png"
     };
+    
+    // Timer for real-time status updates
+    private javax.swing.Timer statusUpdateTimer;
 
     public HOMELINKED() {
         initComponents();
@@ -31,14 +34,21 @@ public class HOMELINKED extends javax.swing.JPanel {
         // Load logged name
         loadLoggedName();
         
+        // Load status
+        loadStatus();
+        
         // Set car image to match the linked car
         setLinkedCarImage();
         
-        // Add listeners to refresh car image when panel becomes visible
+        // Initialize and start real-time status updates
+        initializeStatusTimer();
+        
+        // Add listeners to refresh data when panel becomes visible
         addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent e) {
                 setLinkedCarImage(); // Refresh car image when panel gains focus
+                loadStatus(); // Refresh status when panel gains focus
             }
         });
         
@@ -48,6 +58,10 @@ public class HOMELINKED extends javax.swing.JPanel {
                 if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0) {
                     if (isShowing()) {
                         setLinkedCarImage(); // Refresh car image when panel becomes visible
+                        loadStatus(); // Refresh status when panel becomes visible
+                        startStatusTimer(); // Start timer when panel becomes visible
+                    } else {
+                        stopStatusTimer(); // Stop timer when panel becomes hidden
                     }
                 }
             }
@@ -109,6 +123,88 @@ public class HOMELINKED extends javax.swing.JPanel {
     }
     
     /**
+     * Load status from user's current queue ticket
+     */
+    private void loadStatus() {
+        try {
+            if (Status != null) {
+                String username = cephra.Database.CephraDB.getCurrentUsername();
+                if (username != null && !username.isEmpty()) {
+                    // Get user's current ticket status
+                    String status = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
+                    if (status != null && !status.isEmpty()) {
+                        // Map database status to display status
+                        String displayStatus;
+                        switch (status.toLowerCase()) {
+                            case "pending":
+                                displayStatus = "Pending";
+                                break;
+                            case "waiting":
+                                displayStatus = "Waiting";
+                                break;
+                            case "charging":
+                                displayStatus = "Charging";
+                                break;
+                            case "complete":
+                            case "completed":
+                                displayStatus = "Complete";
+                                break;
+                            default:
+                                displayStatus = "Unavailable";
+                                break;
+                        }
+                        Status.setText(displayStatus);
+                    } else {
+                        // No ticket found - show Unavailable
+                        Status.setText("Unavailable");
+                    }
+                } else {
+                    Status.setText("Unavailable");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading status: " + e.getMessage());
+            Status.setText("Unavailable");
+        }
+    }
+    
+    /**
+     * Initialize the status update timer
+     */
+    private void initializeStatusTimer() {
+        statusUpdateTimer = new javax.swing.Timer(2000, new java.awt.event.ActionListener() { // Update every 2 seconds
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                loadStatus(); // Refresh status in real-time
+            }
+        });
+        statusUpdateTimer.setRepeats(true);
+        
+        // Start timer if panel is currently visible
+        if (isShowing()) {
+            startStatusTimer();
+        }
+    }
+    
+    /**
+     * Start the status update timer
+     */
+    private void startStatusTimer() {
+        if (statusUpdateTimer != null && !statusUpdateTimer.isRunning()) {
+            statusUpdateTimer.start();
+        }
+    }
+    
+    /**
+     * Stop the status update timer
+     */
+    private void stopStatusTimer() {
+        if (statusUpdateTimer != null && statusUpdateTimer.isRunning()) {
+            statusUpdateTimer.stop();
+        }
+    }
+    
+    /**
      * Set car image to match the user's linked car from database
      */
     private void setLinkedCarImage() {
@@ -140,6 +236,7 @@ public class HOMELINKED extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        Status = new javax.swing.JLabel();
         LoggedName = new javax.swing.JLabel();
         CAR = new javax.swing.JLabel();
         Notifications = new javax.swing.JButton();
@@ -154,6 +251,13 @@ public class HOMELINKED extends javax.swing.JPanel {
         wallet = new javax.swing.JButton();
 
         setLayout(null);
+
+        Status.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        Status.setForeground(new java.awt.Color(255, 255, 255));
+        Status.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        Status.setText("Waiting");
+        add(Status);
+        Status.setBounds(230, 337, 110, 40);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         LoggedName.setForeground(new java.awt.Color(0, 204, 204));
@@ -383,6 +487,7 @@ public class HOMELINKED extends javax.swing.JPanel {
     private javax.swing.JLabel CAR;
     private javax.swing.JLabel LoggedName;
     private javax.swing.JButton Notifications;
+    private javax.swing.JLabel Status;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;

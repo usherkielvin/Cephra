@@ -174,6 +174,58 @@ try {
             }
             break;
 
+        case "login":
+            if ($method !== "POST") {
+                echo json_encode([
+                    "success" => false,
+                    "error" => "Method not allowed"
+                ]);
+                break;
+            }
+            
+            $username = $_POST["username"] ?? "";
+            $password = $_POST["password"] ?? "";
+            
+            if (!$username || !$password) {
+                echo json_encode([
+                    "success" => false,
+                    "error" => "Username and password are required"
+                ]);
+                break;
+            }
+            
+            // Check user credentials
+            $stmt = $db->prepare("
+                SELECT username, firstname, lastname, email 
+                FROM users 
+                WHERE username = ? AND password = ?
+            ");
+            $stmt->execute([$username, $password]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user) {
+                // Start session and store user data
+                session_start();
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['firstname'] = $user['firstname'];
+                $_SESSION['lastname'] = $user['lastname'];
+                $_SESSION['email'] = $user['email'];
+                
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Login successful",
+                    "username" => $user['username'],
+                    "firstname" => $user['firstname'],
+                    "lastname" => $user['lastname']
+                ]);
+            } else {
+                echo json_encode([
+                    "success" => false,
+                    "error" => "Invalid username or password"
+                ]);
+            }
+            break;
+
         case "register-user":
             if ($method !== "POST") {
                 echo json_encode([
@@ -233,7 +285,7 @@ try {
                 "success" => false,
                 "error" => "Invalid action",
                 "available_actions" => [
-                    "test", "user-profile", "user-history", "available-bays", 
+                    "test", "login", "user-profile", "user-history", "available-bays", 
                     "create-ticket", "register-user"
                 ]
             ]);

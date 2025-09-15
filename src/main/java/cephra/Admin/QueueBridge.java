@@ -311,15 +311,8 @@ public final class QueueBridge {
                         System.err.println("QueueBridge: Error refreshing history table: " + e.getMessage());
                     }
                     
-                    // Close PayPop on the phone if it is currently showing
-                    SwingUtilities.invokeLater(() -> {
-                        try {
-                            cephra.Phone.Popups.PayPop.hidePayPop();
-                            System.out.println("QueueBridge: Closed PayPop on phone after marking ticket as Paid: " + ticket);
-                        } catch (Throwable t) {
-                            System.err.println("QueueBridge: Failed to close PayPop: " + t.getMessage());
-                        }
-                    });
+                    // Don't close PayPop here - let PayPop handle its own navigation to receipt
+                    System.out.println("QueueBridge: Payment completed for ticket " + ticket + " - PayPop will handle navigation");
                     
                     // COPY THE SAME APPROACH AS MANUAL "MARK AS PAID":
                     // Add a longer delay to ensure database operations complete before UI updates
@@ -706,7 +699,26 @@ public final class QueueBridge {
                     if (ticketId.equals(String.valueOf(ticketValue))) {
                         String status = String.valueOf(model.getValueAt(i, 3));
                         String payment = String.valueOf(model.getValueAt(i, 4));
-                        return "Complete".equalsIgnoreCase(status) && "Pending".equalsIgnoreCase(payment);
+                        
+                        // Ticket is ready for payment when charging is Complete/Completed/Charging and payment is still Pending
+                        // PayPop can be shown for both "Charging" and "Complete" statuses, so accept both
+                        // If payment is already Paid, don't allow payment again
+                        boolean chargingReady = "Complete".equalsIgnoreCase(status) || "Completed".equalsIgnoreCase(status) || "Charging".equalsIgnoreCase(status);
+                        boolean paymentPending = "Pending".equalsIgnoreCase(payment);
+                        boolean alreadyPaid = "Paid".equalsIgnoreCase(payment);
+                        
+                        System.out.println("QueueBridge: Validating ticket " + ticketId + " - Status: '" + status + "', Payment: '" + payment + "'");
+                        
+                        if (chargingReady && paymentPending) {
+                            System.out.println("QueueBridge: Ticket " + ticketId + " is ready for payment");
+                            return true; // Ready for payment
+                        } else if (chargingReady && alreadyPaid) {
+                            System.out.println("QueueBridge: Ticket " + ticketId + " is already paid, payment not allowed");
+                            return false; // Already paid, don't allow payment again
+                        } else {
+                            System.out.println("QueueBridge: Ticket " + ticketId + " not ready - Status: '" + status + "', Payment: '" + payment + "'");
+                            return false; // Not ready for payment
+                        }
                     }
                 }
             }

@@ -54,11 +54,36 @@ public class Reciept extends javax.swing.JPanel {
 
     private void populateAmounts() {
         try {
-            String ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
+            // Try to get ticket ID from PayPop first (most recent payment)
+            String ticket = getTicketFromPayPop();
+            boolean isPayPopPayment = (ticket != null && !ticket.isEmpty());
+            
+            if (ticket == null || ticket.isEmpty()) {
+                // Fallback to QueueFlow
+                ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
+            }
+            System.out.println("Receipt: Using ticket ID: " + ticket);
             if (ticket == null || ticket.isEmpty()) return;
             
-            // Use centralized calculation from QueueBridge for consistency
-            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+            // Get amount - prioritize PayPop payment amount for online payments
+            double amount = 0.0;
+            if (isPayPopPayment) {
+                // For PayPop payments, get the actual payment amount from PayPop
+                amount = cephra.Phone.Popups.PayPop.getPaymentAmount();
+                System.out.println("Receipt: Amount from PayPop: " + amount);
+            }
+            
+            // If PayPop amount is not available or 0, try other sources
+            if (amount <= 0) {
+                // Get amount from charging history since ticket may have been removed from queue
+                amount = getAmountFromChargingHistory(ticket);
+                System.out.println("Receipt: Amount from history: " + amount);
+                if (amount <= 0) {
+                    // Fallback to QueueBridge calculation if not found in history
+                    amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                    System.out.println("Receipt: Fallback amount from QueueBridge: " + amount);
+                }
+            }
             
             // Get kWh calculation from QueueBridge for consistency
             cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
@@ -69,43 +94,136 @@ public class Reciept extends javax.swing.JPanel {
                 usedKWh = (100.0 - start) / 100.0 * cap;
             }
             
-            // Get reference number from queue bridge first (most up-to-date)
-            String refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
-            
-            // If not found in queue, try admin history
-            if (refNumber.isEmpty()) {
-                try {
-                    List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
-                    if (adminRecords != null) {
-                        for (Object[] record : adminRecords) {
-                            if (record.length >= 7 && ticket.equals(String.valueOf(record[0]))) {
-                                refNumber = String.valueOf(record[6]); // Reference number is at index 6
-                                break;
+            // Handle reference number - hide for PayPop payments
+            String refNumber = "";
+            if (!isPayPopPayment) {
+                // Get reference number from queue bridge first (most up-to-date)
+                refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
+                
+                // If not found in queue, try admin history
+                if (refNumber.isEmpty()) {
+                    try {
+                        List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
+                        if (adminRecords != null) {
+                            for (Object[] record : adminRecords) {
+                                if (record.length >= 7 && ticket.equals(String.valueOf(record[0]))) {
+                                    refNumber = String.valueOf(record[6]); // Reference number is at index 6
+                                    break;
+                                }
                             }
                         }
+                    } catch (Exception e) {
+                        System.err.println("Error getting reference from admin history: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    System.err.println("Error getting reference from admin history: " + e.getMessage());
                 }
-            }
-            
-            // If still empty, generate a temporary reference
-            if (refNumber.isEmpty()) {
-                refNumber = String.format("REF%s", ticket);
+                
+                // If still empty, generate a temporary reference
+                if (refNumber.isEmpty()) {
+                    refNumber = String.format("REF%s", ticket);
+                }
             }
             
             // Use values to avoid warnings and aid debugging
             System.out.println("Receipt for " + ticket + ": used=" + String.format("%.2f", usedKWh) + "kWh, amount=" + String.format("%.2f", amount));
+            System.out.println("Receipt: Amount variable value: " + amount);
+            System.out.println("Receipt: Amount variable type: double");
+            System.out.println("Receipt: Setting AmountPaid to: Php " + String.format("%.2f", amount));
+            System.out.println("Receipt: Setting RefNumber to: " + refNumber);
             
-            AmountPaid.setText(String.format("Php %.2f", amount));
+            // Amount is already a double, so use it directly
+            double finalAmount = amount;
+            
+            System.out.println("Receipt: Final amount to display: " + finalAmount);
+            
+            AmountPaid.setText(String.format("Php %.2f", finalAmount));
             Fee.setText(String.format("Php %.2f", cephra.Admin.QueueBridge.getMinimumFee()));
-            price.setText(String.format("PHP %.2f", amount));
-            RefNumber.setText(refNumber); // Use admin queue reference number
+            price.setText(String.format("PHP %.2f", finalAmount));
+            
+            // Handle reference number display - show reference for all payments
+            if (isPayPopPayment) {
+                // For PayPop payments, use the ticket ID as reference or get from PayPop
+                RefNumber.setText(ticket); // Use ticket ID as reference for PayPop payments
+                jLabel8.setText("Ref. Number: "); // Show the label
+            } else {
+                RefNumber.setText(refNumber); // Use admin queue reference number
+                jLabel8.setText("Ref. Number: "); // Show the label for non-PayPop payments
+            }
+            
             NumTicket.setText(ticket); // Use FCH ticket number
+            
+            System.out.println("Receipt: After setting - AmountPaid text: " + AmountPaid.getText());
+            System.out.println("Receipt: After setting - RefNumber text: " + RefNumber.getText());
             TimeDate.setText(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy hh:mm a")));
         } catch (Throwable t) {
             System.err.println("Error populating receipt amounts: " + t.getMessage());
         }
+    }
+    
+    /**
+     * Gets the actual payment amount from charging history
+     * @param ticket the ticket ID
+     * @return the amount paid, or 0 if not found
+     */
+    private double getAmountFromChargingHistory(String ticket) {
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            System.out.println("Receipt: Looking for ticket " + ticket + " for user " + username);
+            if (username == null || username.isEmpty()) return 0;
+            
+            // Get charging history records for the user
+            java.util.List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(username);
+            System.out.println("Receipt: Found " + (adminRecords != null ? adminRecords.size() : 0) + " history records");
+            if (adminRecords != null) {
+                for (Object[] record : adminRecords) {
+                    System.out.println("Receipt: Checking record for ticket: " + record[0]);
+                    if (record.length >= 7 && ticket.equals(String.valueOf(record[0]))) {
+                        // Admin history format: [Ticket, Customer, KWh, Total, Served By, Date & Time, Reference]
+                        System.out.println("Receipt: Record length: " + record.length);
+                        System.out.println("Receipt: Record contents: " + java.util.Arrays.toString(record));
+                        Object amountObj = record[3]; // Total amount is at index 3 in admin history format
+                        System.out.println("Receipt: Found matching ticket, amount object: " + amountObj + " (type: " + amountObj.getClass().getSimpleName() + ")");
+                        if (amountObj instanceof Number) {
+                            double amount = ((Number) amountObj).doubleValue();
+                            System.out.println("Receipt: Returning amount: " + amount);
+                            return amount;
+                        } else if (amountObj instanceof String) {
+                            try {
+                                double amount = Double.parseDouble((String) amountObj);
+                                System.out.println("Receipt: Parsed amount from string: " + amount);
+                                return amount;
+                            } catch (NumberFormatException e) {
+                                System.err.println("Error parsing amount from history: " + amountObj);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting amount from charging history: " + e.getMessage());
+            e.printStackTrace();
+        }
+        System.out.println("Receipt: No amount found in history, returning 0");
+        return 0;
+    }
+    
+    /**
+     * Gets the ticket ID from PayPop if available
+     * @return the ticket ID from PayPop, or null if not available
+     */
+    private String getTicketFromPayPop() {
+        try {
+            // Try to get the ticket ID from PayPop's current instance
+            String ticketId = cephra.Phone.Popups.PayPop.getCurrentTicketId();
+            if (ticketId != null && !ticketId.trim().isEmpty()) {
+                System.out.println("Receipt: Got ticket ID from PayPop: " + ticketId);
+                return ticketId;
+            }
+        } catch (Exception e) {
+            System.err.println("Receipt: Error getting ticket from PayPop: " + e.getMessage());
+        }
+        System.out.println("Receipt: No ticket ID available from PayPop");
+        return null;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

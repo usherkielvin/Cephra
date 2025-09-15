@@ -15,6 +15,7 @@ public class PayPop extends javax.swing.JPanel {
     private static boolean isPendingTopUpReturn = false;
     private static String pendingTicketId = null;
     private static String pendingCustomerUsername = null;
+    private static double lastPaymentAmount = 0.0;
     
     // Popup dimensions (centered in phone frame)
     private static final int POPUP_WIDTH = 270;
@@ -37,6 +38,22 @@ public class PayPop extends javax.swing.JPanel {
      */
     public static boolean hasPendingPayPop() {
         return isPendingTopUpReturn && pendingTicketId != null && pendingCustomerUsername != null;
+    }
+    
+    /**
+     * Gets the current ticket ID from PayPop
+     * @return the current ticket ID, or null if not available
+     */
+    public static String getCurrentTicketId() {
+        return currentTicketId;
+    }
+    
+    /**
+     * Gets the payment amount from PayPop's last payment
+     * @return the payment amount, or 0.0 if not available
+     */
+    public static double getPaymentAmount() {
+        return lastPaymentAmount;
     }
     
     /**
@@ -532,11 +549,14 @@ public class PayPop extends javax.swing.JPanel {
                 System.out.println("Payment error occurred, keeping PayPop open");
                 handlePaymentError(e);
             } finally {
+                System.out.println("PayPop: Payment success: " + paymentSuccess);
                 hidePayPop();
                 // Only navigate to receipt if payment was successful
                 if (paymentSuccess) {
+                    System.out.println("PayPop: Navigating to receipt...");
                     navigateToReceipt();
                 } else {
+                    System.out.println("PayPop: Payment failed, navigating to home...");
                     // If payment failed (e.g., insufficient balance), navigate back to home
                     navigateToHome();
                 }
@@ -571,12 +591,6 @@ public class PayPop extends javax.swing.JPanel {
         
         String currentTicket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
         
-        // Validate ticket is ready for payment
-        if (!isTicketValidForPayment(currentTicket)) {
-            showErrorMessage("Ticket is not ready for payment.");
-            return false;
-        }
-        
         // Get current user
         String currentUser = cephra.Database.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
@@ -587,11 +601,17 @@ public class PayPop extends javax.swing.JPanel {
         // Calculate payment amount
         double paymentAmount = cephra.Admin.QueueBridge.computeAmountDue(currentTicket);
         
-        // Check wallet balance first
+        // Store payment amount for receipt
+        lastPaymentAmount = paymentAmount;
+        
+        // Check wallet balance first - show top-up dialog if insufficient
         if (!cephra.Database.CephraDB.hasSufficientWalletBalance(currentUser, paymentAmount)) {
             showInsufficientBalanceMessage(paymentAmount);
             return false;
         }
+        
+        // No need to validate ticket status - PayPop only shows when ticket is completed
+        System.out.println("PayPop: Processing payment for completed ticket " + currentTicket + ", amount: ₱" + paymentAmount);
         
         // Process wallet payment
         boolean walletPaymentSuccess = cephra.Database.CephraDB.processWalletPayment(currentUser, currentTicket, paymentAmount);
@@ -619,21 +639,6 @@ public class PayPop extends javax.swing.JPanel {
         return true;
     }
     
-    /**
-     * Validates if ticket is ready for payment
-     * @param ticketId the ticket ID
-     * @return true if ticket is valid for payment
-     */
-    private boolean isTicketValidForPayment(String ticketId) {
-        try {
-            // Use the public method from QueueBridge instead of reflection
-            return cephra.Admin.QueueBridge.isTicketValidForPayment(ticketId);
-        } catch (Exception e) {
-            System.err.println("Error validating ticket for payment: " + e.getMessage());
-            // If validation fails, allow payment to proceed
-            return true;
-        }
-    }
     
     /**
      * Shows error message to user
@@ -717,12 +722,18 @@ public class PayPop extends javax.swing.JPanel {
      * Navigates to receipt screen
      */
     private void navigateToReceipt() {
+        System.out.println("PayPop: navigateToReceipt() called");
         SwingUtilities.invokeLater(() -> {
+            System.out.println("PayPop: Looking for Phone window...");
             Window[] windows = Window.getWindows();
+            System.out.println("PayPop: Found " + windows.length + " windows");
             for (Window window : windows) {
+                System.out.println("PayPop: Window type: " + window.getClass().getSimpleName());
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    System.out.println("PayPop: Found Phone window, switching to Receipt panel");
                     phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Reciept());
+                    System.out.println("PayPop: Receipt panel switch completed");
                     break;
                 }
             }

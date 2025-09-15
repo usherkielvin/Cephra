@@ -63,7 +63,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         if (historyScrollPane == null) {
             historyScrollPane = new JScrollPane(historyPanel);
             historyScrollPane.setBorder(null);
-            historyScrollPane.setBounds(50, 150, 290, 480);
+            historyScrollPane.setBounds(40, 150, 285, 520);
             add(historyScrollPane);
         } else {
             // Just update the viewport with the new history panel
@@ -441,7 +441,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(20, 150, 300, 520);
+        historyScrollPane.setBounds(40, 150, 285, 520);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
