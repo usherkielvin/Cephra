@@ -1,12 +1,9 @@
 package cephra.Phone.RewardsWallet;
 
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.*;
 import java.util.List;
-import javax.swing.SwingUtilities;
-import javax.swing.JOptionPane;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class Reciept extends javax.swing.JPanel {
   
@@ -274,7 +271,7 @@ public class Reciept extends javax.swing.JPanel {
         price.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
         price.setText("PHP 650.00");
         add(price);
-        price.setBounds(70, 280, 210, 40);
+        price.setBounds(90, 280, 210, 40);
 
         RefNumber.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         RefNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

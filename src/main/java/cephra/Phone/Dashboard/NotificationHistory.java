@@ -63,7 +63,8 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         if (historyScrollPane == null) {
             historyScrollPane = new JScrollPane(historyPanel);
             historyScrollPane.setBorder(null);
-            historyScrollPane.setBounds(40, 150, 285, 520);
+            // Center the scroll pane: (370 - 285) / 2 = 42.5, round to 43
+            historyScrollPane.setBounds(43, 150, 285, 520);
             add(historyScrollPane);
         } else {
             // Just update the viewport with the new history panel
@@ -434,6 +435,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         setLayout(null);
 
         historyScrollPane.setBorder(null);
+        historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         historyScrollPane.setOpaque(false);
 
         historyPanel.setOpaque(false);
@@ -441,7 +443,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(40, 150, 285, 520);
+        historyScrollPane.setBounds(43, 150, 285, 520);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -454,10 +456,8 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         });
         add(profilebutton);
         profilebutton.setBounds(260, 680, 40, 40);
-
-        closeButton.setText("jButton1");
         add(closeButton);
-        closeButton.setBounds(240, 120, 75, 23);
+        closeButton.setBounds(240, 120, 75, 50);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -469,7 +469,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             }
         });
         add(charge);
-        charge.setBounds(30, 680, 50, 50);
+        charge.setBounds(30, 680, 50, 40);
 
         homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
@@ -481,7 +481,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             }
         });
         add(homebutton);
-        homebutton.setBounds(160, 680, 60, 40);
+        homebutton.setBounds(150, 680, 40, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -493,9 +493,9 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 60, 40);
+        linkbutton.setBounds(90, 680, 40, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/HISTORY - if none.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/notification.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents
