@@ -49,8 +49,10 @@ try {
             $stmt = $db->query("SELECT COUNT(*) as count FROM charging_bays WHERE status = 'Occupied'");
             $stats['active_bays'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
             
-            // Today's revenue (placeholder)
-            $stats['revenue_today'] = 0;
+            // Today's revenue
+            $stmt = $db->query("SELECT SUM(amount) as revenue FROM payment_transactions WHERE DATE(created_at) = CURDATE()");
+            $revenue = $stmt->fetch(PDO::FETCH_ASSOC)['revenue'];
+            $stats['revenue_today'] = $revenue ? (float)$revenue : 0;
             
             // Recent activity from actual database records
             $stmt = $db->query("
@@ -316,17 +318,36 @@ try {
                 echo json_encode(['error' => 'Method not allowed']);
                 break;
             }
-            
+
             $fast_charge_price = $_POST['fast_charge_price'] ?? '';
             $normal_charge_price = $_POST['normal_charge_price'] ?? '';
-            
+
             if (!$fast_charge_price || !$normal_charge_price) {
                 echo json_encode(['error' => 'Both pricing values are required']);
                 break;
             }
-            
+
             // Save settings (placeholder - you might want to create a settings table)
             echo json_encode(['success' => true, 'message' => 'Settings saved successfully']);
+            break;
+
+        case 'analytics':
+            // Get revenue data for the last 7 days
+            $stmt = $db->query("
+                SELECT
+                    DATE(processed_at) as date,
+                    SUM(amount) as revenue
+                FROM payment_transactions
+                WHERE processed_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                GROUP BY DATE(processed_at)
+                ORDER BY DATE(processed_at)
+            ");
+            $revenue_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode([
+                'success' => true,
+                'revenue_data' => $revenue_data
+            ]);
             break;
 
 
@@ -336,7 +357,7 @@ try {
                 'available_actions' => [
                     'dashboard', 'queue', 'bays', 'users', 'ticket-details',
                     'process-ticket', 'set-bay-maintenance', 'set-bay-available',
-                    'add-user', 'delete-user', 'settings', 'save-settings'
+                    'add-user', 'delete-user', 'settings', 'save-settings', 'analytics'
                 ]
             ]);
             break;

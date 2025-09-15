@@ -3,6 +3,7 @@ class AdminPanel {
     constructor() {
         this.currentPanel = 'dashboard';
         this.refreshInterval = null;
+        this.analyticsRange = 'week'; // default range
         this.init();
     }
 
@@ -12,6 +13,7 @@ class AdminPanel {
         this.loadDashboardData();
         this.startAutoRefresh();
         this.startTimeUpdate();
+        this.setupAnalyticsRangeSelector();
     }
 
     setupEventListeners() {
@@ -27,14 +29,14 @@ class AdminPanel {
         const sidebarToggle = document.querySelector('.sidebar-toggle');
         const sidebar = document.querySelector('.sidebar');
         const mainContent = document.querySelector('.main-content');
-        
+
         if (sidebarToggle && sidebar) {
             sidebarToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
                 sidebar.classList.toggle('active');
             });
         }
-        
+
         // Close sidebar when clicking on main content background
         if (mainContent && sidebar) {
             mainContent.addEventListener('click', () => {
@@ -43,7 +45,7 @@ class AdminPanel {
                 }
             });
         }
-        
+
         // Prevent sidebar clicks from closing the sidebar
         if (sidebar) {
             sidebar.addEventListener('click', (e) => {
@@ -71,7 +73,7 @@ class AdminPanel {
         // Queue filters
         const statusFilter = document.getElementById('status-filter');
         const serviceFilter = document.getElementById('service-filter');
-        
+
         if (statusFilter) {
             statusFilter.addEventListener('change', () => this.filterQueue());
         }
@@ -81,7 +83,7 @@ class AdminPanel {
     }
 
     switchPanel(panelName) {
-        
+
         // Update sidebar active state
         document.querySelectorAll('.sidebar-menu li').forEach(item => {
             item.classList.remove('active');
@@ -151,7 +153,7 @@ class AdminPanel {
         document.getElementById('total-users').textContent = stats.total_users || 0;
         document.getElementById('queue-count').textContent = stats.queue_count || 0;
         document.getElementById('active-bays').textContent = stats.active_bays || 0;
-        document.getElementById('revenue-today').textContent = `₱${Math.round(stats.revenue_today || 0)}`;
+        document.getElementById('revenue-today').textContent = `₱${this.formatCurrency(stats.revenue_today || 0)}`;
     }
 
     updateRecentActivity(activities) {
@@ -187,13 +189,13 @@ class AdminPanel {
     }
 
     updateQueueTable(queue) {
-        const tbody = document.getElementById('queue-tbody');
-        if (!queue || queue.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-info-circle"></i> No tickets in queue</td></tr>';
-            return;
-        }
+            const tbody = document.getElementById('queue-tbody');
+            if (!queue || queue.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-info-circle"></i> No tickets in queue</td></tr>';
+                return;
+            }
 
-        tbody.innerHTML = queue.map(ticket => `
+            tbody.innerHTML = queue.map(ticket => `
             <tr>
                 <td>${ticket.ticket_id}</td>
                 <td>${ticket.username}</td>
@@ -202,17 +204,24 @@ class AdminPanel {
                 <td><span class="status-badge ${ticket.payment_status.toLowerCase()}">${ticket.payment_status}</span></td>
                 <td>${this.formatDateTime(ticket.created_at)}</td>
                 <td>
-                    <button class="btn btn-primary btn-sm" onclick="adminPanel.viewTicket('${ticket.ticket_id}')">
+                    <button class="btn btn-primary btn-sm" onclick="if (adminPanel) adminPanel.viewTicket('${ticket.ticket_id}')">
                         <i class="fas fa-eye"></i> View
                     </button>
-                    ${ticket.status === 'Waiting' ? `
-                        <button class="btn btn-success btn-sm" onclick="adminPanel.processTicket('${ticket.ticket_id}')">
-                            <i class="fas fa-play"></i> Process
-                        </button>
-                    ` : ''}
+                ${ticket.status !== 'Complete' ? `
+                    <button class="btn btn-success" onclick="if (adminPanel) adminPanel.proceedTicket('${ticket.ticket_id}', '${ticket.status}')">
+                        <i class="fas fa-play"></i> Process
+                    </button>
+                ` : `
+                    <button class="btn btn-warning" onclick="if (adminPanel) adminPanel.markAsPaid('${ticket.ticket_id}')">
+                        <i class="fas fa-credit-card"></i> Mark as Paid
+                    </button>
+                `}
                 </td>
             </tr>
         `).join('');
+
+        // Auto-remove paid tickets after a delay
+        this.autoRemovePaidTickets();
     }
 
     async loadBaysData() {
@@ -241,7 +250,7 @@ class AdminPanel {
         container.innerHTML = bays.map(bay => `
             <div class="bay-card ${bay.status.toLowerCase()}">
                 <div class="bay-header">
-                    <span class="bay-number">Bay ${bay.bay_number}</span>
+                    <span class="bay-number">${bay.bay_number}</span>
                     <span class="bay-status ${bay.status.toLowerCase()}">${bay.status}</span>
                 </div>
                 <div class="bay-info">
@@ -264,11 +273,11 @@ class AdminPanel {
                 </div>
                 <div class="bay-actions" style="margin-top: 15px;">
                     ${bay.status === 'Available' ? `
-                        <button class="btn btn-warning btn-sm" onclick="adminPanel.setBayMaintenance('${bay.bay_number}')">
+                        <button class="btn btn-warning btn-sm" onclick="if (adminPanel) adminPanel.setBayMaintenance('${bay.bay_number}')">
                             <i class="fas fa-tools"></i> Maintenance
                         </button>
                     ` : bay.status === 'Maintenance' ? `
-                        <button class="btn btn-success btn-sm" onclick="adminPanel.setBayAvailable('${bay.bay_number}')">
+                        <button class="btn btn-success btn-sm" onclick="if (adminPanel) adminPanel.setBayAvailable('${bay.bay_number}')">
                             <i class="fas fa-check"></i> Available
                         </button>
                     ` : ''}
@@ -301,17 +310,14 @@ class AdminPanel {
         }
 
         tbody.innerHTML = users.map(user => `
-            <tr>
+            <tr id="user-row-${user.username}">
                 <td>${user.username}</td>
                 <td>${user.firstname}</td>
                 <td>${user.lastname}</td>
                 <td>${user.email}</td>
                 <td>${this.formatDateTime(user.created_at)}</td>
                 <td>
-                    <button class="btn btn-primary btn-sm" onclick="adminPanel.viewUser('${user.username}')">
-                        <i class="fas fa-eye"></i> View
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="adminPanel.deleteUser('${user.username}')">
+                    <button class="btn btn-danger btn-sm" onclick="if (adminPanel) adminPanel.deleteUser('${user.username}')">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </td>
@@ -319,8 +325,192 @@ class AdminPanel {
         `).join('');
     }
 
+    async deleteUser(username) {
+        if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch('api/admin-clean.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=delete-user&username=${username}`
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                this.showSuccess('User deleted successfully');
+                // Remove the user row from the table
+                const userRow = document.getElementById(`user-row-${username}`);
+                if (userRow) {
+                    userRow.remove();
+                }
+            } else {
+                this.showError(data.message || 'Failed to delete user');
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            this.showError('Failed to delete user');
+        }
+    }
+
+    setupAnalyticsRangeSelector() {
+        const container = document.getElementById('analytics-range-selector');
+        if (!container) return;
+
+        container.innerHTML = `
+            <button id="range-day" class="range-btn">Day</button>
+            <button id="range-week" class="range-btn active">Week</button>
+            <button id="range-month" class="range-btn">Month</button>
+        `;
+
+        container.querySelectorAll('.range-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                container.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.analyticsRange = e.target.id.replace('range-', '');
+                this.loadAnalyticsData();
+            });
+        });
+    }
+
     async loadAnalyticsData() {
-        // Placeholder for analytics data
+        try {
+            const response = await fetch(`api/admin-clean.php?action=analytics&range=${this.analyticsRange}`);
+            const data = await response.json();
+
+            if (data.success) {
+                if (data.revenue_data) {
+                    this.renderRevenueChart(data.revenue_data);
+                }
+                if (data.service_data) {
+                    this.renderServiceChart(data.service_data);
+                }
+            } else {
+                this.showError('Failed to load analytics data');
+            }
+        } catch (error) {
+            console.error('Error loading analytics data:', error);
+            this.showError('Failed to load analytics data - check console for details');
+        }
+    }
+
+    renderRevenueChart(revenueData) {
+        const ctx = document.getElementById('revenue-chart').getContext('2d');
+
+        // Prepare data for chart
+        const labels = revenueData.map(item => item.date);
+        const dataPoints = revenueData.map(item => parseFloat(item.revenue));
+
+        if (this.revenueChart) {
+            this.revenueChart.destroy();
+        }
+
+        this.revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue (₱)',
+                    data: dataPoints,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Revenue (₱)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'nearest',
+                        intersect: false,
+                    }
+                }
+            }
+        });
+    }
+
+    renderServiceChart(serviceData) {
+        const ctx = document.getElementById('service-chart').getContext('2d');
+
+        // Prepare data for chart
+        const labels = serviceData.map(item => item.date);
+        const dataPoints = serviceData.map(item => parseInt(item.service_count));
+
+        if (this.serviceChart) {
+            this.serviceChart.destroy();
+        }
+
+        this.serviceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Service Count',
+                    data: dataPoints,
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Services'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'nearest',
+                        intersect: false,
+                    }
+                }
+            }
+        });
     }
 
     async loadSettingsData() {
@@ -344,6 +534,8 @@ class AdminPanel {
 
             if (data.success) {
                 this.showTicketModal(data.ticket);
+            } else {
+                this.showError('Failed to load ticket details');
             }
         } catch (error) {
             console.error('Error loading ticket details:', error);
@@ -408,8 +600,170 @@ class AdminPanel {
         }
     }
 
+    async processPayment(ticketId) {
+        if (!confirm('Are you sure you want to process payment for this ticket?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('api/admin-clean.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=mark-payment-paid&ticket_id=${ticketId}`
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                this.showSuccess('Payment processed successfully');
+                this.loadQueueData();
+            } else {
+                this.showError(data.message || 'Failed to process payment');
+            }
+        } catch (error) {
+            console.error('Error processing payment:', error);
+            this.showError('Failed to process payment');
+        }
+    }
+
+    async markAsPaid(ticketId) {
+        if (!confirm('Are you sure you want to mark this ticket as paid?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('api/admin-clean.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=mark-as-paid&ticket_id=${ticketId}`
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                this.showSuccess('Ticket marked as paid successfully');
+                this.loadQueueData();
+            } else {
+                this.showError(data.message || 'Failed to mark ticket as paid');
+            }
+        } catch (error) {
+            console.error('Error marking ticket as paid:', error);
+            this.showError('Failed to mark ticket as paid');
+        }
+    }
+
+    async proceedTicket(ticketId, currentStatus) {
+        try {
+            let action = '';
+            let confirmMessage = '';
+
+            switch (currentStatus.toLowerCase()) {
+                case 'pending':
+                    action = 'progress-to-waiting';
+                    confirmMessage = 'Are you sure you want to move this ticket to waiting status?';
+                    break;
+                case 'waiting':
+                    action = 'progress-to-charging';
+                    confirmMessage = 'Are you sure you want to assign this ticket to a charging bay?';
+                    break;
+                case 'charging':
+                    action = 'progress-to-complete';
+                    confirmMessage = 'Are you sure you want to mark this ticket as complete?';
+                    break;
+                case 'complete':
+                    // For complete tickets, show payment processing
+                    this.processPayment(ticketId);
+                    return;
+                default:
+                    this.showError('Invalid ticket status for progression');
+                    return;
+            }
+
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            const response = await fetch('api/admin-clean.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=${action}&ticket_id=${ticketId}`
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                this.showSuccess(`Ticket ${ticketId} progressed successfully`);
+                this.loadQueueData();
+                this.loadBaysData(); // Refresh bays in case assignment happened
+            } else {
+                this.showError(data.message || 'Failed to progress ticket');
+            }
+        } catch (error) {
+            console.error('Error progressing ticket:', error);
+            this.showError('Failed to progress ticket');
+        }
+    }
+
+    autoRemovePaidTickets() {
+        // Auto-remove paid tickets after a delay to allow for visual feedback
+        setTimeout(() => {
+            const tbody = document.getElementById('queue-tbody');
+            if (!tbody) return;
+
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    const paymentStatus = cells[4].textContent.trim().toLowerCase();
+                    if (paymentStatus === 'paid') {
+                        console.log('Auto-removing paid ticket row');
+                        row.remove();
+                    }
+                }
+            });
+
+            // Update counters after removal
+            this.updateQueueCounters();
+        }, 2000); // 2 second delay
+    }
+
+    updateQueueCounters() {
+        // Update the queue counters in the UI
+        const tbody = document.getElementById('queue-tbody');
+        if (!tbody) return;
+
+        let waiting = 0;
+        let charging = 0;
+        let paid = 0;
+
+        const rows = tbody.querySelectorAll('tr');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 5) {
+                const status = cells[3].textContent.trim().toLowerCase();
+                const payment = cells[4].textContent.trim().toLowerCase();
+
+                if (status === 'waiting') waiting++;
+                else if (status === 'charging') charging++;
+                if (payment === 'paid') paid++;
+            }
+        });
+
+        // Update counter elements if they exist
+        const waitingEl = document.getElementById('waiting-count');
+        const chargingEl = document.getElementById('charging-count');
+        const paidEl = document.getElementById('paid-count');
+
+        if (waitingEl) waitingEl.textContent = waiting;
+        if (chargingEl) chargingEl.textContent = charging;
+        if (paidEl) paidEl.textContent = paid;
+    }
+
     async setBayMaintenance(bayNumber) {
-        if (!confirm(`Are you sure you want to set Bay ${bayNumber} to maintenance mode?`)) {
+        if (!confirm(`Are you sure you want to set ${bayNumber} to maintenance mode?`)) {
             return;
         }
 
@@ -654,19 +1008,23 @@ class AdminPanel {
         }, 30000);
     }
 
+    formatCurrency(amount) {
+        return Math.round(amount).toLocaleString();
+    }
+
     formatDateTime(dateString) {
         const date = new Date(dateString);
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
         const year = date.getFullYear();
-        
+
         let hours = date.getHours();
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? 'PM' : 'AM';
-        
+
         hours = hours % 12;
         hours = hours ? hours : 12;
-        
+
         return `${month}/${day}/${year}, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
     }
 }
@@ -678,43 +1036,175 @@ function openMonitorWeb() {
 }
 
 // Global functions for button onclick handlers
+function showLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.background = 'rgba(0, 0, 0, 0.5)';
+        overlay.style.zIndex = '9999';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        console.log('Loading overlay shown with inline styles and refreshing text');
+        return overlay;
+    } else {
+        console.error('Loading overlay element not found');
+        return null;
+    }
+}
+
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+        console.log('Loading overlay hidden');
+    }
+}
+
 function refreshQueue() {
-    adminPanel.loadQueueData();
+    console.log('Refresh Queue clicked');
+    const overlay = showLoadingSpinner();
+    if (!overlay) return;
+
+    if (adminPanel) {
+        console.log('Calling adminPanel.loadQueueData()');
+        adminPanel.loadQueueData()
+            .then(() => {
+                console.log('loadQueueData completed successfully');
+            })
+            .catch((error) => {
+                console.error('loadQueueData failed:', error);
+            })
+            .finally(() => {
+                console.log('Hiding overlay after loadQueueData');
+                setTimeout(() => hideLoadingSpinner(), 1300); // Extended delay to 1.3 seconds
+            });
+    } else {
+        console.log('adminPanel not found, using fallback timeout');
+        setTimeout(() => hideLoadingSpinner(), 1500);
+    }
 }
 
 function refreshBays() {
-    adminPanel.loadBaysData();
+    console.log('Refresh Bays clicked');
+    const overlay = showLoadingSpinner();
+    if (!overlay) return;
+
+    if (adminPanel) {
+        console.log('Calling adminPanel.loadBaysData()');
+        adminPanel.loadBaysData()
+            .then(() => {
+                console.log('loadBaysData completed successfully');
+            })
+            .catch((error) => {
+                console.error('loadBaysData failed:', error);
+            })
+            .finally(() => {
+                console.log('Hiding overlay after loadBaysData');
+                setTimeout(() => hideLoadingSpinner(), 1300); // Extended delay to 1.3 seconds
+            });
+    } else {
+        console.log('adminPanel not found, using fallback timeout');
+        setTimeout(() => hideLoadingSpinner(), 1500);
+    }
 }
 
 function refreshUsers() {
-    adminPanel.loadUsersData();
+    console.log('Refresh Users clicked');
+    const overlay = showLoadingSpinner();
+    if (!overlay) return;
+
+    if (adminPanel) {
+        console.log('Calling adminPanel.loadUsersData()');
+        adminPanel.loadUsersData()
+            .then(() => {
+                console.log('loadUsersData completed successfully');
+            })
+            .catch((error) => {
+                console.error('loadUsersData failed:', error);
+            })
+            .finally(() => {
+                console.log('Hiding overlay after loadUsersData');
+                setTimeout(() => hideLoadingSpinner(), 1300); // Extended delay to 1.3 seconds
+            });
+    } else {
+        console.log('adminPanel not found, using fallback timeout');
+        setTimeout(() => hideLoadingSpinner(), 1500);
+    }
 }
 
 function processNextTicket() {
-    const waitingRows = document.querySelectorAll('#queue-tbody tr');
-    for (let row of waitingRows) {
-        if (row.style.display !== 'none' && row.cells[3].textContent.trim() === 'Waiting') {
-            const ticketId = row.cells[0].textContent.trim();
-            adminPanel.processTicket(ticketId);
-            break;
-        }
+    if (adminPanel) {
+        console.log('Starting processNextTicket...');
+        // Call the new API to progress the next ticket
+        fetch('api/admin-clean.php?action=progress-next-ticket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+            return response.text().then(text => {
+                console.log('Raw response:', text);
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    throw new Error('Invalid JSON response: ' + text);
+                }
+            });
+        })
+        .then(data => {
+            console.log('Parsed data:', data);
+            if (data.success) {
+                adminPanel.showSuccess(`Ticket ${data.ticket_id} assigned to Bay ${data.bay_number} (${data.new_status})`);
+                adminPanel.loadQueueData();
+                adminPanel.loadBaysData(); // Refresh bays to show updated status
+            } else {
+                adminPanel.showError(data.message || 'Failed to progress ticket');
+            }
+        })
+        .catch(error => {
+            console.error('Error progressing ticket:', error);
+            adminPanel.showError('Failed to progress ticket: ' + error.message);
+        });
     }
 }
 
 function showAddUserModal() {
-    adminPanel.showAddUserModal();
+    if (adminPanel) {
+        adminPanel.showAddUserModal();
+    }
 }
 
 function addUser() {
-    adminPanel.addUser();
+    if (adminPanel) {
+        adminPanel.addUser();
+    }
 }
 
 function savePricingSettings() {
-    adminPanel.savePricingSettings();
+    if (adminPanel) {
+        adminPanel.savePricingSettings();
+    }
 }
 
 function closeModal(modalId) {
-    adminPanel.closeModal(modalId);
+    if (adminPanel) {
+        adminPanel.closeModal(modalId);
+    }
+}
+
+function processTicket(ticketId) {
+    if (adminPanel) {
+        adminPanel.processTicket(ticketId);
+    }
 }
 
 // Initialize admin panel when DOM is loaded

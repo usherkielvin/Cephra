@@ -21,6 +21,7 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
     <link rel="icon" type="image/png" href="images/logo.png" />
     <link rel="stylesheet" href="css/admin.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="admin-container">
@@ -126,7 +127,7 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                         </div>
                         <div class="stat-content">
                             <h3 id="revenue-today">₱0</h3>
-                            <p>Today's Revenue</p>
+                            <p>Revenue</p>
                         </div>
                     </div>
                 </div>
@@ -151,9 +152,6 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                     <div class="panel-actions">
                         <button class="btn btn-primary" onclick="refreshQueue()">
                             <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                        <button class="btn btn-success" onclick="processNextTicket()">
-                            <i class="fas fa-forward"></i> Process Next
                         </button>
                     </div>
                 </div>
@@ -256,6 +254,9 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
             <div class="panel" id="analytics-panel">
                 <div class="panel-header">
                     <h2>Analytics & Reports</h2>
+                    <div class="panel-actions">
+                        <div id="analytics-range-selector"></div>
+                    </div>
                 </div>
                 <div class="analytics-container">
                     <div class="analytics-grid">
@@ -298,6 +299,15 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
         </main>
     </div>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="loader">
+                <div class="jimu-primary-loading"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modals -->
     <div class="modal" id="ticket-modal">
         <div class="modal-content">
@@ -310,7 +320,6 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('ticket-modal')">Close</button>
-                <button class="btn btn-primary" onclick="processTicket()">Process Ticket</button>
             </div>
         </div>
     </div>
