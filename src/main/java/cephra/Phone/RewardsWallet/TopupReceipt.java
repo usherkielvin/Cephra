@@ -8,6 +8,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 
 public class TopupReceipt extends javax.swing.JPanel {
+    
+    // Top-up data fields
+    private double topupAmount = 0.0;
+    private String paymentMethod = "N/A";
+    private String username = "";
   
     public TopupReceipt() {
         initComponents();
@@ -16,6 +21,19 @@ public class TopupReceipt extends javax.swing.JPanel {
         setupLabelPosition(); // Set label position
         makeDraggable();
         populateAmounts();
+    }
+    
+    /**
+     * Sets the top-up data from Topup.java
+     * @param amount the top-up amount
+     * @param method the payment method used
+     * @param user the username
+     */
+    public void setTopupData(double amount, String method, String user) {
+        this.topupAmount = amount;
+        this.paymentMethod = method;
+        this.username = user;
+        populateAmounts(); // Refresh the display with new data
     }
      // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
@@ -53,69 +71,49 @@ public class TopupReceipt extends javax.swing.JPanel {
 
     private void populateAmounts() {
         try {
-            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
-            if (currentUser == null || currentUser.isEmpty()) {
-                System.err.println("No current user found for topup receipt");
-                return;
-            }
+            // Use passed data if available, otherwise fallback to database query
+            double amount = topupAmount;
+            String currentUser = username.isEmpty() ? cephra.Database.CephraDB.getCurrentUsername() : username;
+            String method = paymentMethod;
             
-            // Get the most recent topup transaction for this user
-            java.util.List<Object[]> transactions = cephra.Database.CephraDB.getWalletTransactionHistory(currentUser);
-            Object[] latestTopup = null;
-            
-            // Find the most recent TOP_UP transaction
-            for (Object[] transaction : transactions) {
-                String transactionType = (String) transaction[0];
-                if ("TOP_UP".equals(transactionType)) {
-                    latestTopup = transaction;
-                    break; // Transactions are ordered by date desc, so first match is most recent
+            // If no data was passed, try to get from database
+            if (amount == 0.0 && currentUser != null && !currentUser.isEmpty()) {
+                java.util.List<Object[]> transactions = cephra.Database.CephraDB.getWalletTransactionHistory(currentUser);
+                
+                // Find the most recent TOP_UP transaction
+                for (Object[] transaction : transactions) {
+                    String transactionType = (String) transaction[0];
+                    if ("TOP_UP".equals(transactionType)) {
+                        amount = Math.abs((Double) transaction[1]); // Get absolute amount
+                        String description = (String) transaction[3];
+                        
+                        // Extract payment method from description if available
+                        if (description != null && description.contains(" via ")) {
+                            method = description.substring(description.indexOf(" via ") + 5);
+                        }
+                        break; // Transactions are ordered by date desc, so first match is most recent
+                    }
                 }
             }
             
-            if (latestTopup == null) {
-                System.err.println("No topup transaction found for receipt");
+            if (amount == 0.0) {
+                System.err.println("No topup amount found for receipt");
                 return;
             }
             
-            // Extract transaction data: [transaction_type, amount, new_balance, description, reference_id, transaction_date]
-            double amount = Math.abs((Double) latestTopup[1]); // Get absolute amount
-            String description = (String) latestTopup[3];
-            String refNumber = (String) latestTopup[4];
-            java.sql.Timestamp timestamp = (java.sql.Timestamp) latestTopup[5];
-            
-            // If no reference number, generate one
-            if (refNumber == null || refNumber.isEmpty()) {
-                refNumber = String.format("TU%d", System.currentTimeMillis() % 100000);
-            }
-            
-            // Extract payment method from description if available
-            String paymentMethod = "N/A";
-            if (description != null && description.contains(" via ")) {
-                paymentMethod = description.substring(description.indexOf(" via ") + 5);
-            }
-            
             // Use values to aid debugging
-            System.out.println("Topup receipt for " + currentUser + ": amount=" + String.format("%.2f", amount) + ", method=" + paymentMethod);
+            System.out.println("Topup receipt for " + currentUser + ": amount=" + String.format("%.2f", amount) + ", method=" + method);
             
             // Set the receipt fields for topup
             AmountPaid.setText(String.format("Php %.2f", amount));
-            Fee.setText("Php 0.00"); // No fee for topups
-          //  price.setText(String.format("PHP %.2f", amount)); // Main price display
+            Fee.setText("Php 15.00"); // Fixed fee for topups
             
-            // For topup receipt, we'll show the account number as username or user ID
-            AccNumber.setText(currentUser);
+            // For topup receipt, we'll show the payment method used
+            AccNumber.setText(method != null ? method : "N/A");
             
-            // Use timestamp from transaction if available, otherwise current time
-            String dateTime;
-            if (timestamp != null) {
-                dateTime = new java.text.SimpleDateFormat("dd MMMM yyyy hh:mm a").format(timestamp);
-            } else {
-                dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy hh:mm a"));
-            }
+            // Use current time for the transaction
+            String dateTime = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm a"));
             TimeDate.setText(dateTime);
-            
-            // Set reference number
-           // RefNumber.setText(refNumber);
             
         } catch (Throwable t) {
             System.err.println("Error populating topup receipt amounts: " + t.getMessage());
@@ -164,7 +162,7 @@ public class TopupReceipt extends javax.swing.JPanel {
 
         TimeDate.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         TimeDate.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        TimeDate.setText("29/07/2025 05:31 PM");
+        TimeDate.setText("07/29/2025 05:31 PM");
         add(TimeDate);
         TimeDate.setBounds(200, 500, 190, 20);
 
@@ -179,11 +177,11 @@ public class TopupReceipt extends javax.swing.JPanel {
         Fee.setBounds(200, 460, 140, 20);
 
         AccNumber.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        AccNumber.setText("337293727");
+        AccNumber.setText("gcash");
         add(AccNumber);
         AccNumber.setBounds(200, 480, 90, 20);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/TOPUPRECEIPTT.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/topupreceipt.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents

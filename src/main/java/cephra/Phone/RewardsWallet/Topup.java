@@ -537,7 +537,10 @@ public class Topup extends javax.swing.JPanel {
                         for (java.awt.Window window : windows) {
                             if (window instanceof cephra.Frame.Phone) {
                                 cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                                phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.TopupReceipt());
+                                // Create TopupReceipt with the top-up data
+                                TopupReceipt receipt = new TopupReceipt();
+                                receipt.setTopupData(amount, selectedPaymentMethod, currentUser);
+                                phoneFrame.switchPanel(receipt);
                                 break;
                             }
                         }
