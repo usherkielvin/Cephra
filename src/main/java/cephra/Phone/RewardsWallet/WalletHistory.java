@@ -183,7 +183,7 @@ public class WalletHistory extends javax.swing.JPanel {
 
         // Format date and time
         java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
-        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm");
+        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
         String dateStr = dateFormat.format(timestamp);
         String timeStr = timeFormat.format(timestamp);
         
@@ -548,7 +548,7 @@ public class WalletHistory extends javax.swing.JPanel {
         add(linkbutton);
         linkbutton.setBounds(90, 680, 60, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/HISTORY - if none.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/wallethistory.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
     }// </editor-fold>//GEN-END:initComponents

@@ -423,9 +423,7 @@ public class Profile extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void editpfpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editpfpActionPerformed
-        // TODO add your handling code here:
-            // TODO add your handling code here:
-          // Handle profile picture selection and cropping
+       
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {

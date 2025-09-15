@@ -50,7 +50,9 @@ public class Rewards extends javax.swing.JPanel {
             javax.swing.JPanel contentPanel = new javax.swing.JPanel();
             contentPanel.setLayout(new javax.swing.BoxLayout(contentPanel, javax.swing.BoxLayout.Y_AXIS));
             contentPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            contentPanel.setBackground(java.awt.Color.WHITE);
+            contentPanel.setBackground(null);
+            contentPanel.setOpaque(false);
+            contentPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
             
             // Clear the scroll pane first
             jScrollPane1.setViewportView(null);
@@ -58,17 +60,22 @@ public class Rewards extends javax.swing.JPanel {
             // Helper function to create header row panels (F panels - smaller)
             java.util.function.BiFunction<javax.swing.JComponent, javax.swing.JComponent, javax.swing.JPanel> createHeaderRow = 
                 (left, right) -> {
-                    javax.swing.JPanel rowPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 2, 10, 0));
+                    javax.swing.JPanel rowPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 2, 0, 0));
                     rowPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 60)); // Smaller height for headers
-                    rowPanel.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+                    rowPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+                    rowPanel.setBorder(null);
+                    rowPanel.setOpaque(false);
+                    rowPanel.setBackground(null);
                     
                     // Remove components from their current parents
                     if (left.getParent() != null) left.getParent().remove(left);
                     if (right.getParent() != null) right.getParent().remove(right);
                     
-                    // Set smaller preferred sizes for headers
+                    // Set smaller preferred sizes for headers and align to left
                     left.setPreferredSize(new java.awt.Dimension(100, 50));
                     right.setPreferredSize(new java.awt.Dimension(100, 50));
+                    left.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+                    right.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     
                     rowPanel.add(left);
                     rowPanel.add(right);
@@ -81,15 +88,20 @@ public class Rewards extends javax.swing.JPanel {
                 (left, right) -> {
                     javax.swing.JPanel rowPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 2, 2, 0));
                     rowPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 140)); // Larger height for content
-                    rowPanel.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+                    rowPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+                    rowPanel.setBorder(null);
+                    rowPanel.setOpaque(false);
+                    rowPanel.setBackground(null);
                     
                     // Remove components from their current parents
                     if (left.getParent() != null) left.getParent().remove(left);
                     if (right.getParent() != null) right.getParent().remove(right);
                     
-                    // Set larger preferred sizes for content panels
+                    // Set larger preferred sizes for content panels and align to left
                     left.setPreferredSize(new java.awt.Dimension(157, 150));
                     right.setPreferredSize(new java.awt.Dimension(157, 150));
+                    left.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+                    right.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     
                     rowPanel.add(left);
                     rowPanel.add(right);
@@ -134,7 +146,7 @@ public class Rewards extends javax.swing.JPanel {
             
             // Set the content panel as the viewport of the scroll pane
             jScrollPane1.setViewportView(contentPanel);
-            jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
             jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
             
@@ -525,7 +537,7 @@ public class Rewards extends javax.swing.JPanel {
             }
         });
         add(homebutton2);
-        homebutton2.setBounds(150, 680, 40, 40);
+        homebutton2.setBounds(170, 680, 30, 40);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);

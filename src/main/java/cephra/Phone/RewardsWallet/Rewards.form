@@ -205,6 +205,7 @@
       <SubComponents>
         <Container class="javax.swing.JScrollPane" name="jScrollPane1">
           <Properties>
+<<<<<<< HEAD
             <Property name="horizontalScrollBarPolicy" type="int" value="31"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
             <Property name="verticalScrollBarPolicy" type="int" value="21"/>
@@ -221,6 +222,13 @@
               <AbsoluteConstraints x="0" y="0" width="310" height="460"/>
             </Constraint>
           </Constraints>
+=======
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="null"/>
+            </Property>
+            <Property name="opaque" type="boolean" value="false"/>
+          </Properties>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
         </Container>
@@ -231,9 +239,17 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/cephra/Cephra Images/Rewards_1.png"/>
         </Property>
+<<<<<<< HEAD
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
+=======
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
+        <Property name="contentAreaFilled" type="boolean" value="false"/>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="a1ActionPerformed"/>
@@ -249,9 +265,17 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/cephra/Cephra Images/Rewards_2.png"/>
         </Property>
+<<<<<<< HEAD
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
+=======
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
+        <Property name="contentAreaFilled" type="boolean" value="false"/>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="a2ActionPerformed"/>
@@ -267,9 +291,16 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/cephra/Cephra Images/Rewards_3.png"/>
         </Property>
+<<<<<<< HEAD
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
+=======
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="a3ActionPerformed"/>
@@ -285,9 +316,16 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/cephra/Cephra Images/Rewards_4.png"/>
         </Property>
+<<<<<<< HEAD
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
+=======
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="a4ActionPerformed"/>
@@ -303,9 +341,16 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/cephra/Cephra Images/Rewards_5.png"/>
         </Property>
+<<<<<<< HEAD
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
+=======
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="a5ActionPerformed"/>
@@ -321,9 +366,16 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/cephra/Cephra Images/Rewards_6.png"/>
         </Property>
+<<<<<<< HEAD
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
+=======
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="a6ActionPerformed"/>
@@ -339,9 +391,16 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/cephra/Cephra Images/Rewards_7.png"/>
         </Property>
+<<<<<<< HEAD
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
+=======
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="a7ActionPerformed"/>
@@ -357,9 +416,16 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/cephra/Cephra Images/Rewards_8.png"/>
         </Property>
+<<<<<<< HEAD
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="focusPainted" type="boolean" value="false"/>
+=======
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
+>>>>>>> b01b14db31770b0e87da3c4567b5acc329de345c
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="a8ActionPerformed"/>
@@ -435,7 +501,7 @@
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="150" y="680" width="40" height="40"/>
+          <AbsoluteConstraints x="170" y="680" width="30" height="40"/>
         </Constraint>
       </Constraints>
     </Component>
