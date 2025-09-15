@@ -49,7 +49,9 @@ public class Rewards extends javax.swing.JPanel {
             javax.swing.JPanel contentPanel = new javax.swing.JPanel();
             contentPanel.setLayout(new javax.swing.BoxLayout(contentPanel, javax.swing.BoxLayout.Y_AXIS));
             contentPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            contentPanel.setBackground(java.awt.Color.WHITE);
+            contentPanel.setBackground(null);
+            contentPanel.setOpaque(false);
+            contentPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
             
             // Clear the scroll pane first
             jScrollPane1.setViewportView(null);
@@ -57,17 +59,22 @@ public class Rewards extends javax.swing.JPanel {
             // Helper function to create header row panels (F panels - smaller)
             java.util.function.BiFunction<javax.swing.JComponent, javax.swing.JComponent, javax.swing.JPanel> createHeaderRow = 
                 (left, right) -> {
-                    javax.swing.JPanel rowPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 2, 10, 0));
+                    javax.swing.JPanel rowPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 2, 0, 0));
                     rowPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 60)); // Smaller height for headers
-                    rowPanel.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+                    rowPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+                    rowPanel.setBorder(null);
+                    rowPanel.setOpaque(false);
+                    rowPanel.setBackground(null);
                     
                     // Remove components from their current parents
                     if (left.getParent() != null) left.getParent().remove(left);
                     if (right.getParent() != null) right.getParent().remove(right);
                     
-                    // Set smaller preferred sizes for headers
+                    // Set smaller preferred sizes for headers and align to left
                     left.setPreferredSize(new java.awt.Dimension(100, 50));
                     right.setPreferredSize(new java.awt.Dimension(100, 50));
+                    left.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+                    right.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     
                     rowPanel.add(left);
                     rowPanel.add(right);
@@ -78,17 +85,22 @@ public class Rewards extends javax.swing.JPanel {
             // Helper function to create content row panels (A panels - larger)
             java.util.function.BiFunction<javax.swing.JComponent, javax.swing.JComponent, javax.swing.JPanel> createContentRow = 
                 (left, right) -> {
-                    javax.swing.JPanel rowPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 2, 10, 0));
+                    javax.swing.JPanel rowPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 2, 0, 0));
                     rowPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 140)); // Larger height for content
-                    rowPanel.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+                    rowPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+                    rowPanel.setBorder(null);
+                    rowPanel.setOpaque(false);
+                    rowPanel.setBackground(null);
                     
                     // Remove components from their current parents
                     if (left.getParent() != null) left.getParent().remove(left);
                     if (right.getParent() != null) right.getParent().remove(right);
                     
-                    // Set larger preferred sizes for content panels
+                    // Set larger preferred sizes for content panels and align to left
                     left.setPreferredSize(new java.awt.Dimension(157, 150));
                     right.setPreferredSize(new java.awt.Dimension(157, 150));
+                    left.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+                    right.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     
                     rowPanel.add(left);
                     rowPanel.add(right);
@@ -133,7 +145,7 @@ public class Rewards extends javax.swing.JPanel {
             
             // Set the content panel as the viewport of the scroll pane
             jScrollPane1.setViewportView(contentPanel);
-            jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
             jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
             
@@ -386,6 +398,9 @@ public class Rewards extends javax.swing.JPanel {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
+        jScrollPane1.setBorder(null);
+        jScrollPane1.setOpaque(false);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -404,9 +419,11 @@ public class Rewards extends javax.swing.JPanel {
         );
 
         add(jPanel1);
-        jPanel1.setBounds(9, 129, 370, 500);
+        jPanel1.setBounds(9, 129, 370, 485);
 
         a1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_1.png"))); // NOI18N
+        a1.setBorder(null);
+        a1.setBorderPainted(false);
         a1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a1ActionPerformed(evt);
@@ -416,6 +433,8 @@ public class Rewards extends javax.swing.JPanel {
         a1.setBounds(570, 90, 150, 150);
 
         a2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_2.png"))); // NOI18N
+        a2.setBorder(null);
+        a2.setBorderPainted(false);
         a2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a2ActionPerformed(evt);
@@ -425,6 +444,8 @@ public class Rewards extends javax.swing.JPanel {
         a2.setBounds(740, 90, 150, 150);
 
         a3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_3.png"))); // NOI18N
+        a3.setBorder(null);
+        a3.setBorderPainted(false);
         a3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a3ActionPerformed(evt);
@@ -434,6 +455,8 @@ public class Rewards extends javax.swing.JPanel {
         a3.setBounds(570, 250, 150, 150);
 
         a4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_4.png"))); // NOI18N
+        a4.setBorder(null);
+        a4.setBorderPainted(false);
         a4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a4ActionPerformed(evt);
@@ -443,6 +466,8 @@ public class Rewards extends javax.swing.JPanel {
         a4.setBounds(740, 250, 150, 150);
 
         a5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_5.png"))); // NOI18N
+        a5.setBorder(null);
+        a5.setBorderPainted(false);
         a5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a5ActionPerformed(evt);
@@ -452,6 +477,8 @@ public class Rewards extends javax.swing.JPanel {
         a5.setBounds(570, 420, 150, 150);
 
         a6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_6.png"))); // NOI18N
+        a6.setBorder(null);
+        a6.setBorderPainted(false);
         a6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a6ActionPerformed(evt);
@@ -461,6 +488,8 @@ public class Rewards extends javax.swing.JPanel {
         a6.setBounds(740, 410, 150, 150);
 
         a7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_7.png"))); // NOI18N
+        a7.setBorder(null);
+        a7.setBorderPainted(false);
         a7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a7ActionPerformed(evt);
@@ -470,6 +499,8 @@ public class Rewards extends javax.swing.JPanel {
         a7.setBounds(570, 580, 150, 150);
 
         a8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_8.png"))); // NOI18N
+        a8.setBorder(null);
+        a8.setBorderPainted(false);
         a8.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 a8ActionPerformed(evt);
@@ -507,7 +538,7 @@ public class Rewards extends javax.swing.JPanel {
             }
         });
         add(homebutton2);
-        homebutton2.setBounds(150, 680, 40, 40);
+        homebutton2.setBounds(170, 680, 30, 40);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
