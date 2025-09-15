@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS charging_history (
     initial_battery_level INT NOT NULL CHECK (initial_battery_level >= 0 AND initial_battery_level <= 100),
     final_battery_level INT NOT NULL DEFAULT 100 CHECK (final_battery_level >= 0 AND final_battery_level <= 100),
     charging_time_minutes INT NOT NULL,
+    energy_used DECIMAL(10,2) NOT NULL DEFAULT 0.0, -- Energy consumed in kWh
     total_amount DECIMAL(10,2) NOT NULL,
     reference_number VARCHAR(20) NOT NULL,
     served_by VARCHAR(50) DEFAULT 'Admin',

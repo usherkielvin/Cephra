@@ -56,6 +56,10 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                     <i class="fas fa-chart-bar"></i>
                     <span>Analytics</span>
                 </li>
+                <li data-panel="transactions">
+                    <i class="fas fa-receipt"></i>
+                    <span>Transaction History</span>
+                </li>
                 <li data-panel="settings">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
@@ -268,6 +272,62 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                             <h3>Service Usage</h3>
                             <canvas id="service-chart"></canvas>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History Panel -->
+            <div class="panel" id="transactions-panel">
+                <div class="panel-header">
+                    <h2>Transaction History</h2>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" onclick="refreshTransactions()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportTransactions()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="transactions-container">
+                    <div class="transactions-filters">
+                        <select id="transaction-type-filter">
+                            <option value="">All Transactions</option>
+                            <option value="payment">Payment Transactions</option>
+                            <option value="charging">Charging History</option>
+                        </select>
+                        <select id="transaction-status-filter">
+                            <option value="">All Status</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                        <input type="date" id="transaction-date-from" placeholder="From Date">
+                        <input type="date" id="transaction-date-to" placeholder="To Date">
+                        <button class="btn btn-primary" onclick="filterTransactions()">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                    </div>
+                    <div class="transactions-table-container">
+                        <table class="transactions-table" id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Ticket</th>
+                                    <th>User</th>
+                                    <th>kWh</th>
+                                    <th>Total</th>
+                                    <th>Date and Time</th>
+                                    <th>Reference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-tbody">
+                                <tr>
+                                    <td colspan="6" class="loading">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading transaction data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

@@ -281,7 +281,7 @@ public class Reciept extends javax.swing.JPanel {
 
         TimeDate.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         TimeDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        TimeDate.setText("29 August 2025 05:31:02 PM");
+        TimeDate.setText("29 August 2025 05:31 PM");
         add(TimeDate);
         TimeDate.setBounds(70, 410, 190, 20);
 

@@ -1141,8 +1141,8 @@ public class CephraDB {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO charging_history (ticket_id, username, service_type, " +
-                     "initial_battery_level, final_battery_level, charging_time_minutes, total_amount, reference_number, served_by) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                     "initial_battery_level, final_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, served_by) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             
             stmt.setString(1, ticketId);
             stmt.setString(2, username);
@@ -1150,15 +1150,22 @@ public class CephraDB {
             stmt.setInt(4, initialBatteryLevel);
             stmt.setInt(5, 100); // Final battery level is always 100% when completed
             stmt.setInt(6, chargingTimeMinutes);
-            stmt.setDouble(7, totalAmount);
-            stmt.setString(8, referenceNumber);
+            
+            // Calculate energy used in kWh based on battery levels
+            double batteryCapacityKWh = 40.0; // 40kWh capacity
+            double usedFraction = (100.0 - initialBatteryLevel) / 100.0;
+            double energyUsed = usedFraction * batteryCapacityKWh;
+            stmt.setDouble(7, energyUsed);
+            
+            stmt.setDouble(8, totalAmount);
+            stmt.setString(9, referenceNumber);
             
             // Get the actual admin username who is currently logged in
             String adminUsername = getCurrentAdminUsername();
             if (adminUsername == null || adminUsername.trim().isEmpty()) {
                 adminUsername = "Admin"; // Fallback if no admin logged in
             }
-            stmt.setString(9, adminUsername);
+            stmt.setString(10, adminUsername);
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -1175,7 +1182,7 @@ public class CephraDB {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
-                     "total_amount, reference_number, completed_at FROM charging_history " +
+                     "energy_used, total_amount, reference_number, completed_at FROM charging_history " +
                      "WHERE username = ? ORDER BY completed_at DESC")) {
             
             stmt.setString(1, username);
@@ -1188,6 +1195,7 @@ public class CephraDB {
                         rs.getString("service_type"),
                         rs.getInt("initial_battery_level"),
                         rs.getInt("charging_time_minutes"),
+                        rs.getDouble("energy_used"),
                         rs.getDouble("total_amount"),
                         rs.getString("reference_number"),
                         rs.getTimestamp("completed_at")
@@ -1207,7 +1215,7 @@ public class CephraDB {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
-                     "total_amount, reference_number, completed_at FROM charging_history " +
+                     "energy_used, total_amount, reference_number, completed_at FROM charging_history " +
                      "ORDER BY completed_at DESC")) {
             
             try (ResultSet rs = stmt.executeQuery()) {
@@ -1218,6 +1226,7 @@ public class CephraDB {
                         rs.getString("service_type"),
                         rs.getInt("initial_battery_level"),
                         rs.getInt("charging_time_minutes"),
+                        rs.getDouble("energy_used"),
                         rs.getDouble("total_amount"),
                         rs.getString("reference_number"),
                         rs.getTimestamp("completed_at")
@@ -1358,8 +1367,8 @@ public class CephraDB {
             // 1. Add to charging history
             try (PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO charging_history (ticket_id, username, service_type, " +
-                    "initial_battery_level, final_battery_level, charging_time_minutes, total_amount, reference_number, served_by) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                    "initial_battery_level, final_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, served_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
                 
                 stmt.setString(1, ticketId);
                 stmt.setString(2, username);
@@ -1367,15 +1376,22 @@ public class CephraDB {
                 stmt.setInt(4, initialBatteryLevel);
                 stmt.setInt(5, 100); // Final battery level is always 100% when completed
                 stmt.setInt(6, chargingTimeMinutes);
-                stmt.setDouble(7, totalAmount);
-                stmt.setString(8, referenceNumber != null ? referenceNumber : "");
+                
+                // Calculate energy used in kWh based on battery levels
+                double batteryCapacityKWh = 40.0; // 40kWh capacity
+                double usedFraction = (100.0 - initialBatteryLevel) / 100.0;
+                double energyUsed = usedFraction * batteryCapacityKWh;
+                stmt.setDouble(7, energyUsed);
+                
+                stmt.setDouble(8, totalAmount);
+                stmt.setString(9, referenceNumber != null ? referenceNumber : "");
                 
                 // Get the actual admin username who is currently logged in
                 String adminUsername = getCurrentAdminUsername();
                 if (adminUsername == null || adminUsername.trim().isEmpty()) {
                     adminUsername = "Admin"; // Fallback if no admin logged in
                 }
-                stmt.setString(9, adminUsername);
+                stmt.setString(10, adminUsername);
                 
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected <= 0) {

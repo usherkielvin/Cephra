@@ -103,6 +103,7 @@ class AdminPanel {
             'bays': 'Charging Bays',
             'users': 'User Management',
             'analytics': 'Analytics & Reports',
+            'transactions': 'Transaction History',
             'settings': 'System Settings'
         };
         document.getElementById('page-title').textContent = titles[panelName];
@@ -125,6 +126,9 @@ class AdminPanel {
                 break;
             case 'analytics':
                 this.loadAnalyticsData();
+                break;
+            case 'transactions':
+                this.loadTransactions();
                 break;
             case 'settings':
                 this.loadSettingsData();
@@ -920,6 +924,139 @@ class AdminPanel {
         document.getElementById(modalId).classList.remove('active');
     }
 
+    // Transaction History Methods
+    async loadTransactions() {
+        try {
+            const response = await fetch('api/admin.php?action=transactions');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayTransactions(data.transactions);
+                if (data.warnings && data.warnings.length > 0) {
+                    console.warn('Transaction loading warnings:', data.warnings);
+                }
+                if (data.count !== undefined) {
+                    console.log(`Loaded ${data.count} transactions`);
+                }
+            } else {
+                console.error('Failed to load transactions:', data.error);
+                this.showError('Failed to load transaction data: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error loading transactions:', error);
+            this.showError('Error loading transaction data: ' + error.message);
+        }
+    }
+
+    displayTransactions(transactions) {
+        const tbody = document.getElementById('transactions-tbody');
+        if (!tbody) return;
+
+        if (transactions.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        No transactions found
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = transactions.map(transaction => {
+            const date = new Date(transaction.transaction_date);
+            // Format date without seconds
+            const formattedDate = date.toLocaleDateString() + ' ' + 
+                date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const amount = parseFloat(transaction.total_amount || 0).toFixed(2);
+            const energy = parseFloat(transaction.energy_kwh || 0).toFixed(2);
+            
+            return `
+                <tr>
+                    <td>${transaction.ticket_id || 'N/A'}</td>
+                    <td>${transaction.username || 'N/A'}</td>
+                    <td>${energy} kWh</td>
+                    <td>₱${amount}</td>
+                    <td>${formattedDate}</td>
+                    <td>${transaction.reference_number || 'N/A'}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async filterTransactions() {
+        const typeFilter = document.getElementById('transaction-type-filter')?.value || '';
+        const statusFilter = document.getElementById('transaction-status-filter')?.value || '';
+        const dateFrom = document.getElementById('transaction-date-from')?.value || '';
+        const dateTo = document.getElementById('transaction-date-to')?.value || '';
+
+        try {
+            let url = 'api/admin.php?action=transactions';
+            const params = new URLSearchParams();
+            
+            if (typeFilter) params.append('type', typeFilter);
+            if (statusFilter) params.append('status', statusFilter);
+            if (dateFrom) params.append('date_from', dateFrom);
+            if (dateTo) params.append('date_to', dateTo);
+            
+            if (params.toString()) {
+                url += '&' + params.toString();
+            }
+
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayTransactions(data.transactions);
+            } else {
+                console.error('Failed to filter transactions:', data.error);
+                this.showError('Failed to filter transaction data');
+            }
+        } catch (error) {
+            console.error('Error filtering transactions:', error);
+            this.showError('Error filtering transaction data');
+        }
+    }
+
+    exportTransactions() {
+        // Simple CSV export functionality
+        const tbody = document.getElementById('transactions-tbody');
+        if (!tbody) return;
+
+        const rows = tbody.querySelectorAll('tr');
+        if (rows.length === 0) {
+            this.showError('No transactions to export');
+            return;
+        }
+
+        let csv = 'Ticket,User,kWh,Total,Date and Time,Reference\n';
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 6) {
+                const rowData = Array.from(cells).slice(0, 6).map(cell => {
+                    let text = cell.textContent.trim();
+                    // Remove currency symbols and units
+                    text = text.replace(/₱|kWh/g, '').trim();
+                    return `"${text}"`;
+                });
+                csv += rowData.join(',') + '\n';
+            }
+        });
+
+        // Download CSV
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+
     showSuccess(message) {
         this.showNotification(message, 'success');
     }
@@ -1206,6 +1343,26 @@ function processTicket(ticketId) {
         adminPanel.processTicket(ticketId);
     }
 }
+
+// Transaction History Functions
+function refreshTransactions() {
+    if (adminPanel) {
+        adminPanel.loadTransactions();
+    }
+}
+
+function filterTransactions() {
+    if (adminPanel) {
+        adminPanel.filterTransactions();
+    }
+}
+
+function exportTransactions() {
+    if (adminPanel) {
+        adminPanel.exportTransactions();
+    }
+}
+
 
 // Initialize admin panel when DOM is loaded
 let adminPanel;

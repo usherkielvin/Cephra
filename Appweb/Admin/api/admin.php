@@ -13,7 +13,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit();
 }
 
-require_once 'config/database.php';
+require_once '../config/database.php';
 
 $db = (new Database())->getConnection();
 if (!$db) {
@@ -350,6 +350,156 @@ try {
             ]);
             break;
 
+        case 'debug-tables':
+            // Debug endpoint to check table structure
+            try {
+                $tables_info = [];
+                
+                // Check payment_transactions table
+                $stmt = $db->query("SHOW TABLES LIKE 'payment_transactions'");
+                if ($stmt->rowCount() > 0) {
+                    $columns = $db->query("DESCRIBE payment_transactions")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['payment_transactions'] = $columns;
+                }
+                
+                // Check charging_history table
+                $stmt = $db->query("SHOW TABLES LIKE 'charging_history'");
+                if ($stmt->rowCount() > 0) {
+                    $columns = $db->query("DESCRIBE charging_history")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['charging_history'] = $columns;
+                }
+                
+                echo json_encode([
+                    'success' => true,
+                    'tables' => $tables_info
+                ]);
+            } catch (Exception $e) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Debug error: ' . $e->getMessage()
+                ]);
+            }
+            break;
+
+        case 'transactions':
+            // Get transaction history ONLY from charging_history table
+            $type_filter = $_GET['type'] ?? '';
+            $status_filter = $_GET['status'] ?? '';
+            $date_from = $_GET['date_from'] ?? '';
+            $date_to = $_GET['date_to'] ?? '';
+            
+            $transactions = [];
+            $errors = [];
+            
+            try {
+                // Check if charging_history table exists
+                $tables_check = $db->query("SHOW TABLES LIKE 'charging_history'");
+                $charging_table_exists = $tables_check->rowCount() > 0;
+                
+                if (!$charging_table_exists) {
+                    echo json_encode([
+                        'success' => false,
+                        'error' => 'charging_history table not found in database'
+                    ]);
+                    break;
+                }
+                
+                // Check if required columns exist, if not create them
+                $columns_check = $db->query("SHOW COLUMNS FROM charging_history LIKE 'energy_used'");
+                if ($columns_check->rowCount() == 0) {
+                    $db->exec("ALTER TABLE charging_history ADD COLUMN energy_used DECIMAL(10,2) NOT NULL DEFAULT 0.0 COMMENT 'Energy consumed in kWh' AFTER charging_time_minutes");
+                }
+                
+                $columns_check = $db->query("SHOW COLUMNS FROM charging_history LIKE 'reference_number'");
+                if ($columns_check->rowCount() == 0) {
+                    $db->exec("ALTER TABLE charging_history ADD COLUMN reference_number VARCHAR(50) DEFAULT NULL COMMENT 'Transaction reference number' AFTER total_amount");
+                }
+                
+                // Build WHERE clause for filters
+                $where_conditions = [];
+                $params = [];
+                
+                if ($type_filter && $type_filter !== '') {
+                    $where_conditions[] = "ch.service_type = ?";
+                    $params[] = $type_filter;
+                }
+                
+                if ($status_filter && $status_filter !== '') {
+                    $where_conditions[] = "ch.status = ?";
+                    $params[] = $status_filter;
+                }
+                
+                if ($date_from && $date_from !== '') {
+                    $where_conditions[] = "ch.completed_at >= ?";
+                    $params[] = $date_from . ' 00:00:00';
+                }
+                
+                if ($date_to && $date_to !== '') {
+                    $where_conditions[] = "ch.completed_at <= ?";
+                    $params[] = $date_to . ' 23:59:59';
+                }
+                
+                $where_clause = '';
+                if (!empty($where_conditions)) {
+                    $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
+                }
+                
+                // Get charging history ONLY from charging_history table - ONLY 6 COLUMNS
+                $sql = "
+                    SELECT 
+                        ch.ticket_id,
+                        ch.username,
+                        ch.energy_used as energy_kwh,
+                        ch.total_amount,
+                        ch.reference_number,
+                        ch.completed_at as transaction_date
+                    FROM charging_history ch
+                    $where_clause
+                    ORDER BY ch.completed_at DESC
+                    LIMIT 100
+                ";
+                
+                $stmt = $db->prepare($sql);
+                $stmt->execute($params);
+                $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Update missing energy_used values
+                $db->exec("UPDATE charging_history SET energy_used = ((100 - initial_battery_level) / 100.0) * 40.0 WHERE energy_used = 0.0 OR energy_used IS NULL");
+                
+                // Update missing reference_number values
+                $db->exec("UPDATE charging_history SET reference_number = CONCAT('REF', ticket_id, '_', UNIX_TIMESTAMP(NOW())) WHERE reference_number IS NULL OR reference_number = '' OR reference_number = 'N/A'");
+                
+                // Sort by transaction date
+                usort($transactions, function($a, $b) {
+                    $dateA = $a['transaction_date'] ?? '1970-01-01';
+                    $dateB = $b['transaction_date'] ?? '1970-01-01';
+                    return strtotime($dateB) - strtotime($dateA);
+                });
+                
+                // Limit to 100 total
+                $transactions = array_slice($transactions, 0, 100);
+                
+                $response = [
+                    'success' => true,
+                    'data' => $transactions,
+                    'transactions' => $transactions,
+                    'count' => count($transactions)
+                ];
+                
+                if (!empty($errors)) {
+                    $response['warnings'] = $errors;
+                }
+                
+                echo json_encode($response);
+                
+            } catch (Exception $e) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Charging history error: ' . $e->getMessage()
+                ]);
+            }
+            break;
+
 
         default:
             echo json_encode([
@@ -357,7 +507,7 @@ try {
                 'available_actions' => [
                     'dashboard', 'queue', 'bays', 'users', 'ticket-details',
                     'process-ticket', 'set-bay-maintenance', 'set-bay-available',
-                    'add-user', 'delete-user', 'settings', 'save-settings', 'analytics'
+                    'add-user', 'delete-user', 'settings', 'save-settings', 'analytics', 'transactions'
                 ]
             ]);
             break;
