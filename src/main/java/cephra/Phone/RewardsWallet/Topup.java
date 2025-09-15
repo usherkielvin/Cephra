@@ -5,7 +5,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class TopUppanel extends javax.swing.JPanel {
+public class Topup extends javax.swing.JPanel {
 
     // Quick transaction amounts - updated to match the button values
     private static final double[] QUICK_AMOUNTS = {500.0, 1000.0, 1500.0, 2000.0, 3000.0, 5000.0};
@@ -15,7 +15,7 @@ public class TopUppanel extends javax.swing.JPanel {
     private final int PANEL_ANIMATION_DELAY = 10; // milliseconds
     private final int PANEL_SLIDE_SPEED = 15; // pixels per step
 
-    public TopUppanel() {
+    public Topup() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -151,7 +151,7 @@ public class TopUppanel extends javax.swing.JPanel {
             }
         });
         jPanel1.add(morePayMethod);
-        morePayMethod.setBounds(290, 570, 40, 30);
+        morePayMethod.setBounds(180, 570, 150, 30);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -292,12 +292,10 @@ public class TopUppanel extends javax.swing.JPanel {
         updateMethodSelectedLabel("GCash");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton4ActionPerformed
-@SuppressWarnings("unused")
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
         updateMethodSelectedLabel("PayMaya");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton2ActionPerformed
-@SuppressWarnings("unused")
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
         updateMethodSelectedLabel("VISA");
         slideMethodPanelDown(); // Auto-hide panel after selection
@@ -424,6 +422,27 @@ public class TopUppanel extends javax.swing.JPanel {
     private void initializeCustomAmount() {
         Customamount.setText("0.00");
         Customamount.setHorizontalAlignment(JTextField.CENTER);
+        
+        // Add focus listener to preserve text when clicked
+        Customamount.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                // If the field is empty or has placeholder text, set default value
+                String currentText = Customamount.getText().trim();
+                if (currentText.isEmpty() || currentText.equals("00z;00")) {
+                    Customamount.setText("0.00");
+                }
+            }
+            
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                // Ensure field has a valid value when focus is lost
+                String currentText = Customamount.getText().trim();
+                if (currentText.isEmpty()) {
+                    Customamount.setText("0.00");
+                }
+            }
+        });
     }
 
     /**
@@ -556,11 +575,11 @@ public class TopUppanel extends javax.swing.JPanel {
         if (jRadioButton1.isSelected()) {
             return "Earnest Bank";
         } else if (jRadioButton2.isSelected()) {
-            return "VISA";
+            return "PayMaya";
         } else if (jRadioButton3.isSelected()) {
-            return "Maya";
+            return "VISA";
         } else if (jRadioButton4.isSelected()) {
-            return "Gcash";
+            return "GCash";
         }
         return null; // No radio button selected
     }
