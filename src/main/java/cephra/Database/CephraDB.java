@@ -2290,5 +2290,158 @@ public class CephraDB {
         String referenceId = "TOPUP_" + System.currentTimeMillis();
         return updateWalletBalance(username, amount, "TOP_UP", description, referenceId);
     }
+    
+    // ========================= PROFILE PICTURE METHODS =========================
+    
+    /**
+     * Saves a user's profile picture to the database
+     * @param username the username
+     * @param profilePictureBase64 the profile picture as Base64 encoded string
+     * @return true if successful, false otherwise
+     */
+    public static boolean saveUserProfilePicture(String username, String profilePictureBase64) {
+        if (username == null || username.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid username for profile picture save");
+            return false;
+        }
+        
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // First check if profile_picture column exists, add it if not
+            if (!columnExists(conn, "users", "profile_picture")) {
+                addProfilePictureColumn(conn);
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE users SET profile_picture = ? WHERE username = ?")) {
+                
+                stmt.setString(1, profilePictureBase64);
+                stmt.setString(2, username);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("CephraDB: Successfully saved profile picture for user " + username);
+                    return true;
+                } else {
+                    System.err.println("CephraDB: No user found with username " + username + " to update profile picture");
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error saving user profile picture: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Gets a user's profile picture from the database
+     * @param username the username
+     * @return Base64 encoded profile picture string, or null if not found
+     */
+    public static String getUserProfilePicture(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return null;
+        }
+        
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // First check if profile_picture column exists
+            if (!columnExists(conn, "users", "profile_picture")) {
+                System.out.println("CephraDB: profile_picture column doesn't exist yet");
+                return null;
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT profile_picture FROM users WHERE username = ?")) {
+                
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String profilePicture = rs.getString("profile_picture");
+                        if (profilePicture != null && !profilePicture.trim().isEmpty()) {
+                            System.out.println("CephraDB: Retrieved profile picture for user " + username);
+                            return profilePicture;
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting user profile picture: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Gets the current logged-in user's profile picture
+     * @return Base64 encoded profile picture string, or null if not found
+     */
+    public static String getCurrentUserProfilePicture() {
+        String username = getCurrentUsername();
+        if (username != null && !username.isEmpty()) {
+            return getUserProfilePicture(username);
+        }
+        return null;
+    }
+    
+    /**
+     * Removes a user's profile picture from the database
+     * @param username the username
+     * @return true if successful, false otherwise
+     */
+    public static boolean removeUserProfilePicture(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid username for profile picture removal");
+            return false;
+        }
+        
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // First check if profile_picture column exists
+            if (!columnExists(conn, "users", "profile_picture")) {
+                System.out.println("CephraDB: profile_picture column doesn't exist, nothing to remove");
+                return true; // Consider it successful since there's nothing to remove
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE users SET profile_picture = NULL WHERE username = ?")) {
+                
+                stmt.setString(1, username);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("CephraDB: Successfully removed profile picture for user " + username);
+                    return true;
+                } else {
+                    System.err.println("CephraDB: No user found with username " + username + " to remove profile picture");
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error removing user profile picture: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Helper method to add profile_picture column to users table if it doesn't exist
+     * @param conn the database connection
+     */
+    private static void addProfilePictureColumn(Connection conn) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "ALTER TABLE users ADD COLUMN profile_picture LONGTEXT NULL AFTER email")) {
+            stmt.executeUpdate();
+            System.out.println("CephraDB: Added profile_picture column to users table");
+        } catch (SQLException e) {
+            // Column might already exist, check error message
+            if (e.getMessage().contains("Duplicate column name")) {
+                System.out.println("CephraDB: profile_picture column already exists");
+            } else {
+                System.err.println("Error adding profile_picture column: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 
 }
