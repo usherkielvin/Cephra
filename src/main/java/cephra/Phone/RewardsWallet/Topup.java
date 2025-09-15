@@ -151,7 +151,7 @@ public class Topup extends javax.swing.JPanel {
             }
         });
         jPanel1.add(morePayMethod);
-        morePayMethod.setBounds(180, 570, 150, 30);
+        morePayMethod.setBounds(40, 570, 290, 30);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -214,7 +214,9 @@ public class Topup extends javax.swing.JPanel {
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jRadioButton1.setText("                                                      ");
+        jRadioButton1.setBorder(null);
         jRadioButton1.setContentAreaFilled(false);
+        jRadioButton1.setFocusPainted(false);
         jRadioButton1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jRadioButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -230,6 +232,11 @@ public class Topup extends javax.swing.JPanel {
         jRadioButton3.setContentAreaFilled(false);
         jRadioButton3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jRadioButton3.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton3ActionPerformed(evt);
+            }
+        });
         Method.add(jRadioButton3);
         jRadioButton3.setBounds(30, 190, 310, 50);
 
@@ -238,6 +245,11 @@ public class Topup extends javax.swing.JPanel {
         jRadioButton2.setContentAreaFilled(false);
         jRadioButton2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jRadioButton2.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
         Method.add(jRadioButton2);
         jRadioButton2.setBounds(30, 120, 310, 50);
 
@@ -423,15 +435,12 @@ public class Topup extends javax.swing.JPanel {
         Customamount.setText("0.00");
         Customamount.setHorizontalAlignment(JTextField.CENTER);
         
-        // Add focus listener to preserve text when clicked
+        // Add focus listener to clear text when focused
         Customamount.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
-                // If the field is empty or has placeholder text, set default value
-                String currentText = Customamount.getText().trim();
-                if (currentText.isEmpty() || currentText.equals("00z;00")) {
-                    Customamount.setText("0.00");
-                }
+                // Clear the field when focused so user can type
+                Customamount.setText("");
             }
             
             @Override
@@ -528,7 +537,7 @@ public class Topup extends javax.swing.JPanel {
                         for (java.awt.Window window : windows) {
                             if (window instanceof cephra.Frame.Phone) {
                                 cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                                phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.WalletReciept1());
+                                phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.TopupReceipt());
                                 break;
                             }
                         }
@@ -724,12 +733,14 @@ public class Topup extends javax.swing.JPanel {
     }
     
     /**
-     * Initializes the methodselected label
+     * Initializes the methodselected label with GCash as default
      */
     private void initializeMethodSelectedLabel() {
-        methodselected.setText("Select a payment method");
-        methodselected.setFont(new java.awt.Font("Segoe UI", 0, 12));
-        methodselected.setForeground(new Color(100, 100, 100)); // Gray color
+        // Set GCash as default selected payment method
+        jRadioButton4.setSelected(true);
+        
+        // Update the method selected label to show GCash as default
+        updateMethodSelectedLabel("GCash");
     }
     
     /**

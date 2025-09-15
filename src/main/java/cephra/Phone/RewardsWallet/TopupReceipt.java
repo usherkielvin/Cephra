@@ -7,9 +7,9 @@ import java.awt.event.MouseMotionAdapter;
 import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 
-public class WalletReciept1 extends javax.swing.JPanel {
+public class TopupReceipt extends javax.swing.JPanel {
   
-    public WalletReciept1() {
+    public TopupReceipt() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -38,7 +38,7 @@ public class WalletReciept1 extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(WalletReciept1.this);
+                    java.awt.Window window = SwingUtilities.getWindowAncestor(TopupReceipt.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -130,7 +130,6 @@ public class WalletReciept1 extends javax.swing.JPanel {
         Exit = new javax.swing.JButton();
         Download = new javax.swing.JButton();
         TimeDate = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
         AmountPaid = new javax.swing.JLabel();
         Fee = new javax.swing.JLabel();
         AccNumber = new javax.swing.JLabel();
@@ -144,7 +143,7 @@ public class WalletReciept1 extends javax.swing.JPanel {
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
         add(share);
-        share.setBounds(180, 680, 130, 40);
+        share.setBounds(200, 680, 130, 40);
 
         Exit.setBorder(null);
         Exit.setBorderPainted(false);
@@ -155,41 +154,36 @@ public class WalletReciept1 extends javax.swing.JPanel {
             }
         });
         add(Exit);
-        Exit.setBounds(290, 50, 50, 40);
+        Exit.setBounds(290, 50, 60, 40);
 
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
         add(Download);
-        Download.setBounds(30, 683, 120, 30);
+        Download.setBounds(30, 683, 130, 40);
 
         TimeDate.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        TimeDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        TimeDate.setText("29 August 2025 05:31:02 PM");
+        TimeDate.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        TimeDate.setText("29/07/2025 05:31 PM");
         add(TimeDate);
-        TimeDate.setBounds(200, 300, 190, 20);
-
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel6.setText("<html><div style='text-align:leading;'>Amount Paid: <br>Fee: <br>Account Number:  </div></html>");
-        add(jLabel6);
-        jLabel6.setBounds(100, 230, 110, 70);
+        TimeDate.setBounds(200, 500, 190, 20);
 
         AmountPaid.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         AmountPaid.setText("Php 650.00");
         add(AmountPaid);
-        AmountPaid.setBounds(230, 240, 100, 20);
+        AmountPaid.setBounds(200, 440, 100, 20);
 
         Fee.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         Fee.setText("Php 7.00");
         add(Fee);
-        Fee.setBounds(230, 260, 140, 20);
+        Fee.setBounds(200, 460, 140, 20);
 
         AccNumber.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         AccNumber.setText("337293727");
         add(AccNumber);
-        AccNumber.setBounds(230, 280, 90, 20);
+        AccNumber.setBounds(200, 480, 90, 20);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/top up.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/TOPUPRECEIPTT.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -266,7 +260,6 @@ public class WalletReciept1 extends javax.swing.JPanel {
     private javax.swing.JLabel Fee;
     private javax.swing.JLabel TimeDate;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JButton share;
     // End of variables declaration//GEN-END:variables
 }
