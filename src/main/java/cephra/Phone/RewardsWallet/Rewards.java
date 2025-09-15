@@ -97,7 +97,7 @@ public class Rewards extends javax.swing.JPanel {
                 };
             
             // Row 1: F1  F2 (headers - smaller)
-            contentPanel.add(createHeaderRow.apply(f1, f2));
+            contentPanel.add(createHeaderRow.apply(f1, f1));
             contentPanel.add(javax.swing.Box.createVerticalStrut(5));
             
             // Row 2: a1  a2 (content panels - larger)
@@ -105,7 +105,7 @@ public class Rewards extends javax.swing.JPanel {
             contentPanel.add(javax.swing.Box.createVerticalStrut(15));
             
             // Row 3: F3  F4 (headers - smaller)
-            contentPanel.add(createHeaderRow.apply(f3, f4));
+            contentPanel.add(createHeaderRow.apply(f2, f2));
             contentPanel.add(javax.swing.Box.createVerticalStrut(5));
             
             // Row 4: a3  a4 (content panels - larger)
@@ -113,47 +113,23 @@ public class Rewards extends javax.swing.JPanel {
             contentPanel.add(javax.swing.Box.createVerticalStrut(15));
             
             // Row 5: F5  F6 (headers - smaller) - Create additional header panels
-            javax.swing.JPanel f5 = new javax.swing.JPanel();
-            f5.setBackground(new java.awt.Color(255, 255, 255));
-            javax.swing.JLabel f5Label = new javax.swing.JLabel();
-            f5Label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/f1.png")));
-            f5.add(f5Label);
+           contentPanel.add(createContentRow.apply(f3, f3));
+            contentPanel.add(javax.swing.Box.createVerticalStrut(5));
             
-            javax.swing.JPanel f6 = new javax.swing.JPanel();
-            f6.setBackground(new java.awt.Color(255, 255, 255));
-            javax.swing.JLabel f6Label = new javax.swing.JLabel();
-            f6Label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/f2.png")));
-            f6.add(f6Label);
+             contentPanel.add(createContentRow.apply(a5, a6));
+            contentPanel.add(javax.swing.Box.createVerticalStrut(15));
             
-            contentPanel.add(createHeaderRow.apply(f5, f6));
+            contentPanel.add(createHeaderRow.apply(f4, f4));
             contentPanel.add(javax.swing.Box.createVerticalStrut(5));
             
             // Row 6: a5  a6 (content panels - larger)
-            contentPanel.add(createContentRow.apply(a5, a6));
+            contentPanel.add(createContentRow.apply(a7, a8));
             contentPanel.add(javax.swing.Box.createVerticalStrut(15));
             
             // Row 7: F7  F8 (headers - smaller) - Create additional header panels
-            javax.swing.JPanel f7 = new javax.swing.JPanel();
-            f7.setBackground(new java.awt.Color(255, 255, 255));
-            javax.swing.JLabel f7Label = new javax.swing.JLabel();
-            f7Label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/f3.png")));
-            f7.add(f7Label);
+         
             
-            javax.swing.JPanel f8 = new javax.swing.JPanel();
-            f8.setBackground(new java.awt.Color(255, 255, 255));
-            javax.swing.JLabel f8Label = new javax.swing.JLabel();
-            f8Label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/f4.png")));
-            f8.add(f8Label);
-            
-            contentPanel.add(createHeaderRow.apply(f7, f8));
-            contentPanel.add(javax.swing.Box.createVerticalStrut(5));
-            
-            // Row 8: a7  a8 (content panels - larger)
-            contentPanel.add(createContentRow.apply(a7, a8));
-            contentPanel.add(javax.swing.Box.createVerticalStrut(10));
-            
-            // Add flexible glue at the bottom to push content to top
-            contentPanel.add(javax.swing.Box.createVerticalGlue());
+         
             
             // Set the content panel as the viewport of the scroll pane
             jScrollPane1.setViewportView(contentPanel);
