@@ -332,21 +332,43 @@ try {
             break;
 
         case 'analytics':
-            // Get revenue data for the last 7 days
+            // Get range parameter (day, week, month)
+            $range = $_GET['range'] ?? 'week';
+            $interval = match($range) {
+                'day' => 'INTERVAL 1 DAY',
+                'week' => 'INTERVAL 7 DAY',
+                'month' => 'INTERVAL 30 DAY',
+                default => 'INTERVAL 7 DAY'
+            };
+
+            // Get revenue data
             $stmt = $db->query("
                 SELECT
                     DATE(processed_at) as date,
                     SUM(amount) as revenue
                 FROM payment_transactions
-                WHERE processed_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                WHERE processed_at >= DATE_SUB(CURDATE(), $interval)
                 GROUP BY DATE(processed_at)
                 ORDER BY DATE(processed_at)
             ");
             $revenue_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Get service usage data (charging sessions)
+            $stmt = $db->query("
+                SELECT
+                    DATE(completed_at) as date,
+                    COUNT(*) as service_count
+                FROM charging_history
+                WHERE completed_at >= DATE_SUB(CURDATE(), $interval)
+                GROUP BY DATE(completed_at)
+                ORDER BY DATE(completed_at)
+            ");
+            $service_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
             echo json_encode([
                 'success' => true,
-                'revenue_data' => $revenue_data
+                'revenue_data' => $revenue_data,
+                'service_data' => $service_data
             ]);
             break;
 

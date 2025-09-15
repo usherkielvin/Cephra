@@ -382,17 +382,27 @@ class AdminPanel {
 
     async loadAnalyticsData() {
         try {
+            console.log('Loading analytics data for range:', this.analyticsRange);
             const response = await fetch(`api/admin.php?action=analytics&range=${this.analyticsRange}`);
             const data = await response.json();
 
+            console.log('Analytics API response:', data);
+
             if (data.success) {
-                if (data.revenue_data) {
+                if (data.revenue_data && data.revenue_data.length > 0) {
+                    console.log('Rendering revenue chart with', data.revenue_data.length, 'data points');
                     this.renderRevenueChart(data.revenue_data);
+                } else {
+                    console.log('No revenue data available');
                 }
-                if (data.service_data) {
+                if (data.service_data && data.service_data.length > 0) {
+                    console.log('Rendering service chart with', data.service_data.length, 'data points');
                     this.renderServiceChart(data.service_data);
+                } else {
+                    console.log('No service data available');
                 }
             } else {
+                console.error('Analytics API returned error:', data);
                 this.showError('Failed to load analytics data');
             }
         } catch (error) {
