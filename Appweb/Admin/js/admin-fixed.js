@@ -138,7 +138,7 @@ class AdminPanel {
 
     async loadDashboardData() {
         try {
-            const response = await fetch('api/admin-clean.php?action=dashboard');
+            const response = await fetch('api/admin.php?action=dashboard');
             const data = await response.json();
 
             if (data.success) {
@@ -178,7 +178,7 @@ class AdminPanel {
 
     async loadQueueData() {
         try {
-            const response = await fetch('api/admin-clean.php?action=queue');
+            const response = await fetch('api/admin.php?action=queue');
             const data = await response.json();
 
             if (data.success) {
@@ -230,7 +230,7 @@ class AdminPanel {
 
     async loadBaysData() {
         try {
-            const response = await fetch('api/admin-clean.php?action=bays');
+            const response = await fetch('api/admin.php?action=bays');
             const data = await response.json();
 
             if (data.success) {
@@ -292,7 +292,7 @@ class AdminPanel {
 
     async loadUsersData() {
         try {
-            const response = await fetch('api/admin-clean.php?action=users');
+            const response = await fetch('api/admin.php?action=users');
             const data = await response.json();
 
             if (data.success) {
@@ -335,7 +335,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -382,7 +382,7 @@ class AdminPanel {
 
     async loadAnalyticsData() {
         try {
-            const response = await fetch(`api/admin-clean.php?action=analytics&range=${this.analyticsRange}`);
+            const response = await fetch(`api/admin.php?action=analytics&range=${this.analyticsRange}`);
             const data = await response.json();
 
             if (data.success) {
@@ -519,7 +519,7 @@ class AdminPanel {
 
     async loadSettingsData() {
         try {
-            const response = await fetch('api/admin-clean.php?action=settings');
+            const response = await fetch('api/admin.php?action=settings');
             const data = await response.json();
 
             if (data.success) {
@@ -533,7 +533,7 @@ class AdminPanel {
 
     async viewTicket(ticketId) {
         try {
-            const response = await fetch(`api/admin-clean.php?action=ticket-details&ticket_id=${ticketId}`);
+            const response = await fetch(`api/admin.php?action=ticket-details&ticket_id=${ticketId}`);
             const data = await response.json();
 
             if (data.success) {
@@ -583,7 +583,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -610,7 +610,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -637,7 +637,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -689,7 +689,7 @@ class AdminPanel {
                 return;
             }
 
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -772,7 +772,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -799,7 +799,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -840,7 +840,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -872,7 +872,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('api/admin-clean.php', {
+            const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1278,7 +1278,7 @@ function processNextTicket() {
     if (adminPanel) {
         console.log('Starting processNextTicket...');
         // Call the new API to progress the next ticket
-        fetch('api/admin-clean.php?action=progress-next-ticket', {
+        fetch('api/admin.php?action=progress-next-ticket', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

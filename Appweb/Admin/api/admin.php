@@ -50,7 +50,7 @@ try {
             $stats['active_bays'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
             
             // Today's revenue
-            $stmt = $db->query("SELECT SUM(amount) as revenue FROM payment_transactions WHERE DATE(created_at) = CURDATE()");
+            $stmt = $db->query("SELECT SUM(amount) as revenue FROM payment_transactions WHERE DATE(processed_at) = CURDATE()");
             $revenue = $stmt->fetch(PDO::FETCH_ASSOC)['revenue'];
             $stats['revenue_today'] = $revenue ? (float)$revenue : 0;
             
@@ -500,6 +500,41 @@ try {
             }
             break;
 
+        case 'progress-next-ticket':
+            if ($method !== 'POST') {
+                echo json_encode(['error' => 'Method not allowed']);
+                break;
+            }
+            
+            // Find the next waiting ticket
+            $stmt = $db->query("
+                SELECT ticket_id, username, service_type 
+                FROM queue_tickets 
+                WHERE status = 'Waiting' 
+                ORDER BY created_at ASC 
+                LIMIT 1
+            ");
+            $next_ticket = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($next_ticket) {
+                // Update ticket status to Processing
+                $update_stmt = $db->prepare("UPDATE queue_tickets SET status = 'Processing' WHERE ticket_id = ?");
+                $result = $update_stmt->execute([$next_ticket['ticket_id']]);
+                
+                if ($result) {
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Next ticket processed successfully',
+                        'ticket' => $next_ticket
+                    ]);
+                } else {
+                    echo json_encode(['error' => 'Failed to process next ticket']);
+                }
+            } else {
+                echo json_encode(['error' => 'No waiting tickets found']);
+            }
+            break;
+
 
         default:
             echo json_encode([
@@ -507,7 +542,7 @@ try {
                 'available_actions' => [
                     'dashboard', 'queue', 'bays', 'users', 'ticket-details',
                     'process-ticket', 'set-bay-maintenance', 'set-bay-available',
-                    'add-user', 'delete-user', 'settings', 'save-settings', 'analytics', 'transactions'
+                    'add-user', 'delete-user', 'settings', 'save-settings', 'analytics', 'transactions', 'progress-next-ticket'
                 ]
             ]);
             break;
