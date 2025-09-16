@@ -166,7 +166,7 @@ public class LinkedCar extends javax.swing.JPanel {
                     int carIndex = cephra.Database.CephraDB.getUserCarIndex(username);
                     if (carIndex >= 0 && carIndex < carImages.length) {
                         // Create fresh icon from resource to avoid cumulative rotation
-                        ImageIcon originalIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/Bar.png"));
+                        ImageIcon originalIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/ver.png"));
                         ImageIcon rotatedIcon = rotateIcon(originalIcon, degrees);
                         bar.setIcon(rotatedIcon);
                         
@@ -191,14 +191,14 @@ public class LinkedCar extends javax.swing.JPanel {
         charge = new javax.swing.JButton();
         batterypercent = new javax.swing.JLabel();
         km = new javax.swing.JLabel();
+        cover = new javax.swing.JLabel();
+        bar = new javax.swing.JLabel();
         chargingTypeLabel = new javax.swing.JLabel();
         chargingTimeLabel = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        bar = new javax.swing.JLabel();
-        cover = new javax.swing.JLabel();
 
         setLayout(null);
 
@@ -284,6 +284,14 @@ public class LinkedCar extends javax.swing.JPanel {
         add(km);
         km.setBounds(200, 480, 140, 30);
 
+        cover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/co.png"))); // NOI18N
+        add(cover);
+        cover.setBounds(210, 390, 120, 120);
+
+        bar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ver.png"))); // NOI18N
+        add(bar);
+        bar.setBounds(210, 390, 120, 120);
+
         chargingTypeLabel.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
         chargingTypeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         chargingTypeLabel.setText("Fast Charging");
@@ -311,15 +319,6 @@ public class LinkedCar extends javax.swing.JPanel {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/linked.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(3, 0, 380, 750);
-
-        bar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Bar.png"))); // NOI18N
-        add(bar);
-        bar.setBounds(130, 200, 230, 200);
-
-        cover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Cover.png"))); // NOI18N
-        cover.setText("Bar");
-        add(cover);
-        cover.setBounds(90, 230, 230, 210);
     }// </editor-fold>//GEN-END:initComponents
 
     private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profilebuttonActionPerformed
