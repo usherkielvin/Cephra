@@ -1,6 +1,7 @@
 
 package cephra.Phone.RewardsWallet;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.SwingUtilities;
 
@@ -30,7 +31,7 @@ public class Rewards extends javax.swing.JPanel {
      jScrollPane1.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         // Get current user from session
         currentUsername = getCurrentUser();
-        
+      
         // Load points from database
         loadPointsFromDatabase();
         
@@ -50,9 +51,12 @@ public class Rewards extends javax.swing.JPanel {
             javax.swing.JPanel contentPanel = new javax.swing.JPanel();
             contentPanel.setLayout(new javax.swing.BoxLayout(contentPanel, javax.swing.BoxLayout.Y_AXIS));
             contentPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            contentPanel.setBackground(null);
-            contentPanel.setOpaque(false);
+         //   contentPanel.setBackground(null);
+           contentPanel.setBackground(Color.white);
+
+            contentPanel.setOpaque(true);
             contentPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+             
             
             // Clear the scroll pane first
             jScrollPane1.setViewportView(null);
@@ -64,8 +68,8 @@ public class Rewards extends javax.swing.JPanel {
                     rowPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 60)); // Smaller height for headers
                     rowPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     rowPanel.setBorder(null);
-                    rowPanel.setOpaque(false);
-                    rowPanel.setBackground(null);
+                    rowPanel.setOpaque(true);
+                    rowPanel.setBackground(Color.white);
                     
                     // Remove components from their current parents
                     if (left.getParent() != null) left.getParent().remove(left);
@@ -90,8 +94,9 @@ public class Rewards extends javax.swing.JPanel {
                     rowPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 140)); // Larger height for content
                     rowPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     rowPanel.setBorder(null);
-                    rowPanel.setOpaque(false);
-                    rowPanel.setBackground(null);
+                    rowPanel.setOpaque(true);
+                    rowPanel.setBackground(Color.white);
+
                     
                     // Remove components from their current parents
                     if (left.getParent() != null) left.getParent().remove(left);
@@ -108,8 +113,7 @@ public class Rewards extends javax.swing.JPanel {
                     
                     return rowPanel;
                 };
-            
-            // Row 1: F1  F2 (headers - smaller)
+                       // Row 1: F1  F2 (headers - smaller)
             contentPanel.add(createHeaderRow.apply(f1, f1));
             contentPanel.add(javax.swing.Box.createVerticalStrut(5));
             
@@ -330,6 +334,7 @@ public class Rewards extends javax.swing.JPanel {
 
         f4.setBackground(new java.awt.Color(255, 255, 255));
 
+        jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/f4.png"))); // NOI18N
 
         javax.swing.GroupLayout f4Layout = new javax.swing.GroupLayout(f4);
@@ -353,6 +358,7 @@ public class Rewards extends javax.swing.JPanel {
 
         f3.setBackground(new java.awt.Color(255, 255, 255));
 
+        jLabel3.setBackground(new java.awt.Color(255, 255, 255));
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/f3.png"))); // NOI18N
 
         javax.swing.GroupLayout f3Layout = new javax.swing.GroupLayout(f3);
@@ -376,6 +382,7 @@ public class Rewards extends javax.swing.JPanel {
 
         f2.setBackground(new java.awt.Color(255, 255, 255));
 
+        jLabel2.setBackground(new java.awt.Color(255, 255, 255));
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/f2.png"))); // NOI18N
 
         javax.swing.GroupLayout f2Layout = new javax.swing.GroupLayout(f2);
@@ -397,22 +404,36 @@ public class Rewards extends javax.swing.JPanel {
         add(f2);
         f2.setBounds(900, 310, 310, 60);
 
-        jPanel1.setBackground(new java.awt.Color(255, 51, 51));
-        jPanel1.setLayout(null);
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jScrollPane1.setToolTipText("");
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jScrollPane1.setHorizontalScrollBar(null);
-        jScrollPane1.setOpaque(false);
-        jPanel1.add(jScrollPane1);
-        jScrollPane1.setBounds(0, 0, 310, 460);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         add(jPanel1);
-        jPanel1.setBounds(30, 190, 310, 460);
+        jPanel1.setBounds(9, 129, 370, 485);
 
+        a1.setBackground(new java.awt.Color(255, 255, 255));
         a1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_1.png"))); // NOI18N
+        a1.setBorder(null);
         a1.setBorderPainted(false);
         a1.setContentAreaFilled(false);
         a1.setFocusPainted(false);
@@ -424,7 +445,9 @@ public class Rewards extends javax.swing.JPanel {
         add(a1);
         a1.setBounds(570, 90, 150, 150);
 
+        a2.setBackground(new java.awt.Color(255, 255, 255));
         a2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_2.png"))); // NOI18N
+        a2.setBorder(null);
         a2.setBorderPainted(false);
         a2.setContentAreaFilled(false);
         a2.setFocusPainted(false);
@@ -436,7 +459,9 @@ public class Rewards extends javax.swing.JPanel {
         add(a2);
         a2.setBounds(740, 90, 150, 150);
 
+        a3.setBackground(new java.awt.Color(255, 255, 255));
         a3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_3.png"))); // NOI18N
+        a3.setBorder(null);
         a3.setBorderPainted(false);
         a3.setContentAreaFilled(false);
         a3.setFocusPainted(false);
@@ -448,7 +473,9 @@ public class Rewards extends javax.swing.JPanel {
         add(a3);
         a3.setBounds(570, 250, 150, 150);
 
+        a4.setBackground(new java.awt.Color(255, 255, 255));
         a4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_4.png"))); // NOI18N
+        a4.setBorder(null);
         a4.setBorderPainted(false);
         a4.setContentAreaFilled(false);
         a4.setFocusPainted(false);
@@ -460,7 +487,9 @@ public class Rewards extends javax.swing.JPanel {
         add(a4);
         a4.setBounds(740, 250, 150, 150);
 
+        a5.setBackground(new java.awt.Color(255, 255, 255));
         a5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_5.png"))); // NOI18N
+        a5.setBorder(null);
         a5.setBorderPainted(false);
         a5.setContentAreaFilled(false);
         a5.setFocusPainted(false);
@@ -472,7 +501,9 @@ public class Rewards extends javax.swing.JPanel {
         add(a5);
         a5.setBounds(570, 420, 150, 150);
 
+        a6.setBackground(new java.awt.Color(255, 255, 255));
         a6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_6.png"))); // NOI18N
+        a6.setBorder(null);
         a6.setBorderPainted(false);
         a6.setContentAreaFilled(false);
         a6.setFocusPainted(false);
@@ -484,7 +515,9 @@ public class Rewards extends javax.swing.JPanel {
         add(a6);
         a6.setBounds(740, 410, 150, 150);
 
+        a7.setBackground(new java.awt.Color(255, 255, 255));
         a7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_7.png"))); // NOI18N
+        a7.setBorder(null);
         a7.setBorderPainted(false);
         a7.setContentAreaFilled(false);
         a7.setFocusPainted(false);
@@ -496,7 +529,9 @@ public class Rewards extends javax.swing.JPanel {
         add(a7);
         a7.setBounds(570, 580, 150, 150);
 
+        a8.setBackground(new java.awt.Color(255, 255, 255));
         a8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_8.png"))); // NOI18N
+        a8.setBorder(null);
         a8.setBorderPainted(false);
         a8.setContentAreaFilled(false);
         a8.setFocusPainted(false);
@@ -537,7 +572,7 @@ public class Rewards extends javax.swing.JPanel {
             }
         });
         add(homebutton2);
-        homebutton2.setBounds(170, 680, 30, 40);
+        homebutton2.setBounds(150, 680, 40, 40);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
