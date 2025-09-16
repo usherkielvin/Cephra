@@ -3,6 +3,10 @@ package cephra.Phone.Dashboard;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.time.LocalDate;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -12,6 +16,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
     
    
     private String currentUsername;
+    private cephra.Phone.Utilities.HistoryManager.HistoryEntry currentHistoryEntry;
 
     public ChargeHistory() {
         initComponents();
@@ -20,23 +25,17 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         setupLabelPosition(); // Set label position
         makeDraggable();
         
-        JScrollPane scrollPane = new JScrollPane(historyPanel);
-        
-
-// Hide scrollbars but keep scrolling possible
-scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
-
-
-
-     scrollPane.getVerticalScrollBar().setPreferredSize(new java.awt.Dimension(0, 0));
-        // Create and add history panel with scroll pane
-        createHistoryPanel();
+        // Your historyPanel will be created by NetBeans initComponents()
+        // No need to create fallback - we'll use your designed panel
         
         // Register as listener for history updates
         cephra.Phone.Utilities.HistoryManager.addHistoryUpdateListener(this);
         
-        // Load history entries
-        loadHistoryEntries();
+        // Setup custom functionality (design-safe - works with any NetBeans changes!)
+        setupCustomCode();
+        
+        // Setup the scrollable history content similar to rewards
+        setupScrollableHistoryContent();
         
         // Add component listener to refresh when panel becomes visible
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -47,37 +46,299 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         });
     }
     
-    private void createHistoryPanel() {
-        historyPanel = new JPanel();
-        historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
-        historyPanel.setBackground(Color.WHITE);
+    /**
+     * Creates a copy of YOUR designed pink history1 panel with data populated
+     */
+    private JPanel createHistoryEntryPanel(final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
+        // Clone your designed history1 panel directly!
+        JPanel clonedPanel = clonePanel(history1);
         
+        // Find the labels in the cloned panel and update their text
+        updatePanelLabels(clonedPanel, entry);
         
-        // Use the existing scroll pane if it exists, otherwise create a new one
-        if (historyScrollPane == null) {
-            historyScrollPane = new JScrollPane(historyPanel);
-            historyScrollPane.setBorder(null);
-            historyScrollPane.setBounds(50, 150, 280, 480);
-            add(historyScrollPane);
+        return clonedPanel;
+    }
+    
+    /**
+     * Creates an exact copy of your designed panel (works with ANY layout you use!)
+     */
+    private JPanel clonePanel(JPanel originalPanel) {
+        // Create new panel with same properties as your original
+        JPanel clonedPanel = new JPanel();
+        clonedPanel.setBackground(originalPanel.getBackground());
+        clonedPanel.setPreferredSize(originalPanel.getPreferredSize());
+        clonedPanel.setMaximumSize(originalPanel.getMaximumSize());
+        clonedPanel.setMinimumSize(originalPanel.getMinimumSize());
+        clonedPanel.setOpaque(originalPanel.isOpaque());
+        
+        // Create new components (clones of your original ones)
+        JLabel newTime = createClonedLabel(time, "Loading...");
+        JLabel newPrice = createClonedLabel(price, "₱0.00");
+        JLabel newDate = createClonedLabel(date, "No Date");
+        JLabel newType = createClonedLabel(type, "No Service");
+        JLabel newChargetime = createClonedLabel(chargetime, "0 mins");
+        JButton newDetails = createClonedButton(details, "");
+        
+        // Store references in the panel for easy access
+        clonedPanel.putClientProperty("timeLabel", newTime);
+        clonedPanel.putClientProperty("priceLabel", newPrice);
+        clonedPanel.putClientProperty("dateLabel", newDate);
+        clonedPanel.putClientProperty("typeLabel", newType);
+        clonedPanel.putClientProperty("chargetimeLabel", newChargetime);
+        clonedPanel.putClientProperty("detailsButton", newDetails);
+        
+        // Handle ANY layout type you use in NetBeans!
+        java.awt.LayoutManager originalLayout = originalPanel.getLayout();
+        
+        if (originalLayout == null) {
+            // NULL LAYOUT (Absolute positioning) - most common custom layout
+            clonedPanel.setLayout(null);
+            
+            // Copy exact positions from your original components
+            if (time != null) {
+                newTime.setBounds(time.getBounds());
+                clonedPanel.add(newTime);
+            }
+            if (price != null) {
+                newPrice.setBounds(price.getBounds());
+                clonedPanel.add(newPrice);
+            }
+            if (date != null) {
+                newDate.setBounds(date.getBounds());
+                clonedPanel.add(newDate);
+            }
+            if (type != null) {
+                newType.setBounds(type.getBounds());
+                clonedPanel.add(newType);
+            }
+            if (chargetime != null) {
+                newChargetime.setBounds(chargetime.getBounds());
+                clonedPanel.add(newChargetime);
+            }
+            if (details != null) {
+                newDetails.setBounds(details.getBounds());
+                clonedPanel.add(newDetails);
+            }
+            
+            System.out.println("✓ Cloned panel with NULL layout (absolute positioning)");
+            
+        } else if (originalLayout instanceof javax.swing.GroupLayout) {
+            // GROUP LAYOUT - copy the exact layout structure
+            javax.swing.GroupLayout clonedLayout = new javax.swing.GroupLayout(clonedPanel);
+            clonedPanel.setLayout(clonedLayout);
+            
+            // Use your current GroupLayout structure (copying from your latest design)
+            clonedLayout.setHorizontalGroup(
+                clonedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(clonedLayout.createSequentialGroup()
+                    .addGroup(clonedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(clonedLayout.createSequentialGroup()
+                            .addGap(34, 34, 34)
+                            .addGroup(clonedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(newTime)
+                                .addComponent(newDate))
+                            .addGap(46, 46, 46)
+                            .addGroup(clonedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(newPrice)
+                                .addComponent(newType)))
+                        .addGroup(clonedLayout.createSequentialGroup()
+                            .addGap(43, 43, 43)
+                            .addComponent(newChargetime)
+                            .addGap(18, 18, 18)
+                            .addComponent(newDetails)))
+                    .addContainerGap(127, Short.MAX_VALUE))
+            );
+            clonedLayout.setVerticalGroup(
+                clonedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(clonedLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(clonedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(newTime)
+                        .addComponent(newPrice))
+                    .addGroup(clonedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(clonedLayout.createSequentialGroup()
+                            .addGap(29, 29, 29)
+                            .addComponent(newType))
+                        .addGroup(clonedLayout.createSequentialGroup()
+                            .addGap(18, 18, 18)
+                            .addComponent(newDate)))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(clonedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(newChargetime)
+                        .addComponent(newDetails))
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+            
+            System.out.println("✓ Cloned panel with GroupLayout");
+            
         } else {
-            // Just update the viewport with the new history panel
-            historyScrollPane.setViewportView(historyPanel);
+            // OTHER LAYOUT TYPES (BorderLayout, FlowLayout, etc.)
+            try {
+                // Try to create the same layout type
+                java.awt.LayoutManager clonedLayout = originalLayout.getClass().newInstance();
+                clonedPanel.setLayout(clonedLayout);
+                
+                // Add components (positions will depend on the layout type)
+                clonedPanel.add(newTime);
+                clonedPanel.add(newPrice);
+                clonedPanel.add(newDate);
+                clonedPanel.add(newType);
+                clonedPanel.add(newChargetime);
+                clonedPanel.add(newDetails);
+                
+                System.out.println("✓ Cloned panel with " + originalLayout.getClass().getSimpleName());
+                
+            } catch (Exception e) {
+                // Fallback to null layout if we can't clone the layout
+                System.out.println("Could not clone layout, using absolute positioning");
+                clonedPanel.setLayout(null);
+                
+                // Try to get positions if possible
+                if (time != null && time.getBounds() != null) {
+                    newTime.setBounds(time.getBounds());
+                    clonedPanel.add(newTime);
+                }
+                // Add other components with default positions if bounds not available
+                if (newTime.getBounds().equals(new java.awt.Rectangle())) {
+                    newTime.setBounds(10, 10, 100, 20);
+                    newPrice.setBounds(120, 10, 100, 20);
+                    newDate.setBounds(10, 35, 100, 20);
+                    newType.setBounds(120, 35, 100, 20);
+                    newChargetime.setBounds(10, 60, 100, 20);
+                    newDetails.setBounds(120, 60, 80, 25);
+                }
+                clonedPanel.add(newPrice);
+                clonedPanel.add(newDate);
+                clonedPanel.add(newType);
+                clonedPanel.add(newChargetime);
+                clonedPanel.add(newDetails);
+            }
         }
-
-        // Hide scrollbars but keep scrolling possible
-        historyScrollPane.setBorder(null);
-        historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        if (historyScrollPane.getVerticalScrollBar() != null) {
-            historyScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
-            // Adjust scroll speed (higher = faster). Try 20-40 for quicker scrolling
-            historyScrollPane.getVerticalScrollBar().setUnitIncrement(24);
+        
+        return clonedPanel;
+    }
+    
+    /**
+     * Creates a cloned label with same properties as original
+     */
+    private JLabel createClonedLabel(JLabel original, String defaultText) {
+        JLabel cloned = new JLabel(defaultText);
+        if (original != null) {
+            cloned.setFont(original.getFont());
+            cloned.setForeground(original.getForeground());
+            cloned.setBackground(original.getBackground());
+            cloned.setOpaque(original.isOpaque());
+            cloned.setHorizontalAlignment(original.getHorizontalAlignment());
+            cloned.setVerticalAlignment(original.getVerticalAlignment());
         }
-        if (historyScrollPane.getHorizontalScrollBar() != null) {
-            historyScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
+        return cloned;
+    }
+    
+    /**
+     * Creates a cloned button with same properties as original
+     */
+    private JButton createClonedButton(JButton original, String defaultText) {
+        JButton cloned = new JButton(defaultText);
+        if (original != null) {
+            cloned.setFont(original.getFont());
+            cloned.setForeground(original.getForeground());
+            cloned.setBackground(original.getBackground());
+            cloned.setOpaque(original.isOpaque());
+            cloned.setBorder(original.getBorder());
+            cloned.setBorderPainted(original.isBorderPainted());
+            cloned.setContentAreaFilled(original.isContentAreaFilled());
+            cloned.setFocusPainted(original.isFocusPainted());
         }
-        historyScrollPane.setWheelScrollingEnabled(true);
-        historyScrollPane.putClientProperty("JScrollPane.fastWheelScrolling", Boolean.TRUE);
+        return cloned;
+    }
+    
+    /**
+     * Updates the labels in a cloned panel with history entry data
+     */
+    private void updatePanelLabels(JPanel panel, final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
+        // Get the stored components and update their text
+        JLabel timeLabel = (JLabel) panel.getClientProperty("timeLabel");
+        JLabel priceLabel = (JLabel) panel.getClientProperty("priceLabel");
+        JLabel dateLabel = (JLabel) panel.getClientProperty("dateLabel");
+        JLabel typeLabel = (JLabel) panel.getClientProperty("typeLabel");
+        JLabel chargetimeLabel = (JLabel) panel.getClientProperty("chargetimeLabel");
+        JButton detailsButton = (JButton) panel.getClientProperty("detailsButton");
+        
+        // Populate with history data
+        if (timeLabel != null) timeLabel.setText(entry.getFormattedTime());
+        if (priceLabel != null) priceLabel.setText(entry.getTotal());
+        if (dateLabel != null) dateLabel.setText(entry.getFormattedDate());
+        if (typeLabel != null) typeLabel.setText(entry.getServiceType());
+        if (chargetimeLabel != null) chargetimeLabel.setText(entry.getChargingTime());
+        
+        // Add details button functionality for this specific entry
+        if (detailsButton != null) {
+            // Remove any existing listeners
+            for (java.awt.event.ActionListener listener : detailsButton.getActionListeners()) {
+                detailsButton.removeActionListener(listener);
+            }
+            // Add listener for this entry
+            detailsButton.addActionListener(e -> showHistoryDetails(entry));
+        }
+    }
+    
+    /**
+     * Setup scrollable history content using your designed pink history panel with labels
+     */
+    private void setupScrollableHistoryContent() {
+        // Use SwingUtilities.invokeLater to ensure everything is ready after initComponents
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                // Your pink history panel is already set up in initComponents with your labels:
+                // time, price, date, type, chargetime
+                if (history != null) {
+                    System.out.println("Using your designed pink 'history' panel with labels from NetBeans");
+                    
+                    // Your panel is already in the scroll pane thanks to initComponents
+                    // Keep your exact design and layout - don't change anything!
+                    
+                } else {
+                    System.err.println("ERROR: Your designed 'history' panel not found!");
+                    return;
+                }
+                
+                // Configure scroll pane behavior (keep scrollbars hidden like rewards)
+                historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                historyScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+                
+                // Hide scrollbars completely
+                if (historyScrollPane.getVerticalScrollBar() != null) {
+                    historyScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+                }
+                if (historyScrollPane.getHorizontalScrollBar() != null) {
+                    historyScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
+                }
+                
+                historyScrollPane.setWheelScrollingEnabled(true);
+                historyScrollPane.putClientProperty("JScrollPane.fastWheelScrolling", Boolean.TRUE);
+                
+                // Force a repaint to ensure everything displays correctly
+                historyScrollPane.revalidate();
+                historyScrollPane.repaint();
+                this.revalidate();
+                this.repaint();
+                
+                System.out.println("History scroll pane setup completed using your designed pink panel");
+                
+                // Load history entries now that the panel is ready
+                loadHistoryEntries();
+                
+            } catch (Exception e) {
+                System.err.println("Error setting up history scroll pane content: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+    
+    private void createHistoryPanel() {
+        // This method is now handled by setupScrollableHistoryContent
+        // Keep for backward compatibility but functionality moved to setupScrollableHistoryContent
     }
     
     private void loadHistoryEntries() {
@@ -88,8 +349,13 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     }
     
     public void refreshHistoryDisplay() {
-        // Clear existing history items
-        historyPanel.removeAll();
+        // Check if your designed panels are initialized before using them
+        if (history == null || history1 == null) {
+            System.out.println("PhoneHistory: Your designed panels are null, will be loaded when setup completes");
+            return;
+        }
+        
+        System.out.println("PhoneHistory: Refreshing history display with your pink panel ready");
         
         // Get current user's history (now includes admin history entries)
         List<cephra.Phone.Utilities.HistoryManager.HistoryEntry> entries = cephra.Phone.Utilities.HistoryManager.getUserHistory(currentUsername);
@@ -98,15 +364,13 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         System.out.println("PhoneHistory: Found " + entries.size() + " history entries");
         
         if (entries.isEmpty()) {
-            // Show "No history" message
-            JPanel noHistoryPanel = new JPanel(new BorderLayout());
-            noHistoryPanel.setBackground(Color.WHITE);
-            JLabel noHistoryLabel = new JLabel("No charging history found");
-            noHistoryLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            noHistoryLabel.setForeground(Color.GRAY);
-            noHistoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            noHistoryPanel.add(noHistoryLabel, BorderLayout.CENTER);
-            historyPanel.add(noHistoryPanel);
+            // Show "No history" message in your designed labels
+            time.setText("No Data");
+            price.setText("₱0.00");
+            date.setText("No Date");
+            type.setText("No Service");
+            chargetime.setText("0 mins");
+            currentHistoryEntry = null;  // No entry to show details for
             
             // Debug: Check if there are any charging history records in database
             try {
@@ -119,19 +383,28 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
                 System.err.println("PhoneHistory: Error checking database history: " + e.getMessage());
             }
         } else {
-            // Add history entries
+            // Clear the container first
+            history.removeAll();
+            
+            // Create a panel for EACH history entry (so they stack!)
             for (cephra.Phone.Utilities.HistoryManager.HistoryEntry entry : entries) {
-                addHistoryItem(entry);
+                JPanel entryPanel = createHistoryEntryPanel(entry);
+                history.add(entryPanel);
+                history.add(Box.createRigidArea(new Dimension(0, 10))); // Spacing between entries
             }
+            
+            // Store the first entry for details button (if using original design)
+            currentHistoryEntry = entries.get(0);
+            
+            System.out.println("PhoneHistory: Created " + entries.size() + " stacked history panels");
         }
         
-        // Ensure scroll position is at the top to show newest entries
+        // Ensure proper repaint
         SwingUtilities.invokeLater(() -> {
-            if (historyScrollPane != null && historyScrollPane.getVerticalScrollBar() != null) {
-                historyScrollPane.getVerticalScrollBar().setValue(0);
-            }
-            historyPanel.revalidate();
-            historyPanel.repaint();
+            history1.revalidate();
+            history1.repaint();
+            history.revalidate();
+            history.repaint();
         });
     }
     
@@ -144,6 +417,150 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         } else {
             System.out.println("PhoneHistory: Username does not match, ignoring update");
         }
+    }
+    
+    /**
+     * Groups history entries by their date (LocalDate)
+     */
+    private Map<LocalDate, List<cephra.Phone.Utilities.HistoryManager.HistoryEntry>> groupEntriesByDate(
+            List<cephra.Phone.Utilities.HistoryManager.HistoryEntry> entries) {
+        Map<LocalDate, List<cephra.Phone.Utilities.HistoryManager.HistoryEntry>> entriesByDate = new LinkedHashMap<>();
+        
+        for (cephra.Phone.Utilities.HistoryManager.HistoryEntry entry : entries) {
+            LocalDate entryDate = entry.getTimestamp().toLocalDate();
+            
+            entriesByDate.computeIfAbsent(entryDate, k -> new ArrayList<>()).add(entry);
+        }
+        
+        return entriesByDate;
+    }
+    
+    /**
+     * Creates and adds a date header panel
+     */
+    private void addDateHeader(LocalDate date) {
+        JPanel dateHeaderPanel = new JPanel(new BorderLayout());
+        dateHeaderPanel.setBackground(new Color(248, 248, 248)); // Light gray background
+        dateHeaderPanel.setOpaque(true);
+        dateHeaderPanel.setBorder(new EmptyBorder(8, 15, 8, 15));
+        dateHeaderPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        // Set fixed size for date header
+        int headerHeight = 35;
+        int headerWidth = 285; // Match the scroll pane width
+        dateHeaderPanel.setPreferredSize(new Dimension(headerWidth, headerHeight));
+        dateHeaderPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerHeight));
+        dateHeaderPanel.setMinimumSize(new Dimension(headerWidth, headerHeight));
+        
+        // Create date label using the same formatting as HistoryEntry
+        cephra.Phone.Utilities.HistoryManager.HistoryEntry tempEntry = new cephra.Phone.Utilities.HistoryManager.HistoryEntry(
+            "", "", "", "", "", date.atStartOfDay()
+        );
+        
+        JLabel dateLabel = new JLabel(tempEntry.getFormattedDate());
+        dateLabel.setFont(new Font("Arial", Font.BOLD, 13));
+        dateLabel.setForeground(new Color(60, 60, 60));
+        
+        dateHeaderPanel.add(dateLabel, BorderLayout.WEST);
+        
+        history.add(dateHeaderPanel);
+    }
+    
+    /**
+     * Adds a history item without the date label (since date is shown in header)
+     * Styled as a card similar to rewards system
+     */
+    private void addHistoryItemWithoutDate(final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
+        // Create a card-style panel for a single history item
+        JPanel historyItemPanel = new JPanel();
+        historyItemPanel.setLayout(new BorderLayout(8, 5));
+        historyItemPanel.setBackground(new Color(250, 250, 250)); // Light gray background
+        historyItemPanel.setOpaque(true);
+        historyItemPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
+            new EmptyBorder(12, 15, 12, 15)
+        ));
+        historyItemPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Set cursor to hand to indicate clickable
+        historyItemPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        // Set a fixed preferred and maximum height for each history item panel
+        int itemHeight = 80; // Increased height for card-style
+        int itemWidth = 300; // Full width of container
+        historyItemPanel.setPreferredSize(new Dimension(itemWidth, itemHeight));
+        historyItemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, itemHeight));
+        historyItemPanel.setMinimumSize(new Dimension(itemWidth, itemHeight));
+
+        // Left panel for details
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBackground(Color.WHITE);
+        leftPanel.setOpaque(false);
+
+        // Time
+        JLabel timeLabel = new JLabel(entry.getFormattedTime());
+        timeLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        timeLabel.setForeground(new Color(70, 70, 70));
+        timeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Service type
+        JLabel serviceLabel = new JLabel(entry.getServiceType());
+        serviceLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+        serviceLabel.setForeground(new Color(50, 100, 150));
+        serviceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Charging time
+        JLabel chargingTimeLabel = new JLabel("Charged: " + entry.getChargingTime());
+        chargingTimeLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+        chargingTimeLabel.setForeground(Color.GRAY);
+        chargingTimeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        leftPanel.add(timeLabel);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 3)));
+        leftPanel.add(serviceLabel);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        leftPanel.add(chargingTimeLabel);
+
+        // Right panel for total amount
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBackground(Color.WHITE);
+        rightPanel.setOpaque(false);
+
+        // Total amount (prominently displayed)
+        JLabel totalLabel = new JLabel(entry.getTotal());
+        totalLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        totalLabel.setForeground(new Color(0, 150, 0));
+        totalLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+        rightPanel.add(Box.createVerticalGlue());
+        rightPanel.add(totalLabel);
+        rightPanel.add(Box.createVerticalGlue());
+
+        historyItemPanel.add(leftPanel, BorderLayout.WEST);
+        historyItemPanel.add(rightPanel, BorderLayout.EAST);
+        
+        // Add hover effect
+        historyItemPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                showHistoryDetails(entry);
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                historyItemPanel.setBackground(new Color(245, 245, 245));
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                historyItemPanel.setBackground(new Color(250, 250, 250));
+            }
+        });
+
+        history.add(historyItemPanel);
+        history.add(Box.createRigidArea(new Dimension(0, 8))); // Spacing between cards
     }
     
     private void addHistoryItem(final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
@@ -238,104 +655,153 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
             }
         });
 
-        historyPanel.add(historyItemPanel);
+        history.add(historyItemPanel);
     }
 /////
-    private JPanel detailsPanel;
    
-    
     private void showHistoryDetails(cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
-        // If details panel already exists, remove it first
-        if (detailsPanel != null) {
-            remove(detailsPanel);
-        }
+        System.out.println("showHistoryDetails called with entry: " + entry.getTicketId());
         
-        // Hide the history scroll pane
-        historyScrollPane.setVisible(false);
-        
-        // Create panel for details
-        detailsPanel = new JPanel();
-        detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
-        detailsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        detailsPanel.setBackground(Color.WHITE);
-        detailsPanel.setBounds(50, 150, 290, 450);
-        
-        // Add header
-        JLabel headerLabel = new JLabel("Charging Details");
-        headerLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        headerLabel.setForeground(new Color(50, 50, 50));
-        headerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        detailsPanel.add(headerLabel);
-        
-        detailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        
-        // Add ticket information
-        addDetailRow(detailsPanel, "Ticket", entry.getTicketId());
-        addDetailRow(detailsPanel, "Customer", cephra.Database.CephraDB.getCurrentUsername());
-        
-        // Add service type (Fast Charge or Normal Charge)
-        addDetailRow(detailsPanel, "Service", entry.getServiceType());
-        
-        // Add kWh detail (get from admin history record)
-        String kWh = "32.80"; // Default value
-        try {
-            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
-            if (adminRecords != null) {
-                for (Object[] record : adminRecords) {
-                    if (record.length >= 7 && entry.getTicketId().equals(String.valueOf(record[0]))) {
-                        kWh = String.valueOf(record[2]); // KWh is at index 2
-                        break;
-                    }
-                }
+        // Update the designed detailpanel with the entry information
+        if (detailpanel != null) {
+            // Update ticket information - just the value
+            if (ticket != null) {
+                ticket.setText(entry.getTicketId());
             }
-        } catch (Exception e) {
-            System.err.println("Error getting kWh from admin history: " + e.getMessage());
-        }
-        addDetailRow(detailsPanel, "kWh", kWh);
-        
-        // Add charging time
-        addDetailRow(detailsPanel, "Charging Time", entry.getChargingTime());
-        
-        // Add total amount
-        addDetailRow(detailsPanel, "Total", entry.getTotal());
-        
-        // Add served by with correct value
-        String servedBy = "Admin"; // Default fallback
-        try {
-            List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
-            if (adminRecords != null) {
-                for (Object[] record : adminRecords) {
-                    if (record.length >= 5 && entry.getTicketId().equals(String.valueOf(record[0]))) {
-                        String servedByValue = String.valueOf(record[4]); // Served By is at index 4
-                        if (servedByValue != null && !servedByValue.equals("null")) {
-                            servedBy = servedByValue;
+            
+            // Update customer information - just the value
+            if (Customer != null) {
+                Customer.setText(cephra.Database.CephraDB.getCurrentUsername());
+            }
+            
+            // Update service type - just the value
+            if (typed != null) {
+                typed.setText(entry.getServiceType());
+            }
+            
+            // Update kWh information (get from admin history record) - just the value
+            String kWhValue = "32.80"; // Default value
+            try {
+                List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
+                if (adminRecords != null) {
+                    for (Object[] record : adminRecords) {
+                        if (record.length >= 7 && entry.getTicketId().equals(String.valueOf(record[0]))) {
+                            kWhValue = String.valueOf(record[2]); // KWh is at index 2
+                            break;
                         }
-                        break;
                     }
                 }
+            } catch (Exception e) {
+                System.err.println("Error getting kWh from admin history: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("Error getting served by from admin history: " + e.getMessage());
+            if (kwh != null) {
+                kwh.setText(kWhValue);
+            }
+            
+            // Update charging time - just the value
+            if (Chargingtime != null) {
+                Chargingtime.setText(entry.getChargingTime());
+            }
+            
+            // Update total price - just the value
+            if (totalprice != null) {
+                totalprice.setText(entry.getTotal());
+            }
+            
+            // Update served by information - just the value
+            String servedBy = "Admin"; // Default fallback
+            try {
+                List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
+                if (adminRecords != null) {
+                    for (Object[] record : adminRecords) {
+                        if (record.length >= 5 && entry.getTicketId().equals(String.valueOf(record[0]))) {
+                            String servedByValue = String.valueOf(record[4]); // Served By is at index 4
+                            if (servedByValue != null && !servedByValue.equals("null")) {
+                                servedBy = servedByValue;
+                            }
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error getting served by from admin history: " + e.getMessage());
+            }
+            if (server != null) {
+                server.setText(servedBy);
+            }
+            
+            // Update date - just the value
+            if (dated != null) {
+                dated.setText(entry.getFormattedDate());
+            }
+            
+            // Update time - just the value
+            if (timed != null) {
+                timed.setText(entry.getFormattedTime());
+            }
+            
+            // Update reference number - just the value
+            String refNumber = entry.getReferenceNumber();
+            if (refNumber == null || refNumber.trim().isEmpty() || refNumber.equals("null")) {
+                refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(entry.getTicketId());
+            }
+            if (ref != null) {
+                ref.setText(refNumber);
+            }
+            
+            // Setup OK button action if not already done
+            if (ok != null) {
+                // Remove any existing listeners first
+                for (java.awt.event.ActionListener listener : ok.getActionListeners()) {
+                    ok.removeActionListener(listener);
+                }
+                // Add action listener to close the details
+                ok.addActionListener(e -> closeDetailsPanel());
+                ok.setText("OK");
+            }
+            
+            // Create modal overlay to block all clicks except on detailpanel
+            if (modalOverlay == null) {
+                modalOverlay = new javax.swing.JPanel();
+                modalOverlay.setBackground(new java.awt.Color(0, 0, 0, 100)); // Semi-transparent black
+                modalOverlay.setOpaque(false);
+                
+                // Add mouse listener to block all clicks on the overlay
+                modalOverlay.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseClicked(java.awt.event.MouseEvent e) {
+                        // Block all clicks - do nothing
+                        e.consume();
+                    }
+                });
+                
+                // Add mouse motion listener to block drag events too
+                modalOverlay.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                    @Override
+                    public void mouseDragged(java.awt.event.MouseEvent e) {
+                        e.consume();
+                    }
+                });
+                
+                add(modalOverlay);
+            }
+            
+            // Position and show the modal overlay to cover everything
+            modalOverlay.setBounds(0, 0, getWidth(), getHeight());
+            modalOverlay.setVisible(true);
+            System.out.println("Created and shown modal overlay");
+            
+            // Position the detailpanel in the center of the history area as a popup
+            detailpanel.setBounds(75, 200, 230, 330); // Centered in the history area
+            System.out.println("Positioned detailpanel at (75, 200, 230, 330)");
+            detailpanel.setVisible(true);
+            System.out.println("Set detailpanel visible to true");
+            
+            // Make sure detailpanel is on top of the modal overlay
+            setComponentZOrder(modalOverlay, 1); // Behind detailpanel
+            setComponentZOrder(detailpanel, 0);   // On top
+            System.out.println("Set detailpanel to front layer with modal overlay behind");
         }
-        addDetailRow(detailsPanel, "Served By", servedBy);
-        
-        // Add date and time
-        addDetailRow(detailsPanel, "Date", entry.getFormattedDate());
-        addDetailRow(detailsPanel, "Time", entry.getFormattedTime());
-        
-        // Add reference number
-        addDetailRow(detailsPanel, "Reference", entry.getReferenceNumber());
-        
-        detailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        
-        // Add OK button
-        JButton okButton = new JButton("OK");
-        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        okButton.addActionListener(_ -> closeDetailsPanel());
-        detailsPanel.add(okButton);
-        
-        // Add the details panel to the phone frame
-        add(detailsPanel);
         
         // Make sure the background stays behind
         if (jLabel1 != null) {
@@ -347,14 +813,16 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     }
     
     private void closeDetailsPanel() {
-        // Remove the details panel
-        if (detailsPanel != null) {
-            remove(detailsPanel);
-            detailsPanel = null;
+        // Hide the designed detailpanel
+        if (detailpanel != null) {
+            detailpanel.setVisible(false);
         }
         
-        // Show the history scroll pane again
-        historyScrollPane.setVisible(true);
+        // Hide the modal overlay to restore click functionality
+        if (modalOverlay != null) {
+            modalOverlay.setVisible(false);
+            System.out.println("Hidden modal overlay - clicks restored");
+        }
         
         revalidate();
         repaint();
@@ -424,27 +892,71 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        mainHistoryContainer = new javax.swing.JPanel();
         historyScrollPane = new javax.swing.JScrollPane();
-        historyPanel = new javax.swing.JPanel();
+        history = new javax.swing.JPanel();
         profilebutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        history1 = new javax.swing.JPanel();
+        time = new javax.swing.JLabel();
+        price = new javax.swing.JLabel();
+        date = new javax.swing.JLabel();
+        type = new javax.swing.JLabel();
+        chargetime = new javax.swing.JLabel();
+        details = new javax.swing.JButton();
+        detailpanel = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        ticket = new javax.swing.JLabel();
+        Customer = new javax.swing.JLabel();
+        typed = new javax.swing.JLabel();
+        kwh = new javax.swing.JLabel();
+        Chargingtime = new javax.swing.JLabel();
+        totalprice = new javax.swing.JLabel();
+        server = new javax.swing.JLabel();
+        dated = new javax.swing.JLabel();
+        timed = new javax.swing.JLabel();
+        ref = new javax.swing.JLabel();
+        ok = new javax.swing.JToggleButton();
 
         setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
+        mainHistoryContainer.setBackground(new java.awt.Color(255, 255, 255));
+        mainHistoryContainer.setOpaque(false);
+
+        historyScrollPane.setBackground(new java.awt.Color(255, 255, 255));
         historyScrollPane.setBorder(null);
+        historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         historyScrollPane.setOpaque(false);
 
-        historyPanel.setOpaque(false);
-        historyPanel.setLayout(new javax.swing.BoxLayout(historyPanel, javax.swing.BoxLayout.LINE_AXIS));
-        historyScrollPane.setViewportView(historyPanel);
+        history.setBackground(new java.awt.Color(255, 255, 255));
+        history.setLayout(new javax.swing.BoxLayout(history, javax.swing.BoxLayout.Y_AXIS));
+        historyScrollPane.setViewportView(history);
 
-        add(historyScrollPane);
-        historyScrollPane.setBounds(40, 150, 285, 520);
+        javax.swing.GroupLayout mainHistoryContainerLayout = new javax.swing.GroupLayout(mainHistoryContainer);
+        mainHistoryContainer.setLayout(mainHistoryContainerLayout);
+        mainHistoryContainerLayout.setHorizontalGroup(
+            mainHistoryContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mainHistoryContainerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(historyScrollPane)
+                .addContainerGap())
+        );
+        mainHistoryContainerLayout.setVerticalGroup(
+            mainHistoryContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mainHistoryContainerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(historyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        add(mainHistoryContainer);
+        mainHistoryContainer.setBounds(20, 130, 330, 530);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -497,14 +1009,222 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/HISTORY - if none.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
+
+        history1.setBackground(new java.awt.Color(255, 255, 255));
+        history1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        history1.setLayout(null);
+
+        time.setText("time");
+        history1.add(time);
+        time.setBounds(10, 20, 80, 16);
+
+        price.setText("Price");
+        history1.add(price);
+        price.setBounds(220, 30, 70, 16);
+
+        date.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        date.setText("Date");
+        history1.add(date);
+        date.setBounds(10, 0, 120, 20);
+
+        type.setText("jLabel2");
+        history1.add(type);
+        type.setBounds(10, 40, 210, 16);
+
+        chargetime.setText("jLabel2");
+        history1.add(chargetime);
+        chargetime.setBounds(10, 60, 220, 16);
+
+        details.setBorderPainted(false);
+        details.setContentAreaFilled(false);
+        details.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                detailsActionPerformed(evt);
+            }
+        });
+        history1.add(details);
+        details.setBounds(0, 0, 310, 80);
+
+        add(history1);
+        history1.setBounds(400, 160, 310, 80);
+
+        detailpanel.setBackground(new java.awt.Color(255, 255, 255));
+        detailpanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jLabel2.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel2.setText("Charging Details");
+
+        ticket.setText("jLabel3");
+
+        Customer.setText("jLabel3");
+
+        typed.setText("jLabel3");
+
+        kwh.setText("jLabel3");
+
+        Chargingtime.setText("jLabel3");
+
+        totalprice.setText("jLabel3");
+
+        server.setText("jLabel3");
+
+        dated.setText("jLabel3");
+
+        timed.setText("jLabel3");
+
+        ref.setText("jLabel3");
+
+        ok.setText("jToggleButton1");
+
+        javax.swing.GroupLayout detailpanelLayout = new javax.swing.GroupLayout(detailpanel);
+        detailpanel.setLayout(detailpanelLayout);
+        detailpanelLayout.setHorizontalGroup(
+            detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(detailpanelLayout.createSequentialGroup()
+                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(detailpanelLayout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addComponent(jLabel2))
+                    .addGroup(detailpanelLayout.createSequentialGroup()
+                        .addGap(87, 87, 87)
+                        .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Customer)
+                            .addComponent(ticket)
+                            .addComponent(typed)
+                            .addComponent(kwh)
+                            .addComponent(Chargingtime)
+                            .addComponent(totalprice)
+                            .addComponent(server)
+                            .addComponent(dated)
+                            .addComponent(timed)
+                            .addComponent(ref)))
+                    .addGroup(detailpanelLayout.createSequentialGroup()
+                        .addGap(51, 51, 51)
+                        .addComponent(ok)))
+                .addContainerGap(23, Short.MAX_VALUE))
+        );
+        detailpanelLayout.setVerticalGroup(
+            detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(detailpanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addGap(27, 27, 27)
+                .addComponent(ticket)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(Customer)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(typed)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(kwh)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(Chargingtime)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(totalprice)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(server)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dated)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(timed)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ref)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(ok)
+                .addContainerGap(8, Short.MAX_VALUE))
+        );
+
+        add(detailpanel);
+        detailpanel.setBounds(430, 310, 230, 330);
     }// </editor-fold>//GEN-END:initComponents
 
-    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
+    // ===== CUSTOM CODE SECTION - DO NOT REMOVE =====
+    // IMPORTANT: After making changes in NetBeans Designer, make sure:
+    // 1. Call setupCustomCode() in constructor after initComponents()
+    // 2. Keep the detailsActionPerformed method below
+    // 3. This will automatically fix any issues caused by NetBeans regeneration
+    
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
             jLabel1.setBounds(0, 0, 370, 750);
         }
+    }
+    
+    // CUSTOM CODE - DESIGN-SAFE SETUP (Works no matter how you change your NetBeans design!)
+    private void setupCustomCode() {
+        try {
+            System.out.println("=== Setting up custom functionality (design-safe) ===");
+            
+            // 1. ALWAYS fix history1 panel size (your pink panel)
+            if (history1 != null) {
+                history1.setPreferredSize(new java.awt.Dimension(320, 80));
+                history1.setMaximumSize(new java.awt.Dimension(320, 80));
+                history1.setMinimumSize(new java.awt.Dimension(320, 80));
+                System.out.println("✓ Fixed history1 panel size");
+            }
+            
+            // 2. ALWAYS set proper initial text for labels (if they exist)
+            if (time != null) time.setText("Loading...");
+            if (price != null) price.setText("₱0.00");
+            if (date != null) date.setText("No Date");
+            if (type != null) type.setText("No Service");
+            if (chargetime != null) chargetime.setText("0 mins");
+          
+            System.out.println("✓ Set initial label text");
+            
+            // 3. ALWAYS add details button functionality (if button exists)
+            if (details != null) {
+                // Remove any existing listeners first (to prevent duplicates)
+                for (java.awt.event.ActionListener listener : details.getActionListeners()) {
+                    details.removeActionListener(listener);
+                }
+                // Add our custom action listener
+                details.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        detailsActionPerformed(evt);
+                    }
+                });
+                System.out.println("✓ Added details button functionality");
+            }
+            
+            // 4. Setup history container for dynamic panels - DON'T TOUCH YOUR DESIGNED history1!
+            if (history != null) {
+                // DON'T remove history1 from your design - leave it where you put it!
+                // Just clear the scroll pane container - ready for dynamic panels
+                history.removeAll();
+                history.revalidate();
+                history.repaint();
+                System.out.println("✓ Prepared history container for stacked panels (your history1 stays in design)");
+            }
+            
+            // 5. Initially hide the detailpanel (it will be shown when details button is clicked)
+            if (detailpanel != null) {
+                detailpanel.setVisible(false);
+                System.out.println("✓ Initially hid detailpanel (will show when details clicked)");
+            }
+            
+            System.out.println("=== Custom setup completed successfully! ===");
+            
+        } catch (Exception e) {
+            System.err.println("Error in setupCustomCode: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * CALL THIS METHOD AFTER CHANGING YOUR DESIGN IN NETBEANS!
+     * This will fix everything automatically so your customizations work again.
+     * Just add this line to your constructor after initComponents():
+     * setupCustomCode();
+     */
+    public void fixAfterDesignChange() {
+        SwingUtilities.invokeLater(() -> {
+            setupCustomCode();
+            if (currentUsername != null) {
+                refreshHistoryDisplay();
+            }
+        });
     }
 
     private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
@@ -567,16 +1287,51 @@ scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
 
+    private void detailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detailsActionPerformed
+        // Show details of the currently displayed history entry
+        System.out.println("Details button clicked!");
+        if (currentHistoryEntry != null) {
+            System.out.println("Current history entry exists: " + currentHistoryEntry.getTicketId());
+            showHistoryDetails(currentHistoryEntry);
+        } else {
+            System.out.println("No history entry to show details for");
+        }
+    }//GEN-LAST:event_detailsActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Chargingtime;
+    private javax.swing.JLabel Customer;
     private javax.swing.JButton charge;
-    private javax.swing.JPanel historyPanel;
+    private javax.swing.JLabel chargetime;
+    private javax.swing.JLabel date;
+    private javax.swing.JLabel dated;
+    private javax.swing.JPanel detailpanel;
+    private javax.swing.JButton details;
+    private javax.swing.JPanel history;
+    private javax.swing.JPanel history1;
     private javax.swing.JScrollPane historyScrollPane;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel kwh;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JPanel mainHistoryContainer;
+    private javax.swing.JToggleButton ok;
+    private javax.swing.JLabel price;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JLabel ref;
+    private javax.swing.JLabel server;
+    private javax.swing.JLabel ticket;
+    private javax.swing.JLabel time;
+    private javax.swing.JLabel timed;
+    private javax.swing.JLabel totalprice;
+    private javax.swing.JLabel type;
+    private javax.swing.JLabel typed;
     // End of variables declaration//GEN-END:variables
+    
+    // Custom modal overlay to block clicks
+    private javax.swing.JPanel modalOverlay;
 
     @Override
     public void addNotify() {
