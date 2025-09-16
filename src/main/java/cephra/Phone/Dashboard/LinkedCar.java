@@ -193,6 +193,11 @@ public class LinkedCar extends javax.swing.JPanel {
         km = new javax.swing.JLabel();
         cover = new javax.swing.JLabel();
         bar = new javax.swing.JLabel();
+        chargingTypeLabel = new javax.swing.JLabel();
+        chargingTimeLabel = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -200,7 +205,7 @@ public class LinkedCar extends javax.swing.JPanel {
         car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.png"))); // NOI18N
         car.setPreferredSize(new java.awt.Dimension(301, 226));
         add(car);
-        car.setBounds(34, 130, 301, 226);
+        car.setBounds(20, 75, 301, 226);
 
         jPanel1.setOpaque(false);
         jPanel1.setLayout(null);
@@ -217,7 +222,7 @@ public class LinkedCar extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 670, 50, 50);
+        profilebutton.setBounds(260, 680, 50, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -267,25 +272,50 @@ public class LinkedCar extends javax.swing.JPanel {
         add(charge);
         charge.setBounds(30, 680, 50, 40);
 
-        batterypercent.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        batterypercent.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        batterypercent.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         batterypercent.setText("25 %");
         add(batterypercent);
-        batterypercent.setBounds(140, 500, 150, 30);
+        batterypercent.setBounds(210, 430, 80, 30);
 
-        km.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        km.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        km.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         km.setText("400 km");
         add(km);
-        km.setBounds(110, 560, 130, 30);
+        km.setBounds(180, 480, 140, 30);
 
         cover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Cover.png"))); // NOI18N
         cover.setText("Bar");
         add(cover);
-        cover.setBounds(60, 410, 230, 210);
+        cover.setBounds(130, 200, 230, 210);
 
         bar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Bar.png"))); // NOI18N
-        bar.setText("Bar");
         add(bar);
-        bar.setBounds(60, 410, 230, 210);
+        bar.setBounds(130, 200, 230, 200);
+
+        chargingTypeLabel.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
+        chargingTypeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        chargingTypeLabel.setText("Fast Charging");
+        add(chargingTypeLabel);
+        chargingTypeLabel.setBounds(20, 410, 140, 25);
+
+        chargingTimeLabel.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        chargingTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        chargingTimeLabel.setText("100%");
+        add(chargingTimeLabel);
+        chargingTimeLabel.setBounds(40, 440, 100, 50);
+
+        jLabel2.setText("3hrs 12mins");
+        add(jLabel2);
+        jLabel2.setBounds(150, 574, 90, 16);
+
+        jLabel3.setText("2hrs 50mins");
+        add(jLabel3);
+        jLabel3.setBounds(150, 588, 90, 16);
+
+        jLabel4.setText("1hr 30mins");
+        add(jLabel4);
+        jLabel4.setBounds(150, 603, 90, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/linked.png"))); // NOI18N
         add(jLabel1);
@@ -373,10 +403,15 @@ public class LinkedCar extends javax.swing.JPanel {
     private javax.swing.JLabel batterypercent;
     private javax.swing.JLabel car;
     private javax.swing.JButton charge;
+    private javax.swing.JLabel chargingTimeLabel;
+    private javax.swing.JLabel chargingTypeLabel;
     private javax.swing.JLabel cover;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel km;
     private javax.swing.JButton linkbutton;
