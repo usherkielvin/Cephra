@@ -342,14 +342,14 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                         <h3>Pricing Configuration</h3>
                         <div class="settings-form">
                             <div class="form-group">
-                                <label for="fast-charge-price">Fast Charging Price (₱)</label>
-                                <input type="number" id="fast-charge-price" step="1" min="0" />
+                                <label for="min-fee">Minimum Fee (₱)</label>
+                                <input type="number" id="min-fee" step="0.01" min="0" />
                             </div>
                             <div class="form-group">
-                                <label for="normal-charge-price">Normal Charging Price (₱)</label>
-                                <input type="number" id="normal-charge-price" step="1" min="0" />
+                                <label for="kwh-per-peso">kWh per Peso</label>
+                                <input type="number" id="kwh-per-peso" step="0.01" min="0" />
                             </div>
-                            <button class="btn btn-primary" onclick="savePricingSettings()">
+                            <button class="btn btn-primary" onclick="saveBusinessSettings()">
                                 <i class="fas fa-save"></i> Save Settings
                             </button>
                         </div>

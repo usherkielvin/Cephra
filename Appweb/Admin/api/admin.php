@@ -300,35 +300,74 @@ try {
             }
             break;
 
-        case 'settings':
-            // Get current settings (placeholder)
-            $settings = [
-                'fast_charge_price' => 5,
-                'normal_charge_price' => 3
-            ];
-            
-            echo json_encode([
-                'success' => true,
-                'settings' => $settings
-            ]);
+        case 'business-settings':
+            // Get current business settings from database
+            try {
+                $stmt = $db->prepare("SELECT setting_value FROM system_settings WHERE setting_key = ?");
+                
+                // Get minimum fee
+                $stmt->execute(['minimum_fee']);
+                $minFeeRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                $minFee = $minFeeRow ? floatval($minFeeRow['setting_value']) : 50.0;
+                
+                // Get rate per kWh
+                $stmt->execute(['rate_per_kwh']);
+                $rateRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                $ratePerKwh = $rateRow ? floatval($rateRow['setting_value']) : 15.0;
+                
+                $settings = [
+                    'min_fee' => $minFee,
+                    'kwh_per_peso' => $ratePerKwh
+                ];
+                
+                echo json_encode([
+                    'success' => true,
+                    'settings' => $settings
+                ]);
+            } catch (Exception $e) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Failed to load business settings: ' . $e->getMessage()
+                ]);
+            }
             break;
 
-        case 'save-settings':
+        case 'save-business-settings':
             if ($method !== 'POST') {
                 echo json_encode(['error' => 'Method not allowed']);
                 break;
             }
 
-            $fast_charge_price = $_POST['fast_charge_price'] ?? '';
-            $normal_charge_price = $_POST['normal_charge_price'] ?? '';
+            $min_fee = $_POST['min_fee'] ?? '';
+            $kwh_per_peso = $_POST['kwh_per_peso'] ?? '';
 
-            if (!$fast_charge_price || !$normal_charge_price) {
-                echo json_encode(['error' => 'Both pricing values are required']);
+            if ($min_fee === '' || $kwh_per_peso === '') {
+                echo json_encode(['error' => 'Both business values are required']);
                 break;
             }
 
-            // Save settings (placeholder - you might want to create a settings table)
-            echo json_encode(['success' => true, 'message' => 'Settings saved successfully']);
+            // Validate values
+            $min_fee = floatval($min_fee);
+            $kwh_per_peso = floatval($kwh_per_peso);
+
+            if ($min_fee < 0 || $kwh_per_peso <= 0) {
+                echo json_encode(['error' => 'Invalid business values (min fee >= 0, kWh per peso > 0)']);
+                break;
+            }
+
+            try {
+                // Update minimum fee in system_settings table
+                $stmt = $db->prepare("UPDATE system_settings SET setting_value = ? WHERE setting_key = 'minimum_fee'");
+                $stmt->execute([$min_fee]);
+                
+                // Update rate per kWh in system_settings table
+                $stmt = $db->prepare("UPDATE system_settings SET setting_value = ? WHERE setting_key = 'rate_per_kwh'");
+                $stmt->execute([$kwh_per_peso]);
+                
+                echo json_encode(['success' => true, 'message' => 'Business settings updated successfully']);
+            } catch (Exception $e) {
+                echo json_encode(['error' => 'Failed to save business settings: ' . $e->getMessage()]);
+            }
             break;
 
         case 'analytics':

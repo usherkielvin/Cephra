@@ -131,7 +131,7 @@ class AdminPanel {
                 this.loadTransactions();
                 break;
             case 'settings':
-                this.loadSettingsData();
+                this.loadBusinessData();
                 break;
         }
     }
@@ -527,17 +527,17 @@ class AdminPanel {
         });
     }
 
-    async loadSettingsData() {
+    async loadBusinessData() {
         try {
-            const response = await fetch('api/admin.php?action=settings');
+            const response = await fetch('api/admin.php?action=business-settings');
             const data = await response.json();
 
             if (data.success) {
-                document.getElementById('fast-charge-price').value = Math.round(data.settings.fast_charge_price || 0);
-                document.getElementById('normal-charge-price').value = Math.round(data.settings.normal_charge_price || 0);
+                document.getElementById('min-fee').value = data.settings.min_fee || 0;
+                document.getElementById('kwh-per-peso').value = data.settings.kwh_per_peso || 0;
             }
         } catch (error) {
-            console.error('Error loading settings data:', error);
+            console.error('Error loading business data:', error);
         }
     }
 
@@ -872,12 +872,12 @@ class AdminPanel {
         }
     }
 
-    async savePricingSettings() {
-        const fastPrice = Math.round(document.getElementById('fast-charge-price').value);
-        const normalPrice = Math.round(document.getElementById('normal-charge-price').value);
+    async saveBusinessSettings() {
+        const minFee = parseFloat(document.getElementById('min-fee').value);
+        const kwhPerPeso = parseFloat(document.getElementById('kwh-per-peso').value);
 
-        if (!fastPrice || !normalPrice || fastPrice <= 0 || normalPrice <= 0) {
-            this.showError('Please enter valid pricing values (whole numbers only)');
+        if (isNaN(minFee) || isNaN(kwhPerPeso) || minFee < 0 || kwhPerPeso <= 0) {
+            this.showError('Please enter valid business values (min fee >= 0, kWh per peso > 0)');
             return;
         }
 
@@ -887,18 +887,18 @@ class AdminPanel {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `action=save-settings&fast_charge_price=${fastPrice}&normal_charge_price=${normalPrice}`
+                body: `action=save-business-settings&min_fee=${minFee}&kwh_per_peso=${kwhPerPeso}`
             });
             const data = await response.json();
 
             if (data.success) {
-                this.showSuccess('Pricing settings saved successfully');
+                this.showSuccess('Business settings updated successfully');
             } else {
-                this.showError(data.message || 'Failed to save settings');
+                this.showError(data.message || 'Failed to update settings');
             }
         } catch (error) {
-            console.error('Error saving settings:', error);
-            this.showError('Failed to save settings');
+            console.error('Error updating business settings:', error);
+            this.showError('Failed to update business settings');
         }
     }
 
@@ -941,6 +941,8 @@ class AdminPanel {
             const data = await response.json();
             
             if (data.success) {
+                // Store transaction data for export
+                this.transactionData = data.transactions;
                 this.displayTransactions(data.transactions);
                 if (data.warnings && data.warnings.length > 0) {
                     console.warn('Transaction loading warnings:', data.warnings);
@@ -1018,6 +1020,8 @@ class AdminPanel {
             const data = await response.json();
             
             if (data.success) {
+                // Store filtered transaction data for export
+                this.transactionData = data.transactions;
                 this.displayTransactions(data.transactions);
             } else {
                 console.error('Failed to filter transactions:', data.error);
@@ -1030,29 +1034,40 @@ class AdminPanel {
     }
 
     exportTransactions() {
-        // Simple CSV export functionality
-        const tbody = document.getElementById('transactions-tbody');
-        if (!tbody) return;
-
-        const rows = tbody.querySelectorAll('tr');
-        if (rows.length === 0) {
+        // Export transactions using the raw data instead of HTML table content
+        if (!this.transactionData || this.transactionData.length === 0) {
             this.showError('No transactions to export');
             return;
         }
 
         let csv = 'Ticket,User,kWh,Total,Date and Time,Reference\n';
         
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length >= 6) {
-                const rowData = Array.from(cells).slice(0, 6).map(cell => {
-                    let text = cell.textContent.trim();
-                    // Remove currency symbols and units
-                    text = text.replace(/₱|kWh/g, '').trim();
-                    return `"${text}"`;
-                });
-                csv += rowData.join(',') + '\n';
-            }
+        this.transactionData.forEach(transaction => {
+            const date = new Date(transaction.transaction_date);
+            // Format date for CSV export
+            const formattedDate = date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }) + ' ' + date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+            
+            const amount = parseFloat(transaction.total_amount || 0).toFixed(2);
+            const energy = parseFloat(transaction.energy_kwh || 0).toFixed(2);
+            
+            const rowData = [
+                `"${transaction.ticket_id || 'N/A'}"`,
+                `"${transaction.username || 'N/A'}"`,
+                `"${energy}"`,
+                `"${amount}"`,
+                `"${formattedDate}"`,
+                `"${transaction.reference_number || 'N/A'}"`
+            ];
+            
+            csv += rowData.join(',') + '\n';
         });
 
         // Download CSV
@@ -1336,9 +1351,9 @@ function addUser() {
     }
 }
 
-function savePricingSettings() {
+function saveBusinessSettings() {
     if (adminPanel) {
-        adminPanel.savePricingSettings();
+        adminPanel.saveBusinessSettings();
     }
 }
 
