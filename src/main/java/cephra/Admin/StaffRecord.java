@@ -51,6 +51,9 @@ public class StaffRecord extends javax.swing.JPanel {
             passReset.setEnabled(hasSelection);
         });
         
+        // Load staff data into table
+        refreshStaffTable();
+        
         // Add action listener to profRemove button
         profRemove.addActionListener(_ -> removeSelectedStaff());
         
@@ -67,16 +70,6 @@ public class StaffRecord extends javax.swing.JPanel {
         refreshStaffTable();
     }
 
-    // Add this method to refresh the table
-    public void refreshStaffTable() {
-        DefaultTableModel model = (DefaultTableModel) staffTable.getModel();
-        model.setRowCount(0); // Clear table
-        for (String[] staff : StaffData.getStaffList()) {
-            // If your table has only 4 columns, you may want to skip the email or password
-            // Adjust as needed for your table columns
-            model.addRow(new Object[]{staff[0], staff[1], staff[2], staff[3], staff[4]});
-        }
-    }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -239,7 +232,9 @@ public class StaffRecord extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        // Set the staff first name instead of "Admin!"
+        String firstName = getStaffFirstNameFromDB();
+        labelStaff.setText(firstName + "!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -353,22 +348,67 @@ public class StaffRecord extends javax.swing.JPanel {
         String staffName = (String) staffTable.getValueAt(selectedRow, 0);
         String staffUsername = (String) staffTable.getValueAt(selectedRow, 1);
         
-        // Show confirmation dialog
+        // Create password input dialog
+        javax.swing.JPanel panel = new javax.swing.JPanel();
+        panel.setLayout(new java.awt.BorderLayout());
+        
+        javax.swing.JLabel infoLabel = new javax.swing.JLabel("<html><b>Reset Password for:</b><br>" + 
+            "Name: " + staffName + "<br>" + 
+            "Username: " + staffUsername + "</html>");
+        infoLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(infoLabel, java.awt.BorderLayout.NORTH);
+        
+        javax.swing.JPanel inputPanel = new javax.swing.JPanel(new java.awt.FlowLayout());
+        javax.swing.JLabel passwordLabel = new javax.swing.JLabel("New Password:");
+        javax.swing.JPasswordField passwordField = new javax.swing.JPasswordField(20);
+        
+        inputPanel.add(passwordLabel);
+        inputPanel.add(passwordField);
+        panel.add(inputPanel, java.awt.BorderLayout.CENTER);
+        
+        javax.swing.JLabel noteLabel = new javax.swing.JLabel("<html><small><i>Note: Inform the staff member of the new password</i></small></html>");
+        noteLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 10, 10, 10));
+        panel.add(noteLabel, java.awt.BorderLayout.SOUTH);
+        
+        // Show the dialog
         int result = javax.swing.JOptionPane.showConfirmDialog(
             this,
-            "Are you sure you want to reset the password for this staff member?\n\nName: " + staffName + "\nUsername: " + staffUsername + "\n\nPassword will be reset to: 123456",
-            "Confirm Password Reset",
-            javax.swing.JOptionPane.YES_NO_OPTION,
+            panel,
+            "Reset Staff Password",
+            javax.swing.JOptionPane.OK_CANCEL_OPTION,
             javax.swing.JOptionPane.QUESTION_MESSAGE
         );
         
-        if (result == javax.swing.JOptionPane.YES_OPTION) {
+        if (result == javax.swing.JOptionPane.OK_OPTION) {
+            String newPassword = new String(passwordField.getPassword());
+            
+            // Validate password
+            if (newPassword.trim().isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Password cannot be empty!",
+                    "Invalid Password",
+                    javax.swing.JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            
+            if (newPassword.length() < 4) {
+                javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Password must be at least 4 characters long!",
+                    "Invalid Password",
+                    javax.swing.JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            
             // Reset password in database
-            boolean reset = cephra.Database.CephraDB.resetStaffPassword(staffUsername, "123456");
+            boolean reset = cephra.Database.CephraDB.resetStaffPassword(staffUsername, newPassword);
             if (reset) {
                 javax.swing.JOptionPane.showMessageDialog(
                     this,
-                    "Password reset successfully!\n\nNew password: 123456\n\nPlease inform the staff member to change their password after login.",
+                    "Password reset successfully!\n\nNew password: " + newPassword + "\n\nPlease inform the staff member of the new password.",
                     "Success",
                     javax.swing.JOptionPane.INFORMATION_MESSAGE
                 );
@@ -449,19 +489,49 @@ public class StaffRecord extends javax.swing.JPanel {
     private javax.swing.JTable staffTable;
     // End of variables declaration//GEN-END:variables
     
-    @SuppressWarnings("unused")
-    private String getLoggedInUsername() {
+   
+    private String getStaffFirstNameFromDB() {
         try {
+            // Get the logged-in username from the admin frame
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
             if (window instanceof cephra.Frame.Admin) {
-                // Use reflection to get the loggedInUsername field
                 java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
                 usernameField.setAccessible(true);
-                return (String) usernameField.get(window);
+                String username = (String) usernameField.get(window);
+                
+                if (username != null && !username.isEmpty()) {
+                    // Use the updated CephraDB method that queries staff_records.firstname
+                    return cephra.Database.CephraDB.getStaffFirstName(username);
+                }
             }
         } catch (Exception e) {
-            System.err.println("Error getting logged-in username: " + e.getMessage());
+            System.err.println("Error getting staff first name: " + e.getMessage());
         }
         return "Admin"; // Fallback
+    }
+    
+    private void refreshStaffTable() {
+        DefaultTableModel model = (DefaultTableModel) staffTable.getModel();
+        model.setRowCount(0); // Clear existing data
+        
+        try {
+            // Get staff data from database
+            java.util.List<Object[]> staffData = cephra.Database.CephraDB.getAllStaff();
+            
+            for (Object[] staff : staffData) {
+                // staff array: [name, firstname, lastname, username, email, status, password]
+                String fullName = (String) staff[0];        // Combined name (firstname + lastname)
+                String username = (String) staff[3];        // Username
+                String email = (String) staff[4];           // Email
+                String status = (String) staff[5];          // Status
+                String password = (String) staff[6];        // Password
+                
+                // Add row to table: Name, Username, Email, Status, Password
+                model.addRow(new Object[]{fullName, username, email, status, password});
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading staff data: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

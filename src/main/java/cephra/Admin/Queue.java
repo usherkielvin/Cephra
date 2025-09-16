@@ -246,6 +246,18 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     System.out.println("Queue: Moving ticket " + ticket + " from Charging to Complete status");
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
                     
+                    // Update database status to Complete
+                    try {
+                        boolean dbUpdated = cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Complete");
+                        if (dbUpdated) {
+                            System.out.println("Queue: Successfully updated database status to Complete for ticket " + ticket);
+                        } else {
+                            System.err.println("Queue: Failed to update database status for ticket " + ticket);
+                        }
+                    } catch (Exception ex) {
+                        System.err.println("Queue: Error updating database status: " + ex.getMessage());
+                    }
+                    
                     // Ensure payment is set to Pending
                     try { 
                         ensurePaymentPending(ticket); 
@@ -1547,7 +1559,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        // Set the staff first name instead of "Admin!"
+        String firstName = getStaffFirstNameFromDB();
+        labelStaff.setText(firstName + "!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -1666,18 +1680,23 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
     
-    @SuppressWarnings("unused")
-    private String getLoggedInUsername() {
+    
+    private String getStaffFirstNameFromDB() {
         try {
+            // Get the logged-in username from the admin frame
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
             if (window instanceof cephra.Frame.Admin) {
-                // Use reflection to get the loggedInUsername field
                 java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
                 usernameField.setAccessible(true);
-                return (String) usernameField.get(window);
+                String username = (String) usernameField.get(window);
+                
+                if (username != null && !username.isEmpty()) {
+                    // Use the updated CephraDB method that queries staff_records.firstname
+                    return cephra.Database.CephraDB.getStaffFirstName(username);
+                }
             }
         } catch (Exception e) {
-            System.err.println("Error getting logged-in username: " + e.getMessage());
+            System.err.println("Error getting staff first name: " + e.getMessage());
         }
         return "Admin"; // Fallback
     }

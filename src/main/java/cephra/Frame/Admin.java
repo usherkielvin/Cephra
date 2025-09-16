@@ -90,8 +90,54 @@ public class Admin extends javax.swing.JFrame {
         // Update labelStaff in admin panels if it's an admin panel
         updateAdminPanelLabel(newPanel);
         
+        // Hide/show buttons based on user role
+        updateButtonVisibility(newPanel);
+        
         revalidate();
         repaint();
+    }
+    
+    private void updateButtonVisibility(JPanel panel) {
+        try {
+            // Check if user is admin
+            boolean isAdmin = cephra.Database.CephraDB.isAdminUser(loggedInUsername);
+            
+            // Hide Staff Records button for non-admin users
+            try {
+                java.lang.reflect.Field staffButtonField = panel.getClass().getDeclaredField("staffbutton");
+                staffButtonField.setAccessible(true);
+                javax.swing.JButton staffButton = (javax.swing.JButton) staffButtonField.get(panel);
+                if (staffButton != null) {
+                    staffButton.setVisible(isAdmin);
+                }
+            } catch (Exception e) {
+                // Button not found in this panel, ignore
+            }
+            
+            // Hide Business Overview button for non-admin users
+            try {
+                java.lang.reflect.Field businessButtonField = panel.getClass().getDeclaredField("businessbutton");
+                businessButtonField.setAccessible(true);
+                javax.swing.JButton businessButton = (javax.swing.JButton) businessButtonField.get(panel);
+                if (businessButton != null) {
+                    businessButton.setVisible(isAdmin);
+                }
+            } catch (Exception e) {
+                // Button not found in this panel, ignore
+            }
+            
+            // If user is not admin and trying to access restricted panels, redirect to Bay Management
+            if (!isAdmin) {
+                String panelName = panel.getClass().getSimpleName();
+                if ("StaffRecord".equals(panelName) || "Business_Overview".equals(panelName)) {
+                    // Redirect to Bay Management
+                    switchPanel(new cephra.Admin.BayManagement());
+                }
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error updating button visibility: " + e.getMessage());
+        }
     }
     
     public void setLoggedInUsername(String username) {
@@ -105,7 +151,9 @@ public class Admin extends javax.swing.JFrame {
             labelField.setAccessible(true);
             javax.swing.JLabel labelStaff = (javax.swing.JLabel) labelField.get(panel);
             if (labelStaff != null) {
-                labelStaff.setText(loggedInUsername + "!");
+                // Get the firstname from database instead of using username
+                String firstname = cephra.Database.CephraDB.getStaffFirstName(loggedInUsername);
+                labelStaff.setText(firstname + "!");
             }
         } catch (Exception e) {
             // Not an admin panel or labelStaff not found, ignore

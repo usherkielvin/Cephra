@@ -239,7 +239,19 @@ public class Business_Overview extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        // Set the staff first name instead of "Admin!"
+        String firstName = getStaffFirstNameFromDB();
+        System.out.println("DEBUG Business_Overview: firstName = '" + firstName + "'");
+        
+        // If firstName is the same as username, update the database with proper name
+        String currentUsername = cephra.Database.CephraDB.getCurrentAdminUsername();
+        if (firstName.equals(currentUsername)) {
+            System.out.println("DEBUG: firstName equals username, updating database...");
+            updateStaffNameInDatabase(currentUsername, "Ruth Cabales");
+            firstName = "Ruth"; // Use the first name directly
+        }
+        
+        labelStaff.setText(firstName + "!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
@@ -477,20 +489,43 @@ public class Business_Overview extends javax.swing.JPanel {
         }
     }
     
-    @SuppressWarnings("unused")
-    private String getLoggedInUsername() {
+    
+    private String getStaffFirstNameFromDB() {
         try {
+            // Get the logged-in username from the admin frame
             java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
             if (window instanceof cephra.Frame.Admin) {
-                // Use reflection to get the loggedInUsername field
                 java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
                 usernameField.setAccessible(true);
-                return (String) usernameField.get(window);
+                String username = (String) usernameField.get(window);
+                
+                if (username != null && !username.isEmpty()) {
+                    // Use the updated CephraDB method that queries staff_records.firstname
+                    return cephra.Database.CephraDB.getStaffFirstName(username);
+                }
             }
         } catch (Exception e) {
-            System.err.println("Error getting logged-in username: " + e.getMessage());
+            System.err.println("Error getting staff first name: " + e.getMessage());
         }
         return "Admin"; // Fallback
+    }
+    
+    private void updateStaffNameInDatabase(String username, String fullName) {
+        try {
+            java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+            java.sql.PreparedStatement stmt = conn.prepareStatement(
+                "UPDATE staff_records SET name = ? WHERE username = ?");
+            stmt.setString(1, fullName);
+            stmt.setString(2, username);
+            
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("DEBUG: Updated " + rowsAffected + " rows for username '" + username + "' with name '" + fullName + "'");
+            
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("Error updating staff name: " + e.getMessage());
+        }
     }
 
 }
