@@ -305,19 +305,19 @@ public class HOMELINKED extends javax.swing.JPanel {
         add(charge);
         charge.setBounds(50, 680, 40, 40);
 
-        pesobalance.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        pesobalance.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         pesobalance.setForeground(new java.awt.Color(255, 255, 255));
         pesobalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         pesobalance.setText("500");
         add(pesobalance);
-        pesobalance.setBounds(186, 68, 40, 20);
+        pesobalance.setBounds(268, 71, 40, 16);
 
-        rewardbalance.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        rewardbalance.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         rewardbalance.setForeground(new java.awt.Color(255, 255, 255));
         rewardbalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         rewardbalance.setText("500");
         add(rewardbalance);
-        rewardbalance.setBounds(268, 68, 40, 20);
+        rewardbalance.setBounds(185, 68, 40, 20);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
