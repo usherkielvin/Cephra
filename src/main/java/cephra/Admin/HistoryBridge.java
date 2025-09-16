@@ -156,16 +156,16 @@ public final class HistoryBridge {
             }
             
             // Convert database format to admin history format
-            // Database columns: ticket_id, username, service_type, initial_battery_level, charging_time_minutes, total_amount, reference_number, completed_at
+            // Database columns: ticket_id, username, service_type, initial_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, completed_at
             // Admin history columns: Ticket, Customer, KWh, Total, Served By, Date & Time, Reference
             Object[] adminRecord = {
                 record[0], // Ticket (ticket_id)
                 record[1], // Customer (username)
                 String.format("%.1f kWh", kwhUsed), // KWh (calculated)
-                String.format("%.2f", record[5]), // Total (total_amount)
+                String.format("%.2f", record[6]), // Total (total_amount) - corrected index
                 servedBy + " (" + paymentMethod + ")", // Served By (admin + payment method)
-                formatDateTimeForDisplay(record[7]), // Date & Time (completed_at) - format as 12-hour without seconds
-                record[6]  // Reference (reference_number) - compact format
+                formatDateTimeForDisplay(record[8]), // Date & Time (completed_at) - corrected index
+                record[7]  // Reference (reference_number) - corrected index
             };
             userRecords.add(adminRecord);
         }

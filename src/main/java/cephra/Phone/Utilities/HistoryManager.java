@@ -107,9 +107,9 @@ public class HistoryManager {
             String ticketId = (String) record[0];
             String serviceType = (String) record[2];
             int chargingTimeMinutes = (Integer) record[4];
-            double totalAmount = (Double) record[5];
-            String referenceNumber = (String) record[6];
-            java.sql.Timestamp timestamp = (java.sql.Timestamp) record[7];
+            double totalAmount = (Double) record[6]; // This is the actual total amount
+            String referenceNumber = (String) record[7];
+            java.sql.Timestamp timestamp = (java.sql.Timestamp) record[8];
             
             // Convert timestamp to LocalDateTime
             LocalDateTime localDateTime = timestamp.toLocalDateTime();
