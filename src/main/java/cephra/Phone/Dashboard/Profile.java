@@ -224,7 +224,7 @@ public class Profile extends javax.swing.JPanel {
         add(editpfp);
         editpfp.setBounds(170, 188, 150, 37);
         add(Profile);
-        Profile.setBounds(20, 120, 110, 110);
+        Profile.setBounds(30, 130, 110, 110);
 
         Fullname.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
         Fullname.setText("Usher Kielvin Ponce");
