@@ -16,7 +16,8 @@ public class ImageUtils {
     
     /**
      * Opens a file chooser dialog to select an image file.
-     * Only accepts common image formats: JPG, JPEG, PNG, GIF
+     * Only accepts common image formats: JPG, JPEG, PNG, GIF, BMP, WebP
+     * Filters out all other file types like RAR, ZIP, etc.
      * 
      * @param parent The parent component for the dialog
      * @return File object of selected image, or null if cancelled
@@ -24,28 +25,34 @@ public class ImageUtils {
     public static File selectImageFile(Component parent) {
         JFileChooser fileChooser = new JFileChooser();
         
-        // Set up file filter for images only
+        // Set up comprehensive file filter for images only - this hides all other files
         FileNameExtensionFilter imageFilter = new FileNameExtensionFilter(
-            "Image Files (*.jpg, *.jpeg, *.png, *.gif)", 
-            "jpg", "jpeg", "png", "gif"
+            "Image Files (*.jpg, *.jpeg, *.png, *.gif, *.bmp, *.webp)", 
+            "jpg", "jpeg", "png", "gif", "bmp", "webp"
         );
         fileChooser.setFileFilter(imageFilter);
-        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setAcceptAllFileFilterUsed(false); // This is KEY - hides "All Files" option
         
         // Set dialog properties
-        fileChooser.setDialogTitle("Select Profile Picture");
+        fileChooser.setDialogTitle("📸 Select Profile Picture");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        
+        // Set initial directory to Pictures folder if it exists
+        File picturesDir = new File(System.getProperty("user.home"), "Pictures");
+        if (picturesDir.exists() && picturesDir.isDirectory()) {
+            fileChooser.setCurrentDirectory(picturesDir);
+        }
+        
+        // Add custom file view to hide non-image files completely
+        fileChooser.setFileView(new ImageOnlyFileView());
         
         int result = fileChooser.showOpenDialog(parent);
         
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             
-            // Validate file size (max 5MB)
-            if (selectedFile.length() > 5 * 1024 * 1024) {
-                JOptionPane.showMessageDialog(parent, 
-                    "Image file is too large. Please select an image smaller than 5MB.", 
-                    "File Too Large", JOptionPane.ERROR_MESSAGE);
+            // Enhanced validation
+            if (!validateImageFile(selectedFile, parent)) {
                 return null;
             }
             
@@ -53,6 +60,227 @@ public class ImageUtils {
         }
         
         return null;
+    }
+    
+    /**
+     * Enhanced file validation for image files
+     */
+    private static boolean validateImageFile(File file, Component parent) {
+        // Check if file exists
+        if (!file.exists()) {
+            JOptionPane.showMessageDialog(parent, 
+                "File not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        // Check file size (max 10MB for better quality)
+        long maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.length() > maxSize) {
+            JOptionPane.showMessageDialog(parent, 
+                "Image file is too large. Please select an image smaller than 10MB.", 
+                "File Too Large", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        // Check minimum file size (at least 1KB)
+        if (file.length() < 1024) {
+            JOptionPane.showMessageDialog(parent, 
+                "Image file appears to be corrupted or too small.", 
+                "Invalid File", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        // Double-check file extension (extra security)
+        String fileName = file.getName().toLowerCase();
+        String[] validExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"};
+        boolean validExtension = false;
+        for (String ext : validExtensions) {
+            if (fileName.endsWith(ext)) {
+                validExtension = true;
+                break;
+            }
+        }
+        
+        if (!validExtension) {
+            JOptionPane.showMessageDialog(parent, 
+                "Please select a valid image file (JPG, PNG, GIF, BMP, or WebP).", 
+                "Invalid File Type", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Custom file view that completely hides non-image files
+     */
+    private static class ImageOnlyFileView extends javax.swing.filechooser.FileView {
+        private final String[] validExtensions = {"jpg", "jpeg", "png", "gif", "bmp", "webp"};
+        
+        @Override
+        public String getName(File f) {
+            // Only show names for image files
+            if (isImageFile(f)) {
+                return super.getName(f);
+            }
+            return null; // Hide non-image files
+        }
+        
+        @Override
+        public String getDescription(File f) {
+            // Only show descriptions for image files
+            if (isImageFile(f)) {
+                return super.getDescription(f);
+            }
+            return null; // Hide non-image files
+        }
+        
+        @Override
+        public Boolean isTraversable(File f) {
+            // Allow traversal of directories, but hide non-image files
+            if (f.isDirectory()) {
+                return true;
+            }
+            return isImageFile(f) ? true : null; // Hide non-image files
+        }
+        
+        @Override
+        public Icon getIcon(File f) {
+            // Only show icons for image files and directories
+            if (f.isDirectory() || isImageFile(f)) {
+                return super.getIcon(f);
+            }
+            return null; // Hide non-image files
+        }
+        
+        private boolean isImageFile(File f) {
+            if (f.isDirectory()) {
+                return true; // Always show directories
+            }
+            
+            String fileName = f.getName().toLowerCase();
+            for (String ext : validExtensions) {
+                if (fileName.endsWith("." + ext)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+    
+    /**
+     * Alternative method with even stricter filtering - completely hides non-image files
+     * Use this if you want maximum control over what files are visible
+     */
+    public static File selectImageFileStrict(Component parent) {
+        JFileChooser fileChooser = new JFileChooser();
+        
+        // Multiple specific filters for different image types
+        FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter("JPEG Images (*.jpg, *.jpeg)", "jpg", "jpeg");
+        FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG Images (*.png)", "png");
+        FileNameExtensionFilter gifFilter = new FileNameExtensionFilter("GIF Images (*.gif)", "gif");
+        FileNameExtensionFilter bmpFilter = new FileNameExtensionFilter("BMP Images (*.bmp)", "bmp");
+        FileNameExtensionFilter webpFilter = new FileNameExtensionFilter("WebP Images (*.webp)", "webp");
+        
+        // Add all filters
+        fileChooser.addChoosableFileFilter(jpgFilter);
+        fileChooser.addChoosableFileFilter(pngFilter);
+        fileChooser.addChoosableFileFilter(gifFilter);
+        fileChooser.addChoosableFileFilter(bmpFilter);
+        fileChooser.addChoosableFileFilter(webpFilter);
+        
+        // Set default filter
+        fileChooser.setFileFilter(jpgFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false); // CRITICAL - hides "All Files"
+        
+        // Set dialog properties
+        fileChooser.setDialogTitle("📸 Select Profile Picture - Images Only");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        
+        // Set initial directory to Pictures folder
+        File picturesDir = new File(System.getProperty("user.home"), "Pictures");
+        if (picturesDir.exists() && picturesDir.isDirectory()) {
+            fileChooser.setCurrentDirectory(picturesDir);
+        }
+        
+        // Add custom file view that completely hides non-image files
+        fileChooser.setFileView(new StrictImageFileView());
+        
+        int result = fileChooser.showOpenDialog(parent);
+        
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            
+            // Enhanced validation
+            if (!validateImageFile(selectedFile, parent)) {
+                return null;
+            }
+            
+            return selectedFile;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Ultra-strict file view that completely hides non-image files
+     */
+    private static class StrictImageFileView extends javax.swing.filechooser.FileView {
+        private final String[] validExtensions = {"jpg", "jpeg", "png", "gif", "bmp", "webp"};
+        
+        @Override
+        public String getName(File f) {
+            if (f.isDirectory() || isImageFile(f)) {
+                return super.getName(f);
+            }
+            return ""; // Return empty string to hide file
+        }
+        
+        @Override
+        public String getDescription(File f) {
+            if (f.isDirectory() || isImageFile(f)) {
+                return super.getDescription(f);
+            }
+            return ""; // Return empty string to hide file
+        }
+        
+        @Override
+        public Boolean isTraversable(File f) {
+            if (f.isDirectory()) {
+                return true;
+            }
+            return isImageFile(f); // Only allow image files
+        }
+        
+        @Override
+        public Icon getIcon(File f) {
+            if (f.isDirectory() || isImageFile(f)) {
+                return super.getIcon(f);
+            }
+            return null; // Hide icon for non-image files
+        }
+        
+        @Override
+        public String getTypeDescription(File f) {
+            if (f.isDirectory() || isImageFile(f)) {
+                return super.getTypeDescription(f);
+            }
+            return ""; // Hide type description for non-image files
+        }
+        
+        private boolean isImageFile(File f) {
+            if (f.isDirectory()) {
+                return true;
+            }
+            
+            String fileName = f.getName().toLowerCase();
+            for (String ext : validExtensions) {
+                if (fileName.endsWith("." + ext)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
     
     /**
