@@ -55,7 +55,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(See1);
-        See1.setBounds(930, 460, 50, 40);
+        See1.setBounds(900, 460, 80, 40);
 
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
         See.setBorderPainted(false);
@@ -67,7 +67,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(620, 460, 50, 40);
+        See.setBounds(610, 460, 60, 40);
 
         username.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         username.setBorder(null);
@@ -192,13 +192,14 @@ public class AdminRegister extends javax.swing.JPanel {
     }//GEN-LAST:event_ConPassActionPerformed
 
     private void RegisterBTNActionPerformed(java.awt.event.ActionEvent evt) {
-        String name = Firstname.getText().trim();
+        String firstname = Firstname.getText().trim();
+        String lastname = LastName.getText().trim();
         String usernameVal = username.getText().trim();
         String emailVal = email.getText().trim();
         String password = new String(pass.getPassword()).trim();
         String confirm = new String(ConPass.getPassword()).trim();
 
-        if (name.isEmpty() || usernameVal.isEmpty() || emailVal.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+        if (firstname.isEmpty() || lastname.isEmpty() || usernameVal.isEmpty() || emailVal.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields", "Validation", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -212,10 +213,11 @@ public class AdminRegister extends javax.swing.JPanel {
             return;
         }
 
-        cephra.Admin.StaffData.addStaff(name, usernameVal, emailVal, password);
+        cephra.Admin.StaffData.addStaff(firstname, lastname, usernameVal, emailVal, password);
 
         javax.swing.JOptionPane.showMessageDialog(this, "Admin registration successful", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
         Firstname.setText("");
+        LastName.setText("");
         username.setText("");
         email.setText("");
         pass.setText("");

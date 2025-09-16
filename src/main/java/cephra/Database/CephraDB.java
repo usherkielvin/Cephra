@@ -1608,15 +1608,20 @@ public class CephraDB {
     }
     
     // Staff management methods
-    public static boolean addStaff(String name, String username, String email, String password) {
+    public static boolean addStaff(String firstname, String lastname, String username, String email, String password) {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO staff_records (name, username, email, password) VALUES (?, ?, ?, ?)")) {
+                     "INSERT INTO staff_records (name, firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?, ?)")) {
             
-            stmt.setString(1, name);
-            stmt.setString(2, username);
-            stmt.setString(3, email);
-            stmt.setString(4, password);
+            // Combine firstname and lastname for the name column
+            String fullName = firstname.trim() + " " + lastname.trim();
+            
+            stmt.setString(1, fullName);
+            stmt.setString(2, firstname);
+            stmt.setString(3, lastname);
+            stmt.setString(4, username);
+            stmt.setString(5, email);
+            stmt.setString(6, password);
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -1632,12 +1637,14 @@ public class CephraDB {
         java.util.List<Object[]> staff = new ArrayList<>();
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT name, username, email, status, password FROM staff_records ORDER BY name")) {
+                     "SELECT name, firstname, lastname, username, email, status, password FROM staff_records ORDER BY firstname")) {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Object[] row = {
-                        rs.getString("name"),
+                        rs.getString("name"),        // Combined name
+                        rs.getString("firstname"),    // First name only
+                        rs.getString("lastname"),     // Last name only
                         rs.getString("username"),
                         rs.getString("email"),
                         rs.getString("status"),
@@ -1651,6 +1658,41 @@ public class CephraDB {
             e.printStackTrace();
         }
         return staff;
+    }
+    
+    /**
+     * Gets the staff first name by username
+     * @param username the staff username
+     * @return the first name or "Admin" if not found
+     */
+    public static String getStaffFirstName(String username) {
+        System.out.println("DEBUG: getStaffFirstName called with username = '" + username + "'");
+        
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT firstname FROM staff_records WHERE username = ?")) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String firstname = rs.getString("firstname");
+                    System.out.println("DEBUG: Found firstname = '" + firstname + "' for username = '" + username + "'");
+                    if (firstname != null && !firstname.trim().isEmpty()) {
+                        String result = firstname.trim();
+                        System.out.println("DEBUG: Returning firstname = '" + result + "'");
+                        return result;
+                    }
+                } else {
+                    System.out.println("DEBUG: No record found for username = '" + username + "'");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting staff first name: " + e.getMessage());
+            e.printStackTrace();
+        }
+        System.out.println("DEBUG: Returning fallback 'Admin'");
+        return "Admin"; // Fallback
     }
     
     public static boolean removeStaff(String username) {
@@ -1686,6 +1728,15 @@ public class CephraDB {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    /**
+     * Checks if a user is an admin (username = 'admin') or regular staff
+     * @param username the username to check
+     * @return true if user is admin, false if regular staff
+     */
+    public static boolean isAdminUser(String username) {
+        return "admin".equalsIgnoreCase(username);
     }
     
     // Method to validate staff login credentials
@@ -1765,19 +1816,79 @@ public class CephraDB {
                 }
             }
             
+            // Migrate existing staff records to populate firstname/lastname columns
+            migrateStaffRecords(conn);
+            
             // Check if admin staff exists in staff_records, create if not (but don't override existing password)
             try (PreparedStatement checkStmt = conn.prepareStatement(
                     "SELECT username FROM staff_records WHERE username = 'admin'")) {
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (!rs.next()) {
                         // Only create admin if it doesn't exist at all
-                        addStaff("Admin User", "admin", "admin@cephra.com", "admin123");
+                        addStaff("Admin", "User", "admin", "admin@cephra.com", "admin123");
                     }
                 }
             }
             
         } catch (SQLException e) {
             System.err.println("Error verifying database connection: " + e.getMessage());
+        }
+    }
+    
+    // Method to migrate existing staff records to populate firstname/lastname columns
+    private static void migrateStaffRecords(Connection conn) {
+        try {
+            // Check if firstname/lastname columns exist, add them if not
+            if (!columnExists(conn, "staff_records", "firstname")) {
+                try (PreparedStatement stmt = conn.prepareStatement(
+                        "ALTER TABLE staff_records ADD COLUMN firstname VARCHAR(100) AFTER name")) {
+                    stmt.executeUpdate();
+                    System.out.println("CephraDB: Added firstname column to staff_records table");
+                }
+            }
+            
+            if (!columnExists(conn, "staff_records", "lastname")) {
+                try (PreparedStatement stmt = conn.prepareStatement(
+                        "ALTER TABLE staff_records ADD COLUMN lastname VARCHAR(100) AFTER firstname")) {
+                    stmt.executeUpdate();
+                    System.out.println("CephraDB: Added lastname column to staff_records table");
+                }
+            }
+            
+            // Update existing records where firstname/lastname are NULL or empty
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE staff_records SET firstname = ?, lastname = ? WHERE (firstname IS NULL OR firstname = '') AND name IS NOT NULL AND name != ''")) {
+                
+                // Get all staff records that need migration
+                try (PreparedStatement selectStmt = conn.prepareStatement(
+                        "SELECT username, name FROM staff_records WHERE (firstname IS NULL OR firstname = '') AND name IS NOT NULL AND name != ''")) {
+                    
+                    try (ResultSet rs = selectStmt.executeQuery()) {
+                        while (rs.next()) {
+                            String username = rs.getString("username");
+                            String fullName = rs.getString("name");
+                            
+                            if (fullName != null && !fullName.trim().isEmpty()) {
+                                // Split the name into firstname and lastname
+                                String[] nameParts = fullName.trim().split("\\s+", 2);
+                                String firstname = nameParts[0];
+                                String lastname = nameParts.length > 1 ? nameParts[1] : "";
+                                
+                                // Update the record
+                                stmt.setString(1, firstname);
+                                stmt.setString(2, lastname);
+                                stmt.executeUpdate();
+                                
+                                System.out.println("CephraDB: Migrated staff record for " + username + ": '" + fullName + "' -> firstname: '" + firstname + "', lastname: '" + lastname + "'");
+                            }
+                        }
+                    }
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error migrating staff records: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     

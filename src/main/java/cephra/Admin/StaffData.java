@@ -6,9 +6,9 @@ import java.util.List;
 public class StaffData {
     // Each staff: Name, Username, Email, Status, Password
     
-    public static void addStaff(String name, String username, String email, String password) {
+    public static void addStaff(String firstname, String lastname, String username, String email, String password) {
         // Add to database instead of in-memory list
-        cephra.Database.CephraDB.addStaff(name, username, email, password);
+        cephra.Database.CephraDB.addStaff(firstname, lastname, username, email, password);
     }
     
     public static List<String[]> getStaffList() {
@@ -18,11 +18,13 @@ public class StaffData {
         
         for (Object[] staff : dbStaff) {
             staffList.add(new String[]{
-                (String) staff[0], // name
-                (String) staff[1], // username
-                (String) staff[2], // email
-                (String) staff[3], // status
-                (String) staff[4]  // password
+                (String) staff[0], // name (combined firstname + lastname)
+                (String) staff[1], // firstname
+                (String) staff[2], // lastname
+                (String) staff[3], // username
+                (String) staff[4], // email
+                (String) staff[5], // status
+                (String) staff[6]  // password
             });
         }
         

@@ -226,7 +226,9 @@ public class History extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        // Set the staff first name instead of "Admin!"
+        String firstName = getStaffFirstNameFromDB();
+        labelStaff.setText(firstName + "!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
         add(adminHistorySRCH);
@@ -392,5 +394,30 @@ public class History extends javax.swing.JPanel {
             System.err.println("Error formatting timestamp: " + e.getMessage());
         }
         return String.valueOf(timestamp);
+    }
+    
+    private String getStaffFirstNameFromDB() {
+        try {
+            // Get the logged-in username from the admin frame
+            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+            if (window instanceof cephra.Frame.Admin) {
+                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
+                usernameField.setAccessible(true);
+                String username = (String) usernameField.get(window);
+                
+                System.out.println("DEBUG History: Retrieved username from admin frame = '" + username + "'");
+                
+                if (username != null && !username.isEmpty()) {
+                    // Use the updated CephraDB method that queries staff_records.firstname
+                    String result = cephra.Database.CephraDB.getStaffFirstName(username);
+                    System.out.println("DEBUG History: CephraDB.getStaffFirstName returned = '" + result + "'");
+                    return result;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting staff first name: " + e.getMessage());
+        }
+        System.out.println("DEBUG History: Returning fallback 'Admin'");
+        return "Admin"; // Fallback
     }
 }
