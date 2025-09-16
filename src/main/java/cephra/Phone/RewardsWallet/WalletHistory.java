@@ -318,24 +318,26 @@ public class WalletHistory extends javax.swing.JPanel {
             remove(detailsPanel);
         }
         
-        // Hide the history scroll pane
-        historyScrollPane.setVisible(false);
+        // Keep the history scroll pane visible in the background
         
-        // Create panel for details
+        // Create panel for details - smaller popup in center
         detailsPanel = new JPanel();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
-        detailsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        detailsPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2),
+            new EmptyBorder(15, 15, 15, 15)
+        ));
         detailsPanel.setBackground(Color.WHITE);
-        detailsPanel.setBounds(50, 150, 290, 450);
+        detailsPanel.setBounds(75, 200, 220, 300); // Centered smaller popup
         
-        // Add header
+        // Add header - more compact
         JLabel headerLabel = new JLabel("Transaction Details");
-        headerLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        headerLabel.setFont(new Font("Arial", Font.BOLD, 16));
         headerLabel.setForeground(new Color(50, 50, 50));
-        headerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         detailsPanel.add(headerLabel);
         
-        detailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        detailsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         
         // Add transaction type
         addDetailRow(detailsPanel, "Type", getTransactionTypeDisplay(transactionType));
@@ -365,16 +367,70 @@ public class WalletHistory extends javax.swing.JPanel {
         addDetailRow(detailsPanel, "Date", dateFormat.format(timestamp));
         addDetailRow(detailsPanel, "Time", timeFormat.format(timestamp));
         
-        detailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        detailsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         
         // Add OK button
         JButton okButton = new JButton("OK");
         okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        okButton.addActionListener(_ -> closeDetailsPanel());
+        okButton.setFont(new Font("Arial", Font.BOLD, 12));
+        okButton.addActionListener(_ -> {
+            System.out.println("OK button clicked - closing wallet details popup");
+            closeDetailsPanel();
+        });
         detailsPanel.add(okButton);
+        
+        // Create modal overlay to block all clicks except on detailsPanel
+        if (modalOverlay == null) {
+            modalOverlay = new javax.swing.JPanel();
+            modalOverlay.setBackground(new java.awt.Color(0, 0, 0, 120)); // More visible overlay
+            modalOverlay.setOpaque(false);
+            
+            // Add comprehensive mouse listeners to block ALL interactions
+            modalOverlay.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    System.out.println("Modal overlay blocked click - must click OK first!");
+                    e.consume(); // Block the click
+                }
+                
+                @Override
+                public void mousePressed(java.awt.event.MouseEvent e) {
+                    e.consume(); // Block mouse press
+                }
+                
+                @Override
+                public void mouseReleased(java.awt.event.MouseEvent e) {
+                    e.consume(); // Block mouse release
+                }
+            });
+            
+            // Block mouse motion events
+            modalOverlay.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                @Override
+                public void mouseDragged(java.awt.event.MouseEvent e) {
+                    e.consume();
+                }
+                
+                @Override
+                public void mouseMoved(java.awt.event.MouseEvent e) {
+                    e.consume();
+                }
+            });
+            
+            add(modalOverlay);
+        }
+        
+        // Position and show the modal overlay to cover everything
+        modalOverlay.setBounds(0, 0, getWidth(), getHeight());
+        modalOverlay.setVisible(true);
+        System.out.println("Created and shown modal overlay for wallet details");
         
         // Add the details panel to the phone frame
         add(detailsPanel);
+        
+        // Make sure detailsPanel is on top of the modal overlay
+        setComponentZOrder(modalOverlay, 1); // Behind detailsPanel
+        setComponentZOrder(detailsPanel, 0);   // On top
         
         // Make sure the background stays behind
         if (jLabel1 != null) {
@@ -392,8 +448,11 @@ public class WalletHistory extends javax.swing.JPanel {
             detailsPanel = null;
         }
         
-        // Show the history scroll pane again
-        historyScrollPane.setVisible(true);
+        // Hide the modal overlay to restore click functionality
+        if (modalOverlay != null) {
+            modalOverlay.setVisible(false);
+            System.out.println("Hidden modal overlay - wallet clicks restored");
+        }
         
         revalidate();
         repaint();
@@ -401,35 +460,38 @@ public class WalletHistory extends javax.swing.JPanel {
     
     private void addDetailRow(JPanel panel, String label, String value) {
         JPanel rowPanel = new JPanel();
-        rowPanel.setLayout(new BorderLayout(15, 0));
+        rowPanel.setLayout(new BorderLayout(10, 0));
         rowPanel.setBackground(Color.WHITE);
-        rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25)); // More compact
         rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         JLabel labelComponent = new JLabel(label + ":");
-        labelComponent.setFont(new Font("Arial", Font.BOLD, 13));
+        labelComponent.setFont(new Font("Arial", Font.BOLD, 11)); // Smaller font
         labelComponent.setForeground(new Color(70, 70, 70));
         
         JLabel valueComponent = new JLabel(value);
-        valueComponent.setFont(new Font("Arial", Font.PLAIN, 13));
+        valueComponent.setFont(new Font("Arial", Font.PLAIN, 11)); // Smaller font
         valueComponent.setForeground(new Color(30, 30, 30));
         
         // Special formatting for certain fields
-        if (label.equals("Total")) {
-            valueComponent.setFont(new Font("Arial", Font.BOLD, 13));
-            valueComponent.setForeground(new Color(0, 100, 0));
-        } else if (label.equals("Service")) {
+        if (label.equals("Amount")) {
+            valueComponent.setFont(new Font("Arial", Font.BOLD, 12));
+            valueComponent.setForeground(new Color(0, 120, 0));
+        } else if (label.equals("Type")) {
             valueComponent.setForeground(new Color(50, 100, 150));
         } else if (label.equals("Reference")) {
-            valueComponent.setFont(new Font("Arial", Font.BOLD, 12));
+            valueComponent.setFont(new Font("Arial", Font.BOLD, 10));
             valueComponent.setForeground(new Color(100, 50, 150));
+        } else if (label.equals("New Balance")) {
+            valueComponent.setFont(new Font("Arial", Font.BOLD, 11));
+            valueComponent.setForeground(new Color(0, 100, 0));
         }
         
         rowPanel.add(labelComponent, BorderLayout.WEST);
         rowPanel.add(valueComponent, BorderLayout.CENTER);
         
         panel.add(rowPanel);
-        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+        panel.add(Box.createRigidArea(new Dimension(0, 5))); // Less spacing
     }
     ////
     private void makeDraggable() {
@@ -637,6 +699,9 @@ public class WalletHistory extends javax.swing.JPanel {
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
+    
+    // Custom modal overlay to block clicks
+    private javax.swing.JPanel modalOverlay;
 
     @Override
     public void addNotify() {

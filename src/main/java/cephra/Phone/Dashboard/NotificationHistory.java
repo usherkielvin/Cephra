@@ -41,6 +41,14 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             }
         });
         
+        // Add a test paragraph notification to see dynamic height in action
+        String currentUser = cephra.Database.CephraDB.getCurrentUsername();
+        if (currentUser != null) {
+            cephra.Phone.Utilities.NotificationManager.addChargingCompleteNotification(
+                currentUser, "FCH06", "3"
+            );
+        }
+        
         // Load notification entries
         loadNotificationEntries();
         
@@ -182,11 +190,10 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         // Set cursor to hand to indicate clickable
         notificationItemPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        // Set a fixed preferred and maximum height for each notification item panel
-        int itemHeight = 70; // Increased height for better visibility
-        int itemWidth = 290; // Width of the scroll pane
-        notificationItemPanel.setPreferredSize(new Dimension(itemWidth, itemHeight));
-        notificationItemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, itemHeight));
+        // Much better dynamic height calculation to prevent text cutting
+        String message = entry.getMessage();
+        int baseHeight = 80; // Height for header content (date, time, type)
+        int itemWidth = 260; // Made thinner for better text wrapping
 
         // Date label at top
         JLabel dateLabel = new JLabel(entry.getFormattedDate());
@@ -210,27 +217,54 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         typeLabel.setForeground(new Color(50, 100, 150));
         typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Message preview (first 25 chars + ...)
-        String messagePreview = entry.getMessage();
-        if (messagePreview.length() > 25) {
-            messagePreview = messagePreview.substring(0, 25) + "...";
-        }
-        JLabel messageLabel = new JLabel(messagePreview);
-        messageLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-        messageLabel.setForeground(new Color(50, 50, 50));
-        messageLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Use JTextArea for proper multiline text display
+        JTextArea messageTextArea = new JTextArea(entry.getMessage());
+        messageTextArea.setFont(new Font("Arial", Font.PLAIN, 12));
+        messageTextArea.setForeground(new Color(40, 40, 40));
+        messageTextArea.setBackground(Color.WHITE);
+        messageTextArea.setEditable(false);
+        messageTextArea.setFocusable(false);
+        messageTextArea.setWrapStyleWord(true);
+        messageTextArea.setLineWrap(true);
+        messageTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        messageTextArea.setBorder(null);
+        
+        // Calculate proper height based on text content
+        messageTextArea.setColumns(25); // Set width in characters
+        int textLines = messageTextArea.getLineCount();
+        // Force calculation of wrapped lines
+        messageTextArea.setSize(new Dimension(200, Short.MAX_VALUE));
+        int preferredHeight = messageTextArea.getPreferredSize().height;
+        int messageTextHeight = Math.max(60, preferredHeight + 10); // Add padding
+        
+        messageTextArea.setPreferredSize(new Dimension(200, messageTextHeight));
+        messageTextArea.setMaximumSize(new Dimension(200, messageTextHeight));
+        
+        // Now calculate the total panel height based on the text area height
+        int totalHeight = baseHeight + messageTextHeight + 20; // Add padding
+        int itemHeight = Math.max(100, Math.min(totalHeight, 450)); // Min 100px, max 450px
+        
+        notificationItemPanel.setPreferredSize(new Dimension(itemWidth, itemHeight));
+        notificationItemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, itemHeight));
+        
+        System.out.println("Message: '" + message.substring(0, Math.min(30, message.length())) + 
+                           "...', Text Height: " + messageTextHeight + ", Total Height: " + itemHeight);
 
         leftPanel.add(timeLabel);
-        leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 4)));
         leftPanel.add(typeLabel);
-        leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
-        leftPanel.add(messageLabel);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 8))); // More space before paragraph
+        leftPanel.add(messageTextArea);
+        leftPanel.add(Box.createVerticalGlue()); // Push content to top
 
         // Right panel for ticket ID if available
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         rightPanel.setBackground(Color.WHITE);
 
+        // Add some space at the top to align with left panel content
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        
         // Only add ticket info if there's a ticket ID
         if (entry.getTicketId() != null && !entry.getTicketId().isEmpty()) {
             // Ticket ID
@@ -239,6 +273,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             ticketLabel.setForeground(new Color(50, 50, 50));
             ticketLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
             rightPanel.add(ticketLabel);
+            rightPanel.add(Box.createRigidArea(new Dimension(0, 3)));
         }
 
         // Bay number if available
@@ -249,6 +284,9 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             bayLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
             rightPanel.add(bayLabel);
         }
+        
+        // Add glue to push ticket info to top
+        rightPanel.add(Box.createVerticalGlue());
 
         notificationItemPanel.add(dateLabel, BorderLayout.NORTH);
         notificationItemPanel.add(leftPanel, BorderLayout.WEST);
@@ -256,15 +294,115 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             notificationItemPanel.add(rightPanel, BorderLayout.EAST);
         }
         
-        // Add click listener to show details when clicked
+        // Add click listener to show just the message
         notificationItemPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showNotificationDetails(entry);
+                showNotificationMessage(entry);
             }
         });
 
         historyPanel.add(notificationItemPanel);
+    }
+    
+    private JPanel messagePopupPanel;
+    private JPanel modalOverlay;
+    
+    private void showNotificationMessage(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+        // Hide existing popup if any
+        if (messagePopupPanel != null) {
+            remove(messagePopupPanel);
+        }
+        
+        // Create modal overlay to block background clicks
+        if (modalOverlay == null) {
+            modalOverlay = new JPanel();
+            modalOverlay.setBackground(new java.awt.Color(0, 0, 0, 100));
+            modalOverlay.setOpaque(false);
+            modalOverlay.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    e.consume(); // Block clicks
+                }
+            });
+            add(modalOverlay);
+        }
+        
+        // Position and show modal overlay
+        modalOverlay.setBounds(0, 0, getWidth(), getHeight());
+        modalOverlay.setVisible(true);
+        
+        // Create popup panel for the message
+        messagePopupPanel = new JPanel();
+        messagePopupPanel.setLayout(new BoxLayout(messagePopupPanel, BoxLayout.Y_AXIS));
+        messagePopupPanel.setBackground(Color.WHITE);
+        messagePopupPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2),
+            new javax.swing.border.EmptyBorder(20, 20, 20, 20)
+        ));
+        
+        // Position popup in center - size based on message length
+        int popupWidth = Math.min(300, Math.max(250, entry.getMessage().length() * 2));
+        int popupHeight = Math.min(400, Math.max(150, (entry.getMessage().length() / 40) * 25 + 100));
+        int x = (getWidth() - popupWidth) / 2;
+        int y = (getHeight() - popupHeight) / 2;
+        messagePopupPanel.setBounds(x, y, popupWidth, popupHeight);
+        
+        // Add title
+        JLabel titleLabel = new JLabel(entry.getType().getDisplayName());
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setForeground(new Color(50, 50, 50));
+        messagePopupPanel.add(titleLabel);
+        
+        messagePopupPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        
+        // Add message with HTML wrapping
+        String wrappedMessage = "<html><div style='width:" + (popupWidth - 60) + "px; line-height:1.4; text-align:left;'>" + 
+                               entry.getMessage() + "</div></html>";
+        JLabel messageLabel = new JLabel(wrappedMessage);
+        messageLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        messageLabel.setVerticalAlignment(JLabel.TOP);
+        messagePopupPanel.add(messageLabel);
+        
+        messagePopupPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        
+        // Add OK button
+        JButton okButton = new JButton("OK");
+        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        okButton.setFont(new Font("Arial", Font.BOLD, 12));
+        okButton.addActionListener(e -> closeMessagePopup());
+        messagePopupPanel.add(okButton);
+        
+        // Add popup to main panel
+        add(messagePopupPanel);
+        
+        // Set proper layering
+        setComponentZOrder(modalOverlay, 1);
+        setComponentZOrder(messagePopupPanel, 0);
+        
+        // Keep background behind everything
+        if (jLabel1 != null) {
+            setComponentZOrder(jLabel1, getComponentCount() - 1);
+        }
+        
+        revalidate();
+        repaint();
+    }
+    
+    private void closeMessagePopup() {
+        if (messagePopupPanel != null) {
+            remove(messagePopupPanel);
+            messagePopupPanel = null;
+        }
+        
+        if (modalOverlay != null) {
+            modalOverlay.setVisible(false);
+        }
+        
+        revalidate();
+        repaint();
     }
 /////
     private JPanel detailsPanel;
@@ -279,12 +417,12 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         // Hide the history scroll pane
         historyScrollPane.setVisible(false);
         
-        // Create panel for details
+        // Create panel for details - taller for paragraphs
         detailsPanel = new JPanel();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
         detailsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         detailsPanel.setBackground(Color.WHITE);
-        detailsPanel.setBounds(50, 150, 290, 450);
+        detailsPanel.setBounds(30, 120, 310, 500); // Bigger and more centered
         
         // Add header
         JLabel headerLabel = new JLabel("Notification Details");
@@ -361,33 +499,59 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         JPanel rowPanel = new JPanel();
         rowPanel.setLayout(new BorderLayout(15, 0));
         rowPanel.setBackground(Color.WHITE);
-        rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        
+        // Check if this is a long text that needs paragraph treatment
+        boolean isParagraph = (label.equals("Message") || label.equals("Details")) && value.length() > 50;
+        
+        if (isParagraph) {
+            // For paragraphs, use more height
+            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+        } else {
+            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        }
         rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         JLabel labelComponent = new JLabel(label + ":");
         labelComponent.setFont(new Font("Arial", Font.BOLD, 13));
         labelComponent.setForeground(new Color(70, 70, 70));
+        labelComponent.setVerticalAlignment(JLabel.TOP); // Top align for paragraphs
         
-        JLabel valueComponent = new JLabel(value);
-        valueComponent.setFont(new Font("Arial", Font.PLAIN, 13));
+        JLabel valueComponent;
+        if (isParagraph) {
+            // Use HTML for paragraph wrapping in details
+            String htmlValue = "<html><div style='width:200px; line-height:1.4;'>" + value + "</div></html>";
+            valueComponent = new JLabel(htmlValue);
+            valueComponent.setFont(new Font("Arial", Font.PLAIN, 12));
+            valueComponent.setVerticalAlignment(JLabel.TOP);
+            valueComponent.setPreferredSize(new Dimension(200, 100));
+        } else {
+            valueComponent = new JLabel(value);
+            valueComponent.setFont(new Font("Arial", Font.PLAIN, 13));
+        }
+        
         valueComponent.setForeground(new Color(30, 30, 30));
         
         // Special formatting for certain fields
-        if (label.equals("Total")) {
-            valueComponent.setFont(new Font("Arial", Font.BOLD, 13));
-            valueComponent.setForeground(new Color(0, 100, 0));
-        } else if (label.equals("Service")) {
+        if (label.equals("Type")) {
             valueComponent.setForeground(new Color(50, 100, 150));
-        } else if (label.equals("Reference")) {
-            valueComponent.setFont(new Font("Arial", Font.BOLD, 12));
-            valueComponent.setForeground(new Color(100, 50, 150));
+            valueComponent.setFont(new Font("Arial", Font.BOLD, 13));
+        } else if (label.equals("Message")) {
+            valueComponent.setForeground(new Color(40, 40, 40));
+        } else if (label.equals("Details")) {
+            valueComponent.setForeground(new Color(60, 60, 60));
         }
         
         rowPanel.add(labelComponent, BorderLayout.WEST);
         rowPanel.add(valueComponent, BorderLayout.CENTER);
         
         panel.add(rowPanel);
-        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+        
+        // More spacing after paragraphs
+        if (isParagraph) {
+            panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        } else {
+            panel.add(Box.createRigidArea(new Dimension(0, 8)));
+        }
     }
     ////
     private void makeDraggable() {
