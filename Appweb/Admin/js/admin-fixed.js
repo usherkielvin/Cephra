@@ -748,6 +748,11 @@ class AdminPanel {
                 },
                 body: `action=${action}&ticket_id=${ticketId}`
             });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             const data = await response.json();
 
             if (data.success) {
@@ -755,7 +760,8 @@ class AdminPanel {
                 this.loadQueueData();
                 this.loadBaysData(); // Refresh bays in case assignment happened
             } else {
-                this.showError(data.message || 'Failed to progress ticket');
+                console.error('API Error:', data);
+                this.showError(data.error || data.message || 'Failed to progress ticket');
             }
         } catch (error) {
             console.error('Error progressing ticket:', error);
