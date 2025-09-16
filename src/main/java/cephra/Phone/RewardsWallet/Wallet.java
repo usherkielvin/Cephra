@@ -10,7 +10,7 @@ public class Wallet extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
         loadWalletData();
-        HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
+        HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/whiteEyeClose.png")));
         
         
         SwingUtilities.invokeLater(() -> {
@@ -154,10 +154,10 @@ public class Wallet extends javax.swing.JPanel {
         updateBalanceDisplay();      
         if (balanceHidden) {
          //   HideBalance.setText("Show");
-            HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
+            HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/whiteEyeOpen.png")));
         } else {
           //  HideBalance.setText("Hide");
-               HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
+               HideBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/whiteEyeClose.png")));
         }
     }                                           
 
