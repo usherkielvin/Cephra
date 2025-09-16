@@ -429,8 +429,8 @@ public class Profile extends javax.swing.JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    // Step 1: Select image file
-                    java.io.File selectedFile = cephra.Phone.Utilities.ImageUtils.selectImageFile(Profile.this);
+                    // Step 1: Select image file using simple drag and drop interface
+                    java.io.File selectedFile = cephra.Phone.Utilities.SimpleDragDropSelector.showDialog(Profile.this);
                     if (selectedFile == null) {
                         System.out.println("Profile: No image file selected");
                         return; // User cancelled file selection
