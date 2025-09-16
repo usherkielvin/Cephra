@@ -139,21 +139,20 @@ public class Home extends javax.swing.JPanel {
         rewardbalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         rewardbalance.setText("500");
         add(rewardbalance);
-        rewardbalance.setBounds(270, 67, 40, 20);
+        rewardbalance.setBounds(268, 68, 40, 20);
 
         pesobalance.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         pesobalance.setForeground(new java.awt.Color(255, 255, 255));
         pesobalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         pesobalance.setText("500");
         add(pesobalance);
-        pesobalance.setBounds(191, 68, 80, 20);
+        pesobalance.setBounds(186, 68, 40, 20);
 
-        LinkVehicle.setBackground(new java.awt.Color(255, 0, 0));
         LinkVehicle.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
         LinkVehicle.setForeground(new java.awt.Color(255, 255, 255));
-        LinkVehicle.setText("No Vehicle Linked");
         LinkVehicle.setBorder(null);
         LinkVehicle.setBorderPainted(false);
+        LinkVehicle.setContentAreaFilled(false);
         LinkVehicle.setFocusPainted(false);
         LinkVehicle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         LinkVehicle.addActionListener(new java.awt.event.ActionListener() {
@@ -162,7 +161,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(LinkVehicle);
-        LinkVehicle.setBounds(30, 400, 310, 40);
+        LinkVehicle.setBounds(30, 340, 310, 40);
 
         Notifications.setBorder(null);
         Notifications.setBorderPainted(false);
@@ -186,7 +185,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(280, 670, 40, 50);
+        profilebutton.setBounds(280, 680, 40, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -198,7 +197,6 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(220, 680, 40, 40);
         historybutton.setBounds(220, 680, 40, 40);
 
         linkbutton.setBorder(null);
@@ -235,7 +233,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(wallet);
-        wallet.setBounds(190, 590, 150, 60);
+        wallet.setBounds(190, 615, 140, 50);
 
         rewards.setBorder(null);
         rewards.setBorderPainted(false);
@@ -247,7 +245,7 @@ public class Home extends javax.swing.JPanel {
             }
         });
         add(rewards);
-        rewards.setBounds(10, 590, 160, 60);
+        rewards.setBounds(30, 610, 150, 50);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         LoggedName.setForeground(new java.awt.Color(0, 204, 204));

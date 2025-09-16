@@ -243,12 +243,12 @@ public class HOMELINKED extends javax.swing.JPanel {
         charge = new javax.swing.JButton();
         pesobalance = new javax.swing.JLabel();
         rewardbalance = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
         linkbutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
         rewards = new javax.swing.JButton();
         wallet = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
 
@@ -299,19 +299,14 @@ public class HOMELINKED extends javax.swing.JPanel {
         pesobalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         pesobalance.setText("500");
         add(pesobalance);
-        pesobalance.setBounds(191, 68, 80, 20);
+        pesobalance.setBounds(186, 68, 40, 20);
 
         rewardbalance.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         rewardbalance.setForeground(new java.awt.Color(255, 255, 255));
         rewardbalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         rewardbalance.setText("500");
         add(rewardbalance);
-        rewardbalance.setBounds(270, 67, 40, 20);
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home_LINKED.png"))); // NOI18N
-        jLabel1.setPreferredSize(new java.awt.Dimension(350, 750));
-        add(jLabel1);
-        jLabel1.setBounds(0, 0, 350, 750);
+        rewardbalance.setBounds(268, 68, 40, 20);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -372,6 +367,11 @@ public class HOMELINKED extends javax.swing.JPanel {
         });
         add(wallet);
         wallet.setBounds(190, 600, 150, 70);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home_LINKED.png"))); // NOI18N
+        jLabel1.setPreferredSize(new java.awt.Dimension(350, 750));
+        add(jLabel1);
+        jLabel1.setBounds(0, 0, 350, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void NotificationsActionPerformed(java.awt.event.ActionEvent evt) {

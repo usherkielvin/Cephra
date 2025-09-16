@@ -499,7 +499,6 @@ public class WalletHistory extends javax.swing.JPanel {
         profilebutton.setBounds(260, 680, 40, 40);
 
         closeButton.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        closeButton.setText("←");
         closeButton.setToolTipText("Back to Wallet");
         closeButton.setBorder(null);
         closeButton.setBorderPainted(false);
@@ -510,7 +509,7 @@ public class WalletHistory extends javax.swing.JPanel {
             }
         });
         add(closeButton);
-        closeButton.setBounds(10, 110, 75, 23);
+        closeButton.setBounds(0, 50, 75, 30);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);

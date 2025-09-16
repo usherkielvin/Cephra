@@ -89,7 +89,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(280, 680, 50, 40);
+        profilebutton.setBounds(280, 680, 40, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -101,7 +101,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(230, 680, 40, 40);
+        historybutton.setBounds(220, 680, 40, 40);
 
         fastcharge.setBorder(null);
         fastcharge.setBorderPainted(false);
@@ -136,7 +136,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(homebutton);
-        homebutton.setBounds(170, 680, 40, 40);
+        homebutton.setBounds(160, 680, 40, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/fast.png"))); // NOI18N
         add(jLabel1);

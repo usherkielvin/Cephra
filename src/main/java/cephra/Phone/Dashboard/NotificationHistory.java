@@ -443,7 +443,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         historyScrollPane.setViewportView(historyPanel);
 
         add(historyScrollPane);
-        historyScrollPane.setBounds(43, 150, 285, 520);
+        historyScrollPane.setBounds(43, 180, 285, 490);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
