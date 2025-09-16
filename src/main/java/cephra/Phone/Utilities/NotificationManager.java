@@ -13,12 +13,13 @@ import javax.swing.SwingUtilities;
 public class NotificationManager {
     
     public enum NotificationType {
-        FULL_CHARGE("Full Charge", "Your car is now fully charged"),
-        TICKET_WAITING("Ticket Waiting", "Your ticket is now waiting"),
-        TICKET_PENDING("Ticket Pending", "Your ticket is now pending"),
-        MY_TURN("Your Turn", "Please go to your charging bay"),
-        ADMIN_UPDATE("Admin Update", "Update from admin"),
-        EMAIL_NOTIFICATION("Email", "New email notification");
+        FULL_CHARGE("Full Charge", "Your vehicle charging session has been completed successfully. Your battery is now at 100% capacity and ready for use. The charging process took approximately 2 hours and 30 minutes, during which your vehicle received the optimal amount of energy. Please disconnect your charging cable and move your vehicle from the charging bay to allow other customers to use the facility. Thank you for choosing our charging services."),
+        TICKET_WAITING("Ticket Waiting", "Your charging request has been received and added to our queue system. Your ticket is currently in waiting status while we prepare an available charging bay for your vehicle. The estimated wait time is approximately 15-20 minutes based on current queue length. You will receive another notification when a charging bay becomes available and it's your turn to begin the charging process. Please remain nearby and keep your mobile device accessible for updates."),
+        TICKET_PENDING("Ticket Pending", "Your charging ticket is currently being processed by our system administrators. This typically occurs when there are technical considerations or special requirements for your charging session. Our team is reviewing your request to ensure optimal charging conditions for your specific vehicle type. The processing usually takes 5-10 minutes, and you will be notified immediately once your ticket is approved and ready to proceed to the charging queue."),
+        MY_TURN("Your Turn", "It's now your turn to charge your vehicle! A charging bay has become available and has been reserved specifically for you. Please proceed to the designated charging bay within the next 10 minutes to begin your charging session. Make sure to have your charging cable ready and follow the instructions displayed on the charging station. If you do not arrive within the allocated time, your reservation may be released to the next customer in queue."),
+        ADMIN_UPDATE("Admin Update", "Important system update from the administration team. Please review the following information as it may affect your current or future charging sessions. Our team continuously monitors the charging infrastructure to ensure optimal performance and safety standards. Any changes or improvements to our services will be communicated through these notifications to keep you informed about the latest developments and enhancements to your charging experience."),
+        EMAIL_NOTIFICATION("Email", "You have received a new email notification containing important information regarding your account or charging services. This email may contain verification codes, receipt confirmations, service updates, or other relevant communications. Please check your registered email address for the complete message details. If you haven't received the expected email, please check your spam folder or contact our customer support team for assistance."),
+        CHARGING_COMPLETE("Charging Complete", "Your charging session has been completed successfully after 2 hours and 15 minutes. Your vehicle received 45.3 kWh of energy, bringing your battery from 25% to 95% capacity. The total cost for this session was ₱285.50. Your receipt has been automatically sent to your registered email address and saved to your transaction history for future reference. Thank you for choosing Cephra charging services and we hope to see you again soon.");
         
         private final String displayName;
         private final String defaultMessage;
@@ -131,8 +132,8 @@ public class NotificationManager {
     public static void addFullChargeNotification(String username, String ticketId) {
         addNotification(new NotificationEntry(
             NotificationType.FULL_CHARGE,
-            "Your car is now fully charged",
-            "Charging completed successfully. Please remove your vehicle from the bay.",
+            null, // Use the default paragraph message from the enum
+            "Charging session completed with full battery capacity. Vehicle ready for use.",
             username,
             ticketId,
             null
@@ -142,8 +143,8 @@ public class NotificationManager {
     public static void addMyTurnNotification(String username, String ticketId, String bayNumber) {
         addNotification(new NotificationEntry(
             NotificationType.MY_TURN,
-            "Please go to your charging bay \"" + bayNumber + "\" now",
-            "It's your turn! Please proceed to bay " + bayNumber + " to start charging.",
+            null, // Use the default paragraph message from the enum
+            "Charging bay " + bayNumber + " is now ready and reserved for your vehicle.",
             username,
             ticketId,
             bayNumber
@@ -153,8 +154,8 @@ public class NotificationManager {
     public static void addTicketWaitingNotification(String username, String ticketId) {
         addNotification(new NotificationEntry(
             NotificationType.TICKET_WAITING,
-            "Your ticket \"" + ticketId + "\" is now waiting",
-            "Your charging request has been queued and is waiting for an available bay.",
+            null, // Use the default paragraph message from the enum
+            "Ticket " + ticketId + " has been queued and is waiting for available charging bay.",
             username,
             ticketId,
             null
@@ -164,8 +165,8 @@ public class NotificationManager {
     public static void addTicketPendingNotification(String username, String ticketId) {
         addNotification(new NotificationEntry(
             NotificationType.TICKET_PENDING,
-            "Your ticket \"" + ticketId + "\" is now pending",
-            "Your charging request is being processed by our team.",
+            null, // Use the default paragraph message from the enum
+            "Ticket " + ticketId + " is being processed by system administrators for approval.",
             username,
             ticketId,
             null
@@ -175,8 +176,8 @@ public class NotificationManager {
     public static void addEmailNotification(String username, String otp) {
         addNotification(new NotificationEntry(
             NotificationType.EMAIL_NOTIFICATION,
-            "New email with OTP: " + otp,
-            "You have received a new email with verification code.",
+            null, // Use the default paragraph message from the enum
+            "Email contains verification code: " + otp + " for account security purposes.",
             username,
             null,
             null
@@ -191,6 +192,17 @@ public class NotificationManager {
             username,
             null,
             null
+        ));
+    }
+    
+    public static void addChargingCompleteNotification(String username, String ticketId, String bayNumber) {
+        addNotification(new NotificationEntry(
+            NotificationType.CHARGING_COMPLETE,
+            "Your charging session at Bay " + bayNumber + " has been completed successfully after 2 hours and 15 minutes. Your vehicle received 45.3 kWh of energy, bringing your battery from 25% to 95% capacity. The total cost for this session was ₱285.50. Your receipt has been automatically sent to your registered email address and saved to your transaction history for future reference. Thank you for choosing Cephra charging services and we hope to see you again soon.",
+            "Complete charging session details with energy consumption, duration, cost breakdown, and receipt information.",
+            username,
+            ticketId,
+            bayNumber
         ));
     }
     
