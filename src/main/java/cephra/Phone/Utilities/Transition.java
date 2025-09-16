@@ -91,7 +91,7 @@ public class Transition extends javax.swing.JPanel {
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Transis.gif"))); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Coolintro.gif"))); // NOI18N
         add(jLabel2);
         jLabel2.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
