@@ -236,6 +236,7 @@ public class HOMELINKED extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton1 = new javax.swing.JButton();
         Status = new javax.swing.JLabel();
         LoggedName = new javax.swing.JLabel();
         CAR = new javax.swing.JLabel();
@@ -251,6 +252,16 @@ public class HOMELINKED extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/pending.png"))); // NOI18N
+        jButton1.setAlignmentY(0.0F);
+        jButton1.setBorder(null);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        add(jButton1);
+        jButton1.setBounds(40, 240, 310, 80);
 
         Status.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Status.setForeground(new java.awt.Color(255, 255, 255));
@@ -490,6 +501,7 @@ public class HOMELINKED extends javax.swing.JPanel {
     private javax.swing.JLabel Status;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JLabel pesobalance;
