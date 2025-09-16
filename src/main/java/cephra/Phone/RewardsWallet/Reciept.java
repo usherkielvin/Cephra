@@ -249,7 +249,7 @@ public class Reciept extends javax.swing.JPanel {
         share.setBorderPainted(false);
         share.setContentAreaFilled(false);
         add(share);
-        share.setBounds(180, 680, 130, 40);
+        share.setBounds(200, 680, 130, 40);
 
         Exit.setBorder(null);
         Exit.setBorderPainted(false);
@@ -260,68 +260,68 @@ public class Reciept extends javax.swing.JPanel {
             }
         });
         add(Exit);
-        Exit.setBounds(290, 50, 50, 40);
+        Exit.setBounds(310, 50, 30, 30);
 
         Download.setBorder(null);
         Download.setBorderPainted(false);
         Download.setContentAreaFilled(false);
         add(Download);
-        Download.setBounds(30, 683, 120, 30);
+        Download.setBounds(50, 683, 110, 30);
 
         price.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
         price.setText("PHP 650.00");
         add(price);
-        price.setBounds(90, 280, 210, 40);
+        price.setBounds(85, 280, 210, 40);
 
         RefNumber.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         RefNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         RefNumber.setText("33873585637");
         add(RefNumber);
-        RefNumber.setBounds(168, 390, 100, 21);
+        RefNumber.setBounds(185, 390, 100, 21);
 
         TimeDate.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         TimeDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         TimeDate.setText("29 August 2025 05:31 PM");
         add(TimeDate);
-        TimeDate.setBounds(70, 410, 190, 20);
+        TimeDate.setBounds(90, 410, 190, 20);
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel5.setText("Details");
         add(jLabel5);
-        jLabel5.setBounds(140, 450, 70, 30);
+        jLabel5.setBounds(160, 450, 70, 30);
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel6.setText("<html><div style='text-align:leading;'>Amount Paid: <br>Fee: <br>Account Number:  </div></html>");
         add(jLabel6);
-        jLabel6.setBounds(40, 490, 110, 70);
+        jLabel6.setBounds(65, 490, 110, 70);
 
         AmountPaid.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         AmountPaid.setText("Php 650.00");
         add(AmountPaid);
-        AmountPaid.setBounds(200, 490, 100, 20);
+        AmountPaid.setBounds(220, 490, 100, 20);
 
         Fee.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         Fee.setText("Php 7.00");
         add(Fee);
-        Fee.setBounds(200, 510, 140, 20);
+        Fee.setBounds(220, 510, 140, 20);
 
         AccNumber.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         AccNumber.setText("337293727");
         add(AccNumber);
-        AccNumber.setBounds(200, 530, 90, 20);
+        AccNumber.setBounds(220, 530, 90, 20);
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel8.setText("Ref. Number: ");
         add(jLabel8);
-        jLabel8.setBounds(70, 390, 100, 21);
+        jLabel8.setBounds(85, 390, 100, 21);
         jLabel8.getAccessibleContext().setAccessibleName("");
 
         NumTicket.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         NumTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         NumTicket.setText("FCH008");
         add(NumTicket);
-        NumTicket.setBounds(120, 360, 100, 30);
+        NumTicket.setBounds(140, 360, 100, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Receipt.png"))); // NOI18N
         add(jLabel1);

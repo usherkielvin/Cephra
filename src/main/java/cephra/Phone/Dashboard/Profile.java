@@ -153,7 +153,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(historybutton);
-        historybutton.setBounds(230, 683, 30, 40);
+        historybutton.setBounds(220, 683, 40, 40);
 
         homebutton.setBorder(null);
         homebutton.setBorderPainted(false);
@@ -165,7 +165,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(homebutton);
-        homebutton.setBounds(170, 680, 40, 40);
+        homebutton.setBounds(170, 680, 30, 40);
 
         logout.setBorder(null);
         logout.setBorderPainted(false);
@@ -177,7 +177,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(logout);
-        logout.setBounds(80, 610, 250, 40);
+        logout.setBounds(50, 614, 280, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -189,7 +189,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(120, 680, 30, 40);
+        linkbutton.setBounds(110, 680, 40, 40);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -201,7 +201,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(60, 680, 40, 40);
+        charge.setBounds(50, 680, 40, 40);
 
         Help.setBorderPainted(false);
         Help.setContentAreaFilled(false);
@@ -213,14 +213,16 @@ public class Profile extends javax.swing.JPanel {
         add(Help);
         Help.setBounds(50, 520, 290, 50);
 
-        editpfp.setText("Edit");
+        editpfp.setBorder(null);
+        editpfp.setBorderPainted(false);
+        editpfp.setContentAreaFilled(false);
         editpfp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editpfpActionPerformed(evt);
             }
         });
         add(editpfp);
-        editpfp.setBounds(190, 200, 72, 23);
+        editpfp.setBounds(170, 188, 150, 37);
         add(Profile);
         Profile.setBounds(20, 120, 110, 110);
 

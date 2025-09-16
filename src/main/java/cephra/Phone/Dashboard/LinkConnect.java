@@ -76,7 +76,7 @@ public class LinkConnect extends javax.swing.JPanel {
             }
         });
         add(charge);
-        charge.setBounds(40, 670, 50, 60);
+        charge.setBounds(40, 680, 40, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);

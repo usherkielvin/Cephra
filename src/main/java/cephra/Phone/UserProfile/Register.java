@@ -14,6 +14,7 @@ public class Register extends javax.swing.JPanel {
         setupButtons(); // Setup button hover effects
         setupTextFields(); // Setup text field properties
         makeDraggable(); // Make the panel draggable
+        setupLabelPosition(); // fit Label Position
         
         // Add action listeners that NetBeans might remove
         lname.addActionListener(evt -> lnameActionPerformed(evt));
@@ -53,6 +54,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
     }
+   
 
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -84,7 +86,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(300, 470, 50, 20);
+        See.setBounds(280, 470, 50, 20);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
@@ -94,7 +96,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(60, 460, 250, 35);
+        pass.setBounds(40, 460, 250, 35);
 
         email.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         email.setBorder(null);
@@ -104,7 +106,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(65, 402, 280, 32);
+        email.setBounds(45, 402, 280, 32);
 
         fname.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         fname.setBorder(null);
@@ -114,7 +116,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(fname);
-        fname.setBounds(60, 280, 130, 30);
+        fname.setBounds(40, 280, 130, 30);
 
         register.setBorder(null);
         register.setBorderPainted(false);
@@ -126,7 +128,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(register);
-        register.setBounds(50, 520, 310, 50);
+        register.setBounds(30, 520, 310, 50);
 
         termscondition.setBackground(new java.awt.Color(255, 255, 255));
         termscondition.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -140,7 +142,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(termscondition);
-        termscondition.setBounds(80, 490, 280, 40);
+        termscondition.setBounds(60, 490, 280, 40);
 
         loginbutton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         loginbutton.setForeground(new java.awt.Color(0, 204, 204));
@@ -355,7 +357,7 @@ public class Register extends javax.swing.JPanel {
     // Ensure the background label (PNG) stays positioned correctly
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(0, 0, 370, 750);
         }
     }
 

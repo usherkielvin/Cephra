@@ -391,13 +391,15 @@ class AdminPanel {
             if (data.success) {
                 if (data.revenue_data && data.revenue_data.length > 0) {
                     console.log('Rendering revenue chart with', data.revenue_data.length, 'data points');
-                    this.renderRevenueChart(data.revenue_data);
+                    const filledRevenueData = this.fillMissingDates(data.revenue_data, 'revenue');
+                    this.renderRevenueChart(filledRevenueData);
                 } else {
                     console.log('No revenue data available');
                 }
                 if (data.service_data && data.service_data.length > 0) {
                     console.log('Rendering service chart with', data.service_data.length, 'data points');
-                    this.renderServiceChart(data.service_data);
+                    const filledServiceData = this.fillMissingDates(data.service_data, 'service_count');
+                    this.renderServiceChart(filledServiceData);
                 } else {
                     console.log('No service data available');
                 }
@@ -411,11 +413,66 @@ class AdminPanel {
         }
     }
 
+    // Format date for chart display (remove year, show as M/D)
+    formatDateForChart(dateString) {
+        const date = new Date(dateString);
+        const month = date.getMonth() + 1; // getMonth() returns 0-11
+        const day = date.getDate();
+        return `${month}/${day}`;
+    }
+
+    // Fill missing dates with zero values to ensure all days are shown
+    fillMissingDates(data, valueKey) {
+        if (!data || data.length === 0) return data;
+
+        // Determine date range based on analytics range
+        const today = new Date();
+        let startDate = new Date();
+        
+        switch (this.analyticsRange) {
+            case 'day':
+                startDate.setDate(today.getDate() - 1); // Show yesterday and today
+                break;
+            case 'week':
+                startDate.setDate(today.getDate() - 7); // Show last 7 days
+                break;
+            case 'month':
+                startDate.setDate(today.getDate() - 30); // Show last 30 days
+                break;
+            default:
+                startDate.setDate(today.getDate() - 7);
+        }
+
+        // Create a map of existing data
+        const dataMap = new Map();
+        data.forEach(item => {
+            dataMap.set(item.date, parseFloat(item[valueKey]) || 0);
+        });
+
+        // Fill missing dates with zero values
+        const filledData = [];
+        const currentDate = new Date(startDate);
+        
+        while (currentDate <= today) {
+            const dateString = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+            const value = dataMap.get(dateString) || 0;
+            
+            filledData.push({
+                date: dateString,
+                [valueKey]: value
+            });
+            
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return filledData;
+    }
+
     renderRevenueChart(revenueData) {
         const ctx = document.getElementById('revenue-chart').getContext('2d');
 
-        // Prepare data for chart
-        const labels = revenueData.map(item => item.date);
+        // Prepare data for chart with proper date formatting
+        const labels = revenueData.map(item => this.formatDateForChart(item.date));
         const dataPoints = revenueData.map(item => parseFloat(item.revenue));
 
         if (this.revenueChart) {
@@ -472,8 +529,8 @@ class AdminPanel {
     renderServiceChart(serviceData) {
         const ctx = document.getElementById('service-chart').getContext('2d');
 
-        // Prepare data for chart
-        const labels = serviceData.map(item => item.date);
+        // Prepare data for chart with proper date formatting
+        const labels = serviceData.map(item => this.formatDateForChart(item.date));
         const dataPoints = serviceData.map(item => parseInt(item.service_count));
 
         if (this.serviceChart) {
@@ -675,8 +732,9 @@ class AdminPanel {
                     action = 'progress-to-complete';
                     break;
                 case 'complete':
-                    // For complete tickets, show payment processing
-                    this.processPayment(ticketId);
+                    // For complete tickets, show message that PayPop will be displayed to customer
+                    this.showInfo('Charging completed! PayPop will be displayed to the customer for payment.');
+                    this.loadQueueData();
                     return;
                 default:
                     this.showError('Invalid ticket status for progression');
