@@ -154,12 +154,21 @@ public class HOMELINKED extends javax.swing.JPanel {
                                 break;
                         }
                         Status.setText(displayStatus);
+                        
+                        // Show PENDING button only when status is "Complete"
+                        if ("Complete".equals(displayStatus)) {
+                            jButton1.setVisible(true);
+                        } else {
+                            jButton1.setVisible(false);
+                        }
                     } else {
                         // No ticket found - show Unavailable
                         Status.setText("Unavailable");
+                        jButton1.setVisible(false);
                     }
                 } else {
                     Status.setText("Unavailable");
+                    jButton1.setVisible(false);
                 }
             }
         } catch (Exception e) {
@@ -260,8 +269,14 @@ public class HOMELINKED extends javax.swing.JPanel {
         jButton1.setContentAreaFilled(false);
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         add(jButton1);
         jButton1.setBounds(31, 336, 307, 65);
+        jButton1.setVisible(false); // Hide by default
 
         Status.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Status.setForeground(new java.awt.Color(255, 255, 255));
@@ -492,7 +507,34 @@ public class HOMELINKED extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_profilebuttonActionPerformed
 
-
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // Show PayPop payment popup when PENDING button is clicked
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    // Get current user's ticket information
+                    String username = cephra.Database.CephraDB.getCurrentUsername();
+                    if (username != null && !username.isEmpty()) {
+                        // Get user's current ticket ID
+                        String ticketId = cephra.Database.CephraDB.getUserCurrentTicketId(username);
+                        if (ticketId != null && !ticketId.isEmpty()) {
+                            // Show PayPop for this ticket
+                            boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticketId, username);
+                            if (!success) {
+                                System.err.println("HOMELINKED: Failed to show PayPop for ticket " + ticketId);
+                            }
+                        } else {
+                            System.err.println("HOMELINKED: No current ticket found for user " + username);
+                        }
+                    } else {
+                        System.err.println("HOMELINKED: No user logged in");
+                    }
+                } catch (Exception e) {
+                    System.err.println("HOMELINKED: Error showing PayPop: " + e.getMessage());
+                }
+            }
+        });
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel CAR;

@@ -846,6 +846,31 @@ public class CephraDB {
         return null; // No ticket found
     }
     
+    // Method to get current ticket ID for a user
+    public static String getUserCurrentTicketId(String username) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            if (!tableExists(conn, "queue_tickets")) {
+                System.err.println("Warning: queue_tickets table does not exist.");
+                return null; // No table means no tickets
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT ticket_id FROM queue_tickets WHERE username = ? ORDER BY created_at DESC LIMIT 1")) {
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("ticket_id");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting user current ticket ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null; // No ticket found
+    }
+    
     // Queue ticket management methods
     public static boolean addQueueTicket(String ticketId, String username, String serviceType, 
                                        String status, String paymentStatus, int initialBatteryLevel) {

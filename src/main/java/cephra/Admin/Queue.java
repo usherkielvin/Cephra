@@ -246,6 +246,18 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     System.out.println("Queue: Moving ticket " + ticket + " from Charging to Complete status");
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
                     
+                    // Update database status to Complete
+                    try {
+                        boolean dbUpdated = cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Complete");
+                        if (dbUpdated) {
+                            System.out.println("Queue: Successfully updated database status to Complete for ticket " + ticket);
+                        } else {
+                            System.err.println("Queue: Failed to update database status for ticket " + ticket);
+                        }
+                    } catch (Exception ex) {
+                        System.err.println("Queue: Error updating database status: " + ex.getMessage());
+                    }
+                    
                     // Ensure payment is set to Pending
                     try { 
                         ensurePaymentPending(ticket); 
