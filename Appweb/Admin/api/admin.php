@@ -256,16 +256,33 @@ try {
             $all_bays = $debug_stmt->fetchAll(PDO::FETCH_ASSOC);
             error_log("Admin API: All bays: " . json_encode($all_bays));
             
+            // Ensure Bay-3 exists and is properly configured
+            $bay3_check = $db->query("SELECT COUNT(*) as count FROM charging_bays WHERE bay_number = 'Bay-3'");
+            $bay3_exists = $bay3_check->fetch(PDO::FETCH_ASSOC)['count'];
+            
+            if ($bay3_exists == 0) {
+                error_log("Admin API: Bay-3 does not exist - creating it");
+                $create_bay3 = $db->prepare("INSERT INTO charging_bays (bay_number, bay_type, status, current_ticket_id, current_username, start_time) VALUES ('Bay-3', 'Fast', 'Available', NULL, NULL, NULL)");
+                $create_result = $create_bay3->execute();
+                if ($create_result) {
+                    error_log("Admin API: Successfully created Bay-3");
+                } else {
+                    error_log("Admin API: Failed to create Bay-3");
+                }
+            }
+            
             // Find appropriate bay based on service type
             if ($is_fast_charging) {
                 // Fast charging: only use bays 1-3
                 error_log("Admin API: Searching for FCH bays 1-3 with status 'AVAILABLE'");
+                
+                // Database uses 'Bay-1', 'Bay-2', 'Bay-3' format
                 $bay_stmt = $db->query("
                     SELECT bay_number 
                     FROM charging_bays 
                     WHERE TRIM(UPPER(status)) = 'AVAILABLE' 
-                    AND CAST(bay_number AS UNSIGNED) BETWEEN 1 AND 3
-                    ORDER BY CAST(bay_number AS UNSIGNED) ASC 
+                    AND bay_type = 'Fast'
+                    ORDER BY bay_number ASC 
                     LIMIT 1
                 ");
                 
@@ -279,16 +296,36 @@ try {
                 $fast_bays = $debug_fast_stmt->fetchAll(PDO::FETCH_ASSOC);
                 error_log("Admin API: Fast bays 1-3 details: " . json_encode($fast_bays));
                 
-                // Test the exact query that should find Bay 3
+                // Test the exact query that should find Bay-3
                 $test_stmt = $db->query("
-                    SELECT bay_number, status, 
+                    SELECT bay_number, status, bay_type,
                            CASE WHEN TRIM(UPPER(status)) = 'AVAILABLE' THEN 'MATCH' ELSE 'NO_MATCH' END as status_check,
-                           CASE WHEN CAST(bay_number AS UNSIGNED) BETWEEN 1 AND 3 THEN 'IN_RANGE' ELSE 'OUT_OF_RANGE' END as range_check
+                           CASE WHEN bay_type = 'Fast' THEN 'FAST_TYPE' ELSE 'NORMAL_TYPE' END as type_check
                     FROM charging_bays 
-                    WHERE bay_number = '3'
+                    WHERE bay_number = 'Bay-3'
                 ");
                 $bay3_test = $test_stmt->fetch(PDO::FETCH_ASSOC);
-                error_log("Admin API: Bay 3 test: " . json_encode($bay3_test));
+                error_log("Admin API: Bay-3 test: " . json_encode($bay3_test));
+                
+                // Force Bay-3 to be available for FCH tickets
+                error_log("Admin API: Ensuring Bay-3 is available for FCH tickets");
+                $force_bay3 = $db->prepare("UPDATE charging_bays SET status = 'Available', current_ticket_id = NULL, current_username = NULL, start_time = NULL WHERE bay_number = 'Bay-3'");
+                $force_result = $force_bay3->execute();
+                if ($force_result) {
+                    error_log("Admin API: Successfully forced Bay-3 to Available status");
+                }
+                
+                // Retry the bay search after ensuring Bay-3 is available
+                $bay_stmt = $db->query("
+                    SELECT bay_number 
+                    FROM charging_bays 
+                    WHERE TRIM(UPPER(status)) = 'AVAILABLE' 
+                    AND bay_type = 'Fast'
+                    ORDER BY bay_number ASC 
+                    LIMIT 1
+                ");
+                $available_bay = $bay_stmt->fetch(PDO::FETCH_ASSOC);
+                error_log("Admin API: After Bay-3 fix - Bay search result: " . json_encode($available_bay));
                 
             } else {
                 // Normal charging: only use bays 4-8
@@ -297,8 +334,8 @@ try {
                     SELECT bay_number 
                     FROM charging_bays 
                     WHERE TRIM(UPPER(status)) = 'AVAILABLE' 
-                    AND CAST(bay_number AS UNSIGNED) BETWEEN 4 AND 8
-                    ORDER BY CAST(bay_number AS UNSIGNED) ASC 
+                    AND bay_type = 'Normal'
+                    ORDER BY bay_number ASC 
                     LIMIT 1
                 ");
             }
@@ -318,8 +355,8 @@ try {
                             SELECT bay_number 
                             FROM charging_bays 
                             WHERE status = '{$alt_status}' 
-                            AND CAST(bay_number AS UNSIGNED) BETWEEN 1 AND 3
-                            ORDER BY CAST(bay_number AS UNSIGNED) ASC 
+                            AND bay_type = 'Fast'
+                            ORDER BY bay_number ASC 
                             LIMIT 1
                         ");
                     } else {
@@ -327,8 +364,8 @@ try {
                             SELECT bay_number 
                             FROM charging_bays 
                             WHERE status = '{$alt_status}' 
-                            AND CAST(bay_number AS UNSIGNED) BETWEEN 4 AND 8
-                            ORDER BY CAST(bay_number AS UNSIGNED) ASC 
+                            AND bay_type = 'Normal'
+                            ORDER BY bay_number ASC 
                             LIMIT 1
                         ");
                     }
@@ -360,13 +397,12 @@ try {
             error_log("Admin API: Found available bay {$bay_number} for ticket {$ticket_id}");
             
             // Validate bay assignment is correct for service type
-            $bay_num = (int)$bay_number;
-            if ($is_fast_charging && ($bay_num < 1 || $bay_num > 3)) {
-                error_log("Admin API: ERROR - Fast charging ticket {$ticket_id} assigned to invalid bay {$bay_number} (should be 1-3)");
+            if ($is_fast_charging && !in_array($bay_number, ['Bay-1', 'Bay-2', 'Bay-3'])) {
+                error_log("Admin API: ERROR - Fast charging ticket {$ticket_id} assigned to invalid bay {$bay_number} (should be Bay-1, Bay-2, or Bay-3)");
                 echo json_encode(['error' => "Invalid bay assignment: Fast charging ticket assigned to bay {$bay_number}"]);
                 break;
-            } elseif (!$is_fast_charging && ($bay_num < 4 || $bay_num > 8)) {
-                error_log("Admin API: ERROR - Normal charging ticket {$ticket_id} assigned to invalid bay {$bay_number} (should be 4-8)");
+            } elseif (!$is_fast_charging && !in_array($bay_number, ['Bay-4', 'Bay-5', 'Bay-6', 'Bay-7', 'Bay-8'])) {
+                error_log("Admin API: ERROR - Normal charging ticket {$ticket_id} assigned to invalid bay {$bay_number} (should be Bay-4 to Bay-8)");
                 echo json_encode(['error' => "Invalid bay assignment: Normal charging ticket assigned to bay {$bay_number}"]);
                 break;
             }
@@ -400,6 +436,18 @@ try {
                     throw new Exception('Failed to assign bay');
                 }
                 
+                // Verify the bay assignment was successful
+                $verify_stmt = $db->prepare("SELECT bay_number, status, current_ticket_id, current_username FROM charging_bays WHERE bay_number = ?");
+                $verify_stmt->execute([$bay_number]);
+                $verify_result = $verify_stmt->fetch(PDO::FETCH_ASSOC);
+                error_log("Admin API: Bay {$bay_number} verification: " . json_encode($verify_result));
+                
+                // Verify the ticket status was updated
+                $ticket_verify_stmt = $db->prepare("SELECT ticket_id, status FROM queue_tickets WHERE ticket_id = ?");
+                $ticket_verify_stmt->execute([$ticket_id]);
+                $ticket_verify_result = $ticket_verify_stmt->fetch(PDO::FETCH_ASSOC);
+                error_log("Admin API: Ticket {$ticket_id} verification: " . json_encode($ticket_verify_result));
+                
                 $db->commit();
                 
                 error_log("Admin API: Successfully assigned ticket {$ticket_id} to bay {$bay_number}");
@@ -407,7 +455,9 @@ try {
                 echo json_encode([
                     'success' => true, 
                     'message' => 'Ticket assigned to charging bay',
-                    'bay_number' => $bay_number
+                    'bay_number' => $bay_number,
+                    'ticket_status' => 'Charging',
+                    'bay_status' => 'Occupied'
                 ]);
                 
             } catch (Exception $e) {

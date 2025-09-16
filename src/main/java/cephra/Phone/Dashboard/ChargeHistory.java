@@ -46,18 +46,6 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         });
     }
     
-    /**
-     * Creates a copy of YOUR designed pink history1 panel with data populated
-     */
-    private JPanel createHistoryEntryPanel(final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
-        // Clone your designed history1 panel directly!
-        JPanel clonedPanel = clonePanel(history1);
-        
-        // Find the labels in the cloned panel and update their text
-        updatePanelLabels(clonedPanel, entry);
-        
-        return clonedPanel;
-    }
     
     /**
      * Creates an exact copy of your designed panel (works with ANY layout you use!)
