@@ -261,7 +261,7 @@ public class HOMELINKED extends javax.swing.JPanel {
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         add(jButton1);
-        jButton1.setBounds(40, 240, 310, 80);
+        jButton1.setBounds(31, 336, 307, 65);
 
         Status.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Status.setForeground(new java.awt.Color(255, 255, 255));
