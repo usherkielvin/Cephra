@@ -615,10 +615,6 @@ class AdminPanel {
     }
 
     async processPayment(ticketId) {
-        if (!confirm('Are you sure you want to process payment for this ticket?')) {
-            return;
-        }
-
         try {
             const response = await fetch('api/admin.php', {
                 method: 'POST',
@@ -642,17 +638,13 @@ class AdminPanel {
     }
 
     async markAsPaid(ticketId) {
-        if (!confirm('Are you sure you want to mark this ticket as paid?')) {
-            return;
-        }
-
         try {
             const response = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `action=mark-as-paid&ticket_id=${ticketId}`
+                body: `action=mark-payment-paid&ticket_id=${ticketId}`
             });
             const data = await response.json();
 
@@ -671,20 +663,16 @@ class AdminPanel {
     async proceedTicket(ticketId, currentStatus) {
         try {
             let action = '';
-            let confirmMessage = '';
 
             switch (currentStatus.toLowerCase()) {
                 case 'pending':
                     action = 'progress-to-waiting';
-                    confirmMessage = 'Are you sure you want to move this ticket to waiting status?';
                     break;
                 case 'waiting':
                     action = 'progress-to-charging';
-                    confirmMessage = 'Are you sure you want to assign this ticket to a charging bay?';
                     break;
                 case 'charging':
                     action = 'progress-to-complete';
-                    confirmMessage = 'Are you sure you want to mark this ticket as complete?';
                     break;
                 case 'complete':
                     // For complete tickets, show payment processing
@@ -693,10 +681,6 @@ class AdminPanel {
                 default:
                     this.showError('Invalid ticket status for progression');
                     return;
-            }
-
-            if (!confirm(confirmMessage)) {
-                return;
             }
 
             const response = await fetch('api/admin.php', {

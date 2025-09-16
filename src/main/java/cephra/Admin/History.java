@@ -359,14 +359,15 @@ public class History extends javax.swing.JPanel {
 
                 // Convert database format to admin history format
                 // Columns: Ticket, Customer, KWh, Total, Served By, Date & Time, Reference
+                // Database format: [ticket_id, username, service_type, initial_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, completed_at]
                 Object[] adminRecord = {
                     record[0], // ticket_id
                     record[1], // username
                     String.format("%.1f kWh", kwhUsed), // KWh used
-                    String.format("%.2f", record[5]), // Total amount
+                    String.format("%.2f", record[6]), // Total amount (total_amount is at index 6)
                     servedBy + " (" + paymentMethod + ")", // served_by with payment method
-                    formatDateTimeForDisplay(record[7]), // completed_at - format as 12-hour without seconds
-                    record[6] // reference_number - compact format
+                    formatDateTimeForDisplay(record[8]), // completed_at (completed_at is at index 8)
+                    record[7] // reference_number (reference_number is at index 7)
                 };
                 model.addRow(adminRecord);
             }

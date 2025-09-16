@@ -49,10 +49,15 @@ try {
             $stmt = $db->query("SELECT COUNT(*) as count FROM charging_bays WHERE status = 'Occupied'");
             $stats['active_bays'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
             
-            // Today's revenue
-            $stmt = $db->query("SELECT SUM(amount) as revenue FROM payment_transactions WHERE DATE(processed_at) = CURDATE()");
+            // Overall revenue (all time)
+            $stmt = $db->query("SELECT SUM(amount) as revenue FROM payment_transactions");
             $revenue = $stmt->fetch(PDO::FETCH_ASSOC)['revenue'];
             $stats['revenue_today'] = $revenue ? (float)$revenue : 0;
+            
+            // Today's revenue for comparison
+            $stmt = $db->query("SELECT SUM(amount) as revenue FROM payment_transactions WHERE DATE(processed_at) = CURDATE()");
+            $today_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['revenue'];
+            $stats['revenue_today_only'] = $today_revenue ? (float)$today_revenue : 0;
             
             // Recent activity from actual database records
             $stmt = $db->query("
@@ -189,6 +194,221 @@ try {
                 echo json_encode(['success' => true, 'message' => 'Ticket processed successfully']);
             } else {
                 echo json_encode(['error' => 'Failed to process ticket']);
+            }
+            break;
+
+        case 'progress-to-waiting':
+            if ($method !== 'POST') {
+                echo json_encode(['error' => 'Method not allowed']);
+                break;
+            }
+            
+            $ticket_id = $_POST['ticket_id'] ?? '';
+            if (!$ticket_id) {
+                echo json_encode(['error' => 'Ticket ID required']);
+                break;
+            }
+            
+            // Update ticket status to Waiting
+            $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Waiting' WHERE ticket_id = ?");
+            $result = $stmt->execute([$ticket_id]);
+            
+            if ($result) {
+                echo json_encode(['success' => true, 'message' => 'Ticket moved to waiting status']);
+            } else {
+                echo json_encode(['error' => 'Failed to move ticket to waiting']);
+            }
+            break;
+
+        case 'progress-to-charging':
+            if ($method !== 'POST') {
+                echo json_encode(['error' => 'Method not allowed']);
+                break;
+            }
+            
+            $ticket_id = $_POST['ticket_id'] ?? '';
+            if (!$ticket_id) {
+                echo json_encode(['error' => 'Ticket ID required']);
+                break;
+            }
+            
+            // Find next available bay (try both INT and VARCHAR formats)
+            $bay_stmt = $db->query("
+                SELECT bay_number 
+                FROM charging_bays 
+                WHERE status = 'Available' 
+                ORDER BY CAST(bay_number AS UNSIGNED) ASC, bay_number ASC 
+                LIMIT 1
+            ");
+            $available_bay = $bay_stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$available_bay) {
+                echo json_encode(['error' => 'No available charging bays']);
+                break;
+            }
+            
+            $bay_number = $available_bay['bay_number'];
+            
+            // Start transaction
+            $db->beginTransaction();
+            
+            try {
+                // Update ticket status to Charging
+                $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Charging' WHERE ticket_id = ?");
+                $result = $stmt->execute([$ticket_id]);
+                
+                if (!$result) {
+                    throw new Exception('Failed to update ticket status');
+                }
+                
+                // Get ticket details for username
+                $ticket_stmt = $db->prepare("SELECT username FROM queue_tickets WHERE ticket_id = ?");
+                $ticket_stmt->execute([$ticket_id]);
+                $ticket_data = $ticket_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$ticket_data) {
+                    throw new Exception('Ticket not found');
+                }
+                
+                // Assign bay to ticket
+                $bay_stmt = $db->prepare("UPDATE charging_bays SET status = 'Occupied', current_ticket_id = ?, current_username = ?, start_time = NOW() WHERE bay_number = ?");
+                $bay_result = $bay_stmt->execute([$ticket_id, $ticket_data['username'], $bay_number]);
+                
+                if (!$bay_result) {
+                    throw new Exception('Failed to assign bay');
+                }
+                
+                $db->commit();
+                
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Ticket assigned to charging bay',
+                    'bay_number' => $bay_number
+                ]);
+                
+            } catch (Exception $e) {
+                $db->rollback();
+                echo json_encode(['error' => 'Failed to assign ticket to bay: ' . $e->getMessage()]);
+            }
+            break;
+
+        case 'progress-to-complete':
+            if ($method !== 'POST') {
+                echo json_encode(['error' => 'Method not allowed']);
+                break;
+            }
+            
+            $ticket_id = $_POST['ticket_id'] ?? '';
+            if (!$ticket_id) {
+                echo json_encode(['error' => 'Ticket ID required']);
+                break;
+            }
+            
+            // Start transaction
+            $db->beginTransaction();
+            
+            try {
+                // Get ticket details
+                $ticket_stmt = $db->prepare("SELECT * FROM queue_tickets WHERE ticket_id = ?");
+                $ticket_stmt->execute([$ticket_id]);
+                $ticket = $ticket_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$ticket) {
+                    throw new Exception('Ticket not found');
+                }
+                
+                // Use existing reference number from Java admin if available, otherwise generate new one
+                $reference_number = $ticket['reference_number'] ?? '';
+                if (empty($reference_number)) {
+                    // Generate reference number (8-digit random number like Java admin)
+                    $reference_number = str_pad(mt_rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
+                }
+                
+                // Calculate payment amount using Java admin billing system
+                $ratePerKwh = 15.0; // ₱15.00 per kWh (configurable from database)
+                $minimumFee = 50.0; // ₱50.00 minimum fee (configurable from database)
+                $fastMultiplier = 1.25; // 1.25x multiplier for fast charging (configurable from database)
+                $batteryCapacityKwh = 40.0; // 40kWh battery capacity
+                
+                // Calculate energy used based on battery levels (like Java admin)
+                $initialBatteryLevel = $ticket['initial_battery_level'] ?? 50;
+                $usedFraction = (100.0 - $initialBatteryLevel) / 100.0;
+                $energyUsed = $usedFraction * $batteryCapacityKwh;
+                
+                // Determine service multiplier
+                $multiplier = 1.0; // Default for normal charging
+                if (stripos($ticket['service_type'], 'fast') !== false) {
+                    $multiplier = $fastMultiplier; // Apply fast charging premium
+                }
+                
+                // Calculate gross amount (like Java admin)
+                $grossAmount = $energyUsed * $ratePerKwh * $multiplier;
+                $amount = max($grossAmount, $minimumFee * $multiplier); // Apply minimum fee with multiplier
+                
+                // Get the bay number from charging_bays table BEFORE freeing it
+                $bay_stmt = $db->prepare("SELECT bay_number FROM charging_bays WHERE current_ticket_id = ?");
+                $bay_stmt->execute([$ticket_id]);
+                $bay_data = $bay_stmt->fetch(PDO::FETCH_ASSOC);
+                $bay_number = $bay_data ? $bay_data['bay_number'] : 0;
+                
+                // Update ticket status to Complete and save reference number
+                $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Complete', reference_number = ? WHERE ticket_id = ?");
+                $result = $stmt->execute([$reference_number, $ticket_id]);
+                
+                if (!$result) {
+                    throw new Exception('Failed to update ticket status');
+                }
+                
+                // Free up the bay
+                $bay_stmt = $db->prepare("UPDATE charging_bays SET status = 'Available', current_ticket_id = NULL, current_username = NULL, start_time = NULL WHERE current_ticket_id = ?");
+                $bay_result = $bay_stmt->execute([$ticket_id]);
+                
+                if (!$bay_result) {
+                    throw new Exception('Failed to free bay');
+                }
+                
+                // Add to charging history
+                try {
+                    $history_stmt = $db->prepare("
+                        INSERT INTO charging_history (
+                            ticket_id, username, service_type, initial_battery_level,
+                            final_battery_level, charging_time_minutes, energy_used, 
+                            total_amount, reference_number, completed_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    // Reference number already determined above
+                    $history_result = $history_stmt->execute([
+                        $ticket_id, 
+                        $ticket['username'], 
+                        $ticket['service_type'], 
+                        $initialBatteryLevel,
+                        100, // final_battery_level (always 100% when completed)
+                        0, // charging_time_minutes (not calculated yet)
+                        $energyUsed, // energy_used (calculated from battery levels)
+                        $amount, // total_amount (calculated using Java admin billing system)
+                        $reference_number
+                    ]);
+                    
+                    if (!$history_result) {
+                        throw new Exception('Failed to add to charging history');
+                    }
+                } catch (Exception $history_error) {
+                    // Log the error but don't fail the transaction
+                    error_log("Charging history insertion failed for ticket $ticket_id: " . $history_error->getMessage());
+                    // Continue with the transaction - bay is already freed and ticket marked complete
+                }
+                
+                $db->commit();
+                
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Ticket marked as complete',
+                    'reference_number' => $reference_number
+                ]);
+                
+            } catch (Exception $e) {
+                $db->rollback();
+                echo json_encode(['error' => 'Failed to complete ticket: ' . $e->getMessage()]);
             }
             break;
 
@@ -416,6 +636,17 @@ try {
             try {
                 $tables_info = [];
                 
+                // Check charging_bays table
+                $stmt = $db->query("SHOW TABLES LIKE 'charging_bays'");
+                if ($stmt->rowCount() > 0) {
+                    $columns = $db->query("DESCRIBE charging_bays")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['charging_bays'] = $columns;
+                    
+                    // Get sample data
+                    $sample_data = $db->query("SELECT * FROM charging_bays LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['charging_bays_sample'] = $sample_data;
+                }
+                
                 // Check payment_transactions table
                 $stmt = $db->query("SHOW TABLES LIKE 'payment_transactions'");
                 if ($stmt->rowCount() > 0) {
@@ -428,6 +659,36 @@ try {
                 if ($stmt->rowCount() > 0) {
                     $columns = $db->query("DESCRIBE charging_history")->fetchAll(PDO::FETCH_ASSOC);
                     $tables_info['charging_history'] = $columns;
+                    
+                    // Get sample data with specific column order
+                    $history_data = $db->query("SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, completed_at FROM charging_history ORDER BY completed_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['charging_history_sample'] = $history_data;
+                    
+                    // Get numeric indexed data to debug column order
+                    $history_numeric = $db->query("SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, completed_at FROM charging_history ORDER BY completed_at DESC LIMIT 3")->fetchAll(PDO::FETCH_NUM);
+                    $tables_info['charging_history_numeric'] = $history_numeric;
+                }
+                
+                // Check queue_tickets table
+                $stmt = $db->query("SHOW TABLES LIKE 'queue_tickets'");
+                if ($stmt->rowCount() > 0) {
+                    $columns = $db->query("DESCRIBE queue_tickets")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['queue_tickets'] = $columns;
+                    
+                    // Get current tickets
+                    $tickets_data = $db->query("SELECT * FROM queue_tickets ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['queue_tickets_sample'] = $tickets_data;
+                }
+                
+                // Check users table
+                $stmt = $db->query("SHOW TABLES LIKE 'users'");
+                if ($stmt->rowCount() > 0) {
+                    $columns = $db->query("DESCRIBE users")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['users'] = $columns;
+                    
+                    // Get current users
+                    $users_data = $db->query("SELECT username, firstname, lastname FROM users LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+                    $tables_info['users_sample'] = $users_data;
                 }
                 
                 echo json_encode([
@@ -596,13 +857,209 @@ try {
             }
             break;
 
+        case 'mark-payment-paid':
+            if ($method !== 'POST') {
+                echo json_encode(['error' => 'Method not allowed']);
+                break;
+            }
+            
+            $ticket_id = $_POST['ticket_id'] ?? '';
+            if (!$ticket_id) {
+                echo json_encode(['error' => 'Ticket ID required']);
+                break;
+            }
+            
+            // Debug: Log the request
+            error_log("Payment Debug - Starting payment for ticket: $ticket_id");
+            
+            // Start transaction
+            $db->beginTransaction();
+            
+            try {
+                // Get ticket details
+                $ticket_stmt = $db->prepare("SELECT * FROM queue_tickets WHERE ticket_id = ?");
+                $ticket_stmt->execute([$ticket_id]);
+                $ticket = $ticket_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$ticket) {
+                    throw new Exception('Ticket not found');
+                }
+                
+                // Debug: Log ticket data
+                error_log("Payment Debug - Ticket Data: " . json_encode($ticket));
+                
+                // Use existing reference number from Java admin if available, otherwise generate new one
+                $reference_number = $ticket['reference_number'] ?? '';
+                if (empty($reference_number)) {
+                    // Generate reference number (8-digit random number like Java admin)
+                    $reference_number = str_pad(mt_rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
+                    error_log("Payment Debug - Generated new reference number: $reference_number");
+                } else {
+                    error_log("Payment Debug - Using existing reference number from Java admin: $reference_number");
+                }
+                
+                // Get bay number if ticket was assigned to a bay
+                $bay_stmt = $db->prepare("SELECT bay_number FROM charging_bays WHERE current_ticket_id = ?");
+                $bay_stmt->execute([$ticket_id]);
+                $bay_data = $bay_stmt->fetch(PDO::FETCH_ASSOC);
+                $bay_number = $bay_data ? $bay_data['bay_number'] : 0;
+                
+                // Calculate payment amount using Java admin billing system
+                $ratePerKwh = 15.0; // ₱15.00 per kWh (configurable from database)
+                $minimumFee = 50.0; // ₱50.00 minimum fee (configurable from database)
+                $fastMultiplier = 1.25; // 1.25x multiplier for fast charging (configurable from database)
+                $batteryCapacityKwh = 40.0; // 40kWh battery capacity
+                
+                // Calculate energy used based on battery levels (like Java admin)
+                $initialBatteryLevel = $ticket['initial_battery_level'] ?? 50;
+                $usedFraction = (100.0 - $initialBatteryLevel) / 100.0;
+                $energyUsed = $usedFraction * $batteryCapacityKwh;
+                
+                // Determine service multiplier
+                $multiplier = 1.0; // Default for normal charging
+                if (stripos($ticket['service_type'], 'fast') !== false) {
+                    $multiplier = $fastMultiplier; // Apply fast charging premium
+                }
+                
+                // Calculate gross amount (like Java admin)
+                $grossAmount = $energyUsed * $ratePerKwh * $multiplier;
+                $amount = max($grossAmount, $minimumFee * $multiplier); // Apply minimum fee with multiplier
+                
+                // Reference number already determined above
+                
+                // Check if username exists in users table
+                error_log("Payment Debug - Checking user: " . $ticket['username']);
+                $user_check_stmt = $db->prepare("SELECT username FROM users WHERE username = ?");
+                $user_check_stmt->execute([$ticket['username']]);
+                $user_exists = $user_check_stmt->fetch();
+                
+                if (!$user_exists) {
+                    error_log("Payment Debug - User not found: " . $ticket['username']);
+                    throw new Exception('User ' . $ticket['username'] . ' does not exist in users table');
+                }
+                
+                error_log("Payment Debug - User exists: " . $ticket['username']);
+                
+                // Insert payment transaction
+                error_log("Payment Debug - Creating payment transaction for amount: $amount");
+                $payment_stmt = $db->prepare("
+                    INSERT INTO payment_transactions (
+                        ticket_id, username, amount, payment_method, 
+                        reference_number, transaction_status, processed_at
+                    ) VALUES (?, ?, ?, ?, ?, 'Completed', NOW())
+                ");
+                $payment_result = $payment_stmt->execute([
+                    $ticket_id,
+                    $ticket['username'],
+                    $amount,
+                    $ticket['payment_method'] ?? 'Cash',
+                    $reference_number
+                ]);
+                
+                if (!$payment_result) {
+                    $error_info = $payment_stmt->errorInfo();
+                    error_log("Payment Debug - Payment transaction failed: " . json_encode($error_info));
+                    throw new Exception('Failed to create payment transaction: ' . $error_info[2]);
+                }
+                
+                error_log("Payment Debug - Payment transaction created successfully");
+                
+                // Update queue_tickets table with reference number before moving to history
+                $update_ref_stmt = $db->prepare("UPDATE queue_tickets SET reference_number = ? WHERE ticket_id = ?");
+                $update_ref_stmt->execute([$reference_number, $ticket_id]);
+                error_log("Payment Debug - Updated queue_tickets with reference number: $reference_number");
+                
+                // Add to charging history
+                try {
+                    $history_stmt = $db->prepare("
+                        INSERT INTO charging_history (
+                            ticket_id, username, service_type, initial_battery_level,
+                            final_battery_level, charging_time_minutes, energy_used, 
+                            total_amount, reference_number, completed_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    $history_result = $history_stmt->execute([
+                        $ticket_id, 
+                        $ticket['username'], 
+                        $ticket['service_type'], 
+                        $initialBatteryLevel,
+                        100, // final_battery_level (always 100% when completed)
+                        0, // charging_time_minutes (not calculated yet)
+                        $energyUsed, // energy_used (calculated from battery levels)
+                        $amount, // total_amount (calculated using Java admin billing system)
+                        $reference_number
+                    ]);
+                    
+                    if (!$history_result) {
+                        throw new Exception('Failed to add to charging history');
+                    }
+                } catch (Exception $history_error) {
+                    // Log the error but don't fail the transaction
+                    error_log("Charging history insertion failed for ticket $ticket_id: " . $history_error->getMessage());
+                }
+                
+                // Clear active ticket (if exists) - like Java admin
+                try {
+                    $active_stmt = $db->prepare("DELETE FROM active_tickets WHERE ticket_id = ?");
+                    $active_stmt->execute([$ticket_id]);
+                } catch (Exception $e) {
+                    // Don't fail if active_tickets table doesn't exist
+                    error_log("Payment Debug - Active tickets table may not exist: " . $e->getMessage());
+                }
+                
+                // Clear charging bays - like Java admin
+                $bay_stmt = $db->prepare("UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?");
+                $bay_stmt->execute([$ticket_id]);
+                
+                // Clear charging grid - like Java admin
+                try {
+                    $grid_stmt = $db->prepare("UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?");
+                    $grid_stmt->execute([$ticket_id]);
+                } catch (Exception $e) {
+                    // Don't fail if charging_grid table doesn't exist
+                    error_log("Payment Debug - Charging grid table may not exist: " . $e->getMessage());
+                }
+                
+                // Update user's battery level to 100% when charging is completed - like Java admin
+                try {
+                    $battery_stmt = $db->prepare("UPDATE battery_levels SET battery_level = 100, last_updated = NOW() WHERE username = ?");
+                    $battery_stmt->execute([$ticket['username']]);
+                } catch (Exception $e) {
+                    // Don't fail if battery_levels table doesn't exist
+                    error_log("Payment Debug - Battery levels table may not exist: " . $e->getMessage());
+                }
+                
+                // Remove ticket from queue_tickets table (move to history) - like Java admin
+                $delete_stmt = $db->prepare("DELETE FROM queue_tickets WHERE ticket_id = ?");
+                $delete_result = $delete_stmt->execute([$ticket_id]);
+                
+                if (!$delete_result) {
+                    throw new Exception('Failed to remove ticket from queue');
+                }
+                
+                $db->commit();
+                
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Payment processed and ticket moved to history',
+                    'amount' => $amount,
+                    'reference_number' => $reference_number
+                ]);
+                
+            } catch (Exception $e) {
+                $db->rollback();
+                echo json_encode(['error' => 'Failed to process payment: ' . $e->getMessage()]);
+            }
+            break;
+
 
         default:
             echo json_encode([
                 'error' => 'Invalid action',
                 'available_actions' => [
                     'dashboard', 'queue', 'bays', 'users', 'ticket-details',
-                    'process-ticket', 'set-bay-maintenance', 'set-bay-available',
+                    'process-ticket', 'progress-to-waiting', 'progress-to-charging', 'progress-to-complete',
+                    'mark-payment-paid', 'set-bay-maintenance', 'set-bay-available',
                     'add-user', 'delete-user', 'settings', 'save-settings', 'analytics', 'transactions', 'progress-next-ticket'
                 ]
             ]);

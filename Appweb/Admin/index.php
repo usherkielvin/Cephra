@@ -131,7 +131,7 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                         </div>
                         <div class="stat-content">
                             <h3 id="revenue-today">₱0</h3>
-                            <p>Revenue</p>
+                            <p>Overall Revenue</p>
                         </div>
                     </div>
                 </div>

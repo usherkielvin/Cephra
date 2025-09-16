@@ -1141,8 +1141,8 @@ public class CephraDB {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO charging_history (ticket_id, username, service_type, " +
-                     "initial_battery_level, final_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, served_by) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                     "initial_battery_level, final_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, completed_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())")) {
             
             stmt.setString(1, ticketId);
             stmt.setString(2, username);
@@ -1159,13 +1159,7 @@ public class CephraDB {
             
             stmt.setDouble(8, totalAmount);
             stmt.setString(9, referenceNumber);
-            
-            // Get the actual admin username who is currently logged in
-            String adminUsername = getCurrentAdminUsername();
-            if (adminUsername == null || adminUsername.trim().isEmpty()) {
-                adminUsername = "Admin"; // Fallback if no admin logged in
-            }
-            stmt.setString(10, adminUsername);
+            // Note: completed_at is set to NOW() in the SQL, no need for setString(10)
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;

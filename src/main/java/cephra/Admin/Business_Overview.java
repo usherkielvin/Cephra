@@ -456,12 +456,12 @@ public class Business_Overview extends javax.swing.JPanel {
             // Calculate total earnings from all records
             double totalEarnings = 0.0;
             for (Object[] record : historyRecords) {
-                // Total amount is at index 5 in the history record
-                if (record[5] != null) {
+                // Total amount is at index 6 in the database record: [ticket_id, username, service_type, initial_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, completed_at]
+                if (record[6] != null) {
                     try {
-                        totalEarnings += Double.parseDouble(record[5].toString());
+                        totalEarnings += Double.parseDouble(record[6].toString());
                     } catch (NumberFormatException e) {
-                        System.err.println("Error parsing amount: " + record[5]);
+                        System.err.println("Error parsing amount: " + record[6]);
                     }
                 }
             }
