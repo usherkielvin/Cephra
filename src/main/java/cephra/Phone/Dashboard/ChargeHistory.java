@@ -383,20 +383,27 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                 System.err.println("PhoneHistory: Error checking database history: " + e.getMessage());
             }
         } else {
-            // Clear the container first
+            // Clear the container first to add all history entries
             history.removeAll();
             
-            // Create a panel for EACH history entry (so they stack!)
-            for (cephra.Phone.Utilities.HistoryManager.HistoryEntry entry : entries) {
-                JPanel entryPanel = createHistoryEntryPanel(entry);
+            // Create a copy of your history1 panel for each entry
+            for (int i = 0; i < entries.size(); i++) {
+                cephra.Phone.Utilities.HistoryManager.HistoryEntry entry = entries.get(i);
+                
+                // Create a panel that looks like your history1 panel
+                JPanel entryPanel = createHistoryPanelLikeHistory1(entry);
                 history.add(entryPanel);
-                history.add(Box.createRigidArea(new Dimension(0, 10))); // Spacing between entries
+                
+                // Add spacing between entries (except for the last one)
+                if (i < entries.size() - 1) {
+                    history.add(Box.createRigidArea(new Dimension(0, 8)));
+                }
             }
             
-            // Store the first entry for details button (if using original design)
+            // Store the first entry for details button
             currentHistoryEntry = entries.get(0);
             
-            System.out.println("PhoneHistory: Created " + entries.size() + " stacked history panels");
+            System.out.println("PhoneHistory: Created " + entries.size() + " history panels with separators");
         }
         
         // Ensure proper repaint
@@ -417,6 +424,98 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         } else {
             System.out.println("PhoneHistory: Username does not match, ignoring update");
         }
+    }
+    
+    /**
+     * Creates a panel that looks exactly like your designed history1 panel
+     */
+    private JPanel createHistoryPanelLikeHistory1(final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
+        // Create panel with EXACT same properties as your history1
+        JPanel panel = new JPanel();
+        
+        // Copy all properties from your history1 panel
+        panel.setLayout(history1.getLayout());
+        panel.setBackground(history1.getBackground());
+        panel.setBorder(history1.getBorder());
+        panel.setPreferredSize(history1.getPreferredSize());
+        panel.setMaximumSize(history1.getMaximumSize());
+        panel.setMinimumSize(history1.getMinimumSize());
+        
+        // Clone each component from history1 with the same bounds and properties
+        
+        // Clone time label
+        if (time != null) {
+            JLabel timeClone = new JLabel(entry.getFormattedTime());
+            timeClone.setBounds(time.getBounds());
+            timeClone.setFont(time.getFont());
+            timeClone.setForeground(time.getForeground());
+            timeClone.setBackground(time.getBackground());
+            timeClone.setOpaque(time.isOpaque());
+            panel.add(timeClone);
+        }
+        
+        // Clone price label
+        if (price != null) {
+            JLabel priceClone = new JLabel(entry.getTotal());
+            priceClone.setBounds(price.getBounds());
+            priceClone.setFont(price.getFont());
+            priceClone.setForeground(price.getForeground());
+            priceClone.setBackground(price.getBackground());
+            priceClone.setOpaque(price.isOpaque());
+            panel.add(priceClone);
+        }
+        
+        // Clone date label
+        if (date != null) {
+            JLabel dateClone = new JLabel(entry.getFormattedDate());
+            dateClone.setBounds(date.getBounds());
+            dateClone.setFont(date.getFont());
+            dateClone.setForeground(date.getForeground());
+            dateClone.setBackground(date.getBackground());
+            dateClone.setOpaque(date.isOpaque());
+            panel.add(dateClone);
+        }
+        
+        // Clone type label
+        if (type != null) {
+            JLabel typeClone = new JLabel(entry.getServiceType());
+            typeClone.setBounds(type.getBounds());
+            typeClone.setFont(type.getFont());
+            typeClone.setForeground(type.getForeground());
+            typeClone.setBackground(type.getBackground());
+            typeClone.setOpaque(type.isOpaque());
+            panel.add(typeClone);
+        }
+        
+        // Clone chargetime label
+        if (chargetime != null) {
+            JLabel chargetimeClone = new JLabel(entry.getChargingTime());
+            chargetimeClone.setBounds(chargetime.getBounds());
+            chargetimeClone.setFont(chargetime.getFont());
+            chargetimeClone.setForeground(chargetime.getForeground());
+            chargetimeClone.setBackground(chargetime.getBackground());
+            chargetimeClone.setOpaque(chargetime.isOpaque());
+            panel.add(chargetimeClone);
+        }
+        
+        // Clone Separ label
+
+        
+        // Clone details button
+        if (details != null) {
+            JButton detailsClone = new JButton();
+            detailsClone.setBounds(details.getBounds());
+            detailsClone.setBorderPainted(details.isBorderPainted());
+            detailsClone.setContentAreaFilled(details.isContentAreaFilled());
+            detailsClone.setFocusPainted(details.isFocusPainted());
+            detailsClone.addActionListener(evt -> {
+                currentHistoryEntry = entry;
+                showHistoryDetails(entry);
+            });
+            panel.add(detailsClone);
+        }
+        
+        return panel;
     }
     
     /**
@@ -1011,7 +1110,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         jLabel1.setBounds(-15, 0, 398, 750);
 
         history1.setBackground(new java.awt.Color(255, 255, 255));
-        history1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        history1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
         history1.setLayout(null);
 
         time.setText("time");
@@ -1031,6 +1130,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         history1.add(type);
         type.setBounds(10, 40, 210, 16);
 
+        chargetime.setBackground(new java.awt.Color(0, 0, 0));
         chargetime.setText("jLabel2");
         history1.add(chargetime);
         chargetime.setBounds(10, 60, 220, 16);
@@ -1043,7 +1143,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             }
         });
         history1.add(details);
-        details.setBounds(0, 0, 310, 80);
+        details.setBounds(70, -30, 310, 80);
 
         add(history1);
         history1.setBounds(400, 160, 310, 80);
@@ -1170,6 +1270,13 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             if (date != null) date.setText("No Date");
             if (type != null) type.setText("No Service");
             if (chargetime != null) chargetime.setText("0 mins");
+            
+         
+            // 2.6. Adjust chargetime position to avoid overlapping separator
+            if (chargetime != null) {
+                chargetime.setBounds(10, 62, 220, 16); // Moved down to y=62 to avoid separator at y=45
+                System.out.println("✓ Adjusted chargetime position");
+            }
           
             System.out.println("✓ Set initial label text");
             
@@ -1188,14 +1295,31 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                 System.out.println("✓ Added details button functionality");
             }
             
-            // 4. Setup history container for dynamic panels - DON'T TOUCH YOUR DESIGNED history1!
-            if (history != null) {
-                // DON'T remove history1 from your design - leave it where you put it!
-                // Just clear the scroll pane container - ready for dynamic panels
+            // 4. Move your designed history1 panel into the visible area
+            if (history1 != null && history != null) {
+                // Remove history1 from its current position outside the visible area
+                remove(history1);
+                
+                // Position your history1 panel in the visible scroll area
+                history1.setBounds(0, 0, 310, 80);
+                history1.setVisible(true);
+                history1.setOpaque(true);
+                
+                // Clear the scroll container and add your designed history1 panel
                 history.removeAll();
+                history.add(history1);
+                
+            
+                
                 history.revalidate();
                 history.repaint();
-                System.out.println("✓ Prepared history container for stacked panels (your history1 stays in design)");
+                
+                // Debug info
+                System.out.println("✓ history1 panel setup:");
+                System.out.println("  - Bounds: " + history1.getBounds());
+                System.out.println("  - Visible: " + history1.isVisible());
+                System.out.println("  - Component count: " + history1.getComponentCount());
+                System.out.println("✓ Moved your designed history1 panel (with Separ) into visible area");
             }
             
             // 5. Initially hide the detailpanel (it will be shown when details button is clicked)
