@@ -191,21 +191,21 @@ public class LinkedCar extends javax.swing.JPanel {
         charge = new javax.swing.JButton();
         batterypercent = new javax.swing.JLabel();
         km = new javax.swing.JLabel();
-        cover = new javax.swing.JLabel();
-        bar = new javax.swing.JLabel();
         chargingTypeLabel = new javax.swing.JLabel();
         chargingTimeLabel = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        bar = new javax.swing.JLabel();
+        cover = new javax.swing.JLabel();
 
         setLayout(null);
 
         car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.png"))); // NOI18N
         car.setPreferredSize(new java.awt.Dimension(301, 226));
         add(car);
-        car.setBounds(20, 75, 301, 226);
+        car.setBounds(36, 90, 301, 226);
 
         jPanel1.setOpaque(false);
         jPanel1.setLayout(null);
@@ -276,50 +276,50 @@ public class LinkedCar extends javax.swing.JPanel {
         batterypercent.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         batterypercent.setText("25 %");
         add(batterypercent);
-        batterypercent.setBounds(210, 430, 80, 30);
+        batterypercent.setBounds(230, 430, 80, 30);
 
-        km.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        km.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         km.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         km.setText("400 km");
         add(km);
-        km.setBounds(180, 480, 140, 30);
-
-        cover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Cover.png"))); // NOI18N
-        cover.setText("Bar");
-        add(cover);
-        cover.setBounds(130, 200, 230, 210);
-
-        bar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Bar.png"))); // NOI18N
-        add(bar);
-        bar.setBounds(130, 200, 230, 200);
+        km.setBounds(200, 480, 140, 30);
 
         chargingTypeLabel.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
         chargingTypeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         chargingTypeLabel.setText("Fast Charging");
         add(chargingTypeLabel);
-        chargingTypeLabel.setBounds(20, 410, 140, 25);
+        chargingTypeLabel.setBounds(40, 410, 140, 25);
 
         chargingTimeLabel.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         chargingTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         chargingTimeLabel.setText("100%");
         add(chargingTimeLabel);
-        chargingTimeLabel.setBounds(40, 440, 100, 50);
+        chargingTimeLabel.setBounds(60, 440, 100, 50);
 
         jLabel2.setText("3hrs 12mins");
         add(jLabel2);
-        jLabel2.setBounds(150, 574, 90, 16);
+        jLabel2.setBounds(180, 568, 90, 16);
 
         jLabel3.setText("2hrs 50mins");
         add(jLabel3);
-        jLabel3.setBounds(150, 588, 90, 16);
+        jLabel3.setBounds(180, 585, 90, 16);
 
         jLabel4.setText("1hr 30mins");
         add(jLabel4);
-        jLabel4.setBounds(150, 603, 90, 16);
+        jLabel4.setBounds(180, 603, 90, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/linked.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(-15, 0, 398, 750);
+        jLabel1.setBounds(3, 0, 380, 750);
+
+        bar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Bar.png"))); // NOI18N
+        add(bar);
+        bar.setBounds(130, 200, 230, 200);
+
+        cover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Cover.png"))); // NOI18N
+        cover.setText("Bar");
+        add(cover);
+        cover.setBounds(90, 230, 230, 210);
     }// </editor-fold>//GEN-END:initComponents
 
     private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profilebuttonActionPerformed
@@ -440,11 +440,11 @@ public class LinkedCar extends javax.swing.JPanel {
                     
                     // Special case for c2.png - increase height by 2 pixels to show cut-off part
                     if (carIndex == 1) { // c2.png is at index 1 (c1=0, c2=1, c3=2, etc.)
-                        car.setBounds(34, 130, 301, 228); // Height increased from 226 to 228
+                        car.setBounds(36, 90, 301, 228); // Height increased from 226 to 228
                         car.setPreferredSize(new java.awt.Dimension(301, 228));
                         System.out.println("LinkedCar: Set c2.png car image with increased height (301x228) to show full image");
                     } else {
-                        car.setBounds(34, 130, 301, 226);
+                        car.setBounds(36, 90, 301, 226);
                         car.setPreferredSize(new java.awt.Dimension(301, 226));
                         System.out.println("LinkedCar: Set car image to " + carImages[carIndex] + " for user " + username + " at position (34, 130)");
                     }
@@ -454,7 +454,7 @@ public class LinkedCar extends javax.swing.JPanel {
             System.err.println("Error setting car image: " + e.getMessage());
             // Fallback to default car image with preserved positioning
             car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c1.png")));
-            car.setBounds(34, 130, 301, 226);
+            car.setBounds(36, 90, 301, 226);
             car.setPreferredSize(new java.awt.Dimension(301, 226));
         }
     }
@@ -469,18 +469,18 @@ public class LinkedCar extends javax.swing.JPanel {
             if (username != null && !username.isEmpty()) {
                 int carIndex = cephra.Database.CephraDB.getUserCarIndex(username);
                 if (carIndex == 1) { // c2.png is at index 1
-                    car.setBounds(34, 130, 301, 228); // Height increased from 226 to 228
+                    car.setBounds(36, 90, 301, 228); // Height increased from 226 to 228
                     car.setPreferredSize(new java.awt.Dimension(301, 228));
                 } else {
-                    car.setBounds(34, 130, 301, 226);
+                    car.setBounds(36, 90, 301, 226);
                     car.setPreferredSize(new java.awt.Dimension(301, 226));
                 }
             } else {
-                car.setBounds(34, 130, 301, 226);
+                car.setBounds(36, 90, 301, 226);
                 car.setPreferredSize(new java.awt.Dimension(301, 226));
             }
         } catch (Exception e) {
-            car.setBounds(34, 130, 301, 226);
+            car.setBounds(36, 90, 301, 226);
             car.setPreferredSize(new java.awt.Dimension(301, 226));
         }
     }
