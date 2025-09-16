@@ -234,44 +234,50 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     try { assigned = tryAssignToAnyAvailableBay(ticket); } catch (Throwable t) { System.err.println("Queue: assign attempt failed: " + t.getMessage()); }
                     if (assigned) {
                         setTableStatusToChargingByTicket(ticket);
+                    } else {
+                        // Show dialog when assignment fails due to no available bays
+                        Queue.this.showBayUnavailableDialog(ticket);
                     }
                     updateStatusCounters();
                     return;
                 }
                 if ("Charging".equalsIgnoreCase(status)) {
-                    boolean canShowPayPop = false;
-                    try {
-                        canShowPayPop = cephra.Phone.Popups.PayPop.canShowPayPop(ticket, customer);
-                        System.out.println("Queue: Checking if PayPop can be shown for ticket " + ticket + " and customer " + customer + ": " + canShowPayPop);
-                    } catch (Throwable t) {
-                        System.err.println("Error checking PayPop availability: " + t.getMessage());
-                        canShowPayPop = false;
-                    }
-                    if (!canShowPayPop) {
-                        System.out.println("Queue: Cannot show PayPop for ticket " + ticket + " - setting payment to Pending");
-                        try { ensurePaymentPending(ticket); } catch (Exception ex) { System.err.println("Failed to set pending: " + ex.getMessage()); }
-                        return;
-                    }
-                    System.out.println("Queue: PayPop can be shown - completing charging for ticket " + ticket);
+                    // Move from Charging to Complete status
+                    System.out.println("Queue: Moving ticket " + ticket + " from Charging to Complete status");
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
+                    
+                    // Ensure payment is set to Pending
+                    try { 
+                        ensurePaymentPending(ticket); 
+                        if (paymentCol >= 0) {
+                            queTab.setValueAt("Pending", editingRow, paymentCol);
+                        }
+                    } catch (Exception ex) { 
+                        System.err.println("Failed to set payment pending: " + ex.getMessage()); 
+                    }
                     
                     // Trigger FULL_CHARGE notification for the customer
                     triggerNotificationForCustomer(customer, "FULL_CHARGE", ticket, null);
                 }
-                if ("Complete".equalsIgnoreCase(status) || "Charging".equalsIgnoreCase(status)) {
-                    try {
-                        boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticket, customer);
-                        if (!success) { System.err.println("Queue: PayPop failed to open for ticket " + ticket); }
-                    } catch (Throwable t) {
-                        System.err.println("Error showing PayPop: " + t.getMessage());
-                    }
-                } else if ("Complete".equalsIgnoreCase(status)) {
+                if ("Complete".equalsIgnoreCase(status)) {
                 
-                    // If paid, move to History and remove from Queue
+                    // Check payment status
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
                     System.out.println("Queue: Processing Complete ticket " + ticket + " with payment status: " + payment);
                     
-                    if ("Paid".equalsIgnoreCase(payment)) {
+                    if ("Pending".equalsIgnoreCase(payment)) {
+                        // Payment is still pending, show PayPop for payment
+                        System.out.println("Queue: Payment is pending for ticket " + ticket + " - showing PayPop");
+                        try {
+                            boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticket, customer);
+                            if (!success) { 
+                                System.err.println("Queue: PayPop failed to open for ticket " + ticket); 
+                            }
+                        } catch (Throwable t) {
+                            System.err.println("Error showing PayPop: " + t.getMessage());
+                        }
+                        return;
+                    } else if ("Paid".equalsIgnoreCase(payment)) {
                         // Check if payment has already been processed to prevent duplicates
                         boolean alreadyProcessed = cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket);
                         System.out.println("Queue: Checking if payment already processed for ticket " + ticket + ": " + alreadyProcessed);
@@ -627,6 +633,32 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         updateStatusCounters();
     }
     
+    /**
+     * Shows appropriate dialog when a ticket cannot be assigned to bays
+     * @param ticket the ticket ID
+     */
+    private void showBayUnavailableDialog(String ticket) {
+        // Determine if this is a fast or normal charging ticket
+        boolean isFastCharging = ticket.toUpperCase().startsWith("FCH");
+        
+        String message;
+        String title;
+        
+        if (isFastCharging) {
+            message = "All Fast Charging Bays (1-3) are currently occupied or in maintenance!\n\n" +
+                     "Ticket " + ticket + " will remain in the waiting queue.\n" +
+                     "Please wait for a fast charging bay to become available.";
+            title = "Fast Charging Bays Unavailable";
+        } else {
+            message = "All Normal Charging Bays (4-8) are currently occupied or in maintenance!\n\n" +
+                     "Ticket " + ticket + " will remain in the waiting queue.\n" +
+                     "Please wait for a normal charging bay to become available.";
+            title = "Normal Charging Bays Unavailable";
+        }
+        
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
+    }
+    
     private String findNextTicketByType(String type) {
         // Find the lowest numbered ticket of the specified type
         String lowestTicket = null;
@@ -842,11 +874,13 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
 
         if (prefersFast) {
-            if (assignToFastSlot(ticket)) return true;
-            return assignToNormalSlot(ticket);
-        } else {
-            if (assignToNormalSlot(ticket)) return true;
+            // Fast charging requests should ONLY use fast bays (1-3)
+            // No fallback to normal bays to maintain service integrity
             return assignToFastSlot(ticket);
+        } else {
+            // Normal charging requests should ONLY use normal bays (4-8)
+            // No fallback to fast bays to maintain service integrity
+            return assignToNormalSlot(ticket);
         }
     }
 
@@ -1035,6 +1069,16 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                 System.out.println("Queue: About to call markPaymentPaid for ticket " + ticket);
                                 cephra.Admin.QueueBridge.markPaymentPaid(ticket);
                                 System.out.println("Queue: Completed markPaymentPaid for ticket " + ticket);
+                                
+                                // Hide PayPop on phone if it's showing for this ticket
+                                try {
+                                    if (cephra.Phone.Popups.PayPop.isShowingForTicket(ticket)) {
+                                        System.out.println("Queue: Hiding PayPop for ticket " + ticket + " after admin marked as paid");
+                                        cephra.Phone.Popups.PayPop.hidePayPop();
+                                    }
+                                } catch (Exception ex) {
+                                    System.err.println("Error hiding PayPop: " + ex.getMessage());
+                                }
                                 
                                 // Stop cell editing immediately
                                 stopCellEditing();

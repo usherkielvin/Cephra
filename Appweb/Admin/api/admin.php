@@ -232,18 +232,47 @@ try {
                 break;
             }
             
-            // Find next available bay (try both INT and VARCHAR formats)
-            $bay_stmt = $db->query("
-                SELECT bay_number 
-                FROM charging_bays 
-                WHERE status = 'Available' 
-                ORDER BY CAST(bay_number AS UNSIGNED) ASC, bay_number ASC 
-                LIMIT 1
-            ");
+            // Get ticket service type to determine bay type
+            $service_stmt = $db->prepare("SELECT service_type FROM queue_tickets WHERE ticket_id = ?");
+            $service_stmt->execute([$ticket_id]);
+            $ticket_data = $service_stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$ticket_data) {
+                echo json_encode(['error' => 'Ticket not found']);
+                break;
+            }
+            
+            $service_type = $ticket_data['service_type'] ?? '';
+            $is_fast_charging = (stripos($service_type, 'fast') !== false) || (stripos($ticket_id, 'FCH') !== false);
+            
+            // Find appropriate bay based on service type
+            if ($is_fast_charging) {
+                // Fast charging: only use bays 1-3
+                $bay_stmt = $db->query("
+                    SELECT bay_number 
+                    FROM charging_bays 
+                    WHERE status = 'Available' 
+                    AND CAST(bay_number AS UNSIGNED) BETWEEN 1 AND 3
+                    ORDER BY CAST(bay_number AS UNSIGNED) ASC 
+                    LIMIT 1
+                ");
+            } else {
+                // Normal charging: only use bays 4-8
+                $bay_stmt = $db->query("
+                    SELECT bay_number 
+                    FROM charging_bays 
+                    WHERE status = 'Available' 
+                    AND CAST(bay_number AS UNSIGNED) BETWEEN 4 AND 8
+                    ORDER BY CAST(bay_number AS UNSIGNED) ASC 
+                    LIMIT 1
+                ");
+            }
+            
             $available_bay = $bay_stmt->fetch(PDO::FETCH_ASSOC);
             
             if (!$available_bay) {
-                echo json_encode(['error' => 'No available charging bays']);
+                $bay_type = $is_fast_charging ? 'fast charging' : 'normal charging';
+                echo json_encode(['error' => "No available {$bay_type} bays"]);
                 break;
             }
             
@@ -351,8 +380,8 @@ try {
                 $bay_data = $bay_stmt->fetch(PDO::FETCH_ASSOC);
                 $bay_number = $bay_data ? $bay_data['bay_number'] : 0;
                 
-                // Update ticket status to Complete and save reference number
-                $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Complete', reference_number = ? WHERE ticket_id = ?");
+                // Update ticket status to Complete, set payment to Pending, and save reference number
+                $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Complete', payment_status = 'Pending', reference_number = ? WHERE ticket_id = ?");
                 $result = $stmt->execute([$reference_number, $ticket_id]);
                 
                 if (!$result) {
