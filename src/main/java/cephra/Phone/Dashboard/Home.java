@@ -134,19 +134,17 @@ public class Home extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
-        rewardbalance.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        rewardbalance.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         rewardbalance.setForeground(new java.awt.Color(255, 255, 255));
-        rewardbalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         rewardbalance.setText("500");
         add(rewardbalance);
-        rewardbalance.setBounds(268, 68, 40, 20);
+        rewardbalance.setBounds(185, 68, 50, 20);
 
-        pesobalance.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        pesobalance.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         pesobalance.setForeground(new java.awt.Color(255, 255, 255));
-        pesobalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        pesobalance.setText("500");
+        pesobalance.setText("2100");
         add(pesobalance);
-        pesobalance.setBounds(186, 68, 40, 20);
+        pesobalance.setBounds(265, 68, 48, 20);
 
         LinkVehicle.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
         LinkVehicle.setForeground(new java.awt.Color(255, 255, 255));
