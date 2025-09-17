@@ -1025,12 +1025,45 @@ class AdminPanel {
         }
 
         tbody.innerHTML = transactions.map(transaction => {
-            const date = new Date(transaction.transaction_date);
-            // Format date without seconds
-            const formattedDate = date.toLocaleDateString() + ' ' + 
-                date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const amount = parseFloat(transaction.total_amount || 0).toFixed(2);
-            const energy = parseFloat(transaction.energy_kwh || 0).toFixed(2);
+            // Safely handle date parsing
+            let formattedDate = 'N/A';
+            try {
+                if (transaction.transaction_date) {
+                    const date = new Date(transaction.transaction_date);
+                    if (!isNaN(date.getTime())) {
+                        formattedDate = date.toLocaleDateString() + ' ' + 
+                            date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    }
+                }
+            } catch (e) {
+                console.warn('Date parsing error:', e);
+            }
+            
+            // Safely handle numeric values
+            let amount = '0.00';
+            let energy = '0.00';
+            
+            try {
+                if (transaction.total_amount !== null && 
+                    transaction.total_amount !== undefined && 
+                    transaction.total_amount !== '' &&
+                    !isNaN(parseFloat(transaction.total_amount))) {
+                    amount = parseFloat(transaction.total_amount).toFixed(2);
+                }
+            } catch (e) {
+                console.warn('Amount parsing error:', e);
+            }
+            
+            try {
+                if (transaction.energy_kwh !== null && 
+                    transaction.energy_kwh !== undefined && 
+                    transaction.energy_kwh !== '' &&
+                    !isNaN(parseFloat(transaction.energy_kwh))) {
+                    energy = parseFloat(transaction.energy_kwh).toFixed(2);
+                }
+            } catch (e) {
+                console.warn('Energy parsing error:', e);
+            }
             
             return `
                 <tr>
@@ -1082,48 +1115,205 @@ class AdminPanel {
     }
 
     exportTransactions() {
-        // Export transactions using the raw data instead of HTML table content
         if (!this.transactionData || this.transactionData.length === 0) {
             this.showError('No transactions to export');
             return;
         }
 
-        let csv = 'Ticket,User,kWh,Total,Date and Time,Reference\n';
+        // Create proper CSV format for Excel with shorter headers
+        let csv = 'Ticket,User,kWh,Amount,Date,Reference\n';
         
         this.transactionData.forEach(transaction => {
-            const date = new Date(transaction.transaction_date);
-            // Format date for CSV export
-            const formattedDate = date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            }) + ' ' + date.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
+            // Safely handle date parsing - use compact 12-hour format to prevent ####
+            let formattedDate = 'N/A';
+            try {
+                if (transaction.transaction_date) {
+                    const date = new Date(transaction.transaction_date);
+                    if (!isNaN(date.getTime())) {
+                        // Use compact 12-hour format: MM/DD/YY H:MM AM/PM (fits in narrow columns)
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const year = date.getFullYear().toString().slice(-2);
+                        
+                        let hours = date.getHours();
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        
+                        // Convert to 12-hour format
+                        hours = hours % 12;
+                        hours = hours ? hours : 12; // 0 should be 12
+                        
+                        // Add tab character to force Excel to treat as text
+                        formattedDate = `\t${month}/${day}/${year} ${hours}:${minutes} ${ampm}`;
+                    }
+                }
+            } catch (e) {
+                console.warn('Date parsing error:', e);
+            }
             
-            const amount = parseFloat(transaction.total_amount || 0).toFixed(2);
-            const energy = parseFloat(transaction.energy_kwh || 0).toFixed(2);
+            // Safely handle numeric values
+            let amount = '0.00';
+            let energy = '0.00';
             
+            try {
+                if (transaction.total_amount !== null && 
+                    transaction.total_amount !== undefined && 
+                    transaction.total_amount !== '' &&
+                    !isNaN(parseFloat(transaction.total_amount))) {
+                    amount = parseFloat(transaction.total_amount).toFixed(2);
+                }
+            } catch (e) {
+                console.warn('Amount parsing error:', e);
+            }
+            
+            try {
+                if (transaction.energy_kwh !== null && 
+                    transaction.energy_kwh !== undefined && 
+                    transaction.energy_kwh !== '' &&
+                    !isNaN(parseFloat(transaction.energy_kwh))) {
+                    energy = parseFloat(transaction.energy_kwh).toFixed(2);
+                }
+            } catch (e) {
+                console.warn('Energy parsing error:', e);
+            }
+            
+            // Clean text fields and escape quotes for CSV
+            const ticketId = (transaction.ticket_id || 'N/A').toString().replace(/"/g, '""');
+            const username = (transaction.username || 'N/A').toString().replace(/"/g, '""');
+            const reference = (transaction.reference_number || 'N/A').toString().replace(/"/g, '""');
+            
+            // Create CSV row - format date as text to prevent Excel conversion
             const rowData = [
-                `"${transaction.ticket_id || 'N/A'}"`,
-                `"${transaction.username || 'N/A'}"`,
-                `"${energy}"`,
-                `"${amount}"`,
-                `"${formattedDate}"`,
-                `"${transaction.reference_number || 'N/A'}"`
+                `"${ticketId}"`,
+                `"${username}"`,
+                energy, // Don't quote numbers for Excel
+                amount, // Don't quote numbers for Excel
+                `"${formattedDate}"`, // Keep quoted to force text format
+                `"${reference}"`
             ];
             
             csv += rowData.join(',') + '\n';
         });
 
-        // Download CSV
-        const blob = new Blob([csv], { type: 'text/csv' });
+        // Create HTML table directly from transaction data
+        let html = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+              xmlns:x="urn:schemas-microsoft-com:office:excel" 
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+            <meta charset="utf-8">
+            <meta name="ExcelCreated" content="true">
+            <style>
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; font-weight: bold; }
+                .date-column { width: 20em; min-width: 20em; }
+            </style>
+        </head>
+        <body>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticket</th>
+                        <th>User</th>
+                        <th>kWh</th>
+                        <th>Amount</th>
+                        <th class="date-column">Date</th>
+                        <th>Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        // Add data rows directly from transaction data
+        this.transactionData.forEach(transaction => {
+            // Safely handle date parsing - use compact 12-hour format to prevent ####
+            let formattedDate = 'N/A';
+            try {
+                if (transaction.transaction_date) {
+                    const date = new Date(transaction.transaction_date);
+                    if (!isNaN(date.getTime())) {
+                        // Use compact 12-hour format: MM/DD/YY H:MM AM/PM (fits in narrow columns)
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const year = date.getFullYear().toString().slice(-2);
+                        
+                        let hours = date.getHours();
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        
+                        // Convert to 12-hour format
+                        hours = hours % 12;
+                        hours = hours ? hours : 12; // 0 should be 12
+                        
+                        // Add tab character to force Excel to treat as text
+                        formattedDate = `${month}/${day}/${year} ${hours}:${minutes} ${ampm}`;
+                    }
+                }
+            } catch (e) {
+                console.warn('Date parsing error:', e);
+            }
+            
+            // Safely handle numeric values
+            let amount = '0.00';
+            let energy = '0.00';
+            
+            try {
+                if (transaction.total_amount !== null && 
+                    transaction.total_amount !== undefined && 
+                    transaction.total_amount !== '' &&
+                    !isNaN(parseFloat(transaction.total_amount))) {
+                    amount = parseFloat(transaction.total_amount).toFixed(2);
+                }
+            } catch (e) {
+                console.warn('Amount parsing error:', e);
+            }
+            
+            try {
+                if (transaction.energy_kwh !== null && 
+                    transaction.energy_kwh !== undefined && 
+                    transaction.energy_kwh !== '' &&
+                    !isNaN(parseFloat(transaction.energy_kwh))) {
+                    energy = parseFloat(transaction.energy_kwh).toFixed(2);
+                }
+            } catch (e) {
+                console.warn('Energy parsing error:', e);
+            }
+
+            html += `
+                <tr>
+                    <td>${(transaction.ticket_id || 'N/A').toString().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                    <td>${(transaction.username || 'N/A').toString().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                    <td>${energy}</td>
+                    <td>${amount}</td>
+                    <td class="date-column">${formattedDate}</td>
+                    <td>${(transaction.reference_number || 'N/A').toString().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+                </tbody>
+            </table>
+        </body>
+        </html>
+        `;
+
+        // Add BOM for proper UTF-8 encoding in Excel
+        const BOM = '\uFEFF';
+        const csvWithBOM = BOM + html;
+        
+        // Download as Excel-compatible HTML file with column formatting
+        const blob = new Blob([csvWithBOM], { 
+            type: 'application/vnd.ms-excel' 
+        });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `transactions_${new Date().toISOString().split('T')[0]}.xls`;
+        
+        this.showSuccess('Transactions exported successfully! Date column is set to width 20 for proper display.');
+        
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

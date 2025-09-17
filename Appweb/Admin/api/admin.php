@@ -966,6 +966,39 @@ try {
                 // Update missing reference_number values
                 $db->exec("UPDATE charging_history SET reference_number = CONCAT('REF', ticket_id, '_', UNIX_TIMESTAMP(NOW())) WHERE reference_number IS NULL OR reference_number = '' OR reference_number = 'N/A'");
                 
+                // Clean and validate transaction data to prevent Excel ########## issue
+                foreach ($transactions as &$transaction) {
+                    // Ensure numeric values are properly formatted
+                    if (isset($transaction['total_amount'])) {
+                        $transaction['total_amount'] = is_numeric($transaction['total_amount']) ? 
+                            number_format((float)$transaction['total_amount'], 2, '.', '') : '0.00';
+                    } else {
+                        $transaction['total_amount'] = '0.00';
+                    }
+                    
+                    if (isset($transaction['energy_kwh'])) {
+                        $transaction['energy_kwh'] = is_numeric($transaction['energy_kwh']) ? 
+                            number_format((float)$transaction['energy_kwh'], 2, '.', '') : '0.00';
+                    } else {
+                        $transaction['energy_kwh'] = '0.00';
+                    }
+                    
+                    // Ensure reference_number is not null
+                    if (empty($transaction['reference_number'])) {
+                        $transaction['reference_number'] = 'N/A';
+                    }
+                    
+                    // Ensure ticket_id and username are not null
+                    if (empty($transaction['ticket_id'])) {
+                        $transaction['ticket_id'] = 'N/A';
+                    }
+                    
+                    if (empty($transaction['username'])) {
+                        $transaction['username'] = 'N/A';
+                    }
+                }
+                unset($transaction); // Break reference
+                
                 // Sort by transaction date
                 usort($transactions, function($a, $b) {
                     $dateA = $a['transaction_date'] ?? '1970-01-01';
