@@ -3,6 +3,8 @@ package cephra.Phone.Dashboard;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import javax.swing.*;
 
@@ -10,8 +12,6 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     
     private String currentUsername;
     private JPanel previousPanel;
-    private JPanel messagePopupPanel;
-    private JPanel modalOverlay;
 
     public NotificationHistory() {
         initComponents();
@@ -39,16 +39,13 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             }
         });
         
-        // Add a test notification
-        String currentUser = cephra.Database.CephraDB.getCurrentUsername();
-        if (currentUser != null) {
-            cephra.Phone.Utilities.NotificationManager.addChargingCompleteNotification(
-                currentUser, "FCH06", "3"
-            );
-        }
+        // No test notifications - only show real notifications
         
         // Load notification entries
         loadNotificationEntries();
+        
+        // Add a simple test method - you can call this to test notifications
+        // addTestNotification();
         
         // Add component listener to refresh when panel becomes visible
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -171,221 +168,197 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     }
     
     private void addNotificationItem(final cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
-        // Create a panel for a single notification item
-        JPanel notificationItemPanel = new JPanel();
-        notificationItemPanel.setLayout(new BorderLayout(5, 0));
-        notificationItemPanel.setBackground(Color.WHITE);
-        notificationItemPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
-        notificationItemPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Create notification item using the nothis panel as a template but with independent structure
+        JPanel notificationItemPanel = createNotificationItemFromTemplate(entry);
+        historyPanel.add(notificationItemPanel);
+    }
+    
+    private JPanel createNotificationItemFromTemplate(final cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+        JPanel itemPanel = new JPanel();
+        itemPanel.setLayout(null);
         
-        // Set cursor to hand
-        notificationItemPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        // Dynamic height calculation
-        int baseHeight = 80;
-        int itemWidth = 260;
-
-        // Date label at top
-        JLabel dateLabel = new JLabel(entry.getFormattedDate());
-        dateLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        dateLabel.setForeground(new Color(70, 70, 70));
-
-        // Left panel for details
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.setBackground(Color.WHITE);
-
-        // Time
-        JLabel timeLabel = new JLabel(entry.getFormattedTime());
-        timeLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-        timeLabel.setForeground(Color.DARK_GRAY);
-        timeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Notification type
-        JLabel typeLabel = new JLabel(entry.getType().getDisplayName());
-        typeLabel.setFont(new Font("Arial", Font.BOLD, 11));
-        typeLabel.setForeground(new Color(50, 100, 150));
-        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Use JTextArea for proper multiline text display
-        JTextArea messageTextArea = new JTextArea(entry.getMessage());
-        messageTextArea.setFont(new Font("Arial", Font.PLAIN, 12));
+        // Get dimensions and colors from nothis panel if available, otherwise use defaults
+        Dimension panelSize = (nothis != null) ? nothis.getSize() : new Dimension(270, 80);
+        Color panelBg = (nothis != null) ? nothis.getBackground() : new Color(255, 255, 255);
+        
+        itemPanel.setPreferredSize(panelSize);
+        itemPanel.setMaximumSize(panelSize);
+        itemPanel.setBackground(panelBg);
+        itemPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
+        itemPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        itemPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Try to copy components from nothis panel, with fallback to manual creation
+        if (nothis != null && nothis.getComponentCount() > 0) {
+            copyComponentsFromTemplate(itemPanel, entry);
+        } else {
+            createComponentsManually(itemPanel, entry);
+        }
+        
+        // Removed click listener - no more popup details
+        
+        return itemPanel;
+    }
+    
+    private void copyComponentsFromTemplate(JPanel itemPanel, cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+        // Create components based on nothis template but with actual data
+        try {
+            // Find and copy icon component
+            if (jLabel2 != null) {
+                JLabel iconLabel = new JLabel();
+                iconLabel.setIcon(jLabel2.getIcon());
+                iconLabel.setBounds(jLabel2.getBounds());
+                itemPanel.add(iconLabel);
+            }
+            
+            // Find and copy notification type component
+            if (NotifType != null) {
+                JLabel notifTypeLabel = new JLabel(getNotificationTypeText(entry));
+                notifTypeLabel.setBounds(NotifType.getBounds());
+                notifTypeLabel.setFont(NotifType.getFont());
+                notifTypeLabel.setForeground(getNotificationTypeColor(entry));
+                itemPanel.add(notifTypeLabel);
+            }
+            
+            // Find and copy message component (using the JTextArea you added)
+            if (message != null) {
+                String enhancedMessage = getEnhancedMessage(entry);
+                JTextArea messageTextArea = new JTextArea(enhancedMessage);
+                messageTextArea.setBounds(message.getBounds());
+                messageTextArea.setFont(message.getFont());
+                messageTextArea.setForeground(message.getForeground());
+                messageTextArea.setBackground(message.getBackground());
+                messageTextArea.setEditable(false);
+                messageTextArea.setFocusable(false);
+                messageTextArea.setWrapStyleWord(true);
+                messageTextArea.setLineWrap(true);
+                messageTextArea.setBorder(message.getBorder());
+                messageTextArea.setOpaque(message.isOpaque());
+                itemPanel.add(messageTextArea);
+            }
+            
+        } catch (Exception e) {
+            // If copying from template fails, fall back to manual creation
+            createComponentsManually(itemPanel, entry);
+        }
+    }
+    
+    private void createComponentsManually(JPanel itemPanel, cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+        // Manual component creation as fallback
+        
+        // Icon
+        JLabel iconLabel = new JLabel();
+        try {
+            iconLabel.setIcon(new ImageIcon(getClass().getResource("/cephra/Cephra Images/forgotpass-pop.png")));
+        } catch (Exception e) {
+            iconLabel.setText("[i]"); // Fallback text if icon not found
+        }
+        iconLabel.setBounds(10, 30, 30, 30);
+        itemPanel.add(iconLabel);
+        
+        // Notification Type
+        JLabel notifTypeLabel = new JLabel(getNotificationTypeText(entry));
+        notifTypeLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        notifTypeLabel.setForeground(getNotificationTypeColor(entry));
+        notifTypeLabel.setBounds(10, 10, 200, 16);
+        itemPanel.add(notifTypeLabel);
+        
+        // Enhanced Message (JTextArea for automatic line wrapping - fallback if template fails)
+        String enhancedMessage = getEnhancedMessage(entry);
+        JTextArea messageTextArea = new JTextArea(enhancedMessage);
+        messageTextArea.setBounds(60, 25, 200, 50);
+        messageTextArea.setFont(new Font("Arial", Font.PLAIN, 11));
         messageTextArea.setForeground(new Color(40, 40, 40));
-        messageTextArea.setBackground(Color.WHITE);
+        messageTextArea.setBackground(itemPanel.getBackground());
         messageTextArea.setEditable(false);
         messageTextArea.setFocusable(false);
         messageTextArea.setWrapStyleWord(true);
         messageTextArea.setLineWrap(true);
-        messageTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         messageTextArea.setBorder(null);
-        
-        // Calculate proper height based on text content
-        messageTextArea.setColumns(25);
-        messageTextArea.setSize(new Dimension(200, Short.MAX_VALUE));
-        int preferredHeight = messageTextArea.getPreferredSize().height;
-        int messageTextHeight = Math.max(60, preferredHeight + 10);
-        
-        messageTextArea.setPreferredSize(new Dimension(200, messageTextHeight));
-        messageTextArea.setMaximumSize(new Dimension(200, messageTextHeight));
-        
-        // Calculate the total panel height
-        int totalHeight = baseHeight + messageTextHeight + 20;
-        int itemHeight = Math.max(100, Math.min(totalHeight, 450));
-        
-        notificationItemPanel.setPreferredSize(new Dimension(itemWidth, itemHeight));
-        notificationItemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, itemHeight));
-        
-
-        leftPanel.add(timeLabel);
-        leftPanel.add(Box.createRigidArea(new Dimension(0, 4)));
-        leftPanel.add(typeLabel);
-        leftPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        leftPanel.add(messageTextArea);
-        leftPanel.add(Box.createVerticalGlue());
-
-        // Right panel for ticket ID if available
-        JPanel rightPanel = new JPanel();
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setBackground(Color.WHITE);
-
-        // Add some space at the top
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        // Only add ticket info if there's a ticket ID
-        if (entry.getTicketId() != null && !entry.getTicketId().isEmpty()) {
-            // Ticket ID
-            JLabel ticketLabel = new JLabel("Ticket: " + entry.getTicketId());
-            ticketLabel.setFont(new Font("Arial", Font.BOLD, 11));
-            ticketLabel.setForeground(new Color(50, 50, 50));
-            ticketLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            rightPanel.add(ticketLabel);
-            rightPanel.add(Box.createRigidArea(new Dimension(0, 3)));
-        }
-
-        // Bay number if available
-        if (entry.getBayNumber() != null && !entry.getBayNumber().isEmpty()) {
-            JLabel bayLabel = new JLabel("Bay: " + entry.getBayNumber());
-            bayLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-            bayLabel.setForeground(new Color(80, 80, 80));
-            bayLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            rightPanel.add(bayLabel);
-        }
-        
-        // Add glue to push ticket info to top
-        rightPanel.add(Box.createVerticalGlue());
-
-        notificationItemPanel.add(dateLabel, BorderLayout.NORTH);
-        notificationItemPanel.add(leftPanel, BorderLayout.WEST);
-        if (rightPanel.getComponentCount() > 0) {
-            notificationItemPanel.add(rightPanel, BorderLayout.EAST);
-        }
-        
-        // Add click listener to show just the message
-        notificationItemPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                showNotificationMessage(entry);
-            }
-        });
-
-        historyPanel.add(notificationItemPanel);
+        messageTextArea.setOpaque(false);
+        itemPanel.add(messageTextArea);
     }
     
-    private void showNotificationMessage(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
-        // Hide existing popup if any
-        if (messagePopupPanel != null) {
-            remove(messagePopupPanel);
+    private String getNotificationTypeText(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+        switch (entry.getType()) {
+            case CHARGING_COMPLETE:
+            case FULL_CHARGE:
+                return "COMPLETE";
+            case TICKET_PENDING:
+            case TICKET_WAITING:
+                return "WAITING";
+            case MY_TURN:
+                return "CHARGING";
+            default:
+                return "NOTIFICATION";
         }
+    }
+    
+    private Color getNotificationTypeColor(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+        switch (entry.getType()) {
+            case CHARGING_COMPLETE:
+            case FULL_CHARGE:
+                return new Color(34, 139, 34); // Green
+            case TICKET_PENDING:
+            case TICKET_WAITING:
+                return new Color(255, 140, 0); // Orange
+            case MY_TURN:
+                return new Color(30, 144, 255); // Blue
+            default:
+                return new Color(70, 70, 70); // Gray
+        }
+    }
+    
+    private String getEnhancedMessage(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+        String bayInfo = (entry.getBayNumber() != null && !entry.getBayNumber().isEmpty()) ? 
+                        " at Bay " + entry.getBayNumber() : "";
+        String ticketInfo = (entry.getTicketId() != null && !entry.getTicketId().isEmpty()) ? 
+                           " (Ticket: " + entry.getTicketId() + ")" : "";
         
-        // Create modal overlay to block background clicks
-        if (modalOverlay == null) {
-            modalOverlay = new JPanel();
-            modalOverlay.setBackground(new java.awt.Color(0, 0, 0, 100));
-            modalOverlay.setOpaque(false);
-            modalOverlay.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    e.consume();
+        switch (entry.getType()) {
+            case CHARGING_COMPLETE:
+            case FULL_CHARGE:
+                return "Charging session completed successfully" + bayInfo + ". Vehicle ready for use" + ticketInfo + ". Thank you for using Cephra services.";
+            case TICKET_WAITING:
+            case TICKET_PENDING:
+                return "You're in the charging queue" + ticketInfo + ". Please wait for your turn. Estimated time varies based on queue length.";
+            case MY_TURN:
+                return "Your turn! Proceed to charging bay" + bayInfo + " within 10 minutes" + ticketInfo + ". Have your cable ready.";
+            default:
+                // For custom messages, allow longer text
+                String msg = entry.getMessage();
+                return msg.length() > 100 ? msg.substring(0, 97) + "..." : msg;
+        }
+    }
+    
+    private String createHtmlMessage(String text, int maxWidth) {
+        // Create HTML with proper word wrapping
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body style='width: ").append(maxWidth).append("px; margin: 0; padding: 0;'>");
+        html.append("<div style='line-height: 1.3; font-size: 11px;'>");
+        
+        // Split text into sentences for better line breaks
+        String[] sentences = text.split("\\. ");
+        
+        for (int i = 0; i < sentences.length; i++) {
+            String sentence = sentences[i].trim();
+            if (!sentence.isEmpty()) {
+                // Add period back if it was split
+                if (i < sentences.length - 1 && !sentence.endsWith(".")) {
+                    sentence += ".";
                 }
-            });
-            add(modalOverlay);
+                
+                html.append(sentence);
+                
+                // Add line break after each sentence for better readability
+                if (i < sentences.length - 1) {
+                    html.append("<br>");
+                }
+            }
         }
         
-        // Position and show modal overlay
-        modalOverlay.setBounds(0, 0, getWidth(), getHeight());
-        modalOverlay.setVisible(true);
-        
-        // Create popup panel for the message
-        messagePopupPanel = new JPanel();
-        messagePopupPanel.setLayout(new BoxLayout(messagePopupPanel, BoxLayout.Y_AXIS));
-        messagePopupPanel.setBackground(Color.WHITE);
-        messagePopupPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2),
-            new javax.swing.border.EmptyBorder(20, 20, 20, 20)
-        ));
-        
-        // Position popup in center
-        int popupWidth = Math.min(300, Math.max(250, entry.getMessage().length() * 2));
-        int popupHeight = Math.min(400, Math.max(150, (entry.getMessage().length() / 40) * 25 + 100));
-        int x = (getWidth() - popupWidth) / 2;
-        int y = (getHeight() - popupHeight) / 2;
-        messagePopupPanel.setBounds(x, y, popupWidth, popupHeight);
-        
-        // Add title
-        JLabel titleLabel = new JLabel(entry.getType().getDisplayName());
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleLabel.setForeground(new Color(50, 50, 50));
-        messagePopupPanel.add(titleLabel);
-        
-        messagePopupPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        
-        // Add message with HTML wrapping
-        String wrappedMessage = "<html><div style='width:" + (popupWidth - 60) + "px; line-height:1.4; text-align:left;'>" + 
-                               entry.getMessage() + "</div></html>";
-        JLabel messageLabel = new JLabel(wrappedMessage);
-        messageLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        messageLabel.setVerticalAlignment(JLabel.TOP);
-        messagePopupPanel.add(messageLabel);
-        
-        messagePopupPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        
-        // Add OK button
-        JButton okButton = new JButton("OK");
-        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        okButton.setFont(new Font("Arial", Font.BOLD, 12));
-        okButton.addActionListener(_ -> closeMessagePopup());
-        messagePopupPanel.add(okButton);
-        
-        // Add popup to main panel
-        add(messagePopupPanel);
-        
-        // Set proper layering
-        setComponentZOrder(modalOverlay, 1);
-        setComponentZOrder(messagePopupPanel, 0);
-        
-        // Keep background behind everything
-        if (jLabel1 != null) {
-            setComponentZOrder(jLabel1, getComponentCount() - 1);
-        }
-        
-        revalidate();
-        repaint();
-    }
-    
-    private void closeMessagePopup() {
-        if (messagePopupPanel != null) {
-            remove(messagePopupPanel);
-            messagePopupPanel = null;
-        }
-        
-        if (modalOverlay != null) {
-            modalOverlay.setVisible(false);
-        }
-        
-        revalidate();
-        repaint();
+        html.append("</div></body></html>");
+        return html.toString();
     }
     
     
@@ -428,6 +401,10 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         homebutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        nothis = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        NotifType = new javax.swing.JLabel();
+        message = new javax.swing.JTextArea();
 
         setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
@@ -497,6 +474,27 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/notification.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(-15, 0, 398, 750);
+
+        nothis.setBackground(new java.awt.Color(255, 255, 255));
+        nothis.setLayout(null);
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/smalllogo.png"))); // NOI18N
+        jLabel2.setPreferredSize(new java.awt.Dimension(370, 370));
+        nothis.add(jLabel2);
+        jLabel2.setBounds(10, 30, 34, 34);
+
+        NotifType.setText("jLabel3");
+        nothis.add(NotifType);
+        NotifType.setBounds(60, 10, 80, 16);
+
+        message.setColumns(20);
+        message.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        message.setRows(5);
+        nothis.add(message);
+        message.setBounds(52, 30, 210, 40);
+
+        add(nothis);
+        nothis.setBounds(370, 150, 270, 80);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - Setup label position
@@ -568,13 +566,17 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel NotifType;
     private javax.swing.JButton charge;
     private javax.swing.JButton closeButton;
     private javax.swing.JPanel historyPanel;
     private javax.swing.JScrollPane historyScrollPane;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JTextArea message;
+    private javax.swing.JPanel nothis;
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
 
@@ -597,5 +599,23 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         // Unregister as listener when panel is removed
         cephra.Phone.Utilities.NotificationManager.removeNotificationUpdateListener(this);
         super.removeNotify();
+    }
+    
+    // Test method to add sample notifications (for testing purposes)
+    public void addTestNotification() {
+        String currentUser = cephra.Database.CephraDB.getCurrentUsername();
+        if (currentUser != null) {
+            // Add different types of notifications for testing
+            cephra.Phone.Utilities.NotificationManager.addChargingCompleteNotification(
+                currentUser, "A1", "FCH001"
+            );
+            // You can uncomment these for more test notifications:
+            // cephra.Phone.Utilities.NotificationManager.addQueueNotification(
+            //     currentUser, "FCH002"
+            // );
+            // cephra.Phone.Utilities.NotificationManager.addChargingStartedNotification(
+            //     currentUser, "B2", "FCH003"
+            // );
+        }
     }
 }
