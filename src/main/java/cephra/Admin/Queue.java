@@ -863,11 +863,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 updateLocalNormalButtons(cephra.Admin.BayManagement.getNormalChargingGridTexts(), 
                                        cephra.Admin.BayManagement.getNormalChargingGridColors());
                 updateMonitorNormalGrid();
-                System.out.println("Queue: Ticket " + ticket + " assigned to Bay-" + bayNumber + " and showing on grid");
                 return true;
             }
         } else {
-            System.out.println("Queue: No available normal charging bays for ticket " + ticket);
         }
         return false;
     }
@@ -891,7 +889,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 updateLocalFastButtons(cephra.Admin.BayManagement.getFastChargingGridTexts(), 
                                      cephra.Admin.BayManagement.getFastChargingGridColors());
                 updateMonitorFastGrid();
-                System.out.println("Queue: Ticket " + ticket + " assigned to Bay-" + bayNumber + " and showing on grid");
                 return true;
             }
         } else {
