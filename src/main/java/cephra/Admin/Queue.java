@@ -1223,10 +1223,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         nxtfastbtn = new javax.swing.JButton();
         nxtnormalbtn = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        normalcharge2 = new javax.swing.JButton();
-        normalcharge3 = new javax.swing.JButton();
-        normalcharge4 = new javax.swing.JButton();
         normalcharge5 = new javax.swing.JButton();
+        normalcharge4 = new javax.swing.JButton();
+        normalcharge3 = new javax.swing.JButton();
+        normalcharge2 = new javax.swing.JButton();
         queIcon = new javax.swing.JLabel();
         datetimeStaff = new javax.swing.JLabel();
         labelStaff = new javax.swing.JLabel();
@@ -1357,7 +1357,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         ControlPanel.setLayout(null);
 
         fastpanel.setOpaque(false);
-        fastpanel.setLayout(new java.awt.GridLayout(1, 3, 10, 45));
+        fastpanel.setLayout(new java.awt.GridLayout(1, 3, 1, 45));
 
         fastslot1.setBackground(new java.awt.Color(255, 0, 0));
         fastslot1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1365,6 +1365,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastslot1.setText("XXXXXX");
         fastslot1.setBorder(null);
         fastslot1.setBorderPainted(false);
+        fastslot1.setContentAreaFilled(false);
         fastslot1.setFocusPainted(false);
         fastslot1.setFocusable(false);
         fastpanel.add(fastslot1);
@@ -1376,6 +1377,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastslot2.setToolTipText("");
         fastslot2.setBorder(null);
         fastslot2.setBorderPainted(false);
+        fastslot2.setContentAreaFilled(false);
         fastslot2.setFocusPainted(false);
         fastslot2.setFocusable(false);
         fastpanel.add(fastslot2);
@@ -1386,21 +1388,23 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastslot3.setText("XXXXXX");
         fastslot3.setBorder(null);
         fastslot3.setBorderPainted(false);
+        fastslot3.setContentAreaFilled(false);
         fastslot3.setFocusPainted(false);
         fastslot3.setFocusable(false);
         fastpanel.add(fastslot3);
 
         ControlPanel.add(fastpanel);
-        fastpanel.setBounds(97, 143, 410, 50);
+        fastpanel.setBounds(90, 135, 420, 50);
 
         jPanel1.setOpaque(false);
-        jPanel1.setLayout(new java.awt.GridLayout(2, 4, 30, 40));
+        jPanel1.setLayout(new java.awt.GridLayout(2, 4, 1, 20));
 
         jButton1.setBackground(new java.awt.Color(255, 0, 0));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton1.setText("XXXXXX");
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
         jButton1.setFocusPainted(false);
         jButton1.setFocusable(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -1415,6 +1419,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton2.setText("XXXXXX");
         jButton2.setBorder(null);
         jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
         jButton2.setFocusPainted(false);
         jButton2.setFocusable(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -1429,6 +1434,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton3.setText("XXXXXX");
         jButton3.setBorder(null);
         jButton3.setBorderPainted(false);
+        jButton3.setContentAreaFilled(false);
         jButton3.setFocusPainted(false);
         jButton3.setFocusable(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -1443,6 +1449,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton4.setText("XXXXXX");
         jButton4.setBorder(null);
         jButton4.setBorderPainted(false);
+        jButton4.setContentAreaFilled(false);
         jButton4.setFocusPainted(false);
         jButton4.setFocusable(false);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -1457,6 +1464,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton5.setText("XXXXXX");
         jButton5.setBorder(null);
         jButton5.setBorderPainted(false);
+        jButton5.setContentAreaFilled(false);
         jButton5.setFocusPainted(false);
         jButton5.setFocusable(false);
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -1471,6 +1479,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton6.setText("XXXXXX");
         jButton6.setBorder(null);
         jButton6.setBorderPainted(false);
+        jButton6.setContentAreaFilled(false);
         jButton6.setFocusPainted(false);
         jButton6.setFocusable(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -1485,6 +1494,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton7.setText("XXXXXX");
         jButton7.setBorder(null);
         jButton7.setBorderPainted(false);
+        jButton7.setContentAreaFilled(false);
         jButton7.setFocusPainted(false);
         jButton7.setFocusable(false);
         jButton7.addActionListener(new java.awt.event.ActionListener() {
@@ -1499,6 +1509,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jButton8.setText("XXXXXX");
         jButton8.setBorder(null);
         jButton8.setBorderPainted(false);
+        jButton8.setContentAreaFilled(false);
         jButton8.setFocusPainted(false);
         jButton8.setFocusable(false);
         jButton8.addActionListener(new java.awt.event.ActionListener() {
@@ -1509,7 +1520,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton8);
 
         ControlPanel.add(jPanel1);
-        jPanel1.setBounds(90, 430, 550, 180);
+        jPanel1.setBounds(90, 430, 560, 180);
 
         normalcharge1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         normalcharge1.setForeground(new java.awt.Color(41, 182, 246));
@@ -1545,37 +1556,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         nxtnormalbtn.setBounds(750, 250, 140, 70);
 
         jPanel2.setOpaque(false);
-        jPanel2.setLayout(new java.awt.GridLayout(1, 4, 10, 25));
-
-        normalcharge2.setBackground(new java.awt.Color(255, 0, 0));
-        normalcharge2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        normalcharge2.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge2.setText("XXXXXX");
-        normalcharge2.setBorder(null);
-        normalcharge2.setBorderPainted(false);
-        normalcharge2.setFocusPainted(false);
-        normalcharge2.setFocusable(false);
-        jPanel2.add(normalcharge2);
-
-        normalcharge3.setBackground(new java.awt.Color(255, 0, 0));
-        normalcharge3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        normalcharge3.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge3.setText("XXXXXX");
-        normalcharge3.setBorder(null);
-        normalcharge3.setBorderPainted(false);
-        normalcharge3.setFocusPainted(false);
-        normalcharge3.setFocusable(false);
-        jPanel2.add(normalcharge3);
-
-        normalcharge4.setBackground(new java.awt.Color(255, 0, 0));
-        normalcharge4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        normalcharge4.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge4.setText("XXXXXX");
-        normalcharge4.setBorder(null);
-        normalcharge4.setBorderPainted(false);
-        normalcharge4.setFocusPainted(false);
-        normalcharge4.setFocusable(false);
-        jPanel2.add(normalcharge4);
+        jPanel2.setLayout(new java.awt.GridLayout(1, 4, 1, 25));
 
         normalcharge5.setBackground(new java.awt.Color(255, 0, 0));
         normalcharge5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1583,9 +1564,43 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         normalcharge5.setText("XXXXXX");
         normalcharge5.setBorder(null);
         normalcharge5.setBorderPainted(false);
+        normalcharge5.setContentAreaFilled(false);
         normalcharge5.setFocusPainted(false);
         normalcharge5.setFocusable(false);
         jPanel2.add(normalcharge5);
+
+        normalcharge4.setBackground(new java.awt.Color(255, 0, 0));
+        normalcharge4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        normalcharge4.setForeground(new java.awt.Color(41, 182, 246));
+        normalcharge4.setText("XXXXXX");
+        normalcharge4.setBorder(null);
+        normalcharge4.setBorderPainted(false);
+        normalcharge4.setContentAreaFilled(false);
+        normalcharge4.setFocusPainted(false);
+        normalcharge4.setFocusable(false);
+        jPanel2.add(normalcharge4);
+
+        normalcharge3.setBackground(new java.awt.Color(255, 0, 0));
+        normalcharge3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        normalcharge3.setForeground(new java.awt.Color(41, 182, 246));
+        normalcharge3.setText("XXXXXX");
+        normalcharge3.setBorder(null);
+        normalcharge3.setBorderPainted(false);
+        normalcharge3.setContentAreaFilled(false);
+        normalcharge3.setFocusPainted(false);
+        normalcharge3.setFocusable(false);
+        jPanel2.add(normalcharge3);
+
+        normalcharge2.setBackground(new java.awt.Color(255, 0, 0));
+        normalcharge2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        normalcharge2.setForeground(new java.awt.Color(41, 182, 246));
+        normalcharge2.setText("XXXXXX");
+        normalcharge2.setBorder(null);
+        normalcharge2.setBorderPainted(false);
+        normalcharge2.setContentAreaFilled(false);
+        normalcharge2.setFocusPainted(false);
+        normalcharge2.setFocusable(false);
+        jPanel2.add(normalcharge2);
 
         ControlPanel.add(jPanel2);
         jPanel2.setBounds(90, 230, 560, 60);
