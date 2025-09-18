@@ -192,7 +192,19 @@ public class LinkedCar extends javax.swing.JPanel {
             String queueTicketId = cephra.Database.CephraDB.getQueueTicketForUser(username);
             String ticketStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
             
-            if (queueTicketId != null && ticketStatus != null && 
+            // Check if user has completed charging (battery at 100% or ticket completed)
+            boolean isFullyCharged = (batteryLevel >= 100);
+            boolean isChargingCompleted = (ticketStatus != null && 
+                (ticketStatus.equals("Completed") || ticketStatus.equals("Complete")));
+            
+            if (isFullyCharged || isChargingCompleted) {
+                // Battery is fully charged or charging completed - show "Not Charging" status
+                chargingTypeLabel.setText("Not Charging");
+                chargingTimeLabel.setText(isFullyCharged ? "Fully Charged" : "Ready");
+                
+                System.out.println("LinkedCar: Charging completed - showing 'Not Charging' status for user " + username + 
+                                 " (battery: " + batteryLevel + "%, status: " + ticketStatus + ")");
+            } else if (queueTicketId != null && ticketStatus != null && 
                 (ticketStatus.equals("Pending") || ticketStatus.equals("Waiting") || ticketStatus.equals("In Progress"))) {
                 
                 // Get ticket details from database
@@ -216,16 +228,16 @@ public class LinkedCar extends javax.swing.JPanel {
                     System.out.println("LinkedCar: Updated charging display - Type: " + serviceType + 
                                      ", Time: " + timeDisplay + " for user " + username + " (battery: " + batteryLevel + "%)");
                 } else {
-                    // No ticket found, show default values
-                    setDefaultChargingDisplay();
+                    // No ticket found, show not charging status
+                    setNotChargingDisplay();
                 }
             } else {
-                // No active ticket, show default values
-                setDefaultChargingDisplay();
+                // No active ticket or completed charging, show not charging status
+                setNotChargingDisplay();
             }
         } catch (Exception e) {
             System.err.println("Error updating charging time and type: " + e.getMessage());
-            setDefaultChargingDisplay();
+            setNotChargingDisplay();
         }
     }
     
@@ -290,6 +302,12 @@ public class LinkedCar extends javax.swing.JPanel {
         chargingTimeLabel.setText("45m");
         // Set default driving mode times (for 25% battery as per original design)
         updateDrivingModeTimes(25);
+    }
+    
+    // Method to set not charging display when charging is completed or no active ticket
+    private void setNotChargingDisplay() {
+        chargingTypeLabel.setText("Not Charging");
+        chargingTimeLabel.setText("Ready");
     }
     
     // Method to update driving mode times based on battery level

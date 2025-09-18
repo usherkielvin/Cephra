@@ -53,6 +53,42 @@ public class LinkFirst extends javax.swing.JPanel {
             
             currentInstance.setBounds(x, y, POPUP_WIDTH, POPUP_HEIGHT);
             
+            // Create a glass pane to block background interaction
+            Component glassPane = phoneFrame.getRootPane().getGlassPane();
+            if (glassPane == null) {
+                glassPane = new JComponent() {
+                    @Override
+                    protected void paintComponent(Graphics g) {
+                        // Semi-transparent overlay
+                        g.setColor(new Color(0, 0, 0, 100));
+                        g.fillRect(0, 0, getWidth(), getHeight());
+                    }
+                };
+                phoneFrame.getRootPane().setGlassPane(glassPane);
+            }
+            
+            // Add mouse listener to block all background interactions
+            glassPane.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    // Consume the event to prevent it from reaching background
+                    e.consume();
+                }
+                
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    e.consume();
+                }
+                
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    e.consume();
+                }
+            });
+            
+            // Enable the glass pane to block interactions
+            glassPane.setVisible(true);
+            
             JLayeredPane layeredPane = phoneFrame.getRootPane().getLayeredPane();
             layeredPane.add(currentInstance, JLayeredPane.MODAL_LAYER);
             layeredPane.moveToFront(currentInstance);
@@ -72,16 +108,23 @@ public class LinkFirst extends javax.swing.JPanel {
             if (instance.getParent() != null) {
                 instance.getParent().remove(instance);
             }
-            currentInstance = null;
-            currentTicketId = null;
-            isShowing = false;
-
+            
+            // Disable the glass pane to restore background interaction
             for (Window window : Window.getWindows()) {
                 if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    Component glassPane = phoneFrame.getRootPane().getGlassPane();
+                    if (glassPane != null) {
+                        glassPane.setVisible(false);
+                    }
                     window.repaint();
                     break;
                 }
             }
+            
+            currentInstance = null;
+            currentTicketId = null;
+            isShowing = false;
         });
     }
 }
@@ -149,7 +192,7 @@ public class LinkFirst extends javax.swing.JPanel {
             }
         });
         add(notLink);
-        notLink.setBounds(245, 3, 20, 20);
+        notLink.setBounds(215, -7, 60, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Plslink.png"))); // NOI18N
         add(jLabel1);
