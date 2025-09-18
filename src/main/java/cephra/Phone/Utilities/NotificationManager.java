@@ -122,10 +122,6 @@ public class NotificationManager {
             }
         });
         
-        System.out.println("NotificationHistoryManager: Added notification for " + entry.getUsername() + 
-                          " - " + entry.getType().getDisplayName() + ": " + entry.getMessage());
-        System.out.println("NotificationHistoryManager: Total notifications in memory: " + allNotifications.size());
-        System.out.println("NotificationHistoryManager: Total listeners: " + listeners.size());
     }
     
     // Convenience methods for adding different types of notifications

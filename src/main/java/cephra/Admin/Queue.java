@@ -215,16 +215,24 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         queTab.setValueAt("Waiting", editingRow, statusCol);
                         try {
                             cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
-                            // Also place into waiting grid
-                            int svcCol = getColumnIndex("Service");
-                            String serviceName = svcCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, svcCol)) : "";
-                            String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
-                            int battery = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
-                            cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customerName, serviceName, battery);
+                            
+                            // Check if ticket is already in waiting grid to prevent duplication
+                            boolean alreadyInWaitingGrid = cephra.Admin.BayManagement.isTicketInWaitingGrid(ticket);
+                            
+                            if (!alreadyInWaitingGrid) {
+                                // Only place into waiting grid if not already there
+                                int svcCol = getColumnIndex("Service");
+                                String serviceName = svcCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, svcCol)) : "";
+                                String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
+                                int battery = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
+                                cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customerName, serviceName, battery);
+                            }
+                            
                             // Refresh waiting grid view
                             initializeWaitingGridFromDatabase();
                             
                             // Trigger notification for the customer
+                            String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
                             triggerNotificationForCustomer(customerName, "TICKET_WAITING", ticket, null);
                         } catch (Throwable ignore) {}
                     }
@@ -1740,26 +1748,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JButton staffbutton;
     // End of variables declaration//GEN-END:variables
     
-    
-    private String getStaffFirstNameFromDB() {
-        try {
-            // Get the logged-in username from the admin frame
-            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-            if (window instanceof cephra.Frame.Admin) {
-                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
-                usernameField.setAccessible(true);
-                String username = (String) usernameField.get(window);
-                
-                if (username != null && !username.isEmpty()) {
-                    // Use the updated CephraDB method that queries staff_records.firstname
-                    return cephra.Database.CephraDB.getStaffFirstName(username);
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error getting staff first name: " + e.getMessage());
-        }
-        return "Admin"; // Fallback
-    }
     
     /**
      * Initializes grid displays with offline status from BayManagement
