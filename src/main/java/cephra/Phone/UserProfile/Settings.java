@@ -28,7 +28,6 @@ public class Settings extends javax.swing.JPanel {
         Back.setBounds(30, 50, 40, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Settings.png"))); // NOI18N
-        jLabel1.setPreferredSize(new java.awt.Dimension(370, 750));
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
