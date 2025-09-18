@@ -1,0 +1,71 @@
+
+package cephra.Phone.Popups;
+
+
+public class ChargingQueueProceed extends javax.swing.JPanel {
+
+  
+    public ChargingQueueProceed() {
+        initComponents();
+    }
+
+   
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        tickectID = new javax.swing.JLabel();
+        chargingService = new javax.swing.JLabel();
+        batteryLevel = new javax.swing.JLabel();
+        okBTN = new javax.swing.JButton();
+        cancelTixBTN = new javax.swing.JButton();
+        Icon = new javax.swing.JLabel();
+
+        setLayout(null);
+
+        tickectID.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        tickectID.setForeground(new java.awt.Color(0, 189, 201));
+        tickectID.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        tickectID.setText("NCH005");
+        add(tickectID);
+        tickectID.setBounds(17, 20, 230, 50);
+
+        chargingService.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        chargingService.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        chargingService.setText("Normal Charging");
+        add(chargingService);
+        chargingService.setBounds(7, 70, 245, 30);
+
+        batteryLevel.setFont(new java.awt.Font("Segoe UI", 1, 40)); // NOI18N
+        batteryLevel.setForeground(new java.awt.Color(0, 189, 201));
+        batteryLevel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        batteryLevel.setText("55%");
+        add(batteryLevel);
+        batteryLevel.setBounds(66, 114, 130, 50);
+
+        okBTN.setBorder(null);
+        okBTN.setBorderPainted(false);
+        okBTN.setContentAreaFilled(false);
+        add(okBTN);
+        okBTN.setBounds(20, 282, 220, 39);
+
+        cancelTixBTN.setBorder(null);
+        cancelTixBTN.setBorderPainted(false);
+        cancelTixBTN.setContentAreaFilled(false);
+        add(cancelTixBTN);
+        cancelTixBTN.setBounds(20, 335, 220, 35);
+
+        Icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ChargeQueProceed.png"))); // NOI18N
+        add(Icon);
+        Icon.setBounds(0, 0, 270, 390);
+    }// </editor-fold>//GEN-END:initComponents
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Icon;
+    private javax.swing.JLabel batteryLevel;
+    private javax.swing.JButton cancelTixBTN;
+    private javax.swing.JLabel chargingService;
+    private javax.swing.JButton okBTN;
+    private javax.swing.JLabel tickectID;
+    // End of variables declaration//GEN-END:variables
+}

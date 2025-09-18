@@ -298,6 +298,11 @@ public class EditProfile extends javax.swing.JPanel {
         savechanges.setBorderPainted(false);
         savechanges.setContentAreaFilled(false);
         savechanges.setFocusPainted(false);
+        savechanges.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                savechangesActionPerformed(evt);
+            }
+        });
         add(savechanges);
         savechanges.setBounds(25, 510, 310, 50);
 

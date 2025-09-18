@@ -13,7 +13,7 @@ public class AlreadyFull extends javax.swing.JPanel {
     
     // Popup dimensions (centered in phone frame)
     private static final int POPUP_WIDTH = 280;
-    private static final int POPUP_HEIGHT = 140;
+    private static final int POPUP_HEIGHT = 266;
     private static final int PHONE_WIDTH = 350; // fallback if frame size not yet realized
     private static final int PHONE_HEIGHT = 750; // fallback if frame size not yet realized
     
@@ -383,18 +383,20 @@ public class AlreadyFull extends javax.swing.JPanel {
         setLayout(null);
 
         Golink.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        Golink.setText("OK");
+        Golink.setBorder(null);
+        Golink.setBorderPainted(false);
+        Golink.setContentAreaFilled(false);
         Golink.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 GolinkActionPerformed(evt);
             }
         });
         add(Golink);
-        Golink.setBounds(80, 90, 100, 30);
+        Golink.setBounds(20, 180, 220, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/AlreadyFull.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 280, 140);
+        jLabel1.setBounds(10, 0, 280, 230);
     }// </editor-fold>//GEN-END:initComponents
 
     private void GolinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GolinkActionPerformed

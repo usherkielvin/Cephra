@@ -253,8 +253,55 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         }
         panel.add(dateClone);
         
-        // Type label
-        JLabel typeClone = new JLabel(entry.getServiceType());
+        // Type label - show full service type names
+        String serviceType = entry.getServiceType();
+        String displayType;
+        
+        // Clean service type and map to proper display names (handle payment method suffix)
+        if (serviceType != null) {
+            String cleanServiceType = serviceType.toLowerCase();
+            
+            // Remove payment method suffix like " (cash)", " (gcash)", etc.
+            if (cleanServiceType.contains(" (")) {
+                cleanServiceType = cleanServiceType.substring(0, cleanServiceType.indexOf(" ("));
+            }
+            
+            // Check if this is a priority ticket by ticket ID
+            String ticketId = entry.getTicketId();
+            boolean isPriorityTicket = false;
+            if (ticketId != null) {
+                String ticketIdUpper = ticketId.toUpperCase();
+                isPriorityTicket = ticketIdUpper.startsWith("FCHP") || ticketIdUpper.startsWith("NCHP");
+            }
+            
+            switch (cleanServiceType) {
+                case "fast charging":
+                    displayType = isPriorityTicket ? "Prio Fast Charging" : "Fast Charging";
+                    break;
+                case "normal charging":
+                    displayType = isPriorityTicket ? "Prio Normal Charging" : "Normal Charging";
+                    break;
+                case "fast charging priority":
+                    displayType = "Prio Fast Charging";
+                    break;
+                case "normal charging priority":
+                    displayType = "Prio Normal Charging";
+                    break;
+                case "fchp":
+                    displayType = "Prio Fast Charging";
+                    break;
+                case "nchp":
+                    displayType = "Prio Normal Charging";
+                    break;
+                default:
+                    displayType = serviceType; // Fallback to original if not recognized
+                    break;
+            }
+        } else {
+            displayType = "Normal Charging"; // Default fallback
+        }
+        
+        JLabel typeClone = new JLabel(displayType);
         if (type != null) {
             try {
                 typeClone.setBounds(type.getBounds());
@@ -338,9 +385,56 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                 Customer.setText(cephra.Database.CephraDB.getCurrentUsername());
             }
             
-            // Update service type - just the value
+            // Update service type - show full service type names
             if (typed != null) {
-                typed.setText(entry.getServiceType());
+                String serviceType = entry.getServiceType();
+                String displayType;
+                
+                // Clean service type and map to proper display names (handle payment method suffix)
+                if (serviceType != null) {
+                    String cleanServiceType = serviceType.toLowerCase();
+                    
+                    // Remove payment method suffix like " (cash)", " (gcash)", etc.
+                    if (cleanServiceType.contains(" (")) {
+                        cleanServiceType = cleanServiceType.substring(0, cleanServiceType.indexOf(" ("));
+                    }
+                    
+                    // Check if this is a priority ticket by ticket ID
+                    String ticketId = entry.getTicketId();
+                    boolean isPriorityTicket = false;
+                    if (ticketId != null) {
+                        String ticketIdUpper = ticketId.toUpperCase();
+                        isPriorityTicket = ticketIdUpper.startsWith("FCHP") || ticketIdUpper.startsWith("NCHP");
+                    }
+                    
+                    switch (cleanServiceType) {
+                        case "fast charging":
+                            displayType = isPriorityTicket ? "Prio Fast Charging" : "Fast Charging";
+                            break;
+                        case "normal charging":
+                            displayType = isPriorityTicket ? "Prio Normal Charging" : "Normal Charging";
+                            break;
+                        case "fast charging priority":
+                            displayType = "Prio Fast Charging";
+                            break;
+                        case "normal charging priority":
+                            displayType = "Prio Normal Charging";
+                            break;
+                        case "fchp":
+                            displayType = "Prio Fast Charging";
+                            break;
+                        case "nchp":
+                            displayType = "Prio Normal Charging";
+                            break;
+                        default:
+                            displayType = serviceType; // Fallback to original if not recognized
+                            break;
+                    }
+                } else {
+                    displayType = "Normal Charging"; // Default fallback
+                }
+                
+                typed.setText(displayType);
             }
             
             // Update kWh information (get from admin history record) - just the value
@@ -695,7 +789,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         Customer.setBounds(120, 90, 100, 16);
 
         typed.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        typed.setText("NC (GCash)");
+        typed.setText("Normal Charging");
         typed.setToolTipText("");
         typed.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         detailpanel.add(typed);
@@ -883,7 +977,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
     }//GEN-LAST:event_detailsActionPerformed
 
     private void okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okActionPerformed
-        // TODO add your handling code here:
+       
     }//GEN-LAST:event_okActionPerformed
 
 
