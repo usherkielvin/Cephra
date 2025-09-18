@@ -126,8 +126,8 @@ public class Profile extends javax.swing.JPanel {
         logout = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
+        EditProfile = new javax.swing.JButton();
         Help = new javax.swing.JButton();
-        editpfp = new javax.swing.JButton();
         Profile = new javax.swing.JLabel();
         Fullname = new javax.swing.JLabel();
         gmailProf = new javax.swing.JLabel();
@@ -209,6 +209,18 @@ public class Profile extends javax.swing.JPanel {
         add(charge);
         charge.setBounds(50, 680, 40, 40);
 
+        EditProfile.setBorder(null);
+        EditProfile.setBorderPainted(false);
+        EditProfile.setContentAreaFilled(false);
+        EditProfile.setFocusPainted(false);
+        EditProfile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditProfileActionPerformed(evt);
+            }
+        });
+        add(EditProfile);
+        EditProfile.setBounds(85, 333, 200, 50);
+
         Help.setBorderPainted(false);
         Help.setContentAreaFilled(false);
         Help.addActionListener(new java.awt.event.ActionListener() {
@@ -218,19 +230,8 @@ public class Profile extends javax.swing.JPanel {
         });
         add(Help);
         Help.setBounds(40, 460, 290, 40);
-
-        editpfp.setBorder(null);
-        editpfp.setBorderPainted(false);
-        editpfp.setContentAreaFilled(false);
-        editpfp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editpfpActionPerformed(evt);
-            }
-        });
-        add(editpfp);
-        editpfp.setBounds(90, 340, 190, 37);
         add(Profile);
-        Profile.setBounds(110, 120, 150, 130);
+        Profile.setBounds(110, 120, 150, 140);
 
         Fullname.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
         Fullname.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -432,77 +433,20 @@ public class Profile extends javax.swing.JPanel {
         });       
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void editpfpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editpfpActionPerformed
-       
+    private void EditProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditProfileActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    // Step 1: Select image file using simple drag and drop interface
-                    java.io.File selectedFile = cephra.Phone.Utilities.SimpleDragDropSelector.showDialog(Profile.this);
-                    if (selectedFile == null) {
-                        System.out.println("Profile: No image file selected");
-                        return; // User cancelled file selection
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.EditProfile());
+                        break;
                     }
-                    
-                    System.out.println("Profile: Selected image file: " + selectedFile.getName());
-                    
-                    // Step 2: Open crop dialog
-                    java.awt.image.BufferedImage croppedImage = cephra.Phone.Utilities.ImageUtils.openCropDialog(Profile.this, selectedFile);
-                    if (croppedImage == null) {
-                        System.out.println("Profile: Image cropping was cancelled");
-                        return; // User cancelled cropping
-                    }
-                    
-                    System.out.println("Profile: Image cropped successfully");
-                    
-                    // Step 3: Convert to Base64 and save to database
-                    String base64Image = cephra.Phone.Utilities.ImageUtils.imageToBase64(croppedImage, "png");
-                    if (base64Image == null) {
-                        javax.swing.JOptionPane.showMessageDialog(Profile.this, 
-                            "Failed to process the cropped image.", 
-                            "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    
-                    // Step 4: Save to database
-                    String currentUsername = cephra.Database.CephraDB.getCurrentUsername();
-                    if (currentUsername == null || currentUsername.trim().isEmpty()) {
-                        javax.swing.JOptionPane.showMessageDialog(Profile.this, 
-                            "No user is currently logged in.", 
-                            "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    
-                    boolean saved = cephra.Database.CephraDB.saveUserProfilePicture(currentUsername, base64Image);
-                    if (saved) {
-                        // Step 5: Update UI to show new profile picture
-                        java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(croppedImage, 110);
-                        if (Profile != null) {
-                            Profile.setIcon(new javax.swing.ImageIcon(circularImage));
-                        }
-                        
-                        javax.swing.JOptionPane.showMessageDialog(Profile.this, 
-                            "Profile picture updated successfully!", 
-                            "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                        
-                        System.out.println("Profile: Profile picture saved successfully for user " + currentUsername);
-                    } else {
-                        javax.swing.JOptionPane.showMessageDialog(Profile.this, 
-                            "Failed to save profile picture to database.", 
-                            "Database Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-                        System.err.println("Profile: Failed to save profile picture to database");
-                    }
-                    
-                } catch (Exception e) {
-                    System.err.println("Profile: Error in addpicActionPerformed: " + e.getMessage());
-                    e.printStackTrace();
-                    javax.swing.JOptionPane.showMessageDialog(Profile.this, 
-                        "An unexpected error occurred: " + e.getMessage(), 
-                        "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                 }
             }
-        });
-    }//GEN-LAST:event_editpfpActionPerformed
+        });       
+    }//GEN-LAST:event_EditProfileActionPerformed
 
     private void fitTextToLabel(JLabel label) {
         String text = label.getText();
@@ -525,11 +469,11 @@ public class Profile extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton EditProfile;
     private javax.swing.JLabel Fullname;
     private javax.swing.JButton Help;
     private javax.swing.JLabel Profile;
     private javax.swing.JButton charge;
-    private javax.swing.JButton editpfp;
     private javax.swing.JLabel gmailProf;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
