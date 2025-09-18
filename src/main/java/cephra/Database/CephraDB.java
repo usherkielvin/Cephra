@@ -1711,7 +1711,6 @@ public class CephraDB {
      * @return the first name or "Admin" if not found
      */
     public static String getStaffFirstName(String username) {
-        System.out.println("DEBUG: getStaffFirstName called with username = '" + username + "'");
         
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -1722,14 +1721,11 @@ public class CephraDB {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String firstname = rs.getString("firstname");
-                    System.out.println("DEBUG: Found firstname = '" + firstname + "' for username = '" + username + "'");
                     if (firstname != null && !firstname.trim().isEmpty()) {
                         String result = firstname.trim();
-                        System.out.println("DEBUG: Returning firstname = '" + result + "'");
                         return result;
                     }
                 } else {
-                    System.out.println("DEBUG: No record found for username = '" + username + "'");
                 }
             }
         } catch (SQLException e) {
