@@ -1,72 +1,56 @@
 package cephra.Phone.UserProfile;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import javax.swing.JPasswordField;
 import javax.swing.SwingUtilities;
 
 public class PasswordNew extends javax.swing.JPanel {
 
     public PasswordNew() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new Dimension(370, 750));
         setSize(370, 750);
-        pass.setOpaque(false);
-        pass.setBackground(new java.awt.Color(0, 0, 0, 0));
-        pass1.setOpaque(false);
-        pass1.setBackground(new java.awt.Color(0, 0, 0, 0));
-        setupLabelPosition(); // Set label position
-        setupButtons(); // Call our custom setup method
+        
+        setupPasswordFields(); // Setup password field properties
+        makeDraggable(); // Make the panel draggable
+        setupLabelPosition(); // Fit Label Position
     }
 
    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        Back_Button = new javax.swing.JButton();
-        pass1 = new javax.swing.JPasswordField();
-        pass = new javax.swing.JPasswordField();
+        See2 = new javax.swing.JButton();
         See1 = new javax.swing.JButton();
-        See = new javax.swing.JButton();
-        Back = new javax.swing.JButton();
-        contactsup = new javax.swing.JButton();
-        update = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        confirmpass = new javax.swing.JPasswordField();
+        newpass = new javax.swing.JPasswordField();
+        resetsend = new javax.swing.JButton();
+        bg = new javax.swing.JLabel();
 
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
-        Back_Button.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        Back_Button.setText("back to login");
-        Back_Button.setBorder(null);
-        Back_Button.setBorderPainted(false);
-        Back_Button.setContentAreaFilled(false);
-        Back_Button.setFocusPainted(false);
-        Back_Button.addActionListener(new java.awt.event.ActionListener() {
+        See2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
+        See2.setBorder(null);
+        See2.setBorderPainted(false);
+        See2.setContentAreaFilled(false);
+        See2.setFocusPainted(false);
+        See2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Back_ButtonActionPerformed(evt);
+                See2ActionPerformed(evt);
             }
         });
-        add(Back_Button);
-        Back_Button.setBounds(140, 460, 120, 23);
-
-        pass1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        pass1.setBorder(null);
-        pass1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                pass1ActionPerformed(evt);
-            }
-        });
-        add(pass1);
-        pass1.setBounds(90, 350, 220, 35);
-
-        pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        pass.setBorder(null);
-        pass.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                passActionPerformed(evt);
-            }
-        });
-        add(pass);
-        pass.setBounds(90, 290, 220, 35);
+        add(See2);
+        See2.setBounds(280, 350, 50, 30);
 
         See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
+        See1.setBorder(null);
         See1.setBorderPainted(false);
         See1.setContentAreaFilled(false);
         See1.setFocusPainted(false);
@@ -76,106 +60,86 @@ public class PasswordNew extends javax.swing.JPanel {
             }
         });
         add(See1);
-        See1.setBounds(300, 350, 30, 40);
+        See1.setBounds(280, 290, 50, 30);
 
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
-        See.setBorderPainted(false);
-        See.setContentAreaFilled(false);
-        See.setFocusPainted(false);
-        See.addActionListener(new java.awt.event.ActionListener() {
+        confirmpass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        confirmpass.setBorder(null);
+        confirmpass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SeeActionPerformed(evt);
+                confirmpassActionPerformed(evt);
             }
         });
-        add(See);
-        See.setBounds(300, 290, 30, 40);
+        add(confirmpass);
+        confirmpass.setBounds(80, 350, 210, 30);
 
-        Back.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        Back.setForeground(new java.awt.Color(0, 204, 204));
-        Back.setText("Back");
-        Back.setBorder(null);
-        Back.setBorderPainted(false);
-        Back.setContentAreaFilled(false);
-        Back.setFocusPainted(false);
-        Back.addActionListener(new java.awt.event.ActionListener() {
+        newpass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        newpass.setBorder(null);
+        newpass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BackActionPerformed(evt);
+                newpassActionPerformed(evt);
             }
         });
-        add(Back);
-        Back.setBounds(120, 630, 120, 23);
+        add(newpass);
+        newpass.setBounds(80, 290, 210, 30);
 
-        contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        contactsup.setForeground(new java.awt.Color(0, 204, 204));
-        contactsup.setText("Contact Support");
-        contactsup.setBorder(null);
-        contactsup.setBorderPainted(false);
-        contactsup.setContentAreaFilled(false);
-        contactsup.setFocusPainted(false);
-        add(contactsup);
-        contactsup.setBounds(160, 663, 130, 30);
-
-        update.setBorder(null);
-        update.setBorderPainted(false);
-        update.setContentAreaFilled(false);
-        update.setFocusPainted(false);
-        update.addActionListener(new java.awt.event.ActionListener() {
+        resetsend.setBorder(null);
+        resetsend.setBorderPainted(false);
+        resetsend.setContentAreaFilled(false);
+        resetsend.setFocusPainted(false);
+        resetsend.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateActionPerformed(evt);
+                resetsendActionPerformed(evt);
             }
         });
-        add(update);
-        update.setBounds(50, 410, 300, 40);
+        add(resetsend);
+        resetsend.setBounds(40, 410, 290, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/newpass.png"))); // NOI18N
-        add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 750);
+        bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PasswordNew.png"))); // NOI18N
+        add(bg);
+        bg.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
-    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
-    // Setup label position to prevent NetBeans from changing it
+    // Setup password field properties
+    private void setupPasswordFields() {
+        JPasswordField[] passwordFields = {newpass, confirmpass};
+        
+        for (JPasswordField field : passwordFields) {
+            // Make password fields transparent
+            field.setOpaque(false);
+            field.setBackground(new Color(0, 0, 0, 0));
+        }
+    }
+    
+    // Ensure the background label (PNG) stays positioned correctly
     private void setupLabelPosition() {
-        if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+        if (bg != null) {
+            bg.setBounds(0, 0, 370, 750);
         }
     }
 
-    // Add button functionality after initComponents to prevent NetBeans from removing it
-    private void setupButtons() {
-        // Setup Back button (only hover effects, action listener already set in initComponents)
-        Back.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        Back.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                Back.setForeground(new java.awt.Color(0, 255, 255));
-                Back.setText("<html><u>Back</u></html>");
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                Back.setForeground(new java.awt.Color(0, 204, 204));
-                Back.setText("Back");
+    private void makeDraggable() {
+        final Point[] dragPoint = {null};
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                dragPoint[0] = e.getPoint();
             }
         });
 
-        // Setup Contact Support button (only hover effects, action listener already set in initComponents)
-        contactsup.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        contactsup.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                contactsup.setForeground(new java.awt.Color(0, 255, 255));
-                contactsup.setText("<html><u>Contact Support</u></html>");
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                contactsup.setForeground(new java.awt.Color(0, 204, 204));
-                contactsup.setText("Contact Support");
-            }
-        });
-
-        // Setup Update button (only hover effects, action listener already set in initComponents)
-        update.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        update.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                update.setForeground(new java.awt.Color(0, 255, 255));
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                update.setForeground(new java.awt.Color(0, 204, 204));
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (dragPoint[0] != null) {
+                    Window window = SwingUtilities.getWindowAncestor(PasswordNew.this);
+                    if (window != null) {
+                        Point currentLocation = window.getLocation();
+                        window.setLocation(
+                            currentLocation.x + e.getX() - dragPoint[0].x,
+                            currentLocation.y + e.getY() - dragPoint[0].y
+                        );
+                    }
+                }
             }
         });
     }
@@ -183,25 +147,23 @@ public class PasswordNew extends javax.swing.JPanel {
     @Override
     public void addNotify() {
         super.addNotify();
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setupLabelPosition(); // Set label position
-                setupButtons(); // Setup buttons when panel is added to container
-                if (pass != null) {
-                    pass.requestFocusInWindow();
-                }
-                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(PasswordNew.this);
-                if (root != null && update != null) {
-                    root.setDefaultButton(update);
-                }
+        SwingUtilities.invokeLater(() -> {
+            setupLabelPosition(); // Set label position
+            
+            if (newpass != null) {
+                newpass.requestFocusInWindow();
+            }
+            javax.swing.JRootPane root = SwingUtilities.getRootPane(PasswordNew.this);
+            if (root != null && resetsend != null) {
+                root.setDefaultButton(resetsend);
             }
         });
     }
 
-    private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
+    private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
         // Check if passwords match
-        String password = new String(pass.getPassword());
-        String password2 = new String(pass1.getPassword());
+        String password = new String(newpass.getPassword());
+        String password2 = new String(confirmpass.getPassword());
 
         if (password.equals(password2) && !password.isEmpty()) {
             String userEmail = cephra.Phone.Utilities.AppSessionState.userEmailForReset;
@@ -213,9 +175,9 @@ public class PasswordNew extends javax.swing.JPanel {
                     "New password cannot be the same as the old password!", 
                     "Error", 
                     javax.swing.JOptionPane.ERROR_MESSAGE);
-                pass.setText("");
-                pass1.setText("");
-                pass.requestFocusInWindow();
+                newpass.setText("");
+                confirmpass.setText("");
+                newpass.requestFocusInWindow();
                 return;
             }
             
@@ -241,89 +203,48 @@ public class PasswordNew extends javax.swing.JPanel {
             }
         } else {
             javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match or are empty!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-            pass.setText("");
-            pass1.setText("");
-            pass.requestFocusInWindow();
+            newpass.setText("");
+            confirmpass.setText("");
+            newpass.requestFocusInWindow();
         }
-    }//GEN-LAST:event_updateActionPerformed
-
-    private void BackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackActionPerformed
-      
-        
-          SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    java.awt.Window[] windows = java.awt.Window.getWindows();
-                    for (java.awt.Window window : windows) {
-                        if (window instanceof cephra.Frame.Phone) {
-                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
-                            break;
-                        }
-                    }
-                }
-         });
-        
-        
-        
-    }//GEN-LAST:event_BackActionPerformed
-
-    private void SeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeActionPerformed
-
-        if(pass.getEchoChar() == 0) {
-            pass.setEchoChar('•');
-            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
-        } else {
-            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
-            pass.setEchoChar((char) 0 );
-        }
-    }//GEN-LAST:event_SeeActionPerformed
+    }//GEN-LAST:event_resetsendActionPerformed
 
     private void See1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_See1ActionPerformed
-        if(pass1.getEchoChar() == 0) {
-            pass1.setEchoChar('•');
+        if(newpass.getEchoChar() == 0) {
+            newpass.setEchoChar('•');
             See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
         } else {
             See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
-            pass1.setEchoChar((char) 0 );
+            newpass.setEchoChar((char) 0 );
         }
     }//GEN-LAST:event_See1ActionPerformed
 
-    private void passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passActionPerformed
+    private void See2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_See2ActionPerformed
+        if(confirmpass.getEchoChar() == 0) {
+            confirmpass.setEchoChar('•');
+            See2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
+        } else {
+            See2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
+            confirmpass.setEchoChar((char) 0 );
+        }
+    }//GEN-LAST:event_See2ActionPerformed
+
+    private void newpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newpassActionPerformed
         // When Enter key is pressed on password field, move to next field
-        pass1.requestFocusInWindow();
-    }//GEN-LAST:event_passActionPerformed
+        confirmpass.requestFocusInWindow();
+    }//GEN-LAST:event_newpassActionPerformed
 
-    private void pass1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pass1ActionPerformed
+    private void confirmpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmpassActionPerformed
         // When Enter key is pressed on confirm password field, attempt update
-        update.doClick();
-    }//GEN-LAST:event_pass1ActionPerformed
-
-    private void Back_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Back_ButtonActionPerformed
-
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
-                        break;
-                    }
-                }
-            }
-        });
-
-    }//GEN-LAST:event_Back_ButtonActionPerformed
+        resetsend.doClick();
+    }//GEN-LAST:event_confirmpassActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Back;
-    private javax.swing.JButton Back_Button;
-    private javax.swing.JButton See;
     private javax.swing.JButton See1;
-    private javax.swing.JButton contactsup;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPasswordField pass;
-    private javax.swing.JPasswordField pass1;
-    private javax.swing.JButton update;
+    private javax.swing.JButton See2;
+    private javax.swing.JLabel bg;
+    private javax.swing.JPasswordField confirmpass;
+    private javax.swing.JPasswordField newpass;
+    private javax.swing.JButton resetsend;
     // End of variables declaration//GEN-END:variables
 }

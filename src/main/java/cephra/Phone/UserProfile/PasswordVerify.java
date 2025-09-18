@@ -1,10 +1,13 @@
 package cephra.Phone.UserProfile;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import cephra.Phone.Popups.UnifiedNotification;
 
@@ -19,27 +22,14 @@ public class PasswordVerify extends javax.swing.JPanel {
    
     public PasswordVerify() {
         initComponents();
-        setPreferredSize(new java.awt.Dimension(370, 750));
+        setPreferredSize(new Dimension(370, 750));
         setSize(370, 750);
-        setupLabelPosition();
-        setupButtons(); 
-        makeDraggable();       
-     //   otpPreviewLabel.setText(cephra.CephraDB.getGeneratedOTP());
-        code1.setOpaque(false);
-        code1.setBackground(new Color(0, 0, 0, 0));
-        code2.setOpaque(false);
-        code2.setBackground(new Color(0, 0, 0, 0));
-        code3.setOpaque(false);
-        code3.setBackground(new Color(0, 0, 0, 0));
-        code4.setOpaque(false);
-        code4.setBackground(new Color(0, 0, 0, 0));
-        code5.setOpaque(false);
-        code5.setBackground(new Color(0, 0, 0, 0));
-        code6.setOpaque(false);
-        code6.setBackground(new Color(0, 0, 0, 0));
         
-        // Setup digit-only input for all code fields
-        setupDigitOnlyInput();
+        setupCodeFields(); // Setup code field properties
+        makeDraggable(); // Make the panel draggable
+        setupLabelPosition(); // Fit Label Position
+        setupDigitOnlyInput(); // Setup digit-only input for all code fields
+        setupButtons(); // Setup button properties
     }
 
    
@@ -57,18 +47,17 @@ public class PasswordVerify extends javax.swing.JPanel {
         Back = new javax.swing.JButton();
         resetsend = new javax.swing.JButton();
         contactsup = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        bg = new javax.swing.JLabel();
 
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         cephramail.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        cephramail.setText("dizon@cephra.com");
         add(cephramail);
         cephramail.setBounds(200, 251, 160, 20);
 
         code6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        code6.setText("1");
         code6.setBorder(null);
         code6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -80,7 +69,6 @@ public class PasswordVerify extends javax.swing.JPanel {
 
         code5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        code5.setText("1");
         code5.setBorder(null);
         code5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -92,7 +80,6 @@ public class PasswordVerify extends javax.swing.JPanel {
 
         code4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        code4.setText("1");
         code4.setBorder(null);
         code4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -104,7 +91,6 @@ public class PasswordVerify extends javax.swing.JPanel {
 
         code3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        code3.setText("1");
         code3.setBorder(null);
         code3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -116,7 +102,6 @@ public class PasswordVerify extends javax.swing.JPanel {
 
         code2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        code2.setText("1");
         code2.setBorder(null);
         code2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -128,7 +113,6 @@ public class PasswordVerify extends javax.swing.JPanel {
 
         code1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        code1.setText("1");
         code1.setBorder(null);
         code1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -139,8 +123,6 @@ public class PasswordVerify extends javax.swing.JPanel {
         code1.setBounds(40, 310, 30, 50);
 
         resend.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        resend.setForeground(new java.awt.Color(0, 204, 204));
-        resend.setText("Resend email");
         resend.setBorder(null);
         resend.setBorderPainted(false);
         resend.setContentAreaFilled(false);
@@ -155,8 +137,6 @@ public class PasswordVerify extends javax.swing.JPanel {
         resend.setBounds(230, 430, 90, 40);
 
         Back.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        Back.setForeground(new java.awt.Color(0, 204, 204));
-        Back.setText("Back");
         Back.setBorder(null);
         Back.setBorderPainted(false);
         Back.setContentAreaFilled(false);
@@ -182,8 +162,6 @@ public class PasswordVerify extends javax.swing.JPanel {
         resetsend.setBounds(40, 380, 300, 40);
 
         contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        contactsup.setForeground(new java.awt.Color(0, 204, 204));
-        contactsup.setText("Contact Support");
         contactsup.setBorder(null);
         contactsup.setBorderPainted(false);
         contactsup.setContentAreaFilled(false);
@@ -196,15 +174,25 @@ public class PasswordVerify extends javax.swing.JPanel {
         add(contactsup);
         contactsup.setBounds(160, 663, 130, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/checkmail.png"))); // NOI18N
-        add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 750);
+        bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/passwordverify.png"))); // NOI18N
+        add(bg);
+        bg.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
-    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
-    // Setup label position to prevent NetBeans from changing it
+    // Setup code field properties
+    private void setupCodeFields() {
+        JTextField[] codeFields = {code1, code2, code3, code4, code5, code6};
+        
+        for (JTextField field : codeFields) {
+            // Make text fields transparent
+            field.setOpaque(false);
+            field.setBackground(new Color(0, 0, 0, 0));
+        }
+    }
+    
+    // Ensure the background label (PNG) stays positioned correctly
     private void setupLabelPosition() {
-        if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+        if (bg != null) {
+            bg.setBounds(0, 0, 370, 750);
         }
     }
     
@@ -281,7 +269,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    java.awt.Window window = SwingUtilities.getWindowAncestor(PasswordVerify.this);
+                    Window window = SwingUtilities.getWindowAncestor(PasswordVerify.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -418,6 +406,7 @@ public class PasswordVerify extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Back;
+    private javax.swing.JLabel bg;
     private javax.swing.JLabel cephramail;
     private javax.swing.JTextField code1;
     private javax.swing.JTextField code2;
@@ -426,7 +415,6 @@ public class PasswordVerify extends javax.swing.JPanel {
     private javax.swing.JTextField code5;
     private javax.swing.JTextField code6;
     private javax.swing.JButton contactsup;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JButton resend;
     private javax.swing.JButton resetsend;
     // End of variables declaration//GEN-END:variables
@@ -439,7 +427,9 @@ public class PasswordVerify extends javax.swing.JPanel {
         }
         buttonsSetup = true;
         
-        // Setup Resend button (only hover effects, action listener already set in initComponents)
+        // Setup Resend button
+        resend.setText("Resend email");
+        resend.setForeground(new java.awt.Color(0, 204, 204));
         resend.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         resend.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -452,7 +442,9 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
 
-        // Setup Contact Support button (only hover effects, action listener already set in initComponents)
+        // Setup Contact Support button
+        contactsup.setText("Contact Support");
+        contactsup.setForeground(new java.awt.Color(0, 204, 204));
         contactsup.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         contactsup.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -466,6 +458,8 @@ public class PasswordVerify extends javax.swing.JPanel {
         });
 
         // Setup Back button
+        Back.setText("Back");
+        Back.setForeground(new java.awt.Color(0, 204, 204));
         Back.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         Back.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -477,44 +471,32 @@ public class PasswordVerify extends javax.swing.JPanel {
                 Back.setText("Back");
             }
         });
-
-        // Email field setup - no center alignment
-        
-        // Add Enter key listener - will be updated when you add new text fields
-        // Remove any existing KeyListeners first to prevent duplicates
-        
-        // Key listener will be added when you create new text fields
     }
 
     @Override
     public void addNotify() {
         super.addNotify();
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setupLabelPosition(); // Set label position
-                setupButtons(); // Setup buttons when panel is added to container
-                
-                // Set the user's email dynamically
-                if (cephra.Phone.Utilities.AppSessionState.userEmailForReset != null) {
-                    cephramail.setText(cephra.Phone.Utilities.AppSessionState.userEmailForReset);
-                }
-                
-                if (code1 != null) {
-                    code1.requestFocusInWindow();
-                }
-                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(PasswordVerify.this);
-                if (root != null && resetsend != null) {
-                    root.setDefaultButton(resetsend);
-                }
-                
-                // Show notification with OTP only if the flag is set (coming from PasswordForgot or resending)
-                if (cephra.Phone.Utilities.AppSessionState.showOtpNotification) {
-                    showOTPNotification(cephra.Database.CephraDB.getGeneratedOTP());
-                    // Reset the flag after showing the notification
-                    cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
-                }
-                
-                // Enter key functionality is already set up in setupButtons() method
+        SwingUtilities.invokeLater(() -> {
+            setupLabelPosition(); // Set label position
+            
+            // Set the user's email dynamically
+            if (cephra.Phone.Utilities.AppSessionState.userEmailForReset != null) {
+                cephramail.setText(cephra.Phone.Utilities.AppSessionState.userEmailForReset);
+            }
+            
+            if (code1 != null) {
+                code1.requestFocusInWindow();
+            }
+            javax.swing.JRootPane root = SwingUtilities.getRootPane(PasswordVerify.this);
+            if (root != null && resetsend != null) {
+                root.setDefaultButton(resetsend);
+            }
+            
+            // Show notification with OTP only if the flag is set (coming from PasswordForgot or resending)
+            if (cephra.Phone.Utilities.AppSessionState.showOtpNotification) {
+                showOTPNotification(cephra.Database.CephraDB.getGeneratedOTP());
+                // Reset the flag after showing the notification
+                cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
             }
         });
     }
