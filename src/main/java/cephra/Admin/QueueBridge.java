@@ -116,7 +116,12 @@ public final class QueueBridge {
         } else if (userBatteryLevel < 20) {
             // Priority ticket was successfully added to database, also add to waiting grid
             try {
-                cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customer, service, userBatteryLevel);
+                // Check if ticket is already in waiting grid to prevent duplication
+                boolean alreadyInWaitingGrid = cephra.Admin.BayManagement.isTicketInWaitingGrid(ticket);
+                
+                if (!alreadyInWaitingGrid) {
+                    cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customer, service, userBatteryLevel);
+                }
                 
                 // Refresh the queue table to show the updated status
                 SwingUtilities.invokeLater(() -> {
