@@ -110,8 +110,8 @@ $bayNumber = null;
 // Determine priority based on battery level (priority 1 for <20%, priority 0 for >=20%)
 $priority = ($batteryLevel < 20) ? 1 : 0;
 
-// Determine initial status - priority tickets go directly to Waiting
-$initialStatus = ($priority == 1) ? 'Waiting' : 'Pending';
+// Determine initial status - priority tickets go directly to In Progress
+$initialStatus = ($priority == 1) ? 'In Progress' : 'Pending';
 
 // First, record the ticket in queue_tickets so it appears on Admin Queue
 $stmt = $conn->prepare("INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level, priority) VALUES (:ticket_id, :username, :service_type, :status, '', :battery_level, :priority)");
@@ -126,6 +126,80 @@ if (!$stmt->execute()) {
     http_response_code(500);
     echo json_encode(['error' => 'Failed to create queue record', 'db_error' => $errorInfo[2]]);
     exit();
+}
+
+// If this is a priority ticket (In Progress status), try to assign to available bay first
+if ($priority == 1) {
+    try {
+        // Check for available charging bays first
+        $isFastCharging = ($queueServiceType === 'Fast Charging');
+        $bayType = $isFastCharging ? 'Fast' : 'Normal';
+        
+        // Find available bay
+        $stmt = $conn->prepare("SELECT bay_number FROM charging_bays WHERE bay_type = :bay_type AND status = 'Available' ORDER BY bay_number LIMIT 1");
+        $stmt->bindParam(':bay_type', $bayType);
+        $stmt->execute();
+        $availableBay = $stmt->fetchColumn();
+        
+        if ($availableBay) {
+            // Directly assign to charging bay
+            $conn->beginTransaction();
+            
+            try {
+                // Update charging_bays table
+                $stmt = $conn->prepare("UPDATE charging_bays SET ticket_id = :ticket_id, username = :username, status = 'Charging', start_time = CURRENT_TIMESTAMP WHERE bay_number = :bay_number");
+                $stmt->bindParam(':ticket_id', $ticketId);
+                $stmt->bindParam(':username', $username);
+                $stmt->bindParam(':bay_number', $availableBay);
+                $stmt->execute();
+                
+                // Update charging_grid table
+                $stmt = $conn->prepare("UPDATE charging_grid SET ticket_id = :ticket_id, username = :username, service_type = :service_type, initial_battery_level = :battery_level, start_time = CURRENT_TIMESTAMP WHERE bay_number = :bay_number");
+                $stmt->bindParam(':ticket_id', $ticketId);
+                $stmt->bindParam(':username', $username);
+                $stmt->bindParam(':service_type', $queueServiceType);
+                $stmt->bindParam(':battery_level', $batteryLevel);
+                $stmt->bindParam(':bay_number', $availableBay);
+                $stmt->execute();
+                
+                // Update queue_tickets status to In Progress
+                $stmt = $conn->prepare("UPDATE queue_tickets SET status = 'In Progress' WHERE ticket_id = :ticket_id");
+                $stmt->bindParam(':ticket_id', $ticketId);
+                $stmt->execute();
+                
+                $conn->commit();
+                    error_log("Priority ticket $ticketId directly assigned to Bay-$availableBay (no waiting needed)");
+                
+            } catch (Exception $e) {
+                $conn->rollback();
+                error_log("Failed to assign priority ticket $ticketId to bay $availableBay: " . $e->getMessage());
+                throw $e;
+            }
+            
+        } else {
+            // No available bays, add to waiting grid
+            $stmt = $conn->prepare("SELECT slot_number FROM waiting_grid WHERE ticket_id IS NULL ORDER BY slot_number LIMIT 1");
+            $stmt->execute();
+            $availableSlot = $stmt->fetchColumn();
+            
+            if ($availableSlot) {
+                // Add ticket to waiting grid
+                $stmt = $conn->prepare("UPDATE waiting_grid SET ticket_id = :ticket_id, username = :username, service_type = :service_type, initial_battery_level = :battery_level, position_in_queue = :slot WHERE slot_number = :slot");
+                $stmt->bindParam(':ticket_id', $ticketId);
+                $stmt->bindParam(':username', $username);
+                $stmt->bindParam(':service_type', $queueServiceType);
+                $stmt->bindParam(':battery_level', $batteryLevel);
+                $stmt->bindParam(':slot', $availableSlot);
+                $stmt->execute();
+                
+                error_log("Priority ticket $ticketId added to waiting grid slot $availableSlot (no bays available)");
+            } else {
+                error_log("No available waiting slots for priority ticket $ticketId");
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Failed to process priority ticket $ticketId: " . $e->getMessage());
+    }
 }
 
 // Do NOT create an active_tickets entry at ticket creation time.

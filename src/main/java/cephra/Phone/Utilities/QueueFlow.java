@@ -149,6 +149,22 @@ public final class QueueFlow {
         }
         return "";
     }
+    
+    // Returns the next priority ticket id that would be used for the given service and battery level
+    public static String previewNextPriorityTicketIdForService(String serviceName, int batteryLevel) {
+        String s = serviceName == null ? "" : serviceName.toLowerCase();
+        boolean isPriority = (batteryLevel < 20);
+        
+        if (s.contains("fast")) {
+            String prefix = isPriority ? "FCHP" : "FCH";
+            return formatTicket(prefix, nextFastNumber);
+        }
+        if (s.contains("normal")) {
+            String prefix = isPriority ? "NCHP" : "NCH";
+            return formatTicket(prefix, nextNormalNumber);
+        }
+        return "";
+    }
 
     // Returns the next ticket id for the currently selected service, without mutating counters
     public static String previewNextTicketId() {
@@ -323,8 +339,14 @@ public final class QueueFlow {
     private static void updateCountersFromTicket(String ticket) {
         String upper = ticket == null ? "" : ticket.toUpperCase();
         int num = extractNumber(upper);
-        if (upper.startsWith("FCH")) {
+        if (upper.startsWith("FCHP")) {
+            // Priority fast ticket - use FCH counter
             nextFastNumber = Math.max(nextFastNumber, num + 1);
+        } else if (upper.startsWith("FCH")) {
+            nextFastNumber = Math.max(nextFastNumber, num + 1);
+        } else if (upper.startsWith("NCHP")) {
+            // Priority normal ticket - use NCH counter
+            nextNormalNumber = Math.max(nextNormalNumber, num + 1);
         } else if (upper.startsWith("NCH")) {
             nextNormalNumber = Math.max(nextNormalNumber, num + 1);
         }

@@ -207,8 +207,8 @@ public class QueueTicket extends javax.swing.JPanel {
                     if (batteryLevel < 20) {
                         // Low battery - show priority ticket format
                         if (t == null || t.length() == 0) {
-                            // Generate preview priority ticket
-                            String priorityTicket = generatePriorityTicketPreview(s);
+                            // Generate preview priority ticket using QueueFlow
+                            String priorityTicket = cephra.Phone.Utilities.QueueFlow.previewNextPriorityTicketIdForService(s, batteryLevel);
                             QTicket.setText(priorityTicket);
                         } else {
                             // Ensure existing ticket shows priority format
@@ -477,7 +477,7 @@ public class QueueTicket extends javax.swing.JPanel {
             if (batteryLevel < 20) {
                 // Low battery - show priority ticket format
                 if (t == null || t.length() == 0) {
-                    String priorityTicket = generatePriorityTicketPreview(s);
+                    String priorityTicket = cephra.Phone.Utilities.QueueFlow.previewNextPriorityTicketIdForService(s, batteryLevel);
                     QTicket.setText(priorityTicket);
                 } else {
                     String priorityTicket = convertToPriorityTicket(t);

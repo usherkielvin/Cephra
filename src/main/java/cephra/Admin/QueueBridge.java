@@ -99,8 +99,8 @@ public final class QueueBridge {
         int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
         ticketBattery.put(ticket, new BatteryInfo(userBatteryLevel, 40.0)); // 40kWh capacity
         
-        // Determine priority status - priority tickets go to Waiting
-        String finalStatus = (userBatteryLevel < 20) ? "Waiting" : status;
+        // Determine priority status - priority tickets go directly to In Progress
+        String finalStatus = (userBatteryLevel < 20) ? "In Progress" : status;
         
         // Set this as the user's active ticket with correct service type
         cephra.Database.CephraDB.setActiveTicket(customer, ticket, service, userBatteryLevel, "");
@@ -114,6 +114,19 @@ public final class QueueBridge {
             records.remove(0);
             ticketBattery.remove(ticket);
             cephra.Database.CephraDB.clearActiveTicket(customer);
+        } else if (userBatteryLevel < 20) {
+            // Priority ticket was successfully added to database, assign directly to charging bay
+            try {
+                boolean isFastCharging = service.toLowerCase().contains("fast");
+                int assignedBay = cephra.Admin.BayManagement.assignTicketFromQueue(ticket, customer, isFastCharging);
+                if (assignedBay > 0) {
+                    System.out.println("QueueBridge: Priority ticket " + ticket + " directly assigned to Bay-" + assignedBay);
+                } else {
+                    System.out.println("QueueBridge: Priority ticket " + ticket + " created but no bay available - will be processed later");
+                }
+            } catch (Exception e) {
+                System.err.println("QueueBridge: Failed to assign priority ticket " + ticket + " to bay: " + e.getMessage());
+            }
         }
 
         if (model != null) {

@@ -896,8 +896,8 @@ public class CephraDB {
             // Determine priority based on battery level (priority 1 for <20%, priority 0 for >=20%)
             int priority = (initialBatteryLevel < 20) ? 1 : 0;
             
-            // Determine initial status - priority tickets go directly to Waiting
-            String initialStatus = (priority == 1) ? "Waiting" : status;
+            // Use the status passed from QueueBridge (priority tickets now go directly to "In Progress")
+            String finalStatus = status;
             
             // Now insert the queue ticket with priority information
             try (PreparedStatement stmt = conn.prepareStatement(
@@ -907,12 +907,18 @@ public class CephraDB {
                 stmt.setString(1, ticketId);
                 stmt.setString(2, username);
                 stmt.setString(3, serviceType);
-                stmt.setString(4, initialStatus);
+                stmt.setString(4, finalStatus);
                 stmt.setString(5, paymentStatus);
                 stmt.setInt(6, initialBatteryLevel);
                 stmt.setInt(7, priority);
                 
                 int rowsAffected = stmt.executeUpdate();
+                
+                // Priority tickets are now handled by QueueBridge for direct bay assignment
+                if (rowsAffected > 0 && priority == 1) {
+                    System.out.println("CephraDB: Priority ticket " + ticketId + " created with status: " + finalStatus);
+                }
+                
                 return rowsAffected > 0;
             }
             
