@@ -673,108 +673,76 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
 
         detailpanel.setBackground(new java.awt.Color(255, 255, 255));
         detailpanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        detailpanel.setLayout(null);
 
         jLabel2.setBackground(new java.awt.Color(0, 0, 0));
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel2.setText("Charging Details");
+        detailpanel.add(jLabel2);
+        jLabel2.setBounds(30, 7, 176, 32);
 
         ticket.setText("jLabel3");
+        ticket.setToolTipText("");
+        ticket.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(ticket);
+        ticket.setBounds(77, 50, 130, 16);
 
         Customer.setText("jLabel3");
+        Customer.setToolTipText("");
+        Customer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(Customer);
+        Customer.setBounds(77, 70, 130, 16);
 
         typed.setText("jLabel3");
+        typed.setToolTipText("");
+        typed.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        detailpanel.add(typed);
+        typed.setBounds(77, 90, 130, 16);
 
         kwh.setText("jLabel3");
+        kwh.setToolTipText("");
+        detailpanel.add(kwh);
+        kwh.setBounds(77, 110, 130, 16);
 
         Chargingtime.setText("jLabel3");
+        Chargingtime.setToolTipText("");
+        Chargingtime.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        detailpanel.add(Chargingtime);
+        Chargingtime.setBounds(77, 130, 130, 16);
 
         totalprice.setText("jLabel3");
+        totalprice.setToolTipText("");
+        totalprice.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(totalprice);
+        totalprice.setBounds(77, 150, 130, 16);
 
         server.setText("jLabel3");
+        server.setToolTipText("");
+        server.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(server);
+        server.setBounds(77, 170, 130, 16);
 
         dated.setText("jLabel3");
+        dated.setToolTipText("");
+        dated.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(dated);
+        dated.setBounds(77, 190, 130, 16);
 
         timed.setText("jLabel3");
+        timed.setToolTipText("");
+        timed.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(timed);
+        timed.setBounds(77, 210, 130, 16);
 
         ref.setText("jLabel3");
+        ref.setToolTipText("");
+        ref.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(ref);
+        ref.setBounds(77, 230, 130, 16);
 
         ok.setText("jToggleButton1");
-
-        javax.swing.GroupLayout detailpanelLayout = new javax.swing.GroupLayout(detailpanel);
-        detailpanel.setLayout(detailpanelLayout);
-        detailpanelLayout.setHorizontalGroup(
-            detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(detailpanelLayout.createSequentialGroup()
-                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(detailpanelLayout.createSequentialGroup()
-                        .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(detailpanelLayout.createSequentialGroup()
-                                .addGap(29, 29, 29)
-                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(totalprice)
-                                    .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(detailpanelLayout.createSequentialGroup()
-                                            .addComponent(Chargingtime)
-                                            .addGap(21, 21, 21)
-                                            .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addComponent(ref)
-                                                .addGroup(detailpanelLayout.createSequentialGroup()
-                                                    .addGap(55, 55, 55)
-                                                    .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(dated)
-                                                        .addComponent(kwh)))))
-                                        .addComponent(jLabel2)
-                                        .addComponent(server))))
-                            .addGroup(detailpanelLayout.createSequentialGroup()
-                                .addGap(51, 51, 51)
-                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(timed)
-                                    .addGroup(detailpanelLayout.createSequentialGroup()
-                                        .addGap(74, 74, 74)
-                                        .addComponent(Customer))))
-                            .addGroup(detailpanelLayout.createSequentialGroup()
-                                .addGap(38, 38, 38)
-                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(ticket)
-                                    .addComponent(typed))))
-                        .addGap(0, 17, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, detailpanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(ok)))
-                .addContainerGap())
-        );
-        detailpanelLayout.setVerticalGroup(
-            detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(detailpanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ticket)
-                .addGap(29, 29, 29)
-                .addComponent(Customer)
-                .addGap(1, 1, 1)
-                .addComponent(typed)
-                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(detailpanelLayout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addComponent(kwh))
-                    .addGroup(detailpanelLayout.createSequentialGroup()
-                        .addGap(32, 32, 32)
-                        .addComponent(Chargingtime)))
-                .addGap(18, 18, 18)
-                .addComponent(totalprice)
-                .addGap(10, 10, 10)
-                .addComponent(server)
-                .addGap(5, 5, 5)
-                .addComponent(dated)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(timed)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ref)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ok)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        detailpanel.add(ok);
+        ok.setBounds(112, 285, 111, 40);
 
         add(detailpanel);
         detailpanel.setBounds(430, 310, 230, 330);
