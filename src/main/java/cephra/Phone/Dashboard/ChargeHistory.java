@@ -950,14 +950,9 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
     public void addTestHistoryEntry() {
         String currentUser = cephra.Database.CephraDB.getCurrentUsername();
         if (currentUser != null) {
-            cephra.Phone.Utilities.HistoryManager.addHistoryEntry(
-                currentUser,
-                "FCH001",
-                "Fast Charging",
-                "2h 30min",
-                "₱285.50",
-                "REF123456"
-            );
+            // History entries are created from database data, not added manually
+            // This method is for testing - just refresh the display
+            refreshHistoryDisplay();
         }
     }
 }
