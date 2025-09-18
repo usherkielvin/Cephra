@@ -33,6 +33,7 @@ public class Queue extends javax.swing.JPanel {
         SwingUtilities.invokeLater(() -> {
             setupActionColumn();
             setupPaymentColumn();
+            setupTicketColumn();
         });
         jPanel1.setOpaque(false);
         
@@ -567,6 +568,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 
                 // Re-setup action column to ensure renderers are fresh
                 setupActionColumn();
+                setupTicketColumn();
                 
                 // Force scroll pane refresh
                 jScrollPane1.repaint();
@@ -954,6 +956,34 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         });
 
         queTab.getColumnModel().getColumn(paymentCol).setCellEditor(new PaymentEditor());
+    }
+
+    private void setupTicketColumn() {
+        final int ticketCol = getColumnIndex("Ticket");
+        if (ticketCol < 0) return;
+
+        queTab.getColumnModel().getColumn(ticketCol).setCellRenderer(new TableCellRenderer() {
+            private final JLabel label = new JLabel();
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                String ticketId = value == null ? "" : String.valueOf(value).trim();
+                label.setText(ticketId);
+                
+                // Check if ticket has "P" suffix (priority ticket)
+                if (ticketId.contains("P") && (ticketId.startsWith("FCHP") || ticketId.startsWith("NCHP"))) {
+                    // Priority ticket - display in red
+                    label.setForeground(new java.awt.Color(220, 20, 60)); // Red color
+                    label.setFont(label.getFont().deriveFont(Font.BOLD)); // Bold font
+                } else {
+                    // Normal ticket - default color
+                    label.setForeground(new java.awt.Color(0, 0, 0)); // Black color
+                    label.setFont(label.getFont().deriveFont(Font.PLAIN)); // Normal font
+                }
+                
+                return label;
+            }
+        });
     }
 
     private class PaymentEditor extends AbstractCellEditor implements TableCellEditor, java.awt.event.ActionListener {

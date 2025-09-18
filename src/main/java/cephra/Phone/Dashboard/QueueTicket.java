@@ -20,6 +20,20 @@ public class QueueTicket extends javax.swing.JPanel {
         // Update battery percentage and estimated time
         updateBatteryDisplay();
         updateEstimatedTime();
+        
+        // Add listener to refresh when panel becomes visible
+        addHierarchyListener(new java.awt.event.HierarchyListener() {
+            @Override
+            public void hierarchyChanged(java.awt.event.HierarchyEvent e) {
+                if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (isShowing()) {
+                        // Refresh display when panel becomes visible
+                        updateBatteryDisplay();
+                        updateTicketDisplay();
+                    }
+                }
+            }
+        });
 
        // jLabel1.setText("<html>You are next after<br>current charging session</html>");
     }
@@ -184,17 +198,74 @@ public class QueueTicket extends javax.swing.JPanel {
                 // Apply selected ticket/service to labels
                 String s = cephra.Phone.Utilities.QueueFlow.getCurrentServiceName();
                 String t = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
-                if (t == null || t.length() == 0) {
-                    // Preview exact next ticket from QueueFlow counters
-                    QTicket.setText(cephra.Phone.Utilities.QueueFlow.previewNextTicketIdForService(s));
-                } else {
-                    QTicket.setText(t);
+                
+                // Check if user has low battery and should show priority ticket
+                try {
+                    String username = cephra.Database.CephraDB.getCurrentUsername();
+                    int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                    
+                    if (batteryLevel < 20) {
+                        // Low battery - show priority ticket format
+                        if (t == null || t.length() == 0) {
+                            // Generate preview priority ticket
+                            String priorityTicket = generatePriorityTicketPreview(s);
+                            QTicket.setText(priorityTicket);
+                        } else {
+                            // Ensure existing ticket shows priority format
+                            String priorityTicket = convertToPriorityTicket(t);
+                            QTicket.setText(priorityTicket);
+                        }
+                    } else {
+                        // Normal battery - show regular ticket
+                        if (t == null || t.length() == 0) {
+                            // Preview exact next ticket from QueueFlow counters
+                            QTicket.setText(cephra.Phone.Utilities.QueueFlow.previewNextTicketIdForService(s));
+                        } else {
+                            QTicket.setText(t);
+                        }
+                    }
+                } catch (Exception e) {
+                    // Fallback to original logic if battery check fails
+                    if (t == null || t.length() == 0) {
+                        QTicket.setText(cephra.Phone.Utilities.QueueFlow.previewNextTicketIdForService(s));
+                    } else {
+                        QTicket.setText(t);
+                    }
                 }
+                
                 if (s != null && s.length() > 0) {
                     typeofcharge.setText(s);
                 }
             }
         });
+    }
+    
+    // Helper method to generate priority ticket preview
+    private String generatePriorityTicketPreview(String service) {
+        if (service == null) return "FCHP001";
+        
+        if (service.toLowerCase().contains("fast")) {
+            return "FCHP001"; // Fast Charging Priority
+        } else {
+            return "NCHP001"; // Normal Charging Priority
+        }
+    }
+    
+    // Helper method to convert regular ticket to priority ticket
+    private String convertToPriorityTicket(String ticketId) {
+        if (ticketId == null || ticketId.length() == 0) return ticketId;
+        
+        // If already a priority ticket, return as is
+        if (ticketId.contains("P")) return ticketId;
+        
+        // Convert regular ticket to priority ticket
+        if (ticketId.startsWith("FCH")) {
+            return ticketId.replace("FCH", "FCHP");
+        } else if (ticketId.startsWith("NCH")) {
+            return ticketId.replace("NCH", "NCHP");
+        }
+        
+        return ticketId; // Return original if no conversion needed
     }
  // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
@@ -346,7 +417,17 @@ public class QueueTicket extends javax.swing.JPanel {
         try {
             String username = cephra.Database.CephraDB.getCurrentUsername();
             int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
-            String status = batteryLevel <= 20 ? " (LOW)" : batteryLevel <= 50 ? " (MED)" : " (OK)";
+            
+            // Show PRIO for low battery (< 20%), otherwise show normal status
+            String status;
+            if (batteryLevel < 20) {
+                status = " PRIO";
+            } else if (batteryLevel <= 50) {
+                status = " (MED)";
+            } else {
+                status = " (OK)";
+            }
+            
             batterypercent.setText(batteryLevel + "%" + status);
         } catch (Exception e) {
             System.err.println("Error updating battery display: " + e.getMessage());
@@ -382,6 +463,36 @@ public class QueueTicket extends javax.swing.JPanel {
             }
         } else {
             return minutes + " minute" + (minutes != 1 ? "s" : "");
+        }
+    }
+    
+    // Method to update ticket display based on current battery level
+    private void updateTicketDisplay() {
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+            String s = cephra.Phone.Utilities.QueueFlow.getCurrentServiceName();
+            String t = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
+            
+            if (batteryLevel < 20) {
+                // Low battery - show priority ticket format
+                if (t == null || t.length() == 0) {
+                    String priorityTicket = generatePriorityTicketPreview(s);
+                    QTicket.setText(priorityTicket);
+                } else {
+                    String priorityTicket = convertToPriorityTicket(t);
+                    QTicket.setText(priorityTicket);
+                }
+            } else {
+                // Normal battery - show regular ticket
+                if (t == null || t.length() == 0) {
+                    QTicket.setText(cephra.Phone.Utilities.QueueFlow.previewNextTicketIdForService(s));
+                } else {
+                    QTicket.setText(t);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating ticket display: " + e.getMessage());
         }
     }
 }

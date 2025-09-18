@@ -227,13 +227,13 @@ public class HOMELINKED extends javax.swing.JPanel {
                 if (carIndex == -1) {
                     carIndex = new java.util.Random().nextInt(carImages.length);
                     cephra.Database.CephraDB.setUserCarIndex(username, carIndex);
-                    System.out.println("HomeLinked: Assigned car " + (carIndex + 1) + " to user " + username);
+                    // System.out.println("HomeLinked: Assigned car " + (carIndex + 1) + " to user " + username);
                 }
                 
                 // Set the car image while preserving the form positioning (x=31, y=173, size=307x209)
                 if (carIndex >= 0 && carIndex < carImages.length) {
                     CAR.setIcon(new javax.swing.ImageIcon(getClass().getResource(carImages[carIndex])));
-                    System.out.println("HomeLinked: Set car image to " + carImages[carIndex] + " for user " + username);
+                    // System.out.println("HomeLinked: Set car image to " + carImages[carIndex] + " for user " + username);
                 }
             }
         } catch (Exception e) {

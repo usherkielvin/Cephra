@@ -163,15 +163,21 @@ class AdminPanel {
     updateQueueTable(queue) {
         const tbody = document.getElementById('queue-tbody');
         if (!queue || queue.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-info-circle"></i> No tickets in queue</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-info-circle"></i> No tickets in queue</td></tr>';
             return;
         }
 
         tbody.innerHTML = queue.map(ticket => `
             <tr>
-                <td>${ticket.ticket_id}</td>
+                <td class="ticket-priority ${ticket.priority == 1 ? 'urgent' : 'normal'}">${ticket.ticket_id}</td>
                 <td>${ticket.username}</td>
                 <td>${ticket.service_type}</td>
+                <td>
+                    ${ticket.priority == 1 ? 
+                        '<span class="priority-badge urgent"><i class="fas fa-exclamation-triangle"></i> URGENT</span>' : 
+                        '<span class="priority-badge normal"><i class="fas fa-clock"></i> Normal</span>'
+                    }
+                </td>
                 <td><span class="status-badge ${ticket.status.toLowerCase()}">${ticket.status}</span></td>
                 <td><span class="status-badge ${ticket.payment_status.toLowerCase()}">${ticket.payment_status}</span></td>
                 <td>${this.formatDateTime(ticket.created_at)}</td>

@@ -60,6 +60,8 @@ public final class QueueBridge {
                     dbTicket[3], // service_type
                     dbTicket[4], // status
                     dbTicket[5], // payment_status
+                    dbTicket[6], // priority
+                    dbTicket[7], // initial_battery_level
                     "" // action (empty for now)
                 };
                 records.add(queueRecord);
@@ -97,11 +99,14 @@ public final class QueueBridge {
         int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
         ticketBattery.put(ticket, new BatteryInfo(userBatteryLevel, 40.0)); // 40kWh capacity
         
+        // Determine priority status - priority tickets go to Waiting
+        String finalStatus = (userBatteryLevel < 20) ? "Waiting" : status;
+        
         // Set this as the user's active ticket with correct service type
         cephra.Database.CephraDB.setActiveTicket(customer, ticket, service, userBatteryLevel, "");
         
         // Add to database for persistent storage
-        boolean dbSuccess = cephra.Database.CephraDB.addQueueTicket(ticket, customer, service, status, payment, userBatteryLevel);
+        boolean dbSuccess = cephra.Database.CephraDB.addQueueTicket(ticket, customer, service, finalStatus, payment, userBatteryLevel);
         
         if (!dbSuccess) {
             System.err.println("Failed to add ticket " + ticket + " to database. It may already exist.");
@@ -125,7 +130,7 @@ public final class QueueBridge {
             fullRecord[3], // service
             fullRecord[4], // status
             fullRecord[5], // payment
-            fullRecord[6]  // action
+            fullRecord[8]  // action
         };
     }
 

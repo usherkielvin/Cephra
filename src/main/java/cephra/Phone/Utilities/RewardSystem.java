@@ -34,7 +34,7 @@ public class RewardSystem {
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         int points = rs.getInt("total_points");
-                        System.out.println("RewardSystem: Retrieved " + points + " points for user " + username);
+                        // System.out.println("RewardSystem: Retrieved " + points + " points for user " + username);
                         return points;
                     } else {
                         // User not found in user_points table, create entry

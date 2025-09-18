@@ -216,7 +216,7 @@ public class LinkConnect extends javax.swing.JPanel {
             System.out.println("Link: Initialized battery level for " + username + " to " + batteryLevel + "% when linking car");
                 } else {
             // Battery already exists - keep the current level
-            System.out.println("Link: Battery level for " + username + " already exists: " + currentBattery + "% - keeping current level");
+            System.out.println("Battery level is " + currentBattery + "%");
         }
                     
                     // Ensure database update is complete before switching panels
@@ -237,7 +237,7 @@ public class LinkConnect extends javax.swing.JPanel {
                         cephra.Database.CephraDB.setUserCarIndex(username, carIndex);
                         System.out.println("LinkConnect: Assigned car " + (carIndex + 1) + " to user " + username + " when linking");
                     } else {
-                        System.out.println("LinkConnect: User " + username + " already has car " + (currentCarIndex + 1) + " assigned");
+                        System.out.println(username + " already has car linked");
                     }
                 }
                 

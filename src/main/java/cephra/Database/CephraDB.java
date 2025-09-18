@@ -416,7 +416,7 @@ public class CephraDB {
                 if (rs.next()) {
                     // Return the most recent stored battery level (no randomization)
                     int batteryLevel = rs.getInt("battery_level");
-                    System.out.println("CephraDB: Retrieved battery level for " + username + ": " + batteryLevel + "%");
+                    // System.out.println("CephraDB: Retrieved battery level for " + username + ": " + batteryLevel + "%");
                     return batteryLevel;
                 } else {
                     // No battery level found - return -1 to indicate no battery initialized yet
@@ -490,7 +490,7 @@ public class CephraDB {
                             System.out.println("CephraDB: No car index found for " + username + " - returning -1");
                             return -1;
                         }
-                        System.out.println("CephraDB: Retrieved car index for " + username + ": " + carIndex);
+                        // System.out.println("CephraDB: Retrieved car index for " + username + ": " + carIndex);
                         return carIndex;
                     } else {
                         System.out.println("CephraDB: User " + username + " not found - returning -1");
@@ -893,17 +893,24 @@ public class CephraDB {
                 }
             }
             
-            // Now insert the queue ticket
+            // Determine priority based on battery level (priority 1 for <20%, priority 0 for >=20%)
+            int priority = (initialBatteryLevel < 20) ? 1 : 0;
+            
+            // Determine initial status - priority tickets go directly to Waiting
+            String initialStatus = (priority == 1) ? "Waiting" : status;
+            
+            // Now insert the queue ticket with priority information
             try (PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO queue_tickets (ticket_id, username, service_type, status, " +
-                    "payment_status, initial_battery_level) VALUES (?, ?, ?, ?, ?, ?)")) {
+                    "payment_status, initial_battery_level, priority) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
                 
                 stmt.setString(1, ticketId);
                 stmt.setString(2, username);
                 stmt.setString(3, serviceType);
-                stmt.setString(4, status);
+                stmt.setString(4, initialStatus);
                 stmt.setString(5, paymentStatus);
                 stmt.setInt(6, initialBatteryLevel);
+                stmt.setInt(7, priority);
                 
                 int rowsAffected = stmt.executeUpdate();
                 return rowsAffected > 0;
@@ -1264,8 +1271,8 @@ public class CephraDB {
         java.util.List<Object[]> tickets = new ArrayList<>();
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT ticket_id, reference_number, username, service_type, status, payment_status " +
-                     "FROM queue_tickets ORDER BY created_at DESC")) {
+                     "SELECT qt.ticket_id, qt.reference_number, qt.username, qt.service_type, qt.status, qt.payment_status, qt.priority, qt.initial_battery_level " +
+                     "FROM queue_tickets qt ORDER BY qt.priority DESC, qt.created_at ASC")) {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -1275,7 +1282,9 @@ public class CephraDB {
                         rs.getString("username"),
                         rs.getString("service_type"),
                         rs.getString("status"),
-                        rs.getString("payment_status")
+                        rs.getString("payment_status"),
+                        rs.getInt("priority"),
+                        rs.getInt("initial_battery_level")
                     };
                     tickets.add(row);
                 }
