@@ -3,8 +3,6 @@ package cephra.Phone.Dashboard;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 import javax.swing.*;
 
@@ -297,8 +295,6 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     }
     
     private Color getNotificationTypeColor(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
-           String ticket =  entry.getTicketId() ;
-        
         switch (entry.getType()) {
             
             case CHARGING_COMPLETE:
@@ -315,11 +311,6 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     }
     
     private String getEnhancedMessage(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
-        String bayInfo = (entry.getBayNumber() != null && !entry.getBayNumber().isEmpty()) ? 
-                        " at Bay " + entry.getBayNumber() : "";
-        String ticketInfo = (entry.getTicketId() != null && !entry.getTicketId().isEmpty()) ? 
-                           " (Ticket: " + entry.getTicketId() + ")" : "";
-     
         switch (entry.getType()) {
             case CHARGING_COMPLETE:
             case FULL_CHARGE:
@@ -336,35 +327,6 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         }
     }
     
-    private String createHtmlMessage(String text, int maxWidth) {
-        // Create HTML with proper word wrapping
-        StringBuilder html = new StringBuilder();
-        html.append("<html><body style='width: ").append(maxWidth).append("px; margin: 0; padding: 0;'>");
-        html.append("<div style='line-height: 1.3; font-size: 11px;'>");
-        
-        // Split text into sentences for better line breaks
-        String[] sentences = text.split("\\. ");
-        
-        for (int i = 0; i < sentences.length; i++) {
-            String sentence = sentences[i].trim();
-            if (!sentence.isEmpty()) {
-                // Add period back if it was split
-                if (i < sentences.length - 1 && !sentence.endsWith(".")) {
-                    sentence += ".";
-                }
-                
-                html.append(sentence);
-                
-                // Add line break after each sentence for better readability
-                if (i < sentences.length - 1) {
-                    html.append("<br>");
-                }
-            }
-        }
-        
-        html.append("</div></body></html>");
-        return html.toString();
-    }
     
     
     private void makeDraggable() {

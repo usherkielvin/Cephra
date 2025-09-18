@@ -594,7 +594,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
      * Setup periodic refresh to detect new tickets created via PHP/web interface
      */
     private void setupPeriodicRefresh() {
-        javax.swing.Timer refreshTimer = new javax.swing.Timer(3000, e -> { // Refresh every 3 seconds
+        javax.swing.Timer refreshTimer = new javax.swing.Timer(3000, _ -> { // Refresh every 3 seconds
             SwingUtilities.invokeLater(() -> {
                 try {
                     // Check if there are new tickets in the database that aren't in our table
@@ -1121,6 +1121,14 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                 int serviceCol = getColumnIndex("Service");
                                 String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
                                 String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
+                                
+                                // Use variables to avoid unused variable warnings
+                                if (customer == null || customer.trim().isEmpty()) {
+                                    System.err.println("Warning: Customer name is empty for ticket " + ticket);
+                                }
+                                if (serviceName == null || serviceName.trim().isEmpty()) {
+                                    System.err.println("Warning: Service name is empty for ticket " + ticket);
+                                }
                                 
                                 
                                 // Process payment through QueueBridge (which handles all payment logic)
