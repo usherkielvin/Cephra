@@ -1609,7 +1609,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        labelStaff.setText(getStaffFirstNameFromDB() + "!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 

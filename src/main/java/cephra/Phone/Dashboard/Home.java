@@ -409,17 +409,6 @@ public class Home extends javax.swing.JPanel {
         }
         resizeLabelToFitText(pesobalance);
     }
-    
-    //Auto resizable
-    private void setAutoText(javax.swing.JLabel label, String text) {
-        label.setText(text);
-
-        java.awt.FontMetrics fm = label.getFontMetrics(label.getFont());
-        int width = Math.max(30, fm.stringWidth(text)); // 30 = minimum width
-        int height = fm.getHeight();
-
-        label.setSize(width, height);
-    }
 
     /**
      * Loads and displays the current reward points
