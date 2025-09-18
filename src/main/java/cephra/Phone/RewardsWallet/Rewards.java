@@ -28,7 +28,14 @@ public class Rewards extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
-     jScrollPane1.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+        jScrollPane1.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+        
+        // Remove all scrollpane borders and outlines
+        jScrollPane1.setBorder(null);                           // Remove border around entire scrollpane
+        jScrollPane1.setViewportBorder(null);                   // Remove viewport border
+        jScrollPane1.getVerticalScrollBar().setBorder(null);    // Remove vertical scrollbar border
+        jScrollPane1.getHorizontalScrollBar().setBorder(null);  // Remove horizontal scrollbar border
+        
         // Get current user from session
         currentUsername = getCurrentUser();
       
@@ -419,6 +426,8 @@ public class Rewards extends javax.swing.JPanel {
         f2.setBounds(900, 310, 310, 60);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setFocusable(false);
+        jPanel1.setOpaque(false);
 
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
