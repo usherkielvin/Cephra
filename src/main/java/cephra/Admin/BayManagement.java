@@ -320,9 +320,6 @@ public class BayManagement extends javax.swing.JPanel {
     public static void loadToggleStates() {
         // Only load from database ONCE - never reload
         if (toggleStatesLoaded) {
-            System.out.println("*** TOGGLE STATES ALREADY LOADED - PRESERVING CURRENT VALUES ***");
-            System.out.println("Current fastChargingAvailable: [" + fastChargingAvailable[0] + ", " + fastChargingAvailable[1] + ", " + fastChargingAvailable[2] + "]");
-            System.out.println("Current normalChargingAvailable: [" + normalChargingAvailable[0] + ", " + normalChargingAvailable[1] + ", " + normalChargingAvailable[2] + ", " + normalChargingAvailable[3] + ", " + normalChargingAvailable[4] + "]");
             return;
         }
         

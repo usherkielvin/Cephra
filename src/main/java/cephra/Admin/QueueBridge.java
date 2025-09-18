@@ -636,7 +636,6 @@ public final class QueueBridge {
             String minFeeStr = cephra.Database.CephraDB.getSystemSetting("minimum_fee");
             if (minFeeStr != null && !minFeeStr.trim().isEmpty()) {
                 MINIMUM_FEE = Double.parseDouble(minFeeStr);
-                System.out.println("QueueBridge: Loaded minimum fee from database: ₱" + MINIMUM_FEE);
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(MINIMUM_FEE));
@@ -647,7 +646,6 @@ public final class QueueBridge {
             String rateStr = cephra.Database.CephraDB.getSystemSetting("rate_per_kwh");
             if (rateStr != null && !rateStr.trim().isEmpty()) {
                 RATE_PER_KWH = Double.parseDouble(rateStr);
-                System.out.println("QueueBridge: Loaded rate per kWh from database: ₱" + RATE_PER_KWH);
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RATE_PER_KWH));
@@ -658,7 +656,6 @@ public final class QueueBridge {
             String multiplierStr = cephra.Database.CephraDB.getSystemSetting("fast_multiplier");
             if (multiplierStr != null && !multiplierStr.trim().isEmpty()) {
                 FAST_MULTIPLIER = Double.parseDouble(multiplierStr);
-                System.out.println("QueueBridge: Loaded fast multiplier from database: " + String.format("%.0f%%", (FAST_MULTIPLIER - 1) * 100));
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(FAST_MULTIPLIER));

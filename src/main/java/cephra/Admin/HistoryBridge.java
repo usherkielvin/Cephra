@@ -87,7 +87,6 @@ public final class HistoryBridge {
                 records.add(adminRecord);
             }
             
-            System.out.println("HistoryBridge: Loaded " + records.size() + " history records from database");
         } catch (Exception e) {
             System.err.println("HistoryBridge: Error loading history from database: " + e.getMessage());
             e.printStackTrace();

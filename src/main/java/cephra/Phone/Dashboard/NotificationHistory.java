@@ -327,8 +327,6 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         }
     }
     
-    
-    
     private void makeDraggable() {
         final Point[] dragPoint = {null};
 

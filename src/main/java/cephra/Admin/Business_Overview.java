@@ -241,7 +241,6 @@ public class Business_Overview extends javax.swing.JPanel {
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
         // Set the staff first name instead of "Admin!"
         String firstName = getStaffFirstNameFromDB();
-        System.out.println("DEBUG Business_Overview: firstName = '" + firstName + "'");
         
         // If firstName is the same as username, update the database with proper name
         String currentUsername = cephra.Database.CephraDB.getCurrentAdminUsername();
@@ -411,7 +410,6 @@ public class Business_Overview extends javax.swing.JPanel {
             String minFeeStr = cephra.Database.CephraDB.getSystemSetting("minimum_fee");
             if (minFeeStr != null && !minFeeStr.trim().isEmpty()) {
                 Min = Integer.parseInt(minFeeStr);
-                System.out.println("Dashboard: Loaded minimum fee from database: ₱" + Min);
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(Min));
@@ -422,7 +420,6 @@ public class Business_Overview extends javax.swing.JPanel {
             String rateStr = cephra.Database.CephraDB.getSystemSetting("rate_per_kwh");
             if (rateStr != null && !rateStr.trim().isEmpty()) {
                 RPH = Integer.parseInt(rateStr);
-                System.out.println("Dashboard: Loaded rate per kWh from database: ₱" + RPH);
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RPH));
@@ -433,7 +430,6 @@ public class Business_Overview extends javax.swing.JPanel {
             String multiplierStr = cephra.Database.CephraDB.getSystemSetting("fast_multiplier");
             if (multiplierStr != null && !multiplierStr.trim().isEmpty()) {
                 fastMultiplier = Double.parseDouble(multiplierStr);
-                System.out.println("Dashboard: Loaded fast multiplier from database: " + String.format("%.0f%%", (fastMultiplier - 1) * 100));
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(fastMultiplier));
@@ -463,7 +459,6 @@ public class Business_Overview extends javax.swing.JPanel {
             // Calculate total charge sessions count
             int totalSessions = historyRecords.size();
             totalcharge.setText(String.valueOf(totalSessions));
-            System.out.println("Dashboard: Loaded total charge sessions: " + totalSessions);
             
             // Calculate total earnings from all records
             double totalEarnings = 0.0;
@@ -479,7 +474,6 @@ public class Business_Overview extends javax.swing.JPanel {
             }
             
             earnings.setText("₱" + String.format("%,.0f", totalEarnings));
-            System.out.println("Dashboard: Loaded total earnings: ₱" + totalEarnings);
             
         } catch (Exception e) {
             System.err.println("Dashboard: Error loading dashboard stats: " + e.getMessage());
