@@ -721,6 +721,43 @@ body {
     color: #155724;
 }
 
+/* Priority Badges */
+.priority-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.priority-badge.urgent {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.priority-badge.normal {
+    background: #e2e3e5;
+    color: #383d41;
+    border: 1px solid #d6d8db;
+}
+
+/* Priority ticket styling */
+.ticket-priority {
+    font-weight: 600;
+}
+
+.ticket-priority.urgent {
+    color: #dc3545;
+}
+
+.ticket-priority.normal {
+    color: #6c757d;
+}
+
 
 /* Bays Grid */
 

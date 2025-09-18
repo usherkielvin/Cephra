@@ -82,9 +82,10 @@ try {
                     status,
                     payment_status,
                     initial_battery_level,
+                    priority,
                     created_at
                 FROM queue_tickets 
-                ORDER BY created_at DESC
+                ORDER BY priority DESC, created_at ASC
             ");
             $queue = $stmt->fetchAll(PDO::FETCH_ASSOC);
             

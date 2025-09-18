@@ -78,7 +78,7 @@ public class LinkedCar extends javax.swing.JPanel {
                     charge.setToolTipText("Please link your car first to initialize battery level.");
                     charge.setBackground(new java.awt.Color(200, 200, 200));
                     charge.setForeground(new java.awt.Color(100, 100, 100));
-                    System.out.println("PorscheTaycan: No battery initialized for user " + username + " - showing 'Link Car' message");
+                    // System.out.println("PorscheTaycan: No battery initialized for user " + username + " - showing 'Link Car' message");
                 } else {
                     batterypercent.setText(batteryLevel + " %");
                     
@@ -102,7 +102,7 @@ public class LinkedCar extends javax.swing.JPanel {
                     charge.setBackground(null);
                     charge.setForeground(java.awt.Color.WHITE);
                     
-                    System.out.println("PorscheTaycan: Updated battery display to " + batteryLevel + "% for user " + username);
+                    // System.out.println("PorscheTaycan: Updated battery display to " + batteryLevel + "% for user " + username);
                 }
             }
         } catch (Exception e) {
@@ -176,7 +176,7 @@ public class LinkedCar extends javax.swing.JPanel {
                         ImageIcon rotatedIcon = rotateIcon(originalIcon, degrees);
                         bar.setIcon(rotatedIcon);
                         
-                        System.out.println("LinkedCar: Rotated car to " + degrees + "° for battery level " + batteryLevel + "%");
+                        // System.out.println("LinkedCar: Rotated car to " + degrees + "° for battery level " + batteryLevel + "%");
                     }
                 }
             }
@@ -202,8 +202,8 @@ public class LinkedCar extends javax.swing.JPanel {
                 chargingTypeLabel.setText("Not Charging");
                 chargingTimeLabel.setText(isFullyCharged ? "Fully Charged" : "Ready");
                 
-                System.out.println("LinkedCar: Charging completed - showing 'Not Charging' status for user " + username + 
-                                 " (battery: " + batteryLevel + "%, status: " + ticketStatus + ")");
+                // System.out.println("LinkedCar: Charging completed - showing 'Not Charging' status for user " + username + 
+                //                  " (battery: " + batteryLevel + "%, status: " + ticketStatus + ")");
             } else if (queueTicketId != null && ticketStatus != null && 
                 (ticketStatus.equals("Pending") || ticketStatus.equals("Waiting") || ticketStatus.equals("In Progress"))) {
                 
@@ -225,8 +225,8 @@ public class LinkedCar extends javax.swing.JPanel {
                     String timeDisplay = formatChargingTime(estimatedMinutes);
                     chargingTimeLabel.setText(timeDisplay);
                     
-                    System.out.println("LinkedCar: Updated charging display - Type: " + serviceType + 
-                                     ", Time: " + timeDisplay + " for user " + username + " (battery: " + batteryLevel + "%)");
+                    // System.out.println("LinkedCar: Updated charging display - Type: " + serviceType + 
+                    //                  ", Time: " + timeDisplay + " for user " + username + " (battery: " + batteryLevel + "%)");
                 } else {
                     // No ticket found, show not charging status
                     setNotChargingDisplay();
@@ -296,13 +296,6 @@ public class LinkedCar extends javax.swing.JPanel {
         }
     }
     
-    // Method to set default charging display when no ticket is active
-    private void setDefaultChargingDisplay() {
-        chargingTypeLabel.setText("Fast Charging");
-        chargingTimeLabel.setText("45m");
-        // Set default driving mode times (for 25% battery as per original design)
-        updateDrivingModeTimes(25);
-    }
     
     // Method to set not charging display when charging is completed or no active ticket
     private void setNotChargingDisplay() {
@@ -340,10 +333,10 @@ public class LinkedCar extends javax.swing.JPanel {
             normal.setText(formatDrivingTime(normalTimeMinutes));
             sports.setText(formatDrivingTime(sportsTimeMinutes));
             
-            System.out.println("LinkedCar: Updated driving mode times - Eco: " + formatDrivingTime(ecoTimeMinutes) + 
-                             ", Normal: " + formatDrivingTime(normalTimeMinutes) + 
-                             ", Sports: " + formatDrivingTime(sportsTimeMinutes) + 
-                             " (battery: " + batteryLevel + "%)");
+            // System.out.println("LinkedCar: Updated driving mode times - Eco: " + formatDrivingTime(ecoTimeMinutes) + 
+            //                  ", Normal: " + formatDrivingTime(normalTimeMinutes) + 
+            //                  ", Sports: " + formatDrivingTime(sportsTimeMinutes) + 
+            //                  " (battery: " + batteryLevel + "%)");
             
         } catch (Exception e) {
             System.err.println("Error updating driving mode times: " + e.getMessage());
@@ -619,7 +612,7 @@ public class LinkedCar extends javax.swing.JPanel {
                 if (carIndex == -1) {
                     carIndex = new Random().nextInt(carImages.length);
                     cephra.Database.CephraDB.setUserCarIndex(username, carIndex);
-                    System.out.println("LinkedCar: Assigned car " + (carIndex + 1) + " to user " + username);
+                    // System.out.println("LinkedCar: Assigned car " + (carIndex + 1) + " to user " + username);
                 }
                 
                 // Set the car image while preserving the form positioning (x=34, y=130, size=301x226)
@@ -631,11 +624,11 @@ public class LinkedCar extends javax.swing.JPanel {
                     if (carIndex == 1) { // c2.png is at index 1 (c1=0, c2=1, c3=2, etc.)
                         car.setBounds(36, 90, 301, 228); // Height increased from 226 to 228
                         car.setPreferredSize(new java.awt.Dimension(301, 228));
-                        System.out.println("LinkedCar: Set c2.png car image with increased height (301x228) to show full image");
+                        // System.out.println("LinkedCar: Set c2.png car image with increased height (301x228) to show full image");
                     } else {
                         car.setBounds(36, 90, 301, 226);
                         car.setPreferredSize(new java.awt.Dimension(301, 226));
-                        System.out.println("LinkedCar: Set car image to " + carImages[carIndex] + " for user " + username + " at position (34, 130)");
+                        // System.out.println("LinkedCar: Set car image to " + carImages[carIndex] + " for user " + username + " at position (34, 130)");
                     }
                 }
             }

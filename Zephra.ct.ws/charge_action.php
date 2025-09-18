@@ -86,13 +86,14 @@ $bayType = ($serviceType === 'Fast Charging') ? 'Fast' : 'Normal';
 $queueServiceType = ($serviceType === 'Fast Charging') ? 'Fast Charging' : 'Normal Charging';
 
 // Generate ticket ID using DB-driven increment across both tables
-$ticketPrefix = ($serviceType === 'Fast Charging') ? 'FCH' : 'NCH';
+$basePrefix = ($serviceType === 'Fast Charging') ? 'FCH' : 'NCH';
+$ticketPrefix = ($priority == 1) ? $basePrefix . 'P' : $basePrefix;
 $prefixPattern = $ticketPrefix . '%';
 
 // Compute the next number based on the greatest ticket suffix present in either queue_tickets or active_tickets
 $sql = "SELECT GREATEST(
-            IFNULL((SELECT MAX(CAST(SUBSTRING(ticket_id,4) AS UNSIGNED)) FROM queue_tickets WHERE ticket_id LIKE :prefix1), 0),
-            IFNULL((SELECT MAX(CAST(SUBSTRING(ticket_id,4) AS UNSIGNED)) FROM active_tickets WHERE ticket_id LIKE :prefix2), 0)
+            IFNULL((SELECT MAX(CAST(SUBSTRING(ticket_id," . (strlen($ticketPrefix) + 1) . ") AS UNSIGNED)) FROM queue_tickets WHERE ticket_id LIKE :prefix1), 0),
+            IFNULL((SELECT MAX(CAST(SUBSTRING(ticket_id," . (strlen($ticketPrefix) + 1) . ") AS UNSIGNED)) FROM active_tickets WHERE ticket_id LIKE :prefix2), 0)
         ) AS max_num";
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':prefix1', $prefixPattern);
@@ -106,12 +107,20 @@ $ticketId = $ticketPrefix . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
 // Ticket stays in Pending state until routed to a bay by Admin
 $bayNumber = null;
 
+// Determine priority based on battery level (priority 1 for <20%, priority 0 for >=20%)
+$priority = ($batteryLevel < 20) ? 1 : 0;
+
+// Determine initial status - priority tickets go directly to Waiting
+$initialStatus = ($priority == 1) ? 'Waiting' : 'Pending';
+
 // First, record the ticket in queue_tickets so it appears on Admin Queue
-$stmt = $conn->prepare("INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level, priority) VALUES (:ticket_id, :username, :service_type, 'Pending', '', :battery_level, 0)");
+$stmt = $conn->prepare("INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level, priority) VALUES (:ticket_id, :username, :service_type, :status, '', :battery_level, :priority)");
 $stmt->bindParam(':ticket_id', $ticketId);
 $stmt->bindParam(':username', $username);
 $stmt->bindParam(':service_type', $queueServiceType);
+$stmt->bindParam(':status', $initialStatus);
 $stmt->bindParam(':battery_level', $batteryLevel);
+$stmt->bindParam(':priority', $priority);
 if (!$stmt->execute()) {
     $errorInfo = $stmt->errorInfo();
     http_response_code(500);

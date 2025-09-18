@@ -234,19 +234,21 @@ public final class QueueFlow {
 
     public static void addCurrentToAdminAndStore(String customerName) {
         String service = currentServiceName;
-        // If no ticket was pre-assigned, generate the next ID for the service
+        // Get battery level first to determine priority
+        final int initialBatteryPercent = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
+        
+        // If no ticket was pre-assigned, generate the next ID for the service with priority
         if (currentTicketId == null || currentTicketId.length() == 0) {
-            currentTicketId = generateNextTicketIdForService(service);
+            currentTicketId = generatePriorityTicketIdForService(service, initialBatteryPercent);
         } else {
             // If a ticket was pre-set (e.g., FCH001), update counters so subsequent tickets increment
             updateCountersFromTicket(currentTicketId);
         }
         final String ticket = currentTicketId;
-        final String status = "Pending";
+        // Determine initial status based on battery level - priority tickets go to Waiting
+        final String status = (initialBatteryPercent < 20) ? "Waiting" : "Pending";
         final String payment = "";
         final String action = "";
-        // Get actual user battery level from CephraDB
-        final int initialBatteryPercent = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
         final double batteryCapacityKWh = 40.0; // 40kWh capacity
 
         // Store in memory list
@@ -276,6 +278,31 @@ public final class QueueFlow {
         if (serviceName.toLowerCase().contains("normal")) {
             String ticket = formatTicket("NCH", nextNormalNumber);
             System.out.println("QueueFlow: Generated Normal ticket: " + ticket + " (counter: " + nextNormalNumber + ")");
+            return ticket;
+        }
+        // default fall-back
+        return formatTicket("GEN", 1);
+    }
+    
+    // Generate priority ticket ID based on battery level
+    public static String generatePriorityTicketIdForService(String serviceName, int batteryLevel) {
+        if (serviceName == null) {
+            serviceName = "";
+        }
+        
+        // Determine if this should be a priority ticket
+        boolean isPriority = (batteryLevel < 20);
+        
+        if (serviceName.toLowerCase().contains("fast")) {
+            String prefix = isPriority ? "FCHP" : "FCH";
+            String ticket = formatTicket(prefix, nextFastNumber);
+            System.out.println("QueueFlow: Generated " + (isPriority ? "Priority" : "Normal") + " Fast ticket: " + ticket + " (counter: " + nextFastNumber + ")");
+            return ticket;
+        }
+        if (serviceName.toLowerCase().contains("normal")) {
+            String prefix = isPriority ? "NCHP" : "NCH";
+            String ticket = formatTicket(prefix, nextNormalNumber);
+            System.out.println("QueueFlow: Generated " + (isPriority ? "Priority" : "Normal") + " Normal ticket: " + ticket + " (counter: " + nextNormalNumber + ")");
             return ticket;
         }
         // default fall-back

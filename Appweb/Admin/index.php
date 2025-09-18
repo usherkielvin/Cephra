@@ -181,6 +181,7 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                                     <th>Ticket ID</th>
                                     <th>Username</th>
                                     <th>Service Type</th>
+                                    <th>Priority</th>
                                     <th>Status</th>
                                     <th>Payment</th>
                                     <th>Created</th>
@@ -189,7 +190,7 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                             </thead>
                             <tbody id="queue-tbody">
                                 <tr>
-                                    <td colspan="7" class="loading">
+                                    <td colspan="8" class="loading">
                                         <i class="fas fa-spinner fa-spin"></i> Loading queue data...
                                     </td>
                                 </tr>
