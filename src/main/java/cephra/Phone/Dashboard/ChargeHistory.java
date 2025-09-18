@@ -157,89 +157,162 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
      * Creates a panel that looks exactly like your designed history1 panel
      */
     private JPanel createHistoryPanelLikeHistory1(final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
-        // Create panel with EXACT same properties as your history1
+        // Create panel with safe template copying
         JPanel panel = new JPanel();
         
-        // Copy all properties from your history1 panel
-        panel.setLayout(history1.getLayout());
-        panel.setBackground(history1.getBackground());
-        panel.setBorder(history1.getBorder());
-        panel.setPreferredSize(history1.getPreferredSize());
-        panel.setMaximumSize(history1.getMaximumSize());
-        panel.setMinimumSize(history1.getMinimumSize());
-        
-        // Clone each component from history1 with the same bounds and properties
-        
-        // Clone time label
-        if (time != null) {
-            JLabel timeClone = new JLabel(entry.getFormattedTime());
-            timeClone.setBounds(time.getBounds());
-            timeClone.setFont(time.getFont());
-            timeClone.setForeground(time.getForeground());
-            timeClone.setBackground(time.getBackground());
-            timeClone.setOpaque(time.isOpaque());
-            panel.add(timeClone);
+        // Use safe defaults if history1 is not available
+        if (history1 != null) {
+            try {
+                panel.setLayout(null); // Always use null layout for absolute positioning
+                panel.setBackground(history1.getBackground());
+                panel.setBorder(history1.getBorder());
+                panel.setPreferredSize(new Dimension(310, 80));
+                panel.setMaximumSize(new Dimension(310, 80));
+                panel.setMinimumSize(new Dimension(310, 80));
+            } catch (Exception e) {
+                // Fallback to safe defaults
+                panel.setLayout(null);
+                panel.setBackground(Color.WHITE);
+                panel.setPreferredSize(new Dimension(310, 80));
+                panel.setMaximumSize(new Dimension(310, 80));
+            }
+        } else {
+            // Safe defaults when template is not available
+            panel.setLayout(null);
+            panel.setBackground(Color.WHITE);
+            panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+            panel.setPreferredSize(new Dimension(310, 80));
+            panel.setMaximumSize(new Dimension(310, 80));
         }
         
-        // Clone price label
-        if (price != null) {
-            JLabel priceClone = new JLabel(entry.getTotal());
-            priceClone.setBounds(price.getBounds());
-            priceClone.setFont(price.getFont());
-            priceClone.setForeground(price.getForeground());
-            priceClone.setBackground(price.getBackground());
-            priceClone.setOpaque(price.isOpaque());
-            panel.add(priceClone);
-        }
-        
-        // Clone date label
-        if (date != null) {
-            JLabel dateClone = new JLabel(entry.getFormattedDate());
-            dateClone.setBounds(date.getBounds());
-            dateClone.setFont(date.getFont());
-            dateClone.setForeground(date.getForeground());
-            dateClone.setBackground(date.getBackground());
-            dateClone.setOpaque(date.isOpaque());
-            panel.add(dateClone);
-        }
-        
-        // Clone type label
-        if (type != null) {
-            JLabel typeClone = new JLabel(entry.getServiceType());
-            typeClone.setBounds(type.getBounds());
-            typeClone.setFont(type.getFont());
-            typeClone.setForeground(type.getForeground());
-            typeClone.setBackground(type.getBackground());
-            typeClone.setOpaque(type.isOpaque());
-            panel.add(typeClone);
-        }
-        
-        // Clone chargetime label
-        if (chargetime != null) {
-            JLabel chargetimeClone = new JLabel(entry.getChargingTime());
-            chargetimeClone.setBounds(chargetime.getBounds());
-            chargetimeClone.setFont(chargetime.getFont());
-            chargetimeClone.setForeground(chargetime.getForeground());
-            chargetimeClone.setBackground(chargetime.getBackground());
-            chargetimeClone.setOpaque(chargetime.isOpaque());
-            panel.add(chargetimeClone);
-        }
-        
-        // Clone details button
-        if (details != null) {
-            JButton detailsClone = new JButton();
-            detailsClone.setBounds(details.getBounds());
-            detailsClone.setBorderPainted(details.isBorderPainted());
-            detailsClone.setContentAreaFilled(details.isContentAreaFilled());
-            detailsClone.setFocusPainted(details.isFocusPainted());
-            detailsClone.addActionListener(_ -> {
-                currentHistoryEntry = entry;
-                showHistoryDetails(entry);
-            });
-            panel.add(detailsClone);
-        }
+        // Create components with safe copying or fallbacks
+        createHistoryComponents(panel, entry);
         
         return panel;
+    }
+    
+    private void createHistoryComponents(JPanel panel, final cephra.Phone.Utilities.HistoryManager.HistoryEntry entry) {
+        // Time label
+        JLabel timeClone = new JLabel(entry.getFormattedTime());
+        if (time != null) {
+            try {
+                timeClone.setBounds(time.getBounds());
+                timeClone.setFont(time.getFont());
+                timeClone.setForeground(time.getForeground());
+                timeClone.setBackground(time.getBackground());
+                timeClone.setOpaque(time.isOpaque());
+            } catch (Exception e) {
+                timeClone.setBounds(10, 20, 80, 16);
+                timeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+            }
+        } else {
+            timeClone.setBounds(10, 20, 80, 16);
+            timeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+        }
+        panel.add(timeClone);
+        
+        // Price label
+        JLabel priceClone = new JLabel(entry.getTotal());
+        if (price != null) {
+            try {
+                priceClone.setBounds(price.getBounds());
+                priceClone.setFont(price.getFont());
+                priceClone.setForeground(price.getForeground());
+                priceClone.setBackground(price.getBackground());
+                priceClone.setOpaque(price.isOpaque());
+            } catch (Exception e) {
+                priceClone.setBounds(220, 30, 70, 16);
+                priceClone.setFont(new Font("Arial", Font.PLAIN, 12));
+            }
+        } else {
+            priceClone.setBounds(220, 30, 70, 16);
+            priceClone.setFont(new Font("Arial", Font.PLAIN, 12));
+        }
+        panel.add(priceClone);
+        
+        // Date label
+        JLabel dateClone = new JLabel(entry.getFormattedDate());
+        if (date != null) {
+            try {
+                dateClone.setBounds(date.getBounds());
+                dateClone.setFont(date.getFont());
+                dateClone.setForeground(date.getForeground());
+                dateClone.setBackground(date.getBackground());
+                dateClone.setOpaque(date.isOpaque());
+            } catch (Exception e) {
+                dateClone.setBounds(10, 0, 120, 20);
+                dateClone.setFont(new Font("Arial", Font.BOLD, 14));
+            }
+        } else {
+            dateClone.setBounds(10, 0, 120, 20);
+            dateClone.setFont(new Font("Arial", Font.BOLD, 14));
+        }
+        panel.add(dateClone);
+        
+        // Type label
+        JLabel typeClone = new JLabel(entry.getServiceType());
+        if (type != null) {
+            try {
+                typeClone.setBounds(type.getBounds());
+                typeClone.setFont(type.getFont());
+                typeClone.setForeground(type.getForeground());
+                typeClone.setBackground(type.getBackground());
+                typeClone.setOpaque(type.isOpaque());
+            } catch (Exception e) {
+                typeClone.setBounds(10, 40, 210, 16);
+                typeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+            }
+        } else {
+            typeClone.setBounds(10, 40, 210, 16);
+            typeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+        }
+        panel.add(typeClone);
+        
+        // Chargetime label
+        JLabel chargetimeClone = new JLabel(entry.getChargingTime());
+        if (chargetime != null) {
+            try {
+                chargetimeClone.setBounds(chargetime.getBounds());
+                chargetimeClone.setFont(chargetime.getFont());
+                chargetimeClone.setForeground(chargetime.getForeground());
+                chargetimeClone.setBackground(chargetime.getBackground());
+                chargetimeClone.setOpaque(chargetime.isOpaque());
+            } catch (Exception e) {
+                chargetimeClone.setBounds(10, 60, 220, 16);
+                chargetimeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+            }
+        } else {
+            chargetimeClone.setBounds(10, 60, 220, 16);
+            chargetimeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+        }
+        panel.add(chargetimeClone);
+        
+        // Details button
+        JButton detailsClone = new JButton();
+        if (details != null) {
+            try {
+                detailsClone.setBounds(details.getBounds());
+                detailsClone.setBorderPainted(details.isBorderPainted());
+                detailsClone.setContentAreaFilled(details.isContentAreaFilled());
+                detailsClone.setFocusPainted(details.isFocusPainted());
+            } catch (Exception e) {
+                detailsClone.setBounds(200, 0, 110, 80);
+                detailsClone.setBorderPainted(false);
+                detailsClone.setContentAreaFilled(false);
+                detailsClone.setFocusPainted(false);
+            }
+        } else {
+            detailsClone.setBounds(200, 0, 110, 80);
+            detailsClone.setBorderPainted(false);
+            detailsClone.setContentAreaFilled(false);
+            detailsClone.setFocusPainted(false);
+        }
+        
+        detailsClone.addActionListener(_ -> {
+            currentHistoryEntry = entry;
+            showHistoryDetails(entry);
+        });
+        panel.add(detailsClone);
     }
     
     
@@ -450,12 +523,12 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         linkbutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         history1 = new javax.swing.JPanel();
+        details = new javax.swing.JButton();
         time = new javax.swing.JLabel();
         price = new javax.swing.JLabel();
         date = new javax.swing.JLabel();
         type = new javax.swing.JLabel();
         chargetime = new javax.swing.JLabel();
-        details = new javax.swing.JButton();
         detailpanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         ticket = new javax.swing.JLabel();
@@ -563,6 +636,16 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         history1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
         history1.setLayout(null);
 
+        details.setBorderPainted(false);
+        details.setContentAreaFilled(false);
+        details.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                detailsActionPerformed(evt);
+            }
+        });
+        history1.add(details);
+        details.setBounds(200, 0, 110, 80);
+
         time.setText("time");
         history1.add(time);
         time.setBounds(10, 20, 80, 16);
@@ -584,16 +667,6 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         chargetime.setText("jLabel2");
         history1.add(chargetime);
         chargetime.setBounds(10, 60, 220, 16);
-
-        details.setBorderPainted(false);
-        details.setContentAreaFilled(false);
-        details.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                detailsActionPerformed(evt);
-            }
-        });
-        history1.add(details);
-        details.setBounds(70, -30, 310, 80);
 
         add(history1);
         history1.setBounds(400, 160, 310, 80);
@@ -634,54 +707,73 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             .addGroup(detailpanelLayout.createSequentialGroup()
                 .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(detailpanelLayout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addComponent(jLabel2))
-                    .addGroup(detailpanelLayout.createSequentialGroup()
-                        .addGap(87, 87, 87)
                         .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(Customer)
-                            .addComponent(ticket)
-                            .addComponent(typed)
-                            .addComponent(kwh)
-                            .addComponent(Chargingtime)
-                            .addComponent(totalprice)
-                            .addComponent(server)
-                            .addComponent(dated)
-                            .addComponent(timed)
-                            .addComponent(ref)))
-                    .addGroup(detailpanelLayout.createSequentialGroup()
-                        .addGap(51, 51, 51)
+                            .addGroup(detailpanelLayout.createSequentialGroup()
+                                .addGap(29, 29, 29)
+                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(totalprice)
+                                    .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(detailpanelLayout.createSequentialGroup()
+                                            .addComponent(Chargingtime)
+                                            .addGap(21, 21, 21)
+                                            .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(ref)
+                                                .addGroup(detailpanelLayout.createSequentialGroup()
+                                                    .addGap(55, 55, 55)
+                                                    .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(dated)
+                                                        .addComponent(kwh)))))
+                                        .addComponent(jLabel2)
+                                        .addComponent(server))))
+                            .addGroup(detailpanelLayout.createSequentialGroup()
+                                .addGap(51, 51, 51)
+                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(timed)
+                                    .addGroup(detailpanelLayout.createSequentialGroup()
+                                        .addGap(74, 74, 74)
+                                        .addComponent(Customer))))
+                            .addGroup(detailpanelLayout.createSequentialGroup()
+                                .addGap(38, 38, 38)
+                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(ticket)
+                                    .addComponent(typed))))
+                        .addGap(0, 17, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, detailpanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(ok)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap())
         );
         detailpanelLayout.setVerticalGroup(
             detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(detailpanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
-                .addGap(27, 27, 27)
-                .addComponent(ticket)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(ticket)
+                .addGap(29, 29, 29)
                 .addComponent(Customer)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(1, 1, 1)
                 .addComponent(typed)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(kwh)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Chargingtime)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(detailpanelLayout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(kwh))
+                    .addGroup(detailpanelLayout.createSequentialGroup()
+                        .addGap(32, 32, 32)
+                        .addComponent(Chargingtime)))
+                .addGap(18, 18, 18)
                 .addComponent(totalprice)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(10, 10, 10)
                 .addComponent(server)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(5, 5, 5)
                 .addComponent(dated)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(timed)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ref)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ok)
-                .addContainerGap(8, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(detailpanel);
@@ -697,74 +789,29 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         }
     }
     
-    // CUSTOM CODE - DESIGN-SAFE SETUP
+    // SIMPLIFIED CUSTOM CODE - NETBEANS-SAFE
     private void setupCustomCode() {
         try {
-            
-            // Fix history1 panel size
-            if (history1 != null) {
-                history1.setPreferredSize(new java.awt.Dimension(320, 80));
-                history1.setMaximumSize(new java.awt.Dimension(320, 80));
-                history1.setMinimumSize(new java.awt.Dimension(320, 80));
-            }
-            
-            // Set proper initial text for labels
+            // Set initial text for labels (safe operations only)
             if (time != null) time.setText("Loading...");
             if (price != null) price.setText("₱0.00");
             if (date != null) date.setText("No Date");
             if (type != null) type.setText("No Service");
             if (chargetime != null) chargetime.setText("0 mins");
             
-         
-            // Adjust chargetime position
-            if (chargetime != null) {
-                chargetime.setBounds(10, 62, 220, 16); // Moved down to y=62 to avoid separator at y=45
-            }
-          
-            
-            // Add details button functionality
-            if (details != null) {
-                // Remove any existing listeners
-                for (java.awt.event.ActionListener listener : details.getActionListeners()) {
-                    details.removeActionListener(listener);
-                }
-                // Add custom action listener
-                details.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        detailsActionPerformed(evt);
-                    }
-                });
-            }
-            
-            // Move history1 panel into the visible area
-            if (history1 != null && history != null) {
-                // Remove history1 from its current position
-                remove(history1);
-                
-                // Position history1 panel in the visible scroll area
-                history1.setBounds(0, 0, 310, 80);
-                history1.setVisible(true);
-                history1.setOpaque(true);
-                
-                // Clear the scroll container and add history1 panel
-                history.removeAll();
-                history.add(history1);
-                
-            
-                
-                history.revalidate();
-                history.repaint();
-                
-            }
-            
             // Initially hide the detailpanel
             if (detailpanel != null) {
                 detailpanel.setVisible(false);
             }
             
+            // Position history1 outside visible area (it's used as template)
+            if (history1 != null) {
+                history1.setBounds(400, 160, 310, 80); // Keep it outside view
+                history1.setVisible(true);
+            }
             
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error in setupCustomCode: " + e.getMessage());
         }
     }
     
@@ -897,5 +944,20 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         // Unregister as listener when panel is removed
         cephra.Phone.Utilities.HistoryManager.removeHistoryUpdateListener(this);
         super.removeNotify();
+    }
+    
+    // Test method to add sample history entry (for testing purposes)
+    public void addTestHistoryEntry() {
+        String currentUser = cephra.Database.CephraDB.getCurrentUsername();
+        if (currentUser != null) {
+            cephra.Phone.Utilities.HistoryManager.addHistoryEntry(
+                currentUser,
+                "FCH001",
+                "Fast Charging",
+                "2h 30min",
+                "₱285.50",
+                "REF123456"
+            );
+        }
     }
 }

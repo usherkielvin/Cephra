@@ -405,6 +405,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         charge = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
+        historybutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         nothis = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -475,6 +476,18 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         });
         add(linkbutton);
         linkbutton.setBounds(90, 680, 40, 40);
+
+        historybutton.setBorder(null);
+        historybutton.setBorderPainted(false);
+        historybutton.setContentAreaFilled(false);
+        historybutton.setFocusPainted(false);
+        historybutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                historybuttonActionPerformed(evt);
+            }
+        });
+        add(historybutton);
+        historybutton.setBounds(220, 683, 40, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/notification.png"))); // NOI18N
         add(jLabel1);
@@ -569,6 +582,21 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
 
+    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargeHistory());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_historybuttonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel NotifType;
@@ -576,6 +604,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     private javax.swing.JButton closeButton;
     private javax.swing.JPanel historyPanel;
     private javax.swing.JScrollPane historyScrollPane;
+    private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
