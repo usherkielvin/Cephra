@@ -46,12 +46,8 @@ public class EditProfile extends javax.swing.JPanel {
                 if (UsernamePhone != null) UsernamePhone.setText(currentUsername != null ? currentUsername : "");
                 if (email != null) email.setText(userEmail != null ? userEmail : "");
                 
-                System.out.println("EditProfile: Loaded user data for " + currentUsername);
-            } else {
-                System.out.println("EditProfile: No current user logged in");
             }
         } catch (Exception e) {
-            System.err.println("EditProfile: Error loading user data: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -433,20 +429,16 @@ public class EditProfile extends javax.swing.JPanel {
                     // Step 1: Select image file using simple drag and drop interface
                     java.io.File selectedFile = cephra.Phone.Utilities.SimpleDragDropSelector.showDialog(EditProfile.this);
                     if (selectedFile == null) {
-                        System.out.println("Profile: No image file selected");
                         return; // User cancelled file selection
                     }
 
-                    System.out.println("Profile: Selected image file: " + selectedFile.getName());
 
                     // Step 2: Open crop dialog
                     java.awt.image.BufferedImage croppedImage = cephra.Phone.Utilities.ImageUtils.openCropDialog(EditProfile.this, selectedFile);
                     if (croppedImage == null) {
-                        System.out.println("Profile: Image cropping was cancelled");
                         return; // User cancelled cropping
                     }
 
-                    System.out.println("Profile: Image cropped successfully");
 
                     // Step 3: Convert to Base64 and save to database
                     String base64Image = cephra.Phone.Utilities.ImageUtils.imageToBase64(croppedImage, "png");
@@ -474,16 +466,13 @@ public class EditProfile extends javax.swing.JPanel {
                             "Profile picture updated successfully!",
                             "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 
-                        System.out.println("Profile: Profile picture saved successfully for user " + currentUsername);
                     } else {
                         javax.swing.JOptionPane.showMessageDialog(EditProfile.this,
                             "Failed to save profile picture to database.",
                             "Database Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-                        System.err.println("Profile: Failed to save profile picture to database");
                     }
 
                 } catch (Exception e) {
-                    System.err.println("Profile: Error in addpicActionPerformed: " + e.getMessage());
                     e.printStackTrace();
                     javax.swing.JOptionPane.showMessageDialog(EditProfile.this,
                         "An unexpected error occurred: " + e.getMessage(),
@@ -556,24 +545,35 @@ public class EditProfile extends javax.swing.JPanel {
                 return;
             }
 
-           
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Profile changes saved!\n" +
-                "First Name: " + newFirstName + "\n" +
-                "Last Name: " + newLastName + "\n" +
-                "Email: " + newEmail,
-                "Profile Updated", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            // Update user data in database
+            boolean success = updateUserProfile(currentUsername, newFirstName, newLastName, newEmail);
             
-            System.out.println("EditProfile: Profile changes saved for user " + currentUsername);
-
+            if (success) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Profile updated successfully!",
+                    "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Failed to update profile. Please try again.",
+                    "Update Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
         } catch (Exception e) {
-            System.err.println("EditProfile: Error updating profile: " + e.getMessage());
             e.printStackTrace();
             javax.swing.JOptionPane.showMessageDialog(this,
                 "An unexpected error occurred while updating profile: " + e.getMessage(),
                 "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_savechangesActionPerformed
+
+    private boolean updateUserProfile(String username, String firstName, String lastName, String email) {
+        try {
+            // Update user profile in database
+            return cephra.Database.CephraDB.updateUserProfile(username, firstName, lastName, email);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
