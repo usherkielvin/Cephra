@@ -19,6 +19,28 @@ public class LinkFirst extends javax.swing.JPanel {
     }
     
     public static boolean canShowPayPop(String ticketId, String customerUsername) { return true; }
+    
+    // Method to disable all components recursively
+    private static void disableAllComponents(Component component) {
+        component.setEnabled(false);
+        if (component instanceof Container) {
+            Container container = (Container) component;
+            for (Component child : container.getComponents()) {
+                disableAllComponents(child);
+            }
+        }
+    }
+    
+    // Method to enable all components recursively
+    private static void enableAllComponents(Component component) {
+        component.setEnabled(true);
+        if (component instanceof Container) {
+            Container container = (Container) component;
+            for (Component child : container.getComponents()) {
+                enableAllComponents(child);
+            }
+        }
+    }
    
     public static boolean showPayPop(String ticketId, String customerUsername) {
         System.out.println("=== PayPop.showPayPop() called ===");
@@ -48,52 +70,40 @@ public class LinkFirst extends javax.swing.JPanel {
             int containerH = phoneFrame.getContentPane() != null ? phoneFrame.getContentPane().getHeight() : 0;
             if (containerW <= 0) containerW = PHONE_WIDTH;
             if (containerH <= 0) containerH = PHONE_HEIGHT;
-            int x = (containerW - POPUP_WIDTH) / 2;
-            int y = (containerH - POPUP_HEIGHT) / 2;
+            
+            // Center the popup properly within the phone frame
+            int x = Math.max(0, (containerW - POPUP_WIDTH) / 2);
+            int y = Math.max(0, (containerH - POPUP_HEIGHT) / 2);
+            
+            // Ensure popup doesn't go outside bounds
+            x = Math.min(x, containerW - POPUP_WIDTH);
+            y = Math.min(y, containerH - POPUP_HEIGHT);
             
             currentInstance.setBounds(x, y, POPUP_WIDTH, POPUP_HEIGHT);
+            currentInstance.setLocation(x, y);
             
-            // Create a glass pane to block background interaction
-            Component glassPane = phoneFrame.getRootPane().getGlassPane();
-            if (glassPane == null) {
-                glassPane = new JComponent() {
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        // Semi-transparent overlay
-                        g.setColor(new Color(0, 0, 0, 100));
-                        g.fillRect(0, 0, getWidth(), getHeight());
-                    }
-                };
-                phoneFrame.getRootPane().setGlassPane(glassPane);
+            // Disable the background panel (charging option panel)
+            Component contentPane = phoneFrame.getContentPane();
+            if (contentPane != null) {
+                contentPane.setEnabled(false);
+                // Disable all child components recursively
+                disableAllComponents(contentPane);
             }
-            
-            // Add mouse listener to block all background interactions
-            glassPane.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    // Consume the event to prevent it from reaching background
-                    e.consume();
-                }
-                
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    e.consume();
-                }
-                
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    e.consume();
-                }
-            });
-            
-            // Enable the glass pane to block interactions
-            glassPane.setVisible(true);
             
             JLayeredPane layeredPane = phoneFrame.getRootPane().getLayeredPane();
             layeredPane.add(currentInstance, JLayeredPane.MODAL_LAYER);
             layeredPane.moveToFront(currentInstance);
             
+            // Ensure the popup can receive mouse events
+            currentInstance.setEnabled(true);
             currentInstance.setVisible(true);
+            currentInstance.setOpaque(false); // Make sure it's transparent but can receive events
+            
+            // Request focus to the popup so it can receive events
+            SwingUtilities.invokeLater(() -> {
+                currentInstance.requestFocusInWindow();
+            });
+            
             phoneFrame.repaint();
         });
     }
@@ -109,13 +119,15 @@ public class LinkFirst extends javax.swing.JPanel {
                 instance.getParent().remove(instance);
             }
             
-            // Disable the glass pane to restore background interaction
+            // Re-enable the background panel (charging option panel)
             for (Window window : Window.getWindows()) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    Component glassPane = phoneFrame.getRootPane().getGlassPane();
-                    if (glassPane != null) {
-                        glassPane.setVisible(false);
+                    Component contentPane = phoneFrame.getContentPane();
+                    if (contentPane != null) {
+                        contentPane.setEnabled(true);
+                        // Re-enable all child components recursively
+                        enableAllComponents(contentPane);
                     }
                     window.repaint();
                     break;
@@ -148,6 +160,8 @@ public class LinkFirst extends javax.swing.JPanel {
 
     private void setupCloseButton() {
         setFocusable(true);
+        setEnabled(true);
+        
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent evt) {
@@ -157,8 +171,12 @@ public class LinkFirst extends javax.swing.JPanel {
             }
         });
         
-        // Request focus so key events work
-        SwingUtilities.invokeLater(this::requestFocusInWindow);
+        // Ensure buttons are enabled and can receive events
+        SwingUtilities.invokeLater(() -> {
+            Golink.setEnabled(true);
+            notLink.setEnabled(true);
+            requestFocusInWindow();
+        });
     }
 
     // All computation-related methods removed; this popup is informational only
@@ -192,7 +210,7 @@ public class LinkFirst extends javax.swing.JPanel {
             }
         });
         add(notLink);
-        notLink.setBounds(215, -7, 60, 50);
+        notLink.setBounds(215, 5, 60, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Plslink.png"))); // NOI18N
         add(jLabel1);

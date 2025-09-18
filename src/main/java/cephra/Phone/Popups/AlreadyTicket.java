@@ -67,6 +67,28 @@ public class AlreadyTicket extends javax.swing.JPanel {
         return true;
     }
     
+    // Method to disable all components recursively
+    private static void disableAllComponents(Component component) {
+        component.setEnabled(false);
+        if (component instanceof Container) {
+            Container container = (Container) component;
+            for (Component child : container.getComponents()) {
+                disableAllComponents(child);
+            }
+        }
+    }
+    
+    // Method to enable all components recursively
+    private static void enableAllComponents(Component component) {
+        component.setEnabled(true);
+        if (component instanceof Container) {
+            Container container = (Container) component;
+            for (Component child : container.getComponents()) {
+                enableAllComponents(child);
+            }
+        }
+    }
+    
     /**
      * Shows PayPop with validation
      * @param ticketId the ticket ID
@@ -124,6 +146,14 @@ public class AlreadyTicket extends javax.swing.JPanel {
             
             currentInstance.setBounds(x, y, POPUP_WIDTH, POPUP_HEIGHT);
             
+            // Disable the background panel
+            Component contentPane = phoneFrame.getContentPane();
+            if (contentPane != null) {
+                contentPane.setEnabled(false);
+                // Disable all child components recursively
+                disableAllComponents(contentPane);
+            }
+            
             // Add to layered pane so it appears on top of current panel
             JLayeredPane layeredPane = phoneFrame.getRootPane().getLayeredPane();
             layeredPane.add(currentInstance, JLayeredPane.MODAL_LAYER);
@@ -146,17 +176,25 @@ public class AlreadyTicket extends javax.swing.JPanel {
             if (instance.getParent() != null) {
                 instance.getParent().remove(instance);
             }
-            currentInstance = null;
-            currentTicketId = null;
-            isShowing = false;
-
-            // Repaint the phone frame
+            
+            // Re-enable the background panel
             for (Window window : Window.getWindows()) {
                 if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    Component contentPane = phoneFrame.getContentPane();
+                    if (contentPane != null) {
+                        contentPane.setEnabled(true);
+                        // Re-enable all child components recursively
+                        enableAllComponents(contentPane);
+                    }
                     window.repaint();
                     break;
                 }
             }
+            
+            currentInstance = null;
+            currentTicketId = null;
+            isShowing = false;
         });
     }
 }
