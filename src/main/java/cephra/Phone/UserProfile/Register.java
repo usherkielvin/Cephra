@@ -86,7 +86,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(280, 470, 50, 20);
+        See.setBounds(250, 470, 50, 20);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
