@@ -21,7 +21,7 @@ public class Home extends javax.swing.JPanel {
                     int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
                     if (batteryLevel != -1) {
                         // Car is linked and battery is initialized - return HomeLinked
-                        return new cephra.Phone.Dashboard.HOMELINKED();
+                        return new cephra.Phone.Dashboard.LinkedHome();
                     }
                 }
             } catch (Exception e) {
@@ -55,7 +55,7 @@ public class Home extends javax.swing.JPanel {
                                 for (java.awt.Window window : windows) {
                                     if (window instanceof cephra.Frame.Phone) {
                                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.HOMELINKED());
+                                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.LinkedHome());
                                         break;
                                     }
                                 }

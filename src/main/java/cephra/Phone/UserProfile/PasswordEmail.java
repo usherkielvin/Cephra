@@ -52,11 +52,23 @@ public class PasswordEmail extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        Return1 = new javax.swing.JButton();
         Return = new javax.swing.JButton();
         otpLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
+
+        Return1.setBorder(null);
+        Return1.setBorderPainted(false);
+        Return1.setContentAreaFilled(false);
+        Return1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Return1ActionPerformed(evt);
+            }
+        });
+        add(Return1);
+        Return1.setBounds(10, 50, 70, 50);
 
         Return.setBorder(null);
         Return.setBorderPainted(false);
@@ -75,13 +87,13 @@ public class PasswordEmail extends javax.swing.JPanel {
         otpLabel.setBounds(82, 436, 210, 51);
 
         jLabel1.setForeground(new java.awt.Color(255, 0, 51));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ResetPass.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PasswordEmail.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReturnActionPerformed
-        // Don't show notification when returning from PasswordEmail
+       
         cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
         
          javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -98,9 +110,27 @@ public class PasswordEmail extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_ReturnActionPerformed
 
+    private void Return1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Return1ActionPerformed
+        cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
+        
+         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordVerify());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_Return1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Return;
+    private javax.swing.JButton Return1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel otpLabel;
     // End of variables declaration//GEN-END:variables

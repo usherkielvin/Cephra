@@ -179,7 +179,7 @@ public class Register extends javax.swing.JPanel {
         add(lname);
         lname.setBounds(200, 279, 120, 32);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/REGISTER.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Register1.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, -4, 370, 760);
     }// </editor-fold>//GEN-END:initComponents
