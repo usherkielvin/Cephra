@@ -28,6 +28,10 @@ public class EditProfile extends javax.swing.JPanel {
         makeDraggable(); // Make the panel draggable
         setupLabelPosition(); // fit Label Position
         
+        // Load and display initial profile picture
+        loadInitialProfilePicture();
+
+        
     }
     
     private void loadUserData() {
@@ -201,6 +205,7 @@ public class EditProfile extends javax.swing.JPanel {
         UsernamePhone = new javax.swing.JTextField();
         email = new javax.swing.JTextField();
         back = new javax.swing.JButton();
+        Profile = new javax.swing.JLabel();
         bg = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(370, 750));
@@ -216,9 +221,11 @@ public class EditProfile extends javax.swing.JPanel {
         add(fname);
         fname.setBounds(40, 300, 140, 40);
 
+        editpfp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/cam.png"))); // NOI18N
         editpfp.setBorder(null);
         editpfp.setBorderPainted(false);
         editpfp.setContentAreaFilled(false);
+        editpfp.setFocusPainted(false);
         editpfp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editpfpActionPerformed(evt);
@@ -291,11 +298,6 @@ public class EditProfile extends javax.swing.JPanel {
         savechanges.setBorderPainted(false);
         savechanges.setContentAreaFilled(false);
         savechanges.setFocusPainted(false);
-        savechanges.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                savechangesActionPerformed(evt);
-            }
-        });
         add(savechanges);
         savechanges.setBounds(25, 510, 310, 50);
 
@@ -340,6 +342,8 @@ public class EditProfile extends javax.swing.JPanel {
         });
         add(back);
         back.setBounds(30, 50, 40, 40);
+        add(Profile);
+        Profile.setBounds(130, 130, 110, 110);
 
         bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EditProfile.png"))); // NOI18N
         add(bg);
@@ -461,7 +465,9 @@ public class EditProfile extends javax.swing.JPanel {
                     boolean saved = cephra.Database.CephraDB.saveUserProfilePicture(currentUsername, base64Image);
                     if (saved) {
                         // Step 5: Profile picture saved successfully
-
+                        // Update the profile image display immediately
+                        updateProfileImageDisplay();
+                        
                         javax.swing.JOptionPane.showMessageDialog(EditProfile.this,
                             "Profile picture updated successfully!",
                             "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
@@ -574,9 +580,102 @@ public class EditProfile extends javax.swing.JPanel {
             return false;
         }
     }
+    
+    /**
+     * Loads and displays the initial profile picture when the panel is created
+     */
+    private void loadInitialProfilePicture() {
+        try {
+            String profilePictureBase64 = cephra.Database.CephraDB.getCurrentUserProfilePicture();
+            
+            if (profilePictureBase64 != null && !profilePictureBase64.trim().isEmpty()) {
+                java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                
+                if (profileImage != null) {
+                    java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 110);
+                    Profile.setIcon(new javax.swing.ImageIcon(circularImage));
+                } else {
+                    System.err.println("Failed to load profile image from base64");
+                    setDefaultProfileImage();
+                }
+            } else {
+                System.out.println("No profile picture found, using default");
+                setDefaultProfileImage();
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading initial profile picture: " + e.getMessage());
+            setDefaultProfileImage();
+        }
+    }
+    
+    /**
+     * Sets a default profile image when no image is available
+     */
+    private void setDefaultProfileImage() {
+        try {
+            // Create a simple default circular image
+            java.awt.image.BufferedImage defaultImage = new java.awt.image.BufferedImage(110, 110, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            java.awt.Graphics2D g2d = defaultImage.createGraphics();
+            g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            // Fill with light gray background
+            g2d.setColor(new java.awt.Color(240, 240, 240));
+            g2d.fillOval(0, 0, 110, 110);
+            
+            // Add a simple user icon outline
+            g2d.setColor(new java.awt.Color(180, 180, 180));
+            g2d.setStroke(new java.awt.BasicStroke(2));
+            g2d.drawOval(35, 25, 40, 40); // Head circle
+            g2d.drawArc(20, 70, 70, 50, 0, 180); // Body arc
+            
+            g2d.dispose();
+            
+            Profile.setIcon(new javax.swing.ImageIcon(defaultImage));
+        } catch (Exception e) {
+            System.err.println("Error creating default profile image: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Updates the profile image display with the latest image from database
+     */
+    private void updateProfileImageDisplay() {
+        try {
+            // Get the updated profile picture from database
+            String profilePictureBase64 = cephra.Database.CephraDB.getCurrentUserProfilePicture();
+            
+            if (profilePictureBase64 != null && !profilePictureBase64.trim().isEmpty()) {
+                // Convert base64 to image
+                java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                
+                if (profileImage != null) {
+                    // Create circular image for display
+                    java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 110);
+                    
+                    // Update the Profile label with new image
+                    SwingUtilities.invokeLater(() -> {
+                        Profile.setIcon(new javax.swing.ImageIcon(circularImage));
+                        Profile.revalidate();
+                        Profile.repaint();
+                    });
+                    
+                    System.out.println("Profile image updated successfully");
+                } else {
+                    System.err.println("Failed to convert base64 to image");
+                }
+            } else {
+                System.err.println("No profile picture found in database after update");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error updating profile image display: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Profile;
     private javax.swing.JTextField UsernamePhone;
     private javax.swing.JButton back;
     private javax.swing.JLabel bg;

@@ -76,7 +76,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(reghere);
-        reghere.setBounds(220, 667, 80, 30);
+        reghere.setBounds(230, 668, 80, 30);
 
         forgotpass.setForeground(new java.awt.Color(0, 204, 204));
         forgotpass.setText("Forgot password?");

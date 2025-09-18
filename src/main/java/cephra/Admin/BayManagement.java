@@ -1968,6 +1968,28 @@ public class BayManagement extends javax.swing.JPanel {
     }
     
     /**
+     * Checks if a ticket is already in the waiting grid
+     * @param ticketId the ticket ID to check
+     * @return true if ticket is in waiting grid, false otherwise
+     */
+    public static boolean isTicketInWaitingGrid(String ticketId) {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(
+                 "SELECT COUNT(*) FROM waiting_grid WHERE ticket_id = ?")) {
+            
+            pstmt.setString(1, ticketId);
+            try (java.sql.ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            logError("Error checking if ticket is in waiting grid: " + e.getMessage(), e);
+        }
+        return false;
+    }
+    
+    /**
      * Gets all waiting grid tickets
      * @return array of ticket IDs in waiting grid (empty strings for empty slots)
      */
@@ -2129,16 +2151,13 @@ public class BayManagement extends javax.swing.JPanel {
                 
                 if (rs.next()) {
                     int count = rs.getInt("count");
-                    System.out.println("BayManagement: charging_bays table has " + count + " records");
                     
                     if (count == 0) {
-                        System.out.println("BayManagement: No charging bays found - initializing...");
                         initializeChargingBays();
                     }
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error checking charging bays: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -2157,7 +2176,6 @@ public class BayManagement extends javax.swing.JPanel {
                             "INSERT INTO charging_bays (bay_number, bay_type, status, current_ticket_id, current_username, start_time) VALUES (?, 'Fast', 'Available', NULL, NULL, NULL)")) {
                         pstmt.setString(1, "Bay-" + i);
                         pstmt.executeUpdate();
-                        System.out.println("BayManagement: Initialized Bay-" + i + " as Fast charging bay");
                     }
                 }
                 
@@ -2167,21 +2185,17 @@ public class BayManagement extends javax.swing.JPanel {
                             "INSERT INTO charging_bays (bay_number, bay_type, status, current_ticket_id, current_username, start_time) VALUES (?, 'Normal', 'Available', NULL, NULL, NULL)")) {
                         pstmt.setString(1, "Bay-" + i);
                         pstmt.executeUpdate();
-                        System.out.println("BayManagement: Initialized Bay-" + i + " as Normal charging bay");
                     }
                 }
                 
                 conn.commit();
-                System.out.println("BayManagement: Successfully initialized all charging bays");
                 
             } catch (Exception e) {
                 conn.rollback();
-                System.err.println("Error initializing charging bays: " + e.getMessage());
                 e.printStackTrace();
                 throw e;
             }
         } catch (Exception e) {
-            System.err.println("Error in initializeChargingBays: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -2241,7 +2255,6 @@ public class BayManagement extends javax.swing.JPanel {
                     try {
                         // Force a hard refresh of the queue table
                         queueInstance.hardRefreshTable();
-                        System.out.println("BayManagement: Queue table refreshed to show updated statuses");
                     } catch (Exception e) {
                         System.err.println("Error refreshing queue table: " + e.getMessage());
                     }

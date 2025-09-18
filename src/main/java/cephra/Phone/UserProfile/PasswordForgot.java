@@ -15,6 +15,9 @@ public class PasswordForgot extends javax.swing.JPanel {
         
         // Add email prefix functionality
         setupEmailPrefix();
+        
+        // Add email domain auto-completion
+        setupEmailDomainCompletion();
 
         addUnderlineOnHover(Back_Button);
         addUnderlineOnHover(Contact_Support_Button);
@@ -83,7 +86,7 @@ public class PasswordForgot extends javax.swing.JPanel {
         add(email);
         email.setBounds(80, 330, 240, 30);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/FORGOTPASSWORD.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PasswordForgot.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
@@ -96,13 +99,13 @@ public class PasswordForgot extends javax.swing.JPanel {
         }
     }
     
-    // Setup email prefix functionality and placeholder text
+    // Setup email placeholder text only
     private void setupEmailPrefix() {
         // Set placeholder text
         email.setText("Enter your email");
         email.setForeground(new java.awt.Color(128, 128, 128)); // Gray color for placeholder
         
-        // Handle focus events for placeholder and prefix
+        // Handle focus events for placeholder only
         email.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent e) {
@@ -115,16 +118,10 @@ public class PasswordForgot extends javax.swing.JPanel {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
                 String currentText = email.getText();
-                String prefix = "@cephra.com";
                 
                 if (currentText.isEmpty()) {
                     email.setText("Enter your email");
                     email.setForeground(new java.awt.Color(128, 128, 128)); // Gray color for placeholder
-                } else if (!currentText.endsWith(prefix)) {
-                    if (currentText.contains(prefix)) {
-                        currentText = currentText.replace(prefix, "");
-                    }
-                    email.setText(currentText + prefix);
                 }
             }
         });
@@ -133,32 +130,37 @@ public class PasswordForgot extends javax.swing.JPanel {
             @Override
             public void keyTyped(java.awt.event.KeyEvent e) {
                 String currentText = email.getText();
-                String prefix = "@cephra.com";
                 
                 // If placeholder text is still there, clear it
                 if (currentText.equals("Enter your email")) {
                     email.setText("");
                     email.setForeground(new java.awt.Color(0, 0, 0)); // Black color for actual text
-                    currentText = "";
-                }
-                
-                // If the field is empty or doesn't end with the prefix, add it
-                if (currentText.isEmpty() || !currentText.endsWith(prefix)) {
-                    // Remove the prefix if it exists elsewhere in the text
-                    if (currentText.contains(prefix)) {
-                        currentText = currentText.replace(prefix, "");
-                    }
-                    // Add the typed character and then the prefix
-                    String newText = currentText + e.getKeyChar() + prefix;
-                    email.setText(newText);
-                    // Position cursor before the prefix
-                    email.setCaretPosition(newText.length() - prefix.length());
-                    e.consume(); // Prevent the default character insertion
                 }
             }
         });
     }
- 
+    
+    // Setup email domain auto-completion
+    private void setupEmailDomainCompletion() {
+        email.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                String text = email.getText();
+                int caretPos = email.getCaretPosition();
+                
+                // Check if user typed @g and suggest gmail.com
+                if (text.endsWith("@g") && caretPos == text.length()) {
+                    email.setText(text + "mail.com");
+                    email.setCaretPosition(email.getText().length()); // Position cursor at end
+                }
+                // Check if user typed @c and suggest cephra.com
+                else if (text.endsWith("@c") && caretPos == text.length()) {
+                    email.setText(text + "ephra.com");
+                    email.setCaretPosition(email.getText().length()); // Position cursor at end
+                }
+            }
+        });
+    }
 
     private void emailActionPerformed(java.awt.event.ActionEvent evt) {
     resetsendActionPerformed(evt);

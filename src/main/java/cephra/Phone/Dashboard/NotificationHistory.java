@@ -218,22 +218,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
                 itemPanel.add(notifTypeLabel);
             }
             
-            // Find and copy message component (using the JTextArea you added)
-            if (message != null) {
-                String enhancedMessage = getEnhancedMessage(entry);
-                JTextArea messageTextArea = new JTextArea(enhancedMessage);
-                messageTextArea.setBounds(message.getBounds());
-                messageTextArea.setFont(message.getFont());
-                messageTextArea.setForeground(message.getForeground());
-                messageTextArea.setBackground(message.getBackground());
-                messageTextArea.setEditable(false);
-                messageTextArea.setFocusable(false);
-                messageTextArea.setWrapStyleWord(true);
-                messageTextArea.setLineWrap(true);
-                messageTextArea.setBorder(message.getBorder());
-                messageTextArea.setOpaque(message.isOpaque());
-                itemPanel.add(messageTextArea);
-            }
+       
             
         } catch (Exception e) {
             // If copying from template fails, fall back to manual creation

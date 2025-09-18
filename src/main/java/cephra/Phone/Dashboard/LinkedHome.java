@@ -4,7 +4,7 @@ package cephra.Phone.Dashboard;
 import cephra.Phone.Utilities.BalanceManager;
 import javax.swing.SwingUtilities;
 
-public class HOMELINKED extends javax.swing.JPanel {
+public class LinkedHome extends javax.swing.JPanel {
 
     // Car images array - variant versions for HomeLinked (C6.1, C9.1, etc.)
     private static final String[] carImages = {
@@ -23,7 +23,7 @@ public class HOMELINKED extends javax.swing.JPanel {
     // Timer for real-time status updates
     private javax.swing.Timer statusUpdateTimer;
 
-    public HOMELINKED() {
+    public LinkedHome() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);

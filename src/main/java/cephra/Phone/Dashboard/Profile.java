@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 public class Profile extends javax.swing.JPanel {
-
+//
     public Profile() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
@@ -61,7 +61,7 @@ public class Profile extends javax.swing.JPanel {
                 java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
                 if (profileImage != null) {
                     // Create a circular profile picture that fits the ProfilePicture label (110x110)
-                    java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 110);
+                    java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 128);
                     
                     if (Profile != null) {
                         Profile.setIcon(new javax.swing.ImageIcon(circularImage));
@@ -120,7 +120,8 @@ public class Profile extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
+        paymethod = new javax.swing.JButton();
+        back = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
         logout = new javax.swing.JButton();
@@ -137,17 +138,27 @@ public class Profile extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        jButton1.setFocusPainted(false);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        paymethod.setBorderPainted(false);
+        paymethod.setContentAreaFilled(false);
+        paymethod.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                paymethodActionPerformed(evt);
             }
         });
-        add(jButton1);
-        jButton1.setBounds(30, 50, 40, 40);
+        add(paymethod);
+        paymethod.setBounds(40, 410, 290, 40);
+
+        back.setBorder(null);
+        back.setBorderPainted(false);
+        back.setContentAreaFilled(false);
+        back.setFocusPainted(false);
+        back.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backActionPerformed(evt);
+            }
+        });
+        add(back);
+        back.setBounds(30, 50, 40, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -231,7 +242,7 @@ public class Profile extends javax.swing.JPanel {
         add(Help);
         Help.setBounds(40, 460, 290, 40);
         add(Profile);
-        Profile.setBounds(110, 120, 150, 140);
+        Profile.setBounds(120, 120, 130, 130);
 
         Fullname.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
         Fullname.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -418,7 +429,7 @@ public class Profile extends javax.swing.JPanel {
         });           
     }//GEN-LAST:event_HelpActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
@@ -431,10 +442,12 @@ public class Profile extends javax.swing.JPanel {
                 }
             }
         });       
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_backActionPerformed
 
     private void EditProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditProfileActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
+            
+            
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
@@ -447,6 +460,21 @@ public class Profile extends javax.swing.JPanel {
             }
         });       
     }//GEN-LAST:event_EditProfileActionPerformed
+
+    private void paymethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymethodActionPerformed
+       SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PaymentMethod());
+                        break;
+                    }
+                }
+            }
+        });       
+    }//GEN-LAST:event_paymethodActionPerformed
 
     private void fitTextToLabel(JLabel label) {
         String text = label.getText();
@@ -473,14 +501,15 @@ public class Profile extends javax.swing.JPanel {
     private javax.swing.JLabel Fullname;
     private javax.swing.JButton Help;
     private javax.swing.JLabel Profile;
+    private javax.swing.JButton back;
     private javax.swing.JButton charge;
     private javax.swing.JLabel gmailProf;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton logout;
+    private javax.swing.JButton paymethod;
     // End of variables declaration//GEN-END:variables
 
     @Override
