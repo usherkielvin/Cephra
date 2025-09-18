@@ -117,7 +117,6 @@ public final class QueueBridge {
             // Priority ticket was successfully added to database, also add to waiting grid
             try {
                 cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customer, service, userBatteryLevel);
-                System.out.println("QueueBridge: Priority ticket " + ticket + " automatically added to waiting grid");
                 
                 // Refresh the queue table to show the updated status
                 SwingUtilities.invokeLater(() -> {
@@ -320,7 +319,6 @@ public final class QueueBridge {
                 String prev = String.valueOf(r[5]); // Payment is index 5
                 if ("Paid".equalsIgnoreCase(prev)) {
                     alreadyPaid = true;
-                    System.out.println("QueueBridge: Payment already processed for ticket " + ticket + ", skipping duplicate");
                     break;
                 }
                 if (!"Paid".equalsIgnoreCase(prev)) {
@@ -352,7 +350,6 @@ public final class QueueBridge {
             try {
                 // Check if payment already exists in database to prevent duplicates
                 if (cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket)) {
-                    System.out.println("QueueBridge: Payment already exists in database for ticket " + ticket + ", ensuring UI cleanup");
                     try {
                         removeTicket(ticket);
                         triggerHardRefresh();
@@ -368,14 +365,10 @@ public final class QueueBridge {
                 double totalAmount = computeAmountDue(ticket);
                 
                 // Use a single database transaction to ensure consistency
-                System.out.println("QueueBridge: About to process payment transaction for ticket " + ticket + 
-                                 ", customer: " + customerName + ", service: " + serviceName + 
-                                 ", amount: " + totalAmount + ", method: " + paymentMethod);
                 boolean dbSuccess = cephra.Database.CephraDB.processPaymentTransaction(
                     ticket, customerName, serviceName, initialBatteryLevel, 
                     chargingTimeMinutes, totalAmount, paymentMethod, referenceNumber
                 );
-                System.out.println("QueueBridge: Payment transaction result for ticket " + ticket + ": " + dbSuccess);
                 
                 if (dbSuccess) {
                     // Note: processPaymentTransaction already handles:
@@ -384,19 +377,15 @@ public final class QueueBridge {
                     // - Active ticket clearing
                     // - History addition
                     
-                    System.out.println("QueueBridge: " + paymentMethod + " payment completed for ticket " + ticket + 
-                                     ", amount: ₱" + totalAmount + ", reference: " + referenceNumber);
                     
                     // Refresh history table to show the new completed ticket
                     try {
                         cephra.Admin.HistoryBridge.refreshHistoryTable();
-                        System.out.println("QueueBridge: Refreshed history table after payment completion");
                     } catch (Exception e) {
                         System.err.println("QueueBridge: Error refreshing history table: " + e.getMessage());
                     }
                     
                     // Don't close PayPop here - let PayPop handle its own navigation to receipt
-                    System.out.println("QueueBridge: Payment completed for ticket " + ticket + " - PayPop will handle navigation");
                     
                     // COPY THE SAME APPROACH AS MANUAL "MARK AS PAID":
                     // Add a longer delay to ensure database operations complete before UI updates
@@ -404,12 +393,10 @@ public final class QueueBridge {
                         try {
                             // Remove ticket from queue (same as manual payment)
                             removeTicket(ticket);
-                            System.out.println("QueueBridge: Successfully removed ticket " + ticket + " via removeTicket (same as manual payment)");
                             
                             // Trigger multiple refresh approaches to ensure UI updates
                             triggerHardRefresh();
                             triggerPanelSwitchRefresh();
-                            System.out.println("QueueBridge: Triggered multiple refresh approaches (same as manual payment)");
                         } catch (Throwable t) {
                             System.err.println("QueueBridge: Error removing ticket after online payment: " + t.getMessage());
                         }
@@ -649,7 +636,6 @@ public final class QueueBridge {
             String minFeeStr = cephra.Database.CephraDB.getSystemSetting("minimum_fee");
             if (minFeeStr != null && !minFeeStr.trim().isEmpty()) {
                 MINIMUM_FEE = Double.parseDouble(minFeeStr);
-                System.out.println("QueueBridge: Loaded minimum fee from database: ₱" + MINIMUM_FEE);
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(MINIMUM_FEE));
@@ -660,7 +646,6 @@ public final class QueueBridge {
             String rateStr = cephra.Database.CephraDB.getSystemSetting("rate_per_kwh");
             if (rateStr != null && !rateStr.trim().isEmpty()) {
                 RATE_PER_KWH = Double.parseDouble(rateStr);
-                System.out.println("QueueBridge: Loaded rate per kWh from database: ₱" + RATE_PER_KWH);
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RATE_PER_KWH));
@@ -671,7 +656,6 @@ public final class QueueBridge {
             String multiplierStr = cephra.Database.CephraDB.getSystemSetting("fast_multiplier");
             if (multiplierStr != null && !multiplierStr.trim().isEmpty()) {
                 FAST_MULTIPLIER = Double.parseDouble(multiplierStr);
-                System.out.println("QueueBridge: Loaded fast multiplier from database: " + String.format("%.0f%%", (FAST_MULTIPLIER - 1) * 100));
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(FAST_MULTIPLIER));

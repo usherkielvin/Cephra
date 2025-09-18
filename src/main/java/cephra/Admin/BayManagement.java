@@ -73,11 +73,9 @@ public class BayManagement extends javax.swing.JPanel {
         // Check database for available fast charging bays (Bay-1, Bay-2, Bay-3)
         for (int i = 1; i <= 3; i++) {
             if (isBayAvailableForCharging(i)) {
-                System.out.println("BayManagement: Fast charging available - Bay-" + i + " is available");
                 return true;
             }
         }
-        System.out.println("BayManagement: Fast charging NOT available - no bays available");
         return false;
     }
     
@@ -88,11 +86,9 @@ public class BayManagement extends javax.swing.JPanel {
         // Check database for available normal charging bays (Bay-4, Bay-5, Bay-6, Bay-7, Bay-8)
         for (int i = 4; i <= 8; i++) {
             if (isBayAvailableForCharging(i)) {
-                System.out.println("BayManagement: Normal charging available - Bay-" + i + " is available");
                 return true;
             }
         }
-        System.out.println("BayManagement: Normal charging NOT available - no bays available");
         return false;
     }
     
@@ -110,7 +106,6 @@ public class BayManagement extends javax.swing.JPanel {
                         String ticketId = rs.getString("current_ticket_id");
                         
                         boolean isAvailable = "Available".equals(status) && (ticketId == null || ticketId.isEmpty());
-                        System.out.println("BayManagement: Bay-" + bayNumber + " - Status: '" + status + "', Ticket: '" + ticketId + "', Available: " + isAvailable);
                         return isAvailable;
                     } else {
                         System.err.println("BayManagement: No database record found for Bay-" + bayNumber);
@@ -291,7 +286,6 @@ public class BayManagement extends javax.swing.JPanel {
             // Update database
             updateBayReleaseInDatabase(bayNumber);
             
-            System.out.println("Bay-" + bayNumber + " released");
             return true;
             
         } catch (Exception e) {
@@ -326,9 +320,6 @@ public class BayManagement extends javax.swing.JPanel {
     public static void loadToggleStates() {
         // Only load from database ONCE - never reload
         if (toggleStatesLoaded) {
-            System.out.println("*** TOGGLE STATES ALREADY LOADED - PRESERVING CURRENT VALUES ***");
-            System.out.println("Current fastChargingAvailable: [" + fastChargingAvailable[0] + ", " + fastChargingAvailable[1] + ", " + fastChargingAvailable[2] + "]");
-            System.out.println("Current normalChargingAvailable: [" + normalChargingAvailable[0] + ", " + normalChargingAvailable[1] + ", " + normalChargingAvailable[2] + ", " + normalChargingAvailable[3] + ", " + normalChargingAvailable[4] + "]");
             return;
         }
         

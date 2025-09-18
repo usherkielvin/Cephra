@@ -240,16 +240,6 @@ public class QueueTicket extends javax.swing.JPanel {
         });
     }
     
-    // Helper method to generate priority ticket preview
-    private String generatePriorityTicketPreview(String service) {
-        if (service == null) return "FCHP001";
-        
-        if (service.toLowerCase().contains("fast")) {
-            return "FCHP001"; // Fast Charging Priority
-        } else {
-            return "NCHP001"; // Normal Charging Priority
-        }
-    }
     
     // Helper method to convert regular ticket to priority ticket
     private String convertToPriorityTicket(String ticketId) {

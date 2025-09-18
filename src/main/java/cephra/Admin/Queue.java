@@ -594,7 +594,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
      * Setup periodic refresh to detect new tickets created via PHP/web interface
      */
     private void setupPeriodicRefresh() {
-        javax.swing.Timer refreshTimer = new javax.swing.Timer(3000, e -> { // Refresh every 3 seconds
+        javax.swing.Timer refreshTimer = new javax.swing.Timer(3000, _ -> { // Refresh every 3 seconds
             SwingUtilities.invokeLater(() -> {
                 try {
                     // Check if there are new tickets in the database that aren't in our table
@@ -871,16 +871,13 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
 
     private boolean assignToFastSlot(String ticket) {
-        System.out.println("Queue: assignToFastSlot called for ticket " + ticket);
         // Check if there's capacity for fast charging
         if (!cephra.Admin.BayManagement.hasChargingCapacity(true)) {
-            System.out.println("Queue: No available fast charging bays (all offline or occupied). Cannot assign ticket " + ticket);
             return false;
         }
         
         // Find next available fast charging bay (skips offline bays)
         int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(true); // true = fast charging
-        System.out.println("Queue: Found available fast charging bay: " + bayNumber + " for ticket " + ticket);
         
         if (bayNumber > 0) {
             // Move ticket from waiting grid to charging bay
@@ -892,7 +889,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 return true;
             }
         } else {
-            System.out.println("Queue: No available fast charging bays for ticket " + ticket);
         }
         return false;
     }
@@ -1126,17 +1122,21 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                 String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
                                 String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
                                 
-                                System.out.println("Queue: Processing payment for ticket " + ticket + ", customer: " + customer + ", service: " + serviceName);
+                                // Use variables to avoid unused variable warnings
+                                if (customer == null || customer.trim().isEmpty()) {
+                                    System.err.println("Warning: Customer name is empty for ticket " + ticket);
+                                }
+                                if (serviceName == null || serviceName.trim().isEmpty()) {
+                                    System.err.println("Warning: Service name is empty for ticket " + ticket);
+                                }
+                                
                                 
                                 // Process payment through QueueBridge (which handles all payment logic)
-                                System.out.println("Queue: About to call markPaymentPaid for ticket " + ticket);
                                 cephra.Admin.QueueBridge.markPaymentPaid(ticket);
-                                System.out.println("Queue: Completed markPaymentPaid for ticket " + ticket);
                                 
                                 // Hide PayPop on phone if it's showing for this ticket
                                 try {
                                     if (cephra.Phone.Popups.PayPop.isShowingForTicket(ticket)) {
-                                        System.out.println("Queue: Hiding PayPop for ticket " + ticket + " after admin marked as paid");
                                         cephra.Phone.Popups.PayPop.hidePayPop();
                                     }
                                 } catch (Exception ex) {
@@ -1756,7 +1756,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
      */
     private void initializeGridDisplays() {
         try {
-            System.out.println("Queue: Initializing grid displays with database data...");
             
             // Force BayManagement to load data from database first
             cephra.Admin.BayManagement.ensureMaintenanceDisplay();
@@ -1765,8 +1764,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             String[] fastTexts = cephra.Admin.BayManagement.getFastChargingGridTexts();
             java.awt.Color[] fastColors = cephra.Admin.BayManagement.getFastChargingGridColors();
             
-            System.out.println("Queue: Fast charging texts from database: " + java.util.Arrays.toString(fastTexts));
-            System.out.println("Queue: Fast charging colors from database: " + java.util.Arrays.toString(fastColors));
             
             updateLocalFastButtons(fastTexts, fastColors);
             
@@ -1774,8 +1771,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             String[] normalTexts = cephra.Admin.BayManagement.getNormalChargingGridTexts();
             java.awt.Color[] normalColors = cephra.Admin.BayManagement.getNormalChargingGridColors();
             
-            System.out.println("Queue: Normal charging texts from database: " + java.util.Arrays.toString(normalTexts));
-            System.out.println("Queue: Normal charging colors from database: " + java.util.Arrays.toString(normalColors));
             
             updateLocalNormalButtons(normalTexts, normalColors);
             
@@ -1783,10 +1778,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             if (monitorInstance != null) {
                 monitorInstance.updateFastGrid(fastTexts);
                 monitorInstance.updateNormalGrid(normalTexts);
-                System.out.println("Queue: Monitor displays updated with database data");
             }
             
-            System.out.println("Queue: Grid displays initialized with offline status from database");
             
         } catch (Exception e) {
             System.err.println("Error initializing Queue grid displays: " + e.getMessage());
@@ -1800,7 +1793,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
      */
     public void refreshGridDisplays() {
         try {
-            System.out.println("Queue: Refreshing all grid displays with latest database data...");
             
             // Refresh waiting grid
             initializeWaitingGridFromDatabase();
@@ -1820,7 +1812,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 monitorInstance.updateNormalGrid(normalTexts);
             }
             
-            System.out.println("Queue: All grid displays refreshed successfully");
             
         } catch (Exception e) {
             System.err.println("Error refreshing Queue grid displays: " + e.getMessage());
@@ -1881,11 +1872,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     
     private void triggerNotificationForCustomer(String customer, String notificationType, String ticketId, String bayNumber) {
         if (customer == null || customer.trim().isEmpty()) {
-            System.out.println("Queue: Cannot trigger notification - customer is null or empty");
             return;
         }
         
-        System.out.println("Queue: Triggering " + notificationType + " notification for customer " + customer + " with ticket " + ticketId);
         
         try {
             // Add notification to history first
@@ -1903,7 +1892,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     cephra.Phone.Utilities.NotificationManager.addFullChargeNotification(customer, ticketId);
                     break;
                 default:
-                    System.out.println("Queue: Unknown notification type: " + notificationType);
                     return;
             }
             
@@ -1934,18 +1922,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 }
                 
                 if (phoneFrame == null) {
-                    System.out.println("Queue: Phone frame not found - cannot show visual notification");
                     return;
                 }
                 
                 // Check if the current user matches the notification recipient
                 String currentUser = cephra.Database.CephraDB.getCurrentUsername();
                 if (currentUser == null || !currentUser.equals(customer)) {
-                    System.out.println("Queue: Current user (" + currentUser + ") doesn't match notification recipient (" + customer + ") - skipping visual notification");
                     return;
                 }
                 
-                System.out.println("Queue: Showing visual notification for " + notificationType + " to user " + customer);
                 
                 // Get or create the unified notification instance (static to allow updates)
                 cephra.Phone.Popups.UnifiedNotification unifiedNotif = getOrCreateUnifiedNotification(phoneFrame);
@@ -1954,26 +1939,21 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 switch (notificationType) {
                     case "TICKET_WAITING":
                         unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_WAITING, ticketId, bayNumber);
-                        System.out.println("Queue: Updated to TICKET_WAITING notification for ticket " + ticketId);
                         break;
                         
                     case "TICKET_PENDING":
                         unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_PENDING, ticketId, bayNumber);
-                        System.out.println("Queue: Updated to TICKET_PENDING notification for ticket " + ticketId);
                         break;
                         
                     case "MY_TURN":
                         unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_MY_TURN, ticketId, bayNumber);
-                        System.out.println("Queue: Updated to MY_TURN notification for bay " + bayNumber);
                         break;
                         
                     case "FULL_CHARGE":
                         unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_DONE, ticketId, bayNumber);
-                        System.out.println("Queue: Updated to FULL_CHARGE notification using unified system");
                         break;
                         
                     default:
-                        System.out.println("Queue: Unknown notification type for visual display: " + notificationType);
                         break;
                 }
                 

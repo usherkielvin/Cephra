@@ -417,7 +417,6 @@ public class History extends javax.swing.JPanel {
         } catch (Exception e) {
             System.err.println("Error getting staff first name: " + e.getMessage());
         }
-        System.out.println("DEBUG History: Returning fallback 'Admin'");
         return "Admin"; // Fallback
     }
 }
