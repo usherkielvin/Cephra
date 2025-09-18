@@ -1509,7 +1509,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton8);
 
         ControlPanel.add(jPanel1);
-        jPanel1.setBounds(90, 430, 550, 150);
+        jPanel1.setBounds(90, 430, 550, 180);
 
         normalcharge1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         normalcharge1.setForeground(new java.awt.Color(41, 182, 246));
@@ -1520,7 +1520,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         normalcharge1.setFocusPainted(false);
         normalcharge1.setFocusable(false);
         ControlPanel.add(normalcharge1);
-        normalcharge1.setBounds(520, 140, 90, 40);
+        normalcharge1.setBounds(520, 140, 120, 40);
 
         nxtfastbtn.setBorder(null);
         nxtfastbtn.setBorderPainted(false);
@@ -1608,7 +1608,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText(getStaffFirstNameFromDB() + "!");
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
