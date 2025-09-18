@@ -33,9 +33,12 @@ if ($conn) {
         $batteryLevel = (int)($result['battery_level'] ?? -1);
         $currentBatteryLevel = $batteryLevel;
 
-        if ($batteryLevel > 0) {
-            // Car is linked and battery is initialized - keep Link panel visible
+        if ($batteryLevel > 0 && $batteryLevel < 100) {
+            // Car is linked and battery is initialized but not at 100% - keep Link panel visible
             $isCarLinked = true;
+        } else if ($batteryLevel == 100) {
+            // Battery at 100% - car is considered unlinked since no charging needed
+            $isCarLinked = false;
         }
     }
 }
@@ -259,7 +262,7 @@ By checking "I agree", you confirm you have read and accept these Terms.`;
             modalContent.innerHTML = `
                 <h3>Terms and Conditions</h3>
                 <pre style="white-space: pre-wrap; font-family: inherit; font-size: 14px; line-height: 1.5;">${termsText}</pre>
-                <button onclick="this.closest('div').parentElement.remove()" style="margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>
+                <button onclick="this.closest('div').parentElement.remove(); document.getElementById('terms').checked = true;" style="margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">I Agree</button>
             `;
 
             modal.appendChild(modalContent);
@@ -271,7 +274,7 @@ By checking "I agree", you confirm you have read and accept these Terms.`;
             const termsCheckbox = document.getElementById('terms');
             if (!termsCheckbox.checked) {
                 e.preventDefault();
-                showDialog('Link Vehicle', 'Please agree to the Terms & Conditions to continue.');
+                showDialog('Terms Required', 'You must agree to the Terms & Conditions before linking your car.');
                 return false;
             }
         });

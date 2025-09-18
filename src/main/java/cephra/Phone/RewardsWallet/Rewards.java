@@ -242,6 +242,21 @@ public class Rewards extends javax.swing.JPanel {
         syncWithDatabase();
         
         if (currentPoints >= price) {
+            // Show confirmation dialog before purchase
+            int confirmResult = javax.swing.JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to purchase " + itemName + "?\n" +
+                "Cost: " + price + " points\n",
+                "Confirm Purchase",
+                javax.swing.JOptionPane.YES_NO_OPTION,
+                javax.swing.JOptionPane.QUESTION_MESSAGE,
+                new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/smalllogo.png")));
+            
+            // If user clicked "No" or closed the dialog, cancel the purchase
+            if (confirmResult != javax.swing.JOptionPane.YES_OPTION) {
+                System.out.println("Purchase cancelled by user for " + itemName);
+                return false;
+            }
+            
             // Spend points using database
             String description = "Purchased " + itemName + " (Item " + (itemIndex + 1) + ")";
             boolean success = cephra.Phone.Utilities.RewardSystem.spendPoints(currentUsername, price, description, "ITEM_" + (itemIndex + 1));
@@ -252,9 +267,8 @@ public class Rewards extends javax.swing.JPanel {
                 
                 javax.swing.JOptionPane.showMessageDialog(this,
                     "Thank you for purchasing " + itemName + "!\n" +
-                    "Points used: " + price + "\n" +
-                    "Remaining points: " + currentPoints,
-                    "Purchase Successful", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    "Points used: " + price);
+                   
                 
                 System.out.println("Purchased " + itemName + " for " + price + " points. Remaining: " + currentPoints);
                 return true;

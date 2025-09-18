@@ -287,6 +287,36 @@ public class CephraDB {
         }
     }
     
+    // Method to update user profile information
+    public static boolean updateUserProfile(String username, String firstName, String lastName, String email) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE users SET firstname = ?, lastname = ?, email = ? WHERE username = ?")) {
+            
+            stmt.setString(1, firstName);
+            stmt.setString(2, lastName);
+            stmt.setString(3, email);
+            stmt.setString(4, username);
+            
+            int rowsAffected = stmt.executeUpdate();
+            boolean success = rowsAffected > 0;
+            
+            if (success) {
+                System.out.println("CephraDB: Updated profile for user " + username + 
+                    " - Name: " + firstName + " " + lastName + ", Email: " + email);
+            } else {
+                System.err.println("CephraDB: No rows affected when updating profile for user " + username);
+            }
+            
+            return success;
+            
+        } catch (SQLException e) {
+            System.err.println("Error updating user profile: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     // Method to get a user's current password by email
     public static String getUserPasswordByEmail(String email) {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();

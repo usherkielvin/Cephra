@@ -201,7 +201,16 @@ public class LinkConnect extends javax.swing.JPanel {
     }//GEN-LAST:event_homebuttonActionPerformed
 
     private void LinkcarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LinkcarActionPerformed
-          SwingUtilities.invokeLater(new Runnable() {
+        // Check if terms and conditions are agreed to first
+        if (!termscondition.isSelected()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "You must agree to the Terms & Conditions before linking your car.",
+                "Terms Required",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // Generate and set battery level for current user when linking car
                 String username = cephra.Database.CephraDB.getCurrentUsername();
@@ -327,16 +336,18 @@ public class LinkConnect extends javax.swing.JPanel {
         content.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
         content.add(scrollPane, java.awt.BorderLayout.CENTER);
 
-        javax.swing.JButton ok = new javax.swing.JButton("OK");
-        ok.setFocusPainted(false);
-        ok.addActionListener(new java.awt.event.ActionListener() {
+        javax.swing.JButton agreeButton = new javax.swing.JButton("I Agree");
+        agreeButton.setFocusPainted(false);
+        agreeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                // Mark terms as agreed when user clicks "I Agree"
+                termscondition.setSelected(true);
                 dialog.dispose();
             }
         });
         javax.swing.JPanel buttons = new javax.swing.JPanel();
         buttons.setBackground(java.awt.Color.WHITE); 
-        buttons.add(ok);
+        buttons.add(agreeButton);
         content.add(buttons, java.awt.BorderLayout.SOUTH);
 
         dialog.setContentPane(content);
