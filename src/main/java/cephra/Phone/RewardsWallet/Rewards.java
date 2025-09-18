@@ -91,7 +91,7 @@ public class Rewards extends javax.swing.JPanel {
             java.util.function.BiFunction<javax.swing.JComponent, javax.swing.JComponent, javax.swing.JPanel> createContentRow = 
                 (left, right) -> {
                     javax.swing.JPanel rowPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 2, 2, 0));
-                    rowPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 140)); // Larger height for content
+                    rowPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 145)); // Larger height for content
                     rowPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     rowPanel.setBorder(null);
                     rowPanel.setOpaque(true);
@@ -103,8 +103,8 @@ public class Rewards extends javax.swing.JPanel {
                     if (right.getParent() != null) right.getParent().remove(right);
                     
                     // Set larger preferred sizes for content panels and align to left
-                    left.setPreferredSize(new java.awt.Dimension(157, 150));
-                    right.setPreferredSize(new java.awt.Dimension(157, 150));
+                    left.setPreferredSize(new java.awt.Dimension(157, 152));
+                    right.setPreferredSize(new java.awt.Dimension(157, 152));
                     left.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     right.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
                     
@@ -424,15 +424,18 @@ public class Rewards extends javax.swing.JPanel {
         jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        jScrollPane1.setFocusable(false);
+        jScrollPane1.setOpaque(false);
+        jScrollPane1.setRequestFocusEnabled(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(19, 19, 19)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(40, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -485,7 +488,7 @@ public class Rewards extends javax.swing.JPanel {
             }
         });
         add(a3);
-        a3.setBounds(570, 250, 150, 150);
+        a3.setBounds(580, 250, 150, 147);
 
         a4.setBackground(new java.awt.Color(255, 255, 255));
         a4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_4.png"))); // NOI18N
@@ -527,7 +530,7 @@ public class Rewards extends javax.swing.JPanel {
             }
         });
         add(a6);
-        a6.setBounds(740, 410, 150, 150);
+        a6.setBounds(740, 400, 150, 150);
 
         a7.setBackground(new java.awt.Color(255, 255, 255));
         a7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Rewards_7.png"))); // NOI18N
