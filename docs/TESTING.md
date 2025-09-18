@@ -1,261 +1,341 @@
-# 🧪 Cephra API Testing Guide
+# 🧪 Cephra Testing Guide
 
-This document explains how to test the Cephra API endpoints and web interface functionality.
+This document explains how to test the Cephra EV charging management system components.
 
 ## 📋 Test Overview
 
-The Cephra project includes comprehensive testing for:
+The Cephra project includes testing for:
 
-- **Java Unit Tests** - Test API endpoint connectivity and responses
-- **PHP API Tests** - Test server-side API functionality
-- **JavaScript Integration Tests** - Test frontend API integration
-- **Performance Tests** - Test API response times and performance
+- **Java Application Testing** - Desktop application functionality
+- **Web Interface Testing** - PHP web interface and API endpoints
+- **Database Testing** - Data integrity and connection testing
+- **Integration Testing** - End-to-end system testing
 
 ## 🚀 Quick Start
 
-### Run All Tests
+### Run Java Application Tests
 ```bash
-# Run the complete test suite
-scripts/run-tests.bat
+# Build and test Java components
+mvn clean test
+
+# Run specific test classes
+mvn test -Dtest=DatabaseConnectionTest
 ```
 
-### Run Individual Tests
+### Test Web Interface
 ```bash
-# Java unit tests only
-mvn test
-
-# PHP tests only
-# Open: http://localhost/cephra/api/test-endpoints.php
-
-# JavaScript tests only
-# Open: http://localhost/cephra/mobileweb/?test=true
+# Start web server and test endpoints
+# Open browser: http://localhost/cephra/Appweb/User/
+# Test login with: dizon / 123
 ```
 
-## 📁 Test Structure
+## 🔧 Java Application Testing
 
-```
-src/test/java/cephra/api/
-└── ApiEndpointTest.java          # Java unit tests
+### Database Connection Testing
+1. **Test Database Connection**
+   - Launch the Java application
+   - Check console for connection success messages
+   - Verify database initialization completes
 
-api/
-└── test-endpoints.php            # PHP API tests
+2. **Test Table Creation**
+   - Run application first time
+   - Check if all required tables are created
+   - Verify data integrity constraints
 
-mobileweb/
-└── test-api-integration.js       # JavaScript integration tests
+### Admin Panel Testing
+1. **Login Functionality**
+   - Test admin login with valid credentials
+   - Test login with invalid credentials
+   - Verify session management
 
-scripts/
-└── run-tests.bat                 # Test runner script
-```
+2. **Queue Management**
+   - Create test queue tickets
+   - Test queue status updates
+   - Verify queue ordering and processing
 
-## 🔧 Test Types
+3. **Staff Management**
+   - Add new staff members
+   - Test password reset functionality
+   - Verify staff record management
 
-### 1. Java Unit Tests (`ApiEndpointTest.java`)
+### Customer Interface Testing
+1. **User Registration**
+   - Test new user registration
+   - Verify email validation
+   - Test duplicate username handling
 
-**Purpose**: Test API endpoint connectivity and basic functionality
+2. **Queue Joining**
+   - Test joining queue with different services
+   - Verify battery level tracking
+   - Test queue position updates
 
-**Tests Include**:
-- ✅ API Server Health Check
-- ✅ Login Endpoint (Valid/Invalid Credentials)
-- ✅ Queue Data Retrieval
-- ✅ Ticket Creation
-- ✅ Error Handling
-- ✅ Response Time Performance
-- ✅ CORS Headers
+3. **Profile Management**
+   - Test profile information updates
+   - Verify battery level management
+   - Test charging history viewing
 
-**Run Command**:
-```bash
-mvn test -Dtest=ApiEndpointTest
-```
+## 🌐 Web Interface Testing
 
-### 2. PHP API Tests (`test-endpoints.php`)
+### API Endpoint Testing
 
-**Purpose**: Test server-side API functionality with real database
-
-**Tests Include**:
-- ✅ Database Connection
-- ✅ Login Authentication
-- ✅ Queue Data Operations
-- ✅ Ticket Creation/Validation
-- ✅ Error Handling
-- ✅ HTML Page Rendering
-
-**Access**: `http://localhost/cephra/api/test-endpoints.php`
-
-### 3. JavaScript Integration Tests (`test-api-integration.js`)
-
-**Purpose**: Test frontend API integration from browser perspective
-
-**Tests Include**:
-- ✅ API Connectivity
-- ✅ Login Flow
-- ✅ Queue Data Flow
-- ✅ Ticket Creation Flow
-- ✅ Error Handling
-- ✅ CORS Headers
-- ✅ Performance Testing
-
-**Access**: `http://localhost/cephra/mobileweb/?test=true`
-
-## 🎯 API Endpoints Tested
-
-### Authentication
-- `POST /api/mobile.php?action=login`
-  - Valid credentials: `dizon` / `123`
-  - Invalid credentials handling
-  - Missing credentials handling
-
-### Queue Management
-- `GET /api/mobile.php?action=queue`
-  - Retrieve all queue tickets
-  - Data structure validation
-  - Empty queue handling
-
-### Ticket Operations
-- `POST /api/mobile.php?action=create-ticket`
-  - Valid ticket creation
-  - Invalid data handling
-  - Missing field validation
-
-### Web Interface
-- `GET /api/view-queue.php`
-  - HTML page rendering
-  - Content validation
-  - Database integration
-
-## 📊 Test Results
-
-### Success Criteria
-- ✅ All API endpoints respond correctly
-- ✅ Authentication works with valid credentials
-- ✅ Error handling works for invalid requests
-- ✅ Response times under 5 seconds
-- ✅ CORS headers present for web integration
-
-### Test Reports
-- **Java Tests**: Maven surefire reports in `target/surefire-reports/`
-- **PHP Tests**: HTML report in browser
-- **JavaScript Tests**: Console output and JSON report
-
-## 🔧 Test Configuration
-
-### Prerequisites
-1. **Java 21+** - For running unit tests
-2. **Maven 3.6+** - For building and testing
-3. **PHP 8+** - For API server
-4. **MySQL** - For database tests
-5. **Web Server** - XAMPP or similar
-
-### Environment Setup
-1. Start the application: `scripts/run.bat`
-2. Java Swing application is ready to run
-3. Verify database connection
-4. Run tests: `scripts/run-tests.bat`
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### API Server Not Running
-```
-ERROR: API server may not be running
-```
-**Solution**: Start the application with `scripts/run.bat`
-
-#### Database Connection Failed
-```
-Database connection failed
-```
-**Solution**: 
-1. Check MySQL is running
-2. Run `scripts/init-database.bat`
-3. Verify database credentials in `config/database.php`
-
-#### Tests Failing
-```
-Some tests failed
-```
-**Solution**:
-1. Check API server logs
-2. Verify database has test data
-3. Check network connectivity
-4. Review test output for specific errors
-
-### Debug Mode
-Enable debug logging in API files:
+#### User API (`/api/mobile.php`)
 ```php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Test login endpoint
+POST /api/mobile.php
+Content-Type: application/json
+
+{
+    "action": "login",
+    "username": "dizon",
+    "password": "123"
+}
 ```
 
-## 📈 Performance Testing
+#### Admin API (`/api/admin.php`)
+```php
+// Test admin login
+POST /api/admin.php
+Content-Type: application/json
 
-### Response Time Benchmarks
-- **Login**: < 1 second
-- **Queue Data**: < 2 seconds
-- **Ticket Creation**: < 3 seconds
-- **Page Loading**: < 5 seconds
+{
+    "action": "admin_login",
+    "username": "admin",
+    "password": "admin123"
+}
+```
+
+### Web Interface Testing
+1. **Customer Interface** (`/Appweb/User/`)
+   - Test responsive design on mobile devices
+   - Verify real-time queue updates
+   - Test ticket creation and management
+   - Check user authentication flow
+
+2. **Admin Interface** (`/Appweb/Admin/`)
+   - Test admin dashboard functionality
+   - Verify queue management features
+   - Test staff management operations
+   - Check system monitoring capabilities
+
+3. **Monitor Display** (`/Appweb/Monitor/`)
+   - Test public display functionality
+   - Verify queue status display
+   - Test real-time updates
+   - Check information accuracy
+
+## 🗄️ Database Testing
+
+### Data Integrity Testing
+1. **User Data**
+   - Test user registration data validation
+   - Verify password hashing
+   - Test user profile updates
+
+2. **Queue Management**
+   - Test queue ticket creation
+   - Verify queue ordering logic
+   - Test status updates and transitions
+
+3. **Transaction Records**
+   - Test charging history recording
+   - Verify payment transaction logging
+   - Test data consistency across tables
+
+### Connection Testing
+1. **Java Database Connection**
+   - Test connection pooling
+   - Verify connection timeout handling
+   - Test reconnection after connection loss
+
+2. **PHP Database Connection**
+   - Test PDO connection handling
+   - Verify error handling
+   - Test transaction management
+
+## 🔄 Integration Testing
+
+### End-to-End Testing Scenarios
+
+#### Scenario 1: Complete Charging Process
+1. User registers via web interface
+2. User joins queue via mobile app
+3. Admin processes queue ticket
+4. Charging session completes
+5. Payment processed
+6. History recorded
+
+#### Scenario 2: Multi-User Queue Management
+1. Multiple users join queue
+2. Admin manages queue priorities
+3. Bay assignments processed
+4. Real-time updates across interfaces
+5. Queue status synchronization
+
+#### Scenario 3: System Recovery
+1. Simulate database connection loss
+2. Test automatic reconnection
+3. Verify data consistency
+4. Test error handling and recovery
+
+## 🛠️ Test Data Setup
+
+### Sample Test Users
+```sql
+-- Test customer user
+INSERT INTO users (username, email, password, firstname, lastname) 
+VALUES ('testuser', 'test@example.com', 'hashed_password', 'Test', 'User');
+
+-- Test admin user
+INSERT INTO staff_records (username, password, role) 
+VALUES ('testadmin', 'hashed_password', 'admin');
+```
+
+### Sample Test Data
+```sql
+-- Test queue tickets
+INSERT INTO queue_tickets (username, service_type, status, created_at) 
+VALUES ('testuser', 'fast_charge', 'pending', NOW());
+
+-- Test battery levels
+INSERT INTO battery_levels (username, battery_level, initial_battery_level) 
+VALUES ('testuser', 45, 45);
+```
+
+## 📊 Performance Testing
 
 ### Load Testing
-For production deployment, consider:
-- Multiple concurrent users
-- Database connection pooling
-- API rate limiting
-- Caching strategies
+1. **Concurrent Users**
+   - Test with multiple simultaneous users
+   - Verify system performance under load
+   - Check database connection limits
 
-## 🔄 Continuous Integration
+2. **Queue Processing**
+   - Test large queue processing
+   - Verify response times
+   - Check memory usage
 
-### Automated Testing
-The test suite can be integrated into CI/CD pipelines:
+### Response Time Testing
+1. **API Response Times**
+   - Measure endpoint response times
+   - Test under various load conditions
+   - Verify acceptable performance thresholds
 
-```bash
-# CI Pipeline Example
-mvn clean test
-# Run PHP tests
-curl http://localhost/cephra/api/test-endpoints.php
-# Run JavaScript tests
-npm test  # If using Node.js
+2. **Database Query Performance**
+   - Test complex query execution times
+   - Verify index usage
+   - Check query optimization
+
+## 🐛 Bug Testing
+
+### Common Issues to Test
+1. **Network Connectivity**
+   - Test with poor network conditions
+   - Verify offline functionality
+   - Test reconnection scenarios
+
+2. **Data Validation**
+   - Test with invalid input data
+   - Verify error handling
+   - Check data sanitization
+
+3. **Edge Cases**
+   - Test with empty databases
+   - Verify null value handling
+   - Test boundary conditions
+
+## 📝 Test Documentation
+
+### Test Results Recording
+1. **Test Execution Log**
+   - Record test execution times
+   - Document test results
+   - Track bug reports
+
+2. **Performance Metrics**
+   - Record response times
+   - Track resource usage
+   - Monitor system performance
+
+### Bug Reporting
+1. **Bug Report Template**
+   - Description of the issue
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - System environment details
+
+2. **Issue Tracking**
+   - Assign priority levels
+   - Track resolution status
+   - Document fixes and workarounds
+
+## 🔍 Automated Testing
+
+### Unit Tests
+```java
+// Example Java unit test
+@Test
+public void testDatabaseConnection() {
+    Connection conn = DatabaseConnection.getConnection();
+    assertNotNull(conn);
+    // Additional assertions
+}
 ```
 
-### Test Coverage
-Current test coverage includes:
-- ✅ API endpoint functionality
-- ✅ Database operations
-- ✅ Error handling
-- ✅ Performance metrics
-- ✅ Frontend integration
+### API Tests
+```php
+// Example PHP API test
+public function testLoginEndpoint() {
+    $response = $this->post('/api/mobile.php', [
+        'action' => 'login',
+        'username' => 'testuser',
+        'password' => 'testpass'
+    ]);
+    
+    $this->assertEquals(200, $response->getStatusCode());
+    // Additional assertions
+}
+```
 
-## 📝 Adding New Tests
+## 📋 Testing Checklist
 
-### Java Tests
-1. Add test methods to `ApiEndpointTest.java`
-2. Use JUnit 5 annotations
-3. Follow naming convention: `test[Feature][Scenario]`
+### Pre-Release Testing
+- [ ] All Java components tested
+- [ ] Web interface functionality verified
+- [ ] Database operations tested
+- [ ] API endpoints validated
+- [ ] Performance benchmarks met
+- [ ] Security vulnerabilities checked
+- [ ] Cross-platform compatibility verified
+- [ ] Documentation updated
 
-### PHP Tests
-1. Add test methods to `test-endpoints.php`
-2. Use descriptive test names
-3. Include both success and failure scenarios
+### Post-Release Testing
+- [ ] Production environment tested
+- [ ] User acceptance testing completed
+- [ ] Performance monitoring active
+- [ ] Error logging functional
+- [ ] Backup and recovery tested
 
-### JavaScript Tests
-1. Add test methods to `test-api-integration.js`
-2. Use async/await for API calls
-3. Include performance measurements
+## 🆘 Troubleshooting Test Issues
 
-## 🎉 Test Success
+### Common Test Failures
+1. **Database Connection Issues**
+   - Check MySQL service status
+   - Verify connection credentials
+   - Test network connectivity
 
-When all tests pass, you'll see:
-- ✅ Java tests: "BUILD SUCCESS"
-- ✅ PHP tests: "All tests passed! Your API is working correctly."
-- ✅ JavaScript tests: "All tests passed! Your API integration is working correctly."
+2. **Build Failures**
+   - Check Java version compatibility
+   - Verify Maven dependencies
+   - Clean and rebuild project
 
-## 📞 Support
+3. **Web Interface Issues**
+   - Check web server status
+   - Verify PHP configuration
+   - Test browser compatibility
 
-For testing issues:
-1. Check the troubleshooting section above
-2. Review test output and error messages
-3. Verify all prerequisites are installed
-4. Check API server and database status
+## 📚 Additional Resources
 
----
-
-**Happy Testing!** 🧪✨
+- [Java Testing Best Practices](https://docs.oracle.com/javase/tutorial/java/javaOO/testing.html)
+- [PHP Testing Guide](https://phpunit.readthedocs.io/)
+- [MySQL Testing Documentation](https://dev.mysql.com/doc/mysql-test-suite/)
+- [Web Testing Tools](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing)
