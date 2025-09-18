@@ -90,15 +90,21 @@ public class ImageCropDialog extends JDialog {
                 height = Math.min(height, originalImage.getHeight() - y);
                 
                 if (width > 0 && height > 0) {
-                    croppedImage = originalImage.getSubimage(x, y, width, height);
+                    // Get the cropped portion
+                    BufferedImage rawCroppedImage = originalImage.getSubimage(x, y, width, height);
                     
                     // Create a new BufferedImage to ensure it's not a subimage reference
-                    BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-                    Graphics2D g2d = finalImage.createGraphics();
-                    g2d.drawImage(croppedImage, 0, 0, null);
-                    g2d.dispose();
+                    BufferedImage tempImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D tempG2d = tempImage.createGraphics();
+                    tempG2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                    tempG2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    tempG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    tempG2d.drawImage(rawCroppedImage, 0, 0, null);
+                    tempG2d.dispose();
                     
-                    croppedImage = finalImage;
+                    // Apply intelligent scaling for profile picture optimization
+                    croppedImage = scaleImageForProfilePicture(tempImage);
+                    
                     confirmed = true;
                     dispose();
                 } else {
@@ -117,6 +123,148 @@ public class ImageCropDialog extends JDialog {
                 "Please select an area to crop by dragging on the image.", 
                 "No Selection", JOptionPane.WARNING_MESSAGE);
         }
+    }
+    
+    /**
+     * Intelligently scales the cropped image for optimal profile picture quality
+     * Uses advanced scaling techniques for best visual results
+     */
+    private BufferedImage scaleImageForProfilePicture(BufferedImage sourceImage) {
+        int sourceWidth = sourceImage.getWidth();
+        int sourceHeight = sourceImage.getHeight();
+        
+        // Target size for profile pictures - optimal balance between quality and file size
+        int targetSize = 300; // 300x300 pixels - good for web and mobile display
+        
+        // If the image is already close to target size, minimal processing needed
+        if (sourceWidth >= 250 && sourceWidth <= 350 && sourceHeight >= 250 && sourceHeight <= 350) {
+            return createHighQualitySquareImage(sourceImage, targetSize);
+        }
+        
+        // For very small images, use upscaling with interpolation
+        if (sourceWidth < 150 || sourceHeight < 150) {
+            return upscaleSmallImage(sourceImage, targetSize);
+        }
+        
+        // For very large images, use multi-step downscaling for better quality
+        if (sourceWidth > 800 || sourceHeight > 800) {
+            return downscaleLargeImage(sourceImage, targetSize);
+        }
+        
+        // For medium-sized images, use standard high-quality scaling
+        return createHighQualitySquareImage(sourceImage, targetSize);
+    }
+    
+    /**
+     * Creates a high-quality square image from the source
+     */
+    private BufferedImage createHighQualitySquareImage(BufferedImage sourceImage, int targetSize) {
+        // Create square crop from center if not already square
+        BufferedImage squareSource = makeSquare(sourceImage);
+        
+        // Scale to target size with high quality
+        BufferedImage result = new BufferedImage(targetSize, targetSize, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = result.createGraphics();
+        
+        // Apply best quality rendering hints
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        
+        g2d.drawImage(squareSource, 0, 0, targetSize, targetSize, null);
+        g2d.dispose();
+        
+        return result;
+    }
+    
+    /**
+     * Upscales small images with smooth interpolation
+     */
+    private BufferedImage upscaleSmallImage(BufferedImage sourceImage, int targetSize) {
+        // For small images, use progressive scaling for smoother results
+        BufferedImage squareSource = makeSquare(sourceImage);
+        int currentSize = squareSource.getWidth();
+        
+        BufferedImage current = squareSource;
+        
+        // Progressive upscaling - scale by no more than 2x at each step
+        while (currentSize < targetSize) {
+            int nextSize = Math.min(currentSize * 2, targetSize);
+            
+            BufferedImage scaled = new BufferedImage(nextSize, nextSize, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = scaled.createGraphics();
+            
+            // Use bicubic interpolation for smooth upscaling
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            g2d.drawImage(current, 0, 0, nextSize, nextSize, null);
+            g2d.dispose();
+            
+            current = scaled;
+            currentSize = nextSize;
+        }
+        
+        return current;
+    }
+    
+    /**
+     * Downscales large images with multi-step approach to prevent quality loss
+     */
+    private BufferedImage downscaleLargeImage(BufferedImage sourceImage, int targetSize) {
+        BufferedImage squareSource = makeSquare(sourceImage);
+        int currentSize = squareSource.getWidth();
+        
+        BufferedImage current = squareSource;
+        
+        // Progressive downscaling - reduce by no more than 50% at each step
+        while (currentSize > targetSize) {
+            int nextSize = Math.max(currentSize / 2, targetSize);
+            
+            BufferedImage scaled = new BufferedImage(nextSize, nextSize, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = scaled.createGraphics();
+            
+            // Use area averaging for downscaling - provides better quality
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            g2d.drawImage(current, 0, 0, nextSize, nextSize, null);
+            g2d.dispose();
+            
+            current = scaled;
+            currentSize = nextSize;
+        }
+        
+        return current;
+    }
+    
+    /**
+     * Converts any image to a square by cropping from the center
+     */
+    private BufferedImage makeSquare(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        
+        if (width == height) {
+            return image; // Already square
+        }
+        
+        int size = Math.min(width, height);
+        int x = (width - size) / 2;
+        int y = (height - size) / 2;
+        
+        // Create a new square image
+        BufferedImage squareImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = squareImage.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.drawImage(image.getSubimage(x, y, size, size), 0, 0, null);
+        g2d.dispose();
+        
+        return squareImage;
     }
     
     public BufferedImage getCroppedImage() {

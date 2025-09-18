@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 public class Profile extends javax.swing.JPanel {
-
+//
     public Profile() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
@@ -61,7 +61,7 @@ public class Profile extends javax.swing.JPanel {
                 java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
                 if (profileImage != null) {
                     // Create a circular profile picture that fits the ProfilePicture label (110x110)
-                    java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 110);
+                    java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 128);
                     
                     if (Profile != null) {
                         Profile.setIcon(new javax.swing.ImageIcon(circularImage));
@@ -231,7 +231,7 @@ public class Profile extends javax.swing.JPanel {
         add(Help);
         Help.setBounds(40, 460, 290, 40);
         add(Profile);
-        Profile.setBounds(110, 120, 150, 140);
+        Profile.setBounds(120, 120, 130, 130);
 
         Fullname.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
         Fullname.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -435,6 +435,8 @@ public class Profile extends javax.swing.JPanel {
 
     private void EditProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditProfileActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
+            
+            
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
