@@ -977,7 +977,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
     }//GEN-LAST:event_detailsActionPerformed
 
     private void okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okActionPerformed
-      
+        // TODO add your handling code here:
     }//GEN-LAST:event_okActionPerformed
 
 
