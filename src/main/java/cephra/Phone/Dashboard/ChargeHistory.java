@@ -673,43 +673,84 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
 
         detailpanel.setBackground(new java.awt.Color(255, 255, 255));
         detailpanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        detailpanel.setLayout(null);
 
         jLabel2.setBackground(new java.awt.Color(0, 0, 0));
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel2.setText("Charging Details");
+        detailpanel.add(jLabel2);
+        jLabel2.setBounds(30, 7, 176, 32);
 
         ticket.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         ticket.setText("jLabel3");
+        ticket.setToolTipText("");
+        ticket.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(ticket);
+        ticket.setBounds(77, 50, 130, 16);
 
         Customer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Customer.setText("jLabel3");
+        Customer.setToolTipText("");
+        Customer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(Customer);
+        Customer.setBounds(77, 70, 130, 16);
 
         typed.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         typed.setText("jLabel3");
+        typed.setToolTipText("");
+        typed.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        detailpanel.add(typed);
+        typed.setBounds(77, 90, 130, 16);
 
         kwh.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         kwh.setText("jLabel3");
+        kwh.setToolTipText("");
+        detailpanel.add(kwh);
+        kwh.setBounds(77, 110, 130, 16);
 
         Chargingtime.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Chargingtime.setText("jLabel3");
+        Chargingtime.setToolTipText("");
+        Chargingtime.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        detailpanel.add(Chargingtime);
+        Chargingtime.setBounds(77, 130, 130, 16);
 
         totalprice.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         totalprice.setText("jLabel3");
+        totalprice.setToolTipText("");
+        totalprice.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(totalprice);
+        totalprice.setBounds(77, 150, 130, 16);
 
         server.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         server.setText("jLabel3");
+        server.setToolTipText("");
+        server.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(server);
+        server.setBounds(77, 170, 130, 16);
 
         dated.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         dated.setText("jLabel3");
+        dated.setToolTipText("");
+        dated.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(dated);
+        dated.setBounds(77, 190, 130, 16);
 
         timed.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         timed.setText("jLabel3");
+        timed.setToolTipText("");
+        timed.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(timed);
+        timed.setBounds(77, 210, 130, 16);
 
         ref.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ref.setText("jLabel3");
+        ref.setToolTipText("");
+        ref.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(ref);
+        ref.setBounds(77, 230, 130, 16);
 
-        ok.setText("OK");
-        ok.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, java.awt.Color.white, java.awt.Color.lightGray));
+        ok.setText("jToggleButton1");
 
         javax.swing.GroupLayout detailpanelLayout = new javax.swing.GroupLayout(detailpanel);
         detailpanel.setLayout(detailpanelLayout);
@@ -718,27 +759,41 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             .addGroup(detailpanelLayout.createSequentialGroup()
                 .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(detailpanelLayout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addComponent(jLabel2)
+                        .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(detailpanelLayout.createSequentialGroup()
+                                .addGap(29, 29, 29)
+                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(totalprice)
+                                    .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(detailpanelLayout.createSequentialGroup()
+                                            .addComponent(Chargingtime)
+                                            .addGap(21, 21, 21)
+                                            .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(ref)
+                                                .addGroup(detailpanelLayout.createSequentialGroup()
+                                                    .addGap(55, 55, 55)
+                                                    .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(dated)
+                                                        .addComponent(kwh)))))
+                                        .addComponent(jLabel2)
+                                        .addComponent(server))))
+                            .addGroup(detailpanelLayout.createSequentialGroup()
+                                .addGap(51, 51, 51)
+                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(timed)
+                                    .addGroup(detailpanelLayout.createSequentialGroup()
+                                        .addGap(74, 74, 74)
+                                        .addComponent(Customer))))
+                            .addGroup(detailpanelLayout.createSequentialGroup()
+                                .addGap(38, 38, 38)
+                                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(ticket)
+                                    .addComponent(typed))))
                         .addGap(0, 17, Short.MAX_VALUE))
-                    .addComponent(ticket, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, detailpanelLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(typed, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(kwh, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(Chargingtime, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(totalprice, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(server, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(dated, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(timed, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(Customer, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(ref, javax.swing.GroupLayout.Alignment.TRAILING))))
+                        .addComponent(ok)))
                 .addContainerGap())
-            .addGroup(detailpanelLayout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addComponent(ok, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         detailpanelLayout.setVerticalGroup(
             detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -747,27 +802,30 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ticket)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(29, 29, 29)
                 .addComponent(Customer)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(1, 1, 1)
                 .addComponent(typed)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(kwh)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Chargingtime)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(detailpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(detailpanelLayout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(kwh))
+                    .addGroup(detailpanelLayout.createSequentialGroup()
+                        .addGap(32, 32, 32)
+                        .addComponent(Chargingtime)))
+                .addGap(18, 18, 18)
                 .addComponent(totalprice)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(10, 10, 10)
                 .addComponent(server)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(5, 5, 5)
                 .addComponent(dated)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(timed)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ref)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ok)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(detailpanel);
