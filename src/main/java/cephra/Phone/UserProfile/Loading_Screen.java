@@ -50,10 +50,10 @@ public class Loading_Screen extends javax.swing.JPanel {
 
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        exitlogin = new javax.swing.JButton();
+        START = new javax.swing.JButton();
 
         setMaximumSize(new java.awt.Dimension(350, 740));
-        setPreferredSize(new java.awt.Dimension(350, 750));
+        setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/tatatata.png"))); // NOI18N
@@ -64,29 +64,29 @@ public class Loading_Screen extends javax.swing.JPanel {
         add(jLabel1);
         jLabel1.setBounds(0, 0, 370, 750);
 
-        exitlogin.setBorder(null);
-        exitlogin.setBorderPainted(false);
-        exitlogin.setContentAreaFilled(false);
-        exitlogin.setFocusPainted(false);
-        exitlogin.addActionListener(new java.awt.event.ActionListener() {
+        START.setBorder(null);
+        START.setBorderPainted(false);
+        START.setContentAreaFilled(false);
+        START.setFocusPainted(false);
+        START.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitloginActionPerformed(evt);
+                STARTActionPerformed(evt);
             }
         });
-        add(exitlogin);
-        exitlogin.setBounds(30, 440, 300, 260);
+        add(START);
+        START.setBounds(0, 120, 370, 620);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
+    private void STARTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_STARTActionPerformed
         java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Loading_Screen.this);
         if (w instanceof cephra.Frame.Phone) {
             ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.Utilities.Transition());
         }
-    }//GEN-LAST:event_exitloginActionPerformed
+    }//GEN-LAST:event_STARTActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton exitlogin;
+    private javax.swing.JButton START;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
