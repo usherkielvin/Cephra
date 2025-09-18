@@ -13,7 +13,7 @@ public class AlreadyTicket extends javax.swing.JPanel {
     
     // Popup dimensions (centered in phone frame)
     private static final int POPUP_WIDTH = 280;
-    private static final int POPUP_HEIGHT = 140;
+    private static final int POPUP_HEIGHT = 269;
     private static final int PHONE_WIDTH = 350; // fallback if frame size not yet realized
     private static final int PHONE_HEIGHT = 750; // fallback if frame size not yet realized
     
@@ -395,7 +395,7 @@ public class AlreadyTicket extends javax.swing.JPanel {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/AlreadyhaveTicket.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 280, 230);
+        jLabel1.setBounds(10, 0, 280, 230);
     }// </editor-fold>//GEN-END:initComponents
 
     private void GolinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GolinkActionPerformed
