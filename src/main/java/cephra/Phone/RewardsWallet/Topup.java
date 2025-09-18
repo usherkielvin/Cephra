@@ -1,6 +1,7 @@
 
 package cephra.Phone.RewardsWallet;
 
+import cephra.Phone.Utilities.BalanceManager;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
@@ -276,7 +277,7 @@ public class Topup extends javax.swing.JPanel {
 
     private void ProceedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedActionPerformed
         processTopUp();
-        
+       
     }//GEN-LAST:event_ProceedActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
@@ -426,6 +427,10 @@ public class Topup extends javax.swing.JPanel {
             System.err.println("Error loading current balance: " + e.getMessage());
             Currentbalance.setText("₱ 0.00");
         }
+    }
+    
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        BalanceManager.updateBalances("5000", "21000");
     }
 
     /**

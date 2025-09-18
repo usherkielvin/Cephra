@@ -1,6 +1,7 @@
 
 package cephra.Phone.Dashboard;
 
+import cephra.Phone.Utilities.BalanceManager;
 import javax.swing.SwingUtilities;
 
 public class HOMELINKED extends javax.swing.JPanel {
@@ -26,6 +27,10 @@ public class HOMELINKED extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
+        
+        //Auto resizable text
+        BalanceManager.setLabels(rewardbalance, pesobalance);
+
         
         // Load wallet balance and reward points
         loadWalletBalance();
@@ -269,14 +274,8 @@ public class HOMELINKED extends javax.swing.JPanel {
         jButton1.setContentAreaFilled(false);
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
         add(jButton1);
         jButton1.setBounds(31, 336, 307, 65);
-        jButton1.setVisible(false); // Hide by default
 
         Status.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Status.setForeground(new java.awt.Color(255, 255, 255));
@@ -320,19 +319,19 @@ public class HOMELINKED extends javax.swing.JPanel {
         add(charge);
         charge.setBounds(50, 680, 40, 40);
 
-        pesobalance.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        pesobalance.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
         pesobalance.setForeground(new java.awt.Color(255, 255, 255));
         pesobalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         pesobalance.setText("500");
         add(pesobalance);
-        pesobalance.setBounds(268, 71, 40, 16);
+        pesobalance.setBounds(258, 70, 50, 20);
 
         rewardbalance.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         rewardbalance.setForeground(new java.awt.Color(255, 255, 255));
         rewardbalance.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         rewardbalance.setText("500");
         add(rewardbalance);
-        rewardbalance.setBounds(185, 68, 40, 20);
+        rewardbalance.setBounds(170, 70, 50, 20);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);

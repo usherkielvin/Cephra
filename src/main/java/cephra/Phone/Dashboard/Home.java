@@ -1,5 +1,6 @@
 package cephra.Phone.Dashboard;
 
+import cephra.Phone.Utilities.BalanceManager;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -37,6 +38,8 @@ public class Home extends javax.swing.JPanel {
         setSize(370, 750);
         setupLabelPosition(); // Set label position
         makeDraggable();
+        
+        BalanceManager.setLabels(rewardbalance, pesobalance);
         
         // Check if car is linked and switch to HomeLinked if needed
         if (cephra.Phone.Utilities.AppState.isCarLinked) {
@@ -138,13 +141,13 @@ public class Home extends javax.swing.JPanel {
         rewardbalance.setForeground(new java.awt.Color(255, 255, 255));
         rewardbalance.setText("500");
         add(rewardbalance);
-        rewardbalance.setBounds(185, 68, 50, 20);
+        rewardbalance.setBounds(170, 70, 50, 20);
 
-        pesobalance.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        pesobalance.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
         pesobalance.setForeground(new java.awt.Color(255, 255, 255));
         pesobalance.setText("2100");
         add(pesobalance);
-        pesobalance.setBounds(265, 71, 48, 16);
+        pesobalance.setBounds(258, 70, 50, 20);
 
         LinkVehicle.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
         LinkVehicle.setForeground(new java.awt.Color(255, 255, 255));
@@ -404,6 +407,18 @@ public class Home extends javax.swing.JPanel {
             System.err.println("Error loading wallet balance: " + e.getMessage());
             pesobalance.setText("0.00");
         }
+        resizeLabelToFitText(pesobalance);
+    }
+    
+    //Auto resizable
+    private void setAutoText(javax.swing.JLabel label, String text) {
+        label.setText(text);
+
+        java.awt.FontMetrics fm = label.getFontMetrics(label.getFont());
+        int width = Math.max(30, fm.stringWidth(text)); // 30 = minimum width
+        int height = fm.getHeight();
+
+        label.setSize(width, height);
     }
 
     /**
@@ -422,6 +437,17 @@ public class Home extends javax.swing.JPanel {
             System.err.println("Error loading reward points: " + e.getMessage());
             rewardbalance.setText("0");
         }
+        resizeLabelToFitText(rewardbalance);
+    }
+
+    /**
+     * Resizes the given label to fit its text content
+     */
+    private void resizeLabelToFitText(javax.swing.JLabel label) {
+        java.awt.FontMetrics fm = label.getFontMetrics(label.getFont());
+        int width = fm.stringWidth(label.getText()) + 10; // Add some padding
+        int height = label.getHeight();
+        label.setBounds(label.getX(), label.getY(), width, height);
     }
 
     /**

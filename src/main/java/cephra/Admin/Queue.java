@@ -1594,7 +1594,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         queIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ControlQe.png"))); // NOI18N
         ControlPanel.add(queIcon);
-        queIcon.setBounds(0, -70, 1010, 750);
+        queIcon.setBounds(0, -70, 1010, 800);
 
         jTabbedPane1.addTab("Queue Control", ControlPanel);
 
@@ -1609,9 +1609,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        // Set the staff first name instead of "Admin!"
-        String firstName = getStaffFirstNameFromDB();
-        labelStaff.setText(firstName + "!");
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
