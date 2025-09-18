@@ -280,22 +280,27 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
     }
     
     private String getNotificationTypeText(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+           String ticket =  entry.getTicketId() ;
+        
         switch (entry.getType()) {
             case CHARGING_COMPLETE:
             case FULL_CHARGE:
-                return "COMPLETE";
+                return ticket +" COMPLETE";
             case TICKET_PENDING:
             case TICKET_WAITING:
-                return "WAITING";
+                return ticket +" WAITING";
             case MY_TURN:
-                return "CHARGING";
+                return ticket +" CHARGING";
             default:
                 return "NOTIFICATION";
         }
     }
     
     private Color getNotificationTypeColor(cephra.Phone.Utilities.NotificationManager.NotificationEntry entry) {
+           String ticket =  entry.getTicketId() ;
+        
         switch (entry.getType()) {
+            
             case CHARGING_COMPLETE:
             case FULL_CHARGE:
                 return new Color(34, 139, 34); // Green
@@ -314,16 +319,16 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
                         " at Bay " + entry.getBayNumber() : "";
         String ticketInfo = (entry.getTicketId() != null && !entry.getTicketId().isEmpty()) ? 
                            " (Ticket: " + entry.getTicketId() + ")" : "";
-        
+     
         switch (entry.getType()) {
             case CHARGING_COMPLETE:
             case FULL_CHARGE:
-                return "Charging session completed successfully" + bayInfo + ". Vehicle ready for use" + ticketInfo + ". Thank you for using Cephra services.";
+                return "Charging session completed successfully. Vehicle ready for use. Thank you for using Cephra services.";
             case TICKET_WAITING:
             case TICKET_PENDING:
-                return "You're in the charging queue" + ticketInfo + ". Please wait for your turn. Estimated time varies based on queue length.";
+                return "You're in the charging queue. Please wait for your turn. Estimated time varies based on queue length.";
             case MY_TURN:
-                return "Your turn! Proceed to charging bay" + bayInfo + " within 10 minutes" + ticketInfo + ". Have your cable ready.";
+                return "Your turn! Proceed to charging bay within 10 minutes.";
             default:
                 // For custom messages, allow longer text
                 String msg = entry.getMessage();
@@ -485,7 +490,7 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
 
         NotifType.setText("jLabel3");
         nothis.add(NotifType);
-        NotifType.setBounds(60, 10, 80, 16);
+        NotifType.setBounds(50, 10, 200, 16);
 
         message.setColumns(20);
         message.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
