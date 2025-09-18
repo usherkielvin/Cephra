@@ -30,6 +30,9 @@ public class Phone extends javax.swing.JFrame {
             System.err.println("Error refreshing ticket counters: " + e.getMessage());
         }
 
+        // Initialize car linking state from database
+        cephra.Phone.Utilities.AppState.initializeCarLinkingState();
+
         // Start with loading screen panel
         switchPanel(new cephra.Phone.UserProfile.Loading_Screen());
         

@@ -33,9 +33,12 @@ if ($conn) {
         $batteryLevel = (int)($result['battery_level'] ?? -1);
         $currentBatteryLevel = $batteryLevel;
 
-        if ($batteryLevel > 0) {
-            // Car is linked and battery is initialized - keep Link panel visible
+        if ($batteryLevel > 0 && $batteryLevel < 100) {
+            // Car is linked and battery is initialized but not at 100% - keep Link panel visible
             $isCarLinked = true;
+        } else if ($batteryLevel == 100) {
+            // Battery at 100% - car is considered unlinked since no charging needed
+            $isCarLinked = false;
         }
     }
 }

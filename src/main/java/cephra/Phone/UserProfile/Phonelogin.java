@@ -158,6 +158,10 @@ public class Phonelogin extends javax.swing.JPanel {
         if (cephra.Database.CephraDB.validateLogin(usernameText, password)) {
             // Login successful, reset attempts
             loginAttempts = 0;
+            
+            // Initialize car linking state after successful login
+            cephra.Phone.Utilities.AppState.initializeCarLinkingState();
+            
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     java.awt.Window[] windows = java.awt.Window.getWindows();
