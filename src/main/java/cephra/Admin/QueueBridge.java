@@ -84,7 +84,6 @@ public final class QueueBridge {
     
     /** Public method to reload queue from database (for hard refresh) */
     public static void reloadFromDatabase() {
-        System.out.println("QueueBridge: Reloading queue from database");
         loadQueueFromDatabase();
     }
 
@@ -99,8 +98,8 @@ public final class QueueBridge {
         int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
         ticketBattery.put(ticket, new BatteryInfo(userBatteryLevel, 40.0)); // 40kWh capacity
         
-        // Determine priority status - priority tickets go directly to In Progress
-        String finalStatus = (userBatteryLevel < 20) ? "In Progress" : status;
+        // Determine priority status - priority tickets go to Waiting
+        String finalStatus = (userBatteryLevel < 20) ? "Waiting" : status;
         
         // Set this as the user's active ticket with correct service type
         cephra.Database.CephraDB.setActiveTicket(customer, ticket, service, userBatteryLevel, "");
@@ -115,17 +114,33 @@ public final class QueueBridge {
             ticketBattery.remove(ticket);
             cephra.Database.CephraDB.clearActiveTicket(customer);
         } else if (userBatteryLevel < 20) {
-            // Priority ticket was successfully added to database, assign directly to charging bay
+            // Priority ticket was successfully added to database, also add to waiting grid
             try {
-                boolean isFastCharging = service.toLowerCase().contains("fast");
-                int assignedBay = cephra.Admin.BayManagement.assignTicketFromQueue(ticket, customer, isFastCharging);
-                if (assignedBay > 0) {
-                    System.out.println("QueueBridge: Priority ticket " + ticket + " directly assigned to Bay-" + assignedBay);
-                } else {
-                    System.out.println("QueueBridge: Priority ticket " + ticket + " created but no bay available - will be processed later");
-                }
+                cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customer, service, userBatteryLevel);
+                System.out.println("QueueBridge: Priority ticket " + ticket + " automatically added to waiting grid");
+                
+                // Refresh the queue table to show the updated status
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        // Update the status in the table model to reflect "Waiting" status
+                        if (model != null) {
+                            for (int i = 0; i < model.getRowCount(); i++) {
+                                Object ticketVal = model.getValueAt(i, 0);
+                                if (ticket.equals(String.valueOf(ticketVal))) {
+                                    model.setValueAt("Waiting", i, 3); // Update status column
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Trigger a hard refresh to ensure everything is in sync
+                        triggerHardRefresh();
+                    } catch (Exception refreshError) {
+                        System.err.println("QueueBridge: Error refreshing table after priority ticket: " + refreshError.getMessage());
+                    }
+                });
             } catch (Exception e) {
-                System.err.println("QueueBridge: Failed to assign priority ticket " + ticket + " to bay: " + e.getMessage());
+                System.err.println("QueueBridge: Failed to add priority ticket " + ticket + " to waiting grid: " + e.getMessage());
             }
         }
 
@@ -155,7 +170,38 @@ public final class QueueBridge {
     }
 
     public static BatteryInfo getTicketBatteryInfo(String ticket) {
-        return ticketBattery.get(ticket);
+        // First check in-memory storage
+        BatteryInfo info = ticketBattery.get(ticket);
+        if (info != null) {
+            return info;
+        }
+        
+        // If not found in memory, try to get from database
+        try {
+            String customer = getTicketCustomer(ticket);
+            if (customer != null && !customer.isEmpty()) {
+                // Get battery level from queue_tickets table
+                try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+                     java.sql.PreparedStatement stmt = conn.prepareStatement(
+                         "SELECT initial_battery_level FROM queue_tickets WHERE ticket_id = ?")) {
+                    
+                    stmt.setString(1, ticket);
+                    try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            int initialBatteryLevel = rs.getInt("initial_battery_level");
+                            // Store in memory for future use
+                            info = new BatteryInfo(initialBatteryLevel, 40.0);
+                            ticketBattery.put(ticket, info);
+                            return info;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting battery info from database for ticket " + ticket + ": " + e.getMessage());
+        }
+        
+        return null;
     }
 
     /** Retrieve hidden reference number */
@@ -204,11 +250,31 @@ public final class QueueBridge {
     /** Helper method to get customer name from ticket */
     private static String getTicketCustomer(String ticket) {
         if (ticket == null) return null;
+        
+        // First check in-memory records
         for (Object[] record : records) {
             if (record != null && ticket.equals(String.valueOf(record[0]))) {
                 return String.valueOf(record[2]); // Customer is at index 2
             }
         }
+        
+        // If not found in memory, try database
+        try {
+            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+                 java.sql.PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT username FROM queue_tickets WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticket);
+                try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("username");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting customer from database for ticket " + ticket + ": " + e.getMessage());
+        }
+        
         return null;
     }
 

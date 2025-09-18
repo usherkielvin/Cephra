@@ -282,23 +282,6 @@ public final class QueueFlow {
         bumpCounterForService(service, ticket);
     }
 
-    private static String generateNextTicketIdForService(String serviceName) {
-        if (serviceName == null) {
-            serviceName = "";
-        }
-        if (serviceName.toLowerCase().contains("fast")) {
-            String ticket = formatTicket("FCH", nextFastNumber);
-            System.out.println("QueueFlow: Generated Fast ticket: " + ticket + " (counter: " + nextFastNumber + ")");
-            return ticket;
-        }
-        if (serviceName.toLowerCase().contains("normal")) {
-            String ticket = formatTicket("NCH", nextNormalNumber);
-            System.out.println("QueueFlow: Generated Normal ticket: " + ticket + " (counter: " + nextNormalNumber + ")");
-            return ticket;
-        }
-        // default fall-back
-        return formatTicket("GEN", 1);
-    }
     
     // Generate priority ticket ID based on battery level
     public static String generatePriorityTicketIdForService(String serviceName, int batteryLevel) {

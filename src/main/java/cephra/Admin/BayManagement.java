@@ -1315,6 +1315,10 @@ public class BayManagement extends javax.swing.JPanel {
         
         String ticket = getBayTicket(bayNumber);
         if (ticket != null && !ticket.isEmpty()) {
+            // Priority tickets (FCHP, NCHP) show in red
+            if (ticket.startsWith("FCHP") || ticket.startsWith("NCHP")) {
+                return java.awt.Color.RED;
+            }
             return java.awt.Color.GREEN; // Green for occupied
         }
         
@@ -1473,8 +1477,13 @@ public class BayManagement extends javax.swing.JPanel {
                             return java.awt.Color.RED;
                         }
 
-                        // Occupied coloring based on service type: FCH -> green, NCH -> blue
+                        // Occupied coloring based on service type: Priority tickets -> red, FCH -> green, NCH -> blue
                         if (ticketId != null && !ticketId.isEmpty()) {
+                            // Priority tickets (FCHP, NCHP) always show in red
+                            if (ticketId.startsWith("FCHP") || ticketId.startsWith("NCHP")) {
+                                return java.awt.Color.RED;
+                            }
+                            
                             if (serviceType != null) {
                                 if (serviceType.equalsIgnoreCase("Fast") || ticketId.startsWith("FCH")) {
                                     return java.awt.Color.GREEN;
@@ -1817,65 +1826,8 @@ public class BayManagement extends javax.swing.JPanel {
                 return -1;
             }
             
-            // ALWAYS check for available bays first - priority tickets should get immediate assignment
-            int availableBay = findNextAvailableBay(isFastCharging);
-            if (availableBay > 0) {
-                // Directly assign to charging bay - this is the preferred path
-                logInfo("BayManagement: Found available Bay-" + availableBay + " for ticket " + ticketId + " - attempting direct assignment");
-                
-                // Create the ticket directly in charging bay instead of waiting grid
-                try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
-                    conn.setAutoCommit(false);
-                    
-                    try {
-                        // Add to charging grid
-                        try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
-                                "UPDATE charging_grid SET ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, start_time = CURRENT_TIMESTAMP WHERE bay_number = ?")) {
-                            pstmt.setString(1, ticketId);
-                            pstmt.setString(2, username);
-                            pstmt.setString(3, serviceType);
-                            pstmt.setInt(4, batteryLevel);
-                            pstmt.setString(5, "Bay-" + availableBay);
-                            int chargingRowsUpdated = pstmt.executeUpdate();
-                            logInfo("BayManagement: Added ticket " + ticketId + " directly to charging grid Bay-" + availableBay + " - rows updated: " + chargingRowsUpdated);
-                        }
-                        
-                        // Update charging_bays table
-                        try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
-                                "UPDATE charging_bays SET current_ticket_id = ?, current_username = ?, status = 'Occupied', start_time = CURRENT_TIMESTAMP WHERE bay_number = ?")) {
-                            pstmt.setString(1, ticketId);
-                            pstmt.setString(2, username);
-                            pstmt.setString(3, "Bay-" + availableBay);
-                            int bayRowsUpdated = pstmt.executeUpdate();
-                            logInfo("BayManagement: Updated charging_bays for Bay-" + availableBay + " - rows updated: " + bayRowsUpdated);
-                        }
-                        
-                        // Update queue_tickets status to In Progress
-                        try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
-                                "UPDATE queue_tickets SET status = 'In Progress' WHERE ticket_id = ?")) {
-                            pstmt.setString(1, ticketId);
-                            int queueRowsUpdated = pstmt.executeUpdate();
-                            logInfo("BayManagement: Updated queue_tickets status to In Progress for " + ticketId + " - rows updated: " + queueRowsUpdated);
-                        }
-                        
-                        conn.commit();
-                        logInfo("Ticket " + ticketId + " directly assigned to Bay-" + availableBay + " (no waiting needed)");
-                        
-                        // Also refresh the queue table to show status change
-                        refreshQueueTableDisplay();
-                        
-                        return availableBay;
-                        
-                    } catch (Exception e) {
-                        conn.rollback();
-                        logError("Error in direct bay assignment, rolling back: " + e.getMessage(), e);
-                        throw e;
-                    }
-                }
-            }
-            
-            // If no direct assignment possible, add to waiting grid
-            logInfo("No available bays found for ticket " + ticketId + " - adding to waiting grid");
+            // Add ticket to waiting grid (admin will process via proceed button)
+            logInfo("Adding ticket " + ticketId + " to waiting grid for admin processing");
             try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.PreparedStatement pstmt = conn.prepareStatement(
                      "UPDATE waiting_grid SET ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, position_in_queue = ? WHERE slot_number = ? AND ticket_id IS NULL")) {
