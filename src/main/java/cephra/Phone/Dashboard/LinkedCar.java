@@ -89,6 +89,12 @@ public class LinkedCar extends javax.swing.JPanel {
                     // Rotate car based on battery percentage (0% = 0°, 50% = 90°, 100% = 180°)
                     updateCarRotation(batteryLevel);
                     
+                    // Update charging time and type based on queue ticket
+                    updateChargingTimeAndType(username, batteryLevel);
+                    
+                    // Update driving mode times based on battery level
+                    updateDrivingModeTimes(batteryLevel);
+                    
                     // Keep charge button always enabled - full battery handling is done in action listener with JDialog
                     charge.setEnabled(true);
                     charge.setToolTipText(null);
@@ -178,6 +184,172 @@ public class LinkedCar extends javax.swing.JPanel {
             System.err.println("Error rotating car icon: " + e.getMessage());
         }
     }
+    
+    // Method to update charging time and type based on queue ticket
+    private void updateChargingTimeAndType(String username, int batteryLevel) {
+        try {
+            // Check if user has an active queue ticket
+            String queueTicketId = cephra.Database.CephraDB.getQueueTicketForUser(username);
+            String ticketStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
+            
+            if (queueTicketId != null && ticketStatus != null && 
+                (ticketStatus.equals("Pending") || ticketStatus.equals("Waiting") || ticketStatus.equals("In Progress"))) {
+                
+                // Get ticket details from database
+                String serviceType = getTicketServiceType(queueTicketId);
+                
+                if (serviceType != null) {
+                    // Update charging type label
+                    if (serviceType.toLowerCase().contains("fast")) {
+                        chargingTypeLabel.setText("Fast Charging");
+                    } else {
+                        chargingTypeLabel.setText("Normal Charging");
+                    }
+                    
+                    // Calculate estimated charging time based on battery level and service type
+                    int estimatedMinutes = calculateChargingTime(batteryLevel, serviceType);
+                    
+                    // Format time display
+                    String timeDisplay = formatChargingTime(estimatedMinutes);
+                    chargingTimeLabel.setText(timeDisplay);
+                    
+                    System.out.println("LinkedCar: Updated charging display - Type: " + serviceType + 
+                                     ", Time: " + timeDisplay + " for user " + username + " (battery: " + batteryLevel + "%)");
+                } else {
+                    // No ticket found, show default values
+                    setDefaultChargingDisplay();
+                }
+            } else {
+                // No active ticket, show default values
+                setDefaultChargingDisplay();
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating charging time and type: " + e.getMessage());
+            setDefaultChargingDisplay();
+        }
+    }
+    
+    // Method to get service type from ticket ID
+    private String getTicketServiceType(String ticketId) {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            try (java.sql.PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT service_type FROM queue_tickets WHERE ticket_id = ?")) {
+                stmt.setString(1, ticketId);
+                
+                try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("service_type");
+                    }
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            System.err.println("Error getting ticket service type: " + e.getMessage());
+        }
+        return null;
+    }
+    
+    // Method to calculate charging time based on battery level and service type
+    private int calculateChargingTime(int currentBatteryLevel, String serviceType) {
+        // Charging rates from QueueBridge
+        double minsPerPercentFast = 0.8;   // Fast charging: 0.8 minutes per 1%
+        double minsPerPercentNormal = 1.6; // Normal charging: 1.6 minutes per 1%
+        
+        // Calculate percentage needed to reach 100%
+        int batteryNeeded = Math.max(0, 100 - currentBatteryLevel);
+        
+        // Choose charging rate based on service type
+        double minsPerPercent;
+        if (serviceType != null && serviceType.toLowerCase().contains("fast")) {
+            minsPerPercent = minsPerPercentFast;
+        } else {
+            minsPerPercent = minsPerPercentNormal;
+        }
+        
+        // Calculate total minutes needed
+        return (int) Math.round(batteryNeeded * minsPerPercent);
+    }
+    
+    // Method to format charging time for display
+    private String formatChargingTime(int totalMinutes) {
+        if (totalMinutes < 60) {
+            return totalMinutes + "m";
+        } else {
+            int hours = totalMinutes / 60;
+            int minutes = totalMinutes % 60;
+            if (minutes == 0) {
+                return hours + "h";
+            } else {
+                return hours + "h " + minutes + "m";
+            }
+        }
+    }
+    
+    // Method to set default charging display when no ticket is active
+    private void setDefaultChargingDisplay() {
+        chargingTypeLabel.setText("Fast Charging");
+        chargingTimeLabel.setText("45m");
+        // Set default driving mode times (for 25% battery as per original design)
+        updateDrivingModeTimes(25);
+    }
+    
+    // Method to update driving mode times based on battery level
+    private void updateDrivingModeTimes(int batteryLevel) {
+        try {
+            // Calculate driving times for different modes based on battery percentage
+            // Base range: 8km per 1% battery (320km at 100%)
+            int baseRangeKm = batteryLevel * 8;
+            
+            // Different efficiency modes:
+            // Eco: 100% efficiency (base range)
+            // Normal: 85% efficiency 
+            // Sports: 70% efficiency
+            
+            int ecoRange = baseRangeKm;
+            int normalRange = (int) (baseRangeKm * 0.85);
+            int sportsRange = (int) (baseRangeKm * 0.70);
+            
+            // Convert to time estimates (assuming average speeds)
+            // Eco: 60 km/h average
+            // Normal: 70 km/h average  
+            // Sports: 80 km/h average
+            
+            int ecoTimeMinutes = (int) Math.round((double) ecoRange / 60.0 * 60); // km / (km/h) * 60 min/h
+            int normalTimeMinutes = (int) Math.round((double) normalRange / 70.0 * 60);
+            int sportsTimeMinutes = (int) Math.round((double) sportsRange / 80.0 * 60);
+            
+            // Format time display
+            eco.setText(formatDrivingTime(ecoTimeMinutes));
+            normal.setText(formatDrivingTime(normalTimeMinutes));
+            sports.setText(formatDrivingTime(sportsTimeMinutes));
+            
+            System.out.println("LinkedCar: Updated driving mode times - Eco: " + formatDrivingTime(ecoTimeMinutes) + 
+                             ", Normal: " + formatDrivingTime(normalTimeMinutes) + 
+                             ", Sports: " + formatDrivingTime(sportsTimeMinutes) + 
+                             " (battery: " + batteryLevel + "%)");
+            
+        } catch (Exception e) {
+            System.err.println("Error updating driving mode times: " + e.getMessage());
+            // Set default values on error
+            eco.setText("3hrs 12mins");
+            normal.setText("2hrs 50mins");
+            sports.setText("1hr 30mins");
+        }
+    }
+    
+    // Method to format driving time for display
+    private String formatDrivingTime(int totalMinutes) {
+        if (totalMinutes < 60) {
+            return totalMinutes + "mins";
+        } else {
+            int hours = totalMinutes / 60;
+            int minutes = totalMinutes % 60;
+            if (minutes == 0) {
+                return hours + "hrs";
+            } else {
+                return hours + "hrs " + minutes + "mins";
+            }
+        }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -195,9 +367,9 @@ public class LinkedCar extends javax.swing.JPanel {
         bar = new javax.swing.JLabel();
         chargingTypeLabel = new javax.swing.JLabel();
         chargingTimeLabel = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        eco = new javax.swing.JLabel();
+        normal = new javax.swing.JLabel();
+        sports = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -298,23 +470,23 @@ public class LinkedCar extends javax.swing.JPanel {
         add(chargingTypeLabel);
         chargingTypeLabel.setBounds(40, 410, 140, 25);
 
-        chargingTimeLabel.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        chargingTimeLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         chargingTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        chargingTimeLabel.setText("100%");
+        chargingTimeLabel.setText("45m");
         add(chargingTimeLabel);
-        chargingTimeLabel.setBounds(60, 440, 100, 50);
+        chargingTimeLabel.setBounds(20, 440, 180, 50);
 
-        jLabel2.setText("3hrs 12mins");
-        add(jLabel2);
-        jLabel2.setBounds(180, 568, 90, 16);
+        eco.setText("3hrs 12mins");
+        add(eco);
+        eco.setBounds(180, 568, 90, 16);
 
-        jLabel3.setText("2hrs 50mins");
-        add(jLabel3);
-        jLabel3.setBounds(180, 585, 90, 16);
+        normal.setText("2hrs 50mins");
+        add(normal);
+        normal.setBounds(180, 585, 90, 16);
 
-        jLabel4.setText("1hr 30mins");
-        add(jLabel4);
-        jLabel4.setBounds(180, 603, 90, 16);
+        sports.setText("1hr 30mins");
+        add(sports);
+        sports.setBounds(180, 603, 90, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/linked.png"))); // NOI18N
         add(jLabel1);
@@ -405,16 +577,16 @@ public class LinkedCar extends javax.swing.JPanel {
     private javax.swing.JLabel chargingTimeLabel;
     private javax.swing.JLabel chargingTypeLabel;
     private javax.swing.JLabel cover;
+    private javax.swing.JLabel eco;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel km;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JLabel normal;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JLabel sports;
     // End of variables declaration//GEN-END:variables
     
     // Method to set random car image for the current user
