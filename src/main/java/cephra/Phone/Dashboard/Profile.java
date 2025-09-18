@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 public class Profile extends javax.swing.JPanel {
@@ -42,6 +43,11 @@ public class Profile extends javax.swing.JPanel {
         
         // Load and display user's profile picture
         loadProfilePicture();
+        
+        SwingUtilities.invokeLater(() -> {
+            fitTextToLabel(Fullname);
+            fitTextToLabel(gmailProf);
+        });
 
     }
     
@@ -141,7 +147,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(jButton1);
-        jButton1.setBounds(295, 53, 40, 40);
+        jButton1.setBounds(30, 50, 40, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -177,7 +183,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(logout);
-        logout.setBounds(50, 614, 280, 40);
+        logout.setBounds(40, 520, 290, 50);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -211,7 +217,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(Help);
-        Help.setBounds(50, 520, 290, 50);
+        Help.setBounds(40, 460, 290, 40);
 
         editpfp.setBorder(null);
         editpfp.setBorderPainted(false);
@@ -222,19 +228,21 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(editpfp);
-        editpfp.setBounds(170, 188, 150, 37);
+        editpfp.setBounds(90, 340, 190, 37);
         add(Profile);
-        Profile.setBounds(30, 130, 110, 110);
+        Profile.setBounds(110, 120, 150, 130);
 
         Fullname.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
-        Fullname.setText("Usher Kielvin Ponce");
+        Fullname.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Fullname.setText("  Usher Kielvin Ponce");
         add(Fullname);
-        Fullname.setBounds(130, 120, 220, 40);
+        Fullname.setBounds(5, 250, 340, 40);
 
         gmailProf.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        gmailProf.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gmailProf.setText("Usher@gmail.com");
         add(gmailProf);
-        gmailProf.setBounds(150, 156, 190, 20);
+        gmailProf.setBounds(10, 290, 330, 20);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PhoneProfile.png"))); // NOI18N
         add(jLabel1);
@@ -496,6 +504,23 @@ public class Profile extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_editpfpActionPerformed
 
+    private void fitTextToLabel(JLabel label) {
+        String text = label.getText();
+        if (text == null || text.isEmpty()) return;
+
+        int labelWidth = label.getWidth();
+        int fontSize = label.getFont().getSize();
+        java.awt.Font font = label.getFont();
+            java.awt.FontMetrics fm = label.getFontMetrics(font);
+
+        while (fm.stringWidth(text) > labelWidth && fontSize > 10) {
+            fontSize--;
+            font = font.deriveFont((float) fontSize);
+            fm = label.getFontMetrics(font);
+        }   
+
+        label.setFont(font);
+    }
     
 
 
