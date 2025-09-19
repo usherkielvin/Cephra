@@ -36,6 +36,13 @@ public class Topup extends javax.swing.JPanel {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        Method = new javax.swing.JPanel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jRadioButton3 = new javax.swing.JRadioButton();
+        jRadioButton4 = new javax.swing.JRadioButton();
+        jRadioButton5 = new javax.swing.JRadioButton();
+        jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         Currentbalance = new javax.swing.JLabel();
         methodselected = new javax.swing.JLabel();
@@ -54,14 +61,87 @@ public class Topup extends javax.swing.JPanel {
         topUpIcon = new javax.swing.JLabel();
         historybutton = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
-        Method = new javax.swing.JPanel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
+
+        Method.setBackground(new java.awt.Color(204, 204, 204));
+        Method.setLayout(null);
+
+        buttonGroup1.add(jRadioButton1);
+        jRadioButton1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
+        jRadioButton1.setText("                                                      ");
+        jRadioButton1.setBorder(null);
+        jRadioButton1.setContentAreaFilled(false);
+        jRadioButton1.setFocusPainted(false);
+        jRadioButton1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
+        Method.add(jRadioButton1);
+        jRadioButton1.setBounds(30, 260, 310, 50);
+
+        buttonGroup1.add(jRadioButton2);
+        jRadioButton2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
+        jRadioButton2.setContentAreaFilled(false);
+        jRadioButton2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton2.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
+        Method.add(jRadioButton2);
+        jRadioButton2.setBounds(30, 120, 310, 50);
+
+        buttonGroup1.add(jRadioButton3);
+        jRadioButton3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
+        jRadioButton3.setContentAreaFilled(false);
+        jRadioButton3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton3.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton3ActionPerformed(evt);
+            }
+        });
+        Method.add(jRadioButton3);
+        jRadioButton3.setBounds(30, 190, 310, 50);
+
+        buttonGroup1.add(jRadioButton4);
+        jRadioButton4.setContentAreaFilled(false);
+        jRadioButton4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton4.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton4ActionPerformed(evt);
+            }
+        });
+        Method.add(jRadioButton4);
+        jRadioButton4.setBounds(40, 60, 300, 40);
+
+        buttonGroup1.add(jRadioButton5);
+        jRadioButton5.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
+        jRadioButton5.setContentAreaFilled(false);
+        jRadioButton5.setFocusPainted(false);
+        jRadioButton5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jRadioButton5.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton5ActionPerformed(evt);
+            }
+        });
+        Method.add(jRadioButton5);
+        jRadioButton5.setBounds(30, 330, 310, 50);
+
+        jLabel1.setBackground(new java.awt.Color(204, 204, 204));
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/newpaymentmethod.png"))); // NOI18N
+        Method.add(jLabel1);
+        jLabel1.setBounds(0, 0, 370, 470);
+
+        add(Method);
+        Method.setBounds(420, 340, 370, 480);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(null);
@@ -207,71 +287,6 @@ public class Topup extends javax.swing.JPanel {
 
         add(jPanel1);
         jPanel1.setBounds(0, 0, 370, 750);
-
-        Method.setBackground(new java.awt.Color(204, 204, 204));
-        Method.setLayout(null);
-
-        buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
-        jRadioButton1.setText("                                                      ");
-        jRadioButton1.setBorder(null);
-        jRadioButton1.setContentAreaFilled(false);
-        jRadioButton1.setFocusPainted(false);
-        jRadioButton1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jRadioButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton1ActionPerformed(evt);
-            }
-        });
-        Method.add(jRadioButton1);
-        jRadioButton1.setBounds(30, 260, 310, 50);
-
-        buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
-        jRadioButton3.setContentAreaFilled(false);
-        jRadioButton3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jRadioButton3.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton3ActionPerformed(evt);
-            }
-        });
-        Method.add(jRadioButton3);
-        jRadioButton3.setBounds(30, 190, 310, 50);
-
-        buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
-        jRadioButton2.setContentAreaFilled(false);
-        jRadioButton2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jRadioButton2.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton2ActionPerformed(evt);
-            }
-        });
-        Method.add(jRadioButton2);
-        jRadioButton2.setBounds(30, 120, 310, 50);
-
-        buttonGroup1.add(jRadioButton4);
-        jRadioButton4.setContentAreaFilled(false);
-        jRadioButton4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jRadioButton4.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton4ActionPerformed(evt);
-            }
-        });
-        Method.add(jRadioButton4);
-        jRadioButton4.setBounds(40, 60, 300, 40);
-
-        jLabel1.setBackground(new java.awt.Color(204, 204, 204));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/METHO.png"))); // NOI18N
-        Method.add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 350);
-
-        add(Method);
-        Method.setBounds(0, 680, 370, 450);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ProceedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedActionPerformed
@@ -280,7 +295,7 @@ public class Topup extends javax.swing.JPanel {
     }//GEN-LAST:event_ProceedActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        updateMethodSelectedLabel("Earnest Bank");
+        updateMethodSelectedLabel("TBA Bank");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
@@ -312,6 +327,11 @@ public class Topup extends javax.swing.JPanel {
         updateMethodSelectedLabel("VISA");
         slideMethodPanelDown(); // Auto-hide panel after selection
     }//GEN-LAST:event_jRadioButton3ActionPerformed
+
+    private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
+        updateMethodSelectedLabel("DPWH Funds");
+        slideMethodPanelDown(); // Auto-hide panel after selection
+    }//GEN-LAST:event_jRadioButton5ActionPerformed
 
     private void BActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BActionPerformed
       
@@ -585,13 +605,15 @@ public class Topup extends javax.swing.JPanel {
      */
     private String getSelectedPaymentMethod() {
         if (jRadioButton1.isSelected()) {
-            return "Earnest Bank";
+            return "TBA Bank";
         } else if (jRadioButton2.isSelected()) {
             return "PayMaya";
         } else if (jRadioButton3.isSelected()) {
             return "VISA";
         } else if (jRadioButton4.isSelected()) {
             return "GCash";
+        } else if (jRadioButton5.isSelected()) {
+            return "DPWH Funds";
         }
         return null; // No radio button selected
     }
@@ -631,7 +653,7 @@ public class Topup extends javax.swing.JPanel {
         System.out.println("slideMethodPanelUp starting...");
         isMethodPanelVisible = true;
         final int startY = 750; // Off-screen at bottom
-        final int endY = 320;   // Final position (750 - 330 = 420 to show full panel)
+        final int endY = 120;   // Final position (750 - 330 = 420 to show full panel)
         final int currentY = Method.getY();
         
         System.out.println("Animation: startY=" + startY + ", endY=" + endY + ", currentY=" + currentY);
@@ -648,7 +670,7 @@ public class Topup extends javax.swing.JPanel {
                     if (newY <= endY) {
                         newY = endY;
                     }
-                    Method.setBounds(0, newY, 370, 330);
+                    Method.setBounds(0, newY, 370, 470);
                     Method.repaint();
                     step++;
                     
@@ -685,7 +707,7 @@ public class Topup extends javax.swing.JPanel {
                     if (newY >= endY) {
                         newY = endY;
                     }
-                    Method.setBounds(0, newY, 370, 330);
+                    Method.setBounds(0, newY, 370, 470);
                     Method.repaint();
                     step++;
                     
@@ -723,7 +745,7 @@ public class Topup extends javax.swing.JPanel {
      */
     private void initializeMethodPanel() {
         // Ensure Method panel is properly positioned off-screen initially
-        Method.setBounds(0, 750, 370, 330);
+        Method.setBounds(0, 750, 370, 470);
         Method.setVisible(true);
         
         // Bring Method panel to front to ensure it appears above other components
@@ -780,6 +802,7 @@ public class Topup extends javax.swing.JPanel {
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JRadioButton jRadioButton5;
     private javax.swing.JButton linkbutton;
     private javax.swing.JLabel methodselected;
     private javax.swing.JButton morePayMethod;
