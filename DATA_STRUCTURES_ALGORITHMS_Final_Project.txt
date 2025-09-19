@@ -1,0 +1,337 @@
+DATA STRUCTURES AND ALGORITHMS Final Project
+NU MOA                                                                                
+
+Objective:
+• To be able to apply and implement all the learnings from the course.
+
+Development of Queue Management System (QMS)
+
+General Requirements:
+1. Develop a queue management system for an assigned establishment covering all the services the business offers.
+2. The QMS has the following functions:
+   a. INPUT - Customer chooses the transaction s/he wants to perform.
+   b. PROCESS - the QMS will validate the transaction.
+   c. OUTPUT - Issuance of a number and transaction details of the customer.
+   d. Provide simple data analytics on the number of transactions chosen by the customer.
+3. Examples of QMS:
+   a. QMS for Banking
+   b. QMS for Restaurant
+   c. QMS for Hospital
+   d. QMS for LGU (sectors/offices)
+   e. QMS for Dental Clinics
+
+Specific Requirements:
+1. Documentation
+   a. Introduction of QMS for EV Charging Station
+   b. Transactions that are handled by the QMS.
+   c. Screen layout
+   d. Source code
+
+CEPHRA - EV CHARGING QUEUE MANAGEMENT SYSTEM
+
+Introduction of QMS for EV Charging Station:
+Cephra is a comprehensive Electric Vehicle (EV) charging station queue management system that bridges traditional desktop applications 
+with modern web interfaces. Built with Java Swing for robust desktop functionality and enhanced with a mobile-optimized web interface, 
+Cephra provides a complete solution for managing EV charging stations, customer queues, and payment processing.
+
+Transactions that are handled by the QMS:
+1. User Registration and Authentication
+   - Customer account creation with email verification
+   - User login and session management
+   - Profile management with personal information
+
+2. Vehicle Linking and Battery Management
+   - Car linking to user account
+   - Real-time battery level tracking
+   - Battery monitoring and history
+
+3. Charging Service Selection
+   - Fast Charging service selection
+   - Normal Charging service selection
+   - Service availability checking
+
+4. Queue Management
+   - Queue joining with real-time updates
+   - Queue position tracking
+   - Wait time estimation
+   - Queue notifications
+
+5. Payment Processing
+   - Integrated payment handling
+   - Transaction history
+   - Digital receipts
+   - Payment verification
+
+6. Admin Operations
+   - Station management and monitoring
+   - Staff records and employee management
+   - Bay management and control
+   - Business analytics and reporting
+
+7. Display and Monitoring
+   - Public queue display
+   - Real-time station information
+   - System announcements
+   - Live statistics
+
+Screen Layout:
+The system consists of three main interfaces:
+1. Admin Panel (Java Desktop - 1000x750) - Complete management interface for station operators
+2. Customer Mobile Interface (Java Desktop - 350x750 + Web Interface) - User-friendly mobile app for customers
+3. Display Monitor (Java Desktop - 1000x750) - Public display showing queue status and information
+
+Technologies Used:
+- Java 24 with Swing GUI
+- MySQL Database
+- PHP for web interface
+- HTML5, CSS3, JavaScript
+- Maven for dependency management
+- XAMPP for web server
+
+Source Code:
+
+1. Main Application Entry Point (Launcher.java):
+```java
+package cephra;
+import java.awt.GraphicsEnvironment;
+import cephra.Database.CephraDB;
+
+public final class Launcher {
+    public static void main(String[] args) {
+        try {
+            CephraDB.initializeDatabase();
+            CephraDB.validateDatabaseIntegrity();
+            cephra.Phone.Utilities.QueueFlow.refreshCountersFromDatabase();
+        } catch (Exception e) {
+            System.err.println("Database connection failed: " + e.getMessage());
+        }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            // Launch Admin frame (1000x750)
+            cephra.Frame.Admin admin = new cephra.Frame.Admin();
+            admin.setLocation(screenBounds.x + screenBounds.width - admin.getWidth(), screenBounds.y);
+            admin.setVisible(true);
+
+            // Launch Phone frame (350x750)
+            cephra.Frame.Phone phone = new cephra.Frame.Phone();
+            phone.setLocation(screenBounds.x + (screenBounds.width - phone.getWidth()) / 2,
+                            screenBounds.y + screenBounds.height - phone.getHeight() - taskbarHeight);
+            phone.setVisible(true);
+        });
+    }
+}
+```
+
+2. Database Connection Management (DatabaseConnection.java):
+```java
+package cephra.Database;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DatabaseConnection {
+    private static final String URL = "jdbc:mysql://localhost:3306/cephradb";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "";
+    
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.err.println("MySQL JDBC Driver not found: " + e.getMessage());
+        }
+    }
+    
+    public static Connection getConnection() throws SQLException {
+        try {
+            return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            System.err.println("Database connection failed: " + e.getMessage());
+            throw e;
+        }
+    }
+}
+```
+
+3. Queue Management System (QueueFlow.java):
+```java
+package cephra.Phone.Utilities;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public final class QueueFlow {
+    public static final class Entry {
+        public final String ticketId;
+        public final String customerName;
+        public final String serviceName;
+        public final String status;
+        public final String payment;
+        public final String action;
+        public final int initialBatteryPercent;
+        public final double batteryCapacityKWh;
+
+        public Entry(String ticketId, String customerName, String serviceName, 
+                    String status, String payment, String action, 
+                    int initialBatteryPercent, double batteryCapacityKWh) {
+            this.ticketId = ticketId;
+            this.customerName = customerName;
+            this.serviceName = serviceName;
+            this.status = status;
+            this.payment = payment;
+            this.action = action;
+            this.initialBatteryPercent = initialBatteryPercent;
+            this.batteryCapacityKWh = batteryCapacityKWh;
+        }
+    }
+
+    private static final List<Entry> entries = new ArrayList<Entry>();
+    private static String currentTicketId = "";
+    private static String currentServiceName = "";
+    private static int nextFastNumber = 1;   // FCH001, FCH002, ...
+    private static int nextNormalNumber = 1; // NCH001, NCH002, ...
+}
+```
+
+4. Charging Service Selection Algorithm (ChargingOption.java):
+```java
+private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {
+    String username = cephra.Database.CephraDB.getCurrentUsername();
+    
+    // Check if user already has an active ticket
+    if (cephra.Database.CephraDB.hasActiveTicket(username)) {
+        cephra.Phone.Popups.AlreadyTicket.showPayPop(null, username);
+        return;
+    }
+    
+    // Check if car is linked
+    if (!cephra.Phone.Utilities.AppState.isCarLinked) {
+        cephra.Phone.Popups.LinkFirst.showPayPop(null, username);
+        return;
+    }
+    
+    // Prevent charging if battery is already full
+    int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+    if (batteryLevel >= 100) {
+        cephra.Phone.Popups.AlreadyFull.showPayPop(null, username);
+        return;
+    }
+    
+    // Check if fast charging bays are available
+    if (!cephra.Admin.BayManagement.isFastChargingAvailable()) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Fast charging is currently unavailable. All fast charging bays are either unavailable or occupied.",
+            "Fast Charging Unavailable", javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Set Fast Charging service and proceed to queue
+    cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Fast Charging");
+    // Switch to QueueTicket panel
+}
+```
+
+5. Bay Management System (BayManagement.java):
+```java
+package cephra.Admin;
+
+public class BayManagement extends javax.swing.JPanel {
+    // Static variables to track available bays
+    public static boolean[] fastChargingAvailable = {true, true, true}; // Bays 1-3
+    public static boolean[] normalChargingAvailable = {true, true, true, true, true}; // Bays 4-8
+    
+    // Static variables to track occupied bays
+    public static boolean[] fastChargingOccupied = {false, false, false}; // Bays 1-3
+    public static boolean[] normalChargingOccupied = {false, false, false, false, false}; // Bays 4-8
+    
+    // Check if fast charging bays are available
+    public static boolean isFastChargingAvailable() {
+        for (int i = 0; i < fastChargingAvailable.length; i++) {
+            if (fastChargingAvailable[i] && !fastChargingOccupied[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Check if normal charging bays are available
+    public static boolean isNormalChargingAvailable() {
+        for (int i = 0; i < normalChargingAvailable.length; i++) {
+            if (normalChargingAvailable[i] && !normalChargingOccupied[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+6. Database Operations (CephraDB.java):
+```java
+package cephra.Database;
+
+import java.sql.*;
+import java.util.*;
+
+public class CephraDB {
+    private static class User {
+        final String username;
+        final String email;
+        final String password;
+
+        public User(String username, String email, String password) {
+            this.username = username;
+            this.email = email;
+            this.password = password;
+        }
+    }
+    
+    private static User currentPhoneUser;
+    private static User currentAdminUser;
+    
+    // Method to validate user login
+    public static boolean validateLogin(String username, String password) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT username, email, password FROM users WHERE username = ? AND password = ?")) {
+            
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    currentPhoneUser = new User(
+                            rs.getString("username"),
+                            rs.getString("email"),
+                            rs.getString("password")
+                    );
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error validating login: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    // Get current logged-in username
+    public static String getCurrentUsername() {
+        return currentPhoneUser != null ? currentPhoneUser.username : "";
+    }
+}
+```
+
+Key Data Structures Used:
+1. **ArrayList** - For dynamic queue management and ticket storage
+2. **HashMap** - For battery information mapping and user data storage
+3. **Boolean Arrays** - For bay availability and occupation tracking
+4. **PreparedStatement** - For secure database operations
+5. **Swing Components** - For GUI elements and user interface
+
+Key Algorithms Implemented:
+1. **Queue Management Algorithm** - FIFO (First In, First Out) with priority handling for low battery levels
+2. **Bay Allocation Algorithm** - Checks availability and assigns appropriate charging bays
+3. **Ticket Generation Algorithm** - Sequential numbering system (FCH001, NCH001, etc.)
+4. **Battery Level Validation** - Prevents charging when battery is full
+5. **Service Selection Algorithm** - Validates user eligibility and bay availability

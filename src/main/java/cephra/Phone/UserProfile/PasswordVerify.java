@@ -1,24 +1,13 @@
 package cephra.Phone.UserProfile;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Window;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import cephra.Phone.Popups.UnifiedNotification;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class PasswordVerify extends javax.swing.JPanel {
 
-    // Flag to prevent setupButtons from running multiple times
     private boolean buttonsSetup = false;
-    // Flag to prevent multiple verification attempts
     private boolean verificationInProgress = false;
-    // Notification popup instance
-    private UnifiedNotification notificationPop;
    
     public PasswordVerify() {
         initComponents();
@@ -374,8 +363,8 @@ public class PasswordVerify extends javax.swing.JPanel {
         // Set flag to show notification for resend
         cephra.Phone.Utilities.AppSessionState.showOtpNotification = true;
         
-        // Show new notification with updated OTP instead of dialog
-        showOTPNotification(cephra.Database.CephraDB.getGeneratedOTP());
+        // Show EmailOTP popup with new OTP
+        showEmailOTPPopup();
     }//GEN-LAST:event_resendActionPerformed
 
     private void code1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_code1ActionPerformed
@@ -494,7 +483,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             
             // Show notification with OTP only if the flag is set (coming from PasswordForgot or resending)
             if (cephra.Phone.Utilities.AppSessionState.showOtpNotification) {
-                showOTPNotification(cephra.Database.CephraDB.getGeneratedOTP());
+                showEmailOTPPopup();
                 // Reset the flag after showing the notification
                 cephra.Phone.Utilities.AppSessionState.showOtpNotification = false;
             }
@@ -512,26 +501,35 @@ public class PasswordVerify extends javax.swing.JPanel {
     // Custom variables
     
     /**
-     * Shows OTP notification at the top of the phone screen
-     * @param otp The OTP to display
+     * Shows EmailOTP popup with current OTP code
      */
-    private void showOTPNotification(String otp) {
+    private void showEmailOTPPopup() {
+        // Get the current OTP code
+        String currentOTP = cephra.Database.CephraDB.getGeneratedOTP();
+        
         // Get the phone frame
         java.awt.Window[] windows = java.awt.Window.getWindows();
         for (java.awt.Window window : windows) {
             if (window instanceof cephra.Frame.Phone) {
                 cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
                 
-                // Hide existing notification if any
-                if (notificationPop != null) {
-                    notificationPop.hideNotification();
-                }
+                // Create EmailOTP panel
+                cephra.Phone.Popups.EmailOTP emailOTPPanel = new cephra.Phone.Popups.EmailOTP();
                 
-                // Create new notification
-                notificationPop = new UnifiedNotification();
-                notificationPop.setNotificationType(UnifiedNotification.TYPE_OTP, otp, null);
-                notificationPop.addToFrame(phoneFrame);
-                notificationPop.showNotification();
+                // Set the OTP code in the panel
+                emailOTPPanel.setOTPCode(currentOTP);
+                
+                // Set panel size and position
+                emailOTPPanel.setSize(370, 190);
+                emailOTPPanel.setLocation(0, -193); // Start above screen (moved 3 pixels higher)
+                
+                // Add to phone frame's layered pane
+                phoneFrame.getRootPane().getLayeredPane().add(emailOTPPanel, javax.swing.JLayeredPane.POPUP_LAYER);
+                phoneFrame.getRootPane().getLayeredPane().moveToFront(emailOTPPanel);
+                
+                // Show the popup with animation
+                emailOTPPanel.showPopup();
+                
                 break;
             }
         }

@@ -113,7 +113,7 @@ public class Phonelogin extends javax.swing.JPanel {
         add(username);
         username.setBounds(80, 300, 230, 35);
         add(cooldownLabel);
-        cooldownLabel.setBounds(40, 440, 160, 20);
+        cooldownLabel.setBounds(40, 400, 160, 20);
 
         loginhome.setBorder(null);
         loginhome.setBorderPainted(false);
@@ -153,6 +153,19 @@ public class Phonelogin extends javax.swing.JPanel {
         
         String usernameText = username.getText() != null ? username.getText().trim() : "";
         String password = new String(pass.getPassword());
+
+        // Validate empty fields
+        if (usernameText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter your username.", "Empty Field", JOptionPane.WARNING_MESSAGE);
+            username.requestFocusInWindow();
+            return;
+        }
+        
+        if (password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter your password.", "Empty Field", JOptionPane.WARNING_MESSAGE);
+            pass.requestFocusInWindow();
+            return;
+        }
 
         // Validate login using the CephraDB
         if (cephra.Database.CephraDB.validateLogin(usernameText, password)) {
@@ -248,18 +261,32 @@ public class Phonelogin extends javax.swing.JPanel {
     }//GEN-LAST:event_reghereActionPerformed
 
     private void forgotpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forgotpassActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordForgot());
-                        break;
+        // Show confirmation dialog before proceeding to forgot password
+        javax.swing.ImageIcon logoIcon = new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/smalllogo.png"));
+        int result = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to reset your password?",
+            "Confirm Password Reset",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            logoIcon
+        );
+        
+        // Only proceed if user confirms (clicks Yes)
+        if (result == JOptionPane.YES_OPTION) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    java.awt.Window[] windows = java.awt.Window.getWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof cephra.Frame.Phone) {
+                            cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                            phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordForgot());
+                            break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }//GEN-LAST:event_forgotpassActionPerformed
 
     private void passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passActionPerformed

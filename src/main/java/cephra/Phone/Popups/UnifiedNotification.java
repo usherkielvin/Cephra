@@ -69,7 +69,7 @@ public class UnifiedNotification extends javax.swing.JPanel {
                 break;
                 
             case TYPE_OTP:
-                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifWaitingBay.png")));
+                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/notif.png")));
                 statusLabel.setText("Your verification code: " + ticketId);
                 statusLabel.setForeground(new java.awt.Color(0, 102, 102));
                 break;
