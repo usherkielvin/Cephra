@@ -26,13 +26,10 @@ public class CephraDB {
     private static class User {
         final String username;
         final String email;
-        @SuppressWarnings("unused")
-        final String password;
 
-        public User(String username, String email, String password) {
+        public User(String username, String email) {
             this.username = username;
             this.email = email;
-            this.password = password;
         }
     }
     private static User currentPhoneUser;
@@ -44,7 +41,9 @@ public class CephraDB {
             String[] requiredTables = {
                 "users", "battery_levels", "active_tickets", "otp_codes",
                 "queue_tickets", "charging_history", "staff_records", 
-                "charging_bays", "payment_transactions", "system_settings"
+                "charging_bays", "payment_transactions", "system_settings",
+                "wallet_balance", "wallet_transactions", "user_points", 
+                "reward_transactions", "waiting_grid", "charging_grid"
             };
             
             boolean allTablesExist = true;
@@ -56,7 +55,7 @@ public class CephraDB {
             }
             
             if (!allTablesExist) {
-                printDatabaseInitInstructions();
+                System.err.println("Some required database tables are missing.");
             }
             
             // Clean up any existing duplicate battery level entries
@@ -116,8 +115,7 @@ public class CephraDB {
                     // Set the current phone user when login is successful
                     currentPhoneUser = new User(
                             rs.getString("username"),
-                            rs.getString("email"),
-                            rs.getString("password")
+                            rs.getString("email")
                     );
                     return true;
                 }
@@ -256,8 +254,7 @@ public class CephraDB {
                 if (rs.next()) {
                     return new User(
                             rs.getString("username"),
-                            rs.getString("email"),
-                            rs.getString("password")
+                            rs.getString("email")
                     );
                 }
             }
@@ -683,7 +680,6 @@ public class CephraDB {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
-                printDatabaseInitInstructions();
                 return null;
             }
             
@@ -706,7 +702,6 @@ public class CephraDB {
             // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
-                printDatabaseInitInstructions();
                 return; // Cannot set active ticket if table doesn't exist
             }
             
@@ -743,7 +738,6 @@ public class CephraDB {
             // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
-                printDatabaseInitInstructions();
                 return; // Cannot set active ticket if table doesn't exist
             }
             
@@ -780,7 +774,6 @@ public class CephraDB {
             // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
-                printDatabaseInitInstructions();
                 return; // Cannot clear active ticket if table doesn't exist
             }
             
@@ -802,7 +795,6 @@ public class CephraDB {
             // First check if the active_tickets table exists
             if (!tableExists(conn, "active_tickets")) {
                 System.err.println("Warning: active_tickets table does not exist.");
-                printDatabaseInitInstructions();
                 return; // Cannot clear active ticket if table doesn't exist
             }
             
@@ -1824,8 +1816,7 @@ public class CephraDB {
                     // Set the current admin user when login is successful
                     currentAdminUser = new User(
                             rs.getString("username"),
-                            rs.getString("email"),
-                            rs.getString("password")
+                            rs.getString("email")
                     );
                     return true;
                 }
@@ -1961,24 +1952,6 @@ public class CephraDB {
             System.err.println("Error migrating staff records: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-    
-    // Method to provide database initialization instructions
-    public static void printDatabaseInitInstructions() {
-        System.err.println("================================================");
-        System.err.println("DATABASE INITIALIZATION REQUIRED");
-        System.err.println("================================================");
-        System.err.println("Some required database tables are missing.");
-        System.err.println("Please follow these steps to initialize the database:");
-        System.err.println("");
-        System.err.println("1. Start XAMPP Control Panel");
-        System.err.println("2. Start the MySQL service");
-        System.err.println("3. Run one of the following commands:");
-        System.err.println("   - Double-click: scripts/init-database.bat");
-        System.err.println("   - Or manually: mysql -u root -p < src/main/resources/db/init.sql");
-        System.err.println("");
-        System.err.println("After initialization, restart the application.");
-        System.err.println("================================================");
     }
     
     // Method to clean up orphaned queue tickets (tickets in queue but already in history)
@@ -2128,14 +2101,14 @@ public class CephraDB {
     // Method to validate and ensure database integrity
     public static void validateDatabaseIntegrity() {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
-            System.out.println("Validating database integrity...");
             
             // Check if all required tables exist
             String[] requiredTables = {
                 "users", "battery_levels", "active_tickets", "otp_codes",
                 "queue_tickets", "charging_history", "staff_records", 
                 "charging_bays", "payment_transactions", "system_settings",
-                "wallet_balance", "wallet_transactions"
+                "wallet_balance", "wallet_transactions", "user_points", 
+                "reward_transactions", "waiting_grid", "charging_grid"
             };
             
             boolean allTablesExist = true;
@@ -2149,7 +2122,6 @@ public class CephraDB {
             }
             
             if (!allTablesExist) {
-                printDatabaseInitInstructions();
                 return;
             }
             
