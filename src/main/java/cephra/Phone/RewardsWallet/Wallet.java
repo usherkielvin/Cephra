@@ -38,6 +38,7 @@ public class Wallet extends javax.swing.JPanel {
         Latestranscat = new javax.swing.JPanel();
         historybutton1 = new javax.swing.JButton();
         bckToHome = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -144,6 +145,12 @@ public class Wallet extends javax.swing.JPanel {
         });
         add(bckToHome);
         bckToHome.setBounds(170, 680, 30, 40);
+
+        jButton1.setBorder(null);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        add(jButton1);
+        jButton1.setBounds(265, 310, 60, 60);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Wallet.png"))); // NOI18N
         add(jLabel1);
@@ -467,6 +474,7 @@ public class Wallet extends javax.swing.JPanel {
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton historybutton1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton profilebutton;
