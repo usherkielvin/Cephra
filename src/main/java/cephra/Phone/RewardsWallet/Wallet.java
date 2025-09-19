@@ -1,4 +1,5 @@
 package cephra.Phone.RewardsWallet;
+import java.awt.Color;
 import javax.swing.SwingUtilities;
 public class Wallet extends javax.swing.JPanel {
 
@@ -258,13 +259,15 @@ public class Wallet extends javax.swing.JPanel {
     private javax.swing.JPanel createTransactionPanel(String transactionType, double amount, String description, java.sql.Timestamp timestamp) {
         javax.swing.JPanel panel = new javax.swing.JPanel();
         panel.setLayout(new java.awt.BorderLayout());
-        panel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        panel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
         panel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 60));
         panel.setPreferredSize(new java.awt.Dimension(280, 60));
+        panel.setBackground(Color.WHITE);
         
         // Left side - transaction info
         javax.swing.JPanel leftPanel = new javax.swing.JPanel();
         leftPanel.setLayout(new javax.swing.BoxLayout(leftPanel, javax.swing.BoxLayout.Y_AXIS));
+        leftPanel.setBackground(Color.WHITE);
         
         javax.swing.JLabel typeLabel = new javax.swing.JLabel(getTransactionTypeDisplay(transactionType));
         typeLabel.setFont(new java.awt.Font("Segoe UI", 1, 12));
@@ -279,6 +282,7 @@ public class Wallet extends javax.swing.JPanel {
         // Right side - amount and date
         javax.swing.JPanel rightPanel = new javax.swing.JPanel();
         rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
+        rightPanel.setBackground(Color.WHITE);
         
         javax.swing.JLabel amountLabel = new javax.swing.JLabel(formatTransactionAmount(transactionType, amount));
         amountLabel.setFont(new java.awt.Font("Segoe UI", 1, 12));
