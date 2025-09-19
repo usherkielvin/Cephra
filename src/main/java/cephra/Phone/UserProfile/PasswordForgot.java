@@ -168,6 +168,21 @@ public class PasswordForgot extends javax.swing.JPanel {
 
     private void resetsendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetsendActionPerformed
         String emailText = email.getText().trim();
+        
+        // Validate empty email field
+        if (emailText.isEmpty() || emailText.equals("Enter your email")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please enter your email address.", "Empty Field", javax.swing.JOptionPane.WARNING_MESSAGE);
+            email.requestFocusInWindow();
+            return;
+        }
+        
+        // Validate email format
+        if (!emailText.contains("@") || !emailText.contains(".")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Email", javax.swing.JOptionPane.WARNING_MESSAGE);
+            email.requestFocusInWindow();
+            return;
+        }
+        
 if (cephra.Database.CephraDB.findUserByEmail(emailText) != null) {
     cephra.Phone.Utilities.AppSessionState.userEmailForReset = emailText; // Add this line
     cephra.Phone.Utilities.AppSessionState.showOtpNotification = true; // Show notification when coming from PasswordForgot

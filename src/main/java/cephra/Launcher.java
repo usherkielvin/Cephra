@@ -1,6 +1,6 @@
 package cephra;
-import java.awt.GraphicsEnvironment;
 
+import java.awt.GraphicsEnvironment;
 import cephra.Database.CephraDB;
 
 public final class Launcher {
@@ -21,7 +21,7 @@ public final class Launcher {
 				.getDefaultConfiguration()
 				.getBounds();
 
-			// Launch Admin frame (it embeds the Login panel by default)
+			// Launch Admin frame
 			cephra.Frame.Admin admin = new cephra.Frame.Admin();
 			admin.setLocation(
 				screenBounds.x + screenBounds.width - admin.getWidth(),
@@ -29,7 +29,7 @@ public final class Launcher {
 			);
 			admin.setVisible(true);
 
-			// Keep Phone frame launching untouched
+			// Launch Phone frame
 			cephra.Frame.Phone phone = new cephra.Frame.Phone();
 			int taskbarHeight = 30;
 			phone.setLocation(

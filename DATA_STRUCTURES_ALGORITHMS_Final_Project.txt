@@ -1,5 +1,5 @@
 DATA STRUCTURES AND ALGORITHMS Final Project
-NU MOA                                                                                    Page 1
+NU MOA                                                                                
 
 Objective:
 • To be able to apply and implement all the learnings from the course.
@@ -30,7 +30,9 @@ Specific Requirements:
 CEPHRA - EV CHARGING QUEUE MANAGEMENT SYSTEM
 
 Introduction of QMS for EV Charging Station:
-Cephra is a comprehensive Electric Vehicle (EV) charging station queue management system that bridges traditional desktop applications with modern web interfaces. Built with Java Swing for robust desktop functionality and enhanced with a mobile-optimized web interface, Cephra provides a complete solution for managing EV charging stations, customer queues, and payment processing.
+Cephra is a comprehensive Electric Vehicle (EV) charging station queue management system that bridges traditional desktop applications 
+with modern web interfaces. Built with Java Swing for robust desktop functionality and enhanced with a mobile-optimized web interface, 
+Cephra provides a complete solution for managing EV charging stations, customer queues, and payment processing.
 
 Transactions that are handled by the QMS:
 1. User Registration and Authentication

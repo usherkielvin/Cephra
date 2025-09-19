@@ -397,6 +397,19 @@ public class Register extends javax.swing.JPanel {
 
     if (nameText.isEmpty() || lastNameText.isEmpty() || usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", JOptionPane.WARNING_MESSAGE);
+        
+        // Focus on the first empty field
+        if (nameText.isEmpty()) {
+            fname.requestFocusInWindow();
+        } else if (lastNameText.isEmpty()) {
+            lname.requestFocusInWindow();
+        } else if (usernameText.isEmpty()) {
+            UsernamePhone.requestFocusInWindow();
+        } else if (emailText.isEmpty()) {
+            email.requestFocusInWindow();
+        } else if (passwordText.isEmpty()) {
+            pass.requestFocusInWindow();
+        }
         return;
     }
 
