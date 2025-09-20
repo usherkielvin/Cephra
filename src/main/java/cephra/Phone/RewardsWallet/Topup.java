@@ -65,6 +65,7 @@ public class Topup extends javax.swing.JPanel {
         setLayout(null);
 
         Method.setBackground(new java.awt.Color(204, 204, 204));
+        Method.setOpaque(false);
         Method.setLayout(null);
 
         buttonGroup1.add(jRadioButton1);
@@ -122,16 +123,10 @@ public class Topup extends javax.swing.JPanel {
         jRadioButton4.setBounds(40, 60, 300, 40);
 
         buttonGroup1.add(jRadioButton5);
-        jRadioButton5.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jRadioButton5.setContentAreaFilled(false);
         jRadioButton5.setFocusPainted(false);
         jRadioButton5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jRadioButton5.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton5ActionPerformed(evt);
-            }
-        });
         Method.add(jRadioButton5);
         jRadioButton5.setBounds(30, 330, 310, 50);
 
@@ -653,7 +648,7 @@ public class Topup extends javax.swing.JPanel {
         System.out.println("slideMethodPanelUp starting...");
         isMethodPanelVisible = true;
         final int startY = 750; // Off-screen at bottom
-        final int endY = 120;   // Final position (750 - 330 = 420 to show full panel)
+        final int endY = 320;   // Final position (750 - 330 = 420 to show full panel)
         final int currentY = Method.getY();
         
         System.out.println("Animation: startY=" + startY + ", endY=" + endY + ", currentY=" + currentY);

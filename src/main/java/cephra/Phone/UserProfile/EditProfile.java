@@ -635,7 +635,7 @@ public class EditProfile extends javax.swing.JPanel {
             
             g2d.dispose();
             
-            Profile.setIcon(new javax.swing.ImageIcon(defaultImage));
+          //  Profile.setIcon(new javax.swing.ImageIcon(defaultImage));
         } catch (Exception e) {
             System.err.println("Error creating default profile image: " + e.getMessage());
         }
