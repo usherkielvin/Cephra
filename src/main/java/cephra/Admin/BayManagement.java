@@ -655,30 +655,25 @@ public class BayManagement extends javax.swing.JPanel {
     
     
     private String getStaffFirstNameFromDB() {
-        try {
-            // Get the logged-in username from the admin frame
-            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-            if (window instanceof cephra.Frame.Admin) {
-                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
-                usernameField.setAccessible(true);
-                String username = (String) usernameField.get(window);
-                
+        java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (window instanceof cephra.Frame.Admin) {
+            try {
+                java.lang.reflect.Field field = window.getClass().getDeclaredField("loggedInUsername");
+                field.setAccessible(true);
+                String username = (String) field.get(window);
                 if (username != null && !username.isEmpty()) {
-                    // Use the updated CephraDB method that queries staff_records.firstname
                     return cephra.Database.CephraDB.getStaffFirstName(username);
                 }
+            } catch (Exception e) {
+                System.err.println("Error getting staff first name: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("Error getting staff first name: " + e.getMessage());
         }
-        return "Admin"; // Fallback
+        return "Admin";
     }
     
-    /**
-     * Sets up iOS-style toggle switches using NetBeans toggle buttons
-     */
+    //setup ios toggles
     private void setupIOSToggles() {
-        // Initialize toggle buttons array with NetBeans toggles
+
         bayToggleButtons[0] = toggle1;
         bayToggleButtons[1] = toggle2;
         bayToggleButtons[2] = toggle3;
@@ -692,7 +687,7 @@ public class BayManagement extends javax.swing.JPanel {
             final int bayIndex = i;
             JToggleButton toggle = bayToggleButtons[i];
             
-            // Set initial state from database
+           
             if (i < 3) { // Fast charging bays
                 toggle.setSelected(fastChargingAvailable[i]);
             } else { // Normal charging bays
@@ -700,16 +695,18 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
             // Apply iOS-style customization
-            customizeToggleForIOS(toggle, i < 3);
+            toggle.setBorderPainted(false);
+            toggle.setFocusPainted(false);
+            toggle.setContentAreaFilled(false);
+            toggle.setOpaque(false);
+            toggle.setUI(new IOSToggleUI(i < 3));
             
-            // Update bay labels to match database state
             JLabel bayLabel = getBayLabel(bayIndex + 1);
             if (bayLabel != null) {
                 boolean isAvailable = (i < 3) ? fastChargingAvailable[i] : normalChargingAvailable[i - 3];
                 updateBayLabel(bayLabel, isAvailable);
             }
             
-            // Add action listener
             toggle.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -747,26 +744,11 @@ public class BayManagement extends javax.swing.JPanel {
                     // If bay became available, try to auto-assign waiting tickets
                     if (isSelected) {
                         autoAssignWaitingTickets();
-                    }
-                    
+                    }                   
                 }
             });
         }
-    }
-    
-    /**
-     * Customizes a toggle button to look like iOS toggle
-     */
-    private void customizeToggleForIOS(JToggleButton toggle, boolean isFastCharging) {
-        // Remove default styling
-        toggle.setBorderPainted(false);
-        toggle.setFocusPainted(false);
-        toggle.setContentAreaFilled(false);
-        toggle.setOpaque(false);
-        
-        // Apply custom iOS UI
-        toggle.setUI(new IOSToggleUI(isFastCharging));
-    }
+    }   
     
     private JLabel getBayLabel(int bayNumber) {
         switch (bayNumber) {
@@ -792,9 +774,7 @@ public class BayManagement extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Updates all bay labels to match the database states (permanent)
-     */
+    
     private void updateAllBayLabelsFromDatabase() {
         try {
             // Update fast charging bay labels (1-3)
@@ -818,44 +798,16 @@ public class BayManagement extends javax.swing.JPanel {
             System.err.println("Error updating bay labels from database: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-    
-    /**
-     * Forces refresh of toggle states and labels from database (for permanent persistence)
-     * REMOVED - This method was causing toggle states to reset
-     */
-    public void refreshToggleStatesFromDatabase() {
-        // Method disabled to prevent toggle states from being reset
-    }
-    
-    /**
-     * Clears all tickets from the waiting grid (removes test tickets)
-     */
+    }  
     public static void clearWaitingGrid() {
-        try {
-            System.out.println("Clearing waiting grid of any existing tickets...");
-            
-            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
-                 java.sql.Statement stmt = conn.createStatement()) {
-                
-                // Clear all waiting grid slots
-                stmt.execute("UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL");
-                
-                System.out.println("Waiting grid cleared successfully");
-                
-            }
-            
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             java.sql.Statement stmt = conn.createStatement()) {
+            stmt.execute("UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL");
         } catch (Exception e) {
             System.err.println("Error clearing waiting grid: " + e.getMessage());
-            e.printStackTrace();
         }
     }
-    
-    
-    
-    /**
-     * Custom iOS-style toggle UI for JToggleButton
-     */
+ 
     public static class IOSToggleUI extends javax.swing.plaf.basic.BasicToggleButtonUI {
         private Color onColor;
         private Color offColor = new Color(142, 142, 147); // iOS gray
@@ -995,9 +947,7 @@ public class BayManagement extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Saves toggle states to the database
-     */
+    //save toggle states to the database
     private static void saveToggleStatesToDatabase() {
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             
@@ -1048,9 +998,7 @@ public class BayManagement extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Updates bay assignment in the database
-     */
+    //update bay assignment in the database
     private static void updateBayAssignmentInDatabase(String ticketId, String username, int bayNumber) {
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
