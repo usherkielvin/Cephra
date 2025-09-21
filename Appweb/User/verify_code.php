@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cephra Login</title>
+    <title>Cephra - Verify Code</title>
     <link rel="icon" type="image/png" href="images/logo.png?v=2" />
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#062635" />
 
     <!-- Open Graph meta tags for social media previews -->
-    <meta property="og:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
-    <meta property="og:description" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
+    <meta property="og:title" content="Verify Code - Cephra" />
+    <meta property="og:description" content="Enter your verification code for Cephra" />
     <meta property="og:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -21,48 +21,45 @@
 
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
-    <meta name="twitter:description" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
+    <meta name="twitter:title" content="Verify Code - Cephra" />
+    <meta name="twitter:description" content="Enter your verification code for Cephra" />
     <meta name="twitter:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
 
-    <link rel="stylesheet" href="css/index.css" />
-    <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+    <link rel="stylesheet" href="css/verify_code.css" />
 </head>
 <body class="auth-page">
     <div class="auth-wrapper">
-        <form class="form" id="loginForm">
+        <form class="form" id="verifyCodeForm">
             <div class="brand" style="margin-bottom:10px;">
                 <img src="images/logo.png" alt="Cephra" class="brand-img" />
                 <span class="brand-text">CEPHRA</span>
             </div>
-            <p class="title">Sign in</p>
-            <p class="message" style="opacity:.8">Enter your username and password to log in.</p>
-            <div class="flex">
-                <label>
-                    <input class="input" type="text" id="username" name="username" placeholder="" required />
-                    <span>Username</span>
-                </label>
-            </div>
-            <label>
-                <div class="password-input-container">
-                    <input class="input" type="password" id="password" name="password" placeholder="" required />
-                    <span>Password</span>
-                    <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility()">
-                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
-                    </button>
+            <p class="title">Enter Verification Code</p>
+            <p class="message" style="opacity:.8">We've sent a 6-digit code to your email address.</p>
+
+            <div class="code-input-container">
+                <div class="code-inputs">
+                    <input type="text" class="code-input" maxlength="1" id="code1" />
+                    <input type="text" class="code-input" maxlength="1" id="code2" />
+                    <input type="text" class="code-input" maxlength="1" id="code3" />
+                    <input type="text" class="code-input" maxlength="1" id="code4" />
+                    <input type="text" class="code-input" maxlength="1" id="code5" />
+                    <input type="text" class="code-input" maxlength="1" id="code6" />
                 </div>
-            </label>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0 12px 0;">
-                <a href="forgot_password.php" class="ds-link">Forgot password?</a>
-                <a href="Register_Panel.php" class="ds-link">Register here</a>
             </div>
-            <button class="submit" type="submit">Login</button>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0 12px 0;">
+                <a href="forgot_password.php" class="ds-link">← Back</a>
+                <button type="button" class="ds-link" id="resendCode" style="background:none;border:none;padding:0;cursor:pointer;">Resend Code</button>
+            </div>
+
+            <button class="submit" type="submit">Verify Code</button>
         </form>
     </div>
 
     <script>
     (function(){
-        // Ensure custom UI dialog is available for login feedback
+        // Ensure custom UI dialog is available for feedback
         if (typeof window.showDialog === 'undefined') {
             window.showDialog = function(title, message) {
                 var overlay = document.createElement('div');
@@ -89,24 +86,9 @@
                 document.body.appendChild(overlay);
             };
         }
-
-        // Password toggle functionality
-        window.togglePasswordVisibility = function() {
-            const passwordInput = document.getElementById('password');
-            const toggleBtn = document.getElementById('passwordToggleBtn');
-            const toggleIcon = document.getElementById('passwordToggleIcon');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.className = 'fas fa-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.className = 'fas fa-eye';
-            }
-        };
     })();
     </script>
 
-    <script src="script.js"></script>
+    <script src="verify_code_updated.js"></script>
 </body>
 </html>

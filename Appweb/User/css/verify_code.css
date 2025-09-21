@@ -1,4 +1,4 @@
-/* Index (Login) page specific styles - Cephra palette */
+/* Verify Code page specific styles - Cephra palette */
 
 * {
     box-sizing: border-box;
@@ -55,7 +55,7 @@ body {
 }
 
 
-/* Form card (login) */
+/* Form card (verify code) */
 
 .form {
     display: flex;
@@ -81,53 +81,45 @@ body {
 .message {
     color: #ffffff;
     opacity: .8;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.flex {
+.code-input-container {
     display: flex;
-    width: 100%;
-    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
 }
 
-.form .flex label {
-    flex: 1;
+.code-inputs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
 }
 
-.form label {
-    position: relative;
-}
-
-.form label .input {
+.code-input {
+    width: 50px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
     background-color: #333;
     color: #fff;
-    width: 100%;
-    padding: 26px 10px 10px 14px;
-    outline: 0;
-    border: 1px solid rgba(105, 105, 105, 0.4);
+    border: 2px solid rgba(105, 105, 105, 0.4);
     border-radius: 12px;
-    font-size: 18px;
+    outline: none;
+    transition: all 0.25s ease;
 }
 
-.form label .input+span {
-    color: rgba(255, 255, 255, 0.8);
-    position: absolute;
-    left: 14px;
-    top: 6px;
-    font-size: 0.9em;
-    transition: 0.25s ease;
+.code-input:focus {
+    border-color: #00c2ce;
+    box-shadow: 0 0 0 3px rgba(0, 194, 206, 0.2);
+    background-color: #404040;
 }
 
-.form label .input:placeholder-shown+span {
-    top: 16px;
-    font-size: 0.95em;
-}
-
-.form label .input:focus+span,
-.form label .input:valid+span {
-    color: #ffffff;
-    top: 6px;
-    font-size: 0.75em;
-    font-weight: 600;
+.code-input:valid {
+    border-color: #00c2ce;
+    background-color: rgba(0, 194, 206, 0.1);
 }
 
 .submit {
@@ -140,10 +132,17 @@ body {
     background-image: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%);
     box-shadow: 0 10px 22px rgba(0, 194, 206, .35);
     cursor: pointer;
+    margin-top: 10px;
 }
 
 .submit:hover {
     filter: brightness(1.06);
+}
+
+.submit:disabled {
+    background: #666;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 .ds-link {
@@ -154,42 +153,6 @@ body {
 
 .ds-link:hover {
     text-decoration: underline;
-}
-
-
-/* Password toggle button styling */
-
-.password-input-container {
-    position: relative;
-}
-
-.password-toggle-btn {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 4px;
-    transition: color 0.25s ease;
-    z-index: 10;
-}
-
-.password-toggle-btn:hover {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.password-toggle-btn:focus {
-    outline: none;
-    color: #ffffff;
-}
-
-.password-toggle-btn i {
-    font-size: 16px;
-    pointer-events: none;
 }
 
 @media (min-width: 1400px) {
@@ -206,5 +169,13 @@ body {
     }
     .title {
         font-size: 28px;
+    }
+    .code-inputs {
+        gap: 8px;
+    }
+    .code-input {
+        width: 45px;
+        height: 55px;
+        font-size: 20px;
     }
 }

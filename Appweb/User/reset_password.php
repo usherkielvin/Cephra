@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cephra Login</title>
+    <title>Cephra - Reset Password</title>
     <link rel="icon" type="image/png" href="images/logo.png?v=2" />
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#062635" />
 
     <!-- Open Graph meta tags for social media previews -->
-    <meta property="og:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
-    <meta property="og:description" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
+    <meta property="og:title" content="Reset Password - Cephra" />
+    <meta property="og:description" content="Create your new password for Cephra" />
     <meta property="og:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -21,48 +21,68 @@
 
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
-    <meta name="twitter:description" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
+    <meta name="twitter:title" content="Reset Password - Cephra" />
+    <meta name="twitter:description" content="Create your new password for Cephra" />
     <meta name="twitter:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
 
-    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/reset_password.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 </head>
 <body class="auth-page">
     <div class="auth-wrapper">
-        <form class="form" id="loginForm">
+        <form class="form" id="resetPasswordForm">
             <div class="brand" style="margin-bottom:10px;">
                 <img src="images/logo.png" alt="Cephra" class="brand-img" />
                 <span class="brand-text">CEPHRA</span>
             </div>
-            <p class="title">Sign in</p>
-            <p class="message" style="opacity:.8">Enter your username and password to log in.</p>
+            <p class="title">Create New Password</p>
+            <p class="message" style="opacity:.8">Please enter your new password below.</p>
+
             <div class="flex">
                 <label>
-                    <input class="input" type="text" id="username" name="username" placeholder="" required />
-                    <span>Username</span>
+                    <div class="password-input-container">
+                        <input class="input" type="password" id="newPassword" name="newPassword" placeholder="" required />
+                        <span>New Password</span>
+                        <button type="button" class="password-toggle-btn" id="newPasswordToggleBtn" onclick="togglePasswordVisibility('newPassword')">
+                            <i class="fas fa-eye" id="newPasswordToggleIcon"></i>
+                        </button>
+                    </div>
                 </label>
             </div>
-            <label>
-                <div class="password-input-container">
-                    <input class="input" type="password" id="password" name="password" placeholder="" required />
-                    <span>Password</span>
-                    <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility()">
-                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
-                    </button>
-                </div>
-            </label>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0 12px 0;">
-                <a href="forgot_password.php" class="ds-link">Forgot password?</a>
-                <a href="Register_Panel.php" class="ds-link">Register here</a>
+
+            <div class="flex">
+                <label>
+                    <div class="password-input-container">
+                        <input class="input" type="password" id="confirmPassword" name="confirmPassword" placeholder="" required />
+                        <span>Confirm Password</span>
+                        <button type="button" class="password-toggle-btn" id="confirmPasswordToggleBtn" onclick="togglePasswordVisibility('confirmPassword')">
+                            <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
+                        </button>
+                    </div>
+                </label>
             </div>
-            <button class="submit" type="submit">Login</button>
+
+            <div class="password-requirements" id="passwordRequirements">
+                <p class="requirements-title">Password must contain:</p>
+                <ul class="requirements-list">
+                    <li id="req-length" class="requirement">At least 8 characters</li>
+                    <li id="req-uppercase" class="requirement">One uppercase letter</li>
+                    <li id="req-lowercase" class="requirement">One lowercase letter</li>
+                    <li id="req-number" class="requirement">One number</li>
+                </ul>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0 12px 0;">
+                <a href="verify_code.php" class="ds-link">← Back</a>
+            </div>
+
+            <button class="submit" type="submit" id="resetBtn" disabled>Reset Password</button>
         </form>
     </div>
 
     <script>
     (function(){
-        // Ensure custom UI dialog is available for login feedback
+        // Ensure custom UI dialog is available for feedback
         if (typeof window.showDialog === 'undefined') {
             window.showDialog = function(title, message) {
                 var overlay = document.createElement('div');
@@ -90,11 +110,11 @@
             };
         }
 
-        // Password toggle functionality
-        window.togglePasswordVisibility = function() {
-            const passwordInput = document.getElementById('password');
-            const toggleBtn = document.getElementById('passwordToggleBtn');
-            const toggleIcon = document.getElementById('passwordToggleIcon');
+        // Password toggle functionality for both password fields
+        window.togglePasswordVisibility = function(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleBtn = document.getElementById(fieldId + 'ToggleBtn');
+            const toggleIcon = document.getElementById(fieldId + 'ToggleIcon');
 
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
@@ -107,6 +127,6 @@
     })();
     </script>
 
-    <script src="script.js"></script>
+    <script src="reset_password.js"></script>
 </body>
 </html>
