@@ -5,72 +5,38 @@ import javax.swing.*;
 import java.awt.event.*;
 
 public class BayManagement extends javax.swing.JPanel {
-    
     // Static variables to track available bays - ALL SET TO AVAILABLE
-    public static boolean[] fastChargingAvailable = {true, true, true}; // Bays 1-3 - ALL AVAILABLE
-    public static boolean[] normalChargingAvailable = {true, true, true, true, true}; // Bays 4-8 - ALL AVAILABLE
-    
-    // Static flag to track if toggle states have been loaded from database
-    private static boolean toggleStatesLoaded = false; // Reset to false to force reload from database
+    public static boolean[] fastChargingAvailable = {true, true, true};
+    public static boolean[] normalChargingAvailable = {true, true, true, true, true};
+    private static boolean toggleStatesLoaded = false;
     
     // Static variables to track occupied bays
-    public static boolean[] fastChargingOccupied = {false, false, false}; // Bays 1-3
-    public static boolean[] normalChargingOccupied = {false, false, false, false, false}; // Bays 4-8
-    
-    // Static references to Queue and Monitor instances for real-time updates
+    public static boolean[] fastChargingOccupied = {false, false, false};
+    public static boolean[] normalChargingOccupied = {false, false, false, false, false};
     private static cephra.Admin.Queue queueInstance = null;
     private static cephra.Frame.Monitor monitorInstance = null;
+    private static void log(String msg) { System.out.println(msg); }
     
-    // Logging control: set to true to enable debug prints
-    private static final boolean VERBOSE = false;
-    
-    private static void logDebug(String msg) { if (VERBOSE) System.out.println(msg); }
-    private static void logInfo(String msg)  { if (VERBOSE) System.out.println(msg); }
-    private static void logWarn(String msg)  { System.out.println(msg); }
-    private static void logError(String msg) { System.err.println(msg); }
-    private static void logError(String msg, Throwable t) { System.err.println(msg); if (t != null) t.printStackTrace(); }
-    
-    /**
-     * Registers a Queue instance for real-time updates
-     */
     public static void registerQueueInstance(cephra.Admin.Queue queue) {
         queueInstance = queue;
-        logDebug("Queue instance registered for real-time updates");
     }
     
-    /**
-     * Registers a Monitor instance for real-time updates
-     */
     public static void registerMonitorInstance(cephra.Frame.Monitor monitor) {
         monitorInstance = monitor;
-        logDebug("Monitor instance registered for real-time updates");
     }
     
-    /**
-     * Unregisters Queue instance
-     */
     public static void unregisterQueueInstance() {
         queueInstance = null;
-        logDebug("Queue instance unregistered");
     }
     
-    /**
-     * Unregisters Monitor instance
-     */
     public static void unregisterMonitorInstance() {
         monitorInstance = null;
-        logDebug("Monitor instance unregistered");
     }
     
-    // Toggle buttons array for easy access
     private JToggleButton[] bayToggleButtons = new JToggleButton[8];
     
-    // Static methods to check availability - now using database instead of static arrays
     public static boolean isFastChargingAvailable() {
-        // Ensure charging bays exist in database
         ensureChargingBaysExist();
-        
-        // Check database for available fast charging bays (Bay-1, Bay-2, Bay-3)
         for (int i = 1; i <= 3; i++) {
             if (isBayAvailableForCharging(i)) {
                 return true;
@@ -80,10 +46,7 @@ public class BayManagement extends javax.swing.JPanel {
     }
     
     public static boolean isNormalChargingAvailable() {
-        // Ensure charging bays exist in database
         ensureChargingBaysExist();
-        
-        // Check database for available normal charging bays (Bay-4, Bay-5, Bay-6, Bay-7, Bay-8)
         for (int i = 4; i <= 8; i++) {
             if (isBayAvailableForCharging(i)) {
                 return true;
@@ -93,41 +56,29 @@ public class BayManagement extends javax.swing.JPanel {
     }
     
     public static boolean isBayAvailableForCharging(int bayNumber) {
-        try {
-            // Check database for real-time status
-            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
-                 java.sql.PreparedStatement pstmt = conn.prepareStatement(
-                     "SELECT cb.status, cb.current_ticket_id FROM charging_bays cb WHERE cb.bay_number = ?")) {
-                
-                pstmt.setString(1, "Bay-" + bayNumber);
-                try (java.sql.ResultSet rs = pstmt.executeQuery()) {
-                    if (rs.next()) {
-                        String status = rs.getString("status");
-                        String ticketId = rs.getString("current_ticket_id");
-                        
-                        boolean isAvailable = "Available".equals(status) && (ticketId == null || ticketId.isEmpty());
-                        return isAvailable;
-                    } else {
-                        System.err.println("BayManagement: No database record found for Bay-" + bayNumber);
-                    }
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(
+                 "SELECT cb.status, cb.current_ticket_id FROM charging_bays cb WHERE cb.bay_number = ?")) {
+            
+            pstmt.setString(1, "Bay-" + bayNumber);
+            try (java.sql.ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String status = rs.getString("status");
+                    String ticketId = rs.getString("current_ticket_id");
+                    return "Available".equals(status) && (ticketId == null || ticketId.isEmpty());
                 }
             }
         } catch (Exception e) {
             System.err.println("Error checking bay availability for Bay-" + bayNumber + ": " + e.getMessage());
-            e.printStackTrace();
         }
         
-        // Fallback to static array check
         int index = bayNumber - 1;
-        boolean fallbackResult = false;
         if (bayNumber >= 1 && bayNumber <= 3) {
-            fallbackResult = fastChargingAvailable[index] && !fastChargingOccupied[index];
-            logDebug("BayManagement: Fallback check for Bay-" + bayNumber + " - Available: " + fastChargingAvailable[index] + ", Occupied: " + fastChargingOccupied[index] + ", Result: " + fallbackResult);
+            return fastChargingAvailable[index] && !fastChargingOccupied[index];
         } else if (bayNumber >= 4 && bayNumber <= 8) {
-            fallbackResult = normalChargingAvailable[index - 3] && !normalChargingOccupied[index - 3];
-            logDebug("BayManagement: Fallback check for Bay-" + bayNumber + " - Available: " + normalChargingAvailable[index - 3] + ", Occupied: " + normalChargingOccupied[index - 3] + ", Result: " + fallbackResult);
+            return normalChargingAvailable[index - 3] && !normalChargingOccupied[index - 3];
         }
-        return fallbackResult;
+        return false;
     }
     
     /**
@@ -141,10 +92,10 @@ public class BayManagement extends javax.swing.JPanel {
             for (int i = 0; i < 3; i++) {
                 int bayNumber = i + 1;
                 if (isBayAvailableForCharging(bayNumber)) {
-                    logInfo("Found available fast charging bay: Bay-" + bayNumber);
+                    log("Found available fast charging bay: Bay-" + bayNumber);
                     return bayNumber;
                 } else {
-                    logDebug("Bay-" + bayNumber + " is not available (offline or occupied)");
+                    log("Bay-" + bayNumber + " is not available (offline or occupied)");
                 }
             }
         } else {
@@ -152,14 +103,14 @@ public class BayManagement extends javax.swing.JPanel {
             for (int i = 0; i < 5; i++) {
                 int bayNumber = i + 4;
                 if (isBayAvailableForCharging(bayNumber)) {
-                    logInfo("Found available normal charging bay: Bay-" + bayNumber);
+                    log("Found available normal charging bay: Bay-" + bayNumber);
                     return bayNumber;
                 } else {
-                    logDebug("Bay-" + bayNumber + " is not available (offline or occupied)");
+                    log("Bay-" + bayNumber + " is not available (offline or occupied)");
                 }
             }
         }
-        logInfo("No available " + (isFastCharging ? "fast" : "normal") + " charging bays found");
+        log("No available " + (isFastCharging ? "fast" : "normal") + " charging bays found");
         return -1; // No available bay found
     }
     
@@ -260,20 +211,16 @@ public class BayManagement extends javax.swing.JPanel {
             // Update database
             updateBayAssignmentInDatabase(ticketId, username, bayNumber);
             
-            logInfo("Ticket " + ticketId + " assigned to Bay-" + bayNumber + " for user " + username);
+            log("Ticket " + ticketId + " assigned to Bay-" + bayNumber + " for user " + username);
             return true;
             
         } catch (Exception e) {
-            logError("Error assigning ticket to bay: " + e.getMessage(), e);
+            System.out.println("Error assigning ticket to bay: " + e.getMessage());
             return false;
         }
     }
     
-    /**
-     * Releases a bay when charging is complete
-     * @param bayNumber the bay number to release
-     * @return true if release successful, false otherwise
-     */
+    
     public static boolean releaseBay(int bayNumber) {
         try {
             // Update bay occupation status
@@ -323,7 +270,6 @@ public class BayManagement extends javax.swing.JPanel {
             return;
         }
         
-        logDebug("*** LOADING TOGGLE STATES FROM DATABASE FOR THE FIRST TIME ONLY ***");
         try {
             // Create bay_toggle_states table if it doesn't exist
             createToggleStatesTable();
@@ -332,25 +278,23 @@ public class BayManagement extends javax.swing.JPanel {
             loadToggleStatesFromDatabase();
             
             toggleStatesLoaded = true;
-            logDebug("*** TOGGLE STATES LOADED AND LOCKED - WILL NEVER RELOAD AGAIN ***");
             
         } catch (Exception e) {
-            logError("Error loading toggle states: " + e.getMessage());
+            System.out.println("Error loading toggle states: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
     public static void saveToggleStates() {
-        logDebug("Saving toggle states to database...");
         try {
             // Save toggle states to database
             saveToggleStatesToDatabase();
             
-            logWarn("Fast Charging Available: " + getAvailableFastChargingCount() + "/3");
-            logWarn("Normal Charging Available: " + getAvailableNormalChargingCount() + "/5");
+            System.out.println("Fast Charging: " + getAvailableFastChargingCount() + "/3");
+            System.out.println("Normal Charging: " + getAvailableNormalChargingCount() + "/5");
             
         } catch (Exception e) {
-            logError("Error saving toggle states: " + e.getMessage());
+            System.out.println("Error saving toggle states: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -368,17 +312,14 @@ public class BayManagement extends javax.swing.JPanel {
      * Forces toggle buttons to match current static array values
      */
     private void forceToggleButtonsToMatchStaticArrays() {
-        logDebug("*** FORCING TOGGLE BUTTONS TO MATCH STATIC ARRAYS ***");
         if (bayToggleButtons != null) {
             for (int i = 0; i < 8; i++) {
                 if (bayToggleButtons[i] != null) {
                     boolean isAvailable = (i < 3) ? fastChargingAvailable[i] : normalChargingAvailable[i - 3];
                     bayToggleButtons[i].setSelected(isAvailable);
-                    logDebug("Bay-" + (i + 1) + " toggle FORCED to: " + (isAvailable ? "Available" : "Maintenance"));
                 }
             }
         }
-        logDebug("*** TOGGLE BUTTONS FORCED TO MATCH STATIC ARRAYS ***");
     }
     
   
@@ -798,8 +739,7 @@ public class BayManagement extends javax.swing.JPanel {
                     // Save to database immediately
                     saveToggleStates();
                     
-                    logInfo("*** TOGGLE SAVED PERMANENTLY *** Bay-" + bayNumber + " = " + (isSelected ? "Available" : "Maintenance"));
-                    logDebug("Static arrays updated and saved to database - will NOT reset");
+                    System.out.println("Bay-" + bayNumber + " = " + (isSelected ? "Available" : "Maintenance"));
                     
                     // Update all grid displays with new maintenance status
                     updateAllBayGridDisplays();
@@ -809,7 +749,6 @@ public class BayManagement extends javax.swing.JPanel {
                         autoAssignWaitingTickets();
                     }
                     
-                    logInfo("Bay-" + bayNumber + " toggled to: " + (isSelected ? "Available" : "Maintenance"));
                 }
             });
         }
@@ -874,7 +813,6 @@ public class BayManagement extends javax.swing.JPanel {
                 }
             }
             
-            logInfo("All bay labels updated to match database states (permanent)");
             
         } catch (Exception e) {
             System.err.println("Error updating bay labels from database: " + e.getMessage());
@@ -887,7 +825,6 @@ public class BayManagement extends javax.swing.JPanel {
      * REMOVED - This method was causing toggle states to reset
      */
     public void refreshToggleStatesFromDatabase() {
-        System.out.println("refreshToggleStatesFromDatabase() called but DISABLED to prevent toggle reset");
         // Method disabled to prevent toggle states from being reset
     }
     
@@ -993,7 +930,6 @@ public class BayManagement extends javax.swing.JPanel {
                 stmt.execute(insertSQL);
             }
             
-            logInfo("Bay toggle states table created/verified successfully");
             
         } catch (Exception e) {
             System.err.println("Error creating toggle states table: " + e.getMessage());
@@ -1017,22 +953,16 @@ public class BayManagement extends javax.swing.JPanel {
                     int bayNumber = rs.getInt("bay_number");
                     boolean isAvailable = rs.getBoolean("is_available");
                     
-                    logDebug("BayManagement: Loading toggle state for Bay-" + bayNumber + " = " + isAvailable);
                     
                     // Update the static arrays
                     if (bayNumber >= 1 && bayNumber <= 3) {
                         fastChargingAvailable[bayNumber - 1] = isAvailable;
-                        logDebug("BayManagement: Set fastChargingAvailable[" + (bayNumber - 1) + "] = " + isAvailable);
                     } else if (bayNumber >= 4 && bayNumber <= 8) {
                         normalChargingAvailable[bayNumber - 4] = isAvailable;
-                        logDebug("BayManagement: Set normalChargingAvailable[" + (bayNumber - 4) + "] = " + isAvailable);
                     }
                 }
                 
                 if (hasToggleStates) {
-                    logInfo("Toggle states loaded from bay_toggle_states table successfully");
-                    logDebug("Current fastChargingAvailable: [" + fastChargingAvailable[0] + ", " + fastChargingAvailable[1] + ", " + fastChargingAvailable[2] + "]");
-                    logDebug("Current normalChargingAvailable: [" + normalChargingAvailable[0] + ", " + normalChargingAvailable[1] + ", " + normalChargingAvailable[2] + ", " + normalChargingAvailable[3] + ", " + normalChargingAvailable[4] + "]");
                     toggleStatesLoaded = true;
                     return;
                 }
@@ -1056,12 +986,11 @@ public class BayManagement extends javax.swing.JPanel {
                     }
                 }
                 
-                logInfo("Toggle states loaded from charging_bays table successfully");
                 toggleStatesLoaded = true;
             }
             
         } catch (Exception e) {
-            logError("Error loading toggle states from database: " + e.getMessage(), e);
+            System.out.println("Error loading toggle states from database: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1080,16 +1009,14 @@ public class BayManagement extends javax.swing.JPanel {
                 for (int i = 0; i < fastChargingAvailable.length; i++) {
                     pstmt.setBoolean(1, fastChargingAvailable[i]);
                     pstmt.setInt(2, i + 1);
-                    int rowsUpdated = pstmt.executeUpdate();
-                    logDebug("BayManagement: Updated bay_toggle_states for Bay-" + (i + 1) + " to " + fastChargingAvailable[i] + " - rows updated: " + rowsUpdated);
+                    pstmt.executeUpdate();
                 }
                 
                 // Save normal charging bays (4-8)
                 for (int i = 0; i < normalChargingAvailable.length; i++) {
                     pstmt.setBoolean(1, normalChargingAvailable[i]);
                     pstmt.setInt(2, i + 4);
-                    int rowsUpdated = pstmt.executeUpdate();
-                    logDebug("BayManagement: Updated bay_toggle_states for Bay-" + (i + 4) + " to " + normalChargingAvailable[i] + " - rows updated: " + rowsUpdated);
+                    pstmt.executeUpdate();
                 }
             }
             
@@ -1102,8 +1029,7 @@ public class BayManagement extends javax.swing.JPanel {
                     String status = fastChargingAvailable[i] ? "Available" : "Maintenance";
                     pstmt.setString(1, status);
                     pstmt.setString(2, "Bay-" + (i + 1));
-                    int rowsUpdated = pstmt.executeUpdate();
-                    logDebug("BayManagement: Updated charging_bays for Bay-" + (i + 1) + " to " + status + " - rows updated: " + rowsUpdated);
+                    pstmt.executeUpdate();
                 }
                 
                 // Update normal charging bays (4-8)
@@ -1111,12 +1037,10 @@ public class BayManagement extends javax.swing.JPanel {
                     String status = normalChargingAvailable[i] ? "Available" : "Maintenance";
                     pstmt.setString(1, status);
                     pstmt.setString(2, "Bay-" + (i + 4));
-                    int rowsUpdated = pstmt.executeUpdate();
-                    logDebug("BayManagement: Updated charging_bays for Bay-" + (i + 4) + " to " + status + " - rows updated: " + rowsUpdated);
+                    pstmt.executeUpdate();
                 }
             }
             
-            logDebug("Toggle states and bay status updated in database successfully");
             
         } catch (Exception e) {
             System.err.println("Error saving toggle states to database: " + e.getMessage());
@@ -1138,13 +1062,13 @@ public class BayManagement extends javax.swing.JPanel {
             
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                logInfo("Bay-" + bayNumber + " assigned to ticket " + ticketId + " in database");
+                log("Bay-" + bayNumber + " assigned to ticket " + ticketId + " in database");
             } else {
-                logWarn("Failed to update bay assignment in database");
+                log("Failed to update bay assignment in database");
             }
             
         } catch (Exception e) {
-            logError("Error updating bay assignment in database: " + e.getMessage(), e);
+            System.out.println("Error updating bay assignment in database: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1161,13 +1085,13 @@ public class BayManagement extends javax.swing.JPanel {
             
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                logInfo("Bay-" + bayNumber + " released in database");
+                log("Bay-" + bayNumber + " released in database");
             } else {
-                logWarn("Failed to update bay release in database");
+                log("Failed to update bay release in database");
             }
             
         } catch (Exception e) {
-            logError("Error updating bay release in database: " + e.getMessage(), e);
+            System.out.println("Error updating bay release in database: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1185,7 +1109,7 @@ public class BayManagement extends javax.swing.JPanel {
             int bayNumber = findNextAvailableBay(isFastCharging);
             
             if (bayNumber == -1) {
-                logInfo("No available " + (isFastCharging ? "fast" : "normal") + " charging bays for ticket " + ticketId);
+                log("No available " + (isFastCharging ? "fast" : "normal") + " charging bays for ticket " + ticketId);
                 return -1;
             }
             
@@ -1193,15 +1117,15 @@ public class BayManagement extends javax.swing.JPanel {
             boolean success = assignTicketToBay(ticketId, username, bayNumber);
             
             if (success) {
-                logInfo("Ticket " + ticketId + " assigned to Bay-" + bayNumber + " from queue");
+                log("Ticket " + ticketId + " assigned to Bay-" + bayNumber + " from queue");
                 return bayNumber;
             } else {
-                logError("Failed to assign ticket " + ticketId + " to Bay-" + bayNumber);
+                log("Failed to assign ticket " + ticketId + " to Bay-" + bayNumber);
                 return -1;
             }
             
         } catch (Exception e) {
-            logError("Error in queue flow assignment: " + e.getMessage(), e);
+            System.out.println("Error in queue flow assignment: " + e.getMessage());
             e.printStackTrace();
             return -1;
         }
@@ -1226,7 +1150,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("Error getting ticket bay assignment: " + e.getMessage(), e);
+            System.out.println("Error getting ticket bay assignment: " + e.getMessage());
             e.printStackTrace();
         }
         return -1;
@@ -1250,7 +1174,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("Error getting bay user: " + e.getMessage(), e);
+            System.out.println("Error getting bay user: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -1274,7 +1198,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("Error getting bay ticket: " + e.getMessage(), e);
+            System.out.println("Error getting bay ticket: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -1294,11 +1218,7 @@ public class BayManagement extends javax.swing.JPanel {
         return ticket != null ? ticket : "";
     }
     
-    /**
-     * Gets the display color for a bay grid slot
-     * @param bayNumber the bay number (1-8)
-     * @return Color object for the bay display
-     */
+  
     public static java.awt.Color getBayDisplayColor(int bayNumber) {
         if (!isBayAvailableForCharging(bayNumber)) {
             return java.awt.Color.RED; // Red for maintenance
@@ -1351,7 +1271,6 @@ public class BayManagement extends javax.swing.JPanel {
     public static void updateAllBayGridDisplays() {
         // This method will be called by Queue and Monitor components
         // to refresh their grid displays with current bay status
-        logDebug("Bay grid displays updated - maintenance bays will show 'OFFLINE' text");
         
         // Notify Queue and Monitor components to refresh their displays
         notifyGridDisplayUpdate();
@@ -1373,7 +1292,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("Error updating grid displays: " + e.getMessage(), e);
+            System.out.println("Error updating grid displays: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1387,10 +1306,6 @@ public class BayManagement extends javax.swing.JPanel {
      */
     public static String getGridSlotText(int bayNumber) {
         try {
-            // Debug: Log which bay we're checking
-            if (bayNumber == 1 || bayNumber == 2 || bayNumber == 3 || bayNumber == 6) {
-                logDebug("DEBUG: Getting grid slot text for Bay-" + bayNumber);
-            }
             
             // Read directly from charging_grid table for real-time ticket status
             try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
@@ -1403,10 +1318,6 @@ public class BayManagement extends javax.swing.JPanel {
                         String ticketId = rs.getString("ticket_id");
                         String status = rs.getString("status");
                         
-                        // Debug: Log Bay details
-                        if (bayNumber == 1 || bayNumber == 2 || bayNumber == 3 || bayNumber == 6) {
-                            logDebug("DEBUG: Bay-" + bayNumber + " - ticketId: " + ticketId + ", status: " + status);
-                        }
                         
                         // Check if bay is in maintenance
                         if ("Maintenance".equals(status)) {
@@ -1422,15 +1333,11 @@ public class BayManagement extends javax.swing.JPanel {
                         // The UI will handle showing/hiding the button based on this
                         return "";
                     } else {
-                        // Debug: Log if no result found
-                        if (bayNumber == 1 || bayNumber == 2 || bayNumber == 3 || bayNumber == 6) {
-                            logDebug("DEBUG: No result found for Bay-" + bayNumber + " in database query");
-                        }
                     }
                 }
             }
         } catch (Exception e) {
-            logError("Error reading bay status from database for Bay-" + bayNumber + ": " + e.getMessage(), e);
+            System.out.println("Error reading bay status from database for Bay-" + bayNumber + ": " + e.getMessage());
             e.printStackTrace();
         }
         
@@ -1493,7 +1400,7 @@ public class BayManagement extends javax.swing.JPanel {
                 }
             }
         } catch (Exception e) {
-            logError("Error reading bay color from database: " + e.getMessage(), e);
+            System.out.println("Error reading bay color from database: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -1518,8 +1425,6 @@ public class BayManagement extends javax.swing.JPanel {
             texts[i] = getGridSlotText(i + 1); // Bay-1, Bay-2, Bay-3
         }
         
-        // Debug: Log fast charging grid texts
-        logDebug("DEBUG: Fast charging grid texts: " + java.util.Arrays.toString(texts));
         
         return texts;
     }
@@ -1537,8 +1442,6 @@ public class BayManagement extends javax.swing.JPanel {
             texts[i] = getGridSlotText(i + 4); // Bay-4, Bay-5, Bay-6, Bay-7, Bay-8
         }
         
-        // Debug: Log normal charging grid texts
-        logDebug("DEBUG: Normal charging grid texts: " + java.util.Arrays.toString(texts));
         
         return texts;
     }
@@ -1600,14 +1503,13 @@ public class BayManagement extends javax.swing.JPanel {
                 }
                 
                 if (isOccupied) {
-                    logInfo("Bay-" + bayNumber + " is occupied by ticket " + currentTicketId + " (user: " + currentUsername + ")");
+                    log("Bay-" + bayNumber + " is occupied by ticket " + currentTicketId + " (user: " + currentUsername + ")");
                 }
             }
             
-            logInfo("Bay occupation status loaded from database successfully");
             
         } catch (Exception e) {
-            logError("Error loading bay occupation from database: " + e.getMessage(), e);
+            System.out.println("Error loading bay occupation from database: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1619,7 +1521,7 @@ public class BayManagement extends javax.swing.JPanel {
         try {
             // Ensure database connection is established
             if (!cephra.Database.DatabaseConnection.testConnection()) {
-                logError("Database connection failed during grid initialization");
+                log("Database connection failed during grid initialization");
                 return;
             }
             
@@ -1629,10 +1531,9 @@ public class BayManagement extends javax.swing.JPanel {
             // Update all grid displays with current status
             updateAllBayGridDisplays();
             
-            logInfo("Grid displays initialized with offline status from database");
             
         } catch (Exception e) {
-            logError("Error initializing grid displays: " + e.getMessage(), e);
+            System.out.println("Error initializing grid displays: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1663,15 +1564,11 @@ public class BayManagement extends javax.swing.JPanel {
                     normalChargingAvailable[bayNumber - 4] = !isMaintenance;
                 }
                 
-                if (isMaintenance) {
-                    logInfo("Bay-" + bayNumber + " is in maintenance mode - will show 'OFFLINE' text permanently");
-                }
             }
             
-            logInfo("Maintenance status loaded from database successfully");
             
         } catch (Exception e) {
-            logError("Error loading maintenance status from database: " + e.getMessage(), e);
+            System.out.println("Error loading maintenance status from database: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1688,15 +1585,9 @@ public class BayManagement extends javax.swing.JPanel {
             // Update all grid displays
             updateAllBayGridDisplays();
             
-            // Log maintenance bays
-            for (int i = 1; i <= 8; i++) {
-                if (!isBayAvailableForCharging(i)) {
-                    logInfo("Bay-" + i + " maintenance status: PERMANENT 'OFFLINE' text displayed");
-                }
-            }
             
         } catch (Exception e) {
-            logError("Error ensuring maintenance display: " + e.getMessage(), e);
+            System.out.println("Error ensuring maintenance display: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1720,7 +1611,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("Error checking permanent maintenance status: " + e.getMessage(), e);
+            System.out.println("Error checking permanent maintenance status: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -1741,13 +1632,13 @@ public class BayManagement extends javax.swing.JPanel {
             
             int rowsUpdated = pstmt.executeUpdate();
             if (rowsUpdated > 0) {
-                logInfo("Bay-" + bayNumber + " status updated to: " + status);
+                log("Bay-" + bayNumber + " status updated to: " + status);
             } else {
-                logWarn("No rows updated for Bay-" + bayNumber);
+                log("No rows updated for Bay-" + bayNumber);
             }
             
         } catch (Exception e) {
-            logError("Error updating bay status in database: " + e.getMessage(), e);
+            System.out.println("Error updating bay status in database: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1770,7 +1661,7 @@ public class BayManagement extends javax.swing.JPanel {
         
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             if (conn == null) {
-                logError("Could not establish database connection for bay number lookup");
+                log("Could not establish database connection for bay number lookup");
                 return null;
             }
             
@@ -1790,7 +1681,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("Error getting bay number by ticket: " + e.getMessage(), e);
+            System.out.println("Error getting bay number by ticket: " + e.getMessage());
         }
         
         return null;
@@ -1813,12 +1704,12 @@ public class BayManagement extends javax.swing.JPanel {
                 isFastCharging = svc.contains("fast");
             }
             if (!hasChargingCapacity(isFastCharging)) {
-                logInfo("No available charging bays for " + serviceType + " service. Ticket " + ticketId + " cannot be added to waiting grid.");
+                log("No available charging bays for " + serviceType + " service. Ticket " + ticketId + " cannot be added to waiting grid.");
                 return -1;
             }
             
             // Add ticket to waiting grid (admin will process via proceed button)
-            logInfo("Adding ticket " + ticketId + " to waiting grid for admin processing");
+            log("Adding ticket " + ticketId + " to waiting grid for admin processing");
             try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.PreparedStatement pstmt = conn.prepareStatement(
                      "UPDATE waiting_grid SET ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, position_in_queue = ? WHERE slot_number = ? AND ticket_id IS NULL")) {
@@ -1826,7 +1717,7 @@ public class BayManagement extends javax.swing.JPanel {
                 // Find the first available slot
                 int availableSlot = findNextAvailableWaitingSlot();
                 if (availableSlot == -1) {
-                    logInfo("No available waiting slots for ticket: " + ticketId);
+                    log("No available waiting slots for ticket: " + ticketId);
                     return -1;
                 }
                 
@@ -1839,13 +1730,13 @@ public class BayManagement extends javax.swing.JPanel {
                 
                 int rowsUpdated = pstmt.executeUpdate();
                 if (rowsUpdated > 0) {
-                    logInfo("Ticket " + ticketId + " added to waiting grid slot " + availableSlot);
+                    log("Ticket " + ticketId + " added to waiting grid slot " + availableSlot);
                     return availableSlot;
                 }
             }
             
         } catch (Exception e) {
-            logError("Error adding ticket to waiting grid: " + e.getMessage(), e);
+            System.out.println("Error adding ticket to waiting grid: " + e.getMessage());
             e.printStackTrace();
         }
         return -1;
@@ -1865,7 +1756,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("Error finding available waiting slot: " + e.getMessage(), e);
+            System.out.println("Error finding available waiting slot: " + e.getMessage());
             e.printStackTrace();
         }
         return -1;
@@ -1878,7 +1769,7 @@ public class BayManagement extends javax.swing.JPanel {
      * @return true if successful, false otherwise
      */
     public static boolean moveTicketFromWaitingToCharging(String ticketId, int bayNumber) {
-        logDebug("BayManagement: Starting moveTicketFromWaitingToCharging for ticket " + ticketId + " to Bay-" + bayNumber);
+        log("BayManagement: Starting moveTicketFromWaitingToCharging for ticket " + ticketId + " to Bay-" + bayNumber);
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
             
@@ -1896,9 +1787,9 @@ public class BayManagement extends javax.swing.JPanel {
                             username = rs.getString("username");
                             serviceType = rs.getString("service_type");
                             batteryLevel = rs.getInt("initial_battery_level");
-                            logInfo("BayManagement: Found ticket " + ticketId + " in waiting grid - username: " + username + ", service: " + serviceType + ", battery: " + batteryLevel);
+                            log("BayManagement: Found ticket " + ticketId + " in waiting grid - username: " + username + ", service: " + serviceType + ", battery: " + batteryLevel);
                         } else {
-                            logError("BayManagement: Ticket " + ticketId + " not found in waiting grid");
+                            log("BayManagement: Ticket " + ticketId + " not found in waiting grid");
                             return false;
                         }
                     }
@@ -1909,7 +1800,7 @@ public class BayManagement extends javax.swing.JPanel {
                         "UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?")) {
                     pstmt.setString(1, ticketId);
                     int waitingRowsUpdated = pstmt.executeUpdate();
-                    logInfo("BayManagement: Removed ticket " + ticketId + " from waiting grid - rows updated: " + waitingRowsUpdated);
+                    log("BayManagement: Removed ticket " + ticketId + " from waiting grid - rows updated: " + waitingRowsUpdated);
                 }
                 
                 // Add to charging grid
@@ -1921,7 +1812,7 @@ public class BayManagement extends javax.swing.JPanel {
                     pstmt.setInt(4, batteryLevel);
                     pstmt.setString(5, "Bay-" + bayNumber);
                     int chargingRowsUpdated = pstmt.executeUpdate();
-                    logInfo("BayManagement: Added ticket " + ticketId + " to charging grid Bay-" + bayNumber + " - rows updated: " + chargingRowsUpdated);
+                    log("BayManagement: Added ticket " + ticketId + " to charging grid Bay-" + bayNumber + " - rows updated: " + chargingRowsUpdated);
                 }
                 
                 // Update charging_bays table
@@ -1931,7 +1822,7 @@ public class BayManagement extends javax.swing.JPanel {
                     pstmt.setString(2, username);
                     pstmt.setString(3, "Bay-" + bayNumber);
                     int bayRowsUpdated = pstmt.executeUpdate();
-                    logInfo("BayManagement: Updated charging_bays Bay-" + bayNumber + " to Occupied - rows updated: " + bayRowsUpdated);
+                    log("BayManagement: Updated charging_bays Bay-" + bayNumber + " to Occupied - rows updated: " + bayRowsUpdated);
                 }
                 
                 // CRITICAL: Update queue_tickets status from "Waiting" to "In Progress"
@@ -1939,11 +1830,11 @@ public class BayManagement extends javax.swing.JPanel {
                         "UPDATE queue_tickets SET status = 'In Progress' WHERE ticket_id = ?")) {
                     pstmt.setString(1, ticketId);
                     int queueRowsUpdated = pstmt.executeUpdate();
-                    logInfo("BayManagement: Updated queue_tickets status to In Progress for " + ticketId + " - rows updated: " + queueRowsUpdated);
+                    log("BayManagement: Updated queue_tickets status to In Progress for " + ticketId + " - rows updated: " + queueRowsUpdated);
                 }
                 
                 conn.commit();
-                logInfo("Ticket " + ticketId + " moved from waiting grid to Bay-" + bayNumber + " and status updated to In Progress");
+                log("Ticket " + ticketId + " moved from waiting grid to Bay-" + bayNumber + " and status updated to In Progress");
                 
                 // Notify Queue and Monitor to refresh their displays
                 notifyGridDisplayUpdate();
@@ -1961,7 +1852,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("Error moving ticket from waiting to charging: " + e.getMessage(), e);
+            System.out.println("Error moving ticket from waiting to charging: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -1984,7 +1875,7 @@ public class BayManagement extends javax.swing.JPanel {
                 }
             }
         } catch (Exception e) {
-            logError("Error checking if ticket is in waiting grid: " + e.getMessage(), e);
+            System.out.println("Error checking if ticket is in waiting grid: " + e.getMessage());
         }
         return false;
     }
@@ -2009,15 +1900,15 @@ public class BayManagement extends javax.swing.JPanel {
             
         } catch (java.sql.SQLSyntaxErrorException e) {
             if (e.getMessage().contains("doesn't exist")) {
-                logInfo("Waiting grid table doesn't exist yet. H2DatabaseConnection should have created it.");
+                log("Waiting grid table doesn't exist yet. H2DatabaseConnection should have created it.");
                 // Return empty array for now
                 return new String[10];
             } else {
-                logError("Error getting waiting grid tickets: " + e.getMessage(), e);
+                System.out.println("Error getting waiting grid tickets: " + e.getMessage());
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            logError("Error getting waiting grid tickets: " + e.getMessage(), e);
+            System.out.println("Error getting waiting grid tickets: " + e.getMessage());
             e.printStackTrace();
         }
         return tickets;
@@ -2052,15 +1943,15 @@ public class BayManagement extends javax.swing.JPanel {
             
         } catch (java.sql.SQLSyntaxErrorException e) {
             if (e.getMessage().contains("doesn't exist")) {
-                logInfo("Charging grid table doesn't exist yet. H2DatabaseConnection should have created it.");
+                log("Charging grid table doesn't exist yet. H2DatabaseConnection should have created it.");
                 // Return empty array for now
                 return new String[8];
             } else {
-                logError("Error getting charging grid tickets: " + e.getMessage(), e);
+                System.out.println("Error getting charging grid tickets: " + e.getMessage());
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            logError("Error getting charging grid tickets: " + e.getMessage(), e);
+            System.out.println("Error getting charging grid tickets: " + e.getMessage());
             e.printStackTrace();
         }
         return tickets;
@@ -2073,13 +1964,13 @@ public class BayManagement extends javax.swing.JPanel {
      */
     public static int countAvailableBays(boolean isFastCharging) {
         int count = 0;
-        logDebug("BayManagement: Counting available " + (isFastCharging ? "fast" : "normal") + " charging bays...");
+        log("BayManagement: Counting available " + (isFastCharging ? "fast" : "normal") + " charging bays...");
         
         if (isFastCharging) {
             // Count available fast charging bays (1-3)
             for (int i = 1; i <= 3; i++) {
                 boolean available = isBayAvailableForCharging(i);
-                logDebug("BayManagement: Bay-" + i + " available: " + available);
+                log("BayManagement: Bay-" + i + " available: " + available);
                 if (available) {
                     count++;
                 }
@@ -2088,14 +1979,14 @@ public class BayManagement extends javax.swing.JPanel {
             // Count available normal charging bays (4-8)
             for (int i = 4; i <= 8; i++) {
                 boolean available = isBayAvailableForCharging(i);
-                logDebug("BayManagement: Bay-" + i + " available: " + available);
+                log("BayManagement: Bay-" + i + " available: " + available);
                 if (available) {
                     count++;
                 }
             }
         }
         
-        logDebug("BayManagement: Total available " + (isFastCharging ? "fast" : "normal") + " charging bays: " + count);
+        log("BayManagement: Total available " + (isFastCharging ? "fast" : "normal") + " charging bays: " + count);
         return count;
     }
     
@@ -2120,7 +2011,7 @@ public class BayManagement extends javax.swing.JPanel {
                 }
             }
         } catch (Exception e) {
-            logError("Error counting occupied bays: " + e.getMessage(), e);
+            System.out.println("Error counting occupied bays: " + e.getMessage());
             e.printStackTrace();
         }
         return count;
@@ -2205,7 +2096,6 @@ public class BayManagement extends javax.swing.JPanel {
      * This should be called during initialization to ensure consistency
      */
     public static void synchronizeBayStatusWithDatabase() {
-        logDebug("*** synchronizeBayStatusWithDatabase() DISABLED to prevent toggle reset ***");
         // Method disabled to prevent toggle states from being reset
         // This method was overriding the toggle states and causing Bay-2 and Bay-6 to reset
     }
@@ -2215,16 +2105,16 @@ public class BayManagement extends javax.swing.JPanel {
      * Debug method to print current state of static arrays
      */
     public static void printCurrentBayStatus() {
-        logDebug("=== CURRENT BAY STATUS (Static Arrays) ===");
-        logDebug("Fast Charging Bays (1-3):");
+        log("=== CURRENT BAY STATUS (Static Arrays) ===");
+        log("Fast Charging Bays (1-3):");
         for (int i = 0; i < 3; i++) {
-            logDebug("  Bay-" + (i + 1) + " - Available: " + fastChargingAvailable[i] + ", Occupied: " + fastChargingOccupied[i]);
+            log("  Bay-" + (i + 1) + " - Available: " + fastChargingAvailable[i] + ", Occupied: " + fastChargingOccupied[i]);
         }
-        logDebug("Normal Charging Bays (4-8):");
+        log("Normal Charging Bays (4-8):");
         for (int i = 0; i < 5; i++) {
-            logDebug("  Bay-" + (i + 4) + " - Available: " + normalChargingAvailable[i] + ", Occupied: " + normalChargingOccupied[i]);
+            log("  Bay-" + (i + 4) + " - Available: " + normalChargingAvailable[i] + ", Occupied: " + normalChargingOccupied[i]);
         }
-        logDebug("=== END BAY STATUS ===");
+        log("=== END BAY STATUS ===");
     }
     
     /**
@@ -2330,7 +2220,7 @@ public class BayManagement extends javax.swing.JPanel {
      */
     public static void autoAssignWaitingTickets() {
         try {
-            logInfo("Auto-assigning waiting tickets to available bays...");
+            log("Auto-assigning waiting tickets to available bays...");
             
             // Get all waiting tickets
             try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
@@ -2351,19 +2241,19 @@ public class BayManagement extends javax.swing.JPanel {
                         if (bayNumber > 0) {
                             // Move ticket to available bay
                             if (moveTicketFromWaitingToCharging(ticketId, bayNumber)) {
-                                logInfo("Auto-assigned ticket " + ticketId + " to Bay-" + bayNumber);
+                                log("Auto-assigned ticket " + ticketId + " to Bay-" + bayNumber);
                                 // Update grid displays
                                 updateAllBayGridDisplays();
                             }
                         } else {
-                            logInfo("No available " + (isFastCharging ? "fast" : "normal") + " charging bays for ticket " + ticketId);
+                            log("No available " + (isFastCharging ? "fast" : "normal") + " charging bays for ticket " + ticketId);
                         }
                     }
                 }
             }
             
         } catch (Exception e) {
-            logError("Error auto-assigning waiting tickets: " + e.getMessage(), e);
+            System.out.println("Error auto-assigning waiting tickets: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -2374,7 +2264,7 @@ public class BayManagement extends javax.swing.JPanel {
      * @return true if successful, false otherwise
      */
     public static boolean clearChargingBayForCompletedTicket(String ticketId) {
-        logInfo("BayManagement: Clearing charging bay for completed ticket " + ticketId);
+        log("BayManagement: Clearing charging bay for completed ticket " + ticketId);
         
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -2385,7 +2275,7 @@ public class BayManagement extends javax.swing.JPanel {
                         "UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?")) {
                     pstmt.setString(1, ticketId);
                     int bayRowsUpdated = pstmt.executeUpdate();
-                    logDebug("BayManagement: Cleared charging bay for ticket " + ticketId + " - rows updated: " + bayRowsUpdated);
+                    log("BayManagement: Cleared charging bay for ticket " + ticketId + " - rows updated: " + bayRowsUpdated);
                 }
                 
                 // Clear charging_grid table
@@ -2393,11 +2283,11 @@ public class BayManagement extends javax.swing.JPanel {
                         "UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?")) {
                     pstmt.setString(1, ticketId);
                     int gridRowsUpdated = pstmt.executeUpdate();
-                    logDebug("BayManagement: Cleared charging grid for ticket " + ticketId + " - rows updated: " + gridRowsUpdated);
+                    log("BayManagement: Cleared charging grid for ticket " + ticketId + " - rows updated: " + gridRowsUpdated);
                 }
                 
                 conn.commit();
-                logInfo("BayManagement: Successfully cleared charging bay and grid for ticket " + ticketId);
+                log("BayManagement: Successfully cleared charging bay and grid for ticket " + ticketId);
                 
                 // Notify Queue and Monitor to refresh their displays
                 notifyGridDisplayUpdate();
@@ -2412,7 +2302,7 @@ public class BayManagement extends javax.swing.JPanel {
             }
             
         } catch (Exception e) {
-            logError("BayManagement: Error clearing charging bay for ticket " + ticketId + ": " + e.getMessage(), e);
+            System.out.println("BayManagement: Error clearing charging bay for ticket " + ticketId + ": " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -2470,15 +2360,14 @@ public class BayManagement extends javax.swing.JPanel {
                 }
 
                 conn.commit();
-                logInfo("Recovered " + tickets.size() + " pending-payment ticket(s) from stale state (if any)");
             } catch (Exception ex) {
                 conn.rollback();
-                logError("Recovery of pending-payment tickets failed: " + ex.getMessage(), ex);
+                System.out.println("Recovery of pending-payment tickets failed: " + ex.getMessage());
             } finally {
                 try { conn.setAutoCommit(true); } catch (Exception ignore) {}
             }
         } catch (Exception e) {
-            logError("Recovery connection error: " + e.getMessage(), e);
+            System.out.println("Recovery connection error: " + e.getMessage());
         }
     }
 }

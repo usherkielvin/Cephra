@@ -1,8 +1,7 @@
 package cephra.Admin;
 
-import java.awt.Color;
-import java.awt.Window;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import javax.swing.*;
 
 public class AdminRegister extends javax.swing.JPanel {
 
