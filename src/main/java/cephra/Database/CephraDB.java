@@ -70,9 +70,6 @@ public class CephraDB {
             // Clean up admin users from users table (they should be in staff_records)
             cleanupAdminFromUsersTable();
             
-            // Synchronize bay status with database
-            cephra.Admin.BayManagement.synchronizeBayStatusWithDatabase();
-            
             // Verify database connection and basic functionality
             verifyDatabaseConnection(conn);
         } catch (SQLException e) {
@@ -178,7 +175,6 @@ public class CephraDB {
     
     // Method to logout the current phone user
     public static void logoutCurrentUser() {
-        System.out.println("CephraDB: Logging out user " + (currentPhoneUser != null ? currentPhoneUser.username : "null"));
         currentPhoneUser = null;
     }
     
@@ -468,7 +464,6 @@ public class CephraDB {
                 deleteStmt.setString(1, username);
                 int deletedRows = deleteStmt.executeUpdate();
                 if (deletedRows > 0) {
-                    System.out.println("CephraDB: Deleted " + deletedRows + " old battery level entries for " + username);
                 }
             }
             
@@ -481,8 +476,7 @@ public class CephraDB {
                 insertStmt.setInt(3, batteryLevel); // initial_battery_level same as current
                 insertStmt.setDouble(4, 40.0); // default battery capacity
                 
-                int rowsAffected = insertStmt.executeUpdate();
-                System.out.println("CephraDB: Set new battery level for " + username + " to " + batteryLevel + "% (rows affected: " + rowsAffected + ")");
+                insertStmt.executeUpdate();
             }
             
         } catch (SQLException e) {
@@ -1640,7 +1634,7 @@ public class CephraDB {
             
             // Refresh admin history table to show the new completed ticket
             try {
-                cephra.Admin.HistoryBridge.refreshHistoryTable();
+                cephra.Admin.Utilities.HistoryBridge.refreshHistoryTable();
             } catch (Exception e) {
                 System.err.println("CephraDB: Error refreshing admin history table: " + e.getMessage());
             }
@@ -1704,7 +1698,7 @@ public class CephraDB {
         java.util.List<Object[]> staff = new ArrayList<>();
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT name, firstname, lastname, username, email, status, password FROM staff_records ORDER BY firstname")) {
+                     "SELECT name, firstname, lastname, username, email, status, password, DATE_FORMAT(created_at, '%m/%d/%Y') as created_at FROM staff_records ORDER BY firstname")) {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -1715,7 +1709,8 @@ public class CephraDB {
                         rs.getString("username"),
                         rs.getString("email"),
                         rs.getString("status"),
-                        rs.getString("password")
+                        rs.getString("password"),
+                        rs.getString("created_at")   // Date created
                     };
                     staff.add(row);
                 }
@@ -2035,7 +2030,7 @@ public class CephraDB {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")),
                 referenceNumber != null ? referenceNumber : ""
             };
-            cephra.Admin.HistoryBridge.addRecord(historyRow);
+            cephra.Admin.Utilities.HistoryBridge.addRecord(historyRow);
         } catch (Throwable t) {
             // Ignore if HistoryBridge is not available
         }
@@ -2523,7 +2518,6 @@ public class CephraDB {
                     if (rs.next()) {
                         String profilePicture = rs.getString("profile_picture");
                         if (profilePicture != null && !profilePicture.trim().isEmpty()) {
-                            System.out.println("CephraDB: Retrieved profile picture for user " + username);
                             return profilePicture;
                         }
                     }

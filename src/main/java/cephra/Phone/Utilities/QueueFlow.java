@@ -272,8 +272,8 @@ public final class QueueFlow {
 
         // Reflect into Admin table if registered
         try {
-            cephra.Admin.QueueBridge.addTicket(ticket, customerName, service, status, payment, action);
-            cephra.Admin.QueueBridge.setTicketBatteryInfo(ticket, initialBatteryPercent, batteryCapacityKWh);
+            cephra.Admin.Utilities.QueueBridge.addTicket(ticket, customerName, service, status, payment, action);
+            cephra.Admin.Utilities.QueueBridge.setTicketBatteryInfo(ticket, initialBatteryPercent, batteryCapacityKWh);
         } catch (Throwable t) {
             // ignore if admin queue not ready
         }

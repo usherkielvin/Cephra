@@ -1,15 +1,9 @@
-
 package cephra.Admin;
 
-//import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Window;
-
-import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.table.*;
+import cephra.Admin.Utilities.*;
 
 public class History extends javax.swing.JPanel {
 
@@ -26,20 +20,13 @@ public class History extends javax.swing.JPanel {
         ButtonHoverEffect.addHoverEffect(quebutton);
         ButtonHoverEffect.addHoverEffect(exitlogin);
         
-        // Register history table model so other modules can add rows
-       /* jtableDesign.apply(jTable1);
-        jtableDesign.makeScrollPaneTransparent(jScrollPane1);*/
-        
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
         jScrollPane1.setViewportView(jTable1);
-
-        // Ensure vertical lines are hidden like staff table
         
         adminHistorySRCH.setOpaque(false);
         adminHistorySRCH.setBackground(new Color(0, 0, 0, 0));
-        adminHistorySRCH.setBorder(null);
-        
+        adminHistorySRCH.setBorder(null);    
         adminHistorySRCH.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -49,11 +36,10 @@ public class History extends javax.swing.JPanel {
             }
         });
         
-        // Disable vertical and horizontal scrollbars like staff table
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-  
-        
+       
+        // Set column widths
         JTableHeader header = jTable1.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         
@@ -75,16 +61,12 @@ public class History extends javax.swing.JPanel {
             }
         });
         
-        // Copy the column headers from the original model
         for (int i = 0; i < model.getColumnCount(); i++) {
             ((DefaultTableModel) jTable1.getModel()).addColumn(model.getColumnName(i));
         }
         
-        // Register the new non-editable model with HistoryBridge
-        cephra.Admin.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());
-        
+        cephra.Admin.Utilities.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());       
     }
-
  
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -301,8 +283,7 @@ public class History extends javax.swing.JPanel {
         
         datetime.setText(time + " " + date);
     }
-
-    
+ 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
     private javax.swing.JLabel HISTORYtEXT;
@@ -325,7 +306,7 @@ public class History extends javax.swing.JPanel {
         model.setRowCount(0);
 
         if (keyword.isEmpty()) {
-            cephra.Admin.HistoryBridge.refreshHistoryTable();
+            cephra.Admin.Utilities.HistoryBridge.refreshHistoryTable();
             return;
         }
 

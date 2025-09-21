@@ -1,6 +1,9 @@
 package cephra.Admin;
 
 import javax.swing.*;
+
+import cephra.Admin.Utilities.ButtonHoverEffect;
+
 import java.util.List;
 
 public class Business_Overview extends javax.swing.JPanel {
@@ -63,16 +66,13 @@ public class Business_Overview extends javax.swing.JPanel {
                 }
             }
         });
-
-
-        
+     
         // Add hover effects to navigation buttons
         ButtonHoverEffect.addHoverEffect(quebutton);
         ButtonHoverEffect.addHoverEffect(Baybutton);
         ButtonHoverEffect.addHoverEffect(historybutton);
         ButtonHoverEffect.addHoverEffect(staffbutton);
         
-
         //Spinner setHorizontalAlignment
         JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) MinfeeSpinner.getEditor();
         javax.swing.JFormattedTextField textfield = editor.getTextField();
@@ -82,9 +82,6 @@ public class Business_Overview extends javax.swing.JPanel {
         javax.swing.JFormattedTextField textfield1 = editor1.getTextField();
         textfield1.setHorizontalAlignment(JTextField.CENTER);
         
-
-        
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -293,10 +290,6 @@ public class Business_Overview extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_staffbuttonActionPerformed
     
-   
-    
-   
-
     private void exitloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitloginActionPerformed
         java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Business_Overview.this);
         if (w instanceof cephra.Frame.Admin) {
@@ -311,7 +304,7 @@ public class Business_Overview extends javax.swing.JPanel {
         boolean saved = cephra.Database.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(Min));
         if (saved) {
             // Update QueueBridge with new minimum fee
-            cephra.Admin.QueueBridge.setMinimumFee(Min);
+            cephra.Admin.Utilities.QueueBridge.setMinimumFee(Min);
             javax.swing.JOptionPane.showMessageDialog(this, "Minimum fee saved: ₱" + Min);
         } else {
             javax.swing.JOptionPane.showMessageDialog(this, "Error saving minimum fee!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
@@ -325,16 +318,12 @@ public class Business_Overview extends javax.swing.JPanel {
         boolean saved = cephra.Database.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RPH));
         if (saved) {
             // Update QueueBridge with new rate
-            cephra.Admin.QueueBridge.setRatePerKWh(RPH);
+            cephra.Admin.Utilities.QueueBridge.setRatePerKWh(RPH);
             javax.swing.JOptionPane.showMessageDialog(this, "Rate per kWh saved: ₱" + RPH);
         } else {
             javax.swing.JOptionPane.showMessageDialog(this, "Error saving rate per kWh!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_SaverateperhourActionPerformed
-
-
-
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel BUSINESStEXT;
@@ -354,8 +343,6 @@ public class Business_Overview extends javax.swing.JPanel {
     private javax.swing.JButton staffbutton;
     private javax.swing.JLabel totalcharge;
     // End of variables declaration//GEN-END:variables
-
-   
 
     private void loadDashboardImage() {
         try {
@@ -441,9 +428,9 @@ public class Business_Overview extends javax.swing.JPanel {
             RPHSpinner.setValue(RPH);
             
             // Update QueueBridge with loaded values
-            cephra.Admin.QueueBridge.setMinimumFee(Min);
-            cephra.Admin.QueueBridge.setRatePerKWh(RPH);
-            cephra.Admin.QueueBridge.setFastMultiplier(fastMultiplier);
+            cephra.Admin.Utilities.QueueBridge.setMinimumFee(Min);
+            cephra.Admin.Utilities.QueueBridge.setRatePerKWh(RPH);
+            cephra.Admin.Utilities.QueueBridge.setFastMultiplier(fastMultiplier);
             
         } catch (Exception e) {
             System.err.println("Dashboard: Error loading settings from database: " + e.getMessage());
@@ -481,8 +468,7 @@ public class Business_Overview extends javax.swing.JPanel {
             totalcharge.setText("0");
             earnings.setText("₱0");
         }
-    }
-    
+    }  
     
     private String getStaffFirstNameFromDB() {
         try {

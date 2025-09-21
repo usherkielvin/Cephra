@@ -3,6 +3,9 @@ package cephra.Admin;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
+
+import cephra.Admin.Utilities.ButtonHoverEffect;
+import cephra.Admin.Utilities.jtableDesign;
 import cephra.Frame.Monitor;
 
 public class Queue extends javax.swing.JPanel {
@@ -26,7 +29,7 @@ public class Queue extends javax.swing.JPanel {
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         
         // Register the queue table model so other modules can add rows
-        cephra.Admin.QueueBridge.registerModel((DefaultTableModel) queTab.getModel());
+        cephra.Admin.Utilities.QueueBridge.registerModel((DefaultTableModel) queTab.getModel());
         
         // Setup Action column with an invisible button that shows text "Proceed"
         // Delay setup to ensure table model is ready
@@ -37,11 +40,11 @@ public class Queue extends javax.swing.JPanel {
         });
         jPanel1.setOpaque(false);
         
-        // Create a single instance of Monitor
-        if (monitorInstance == null) {
-           // monitorInstance = new cephra.Frame.Monitor();
-           // monitorInstance.setVisible(true);
-        }
+        // Monitor instance initialization (commented out)
+        // if (monitorInstance == null) {
+        //     monitorInstance = new cephra.Frame.Monitor();
+        //     monitorInstance.setVisible(true);
+        // }
         
         // Initialize grid buttons
         gridButtons = new JButton[] {
@@ -57,33 +60,24 @@ public class Queue extends javax.swing.JPanel {
         // Setup next buttons
         setupNextButtons();
 
-        // Listen to table changes to keep counters in sync and auto-remove paid rows
         queTab.getModel().addTableModelListener(e -> {
             updateStatusCounters();
-            // Auto-remove rows when payment status becomes "Paid"
             if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
                 checkAndRemovePaidRows();
             }
         });
         updateStatusCounters();
         
-        // Initialize grid displays with maintenance status from BayManagement
         initializeGridDisplays();
-        
-        // Initialize waiting grid from database
         initializeWaitingGridFromDatabase();
-        
-        // Register this Queue instance with BayManagement for real-time updates
         cephra.Admin.BayManagement.registerQueueInstance(this);
 
-        // Add hover effects to navigation buttons
         ButtonHoverEffect.addHoverEffect(Baybutton);
         ButtonHoverEffect.addHoverEffect(businessbutton);
         ButtonHoverEffect.addHoverEffect(exitlogin);
         ButtonHoverEffect.addHoverEffect(staffbutton);
         ButtonHoverEffect.addHoverEffect(historybutton);
         
-        // Setup periodic refresh to detect new tickets created via PHP/web interface
         setupPeriodicRefresh();
     }
 
@@ -96,21 +90,11 @@ public class Queue extends javax.swing.JPanel {
             if ("Waiting".equalsIgnoreCase(status)) waiting++;
             else if ("Charging".equalsIgnoreCase(status)) charging++;
         }
-        int paidCumulative = 0;
-        try {
-            paidCumulative = cephra.Admin.QueueBridge.getTotalPaidCount();
-        } catch (Throwable t) {
-            // Ignore errors
-        }
-        try { 
-            Waitings.setText(String.valueOf(waiting)); 
-        } catch (Throwable t) {}
-        try { 
-            Charging.setText(String.valueOf(charging)); 
-        } catch (Throwable t) {}
-        try { 
-            Paid.setText(String.valueOf(paidCumulative)); 
-        } catch (Throwable t) {}
+        
+        int paidCumulative = cephra.Admin.Utilities.QueueBridge.getTotalPaidCount();
+        Waitings.setText(String.valueOf(waiting));
+        Charging.setText(String.valueOf(charging));
+        Paid.setText(String.valueOf(paidCumulative));
     }
 
     private void setupActionColumn() {
@@ -118,7 +102,6 @@ public class Queue extends javax.swing.JPanel {
         final int statusCol = getColumnIndex("Status");
         if (actionCol < 0 || statusCol < 0) return;
 
-        // Renderer: show Proceed only on rows that have a real ticket AND are not paid
         queTab.getColumnModel().getColumn(actionCol).setCellRenderer(new TableCellRenderer() {
             private final JButton button = createFlatButton();
             private final JLabel empty = new JLabel("");
@@ -128,7 +111,6 @@ public class Queue extends javax.swing.JPanel {
                 Object ticketVal = table.getValueAt(row, getColumnIndex("Ticket"));
                 boolean hasTicket = ticketVal != null && String.valueOf(ticketVal).trim().length() > 0;
                 
-                // Also check payment status - don't show proceed button for paid tickets
                 int paymentCol = getColumnIndex("Payment");
                 boolean isPaid = false;
                 if (paymentCol >= 0 && hasTicket) {
@@ -137,21 +119,19 @@ public class Queue extends javax.swing.JPanel {
                     isPaid = "Paid".equalsIgnoreCase(paymentStatus);
                 }
                 
-                // Only show proceed button if there's a ticket AND it's not paid
                 if (hasTicket && !isPaid) {
                     button.setText("Proceed");
-                    button.setForeground(new java.awt.Color(255, 255, 255)); // Ensure white text color
-                    button.setBackground(new java.awt.Color(0, 120, 215)); // Ensure visible background
-                    button.setOpaque(true); // Ensure button is opaque
+                    button.setForeground(new java.awt.Color(255, 255, 255));
+                    button.setBackground(new java.awt.Color(0, 120, 215));
+                    button.setOpaque(true);
                     return button;
                 }
                 return empty;
             }
         });
 
-    // Combined Editor: handles both status progression AND grid button updates
-    queTab.getColumnModel().getColumn(actionCol).setCellEditor(new CombinedProceedEditor(statusCol));
-}
+        queTab.getColumnModel().getColumn(actionCol).setCellEditor(new CombinedProceedEditor(statusCol));
+    }
 
 private class CombinedProceedEditor extends AbstractCellEditor implements TableCellEditor, java.awt.event.ActionListener {
         private final JButton button = createFlatButton();
@@ -188,7 +168,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             int paymentCol = getColumnIndex("Payment");
             String status = String.valueOf(queTab.getValueAt(editingRow, statusColumnIndex));
 
-            // Crash-recovery: if payment not Paid, force/reset to Pending so flow can continue
             try {
                 String payVal = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
                 if ("Complete".equalsIgnoreCase(status)
@@ -206,21 +185,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             int customerCol = Math.min(1, queTab.getColumnCount() - 1);
             String customer = String.valueOf(queTab.getValueAt(editingRow, customerCol));
 
-            // Preserve existing flow below
             try {
                 if ("Pending".equalsIgnoreCase(status)) {
-                    // Promote Pending -> Waiting on first proceed
                     int statusCol = getColumnIndex("Status");
                     if (statusCol >= 0) {
                         queTab.setValueAt("Waiting", editingRow, statusCol);
                         try {
                             cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Waiting");
                             
-                            // Check if ticket is already in waiting grid to prevent duplication
                             boolean alreadyInWaitingGrid = cephra.Admin.BayManagement.isTicketInWaitingGrid(ticket);
                             
                             if (!alreadyInWaitingGrid) {
-                                // Only place into waiting grid if not already there
                                 int svcCol = getColumnIndex("Service");
                                 String serviceName = svcCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, svcCol)) : "";
                                 String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
@@ -228,47 +203,41 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                 cephra.Admin.BayManagement.addTicketToWaitingGrid(ticket, customerName, serviceName, battery);
                             }
                             
-                            // Refresh waiting grid view
                             initializeWaitingGridFromDatabase();
-                            
-                            // Trigger notification for the customer
                             String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
                             triggerNotificationForCustomer(customerName, "TICKET_WAITING", ticket, null);
                         } catch (Throwable ignore) {}
                     }
-                    // Do not open PayPop yet when still Waiting
                     updateStatusCounters();
                     return;
                 }
                 if ("Waiting".equalsIgnoreCase(status)) {
-                    // Try to assign to a charging bay; if assigned, status becomes Charging
                     boolean assigned = false;
-                    try { assigned = tryAssignToAnyAvailableBay(ticket); } catch (Throwable t) { System.err.println("Queue: assign attempt failed: " + t.getMessage()); }
+                    try { 
+                        assigned = tryAssignToAnyAvailableBay(ticket); 
+                    } catch (Throwable t) { 
+                        System.err.println("Queue: assign attempt failed: " + t.getMessage()); 
+                    }
                     if (assigned) {
                         setTableStatusToChargingByTicket(ticket);
                     } else {
-                        // Show dialog when assignment fails due to no available bays
                         Queue.this.showBayUnavailableDialog(ticket);
                     }
                     updateStatusCounters();
                     return;
                 }
                 if ("Charging".equalsIgnoreCase(status)) {
-                    // Move from Charging to Complete status
                     queTab.setValueAt("Complete", editingRow, statusColumnIndex);
                     
-                    // Update database status to Complete
                     try {
                         boolean dbUpdated = cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Complete");
-                        if (dbUpdated) {
-                        } else {
+                        if (!dbUpdated) {
                             System.err.println("Queue: Failed to update database status for ticket " + ticket);
                         }
                     } catch (Exception ex) {
                         System.err.println("Queue: Error updating database status: " + ex.getMessage());
                     }
                     
-                    // Ensure payment is set to Pending
                     try { 
                         ensurePaymentPending(ticket); 
                         if (paymentCol >= 0) {
@@ -278,18 +247,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         System.err.println("Failed to set payment pending: " + ex.getMessage()); 
                     }
                     
-                    // Trigger FULL_CHARGE notification for the customer
                     triggerNotificationForCustomer(customer, "FULL_CHARGE", ticket, null);
                 }
                 if ("Complete".equalsIgnoreCase(status)) {
-                
-                    // Check payment status
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
-                    System.out.println("Queue: Processing Complete ticket " + ticket + " with payment status: " + payment);
                     
                     if ("Pending".equalsIgnoreCase(payment)) {
-                        // Payment is still pending, show PayPop for payment
-                        System.out.println("Queue: Payment is pending for ticket " + ticket + " - showing PayPop");
                         try {
                             boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticket, customer);
                             if (!success) { 
@@ -300,62 +263,46 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         }
                         return;
                     } else if ("Paid".equalsIgnoreCase(payment)) {
-                        // Check if payment has already been processed to prevent duplicates
                         boolean alreadyProcessed = cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket);
-                        System.out.println("Queue: Checking if payment already processed for ticket " + ticket + ": " + alreadyProcessed);
                         
                         if (alreadyProcessed) {
-                            // Stop cell editing immediately
                             stopCellEditing();
-                            
-                            // Use QueueBridge.removeTicket() for consistent removal
                             try {
-                                cephra.Admin.QueueBridge.removeTicket(ticket);
-                                
-                                // Hard refresh entire panel after payment
+                                cephra.Admin.Utilities.QueueBridge.removeTicket(ticket);
                                 hardRefreshTable();
                             } catch (Throwable t) {
                                 System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
                             }
-                            return; // Exit early since payment was already processed
+                            return;
                         }
                         
-                        System.out.println("Queue: Payment not yet processed, proceeding with payment transaction for ticket " + ticket);
-                        
                         final String customerName = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
-                        // Get reference number from QueueBridge to ensure consistency
-                        final String reference = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
+                        final String reference = cephra.Admin.Utilities.QueueBridge.getTicketRefNumber(ticket);
                         
-                        // Process payment transaction immediately
                         double amount = 0.0;
                         try {
-                            // Centralized calculation for total amount
-                            amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                            amount = cephra.Admin.Utilities.QueueBridge.computeAmountDue(ticket);
                         } catch (Throwable t) {
                             System.err.println("Error computing amount for ticket " + ticket + ": " + t.getMessage());
                         }
                         
-                        // Process payment transaction to move ticket to charging history
                         try {
                             int serviceCol = getColumnIndex("Service");
                             String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
                             
-                            // Get battery info for calculations
-                            cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+                            cephra.Admin.Utilities.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.Utilities.QueueBridge.getTicketBatteryInfo(ticket);
                             if (batteryInfo == null) {
                                 int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
-                                batteryInfo = new cephra.Admin.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
+                                batteryInfo = new cephra.Admin.Utilities.QueueBridge.BatteryInfo(userBatteryLevel, 40.0);
                             }
                             
-                            // Calculate charging time based on service type
                             int chargingTimeMinutes = 0;
                             if (serviceName != null && serviceName.contains("Fast")) {
-                                chargingTimeMinutes = (int)((100.0 - batteryInfo.initialPercent) * 0.8); // 0.8 min per 1%
+                                chargingTimeMinutes = (int)((100.0 - batteryInfo.initialPercent) * 0.8);
                             } else {
-                                chargingTimeMinutes = (int)((100.0 - batteryInfo.initialPercent) * 1.6); // 1.6 min per 1%
+                                chargingTimeMinutes = (int)((100.0 - batteryInfo.initialPercent) * 1.6);
                             }
                             
-                            // Process the payment transaction (this will add to charging history)
                             boolean success = cephra.Database.CephraDB.processPaymentTransaction(
                                 ticket, customerName, serviceName, 
                                 batteryInfo.initialPercent, chargingTimeMinutes, 
@@ -364,28 +311,21 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             
                             if (success) {
                                 System.out.println("Successfully processed payment transaction for ticket: " + ticket);
-                                // Clear the active ticket since it's now in history
                                 try {
                                     cephra.Database.CephraDB.clearActiveTicketByTicketId(ticket);
                                 } catch (Exception ex) {
                                     System.err.println("Error clearing active ticket: " + ex.getMessage());
                                 }
                                 
-                                // Stop cell editing immediately
                                 stopCellEditing();
-                                
-                                // Use QueueBridge.removeTicket() for consistent removal
                                 try {
-                                    cephra.Admin.QueueBridge.removeTicket(ticket);
-                                    
-                                    // Refresh entire panel after payment
+                                    cephra.Admin.Utilities.QueueBridge.removeTicket(ticket);
                                     refreshEntirePanel();
                                 } catch (Throwable t) {
                                     System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
                                 }
                             } else {
                                 System.err.println("Failed to process payment transaction for ticket: " + ticket);
-                                // Show error message to user
                                 SwingUtilities.invokeLater(() -> {
                                     JOptionPane.showMessageDialog(Queue.this,
                                         "Failed to process payment for ticket " + ticket + ".\nPlease try again.",
@@ -395,7 +335,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             }
                         } catch (Exception ex) {
                             System.err.println("Error processing payment transaction: " + ex.getMessage());
-                            // Show error message to user
                             SwingUtilities.invokeLater(() -> {
                                 JOptionPane.showMessageDialog(Queue.this,
                                     "Error processing payment for ticket " + ticket + ".\nPlease try again.",
@@ -408,7 +347,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             } catch (Throwable t) {
                 System.err.println("Queue: Error in proceed action: " + t.getMessage());
             }
-            // Keep counters in sync after any action
             updateStatusCounters();
         }
     }
@@ -433,14 +371,14 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private static JButton createFlatButton() {
         JButton b = new JButton();
         b.setBorderPainted(false);
-        b.setContentAreaFilled(true); // Make sure content area is filled
+        b.setContentAreaFilled(true);
         b.setFocusPainted(false);
-        b.setOpaque(true); // Make button opaque so it's visible
+        b.setOpaque(true);
         b.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        b.setForeground(new java.awt.Color(255, 255, 255)); // Set text color to white
-        b.setBackground(new java.awt.Color(0, 120, 215)); // Set a visible background color
+        b.setForeground(new java.awt.Color(255, 255, 255));
+        b.setBackground(new java.awt.Color(0, 120, 215));
         b.setText("Proceed");
-        b.setPreferredSize(new java.awt.Dimension(80, 25)); // Set preferred size
+        b.setPreferredSize(new java.awt.Dimension(80, 25));
         return b;
     }
 
@@ -453,40 +391,26 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         return -1;
     }
     
-    /**
-     * Checks for rows with "Paid" payment status and automatically removes them
-     */
     private void checkAndRemovePaidRows() {
-        // Add a small delay to ensure payment processing is complete
         SwingUtilities.invokeLater(() -> {
-            // Use a timer to delay the check slightly
             javax.swing.Timer timer = new javax.swing.Timer(500, _ -> {
                 int paymentCol = getColumnIndex("Payment");
                 int ticketCol = getColumnIndex("Ticket");
                 
                 if (paymentCol < 0 || ticketCol < 0) return;
                 
-                // Check all rows for "Paid" status
                 for (int i = queTab.getRowCount() - 1; i >= 0; i--) {
                     Object paymentVal = queTab.getValueAt(i, paymentCol);
                     String paymentStatus = paymentVal == null ? "" : String.valueOf(paymentVal).trim();
                     
                     if ("Paid".equalsIgnoreCase(paymentStatus)) {
-                        // Get ticket information before removing
                         Object ticketVal = queTab.getValueAt(i, ticketCol);
                         String ticket = ticketVal == null ? "" : String.valueOf(ticketVal).trim();
                         
-                        System.out.println("Queue: Auto-removing row with Paid status for ticket: " + ticket);
-                        
-                        // Use QueueBridge.removeTicket() for consistent removal
                         if (!ticket.isEmpty()) {
                             try {
-                                cephra.Admin.QueueBridge.removeTicket(ticket);
-                                System.out.println("Queue: Successfully auto-removed ticket " + ticket + " via QueueBridge");
-                                
-                                // Hard refresh entire panel after payment
+                                cephra.Admin.Utilities.QueueBridge.removeTicket(ticket);
                                 hardRefreshTable();
-                                
                             } catch (Throwable t) {
                                 System.err.println("Error auto-removing ticket via QueueBridge: " + t.getMessage());
                             }
@@ -494,53 +418,37 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     }
                 }
             });
-            timer.setRepeats(false); // Only run once
+            timer.setRepeats(false);
             timer.start();
         });
     }
     
     
     
-    /**
-     * Refreshes the entire queue panel when a ticket is paid
-     */
     public void refreshEntirePanel() {
         SwingUtilities.invokeLater(() -> {
-            
-            // Force complete panel refresh
             this.repaint();
             this.revalidate();
-            
-            // Force table refresh
             queTab.repaint();
             queTab.revalidate();
             
-            // Force scroll pane refresh
             if (jScrollPane1 != null) {
                 jScrollPane1.repaint();
                 jScrollPane1.revalidate();
             }
             
-            // Force parent container refresh
             if (this.getParent() != null) {
                 this.getParent().repaint();
                 this.getParent().revalidate();
             }
             
-            // Update status counters
             updateStatusCounters();
-            
         });
     }
     
-    /**
-     * Performs a hard refresh by completely reloading the table from database
-     */
     public void hardRefreshTable() {
         SwingUtilities.invokeLater(() -> {
-            
             try {
-                // Stop any active cell editing safely
                 if (queTab.isEditing() && queTab.getRowCount() > 0) {
                     try {
                         queTab.getCellEditor().stopCellEditing();
@@ -549,40 +457,26 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     }
                 }
                 
-                // Clear the current table completely
                 ((DefaultTableModel) queTab.getModel()).setRowCount(0);
+                cephra.Admin.Utilities.QueueBridge.reloadFromDatabase();
                 
-                // Force QueueBridge to reload from database
-                cephra.Admin.QueueBridge.reloadFromDatabase();
-                
-                // Force complete UI refresh
                 queTab.clearSelection();
                 queTab.repaint();
                 queTab.revalidate();
-                
-                // Force table to refresh all cell renderers
                 queTab.updateUI();
                 
-                // Force complete renderer refresh by temporarily changing table model
                 DefaultTableModel currentModel = (DefaultTableModel) queTab.getModel();
                 queTab.setModel(new DefaultTableModel());
                 queTab.setModel(currentModel);
                 
-                // Re-setup action column to ensure renderers are fresh
                 setupActionColumn();
                 setupTicketColumn();
                 
-                // Force scroll pane refresh
                 jScrollPane1.repaint();
                 jScrollPane1.revalidate();
-                
-                // Force panel refresh
                 this.repaint();
                 this.revalidate();
-                
-                // Update status counters
                 updateStatusCounters();
-                
                 
             } catch (Exception e) {
                 System.err.println("Queue: Error during hard refresh: " + e.getMessage());
@@ -598,34 +492,22 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         nxtfastbtn.addActionListener(_ -> nextFastTicket());
     }
     
-    /**
-     * Setup periodic refresh to detect new tickets created via PHP/web interface
-     */
     private void setupPeriodicRefresh() {
-        javax.swing.Timer refreshTimer = new javax.swing.Timer(3000, _ -> { // Refresh every 3 seconds
+        javax.swing.Timer refreshTimer = new javax.swing.Timer(3000, _ -> {
             SwingUtilities.invokeLater(() -> {
                 try {
-                    // Check if there are new tickets in the database that aren't in our table
                     int currentRowCount = queTab.getRowCount();
+                    cephra.Admin.Utilities.QueueBridge.reloadFromDatabase();
                     
-                    // Reload from database to get latest tickets
-                    cephra.Admin.QueueBridge.reloadFromDatabase();
-                    
-                    // If new rows were added, refresh the table display
                     int newRowCount = queTab.getRowCount();
                     if (newRowCount > currentRowCount) {
-                        // Force table refresh to show new tickets
                         queTab.repaint();
                         queTab.revalidate();
-                        
-                        // Update status counters
                         updateStatusCounters();
                     }
                     
-                    // Always refresh waiting grid to catch priority tickets created via PHP
                     initializeWaitingGridFromDatabase();
                 } catch (Exception ex) {
-                    // Silently ignore refresh errors to avoid spam
                     System.err.println("Queue: Error during periodic refresh: " + ex.getMessage());
                 }
             });
@@ -638,13 +520,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void nextNormalTicket() {
         String ticket = findNextTicketByType("NCH");
         if (ticket != null) {
-            // Assign via BayManagement so grids update correctly
             boolean assigned = assignToNormalSlot(ticket);
             if (assigned) {
                 setTableStatusToChargingByTicket(ticket);
                 removeTicketFromGrid(ticket);
                 
-                // Get customer name and bay number for notification
                 String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
@@ -663,13 +543,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void nextFastTicket() {
         String ticket = findNextTicketByType("FCH");
         if (ticket != null) {
-            // Assign via BayManagement so grids update correctly
             boolean assigned = assignToFastSlot(ticket);
             if (assigned) {
                 setTableStatusToChargingByTicket(ticket);
                 removeTicketFromGrid(ticket);
                 
-                // Get customer name and bay number for notification
                 String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
@@ -685,12 +563,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         updateStatusCounters();
     }
     
-    /**
-     * Shows appropriate dialog when a ticket cannot be assigned to bays
-     * @param ticket the ticket ID
-     */
     private void showBayUnavailableDialog(String ticket) {
-        // Determine if this is a fast or normal charging ticket
         boolean isFastCharging = ticket.toUpperCase().startsWith("FCH");
         
         String message;
@@ -712,14 +585,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
     
     private String findNextTicketByType(String type) {
-        // Find the lowest numbered ticket of the specified type
         String lowestTicket = null;
         int lowestNumber = Integer.MAX_VALUE;
         
         for (int i = 0; i < buttonCount; i++) {
             String ticketText = gridButtons[i].getText();
             if (ticketText.contains(type)) {
-                // Extract the number from the ticket (e.g., "NCH001" -> 1, "FCH002" -> 2)
                 try {
                     String numberPart = ticketText.replaceAll("[^0-9]", "");
                     if (!numberPart.isEmpty()) {
@@ -730,7 +601,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         }
                     }
                 } catch (NumberFormatException e) {
-                    // If parsing fails, just use the ticket as is
                     if (lowestTicket == null) {
                         lowestTicket = ticketText;
                     }
@@ -743,7 +613,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void removeTicketFromGrid(String ticket) {
         for (int i = 0; i < buttonCount; i++) {
             if (gridButtons[i].getText().equals(ticket)) {
-                // Remove from database waiting grid
                 try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                      java.sql.PreparedStatement pstmt = conn.prepareStatement(
                          "UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?")) {
@@ -753,7 +622,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     System.err.println("Error removing ticket from waiting grid database: " + e.getMessage());
                 }
                 
-                // Shift remaining buttons
                 for (int j = i; j < buttonCount - 1; j++) {
                     gridButtons[j].setText(gridButtons[j + 1].getText());
                     gridButtons[j].setVisible(gridButtons[j + 1].isVisible());
@@ -767,136 +635,108 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
     
-         private void updateMonitorDisplay() {
-         if (monitorInstance != null) {
-             String[] buttonTexts = new String[10];
-             for (int i = 0; i < 10; i++) {
-                 if (i < buttonCount) {
-                     buttonTexts[i] = gridButtons[i].getText();
-                 } else {
-                     buttonTexts[i] = "";
-                 }
-             }
-             monitorInstance.updateDisplay(buttonTexts);
-         }
-     }
+    private void updateMonitorDisplay() {
+        if (monitorInstance != null) {
+            String[] buttonTexts = new String[10];
+            for (int i = 0; i < 10; i++) {
+                if (i < buttonCount) {
+                    buttonTexts[i] = gridButtons[i].getText();
+                } else {
+                    buttonTexts[i] = "";
+                }
+            }
+            monitorInstance.updateDisplay(buttonTexts);
+        }
+    }
      
-     private void updateMonitorFastGrid() {
-         if (monitorInstance != null) {
-            // Get grid display data from BayManagement (includes maintenance status)
+    private void updateMonitorFastGrid() {
+        if (monitorInstance != null) {
             String[] fastTickets = cephra.Admin.BayManagement.getFastChargingGridTexts();
             java.awt.Color[] fastColors = cephra.Admin.BayManagement.getFastChargingGridColors();
             
-            // Update Monitor with BayManagement data
-             monitorInstance.updateFastGrid(fastTickets);
-            
-            // Update local buttons with BayManagement data
+            monitorInstance.updateFastGrid(fastTickets);
             updateLocalFastButtons(fastTickets, fastColors);
         }
     }
     
-    /**
-     * Updates local fast charging buttons with BayManagement data
-     */
     private void updateLocalFastButtons(String[] texts, java.awt.Color[] colors) {
         JButton[] fastButtons = {fastslot1, fastslot2, fastslot3};
         
         for (int i = 0; i < fastButtons.length && i < texts.length; i++) {
             if (texts[i] != null && !texts[i].isEmpty()) {
-                // Bay has a ticket or is offline
                 fastButtons[i].setText(texts[i]);
                 fastButtons[i].setVisible(true);
                 if (colors != null && i < colors.length) {
                     fastButtons[i].setForeground(colors[i]);
                 }
             } else {
-                // Bay is available but empty - show empty button
                 fastButtons[i].setText("");
                 fastButtons[i].setVisible(true);
-                fastButtons[i].setForeground(new java.awt.Color(0, 230, 118)); // Green for available
+                fastButtons[i].setForeground(new java.awt.Color(0, 230, 118));
             }
-         }
-     }
+        }
+    }
      
-     private void updateMonitorNormalGrid() {
-         if (monitorInstance != null) {
-            // Get grid display data from BayManagement (includes maintenance status)
+    private void updateMonitorNormalGrid() {
+        if (monitorInstance != null) {
             String[] normalTickets = cephra.Admin.BayManagement.getNormalChargingGridTexts();
             java.awt.Color[] normalColors = cephra.Admin.BayManagement.getNormalChargingGridColors();
             
-            // Update Monitor with BayManagement data
-             monitorInstance.updateNormalGrid(normalTickets);
-            
-            // Update local buttons with BayManagement data
+            monitorInstance.updateNormalGrid(normalTickets);
             updateLocalNormalButtons(normalTickets, normalColors);
         }
     }
     
-    /**
-     * Updates local normal charging buttons with BayManagement data
-     */
     private void updateLocalNormalButtons(String[] texts, java.awt.Color[] colors) {
         JButton[] normalButtons = {normalcharge1, normalcharge2, normalcharge3, normalcharge4, normalcharge5};
         
         for (int i = 0; i < normalButtons.length && i < texts.length; i++) {
             if (texts[i] != null && !texts[i].isEmpty()) {
-                // Bay has a ticket or is offline
                 normalButtons[i].setText(texts[i]);
                 normalButtons[i].setVisible(true);
                 if (colors != null && i < colors.length) {
                     normalButtons[i].setForeground(colors[i]);
                 }
             } else {
-                // Bay is available but empty - show empty button
                 normalButtons[i].setText("");
                 normalButtons[i].setVisible(true);
-                normalButtons[i].setForeground(new java.awt.Color(0, 230, 118)); // Green for available
+                normalButtons[i].setForeground(new java.awt.Color(0, 230, 118));
             }
         }
     }
 
     private boolean assignToNormalSlot(String ticket) {
-        // Check if there's capacity for normal charging
         if (!cephra.Admin.BayManagement.hasChargingCapacity(false)) {
             return false;
         }
         
-        // Find next available normal charging bay (skips offline bays)
-        int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(false); // false = normal charging
+        int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(false);
         
         if (bayNumber > 0) {
-            // Move ticket from waiting grid to charging bay
             if (cephra.Admin.BayManagement.moveTicketFromWaitingToCharging(ticket, bayNumber)) {
-                // Update local display with fresh data from database
                 updateLocalNormalButtons(cephra.Admin.BayManagement.getNormalChargingGridTexts(), 
                                        cephra.Admin.BayManagement.getNormalChargingGridColors());
                 updateMonitorNormalGrid();
                 return true;
             }
-        } else {
         }
         return false;
     }
 
     private boolean assignToFastSlot(String ticket) {
-        // Check if there's capacity for fast charging
         if (!cephra.Admin.BayManagement.hasChargingCapacity(true)) {
             return false;
         }
         
-        // Find next available fast charging bay (skips offline bays)
-        int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(true); // true = fast charging
+        int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(true);
         
         if (bayNumber > 0) {
-            // Move ticket from waiting grid to charging bay
             if (cephra.Admin.BayManagement.moveTicketFromWaitingToCharging(ticket, bayNumber)) {
-                // Update local display with fresh data from database
                 updateLocalFastButtons(cephra.Admin.BayManagement.getFastChargingGridTexts(), 
                                      cephra.Admin.BayManagement.getFastChargingGridColors());
                 updateMonitorFastGrid();
                 return true;
             }
-        } else {
         }
         return false;
     }
@@ -904,7 +744,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private boolean tryAssignToAnyAvailableBay(String ticket) {
         String service = null;
         try {
-            service = cephra.Admin.QueueBridge.getTicketService(ticket);
+            service = cephra.Admin.Utilities.QueueBridge.getTicketService(ticket);
         } catch (Throwable ignore) {}
 
         boolean prefersFast = false;
@@ -915,12 +755,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
 
         if (prefersFast) {
-            // Fast charging requests should ONLY use fast bays (1-3)
-            // No fallback to normal bays to maintain service integrity
             return assignToFastSlot(ticket);
         } else {
-            // Normal charging requests should ONLY use normal bays (4-8)
-            // No fallback to fast bays to maintain service integrity
             return assignToNormalSlot(ticket);
         }
     }
@@ -934,10 +770,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             Object val = queTab.getValueAt(row, ticketCol);
             if (val != null && ticket.equals(String.valueOf(val).trim())) {
                 queTab.setValueAt("Charging", row, statusCol);
-                // Update database status
                 cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Charging");
                 
-                // Get customer name and bay number for MY_TURN notification
                 String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
                 String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                 if (customerName != null) {
@@ -963,18 +797,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 String v = value == null ? "" : String.valueOf(value).trim();
                 
-                // Show button for all payment statuses
                 if ("Pending".equalsIgnoreCase(v)) {
                     btn.setText("Pending");
-                    btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
-                    btn.setBackground(new java.awt.Color(255, 140, 0)); // Orange background for pending
-                    btn.setOpaque(true); // Ensure button is opaque
+                    btn.setForeground(new java.awt.Color(255, 255, 255));
+                    btn.setBackground(new java.awt.Color(255, 140, 0));
+                    btn.setOpaque(true);
                     return btn;
                 } else if ("Paid".equalsIgnoreCase(v)) {
                     btn.setText("Paid");
-                    btn.setBackground(new java.awt.Color(34, 139, 34)); // Green background for paid
-                    btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
-                    btn.setOpaque(true); // Ensure button is opaque
+                    btn.setBackground(new java.awt.Color(34, 139, 34));
+                    btn.setForeground(new java.awt.Color(255, 255, 255));
+                    btn.setOpaque(true);
                     return btn;
                 }
                 label.setText(v);
@@ -997,15 +830,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 String ticketId = value == null ? "" : String.valueOf(value).trim();
                 label.setText(ticketId);
                 
-                // Check if ticket has "P" suffix (priority ticket)
                 if (ticketId.contains("P") && (ticketId.startsWith("FCHP") || ticketId.startsWith("NCHP"))) {
-                    // Priority ticket - display in red
-                    label.setForeground(new java.awt.Color(220, 20, 60)); // Red color
-                    label.setFont(label.getFont().deriveFont(Font.BOLD)); // Bold font
+                    label.setForeground(new java.awt.Color(220, 20, 60));
+                    label.setFont(label.getFont().deriveFont(Font.BOLD));
                 } else {
-                    // Normal ticket - default color
-                    label.setForeground(new java.awt.Color(0, 0, 0)); // Black color
-                    label.setFont(label.getFont().deriveFont(Font.PLAIN)); // Normal font
+                    label.setForeground(new java.awt.Color(0, 0, 0));
+                    label.setFont(label.getFont().deriveFont(Font.PLAIN));
                 }
                 
                 return label;
@@ -1029,18 +859,17 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             String v = value == null ? "" : String.valueOf(value).trim();
             editorValue = v;
             
-            // Show button for all payment statuses
             if ("Pending".equalsIgnoreCase(v)) {
                 btn.setText("Pending");
-                btn.setBackground(new java.awt.Color(255, 140, 0)); // Orange background for pending
-                btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
-                btn.setOpaque(true); // Ensure button is opaque
+                btn.setBackground(new java.awt.Color(255, 140, 0));
+                btn.setForeground(new java.awt.Color(255, 255, 255));
+                btn.setOpaque(true);
                 return btn;
             } else if ("Paid".equalsIgnoreCase(v)) {
                 btn.setText("Paid");
-                btn.setBackground(new java.awt.Color(34, 139, 34)); // Green background for paid
-                btn.setForeground(new java.awt.Color(255, 255, 255)); // White text color
-                btn.setOpaque(true); // Ensure button is opaque
+                btn.setBackground(new java.awt.Color(34, 139, 34));
+                btn.setForeground(new java.awt.Color(255, 255, 255));
+                btn.setOpaque(true);
                 return btn;
             }
             label.setText(v);
@@ -1055,7 +884,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         @Override
         public void actionPerformed(java.awt.event.ActionEvent e) {
             if (editingRow >= 0 && editingRow < queTab.getRowCount()) {
-                // Check if charging is complete before allowing payment
                 int statusCol = getColumnIndex("Status");
                 String status = statusCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, statusCol)) : "";
                 
@@ -1070,7 +898,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     return;
                 }
                 
-                // Check if payment method is Cash
                 int ticketCol = getColumnIndex("Ticket");
                 if (ticketCol >= 0) {
                     Object v = queTab.getValueAt(editingRow, ticketCol);
@@ -1103,34 +930,25 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 );
                 if (choice == 0) {
                     editorValue = "Paid";
-                    // Sync cumulative paid counter and table via QueueBridge
                     if (ticketCol >= 0) {
                         Object v = queTab.getValueAt(editingRow, ticketCol);
                         String ticket = v == null ? "" : String.valueOf(v).trim();
                         if (!ticket.isEmpty()) {
-                            // Check if payment already processed to prevent duplicates
                             boolean alreadyProcessed = cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket);
                             if (alreadyProcessed) {
-                                // Stop cell editing immediately
                                 stopCellEditing();
-                                
-                                // Use QueueBridge.removeTicket() for consistent removal
                                 try {
-                                    cephra.Admin.QueueBridge.removeTicket(ticket);
-                                    
-                                    // Refresh entire panel after payment
+                                    cephra.Admin.Utilities.QueueBridge.removeTicket(ticket);
                                     refreshEntirePanel();
                                 } catch (Throwable t) {
                                     System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
                                 }
                             } else {
-                                // Get customer and service information for payment processing
                                 int customerCol = getColumnIndex("Customer");
                                 int serviceCol = getColumnIndex("Service");
                                 String customer = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
                                 String serviceName = serviceCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, serviceCol)) : "";
                                 
-                                // Use variables to avoid unused variable warnings
                                 if (customer == null || customer.trim().isEmpty()) {
                                     System.err.println("Warning: Customer name is empty for ticket " + ticket);
                                 }
@@ -1138,11 +956,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                     System.err.println("Warning: Service name is empty for ticket " + ticket);
                                 }
                                 
+                                cephra.Admin.Utilities.QueueBridge.markPaymentPaid(ticket);
                                 
-                                // Process payment through QueueBridge (which handles all payment logic)
-                                cephra.Admin.QueueBridge.markPaymentPaid(ticket);
-                                
-                                // Hide PayPop on phone if it's showing for this ticket
                                 try {
                                     if (cephra.Phone.Popups.PayPop.isShowingForTicket(ticket)) {
                                         cephra.Phone.Popups.PayPop.hidePayPop();
@@ -1151,14 +966,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                     System.err.println("Error hiding PayPop: " + ex.getMessage());
                                 }
                                 
-                                // Stop cell editing immediately
                                 stopCellEditing();
-                                
-                                // Use QueueBridge.removeTicket() for consistent removal
                                 try {
-                                    cephra.Admin.QueueBridge.removeTicket(ticket);
-                                    
-                                    // Refresh entire panel after payment
+                                    cephra.Admin.Utilities.QueueBridge.removeTicket(ticket);
                                     refreshEntirePanel();
                                 } catch (Throwable t) {
                                     System.err.println("Error removing ticket via QueueBridge: " + t.getMessage());
@@ -1173,14 +983,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
     
-     private void setupDateTimeTimer() {
+    private void setupDateTimeTimer() {
         updateDateTime();
-        javax.swing.Timer timer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                updateDateTime();
-            }
-        });
+        javax.swing.Timer timer = new javax.swing.Timer(1000, _ -> updateDateTime());
         timer.start();
     }
     
@@ -1687,14 +1492,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 
-    private void nxtnormalbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nxtnormalbtnActionPerformed
-      
-    }//GEN-LAST:event_nxtnormalbtnActionPerformed
+    private void nxtnormalbtnActionPerformed(java.awt.event.ActionEvent evt) {}
+    private void nxtfastbtnActionPerformed(java.awt.event.ActionEvent evt) {}
 
-    private void nxtfastbtnActionPerformed(java.awt.event.ActionEvent evt) {                                               
-    }                                          
-
-    // Grid button action listeners - placeholder methods for future functionality
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {}
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {}
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {}
@@ -1704,7 +1504,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {}
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {}
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Baybutton;
     private javax.swing.JLabel Charging;
     private javax.swing.JPanel ControlPanel;
@@ -1746,38 +1545,24 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private javax.swing.JLabel queIcon;
     private javax.swing.JTable queTab;
     private javax.swing.JButton staffbutton;
-    // End of variables declaration//GEN-END:variables
     
     
-    /**
-     * Initializes grid displays with offline status from BayManagement
-     */
     private void initializeGridDisplays() {
         try {
-            
-            // Force BayManagement to load data from database first
             cephra.Admin.BayManagement.ensureMaintenanceDisplay();
             
-            // Initialize fast charging grid with BayManagement data
             String[] fastTexts = cephra.Admin.BayManagement.getFastChargingGridTexts();
             java.awt.Color[] fastColors = cephra.Admin.BayManagement.getFastChargingGridColors();
-            
-            
             updateLocalFastButtons(fastTexts, fastColors);
             
-            // Initialize normal charging grid with BayManagement data
             String[] normalTexts = cephra.Admin.BayManagement.getNormalChargingGridTexts();
             java.awt.Color[] normalColors = cephra.Admin.BayManagement.getNormalChargingGridColors();
-            
-            
             updateLocalNormalButtons(normalTexts, normalColors);
             
-            // Update Monitor displays
             if (monitorInstance != null) {
                 monitorInstance.updateFastGrid(fastTexts);
                 monitorInstance.updateNormalGrid(normalTexts);
             }
-            
             
         } catch (Exception e) {
             System.err.println("Error initializing Queue grid displays: " + e.getMessage());
@@ -1785,17 +1570,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
     
-    /**
-     * Public method to refresh all grid displays with latest database data
-     * Called by BayManagement when tickets are moved to charging
-     */
     public void refreshGridDisplays() {
         try {
-            
-            // Refresh waiting grid
             initializeWaitingGridFromDatabase();
             
-            // Refresh charging grids with latest data from BayManagement (without triggering refresh cycle)
             String[] fastTexts = cephra.Admin.BayManagement.getFastChargingGridTexts();
             java.awt.Color[] fastColors = cephra.Admin.BayManagement.getFastChargingGridColors();
             updateLocalFastButtons(fastTexts, fastColors);
@@ -1804,12 +1582,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             java.awt.Color[] normalColors = cephra.Admin.BayManagement.getNormalChargingGridColors();
             updateLocalNormalButtons(normalTexts, normalColors);
             
-            // Update Monitor displays directly (without calling updateMonitorFastGrid/NormalGrid to avoid recursion)
             if (monitorInstance != null) {
                 monitorInstance.updateFastGrid(fastTexts);
                 monitorInstance.updateNormalGrid(normalTexts);
             }
-            
             
         } catch (Exception e) {
             System.err.println("Error refreshing Queue grid displays: " + e.getMessage());
@@ -1817,25 +1593,19 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
     
-    /**
-     * Initializes waiting grid from database
-     */
     private void initializeWaitingGridFromDatabase() {
         try {
-            // Get waiting grid tickets from database
             String[] waitingTickets = cephra.Admin.BayManagement.getWaitingGridTickets();
             
-            // Update waiting grid buttons
             for (int i = 0; i < waitingTickets.length && i < gridButtons.length; i++) {
                 if (waitingTickets[i] != null && !waitingTickets[i].isEmpty()) {
                     gridButtons[i].setText(waitingTickets[i]);
                     gridButtons[i].setVisible(true);
                     
-                    // Set color for priority tickets (FCHP, NCHP)
                     if (waitingTickets[i].startsWith("FCHP") || waitingTickets[i].startsWith("NCHP")) {
                         gridButtons[i].setForeground(java.awt.Color.RED);
                     } else {
-                        gridButtons[i].setForeground(java.awt.Color.BLACK); // Default color
+                        gridButtons[i].setForeground(java.awt.Color.BLACK);
                     }
                     
                     buttonCount = Math.max(buttonCount, i + 1);
@@ -1845,7 +1615,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 }
             }
             
-            // Update Monitor waiting grid
             if (monitorInstance != null) {
                 monitorInstance.updateDisplay(waitingTickets);
             }
@@ -1857,9 +1626,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
     
   
-    /**
-     * Get or create the static unified notification instance
-     */
     private static cephra.Phone.Popups.UnifiedNotification getOrCreateUnifiedNotification(cephra.Frame.Phone phoneFrame) {
         if (staticNotification == null) {
             staticNotification = new cephra.Phone.Popups.UnifiedNotification();
@@ -1873,9 +1639,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             return;
         }
         
-        
         try {
-            // Add notification to history first
             switch (notificationType) {
                 case "TICKET_WAITING":
                     cephra.Phone.Utilities.NotificationManager.addTicketWaitingNotification(customer, ticketId);
@@ -1893,7 +1657,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     return;
             }
             
-            // Show visual notification on phone screen
             showVisualNotification(customer, notificationType, ticketId, bayNumber);
             
         } catch (Exception e) {
@@ -1902,13 +1665,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
     
-    /**
-     * Shows the actual visual notification on the phone screen
-     */
     private void showVisualNotification(String customer, String notificationType, String ticketId, String bayNumber) {
         SwingUtilities.invokeLater(() -> {
             try {
-                // Find the phone frame
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 cephra.Frame.Phone phoneFrame = null;
                 
@@ -1923,17 +1682,13 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     return;
                 }
                 
-                // Check if the current user matches the notification recipient
                 String currentUser = cephra.Database.CephraDB.getCurrentUsername();
                 if (currentUser == null || !currentUser.equals(customer)) {
                     return;
                 }
                 
-                
-                // Get or create the unified notification instance (static to allow updates)
                 cephra.Phone.Popups.UnifiedNotification unifiedNotif = getOrCreateUnifiedNotification(phoneFrame);
                 
-                // Update and show the notification (this will override any current notification)
                 switch (notificationType) {
                     case "TICKET_WAITING":
                         unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_WAITING, ticketId, bayNumber);
@@ -1970,31 +1725,22 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         
         try {
             if (isFast) {
-                // Check fast charging slots
                 if (ticket.equals(fastslot1.getText())) return "Bay-1";
                 if (ticket.equals(fastslot2.getText())) return "Bay-2";
                 if (ticket.equals(fastslot3.getText())) return "Bay-3";
-                
-                // If not found in current display, try to determine from ticket type
-                // Fast charging bays are typically Bay-1, Bay-2, Bay-3
-                return "Bay-1"; // Default to first fast charging bay
+                return "Bay-1";
             } else {
-                // Check normal charging slots
                 if (ticket.equals(normalcharge1.getText())) return "Bay-4";
                 if (ticket.equals(normalcharge2.getText())) return "Bay-5";
                 if (ticket.equals(normalcharge3.getText())) return "Bay-6";
                 if (ticket.equals(normalcharge4.getText())) return "Bay-7";
                 if (ticket.equals(normalcharge5.getText())) return "Bay-8";
-                
-                // If not found in current display, try to determine from ticket type
-                // Normal charging bays are typically Bay-4, Bay-5, Bay-6, Bay-7, Bay-8
-                return "Bay-4"; // Default to first normal charging bay
+                return "Bay-4";
             }
         } catch (Exception e) {
             System.err.println("Error determining bay number for ticket " + ticket + ": " + e.getMessage());
         }
         
-        // Default fallback based on ticket type
         return isFast ? "Bay-1" : "Bay-4";
     }
 }

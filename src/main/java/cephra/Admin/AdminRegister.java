@@ -1,8 +1,7 @@
 package cephra.Admin;
 
-import java.awt.Color;
-import java.awt.Window;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import javax.swing.*;
 
 public class AdminRegister extends javax.swing.JPanel {
 
@@ -213,7 +212,7 @@ public class AdminRegister extends javax.swing.JPanel {
             return;
         }
 
-        cephra.Admin.StaffData.addStaff(firstname, lastname, usernameVal, emailVal, password);
+        cephra.Admin.Utilities.StaffData.addStaff(firstname, lastname, usernameVal, emailVal, password);
 
         javax.swing.JOptionPane.showMessageDialog(this, "Admin registration successful", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
         Firstname.setText("");

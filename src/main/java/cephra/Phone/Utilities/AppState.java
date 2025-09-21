@@ -17,13 +17,9 @@ public final class AppState {
                 int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
                 // Car is linked if battery exists and is not 100% (meaning it needs charging)
                 isCarLinked = (batteryLevel != -1 && batteryLevel < 100);
-                System.out.println("AppState: Initialized car linking state - username: " + username + 
-                                 ", battery: " + batteryLevel + "%, isCarLinked: " + isCarLinked);
-                
                 // If battery is 100%, ensure car is considered unlinked
                 if (batteryLevel == 100) {
                     isCarLinked = false;
-                    System.out.println("AppState: Battery at 100% - car is considered unlinked");
                 }
             }
         } catch (Exception e) {

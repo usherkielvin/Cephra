@@ -65,7 +65,6 @@ public class PayPop extends javax.swing.JPanel {
             return false;
         }
         
-        System.out.println("PayPop: Restoring PayPop after top-up for ticket: " + pendingTicketId);
         
         // Store the pending values
         String ticketId = pendingTicketId;
@@ -94,37 +93,28 @@ public class PayPop extends javax.swing.JPanel {
      * @return true if PayPop can be shown
      */
     public static boolean canShowPayPop(String ticketId, String customerUsername) {
-        System.out.println("=== PayPop.canShowPayPop() validation ===");
-        System.out.println("- Ticket ID: '" + ticketId + "'");
-        System.out.println("- Customer Username: '" + customerUsername + "'");
-        System.out.println("- Currently showing: " + isShowing);
         
         // Allow reappearing - if already showing, hide first then show again
         if (isShowing) {
-            System.out.println("PayPop: Already showing, will hide and reshow");
             hidePayPop();
         }
         
         // Validate user is logged in
         if (!cephra.Database.CephraDB.isUserLoggedIn()) {
-            System.out.println("PayPop: No user is currently logged in");
             return false;
         }
         
         // Get and validate current user
         String currentUser = cephra.Database.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
-            System.out.println("PayPop: Current user is null or empty");
             return false;
         }
         
         // Validate user matches ticket owner
         if (!currentUser.trim().equals(customerUsername.trim())) {
-            System.out.println("PayPop: User mismatch - current user ('" + currentUser + "') does not match ticket owner ('" + customerUsername + "')");
             return false;
         }
         
-        System.out.println("PayPop: Validation passed - PayPop CAN be shown for user '" + currentUser + "' and ticket '" + ticketId + "'");
         return true;
     }
     
@@ -135,7 +125,6 @@ public class PayPop extends javax.swing.JPanel {
      * @return true if PayPop was shown successfully
      */
     public static boolean showPayPop(String ticketId, String customerUsername) {
-        System.out.println("=== PayPop.showPayPop() called ===");
         
         if (!canShowPayPop(ticketId, customerUsername)) {
             return false;
@@ -240,7 +229,7 @@ public class PayPop extends javax.swing.JPanel {
         try {
             if (username == null || username.trim().isEmpty()) return null;
             javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel)
-                cephra.Admin.QueueBridge.class.getDeclaredField("model").get(null);
+                cephra.Admin.Utilities.QueueBridge.class.getDeclaredField("model").get(null);
             if (model == null) return null;
 
             final int colCount = model.getColumnCount();
@@ -338,18 +327,13 @@ public class PayPop extends javax.swing.JPanel {
             }
             
             // Calculate amounts using centralized QueueBridge methods
-            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
-            double commission = cephra.Admin.QueueBridge.computePlatformCommission(amount);
-            double net = cephra.Admin.QueueBridge.computeNetToStation(amount);
+            double amount = cephra.Admin.Utilities.QueueBridge.computeAmountDue(ticket);
             
             // Calculate energy usage
             double usedKWh = calculateEnergyUsage(ticket);
             
             // Update UI labels
             updateLabels(ticket, amount, usedKWh);
-            
-            // Log summary for debugging
-            logPaymentSummary(ticket, amount, usedKWh, commission, net);
             
         } catch (Exception e) {
             System.err.println("Error updating PayPop labels: " + e.getMessage());
@@ -363,7 +347,7 @@ public class PayPop extends javax.swing.JPanel {
      * @return energy usage in kWh
      */
     private double calculateEnergyUsage(String ticket) {
-        cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+        cephra.Admin.Utilities.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.Utilities.QueueBridge.getTicketBatteryInfo(ticket);
         if (batteryInfo != null) {
             int start = batteryInfo.initialPercent;
             double cap = batteryInfo.capacityKWh;
@@ -394,26 +378,6 @@ public class PayPop extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Logs payment summary for debugging
-     * @param ticket the ticket ID
-     * @param amount the total amount
-     * @param usedKWh the energy usage
-     * @param commission the commission amount
-     * @param net the net amount to station
-     */
-    private void logPaymentSummary(String ticket, double amount, double usedKWh, double commission, double net) {
-        String summary = String.format(
-            "Charging Complete – Please Pay ₱%.2f\nEnergy: %.1f kWh @ ₱%.2f/kWh\nMin fee: ₱%.2f applies if higher\nCommission: ₱%.2f (18%%)\nNet to station: ₱%.2f",
-            amount,
-            usedKWh,
-            cephra.Admin.QueueBridge.getRatePerKWh(),
-            cephra.Admin.QueueBridge.getMinimumFee(),
-            commission,
-            net
-        );
-        System.out.println("PayPop Summary for " + ticket + ":\n" + summary);
-    }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -474,14 +438,9 @@ public class PayPop extends javax.swing.JPanel {
      * @param evt the action event
      */
     private void CashActionPerformed(ActionEvent evt) {
-        System.out.println("Cash payment button clicked");
-        
         if (!validateUserLoggedIn()) {
             return;
         }
-        
-        String currentUser = cephra.Database.CephraDB.getCurrentUsername();
-        System.out.println("Processing cash payment for user: " + currentUser);
         
         try {
             // Get current ticket ID
@@ -493,11 +452,9 @@ public class PayPop extends javax.swing.JPanel {
             if (currentTicket != null && !currentTicket.isEmpty()) {
                 // Set payment method to Cash in the database
                 cephra.Database.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Cash");
-                System.out.println("Cash payment method set for ticket: " + currentTicket);
                 
                 // Mark payment as cash payment in the system
-                cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
-                System.out.println("Cash payment recorded for ticket: " + currentTicket);
+                cephra.Admin.Utilities.QueueBridge.markPaymentPaid(currentTicket);
             }
             
             // Clear any pending PayPop state since payment is completed
@@ -519,14 +476,9 @@ public class PayPop extends javax.swing.JPanel {
      * @param evt the action event
      */
     private void payonlineActionPerformed(ActionEvent evt) {
-        System.out.println("Online payment button clicked");
-        
         if (!validateUserLoggedIn()) {
             return;
         }
-        
-        String currentUser = cephra.Database.CephraDB.getCurrentUsername();
-        System.out.println("Processing online payment for user: " + currentUser);
         
         SwingUtilities.invokeLater(() -> {
             boolean paymentSuccess = false;
@@ -539,24 +491,19 @@ public class PayPop extends javax.swing.JPanel {
                         if (currentTicket != null && !currentTicket.isEmpty()) {
                             // Set payment method to Online in the database
                             cephra.Database.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Online");
-                            System.out.println("Online payment method set for ticket: " + currentTicket);
                             
-                            cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
+                            cephra.Admin.Utilities.QueueBridge.markPaymentPaidOnline(currentTicket);
                         }
                     } catch (Throwable ignore) {}
                 }
             } catch (Exception e) {
-                System.out.println("Payment error occurred, keeping PayPop open");
                 handlePaymentError(e);
             } finally {
-                System.out.println("PayPop: Payment success: " + paymentSuccess);
                 hidePayPop();
                 // Only navigate to receipt if payment was successful
                 if (paymentSuccess) {
-                    System.out.println("PayPop: Navigating to receipt...");
                     navigateToReceipt();
                 } else {
-                    System.out.println("PayPop: Payment failed, navigating to home...");
                     // If payment failed (e.g., insufficient balance), navigate back to home
                     navigateToHome();
                 }
@@ -599,7 +546,7 @@ public class PayPop extends javax.swing.JPanel {
         }
         
         // Calculate payment amount
-        double paymentAmount = cephra.Admin.QueueBridge.computeAmountDue(currentTicket);
+        double paymentAmount = cephra.Admin.Utilities.QueueBridge.computeAmountDue(currentTicket);
         
         // Store payment amount for receipt
         lastPaymentAmount = paymentAmount;
@@ -611,7 +558,6 @@ public class PayPop extends javax.swing.JPanel {
         }
         
         // No need to validate ticket status - PayPop only shows when ticket is completed
-        System.out.println("PayPop: Processing payment for completed ticket " + currentTicket + ", amount: ₱" + paymentAmount);
         
         // Process wallet payment
         boolean walletPaymentSuccess = cephra.Database.CephraDB.processWalletPayment(currentUser, currentTicket, paymentAmount);
@@ -622,12 +568,10 @@ public class PayPop extends javax.swing.JPanel {
         }
         
         // Process payment through existing system - markPaymentPaidOnline already handles everything
-        cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
+        cephra.Admin.Utilities.QueueBridge.markPaymentPaidOnline(currentTicket);
         
         // Clear any pending PayPop state since payment is completed successfully
         clearPendingState();
-        
-        System.out.println("Wallet payment processed successfully for ticket: " + currentTicket + ", Amount: ₱" + paymentAmount);
         
         // Note: markPaymentPaidOnline already handles:
         // - Payment processing and database updates
@@ -696,9 +640,6 @@ public class PayPop extends javax.swing.JPanel {
      * @param e the exception
      */
     private void handlePaymentError(Exception e) {
-        System.err.println("Error updating payment status: " + e.getMessage());
-        e.printStackTrace();
-        
         showErrorMessage("Failed to process GCash payment.\nError: " + e.getMessage() + "\nPlease try again or contact support.");
     }
     
@@ -722,18 +663,12 @@ public class PayPop extends javax.swing.JPanel {
      * Navigates to receipt screen
      */
     private void navigateToReceipt() {
-        System.out.println("PayPop: navigateToReceipt() called");
         SwingUtilities.invokeLater(() -> {
-            System.out.println("PayPop: Looking for Phone window...");
             Window[] windows = Window.getWindows();
-            System.out.println("PayPop: Found " + windows.length + " windows");
             for (Window window : windows) {
-                System.out.println("PayPop: Window type: " + window.getClass().getSimpleName());
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    System.out.println("PayPop: Found Phone window, switching to Receipt panel");
                     phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Reciept());
-                    System.out.println("PayPop: Receipt panel switch completed");
                     break;
                 }
             }
@@ -751,7 +686,6 @@ public class PayPop extends javax.swing.JPanel {
                 isPendingTopUpReturn = true;
                 pendingTicketId = currentTicketId;
                 pendingCustomerUsername = currentUser;
-                System.out.println("PayPop: Storing payment state for ticket " + currentTicketId + " before top-up");
             }
             
             hidePayPop(); // Hide the current PayPop

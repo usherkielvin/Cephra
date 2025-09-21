@@ -7,6 +7,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import cephra.Admin.Utilities.ButtonHoverEffect;
+import cephra.Admin.Utilities.StaffData;
+import cephra.Admin.Utilities.jtableDesign;
+
 
 public class StaffRecord extends javax.swing.JPanel {
 
@@ -205,14 +209,26 @@ public class StaffRecord extends javax.swing.JPanel {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Name", "Username", "Email", "Status", "Password"
+                "Name", "Username", "Email", "Status", "Date Created"
             }
-        ));
+        ) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return String.class;
+            }
+        });
         staffTable.setFocusable(false);
         staffTable.setGridColor(new java.awt.Color(255, 255, 255));
         staffTable.setOpaque(false);
         staffTable.setRequestFocusEnabled(false);
         staffTable.setShowHorizontalLines(true);
+        
+        // Set center alignment for all columns
+        javax.swing.table.DefaultTableCellRenderer centerRenderer = new javax.swing.table.DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        for (int i = 0; i < staffTable.getColumnCount(); i++) {
+            staffTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
         staffTable.getTableHeader().setResizingAllowed(false);
         staffTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(staffTable);
@@ -331,9 +347,17 @@ public class StaffRecord extends javax.swing.JPanel {
         } 
         
         for (String[] staff : StaffData.getStaffList()) {
+            String username = staff[3]; // Username is at index 3
+            
+            // Skip admin account - it's a special system account
+            if ("admin".equalsIgnoreCase(username)) {
+                continue;
+            }
+            
             String name = staff[0];
             if (name.toLowerCase().contains(keyword)) {
-                model.addRow(new Object[]{staff[0], staff[1], staff[2], staff[3], staff[4]});
+                // staff array: [name, firstname, lastname, username, email, status, password, date_created]
+                model.addRow(new Object[]{staff[0], staff[3], staff[4], staff[5], staff[7]});
             }
         }
     }
@@ -348,61 +372,20 @@ public class StaffRecord extends javax.swing.JPanel {
         String staffName = (String) staffTable.getValueAt(selectedRow, 0);
         String staffUsername = (String) staffTable.getValueAt(selectedRow, 1);
         
-        // Create password input dialog
-        javax.swing.JPanel panel = new javax.swing.JPanel();
-        panel.setLayout(new java.awt.BorderLayout());
+        // Generate random 6-digit password
+        java.util.Random random = new java.util.Random();
+        String newPassword = String.format("%06d", random.nextInt(1000000));
         
-        javax.swing.JLabel infoLabel = new javax.swing.JLabel("<html><b>Reset Password for:</b><br>" + 
-            "Name: " + staffName + "<br>" + 
-            "Username: " + staffUsername + "</html>");
-        infoLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.add(infoLabel, java.awt.BorderLayout.NORTH);
-        
-        javax.swing.JPanel inputPanel = new javax.swing.JPanel(new java.awt.FlowLayout());
-        javax.swing.JLabel passwordLabel = new javax.swing.JLabel("New Password:");
-        javax.swing.JPasswordField passwordField = new javax.swing.JPasswordField(20);
-        
-        inputPanel.add(passwordLabel);
-        inputPanel.add(passwordField);
-        panel.add(inputPanel, java.awt.BorderLayout.CENTER);
-        
-        javax.swing.JLabel noteLabel = new javax.swing.JLabel("<html><small><i>Note: Inform the staff member of the new password</i></small></html>");
-        noteLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 10, 10, 10));
-        panel.add(noteLabel, java.awt.BorderLayout.SOUTH);
-        
-        // Show the dialog
+        // Show confirmation dialog
         int result = javax.swing.JOptionPane.showConfirmDialog(
             this,
-            panel,
+            "Reset password for:\nName: " + staffName + "\nUsername: " + staffUsername + "\n\nNew password will be: " + newPassword + "\n\nProceed with reset?",
             "Reset Staff Password",
-            javax.swing.JOptionPane.OK_CANCEL_OPTION,
+            javax.swing.JOptionPane.YES_NO_OPTION,
             javax.swing.JOptionPane.QUESTION_MESSAGE
         );
         
-        if (result == javax.swing.JOptionPane.OK_OPTION) {
-            String newPassword = new String(passwordField.getPassword());
-            
-            // Validate password
-            if (newPassword.trim().isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(
-                    this,
-                    "Password cannot be empty!",
-                    "Invalid Password",
-                    javax.swing.JOptionPane.WARNING_MESSAGE
-                );
-                return;
-            }
-            
-            if (newPassword.length() < 4) {
-                javax.swing.JOptionPane.showMessageDialog(
-                    this,
-                    "Password must be at least 4 characters long!",
-                    "Invalid Password",
-                    javax.swing.JOptionPane.WARNING_MESSAGE
-                );
-                return;
-            }
-            
+        if (result == javax.swing.JOptionPane.YES_OPTION) {
             // Reset password in database
             boolean reset = cephra.Database.CephraDB.resetStaffPassword(staffUsername, newPassword);
             if (reset) {
@@ -520,14 +503,20 @@ public class StaffRecord extends javax.swing.JPanel {
             
             for (Object[] staff : staffData) {
                 // staff array: [name, firstname, lastname, username, email, status, password]
-                String fullName = (String) staff[0];        // Combined name (firstname + lastname)
                 String username = (String) staff[3];        // Username
+                
+                // Skip admin account - it's a special system account
+                if ("admin".equalsIgnoreCase(username)) {
+                    continue;
+                }
+                
+                String fullName = (String) staff[0];        // Combined name (firstname + lastname)
                 String email = (String) staff[4];           // Email
                 String status = (String) staff[5];          // Status
-                String password = (String) staff[6];        // Password
+                String dateCreated = (String) staff[7];     // Date created
                 
-                // Add row to table: Name, Username, Email, Status, Password
-                model.addRow(new Object[]{fullName, username, email, status, password});
+                // Add row to table: Name, Username, Email, Status, Date Created
+                model.addRow(new Object[]{fullName, username, email, status, dateCreated});
             }
         } catch (Exception e) {
             System.err.println("Error loading staff data: " + e.getMessage());
