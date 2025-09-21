@@ -144,13 +144,10 @@ public class HistoryManager {
             return;
         }
         
-        System.out.println("UserHistoryManager: Notifying listeners about history update for user: " + username);
-        System.out.println("UserHistoryManager: Number of registered listeners: " + listeners.size());
         
         // Notify all listeners about the history update
         for (HistoryUpdateListener listener : listeners) {
             try {
-                System.out.println("UserHistoryManager: Notifying listener: " + listener.getClass().getSimpleName());
                 listener.onHistoryUpdated(username);
             } catch (Exception e) {
                 System.err.println("UserHistoryManager: Error notifying listener: " + e.getMessage());
@@ -158,7 +155,6 @@ public class HistoryManager {
             }
         }
         
-        System.out.println("UserHistoryManager: Finished notifying all listeners for user: " + username);
     }
     
     // Method to get current counter values for debugging

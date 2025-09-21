@@ -70,9 +70,6 @@ public class CephraDB {
             // Clean up admin users from users table (they should be in staff_records)
             cleanupAdminFromUsersTable();
             
-            // Synchronize bay status with database
-            cephra.Admin.BayManagement.synchronizeBayStatusWithDatabase();
-            
             // Verify database connection and basic functionality
             verifyDatabaseConnection(conn);
         } catch (SQLException e) {
@@ -178,7 +175,6 @@ public class CephraDB {
     
     // Method to logout the current phone user
     public static void logoutCurrentUser() {
-        System.out.println("CephraDB: Logging out user " + (currentPhoneUser != null ? currentPhoneUser.username : "null"));
         currentPhoneUser = null;
     }
     
@@ -468,7 +464,6 @@ public class CephraDB {
                 deleteStmt.setString(1, username);
                 int deletedRows = deleteStmt.executeUpdate();
                 if (deletedRows > 0) {
-                    System.out.println("CephraDB: Deleted " + deletedRows + " old battery level entries for " + username);
                 }
             }
             
@@ -481,8 +476,7 @@ public class CephraDB {
                 insertStmt.setInt(3, batteryLevel); // initial_battery_level same as current
                 insertStmt.setDouble(4, 40.0); // default battery capacity
                 
-                int rowsAffected = insertStmt.executeUpdate();
-                System.out.println("CephraDB: Set new battery level for " + username + " to " + batteryLevel + "% (rows affected: " + rowsAffected + ")");
+                insertStmt.executeUpdate();
             }
             
         } catch (SQLException e) {
@@ -2524,7 +2518,6 @@ public class CephraDB {
                     if (rs.next()) {
                         String profilePicture = rs.getString("profile_picture");
                         if (profilePicture != null && !profilePicture.trim().isEmpty()) {
-                            System.out.println("CephraDB: Retrieved profile picture for user " + username);
                             return profilePicture;
                         }
                     }

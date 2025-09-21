@@ -33,37 +33,31 @@ public class AlreadyFull extends javax.swing.JPanel {
      * @return true if PayPop can be shown
      */
     public static boolean canShowPayPop(String ticketId, String customerUsername) {
-        System.out.println("=== PayPop.canShowPayPop() validation ===");
         System.out.println("- Ticket ID: '" + ticketId + "'");
         System.out.println("- Customer Username: '" + customerUsername + "'");
         System.out.println("- Currently showing: " + isShowing);
         
         // Allow reappearing - if already showing, hide first then show again
         if (isShowing) {
-            System.out.println("PayPop: Already showing, will hide and reshow");
             hidepop();
         }
         
         // Validate user is logged in
         if (!cephra.Database.CephraDB.isUserLoggedIn()) {
-            System.out.println("PayPop: No user is currently logged in");
             return false;
         }
         
         // Get and validate current user
         String currentUser = cephra.Database.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
-            System.out.println("PayPop: Current user is null or empty");
             return false;
         }
         
         // Validate user matches ticket owner
         if (!currentUser.trim().equals(customerUsername.trim())) {
-            System.out.println("PayPop: User mismatch - current user ('" + currentUser + "') does not match ticket owner ('" + customerUsername + "')");
             return false;
         }
         
-        System.out.println("PayPop: Validation passed - PayPop CAN be shown for user '" + currentUser + "' and ticket '" + ticketId + "'");
         return true;
     }
     
@@ -96,7 +90,6 @@ public class AlreadyFull extends javax.swing.JPanel {
      * @return true if PayPop was shown successfully
      */
     public static boolean showPayPop(String ticketId, String customerUsername) {
-        System.out.println("=== PayPop.showPayPop() called ===");
         
         if (!canShowPayPop(ticketId, customerUsername)) {
             return false;
@@ -309,19 +302,7 @@ public class AlreadyFull extends javax.swing.JPanel {
                 return;
             }
             
-            // Calculate amounts using centralized QueueBridge methods
-            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
-            double commission = cephra.Admin.QueueBridge.computePlatformCommission(amount);
-            double net = cephra.Admin.QueueBridge.computeNetToStation(amount);
             
-            // Calculate energy usage
-            double usedKWh = calculateEnergyUsage(ticket);
-            
-            // Update UI labels
-            updateLabels(ticket, amount, usedKWh);
-            
-            // Log summary for debugging
-            logPaymentSummary(ticket, amount, usedKWh, commission, net);
             
         } catch (Exception e) {
             System.err.println("Error updating PayPop labels: " + e.getMessage());
@@ -329,51 +310,6 @@ public class AlreadyFull extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * Calculates energy usage for the ticket
-     * @param ticket the ticket ID
-     * @return energy usage in kWh
-     */
-    private double calculateEnergyUsage(String ticket) {
-        cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
-        if (batteryInfo != null) {
-            int start = batteryInfo.initialPercent;
-            double cap = batteryInfo.capacityKWh;
-            return (100.0 - start) / 100.0 * cap;
-        }
-        return 0.0;
-    }
-    
-    /**
-     * Updates all UI labels with ticket data
-     * @param ticket the ticket ID
-     * @param amount the total amount
-     * @param usedKWh the energy usage
-     */
-    private void updateLabels(String ticket, double amount, double usedKWh) {
-       
-    }
-    
-    /**
-     * Logs payment summary for debugging
-     * @param ticket the ticket ID
-     * @param amount the total amount
-     * @param usedKWh the energy usage
-     * @param commission the commission amount
-     * @param net the net amount to station
-     */
-    private void logPaymentSummary(String ticket, double amount, double usedKWh, double commission, double net) {
-        String summary = String.format(
-            "Charging Complete – Please Pay ₱%.2f\nEnergy: %.1f kWh @ ₱%.2f/kWh\nMin fee: ₱%.2f applies if higher\nCommission: ₱%.2f (18%%)\nNet to station: ₱%.2f",
-            amount,
-            usedKWh,
-            cephra.Admin.QueueBridge.getRatePerKWh(),
-            cephra.Admin.QueueBridge.getMinimumFee(),
-            commission,
-            net
-        );
-        System.out.println("PayPop Summary for " + ticket + ":\n" + summary);
-    }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 

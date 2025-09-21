@@ -285,11 +285,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 
                     // Check payment status
                     String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, paymentCol)) : "";
-                    System.out.println("Queue: Processing Complete ticket " + ticket + " with payment status: " + payment);
                     
                     if ("Pending".equalsIgnoreCase(payment)) {
                         // Payment is still pending, show PayPop for payment
-                        System.out.println("Queue: Payment is pending for ticket " + ticket + " - showing PayPop");
                         try {
                             boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticket, customer);
                             if (!success) { 
@@ -302,7 +300,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     } else if ("Paid".equalsIgnoreCase(payment)) {
                         // Check if payment has already been processed to prevent duplicates
                         boolean alreadyProcessed = cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket);
-                        System.out.println("Queue: Checking if payment already processed for ticket " + ticket + ": " + alreadyProcessed);
                         
                         if (alreadyProcessed) {
                             // Stop cell editing immediately
@@ -320,7 +317,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             return; // Exit early since payment was already processed
                         }
                         
-                        System.out.println("Queue: Payment not yet processed, proceeding with payment transaction for ticket " + ticket);
                         
                         final String customerName = customerCol >= 0 ? String.valueOf(queTab.getValueAt(editingRow, customerCol)) : "";
                         // Get reference number from QueueBridge to ensure consistency
@@ -476,13 +472,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         Object ticketVal = queTab.getValueAt(i, ticketCol);
                         String ticket = ticketVal == null ? "" : String.valueOf(ticketVal).trim();
                         
-                        System.out.println("Queue: Auto-removing row with Paid status for ticket: " + ticket);
                         
                         // Use QueueBridge.removeTicket() for consistent removal
                         if (!ticket.isEmpty()) {
                             try {
                                 cephra.Admin.QueueBridge.removeTicket(ticket);
-                                System.out.println("Queue: Successfully auto-removed ticket " + ticket + " via QueueBridge");
                                 
                                 // Hard refresh entire panel after payment
                                 hardRefreshTable();

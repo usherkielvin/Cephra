@@ -43,7 +43,6 @@ public class LinkFirst extends javax.swing.JPanel {
     }
    
     public static boolean showPayPop(String ticketId, String customerUsername) {
-        System.out.println("=== PayPop.showPayPop() called ===");
         
         if (!canShowPayPop(ticketId, customerUsername)) {
             return false;

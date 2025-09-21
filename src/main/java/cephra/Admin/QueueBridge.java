@@ -465,7 +465,6 @@ public final class QueueBridge {
                             
                             // Trigger hard refresh
                             queuePanel.hardRefreshTable();
-                            System.out.println("QueueBridge: Triggered HARD refresh");
                             break;
                         }
                     }
@@ -505,7 +504,6 @@ public final class QueueBridge {
                             // Force table refresh
                             queuePanel.hardRefreshTable();
                             
-                            System.out.println("QueueBridge: Triggered panel switch refresh (mimics switching panels)");
                             break;
                         }
                     }
@@ -524,7 +522,6 @@ public final class QueueBridge {
             javax.swing.JTabbedPane tabbedPane = (javax.swing.JTabbedPane) container;
             tabbedPane.revalidate();
             tabbedPane.repaint();
-            System.out.println("QueueBridge: Refreshed tabbed pane");
         }
         
         for (java.awt.Component component : container.getComponents()) {
@@ -644,7 +641,6 @@ public final class QueueBridge {
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("minimum_fee", String.valueOf(MINIMUM_FEE));
-                System.out.println("QueueBridge: Set default minimum fee: ₱" + MINIMUM_FEE);
             }
             
             // Load rate per kWh from database
@@ -654,7 +650,6 @@ public final class QueueBridge {
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("rate_per_kwh", String.valueOf(RATE_PER_KWH));
-                System.out.println("QueueBridge: Set default rate per kWh: ₱" + RATE_PER_KWH);
             }
             
             // Load fast multiplier from database
@@ -664,7 +659,6 @@ public final class QueueBridge {
             } else {
                 // Set default if not found in database
                 cephra.Database.CephraDB.updateSystemSetting("fast_multiplier", String.valueOf(FAST_MULTIPLIER));
-                System.out.println("QueueBridge: Set default fast multiplier: " + String.format("%.0f%%", (FAST_MULTIPLIER - 1) * 100));
             }
             
         } catch (Exception e) {
@@ -697,7 +691,6 @@ public final class QueueBridge {
                 System.err.println("QueueBridge: Error removing ticket from database: " + e.getMessage());
             }
         } else {
-            System.out.println("QueueBridge: Ticket " + ticket + " already processed, removing from UI only");
         }
 
         // Remove from memory records
@@ -726,7 +719,6 @@ public final class QueueBridge {
                                 Object v = model.getValueAt(i, 0);
                                 if (v != null && ticket.equals(String.valueOf(v))) {
                                     model.removeRow(i);
-                                    System.out.println("QueueBridge: Successfully removed ticket " + ticket + " from table model at row " + i);
                                     
                                     // Force table model to fire change events
                                     model.fireTableDataChanged();
@@ -780,16 +772,12 @@ public final class QueueBridge {
                         boolean paymentPending = "Pending".equalsIgnoreCase(payment);
                         boolean alreadyPaid = "Paid".equalsIgnoreCase(payment);
                         
-                        System.out.println("QueueBridge: Validating ticket " + ticketId + " - Status: '" + status + "', Payment: '" + payment + "'");
                         
                         if (chargingReady && paymentPending) {
-                            System.out.println("QueueBridge: Ticket " + ticketId + " is ready for payment");
                             return true; // Ready for payment
                         } else if (chargingReady && alreadyPaid) {
-                            System.out.println("QueueBridge: Ticket " + ticketId + " is already paid, payment not allowed");
                             return false; // Already paid, don't allow payment again
                         } else {
-                            System.out.println("QueueBridge: Ticket " + ticketId + " not ready - Status: '" + status + "', Payment: '" + payment + "'");
                             return false; // Not ready for payment
                         }
                     }

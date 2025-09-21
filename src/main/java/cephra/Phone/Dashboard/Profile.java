@@ -65,7 +65,6 @@ public class Profile extends javax.swing.JPanel {
                     
                     if (Profile != null) {
                         Profile.setIcon(new javax.swing.ImageIcon(circularImage));
-                        System.out.println("Profile: Loaded profile picture for current user");
                     }
                 } else {
                     System.err.println("Profile: Failed to decode profile picture from Base64");
@@ -316,7 +315,6 @@ public class Profile extends javax.swing.JPanel {
                             
                             // Save to database first
                             cephra.Database.CephraDB.setUserBatteryLevel(username, newBatteryLevel);
-                            System.out.println("Profile: Reset battery level for " + username + " from " + currentBatteryLevel + "% to " + newBatteryLevel + "% on logout");
                             
                             // Check for duplicate battery level entries
                             cephra.Database.CephraDB.checkDuplicateBatteryLevels(username);
@@ -324,7 +322,6 @@ public class Profile extends javax.swing.JPanel {
                             // Verify the database update worked
                             try {
                                 int verifyBattery = cephra.Database.CephraDB.getUserBatteryLevel(username);
-                                System.out.println("Profile: Verified database update - battery level is now " + verifyBattery + "%");
                                 if (verifyBattery != newBatteryLevel) {
                                     System.err.println("Profile: WARNING - Database update failed! Expected " + newBatteryLevel + "% but got " + verifyBattery + "%");
                                 }
@@ -334,7 +331,6 @@ public class Profile extends javax.swing.JPanel {
                             
                             // RESET CAR LINKING STATUS - User will see regular Home panel on next login
                             cephra.Phone.Utilities.AppState.isCarLinked = false;
-                            System.out.println("Profile: Reset car linking status to false - user will see regular Home panel on next login");
                          
                             // Refresh any visible Porsche panel to show the new battery level
                             try {
@@ -370,7 +366,6 @@ public class Profile extends javax.swing.JPanel {
                 
                 // Properly logout the current user
                 cephra.Database.CephraDB.logoutCurrentUser();
-                System.out.println("Profile: User has been logged out");
                 
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
