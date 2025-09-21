@@ -440,7 +440,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             // Update kWh information (get from admin history record) - just the value
             String kWhValue = "32.80"; // Default value
             try {
-                java.util.List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
+                java.util.List<Object[]> adminRecords = cephra.Admin.Utilities.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
                 if (adminRecords != null) {
                     for (Object[] record : adminRecords) {
                         if (record.length >= 7 && entry.getTicketId().equals(String.valueOf(record[0]))) {
@@ -469,7 +469,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             // Update served by information - just the value
             String servedBy = "Admin"; // Default fallback
             try {
-                java.util.List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
+                java.util.List<Object[]> adminRecords = cephra.Admin.Utilities.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
                 if (adminRecords != null) {
                     for (Object[] record : adminRecords) {
                         if (record.length >= 5 && entry.getTicketId().equals(String.valueOf(record[0]))) {
@@ -501,7 +501,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             // Update reference number - just the value
             String refNumber = entry.getReferenceNumber();
             if (refNumber == null || refNumber.trim().isEmpty() || refNumber.equals("null")) {
-                refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(entry.getTicketId());
+                refNumber = cephra.Admin.Utilities.QueueBridge.getTicketRefNumber(entry.getTicketId());
             }
             if (ref != null) {
                 ref.setText(refNumber);

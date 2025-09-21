@@ -1,7 +1,9 @@
-package cephra.Admin;
+package cephra.Admin.Utilities;
 
 import javax.swing.*;
 import javax.swing.table.*;
+
+
 import java.util.*;
 
 public final class QueueBridge {
@@ -385,7 +387,7 @@ public final class QueueBridge {
                     
                     // Refresh history table to show the new completed ticket
                     try {
-                        cephra.Admin.HistoryBridge.refreshHistoryTable();
+                        cephra.Admin.Utilities.HistoryBridge.refreshHistoryTable();
                     } catch (Exception e) {
                         System.err.println("QueueBridge: Error refreshing history table: " + e.getMessage());
                     }

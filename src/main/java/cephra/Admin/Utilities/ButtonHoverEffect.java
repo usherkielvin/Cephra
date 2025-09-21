@@ -1,4 +1,4 @@
-package cephra.Admin;
+package cephra.Admin.Utilities;
 
 import javax.swing.JButton;
 import java.awt.Color;

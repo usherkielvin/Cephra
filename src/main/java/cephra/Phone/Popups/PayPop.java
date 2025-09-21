@@ -229,7 +229,7 @@ public class PayPop extends javax.swing.JPanel {
         try {
             if (username == null || username.trim().isEmpty()) return null;
             javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel)
-                cephra.Admin.QueueBridge.class.getDeclaredField("model").get(null);
+                cephra.Admin.Utilities.QueueBridge.class.getDeclaredField("model").get(null);
             if (model == null) return null;
 
             final int colCount = model.getColumnCount();
@@ -327,7 +327,7 @@ public class PayPop extends javax.swing.JPanel {
             }
             
             // Calculate amounts using centralized QueueBridge methods
-            double amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+            double amount = cephra.Admin.Utilities.QueueBridge.computeAmountDue(ticket);
             
             // Calculate energy usage
             double usedKWh = calculateEnergyUsage(ticket);
@@ -347,7 +347,7 @@ public class PayPop extends javax.swing.JPanel {
      * @return energy usage in kWh
      */
     private double calculateEnergyUsage(String ticket) {
-        cephra.Admin.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.QueueBridge.getTicketBatteryInfo(ticket);
+        cephra.Admin.Utilities.QueueBridge.BatteryInfo batteryInfo = cephra.Admin.Utilities.QueueBridge.getTicketBatteryInfo(ticket);
         if (batteryInfo != null) {
             int start = batteryInfo.initialPercent;
             double cap = batteryInfo.capacityKWh;
@@ -454,7 +454,7 @@ public class PayPop extends javax.swing.JPanel {
                 cephra.Database.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Cash");
                 
                 // Mark payment as cash payment in the system
-                cephra.Admin.QueueBridge.markPaymentPaid(currentTicket);
+                cephra.Admin.Utilities.QueueBridge.markPaymentPaid(currentTicket);
             }
             
             // Clear any pending PayPop state since payment is completed
@@ -492,7 +492,7 @@ public class PayPop extends javax.swing.JPanel {
                             // Set payment method to Online in the database
                             cephra.Database.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Online");
                             
-                            cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
+                            cephra.Admin.Utilities.QueueBridge.markPaymentPaidOnline(currentTicket);
                         }
                     } catch (Throwable ignore) {}
                 }
@@ -546,7 +546,7 @@ public class PayPop extends javax.swing.JPanel {
         }
         
         // Calculate payment amount
-        double paymentAmount = cephra.Admin.QueueBridge.computeAmountDue(currentTicket);
+        double paymentAmount = cephra.Admin.Utilities.QueueBridge.computeAmountDue(currentTicket);
         
         // Store payment amount for receipt
         lastPaymentAmount = paymentAmount;
@@ -568,7 +568,7 @@ public class PayPop extends javax.swing.JPanel {
         }
         
         // Process payment through existing system - markPaymentPaidOnline already handles everything
-        cephra.Admin.QueueBridge.markPaymentPaidOnline(currentTicket);
+        cephra.Admin.Utilities.QueueBridge.markPaymentPaidOnline(currentTicket);
         
         // Clear any pending PayPop state since payment is completed successfully
         clearPendingState();

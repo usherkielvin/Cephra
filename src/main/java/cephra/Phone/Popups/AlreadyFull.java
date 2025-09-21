@@ -205,7 +205,7 @@ public class AlreadyFull extends javax.swing.JPanel {
         try {
             if (username == null || username.trim().isEmpty()) return null;
             javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel)
-                cephra.Admin.QueueBridge.class.getDeclaredField("model").get(null);
+                cephra.Admin.Utilities.QueueBridge.class.getDeclaredField("model").get(null);
             if (model == null) return null;
 
             final int colCount = model.getColumnCount();

@@ -74,7 +74,7 @@ public class Reciept extends javax.swing.JPanel {
                 amount = getAmountFromChargingHistory(ticket);
                 if (amount <= 0) {
                     // Fallback to QueueBridge calculation if not found in history
-                    amount = cephra.Admin.QueueBridge.computeAmountDue(ticket);
+                    amount = cephra.Admin.Utilities.QueueBridge.computeAmountDue(ticket);
                 }
             }
             
@@ -83,12 +83,12 @@ public class Reciept extends javax.swing.JPanel {
             String refNumber = "";
             if (!isPayPopPayment) {
                 // Get reference number from queue bridge first (most up-to-date)
-                refNumber = cephra.Admin.QueueBridge.getTicketRefNumber(ticket);
+                refNumber = cephra.Admin.Utilities.QueueBridge.getTicketRefNumber(ticket);
                 
                 // If not found in queue, try admin history
                 if (refNumber.isEmpty()) {
                     try {
-                        List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
+                        List<Object[]> adminRecords = cephra.Admin.Utilities.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
                         if (adminRecords != null) {
                             for (Object[] record : adminRecords) {
                                 if (record.length >= 7 && ticket.equals(String.valueOf(record[0]))) {
@@ -114,7 +114,7 @@ public class Reciept extends javax.swing.JPanel {
             
             
             AmountPaid.setText(String.format("Php %.2f", finalAmount));
-            Fee.setText(String.format("Php %.2f", cephra.Admin.QueueBridge.getMinimumFee()));
+            Fee.setText(String.format("Php %.2f", cephra.Admin.Utilities.QueueBridge.getMinimumFee()));
             price.setText(String.format("PHP %.2f", finalAmount));
             
             // Handle reference number display - show reference for all payments
@@ -146,7 +146,7 @@ public class Reciept extends javax.swing.JPanel {
             if (username == null || username.isEmpty()) return 0;
             
             // Get charging history records for the user
-            java.util.List<Object[]> adminRecords = cephra.Admin.HistoryBridge.getRecordsForUser(username);
+            java.util.List<Object[]> adminRecords = cephra.Admin.Utilities.HistoryBridge.getRecordsForUser(username);
             if (adminRecords != null) {
                 for (Object[] record : adminRecords) {
                     if (record.length >= 7 && ticket.equals(String.valueOf(record[0]))) {

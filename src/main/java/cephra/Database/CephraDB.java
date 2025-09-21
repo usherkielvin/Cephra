@@ -1634,7 +1634,7 @@ public class CephraDB {
             
             // Refresh admin history table to show the new completed ticket
             try {
-                cephra.Admin.HistoryBridge.refreshHistoryTable();
+                cephra.Admin.Utilities.HistoryBridge.refreshHistoryTable();
             } catch (Exception e) {
                 System.err.println("CephraDB: Error refreshing admin history table: " + e.getMessage());
             }
@@ -2030,7 +2030,7 @@ public class CephraDB {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")),
                 referenceNumber != null ? referenceNumber : ""
             };
-            cephra.Admin.HistoryBridge.addRecord(historyRow);
+            cephra.Admin.Utilities.HistoryBridge.addRecord(historyRow);
         } catch (Throwable t) {
             // Ignore if HistoryBridge is not available
         }

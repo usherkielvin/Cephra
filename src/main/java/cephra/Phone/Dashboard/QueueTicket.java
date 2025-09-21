@@ -432,9 +432,9 @@ public class QueueTicket extends javax.swing.JPanel {
             int start = cephra.Database.CephraDB.getUserBatteryLevel(username);
             int minutes;
             if (ticket != null && !ticket.isEmpty()) {
-                minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(ticket);
+                minutes = cephra.Admin.Utilities.QueueBridge.computeEstimatedMinutes(ticket);
             } else {
-                minutes = cephra.Admin.QueueBridge.computeEstimatedMinutes(start, service);
+                minutes = cephra.Admin.Utilities.QueueBridge.computeEstimatedMinutes(start, service);
             }
             mins1.setText(formatTimeDisplay(minutes));
         } catch (Exception e) {

@@ -7,6 +7,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import cephra.Admin.Utilities.ButtonHoverEffect;
+import cephra.Admin.Utilities.StaffData;
+import cephra.Admin.Utilities.jtableDesign;
+
 
 public class StaffRecord extends javax.swing.JPanel {
 
