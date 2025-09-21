@@ -1,13 +1,8 @@
 package cephra.Frame;
 
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class Admin extends javax.swing.JFrame {
     
@@ -21,29 +16,13 @@ public class Admin extends javax.swing.JFrame {
         setAppIcon();
         addEscapeKeyListener();
         makeDraggable();
-        
-        // Start with the Login panel (Splash removed)
         switchPanel(new cephra.Admin.Login());
     }
 
     private void setAppIcon() {
-        try {
-            // Try different resource paths to find the icon
-            java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/lod.png");
-            if (iconUrl == null) {
-                iconUrl = getClass().getClassLoader().getResource("cephra/Cephra Images/lod.png");
-            }
-            if (iconUrl == null) {
-                iconUrl = getClass().getResource("/cephra/Photos/lod.png");
-            }
-            
-            if (iconUrl != null) {
-                setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
-            } else {
-                System.err.println("Could not find admin app icon: lod.png");
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading admin app icon: " + e.getMessage());
+        java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/Applogo.png");
+        if (iconUrl != null) {
+            setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
         }
     }
 
@@ -86,13 +65,8 @@ public class Admin extends javax.swing.JFrame {
     public void switchPanel(JPanel newPanel) {
         getContentPane().removeAll();
         getContentPane().add(newPanel, BorderLayout.CENTER);
-        
-        // Update labelStaff in admin panels if it's an admin panel
         updateAdminPanelLabel(newPanel);
-        
-        // Hide/show buttons based on user role
-        updateButtonVisibility(newPanel);
-        
+        updateButtonVisibility(newPanel);       
         revalidate();
         repaint();
     }
@@ -146,17 +120,15 @@ public class Admin extends javax.swing.JFrame {
     
     private void updateAdminPanelLabel(JPanel panel) {
         try {
-            // Use reflection to find and update labelStaff in admin panels
             java.lang.reflect.Field labelField = panel.getClass().getDeclaredField("labelStaff");
             labelField.setAccessible(true);
             javax.swing.JLabel labelStaff = (javax.swing.JLabel) labelField.get(panel);
             if (labelStaff != null) {
-                // Get the firstname from database instead of using username
                 String firstname = cephra.Database.CephraDB.getStaffFirstName(loggedInUsername);
                 labelStaff.setText(firstname + "!");
             }
         } catch (Exception e) {
-            // Not an admin panel or labelStaff not found, ignore
+           
         }
     }
 

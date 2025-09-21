@@ -8,8 +8,8 @@ public class Phone extends javax.swing.JFrame {
 
     private Point dragStartPoint;
     private JLabel Iphoneframe;
-    public Phone() {
 
+    public Phone() {
         setUndecorated(true);
         initComponents();
         setSize(370, 750);
@@ -17,44 +17,19 @@ public class Phone extends javax.swing.JFrame {
         setAppIcon();
         addEscapeKeyListener();
         makeDraggable();
-        // Use absolute positioning for phone panels
         getContentPane().setLayout(null);
-        
-        // Add curved edges to the frame
         setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 370, 750, 120, 120));
-        
-        // Refresh ticket counters when Phone frame is created
-        try {
-            cephra.Phone.Utilities.QueueFlow.refreshCountersFromDatabase();
-        } catch (Exception e) {
-            System.err.println("Error refreshing ticket counters: " + e.getMessage());
-        }
 
-        // Initialize car linking state from database
         cephra.Phone.Utilities.AppState.initializeCarLinkingState();
-
-        // Start with loading screen panel
         switchPanel(new cephra.Phone.UserProfile.Loading_Screen());
-        
-        // Create and setup phone frame overlay to always appear on top
         PhoneFrame();
-
-        // Initialize and start the time label updates
         updateTime();
         startTimeTimer();
-        }
+    }
 
     private void setAppIcon() {
-        try {
-            java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/lod.png");
-            if (iconUrl != null) {
-                setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
-            } else {
-                System.err.println("Could not find app icon: lod.png");
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading app icon: " + e.getMessage());
-        }
+        java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/Applogo.png");
+        setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
     }
 
     private void addEscapeKeyListener() {
@@ -97,39 +72,18 @@ public class Phone extends javax.swing.JFrame {
         Iphoneframe.setBounds(0, 0, 370, 750);
         Iphoneframe.setHorizontalAlignment(SwingConstants.CENTER);
         Iphoneframe.setOpaque(false);
-        
-        // Add to layered pane to ensure it's always on top
         getRootPane().getLayeredPane().add(Iphoneframe, JLayeredPane.DRAG_LAYER);
         
-        // Move time label to layered pane above the phone frame
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if (jLabel1.getParent() == getContentPane()) {
-                        getContentPane().remove(jLabel1);
-                    }
-                    jLabel1.setOpaque(false);
-                    jLabel1.setForeground(Color.BLACK);
-                    jLabel1.setVisible(true);
-                    jLabel1.setBounds(39, 21, 55, 20);
-                    getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.MODAL_LAYER);
-                    getRootPane().getLayeredPane().moveToFront(jLabel1);
-                    getRootPane().revalidate();
-                    getRootPane().repaint();
-                }
-            });
-        } catch (Exception ignore) {}
-        
-        // Ensure visibility
-        Iphoneframe.setVisible(true);
-        jLabel1.setVisible(true);
-        jLabel1.setForeground(Color.BLACK);
-        jLabel1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12));
-        getRootPane().getLayeredPane().moveToFront(jLabel1);
-        getRootPane().getLayeredPane().moveToFront(Iphoneframe);
-        
-        // Force repaint to ensure visibility
         SwingUtilities.invokeLater(() -> {
+            if (jLabel1.getParent() == getContentPane()) {
+                getContentPane().remove(jLabel1);
+            }
+            jLabel1.setOpaque(false);
+            jLabel1.setForeground(Color.BLACK);
+            jLabel1.setBounds(39, 21, 55, 20);
+            jLabel1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12));
+            getRootPane().getLayeredPane().add(jLabel1, JLayeredPane.MODAL_LAYER);
+            getRootPane().getLayeredPane().moveToFront(jLabel1);
             getRootPane().revalidate();
             getRootPane().repaint();
         });
@@ -141,8 +95,6 @@ public class Phone extends javax.swing.JFrame {
         getContentPane().add(newPanel);
         revalidate();
         repaint();
-        
-        // Ensure overlay stays on top
         ensureIphoneFrameOnTop();
     }
 
@@ -160,18 +112,11 @@ public class Phone extends javax.swing.JFrame {
             java.time.LocalTime now = java.time.LocalTime.now();
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("h:mm a");
             jLabel1.setText(now.format(formatter));
-            // Debug: ensure label is visible and positioned correctly
-            if (!jLabel1.isVisible()) {
-                jLabel1.setVisible(true);
-                System.out.println("Time label was not visible - made visible");
-            }
-        } else {
-            System.err.println("Time label (jLabel1) is null!");
         }
     }
     
     private void startTimeTimer() {
-        javax.swing.Timer timer = new javax.swing.Timer(1000, _ -> updateTime()); // Update every second
+        javax.swing.Timer timer = new javax.swing.Timer(1000, _ -> updateTime());
         timer.setRepeats(true);
         timer.start();
     }

@@ -1,16 +1,17 @@
 package cephra.Phone.UserProfile;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
 public class Phonelogin extends javax.swing.JPanel {
-   private int loginAttempts = 0;
-   private final int MAX_ATTEMPTS = 3;
-   private Timer cooldownTimer;
-   private int cooldownSeconds = 30;
-   
-   public Phonelogin() {
+    private int loginAttempts = 0;
+    private final int MAX_ATTEMPTS = 3;
+    private Timer cooldownTimer;
+    private int cooldownSeconds = 30;
+
+    public Phonelogin() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -19,22 +20,27 @@ public class Phonelogin extends javax.swing.JPanel {
         pass.setOpaque(false);
         pass.setBackground(new Color(0, 0, 0, 0));
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
-
-        // --- INTEGRATED FILTERS ---
-        // Removed username character limit - no longer restricting username length
         ((AbstractDocument) pass.getDocument()).setDocumentFilter(new InputLimitFilter(15, false));
-        
         See.setBorderPainted(false);
         See.setOpaque(false);
         See.setContentAreaFilled(false);
-        
-
-
-        // Restore hover underline on Register and Forgot Password
+        addEscapeKeyListener();
         addUnderlineOnHover(reghere);
         addUnderlineOnHover(forgotpass);
     }
-    
+
+    private void addEscapeKeyListener() {
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    System.exit(0);
+                }
+            }
+        });
+        setFocusable(true);
+    }
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -103,7 +109,7 @@ public class Phonelogin extends javax.swing.JPanel {
         add(pass);
         pass.setBounds(80, 360, 200, 30);
 
-        username.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        username.setFont(new java.awt.Font("Segoe UI", 0, 18)); 
         username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -127,13 +133,11 @@ public class Phonelogin extends javax.swing.JPanel {
         add(loginhome);
         loginhome.setBounds(40, 430, 290, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN.png")));
         add(jLabel1);
         jLabel1.setBounds(0, 0, 360, 750);
     }// </editor-fold>//GEN-END:initComponents
 
-    // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
-    // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
             jLabel1.setBounds(0, 0, 370, 750);
@@ -144,8 +148,7 @@ public class Phonelogin extends javax.swing.JPanel {
         attemptLogin();
     }//GEN-LAST:event_loginhomeActionPerformed
 
-     private void attemptLogin() {
-        // Check if in cooldown period
+    private void attemptLogin() {
         if (cooldownTimer != null && cooldownTimer.isRunning()) {
             JOptionPane.showMessageDialog(this, "Please wait for the cooldown period to end.", "Login Locked", JOptionPane.WARNING_MESSAGE);
             return;
@@ -154,7 +157,6 @@ public class Phonelogin extends javax.swing.JPanel {
         String usernameText = username.getText() != null ? username.getText().trim() : "";
         String password = new String(pass.getPassword());
 
-        // Validate empty fields
         if (usernameText.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter your username.", "Empty Field", JOptionPane.WARNING_MESSAGE);
             username.requestFocusInWindow();
@@ -167,12 +169,8 @@ public class Phonelogin extends javax.swing.JPanel {
             return;
         }
 
-        // Validate login using the CephraDB
         if (cephra.Database.CephraDB.validateLogin(usernameText, password)) {
-            // Login successful, reset attempts
             loginAttempts = 0;
-            
-            // Initialize car linking state after successful login
             cephra.Phone.Utilities.AppState.initializeCarLinkingState();
             
             SwingUtilities.invokeLater(new Runnable() {
@@ -188,47 +186,37 @@ public class Phonelogin extends javax.swing.JPanel {
                 }
             });
         } else {
-            // Login failed, increment attempts
             loginAttempts++;
             
             if (loginAttempts >= MAX_ATTEMPTS) {
-                // Start cooldown timer
                 startCooldownTimer();
                 JOptionPane.showMessageDialog(this, "Too many failed login attempts. Please wait 30 seconds before trying again.", 
                     "Login Locked", JOptionPane.ERROR_MESSAGE);
             } else {
-                // Show warning with remaining attempts
                 int remainingAttempts = MAX_ATTEMPTS - loginAttempts;
                 javax.swing.JOptionPane.showMessageDialog(this, 
                     "Invalid credentials. You have " + remainingAttempts + " attempts remaining.", 
                     "Login Failed", javax.swing.JOptionPane.WARNING_MESSAGE);
             }
             
-            pass.setText(""); // Clear password field
-            username.requestFocusInWindow(); // Refocus on username field
+            pass.setText("");
+            username.requestFocusInWindow();
         }
     }
-    
+
     private void startCooldownTimer() {
-        // Disable login components
         loginhome.setEnabled(false);
         username.setEnabled(false);
         pass.setEnabled(false);
-        
-        // Reset cooldown seconds
         cooldownSeconds = 30;
-        
-        // Update and show cooldown label
         cooldownLabel.setText("Cooldown: " + cooldownSeconds + "s");
         cooldownLabel.setVisible(true);
         
-        // Create and start the timer
         cooldownTimer = new Timer(1000, e -> {
             cooldownSeconds--;
             cooldownLabel.setText("Cooldown: " + cooldownSeconds + "s");
             
             if (cooldownSeconds <= 0) {
-                // Time's up, stop the timer and reset
                 ((Timer)e.getSource()).stop();
                 loginAttempts = 0;
                 cooldownLabel.setVisible(false);
@@ -261,7 +249,6 @@ public class Phonelogin extends javax.swing.JPanel {
     }//GEN-LAST:event_reghereActionPerformed
 
     private void forgotpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forgotpassActionPerformed
-        // Show confirmation dialog before proceeding to forgot password
         javax.swing.ImageIcon logoIcon = new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/smalllogo.png"));
         int result = JOptionPane.showConfirmDialog(
             this,
@@ -272,7 +259,6 @@ public class Phonelogin extends javax.swing.JPanel {
             logoIcon
         );
         
-        // Only proceed if user confirms (clicks Yes)
         if (result == JOptionPane.YES_OPTION) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -290,34 +276,17 @@ public class Phonelogin extends javax.swing.JPanel {
     }//GEN-LAST:event_forgotpassActionPerformed
 
     private void passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passActionPerformed
-        // When Enter key is pressed on password field, attempt login
         attemptLogin();
     }//GEN-LAST:event_passActionPerformed
 
     private void SeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeActionPerformed
-        
-        
-        
-        
-        
-         
-        
-           if(pass.getEchoChar() == 0) {
-        pass.setEchoChar('•');
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
-    } else {
-        See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
-        pass.setEchoChar((char) 0);
-    }
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        if(pass.getEchoChar() == 0) {
+            pass.setEchoChar('•');
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png")));
+        } else {
+            See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeOpen.png")));
+            pass.setEchoChar((char) 0);
+        }
     }//GEN-LAST:event_SeeActionPerformed
 
     @Override

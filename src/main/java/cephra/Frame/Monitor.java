@@ -1,12 +1,12 @@
 package cephra.Frame;
-///
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
 public class Monitor extends javax.swing.JFrame {
  private JButton[] displayButtons;
- // Responsive layout base and scaling
+ 
  private static final int BASE_W = 1000;
  private static final int BASE_H = 750;
  private static final Rectangle ORIG_WAITING = new Rectangle(30, 330, 300, 370);
@@ -209,19 +209,19 @@ public class Monitor extends javax.swing.JFrame {
     private void setAppIcon() {
         try {
             // Try different resource paths to find the icon
-            java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/lod.png");
+            java.net.URL iconUrl = getClass().getResource("/cephra/Cephra Images/Applogo.png");
             if (iconUrl == null) {
-                iconUrl = getClass().getClassLoader().getResource("cephra/Cephra Images/lod.png");
+                iconUrl = getClass().getClassLoader().getResource("cephra/Cephra Images/Applogo.png");
             }
             if (iconUrl == null) {
-                iconUrl = getClass().getResource("/cephra/Photos/lod.png");
+                iconUrl = getClass().getResource("/cephra/Photos/Applogo.png");
             }
             
             if (iconUrl != null) {
                 setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
                 System.out.println("Monitor app icon loaded successfully from: " + iconUrl);
             } else {
-                System.err.println("Could not find monitor app icon: lod.png");
+                System.err.println("Could not find monitor app icon: Applogo.png");
             }
         } catch (Exception e) {
             System.err.println("Error loading monitor app icon: " + e.getMessage());

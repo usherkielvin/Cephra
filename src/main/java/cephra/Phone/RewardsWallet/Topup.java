@@ -127,6 +127,11 @@ public class Topup extends javax.swing.JPanel {
         jRadioButton5.setFocusPainted(false);
         jRadioButton5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jRadioButton5.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton5ActionPerformed(evt);
+            }
+        });
         Method.add(jRadioButton5);
         jRadioButton5.setBounds(30, 330, 310, 50);
 
