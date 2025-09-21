@@ -1704,7 +1704,7 @@ public class CephraDB {
         java.util.List<Object[]> staff = new ArrayList<>();
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT name, firstname, lastname, username, email, status, password FROM staff_records ORDER BY firstname")) {
+                     "SELECT name, firstname, lastname, username, email, status, password, DATE_FORMAT(created_at, '%m/%d/%Y') as created_at FROM staff_records ORDER BY firstname")) {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -1715,7 +1715,8 @@ public class CephraDB {
                         rs.getString("username"),
                         rs.getString("email"),
                         rs.getString("status"),
-                        rs.getString("password")
+                        rs.getString("password"),
+                        rs.getString("created_at")   // Date created
                     };
                     staff.add(row);
                 }

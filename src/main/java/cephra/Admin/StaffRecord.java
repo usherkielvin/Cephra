@@ -205,14 +205,26 @@ public class StaffRecord extends javax.swing.JPanel {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Name", "Username", "Email", "Status", "Password"
+                "Name", "Username", "Email", "Status", "Date Created"
             }
-        ));
+        ) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return String.class;
+            }
+        });
         staffTable.setFocusable(false);
         staffTable.setGridColor(new java.awt.Color(255, 255, 255));
         staffTable.setOpaque(false);
         staffTable.setRequestFocusEnabled(false);
         staffTable.setShowHorizontalLines(true);
+        
+        // Set center alignment for all columns
+        javax.swing.table.DefaultTableCellRenderer centerRenderer = new javax.swing.table.DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        for (int i = 0; i < staffTable.getColumnCount(); i++) {
+            staffTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
         staffTable.getTableHeader().setResizingAllowed(false);
         staffTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(staffTable);
@@ -340,7 +352,8 @@ public class StaffRecord extends javax.swing.JPanel {
             
             String name = staff[0];
             if (name.toLowerCase().contains(keyword)) {
-                model.addRow(new Object[]{staff[0], staff[1], staff[2], staff[3], staff[4]});
+                // staff array: [name, firstname, lastname, username, email, status, password, date_created]
+                model.addRow(new Object[]{staff[0], staff[3], staff[4], staff[5], staff[7]});
             }
         }
     }
@@ -496,10 +509,10 @@ public class StaffRecord extends javax.swing.JPanel {
                 String fullName = (String) staff[0];        // Combined name (firstname + lastname)
                 String email = (String) staff[4];           // Email
                 String status = (String) staff[5];          // Status
-                String password = (String) staff[6];        // Password
+                String dateCreated = (String) staff[7];     // Date created
                 
-                // Add row to table: Name, Username, Email, Status, Password
-                model.addRow(new Object[]{fullName, username, email, status, password});
+                // Add row to table: Name, Username, Email, Status, Date Created
+                model.addRow(new Object[]{fullName, username, email, status, dateCreated});
             }
         } catch (Exception e) {
             System.err.println("Error loading staff data: " + e.getMessage());
