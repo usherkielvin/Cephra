@@ -39,7 +39,15 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 		<meta name="theme-color" content="#062635" />
 		<link rel="stylesheet" href="css/main.css" />
 		<style>
-			/* Green Points Popup Styles */
+			/* ============================================
+			   EASY-TO-ADJUST POPUP STYLES
+			   ============================================
+			   Simply change the values below to adjust:
+			   - Popup size and position
+			   - Image sizing and fit
+			   - Border radius and appearance
+			   ============================================ */
+
 			.popup-overlay {
 				position: fixed;
 				top: 0;
@@ -53,23 +61,36 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				z-index: 10000;
 				padding: 20px;
 			}
-			
+
+			/* ADJUST POPUP CONTAINER SIZE */
 			.popup-content {
-				background: #1A3647;
-				border-radius: 20px;
-				width: 90%;
-				max-width: 400px;
 				position: relative;
+				width: 90%;                    /* ← CHANGE: 80% = smaller, 95% = larger */
+				max-width: 400px;              /* ← CHANGE: 300px = smaller, 500px = larger */
+				max-height: 85vh;              /* ← CHANGE: 70vh = shorter, 90vh = taller */
+				border-radius: 20px;           /* ← CHANGE: 0px = sharp corners, 30px = more rounded */
 				overflow: hidden;
-				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-				border: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
-			
+
+			/* ADJUST IMAGE SIZING */
+			.popup-image {
+				width: 100%;                   /* ← CHANGE: 90% = add margins, 95% = smaller margins */
+				height: auto;
+				max-height: 100%;              /* ← CHANGE: 90% = add padding inside */
+				max-width: 100%;
+				object-fit: contain;           /* ← CHANGE: 'cover' = fill entire space, 'scale-down' = never enlarge */
+				display: block;
+				border-radius: 20px;           /* ← CHANGE: 0px = sharp corners, 30px = more rounded */
+			}
+
 			.close-btn {
 				position: absolute;
 				top: 15px;
 				right: 15px;
-				background: #000;
+				background: rgba(0, 0, 0, 0.8);
 				color: white;
 				border: none;
 				border-radius: 50%;
@@ -83,153 +104,12 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				justify-content: center;
 				font-weight: bold;
 			}
-			
-			.popup-header {
-				text-align: center;
-				padding: 20px 20px 10px;
-			}
-			
-			.logo-section {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				gap: 10px;
-			}
-			
-			.porsche-logo {
-				font-size: 40px;
-				margin-bottom: 5px;
-			}
-			
-			.brand-name {
-				color: white;
-				font-size: 24px;
-				font-weight: bold;
-				margin: 0;
-				letter-spacing: 2px;
-				font-family: 'Arial', sans-serif;
-				text-transform: uppercase;
-			}
-			
-			.popup-body {
-				padding: 20px;
-				text-align: center;
-			}
-			
-			.main-headline {
-				color: white;
-				font-size: 32px;
-				font-weight: bold;
-				margin: 20px 0;
-				line-height: 1.2;
-				font-family: 'Arial', sans-serif;
-				text-transform: uppercase;
-			}
-			
-			.reward-section {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				gap: 15px;
-				margin: 30px 0;
-			}
-			
-			.hexagon {
-				width: 50px;
-				height: 50px;
-				background: #00C2CE;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				border-radius: 8px;
-				transform: rotate(45deg);
-				box-shadow: 0 2px 8px rgba(0, 194, 206, 0.3);
-			}
-			
-			.leaf-icon {
-				transform: rotate(-45deg);
-				font-size: 20px;
-			}
-			
-			.reward-value {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-			}
-			
-			.points-number {
-				color: white;
-				font-size: 48px;
-				font-weight: bold;
-				line-height: 1;
-				font-family: 'Arial', sans-serif;
-			}
-			
-			.points-label {
-				color: #00C2CE;
-				font-size: 14px;
-				font-weight: 500;
-				margin-top: 5px;
-				font-family: 'Arial', sans-serif;
-				text-transform: uppercase;
-			}
-			
-			.car-section {
-				position: relative;
-				margin: 40px 0;
-				height: 80px;
-			}
-			
-			.floating-leaves {
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				height: 100%;
-			}
-			
-			.leaf {
-				position: absolute;
-				top: 10px;
-				font-size: 24px;
-			}
-			
-			.leaf.left {
-				left: 20%;
-			}
-			
-			.leaf.right {
-				right: 20%;
-			}
-			
-			.electric-car {
-				position: absolute;
-				bottom: 0;
-				left: 50%;
-				transform: translateX(-50%);
-				font-size: 50px;
-				filter: hue-rotate(180deg) saturate(1.5);
-			}
-			
-			.legal-text {
-				margin-top: 30px;
-				padding-top: 20px;
-				border-top: 1px solid rgba(255, 255, 255, 0.2);
-			}
-			
-			.legal-text p {
-				color: white;
-				font-size: 10px;
-				margin: 5px 0;
-				line-height: 1.3;
-				font-family: 'Arial', sans-serif;
-			}
-			
+
 			/* Animation for popup appearance */
 			.popup-content {
 				animation: popupSlideIn 0.3s ease-out;
 			}
-			
+
 			@keyframes popupSlideIn {
 				from {
 					opacity: 0;
@@ -253,7 +133,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 								<!-- Logo -->
 									<h1>
-									
+
 									<a href="dashboard.php" id="logo" style="display:inline-flex;align-items:center;gap:8px;"><img src="images/logo.png" alt="Cephra" style="width:28px;height:28px;border-radius:6px;object-fit:cover;vertical-align:middle;" /><span>Cephra</span></a>
 									</h1>
 
@@ -289,7 +169,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 					<div class="wrapper style1">
 						<div class="inner">
 
-							
+
 
 							<!-- Feature 2 -->
 								<section class="container box feature2">
@@ -323,7 +203,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 							</div>
 					</div>
-					
+
 			<!-- Footer Wrapper -->
 				<div id="footer-wrapper">
 					<footer id="footer" class="container">
@@ -385,46 +265,11 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 		</div>
 
-		<!-- Green Points Popup Ad -->
+		<!-- Image-based Popup Ad -->
 		<div id="greenPointsPopup" class="popup-overlay" style="display: none;">
 			<div class="popup-content">
 				<button class="close-btn" onclick="closeGreenPointsPopup()">×</button>
-				
-				<div class="popup-header">
-					<div class="logo-section">
-						<div class="porsche-logo">🏎️</div>
-						<h1 class="brand-name">CEPHRA</h1>
-					</div>
-				</div>
-				
-				<div class="popup-body">
-					<h2 class="main-headline">GO GREEN<br>EARN POINT</h2>
-					
-					<div class="reward-section">
-						<div class="reward-icon">
-							<div class="hexagon">
-								<span class="leaf-icon">🌿</span>
-							</div>
-						</div>
-						<div class="reward-value">
-							<span class="points-number">500</span>
-							<span class="points-label">GREEN POINT</span>
-						</div>
-					</div>
-					
-					<div class="car-section">
-						<div class="floating-leaves">
-							<div class="leaf left">🌿</div>
-							<div class="leaf right">🌿</div>
-						</div>
-						<div class="electric-car">🏎️</div>
-					</div>
-					
-					<div class="legal-text">
-						<p>To comply with DTI Fair Trade Permit No. FTEB:-227229 Series of 2024</p>
-						<p>Duration: 04 Jun-30 Aug, 2025</p>
-					</div>
-				</div>
+				<img src="images/pop-up.png" alt="Cephra Rewards Popup" class="popup-image" />
 			</div>
 		</div>
 
@@ -466,19 +311,19 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                 function showGreenPointsPopup() {
                     document.getElementById('greenPointsPopup').style.display = 'flex';
                 }
-                
+
                 // Function to close Green Points popup
                 function closeGreenPointsPopup() {
                     document.getElementById('greenPointsPopup').style.display = 'none';
                 }
-                
+
                 // Show popup after page loads (with delay)
                 $(document).ready(function() {
                     // Show Green Points popup after 2 seconds
                     setTimeout(function() {
                         showGreenPointsPopup();
                     }, 2000);
-                    
+
                     // Normal Charge Button Click Handler
                     $('#normalChargeBtn').click(function(e) {
                         e.preventDefault();
@@ -555,13 +400,13 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                         $('#queuePopup').remove();
                     };
                 });
-                
+
                 // Function to open Monitor Web in new tab
                 window.openMonitorWeb = function() {
                     const monitorUrl = 'monitor/';
                     window.open(monitorUrl, '_blank', 'noopener,noreferrer');
                 };
             </script>
-			
+
 		</body>
-		</html>
+	</html>
