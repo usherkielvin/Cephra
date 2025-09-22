@@ -576,15 +576,29 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         String title;
         
         if (isFastCharging) {
-            message = "All Fast Charging Bays (1-3) are currently occupied or in maintenance!\n\n" +
-                     "Ticket " + ticket + " will remain in the waiting queue.\n" +
+            message = """
+                      All Fast Charging Bays (1-3) are currently occupied or in maintenance!
+                      
+                      Ticket """ + ticket + " will remain in the waiting queue.\n" +
                      "Please wait for a fast charging bay to become available.";
             title = "Fast Charging Bays Unavailable";
-        } else {
-            message = "All Normal Charging Bays (4-8) are currently occupied or in maintenance!\n\n" +
+            /* message = "All Fast Charging Bays (1-3) are currently occupied or in maintenance!\n\n" +
                      "Ticket " + ticket + " will remain in the waiting queue.\n" +
+                     "Please wait for a fast charging bay to become available.";
+            title = "Fast Charging Bays Unavailable";*/
+            
+        } else {
+            message = """
+                      All Normal Charging Bays (4-8) are currently occupied or in maintenance!
+                      
+                      Ticket """ + ticket + " will remain in the waiting queue.\n" +
                      "Please wait for a normal charging bay to become available.";
             title = "Normal Charging Bays Unavailable";
+            
+            /* message = "All Normal Charging Bays (4-8) are currently occupied or in maintenance!\n\n" +
+                     "Ticket " + ticket + " will remain in the waiting queue.\n" +
+                     "Please wait for a normal charging bay to become available.";
+            title = "Normal Charging Bays Unavailable";*/
         }
         
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
@@ -678,7 +692,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             } else {
                 fastButtons[i].setText("");
                 fastButtons[i].setVisible(true);
-                fastButtons[i].setForeground(new java.awt.Color(0, 230, 118));
+                fastButtons[i].setForeground(new java.awt.Color(255,0,0));
             }
         }
     }
@@ -706,7 +720,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             } else {
                 normalButtons[i].setText("");
                 normalButtons[i].setVisible(true);
-                normalButtons[i].setForeground(new java.awt.Color(0, 230, 118));
+                normalButtons[i].setForeground(new java.awt.Color(22,130,146));
             }
         }
     }
@@ -1056,7 +1070,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         setLayout(null);
 
         Baybutton.setForeground(new java.awt.Color(255, 255, 255));
-        Baybutton.setText("BAYS"); // NOI18N
+        Baybutton.setText("BAYS");
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
         Baybutton.setContentAreaFilled(false);
@@ -1070,7 +1084,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         Baybutton.setBounds(385, 26, 33, 15);
 
         businessbutton.setForeground(new java.awt.Color(255, 255, 255));
-        businessbutton.setText("BUSINESS OVERVIEW"); // NOI18N
+        businessbutton.setText("BUSINESS OVERVIEW");
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
@@ -1095,7 +1109,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         exitlogin.setBounds(930, 0, 70, 60);
 
         staffbutton.setForeground(new java.awt.Color(255, 255, 255));
-        staffbutton.setText("STAFF RECORDS"); // NOI18N
+        staffbutton.setText("STAFF RECORDS");
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
         staffbutton.setContentAreaFilled(false);
@@ -1109,7 +1123,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         staffbutton.setBounds(505, 26, 96, 15);
 
         historybutton.setForeground(new java.awt.Color(255, 255, 255));
-        historybutton.setText("HISTORY"); // NOI18N
+        historybutton.setText("HISTORY");
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
@@ -1130,19 +1144,19 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         Paid.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Paid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Paid.setText("5"); // NOI18N
+        Paid.setText("5");
         panelLists.add(Paid);
         Paid.setBounds(40, 520, 120, 70);
 
         Waitings.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Waitings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Waitings.setText("4"); // NOI18N
+        Waitings.setText("4");
         panelLists.add(Waitings);
         Waitings.setBounds(40, 140, 120, 70);
 
         Charging.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Charging.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Charging.setText("4"); // NOI18N
+        Charging.setText("4");
         panelLists.add(Charging);
         Charging.setBounds(40, 330, 120, 70);
 
@@ -1153,8 +1167,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null}
             },
-            new String [] { // NOI18N
-                "Ticket", "Customer", "Service", "Status", "Payment", "Action" // NOI18N
+            new String [] {
+                "Ticket", "Customer", "Service", "Status", "Payment", "Action"
             }
         ));
         queTab.setShowHorizontalLines(true);
@@ -1178,9 +1192,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastpanel.setLayout(new java.awt.GridLayout(1, 3, 1, 45));
 
         fastslot1.setBackground(new java.awt.Color(255, 0, 0));
-        fastslot1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        fastslot1.setForeground(new java.awt.Color(0, 230, 118));
-        fastslot1.setText("XXXXXX"); // NOI18N
+        fastslot1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        fastslot1.setForeground(new java.awt.Color(51, 51, 255));
+        fastslot1.setText("XXXXXX");
         fastslot1.setBorder(null);
         fastslot1.setBorderPainted(false);
         fastslot1.setContentAreaFilled(false);
@@ -1189,10 +1203,10 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastpanel.add(fastslot1);
 
         fastslot2.setBackground(new java.awt.Color(255, 0, 0));
-        fastslot2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        fastslot2.setForeground(new java.awt.Color(0, 230, 118));
-        fastslot2.setText("XXXXXX"); // NOI18N
-        fastslot2.setToolTipText(""); // NOI18N
+        fastslot2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        fastslot2.setForeground(new java.awt.Color(0, 147, 73));
+        fastslot2.setText("XXXXXX");
+        fastslot2.setToolTipText("");
         fastslot2.setBorder(null);
         fastslot2.setBorderPainted(false);
         fastslot2.setContentAreaFilled(false);
@@ -1201,9 +1215,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastpanel.add(fastslot2);
 
         fastslot3.setBackground(new java.awt.Color(255, 0, 0));
-        fastslot3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        fastslot3.setForeground(new java.awt.Color(0, 230, 118));
-        fastslot3.setText("XXXXXX"); // NOI18N
+        fastslot3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        fastslot3.setForeground(new java.awt.Color(0, 147, 73));
+        fastslot3.setText("XXXXXX");
         fastslot3.setBorder(null);
         fastslot3.setBorderPainted(false);
         fastslot3.setContentAreaFilled(false);
@@ -1218,8 +1232,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.setLayout(new java.awt.GridLayout(2, 4, 1, 20));
 
         jButton1.setBackground(new java.awt.Color(255, 0, 0));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton1.setText("XXXXXX"); // NOI18N
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton1.setText("XXXXXX");
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -1233,8 +1247,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton1);
 
         jButton2.setBackground(new java.awt.Color(255, 0, 0));
-        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton2.setText("XXXXXX"); // NOI18N
+        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton2.setText("XXXXXX");
         jButton2.setBorder(null);
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
@@ -1248,8 +1262,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton2);
 
         jButton3.setBackground(new java.awt.Color(255, 0, 0));
-        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton3.setText("XXXXXX"); // NOI18N
+        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton3.setText("XXXXXX");
         jButton3.setBorder(null);
         jButton3.setBorderPainted(false);
         jButton3.setContentAreaFilled(false);
@@ -1263,8 +1277,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton3);
 
         jButton4.setBackground(new java.awt.Color(255, 0, 0));
-        jButton4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton4.setText("XXXXXX"); // NOI18N
+        jButton4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton4.setText("XXXXXX");
         jButton4.setBorder(null);
         jButton4.setBorderPainted(false);
         jButton4.setContentAreaFilled(false);
@@ -1278,8 +1292,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton4);
 
         jButton5.setBackground(new java.awt.Color(255, 0, 0));
-        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton5.setText("XXXXXX"); // NOI18N
+        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton5.setText("XXXXXX");
         jButton5.setBorder(null);
         jButton5.setBorderPainted(false);
         jButton5.setContentAreaFilled(false);
@@ -1293,8 +1307,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton5);
 
         jButton6.setBackground(new java.awt.Color(255, 0, 0));
-        jButton6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton6.setText("XXXXXX"); // NOI18N
+        jButton6.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton6.setText("XXXXXX");
         jButton6.setBorder(null);
         jButton6.setBorderPainted(false);
         jButton6.setContentAreaFilled(false);
@@ -1308,8 +1322,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton6);
 
         jButton7.setBackground(new java.awt.Color(255, 0, 0));
-        jButton7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton7.setText("XXXXXX"); // NOI18N
+        jButton7.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton7.setText("XXXXXX");
         jButton7.setBorder(null);
         jButton7.setBorderPainted(false);
         jButton7.setContentAreaFilled(false);
@@ -1323,8 +1337,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel1.add(jButton7);
 
         jButton8.setBackground(new java.awt.Color(255, 0, 0));
-        jButton8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton8.setText("XXXXXX"); // NOI18N
+        jButton8.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton8.setText("XXXXXX");
         jButton8.setBorder(null);
         jButton8.setBorderPainted(false);
         jButton8.setContentAreaFilled(false);
@@ -1340,9 +1354,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         ControlPanel.add(jPanel1);
         jPanel1.setBounds(90, 430, 560, 180);
 
-        normalcharge1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        normalcharge1.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge1.setText("XXXXXX"); // NOI18N
+        normalcharge1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        normalcharge1.setForeground(new java.awt.Color(22, 130, 146));
+        normalcharge1.setText("XXXXXX");
         normalcharge1.setBorder(null);
         normalcharge1.setBorderPainted(false);
         normalcharge1.setContentAreaFilled(false);
@@ -1377,9 +1391,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel2.setLayout(new java.awt.GridLayout(1, 4, 1, 25));
 
         normalcharge5.setBackground(new java.awt.Color(255, 0, 0));
-        normalcharge5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        normalcharge5.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge5.setText("XXXXXX"); // NOI18N
+        normalcharge5.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        normalcharge5.setForeground(new java.awt.Color(22, 130, 146));
+        normalcharge5.setText("XXXXXX");
         normalcharge5.setBorder(null);
         normalcharge5.setBorderPainted(false);
         normalcharge5.setContentAreaFilled(false);
@@ -1388,9 +1402,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel2.add(normalcharge5);
 
         normalcharge4.setBackground(new java.awt.Color(255, 0, 0));
-        normalcharge4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        normalcharge4.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge4.setText("XXXXXX"); // NOI18N
+        normalcharge4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        normalcharge4.setForeground(new java.awt.Color(22, 130, 146));
+        normalcharge4.setText("XXXXXX");
         normalcharge4.setBorder(null);
         normalcharge4.setBorderPainted(false);
         normalcharge4.setContentAreaFilled(false);
@@ -1399,9 +1413,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel2.add(normalcharge4);
 
         normalcharge3.setBackground(new java.awt.Color(255, 0, 0));
-        normalcharge3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        normalcharge3.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge3.setText("XXXXXX"); // NOI18N
+        normalcharge3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        normalcharge3.setForeground(new java.awt.Color(22, 130, 146));
+        normalcharge3.setText("XXXXXX");
         normalcharge3.setBorder(null);
         normalcharge3.setBorderPainted(false);
         normalcharge3.setContentAreaFilled(false);
@@ -1410,9 +1424,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         jPanel2.add(normalcharge3);
 
         normalcharge2.setBackground(new java.awt.Color(255, 0, 0));
-        normalcharge2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        normalcharge2.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge2.setText("XXXXXX"); // NOI18N
+        normalcharge2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        normalcharge2.setForeground(new java.awt.Color(22, 130, 146));
+        normalcharge2.setText("XXXXXX");
         normalcharge2.setBorder(null);
         normalcharge2.setBorderPainted(false);
         normalcharge2.setContentAreaFilled(false);
@@ -1435,25 +1449,25 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));
-        datetimeStaff.setText("10:44 AM 17 August, Sunday"); // NOI18N
+        datetimeStaff.setText("10:44 AM 17 August, Sunday");
         add(datetimeStaff);
         datetimeStaff.setBounds(820, 40, 170, 20);
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!"); // NOI18N
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Hello,"); // NOI18N
+        jLabel3.setText("Hello,");
         add(jLabel3);
         jLabel3.setBounds(820, 10, 50, 30);
 
         jLabel1.setForeground(new java.awt.Color(4, 167, 182));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("QUEUE LIST"); // NOI18N
+        jLabel1.setText("QUEUE LIST");
         add(jLabel1);
         jLabel1.setBounds(289, 26, 80, 15);
 
