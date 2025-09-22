@@ -11,7 +11,11 @@
     padding: 20px;
     width: 300px;
     z-index: 10000;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#queuePopup .popup-content {
+    /* Content styling */
 }
 
 #queuePopup h2 {
@@ -26,19 +30,20 @@
     text-align: center;
 }
 
-#queuePopup button {
-    display: block;
-    margin: 15px auto 0;
-    padding: 10px 20px;
-    background: #007bff;
-    color: white;
+#closePopupBtn {
+    position: fixed;
+    top: calc(20% - 30px);
+    right: calc(50% - 150px);
+    background: none;
     border: none;
-    border-radius: 5px;
+    color: #007bff;
+    font-size: 20px;
     cursor: pointer;
+    z-index: 10001;
+    padding: 0;
+    min-width: auto;
 }
 
-#queuePopup button:hover {
-    background: #0056b3;
+#closePopupBtn:hover {
+    color: #0056b3;
 }
-
-

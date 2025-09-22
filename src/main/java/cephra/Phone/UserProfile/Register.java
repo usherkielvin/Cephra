@@ -517,7 +517,7 @@ public class Register extends javax.swing.JPanel {
         content.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
         content.add(scrollPane, java.awt.BorderLayout.CENTER);
 
-        javax.swing.JButton ok = new javax.swing.JButton("OK");
+        javax.swing.JButton ok = new javax.swing.JButton("I Agree");
         ok.setFocusPainted(false);
         ok.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

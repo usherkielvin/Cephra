@@ -128,6 +128,7 @@ public class Profile extends javax.swing.JPanel {
         charge = new javax.swing.JButton();
         EditProfile = new javax.swing.JButton();
         Help = new javax.swing.JButton();
+        Frame = new javax.swing.JLabel();
         Profile = new javax.swing.JLabel();
         Fullname = new javax.swing.JLabel();
         gmailProf = new javax.swing.JLabel();
@@ -240,6 +241,10 @@ public class Profile extends javax.swing.JPanel {
         });
         add(Help);
         Help.setBounds(40, 460, 290, 40);
+
+        Frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PfpDashboardFrame.png"))); // NOI18N
+        add(Frame);
+        Frame.setBounds(118, 118, 140, 140);
         add(Profile);
         Profile.setBounds(120, 120, 130, 130);
 
@@ -493,6 +498,7 @@ public class Profile extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton EditProfile;
+    private javax.swing.JLabel Frame;
     private javax.swing.JLabel Fullname;
     private javax.swing.JButton Help;
     private javax.swing.JLabel Profile;

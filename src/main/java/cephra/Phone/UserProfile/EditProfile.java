@@ -205,6 +205,7 @@ public class EditProfile extends javax.swing.JPanel {
         UsernamePhone = new javax.swing.JTextField();
         email = new javax.swing.JTextField();
         back = new javax.swing.JButton();
+        Frame = new javax.swing.JLabel();
         Profile = new javax.swing.JLabel();
         bg = new javax.swing.JLabel();
 
@@ -347,6 +348,10 @@ public class EditProfile extends javax.swing.JPanel {
         });
         add(back);
         back.setBounds(30, 50, 40, 40);
+
+        Frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Profileframe.png"))); // NOI18N
+        add(Frame);
+        Frame.setBounds(126, 125, 120, 120);
         add(Profile);
         Profile.setBounds(130, 130, 110, 110);
 
@@ -680,6 +685,7 @@ public class EditProfile extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Frame;
     private javax.swing.JLabel Profile;
     private javax.swing.JTextField UsernamePhone;
     private javax.swing.JButton back;

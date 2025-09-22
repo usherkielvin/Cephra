@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 sessionStorage.setItem('resetEmail', email);
                 // Redirect to verify code page after short delay
                 setTimeout(() => {
-                    window.location.href = 'verify_code_updated.php';
+                    window.location.href = 'verify_code.php';
                 }, 2000);
             } else {
                 showDialog('Error', result.error || 'Failed to send reset code. Please try again.');

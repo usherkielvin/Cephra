@@ -182,6 +182,9 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <button class="btn btn-primary" onclick="refreshQueue()">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
+                        <button class="btn btn-success" onclick="autoAssignWaitingTickets()">
+                            <i class="fas fa-magic"></i> Auto-Assign Waiting
+                        </button>
                     </div>
                 </div>
                 <div class="queue-container">

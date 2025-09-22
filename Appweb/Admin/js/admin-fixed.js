@@ -1783,6 +1783,43 @@ function refreshUsers() {
     }
 }
 
+function autoAssignWaitingTickets() {
+    console.log('Auto-Assign Waiting Tickets clicked');
+    
+    // Show confirmation dialog
+    if (!confirm('This will automatically assign all waiting tickets to available bays. Continue?')) {
+        return;
+    }
+    
+    const overlay = showLoadingSpinner();
+    if (!overlay) return;
+
+    fetch('api/admin.php?action=auto-assign-waiting-tickets', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            hideLoadingSpinner(overlay);
+            if (data.success) {
+                const count = data.assigned_count || 0;
+                adminPanel.showSuccess(`Successfully assigned ${count} waiting tickets to available bays`);
+                adminPanel.loadQueueData();
+                adminPanel.loadBaysData(); // Refresh bays to show updated status
+            } else {
+                console.error('API Error:', data);
+                adminPanel.showError(data.error || data.message || 'Failed to auto-assign waiting tickets');
+            }
+        })
+        .catch(error => {
+            hideLoadingSpinner(overlay);
+            console.error('Network Error:', error);
+            adminPanel.showError('Network error occurred while auto-assigning tickets');
+        });
+}
+
 function processNextTicket() {
     if (adminPanel) {
         console.log('Starting processNextTicket...');
