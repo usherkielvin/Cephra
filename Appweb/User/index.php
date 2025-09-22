@@ -28,36 +28,63 @@
     <link rel="stylesheet" href="css/index.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 </head>
-<body class="auth-page">
+<body class="auth-page" id="authPage">
+    <!-- Theme Toggle Button -->
+    <button type="button" class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+        <i class="fas fa-sun" id="themeIcon"></i>
+    </button>
+
     <div class="auth-wrapper">
-        <form class="form" id="loginForm">
-            <div class="brand" style="margin-bottom:10px;">
-                <img src="images/logo.png" alt="Cephra" class="brand-img" />
-                <span class="brand-text">CEPHRA</span>
-            </div>
-            <p class="title">Sign in</p>
-            <p class="message" style="opacity:.8">Enter your username and password to log in.</p>
-            <div class="flex">
-                <label>
-                    <input class="input" type="text" id="username" name="username" placeholder="" required />
-                    <span>Username</span>
-                </label>
-            </div>
-            <label>
-                <div class="password-input-container">
-                    <input class="input" type="password" id="password" name="password" placeholder="" required />
-                    <span>Password</span>
-                    <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility()">
-                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
-                    </button>
+        <!-- Left Panel - Branding -->
+        <div class="left-panel">
+            <div class="brand-section">
+                <div class="brand-icon">
+                    <img src="images/logo.png" alt="Cephra" class="brand-logo" />
                 </div>
-            </label>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0 12px 0;">
-                <a href="forgot_password.php" class="ds-link">Forgot password?</a>
-                <a href="Register_Panel.php" class="ds-link">Register here</a>
+                <h1 class="main-title">CEPHRA</h1>
+                <p class="main-subtitle">Your Electric Vehicle Charging Platform</p>
+                <p class="main-description">Sign in to access your charging dashboard and manage your electric vehicle charging sessions.</p>
             </div>
-            <button class="submit" type="submit">Login</button>
-        </form>
+        </div>
+
+        <!-- Right Panel - Login Form -->
+        <div class="right-panel">
+            <form class="form" id="loginForm">
+                <div class="form-header">
+                    <h2 class="form-title">Sign In</h2>
+                    <p class="form-subtitle">Enter your credentials to access your account</p>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <div class="username-input-container">
+                            <input class="input" type="text" id="username" name="username" placeholder="" required />
+                            <span>Username</span>
+
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <div class="password-input-container">
+                            <input class="input" type="password" id="password" name="password" placeholder="" required />
+                            <span>Password</span>
+                            <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility()">
+                                <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <a href="forgot_password.php" class="forgot-link">Forgot password?</a>
+                    <a href="Register_Panel.php" class="register-link">Create account</a>
+                </div>
+
+                <button class="submit" type="submit">Sign In</button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -104,6 +131,52 @@
                 toggleIcon.className = 'fas fa-eye';
             }
         };
+
+        // Username toggle functionality
+        window.toggleUsernameVisibility = function() {
+            const usernameInput = document.getElementById('username');
+            const toggleBtn = document.getElementById('usernameToggleBtn');
+            const toggleIcon = document.getElementById('usernameToggleIcon');
+
+            if (usernameInput.type === 'text') {
+                usernameInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                usernameInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        };
+
+        // Theme toggle functionality
+        window.toggleTheme = function() {
+            const body = document.getElementById('authPage');
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                themeIcon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-theme');
+                body.classList.add('light-theme');
+                themeIcon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            }
+        };
+
+        // Initialize theme on page load
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const body = document.getElementById('authPage');
+        const themeIcon = document.getElementById('themeIcon');
+
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            themeIcon.className = 'fas fa-moon';
+        } else {
+            body.classList.add('dark-theme');
+            themeIcon.className = 'fas fa-sun';
+        }
     })();
     </script>
 

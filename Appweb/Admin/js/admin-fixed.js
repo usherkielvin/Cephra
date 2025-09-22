@@ -521,6 +521,9 @@ class AdminPanel {
 
             console.log('Analytics API response:', data);
 
+            // Update chart titles based on selected range
+            this.updateChartTitles();
+
             if (data.success) {
                 if (data.revenue_data && data.revenue_data.length > 0) {
                     console.log('Rendering revenue chart with', data.revenue_data.length, 'data points');
@@ -531,7 +534,7 @@ class AdminPanel {
                 }
                 if (data.service_data && data.service_data.length > 0) {
                     console.log('Rendering service chart with', data.service_data.length, 'data points');
-                    const filledServiceData = this.fillMissingDates(data.service_data, 'service_count');
+                    const filledServiceData = this.fillMissingServiceDates(data.service_data);
                     this.renderServiceChart(filledServiceData);
                 } else {
                     console.log('No service data available');
@@ -543,6 +546,32 @@ class AdminPanel {
         } catch (error) {
             console.error('Error loading analytics data:', error);
             this.showError('Failed to load analytics data - check console for details');
+        }
+    }
+
+    updateChartTitles() {
+        // Update chart card titles based on selected range
+        const revenueTitle = document.querySelector('#analytics-panel .analytics-card:first-child h3');
+        const serviceTitle = document.querySelector('#analytics-panel .analytics-card:last-child h3');
+        
+        let rangeText = '';
+        switch (this.analyticsRange) {
+            case 'day':
+                rangeText = ' - Last 7 Days';
+                break;
+            case 'week':
+                rangeText = ' - Last 2 Weeks';
+                break;
+            case 'month':
+                rangeText = ' - Last 30 Days';
+                break;
+        }
+        
+        if (revenueTitle) {
+            revenueTitle.textContent = 'Daily Revenue' + rangeText;
+        }
+        if (serviceTitle) {
+            serviceTitle.textContent = 'Service Usage' + rangeText;
         }
     }
 
@@ -564,10 +593,10 @@ class AdminPanel {
         
         switch (this.analyticsRange) {
             case 'day':
-                startDate.setDate(today.getDate() - 1); // Show yesterday and today
+                startDate.setDate(today.getDate() - 7); // Show last 7 days
                 break;
             case 'week':
-                startDate.setDate(today.getDate() - 7); // Show last 7 days
+                startDate.setDate(today.getDate() - 14); // Show last 2 weeks
                 break;
             case 'month':
                 startDate.setDate(today.getDate() - 30); // Show last 30 days
@@ -593,6 +622,59 @@ class AdminPanel {
             filledData.push({
                 date: dateString,
                 [valueKey]: value
+            });
+            
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return filledData;
+    }
+
+    // Fill missing dates for service data with separate normal and fast charging counts
+    fillMissingServiceDates(data) {
+        if (!data || data.length === 0) return data;
+
+        // Determine date range based on analytics range
+        const today = new Date();
+        let startDate = new Date();
+        
+        switch (this.analyticsRange) {
+            case 'day':
+                startDate.setDate(today.getDate() - 7); // Show last 7 days
+                break;
+            case 'week':
+                startDate.setDate(today.getDate() - 14); // Show last 2 weeks
+                break;
+            case 'month':
+                startDate.setDate(today.getDate() - 30); // Show last 30 days
+                break;
+            default:
+                startDate.setDate(today.getDate() - 7);
+        }
+
+        // Create maps for existing data
+        const normalDataMap = new Map();
+        const fastDataMap = new Map();
+        
+        data.forEach(item => {
+            normalDataMap.set(item.date, parseInt(item.normal_count) || 0);
+            fastDataMap.set(item.date, parseInt(item.fast_count) || 0);
+        });
+
+        // Fill missing dates with zero values
+        const filledData = [];
+        const currentDate = new Date(startDate);
+        
+        while (currentDate <= today) {
+            const dateString = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+            const normalCount = normalDataMap.get(dateString) || 0;
+            const fastCount = fastDataMap.get(dateString) || 0;
+            
+            filledData.push({
+                date: dateString,
+                normal_count: normalCount,
+                fast_count: fastCount,
+                service_count: normalCount + fastCount // Total for backward compatibility
             });
             
             currentDate.setDate(currentDate.getDate() + 1);
@@ -633,7 +715,8 @@ class AdminPanel {
                     x: {
                         title: {
                             display: true,
-                            text: 'Date'
+                            text: this.analyticsRange === 'day' ? 'Last 7 Days' : 
+                                  this.analyticsRange === 'week' ? 'Last 2 Weeks' : 'Date'
                         }
                     },
                     y: {
@@ -664,7 +747,8 @@ class AdminPanel {
 
         // Prepare data for chart with proper date formatting
         const labels = serviceData.map(item => this.formatDateForChart(item.date));
-        const dataPoints = serviceData.map(item => parseInt(item.service_count));
+        const normalData = serviceData.map(item => parseInt(item.normal_count || 0));
+        const fastData = serviceData.map(item => parseInt(item.fast_count || 0));
 
         if (this.serviceChart) {
             this.serviceChart.destroy();
@@ -674,24 +758,43 @@ class AdminPanel {
             type: 'line',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: 'Service Count',
-                    data: dataPoints,
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                }]
+                datasets: [
+                    {
+                        label: 'Normal Charging',
+                        data: normalData,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Fast Charging',
+                        data: fastData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
+                    }
+                ]
             },
             options: {
                 responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 scales: {
                     x: {
                         title: {
                             display: true,
-                            text: 'Date'
+                            text: this.analyticsRange === 'day' ? 'Last 7 Days' : 
+                                  this.analyticsRange === 'week' ? 'Last 2 Weeks' : 'Date'
                         }
                     },
                     y: {
@@ -709,8 +812,18 @@ class AdminPanel {
                     },
                     tooltip: {
                         enabled: true,
-                        mode: 'nearest',
+                        mode: 'index',
                         intersect: false,
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].label;
+                            },
+                            label: function(context) {
+                                const datasetLabel = context.dataset.label;
+                                const value = context.parsed.y;
+                                return `${datasetLabel}: ${value} services`;
+                            }
+                        }
                     }
                 }
             }

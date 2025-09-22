@@ -839,8 +839,8 @@ try {
             // Get range parameter (day, week, month)
             $range = $_GET['range'] ?? 'week';
             $interval = match($range) {
-                'day' => 'INTERVAL 1 DAY',
-                'week' => 'INTERVAL 7 DAY',
+                'day' => 'INTERVAL 7 DAY', // Daily view shows 7 days
+                'week' => 'INTERVAL 14 DAY', // Weekly view shows 2 weeks
                 'month' => 'INTERVAL 30 DAY',
                 default => 'INTERVAL 7 DAY'
             };
@@ -857,17 +857,53 @@ try {
             ");
             $revenue_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Get service usage data (charging sessions)
+            // Get service usage data broken down by service type
             $stmt = $db->query("
                 SELECT
                     DATE(completed_at) as date,
+                    service_type,
                     COUNT(*) as service_count
                 FROM charging_history
                 WHERE completed_at >= DATE_SUB(CURDATE(), $interval)
-                GROUP BY DATE(completed_at)
-                ORDER BY DATE(completed_at)
+                GROUP BY DATE(completed_at), service_type
+                ORDER BY DATE(completed_at), service_type
             ");
-            $service_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $service_data_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Process service data to separate Normal and Fast Charging
+            $service_data = [];
+            $normal_data = [];
+            $fast_data = [];
+            
+            // Create arrays for each service type
+            foreach ($service_data_raw as $row) {
+                $date = $row['date'];
+                $service_type = $row['service_type'];
+                $count = (int)$row['service_count'];
+                
+                // Determine if it's fast charging
+                $is_fast = (stripos($service_type, 'fast') !== false) || (stripos($service_type, 'FCH') !== false);
+                
+                if ($is_fast) {
+                    $fast_data[$date] = $count;
+                } else {
+                    $normal_data[$date] = $count;
+                }
+            }
+            
+            // Get all unique dates from the data
+            $all_dates = array_unique(array_column($service_data_raw, 'date'));
+            sort($all_dates);
+            
+            // Create structured data with all dates
+            foreach ($all_dates as $date) {
+                $service_data[] = [
+                    'date' => $date,
+                    'normal_count' => $normal_data[$date] ?? 0,
+                    'fast_count' => $fast_data[$date] ?? 0,
+                    'service_count' => ($normal_data[$date] ?? 0) + ($fast_data[$date] ?? 0) // Total for backward compatibility
+                ];
+            }
 
             echo json_encode([
                 'success' => true,
