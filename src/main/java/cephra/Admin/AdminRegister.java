@@ -54,7 +54,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(See1);
-        See1.setBounds(900, 460, 80, 40);
+        See1.setBounds(900, 362, 80, 40);
 
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
         See.setBorderPainted(false);
@@ -66,7 +66,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(610, 460, 60, 40);
+        See.setBounds(910, 274, 60, 40);
 
         username.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         username.setBorder(null);
@@ -76,7 +76,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(388, 362, 260, 37);
+        username.setBounds(388, 364, 260, 37);
 
         email.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         email.setBorder(null);
@@ -86,7 +86,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(700, 360, 260, 37);
+        email.setBounds(388, 452, 260, 37);
 
         RegisterBTN.setBorderPainted(false);
         RegisterBTN.setContentAreaFilled(false);
@@ -106,7 +106,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(390, 460, 260, 37);
+        pass.setBounds(694, 276, 260, 37);
 
         ConPass.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         ConPass.setBorder(null);
@@ -116,7 +116,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(ConPass);
-        ConPass.setBounds(700, 460, 260, 38);
+        ConPass.setBounds(694, 363, 260, 37);
 
         log.setBorderPainted(false);
         log.setContentAreaFilled(false);
@@ -147,7 +147,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(Firstname);
-        Firstname.setBounds(390, 263, 120, 37);
+        Firstname.setBounds(388, 276, 120, 37);
 
         LastName.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         LastName.setBorder(null);
@@ -157,7 +157,7 @@ public class AdminRegister extends javax.swing.JPanel {
             }
         });
         add(LastName);
-        LastName.setBounds(533, 263, 120, 37);
+        LastName.setBounds(533, 276, 120, 37);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ADMINregister.png"))); // NOI18N
         add(jLabel1);
