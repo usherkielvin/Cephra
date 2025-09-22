@@ -54,7 +54,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code6);
-        code6.setBounds(300, 310, 30, 50);
+        code6.setBounds(300, 328, 30, 50);
 
         code5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -65,7 +65,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code5);
-        code5.setBounds(248, 310, 30, 50);
+        code5.setBounds(248, 328, 30, 50);
 
         code4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -76,7 +76,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code4);
-        code4.setBounds(197, 310, 30, 50);
+        code4.setBounds(197, 328, 30, 50);
 
         code3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -87,7 +87,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code3);
-        code3.setBounds(145, 310, 30, 50);
+        code3.setBounds(145, 328, 30, 50);
 
         code2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -98,10 +98,12 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code2);
-        code2.setBounds(93, 310, 30, 50);
+        code2.setBounds(93, 328, 30, 50);
 
         code1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        code1.setText("1");
+        code1.setToolTipText("");
         code1.setBorder(null);
         code1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -109,7 +111,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(code1);
-        code1.setBounds(40, 310, 30, 50);
+        code1.setBounds(40, 328, 30, 50);
 
         resend.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         resend.setBorder(null);
@@ -123,7 +125,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(resend);
-        resend.setBounds(230, 430, 90, 40);
+        resend.setBounds(230, 465, 90, 40);
 
         Back.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         Back.setBorder(null);
@@ -148,7 +150,7 @@ public class PasswordVerify extends javax.swing.JPanel {
             }
         });
         add(resetsend);
-        resetsend.setBounds(40, 380, 300, 40);
+        resetsend.setBounds(40, 418, 290, 40);
 
         contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         contactsup.setBorder(null);

@@ -66,7 +66,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(278, 360, 50, 30);
+        See.setBounds(280, 390, 50, 30);
 
         reghere.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         reghere.setForeground(new java.awt.Color(0, 204, 204));
@@ -82,7 +82,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(reghere);
-        reghere.setBounds(230, 668, 80, 30);
+        reghere.setBounds(220, 667, 80, 30);
 
         forgotpass.setForeground(new java.awt.Color(0, 204, 204));
         forgotpass.setText("Forgot password?");
@@ -97,7 +97,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(forgotpass);
-        forgotpass.setBounds(210, 390, 120, 30);
+        forgotpass.setBounds(210, 425, 120, 30);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
@@ -107,9 +107,9 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(80, 360, 200, 30);
+        pass.setBounds(80, 390, 200, 30);
 
-        username.setFont(new java.awt.Font("Segoe UI", 0, 18)); 
+        username.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         username.setBorder(null);
         username.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -117,7 +117,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(username);
-        username.setBounds(80, 300, 230, 35);
+        username.setBounds(80, 320, 230, 35);
         add(cooldownLabel);
         cooldownLabel.setBounds(40, 400, 160, 20);
 
@@ -133,7 +133,7 @@ public class Phonelogin extends javax.swing.JPanel {
         add(loginhome);
         loginhome.setBounds(40, 430, 290, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN.png")));
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(0, 0, 360, 750);
     }// </editor-fold>//GEN-END:initComponents

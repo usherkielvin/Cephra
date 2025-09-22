@@ -86,7 +86,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(See);
-        See.setBounds(280, 470, 50, 20);
+        See.setBounds(285, 520, 50, 20);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
@@ -96,7 +96,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(pass);
-        pass.setBounds(40, 464, 250, 31);
+        pass.setBounds(50, 516, 250, 31);
 
         email.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         email.setBorder(null);
@@ -106,7 +106,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(45, 402, 280, 32);
+        email.setBounds(50, 438, 280, 32);
 
         fname.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         fname.setBorder(null);
@@ -116,7 +116,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(fname);
-        fname.setBounds(40, 280, 130, 30);
+        fname.setBounds(40, 283, 130, 30);
 
         register.setBorder(null);
         register.setBorderPainted(false);
@@ -128,7 +128,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(register);
-        register.setBounds(30, 520, 310, 50);
+        register.setBounds(30, 620, 310, 40);
 
         termscondition.setBackground(new java.awt.Color(255, 255, 255));
         termscondition.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -142,7 +142,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(termscondition);
-        termscondition.setBounds(60, 490, 280, 40);
+        termscondition.setBounds(50, 580, 280, 40);
 
         loginbutton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         loginbutton.setForeground(new java.awt.Color(0, 204, 204));
@@ -167,7 +167,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(UsernamePhone);
-        UsernamePhone.setBounds(45, 340, 280, 32);
+        UsernamePhone.setBounds(45, 360, 280, 32);
 
         lname.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         lname.setBorder(null);
@@ -177,7 +177,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(lname);
-        lname.setBounds(200, 279, 120, 32);
+        lname.setBounds(200, 282, 120, 32);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Register1.png"))); // NOI18N
         add(jLabel1);
