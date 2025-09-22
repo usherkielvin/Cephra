@@ -130,6 +130,7 @@ public class Home extends javax.swing.JPanel {
         charge = new javax.swing.JButton();
         wallet = new javax.swing.JButton();
         rewards = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         LoggedName = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -247,6 +248,10 @@ public class Home extends javax.swing.JPanel {
         });
         add(rewards);
         rewards.setBounds(30, 610, 150, 50);
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/demovid.gif"))); // NOI18N
+        add(jLabel2);
+        jLabel2.setBounds(30, 400, 310, 196);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         LoggedName.setForeground(new java.awt.Color(0, 204, 204));
@@ -455,6 +460,7 @@ public class Home extends javax.swing.JPanel {
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JButton linkbutton;
     private javax.swing.JLabel pesobalance;
     private javax.swing.JButton profilebutton;

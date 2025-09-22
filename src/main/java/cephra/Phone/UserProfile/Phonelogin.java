@@ -131,7 +131,7 @@ public class Phonelogin extends javax.swing.JPanel {
             }
         });
         add(loginhome);
-        loginhome.setBounds(40, 430, 290, 40);
+        loginhome.setBounds(40, 490, 290, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/LOGIN.png"))); // NOI18N
         add(jLabel1);
