@@ -209,7 +209,7 @@ public class Wallet extends javax.swing.JPanel {
                 return;
             }
             
-            java.util.List<Object[]> transactions = cephra.Database.CephraDB.getWalletTransactionHistory(currentUser);
+            java.util.List<Object[]> transactions = cephra.Database.CephraDB.getLatestWalletTransactions(currentUser);
             displayTransactionHistory(transactions);
             
         } catch (Exception e) {
@@ -376,7 +376,7 @@ public class Wallet extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargeHistory());
+                        phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.WalletHistory());
                         break;
                     }
                 }

@@ -2297,8 +2297,11 @@ public class CephraDB {
                 transStmt.executeUpdate();
             }
             
+            // Notify wallet history manager about the transaction
+            cephra.Phone.Utilities.WalletHistoryManager.updateWalletHistory(username);
+            
             // Note: No automatic transaction limit - preserve all wallet history
-            // The Wallet panel preview uses LIMIT 5 in query, but WalletHistory shows all
+            // The Wallet panel preview uses getLatestWalletTransactions (LIMIT 5), but WalletHistory uses getWalletTransactionHistory (LIMIT 20)
             
             conn.commit(); // Commit transaction
             System.out.println("Wallet balance updated successfully for " + username + ": " + currentBalance + " → " + newBalance);
@@ -2371,11 +2374,51 @@ public class CephraDB {
     }
     
     /**
-     * Gets the latest wallet transactions for a user (up to 5 for Wallet panel preview)
+     * Gets the latest wallet transactions for a user (up to 20 transactions for WalletHistory panel)
      * @param username the username
      * @return list of wallet transaction records
      */
     public static java.util.List<Object[]> getWalletTransactionHistory(String username) {
+        java.util.List<Object[]> transactions = new ArrayList<>();
+        
+        if (username == null || username.trim().isEmpty()) {
+            return transactions;
+        }
+        
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT transaction_type, amount, new_balance, description, reference_id, transaction_date " +
+                     "FROM wallet_transactions WHERE username = ? ORDER BY transaction_date DESC LIMIT 20")) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getString("transaction_type"),
+                        rs.getDouble("amount"),
+                        rs.getDouble("new_balance"),
+                        rs.getString("description"),
+                        rs.getString("reference_id"),
+                        rs.getTimestamp("transaction_date")
+                    };
+                    transactions.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting wallet transaction history: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return transactions;
+    }
+    
+    /**
+     * Gets the 5 latest wallet transactions for a user (specifically for Wallet panel preview)
+     * @param username the username
+     * @return list of wallet transaction records (maximum 5)
+     */
+    public static java.util.List<Object[]> getLatestWalletTransactions(String username) {
         java.util.List<Object[]> transactions = new ArrayList<>();
         
         if (username == null || username.trim().isEmpty()) {
@@ -2403,7 +2446,7 @@ public class CephraDB {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error getting wallet transaction history: " + e.getMessage());
+            System.err.println("Error getting latest wallet transactions: " + e.getMessage());
             e.printStackTrace();
         }
         

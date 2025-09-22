@@ -5,42 +5,33 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import cephra.Phone.Utilities.WalletHistoryManager.WalletHistoryUpdateListener;
 
-public class WalletHistory extends javax.swing.JPanel {
+public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUpdateListener {
     
-    
-    
-   
     private String currentUsername;
+    private Object[] currentTransactionEntry;
+    private javax.swing.JPanel modalOverlay;
     private JPanel previousPanel; // To store the previous panel for back navigation
 
     public WalletHistory() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
-        setupLabelPosition(); // Set label position
+        setupLabelPosition();
         makeDraggable();
         
-        JScrollPane scrollPane = new JScrollPane(historyPanel);
+        // Initialize components
+        setupCustomCode();
+        setupScrollableHistoryContent();
         
-        // Hide scrollbars but keep scrolling possible
-        scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
-        scrollPane.getVerticalScrollBar().setPreferredSize(new java.awt.Dimension(0, 0));
+        // Add close button action
+      
+        // Register with WalletHistoryManager to receive updates
+        cephra.Phone.Utilities.WalletHistoryManager.addWalletHistoryUpdateListener(this);
         
-        // Create and add history panel with scroll pane
-        createHistoryPanel();
-        
-        // Add close button
-        closeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                goBackToPreviousPanel();
-            }
-        });
-        
-        // Load wallet transaction entries
-        loadWalletTransactions();
-        
-        // Add component listener to refresh when panel becomes visible
         addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentShown(java.awt.event.ComponentEvent e) {
@@ -49,43 +40,107 @@ public class WalletHistory extends javax.swing.JPanel {
         });
     }
     
-    private void createHistoryPanel() {
-        historyPanel = new JPanel();
-        historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
-        historyPanel.setBackground(Color.WHITE);
-        
-        
-        // Use the existing scroll pane if it exists, otherwise create a new one
-        if (historyScrollPane == null) {
-            historyScrollPane = new JScrollPane(historyPanel);
-            historyScrollPane.setBorder(null);
-            historyScrollPane.setBounds(50, 150, 290, 480);
-            add(historyScrollPane);
-        } else {
-            // Just update the viewport with the new history panel
-            historyScrollPane.setViewportView(historyPanel);
-        }
-
-        // Hide scrollbars but keep scrolling possible
-        historyScrollPane.setBorder(null);
-        historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        if (historyScrollPane.getVerticalScrollBar() != null) {
-            historyScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
-            // Adjust scroll speed (higher = faster). Try 20-40 for quicker scrolling
-            historyScrollPane.getVerticalScrollBar().setUnitIncrement(24);
-        }
-        if (historyScrollPane.getHorizontalScrollBar() != null) {
-            historyScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
-        }
-        historyScrollPane.setWheelScrollingEnabled(true);
-        historyScrollPane.putClientProperty("JScrollPane.fastWheelScrolling", Boolean.TRUE);
+    /**
+     * Setup scrollable history content using designed panel structure like ChargeHistory
+     */
+    private void setupScrollableHistoryContent() {
+        // Use SwingUtilities.invokeLater to ensure everything is ready after initComponents
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                // Your history panel is already set up in initComponents with your labels:
+                // time, amount, date, type, description
+                if (historyPanel != null) {
+                    
+                    // Your panel is already in the scroll pane thanks to initComponents
+                    // Keep your exact design and layout - don't change anything!
+                    
+                } else {
+                    return;
+                }
+                
+                // Configure scroll pane behavior to enable vertical scrolling
+                historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                historyScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+                
+                // Style the scrollbar to match the application's design
+           
+                if (historyScrollPane.getHorizontalScrollBar() != null) {
+                    historyScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
+                }
+                
+                historyScrollPane.setWheelScrollingEnabled(true);
+                historyScrollPane.putClientProperty("JScrollPane.fastWheelScrolling", Boolean.TRUE);
+                
+                // Add mouse wheel listener to the main panel to ensure scrolling works properly
+                this.addMouseWheelListener(new MouseWheelListener() {
+                    @Override
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        JScrollBar verticalScrollBar = historyScrollPane.getVerticalScrollBar();
+                        int notches = e.getWheelRotation();
+                        int scrollAmount = verticalScrollBar.getUnitIncrement() * notches * 3;
+                        int newValue = verticalScrollBar.getValue() + scrollAmount;
+                        
+                        // Ensure the new value is within bounds
+                        newValue = Math.max(newValue, verticalScrollBar.getMinimum());
+                        newValue = Math.min(newValue, verticalScrollBar.getMaximum() - verticalScrollBar.getVisibleAmount());
+                        
+                        verticalScrollBar.setValue(newValue);
+                        e.consume(); // Prevent the event from propagating
+                    }
+                });
+                
+                // Also add the listener to the history panel and scroll pane for better coverage
+                historyPanel.addMouseWheelListener(new MouseWheelListener() {
+                    @Override
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        JScrollBar verticalScrollBar = historyScrollPane.getVerticalScrollBar();
+                        int notches = e.getWheelRotation();
+                        int scrollAmount = verticalScrollBar.getUnitIncrement() * notches * 3;
+                        int newValue = verticalScrollBar.getValue() + scrollAmount;
+                        
+                        newValue = Math.max(newValue, verticalScrollBar.getMinimum());
+                        newValue = Math.min(newValue, verticalScrollBar.getMaximum() - verticalScrollBar.getVisibleAmount());
+                        
+                        verticalScrollBar.setValue(newValue);
+                        e.consume();
+                    }
+                });
+                
+                mainHistoryContainer.addMouseWheelListener(new MouseWheelListener() {
+                    @Override
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        JScrollBar verticalScrollBar = historyScrollPane.getVerticalScrollBar();
+                        int notches = e.getWheelRotation();
+                        int scrollAmount = verticalScrollBar.getUnitIncrement() * notches * 3;
+                        int newValue = verticalScrollBar.getValue() + scrollAmount;
+                        
+                        newValue = Math.max(newValue, verticalScrollBar.getMinimum());
+                        newValue = Math.min(newValue, verticalScrollBar.getMaximum() - verticalScrollBar.getVisibleAmount());
+                        
+                        verticalScrollBar.setValue(newValue);
+                        e.consume();
+                    }
+                });
+                
+                // Force a repaint to ensure everything displays correctly
+                historyScrollPane.revalidate();
+                historyScrollPane.repaint();
+                this.revalidate();
+                this.repaint();
+                
+                // Load wallet transaction entries now that the panel is ready
+                loadWalletTransactions();
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
     
     private void loadWalletTransactions() {
         // Get current user's wallet transactions
-        currentUsername = cephra.Database.CephraDB.getCurrentUsername();
-        System.out.println("WalletHistory: Loading wallet transactions for user: " + currentUsername);
+        currentUsername =   cephra.Database.CephraDB.getCurrentUsername(); // Placeholder - replace with actual current user logic
         refreshHistoryDisplay();
     }
     
@@ -96,56 +151,87 @@ public class WalletHistory extends javax.swing.JPanel {
     private void goBackToPreviousPanel() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                System.out.println("Going back from Wallet History");
+                     
+          
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        if (previousPanel != null) {
-                            phoneFrame.switchPanel(previousPanel);
-                        } else {
-                            phoneFrame.switchPanel(cephra.Phone.Dashboard.Home.getAppropriateHomePanel());
-                        }
+                        phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Wallet());
                         break;
                     }
+                
+            
+        }
+                // Close or navigate back logic would go here
+                if (previousPanel != null) {
+                    System.out.println("Would switch to previous panel: " + previousPanel.getClass().getSimpleName());
+                    
                 }
             }
         });
     }
     
     public void refreshHistoryDisplay() {
-        // Clear existing transaction items
-        historyPanel.removeAll();
-        
-        // Get ALL wallet transactions for complete history
-        java.util.List<Object[]> transactions = cephra.Database.CephraDB.getAllWalletTransactionHistory(currentUsername);
-        
-        // Debug information
-        System.out.println("WalletHistory: Found " + transactions.size() + " wallet transactions");
-        
-        if (transactions.isEmpty()) {
-            // Show "No transactions" message
-            JPanel noHistoryPanel = new JPanel(new BorderLayout());
-            noHistoryPanel.setBackground(Color.WHITE);
-            JLabel noHistoryLabel = new JLabel("No wallet transactions found");
-            noHistoryLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            noHistoryLabel.setForeground(Color.GRAY);
-            noHistoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            noHistoryPanel.add(noHistoryLabel, BorderLayout.CENTER);
-            historyPanel.add(noHistoryPanel);
-        } else {
-            // Add wallet transaction entries
-            for (Object[] transaction : transactions) {
-                addTransactionItem(transaction);
-            }
+        // Check if your designed panels are initialized before using them
+        if (historyPanel == null || history1 == null) {
+            return;
         }
         
-        // Ensure scroll position is at the top to show newest entries
-        SwingUtilities.invokeLater(() -> {
-            if (historyScrollPane != null && historyScrollPane.getVerticalScrollBar() != null) {
-                historyScrollPane.getVerticalScrollBar().setValue(0);
+        // Get current user's wallet transactions from the database
+        java.util.List<Object[]> transactions = cephra.Database.CephraDB.getWalletTransactionHistory(currentUsername);
+        
+        if (transactions.isEmpty()) {
+            // Show "No transactions" message in your designed labels
+            time.setText("No Data");
+            amount.setText("₱0.00");
+            date.setText("No Date");
+            type.setText("No Transactions");
+            description.setText("0 transactions");
+            currentTransactionEntry = null;  // No entry to show details for
+            
+        } else {
+            // Clear the container first to add all transaction entries
+            historyPanel.removeAll();
+            
+            // Create a copy of your history1 panel for each entry
+            for (int i = 0; i < transactions.size(); i++) {
+                Object[] transaction = transactions.get(i);
+                
+                // Create a panel that looks like your history1 panel
+                JPanel entryPanel = createHistoryPanelLikeHistory1(transaction);
+                historyPanel.add(entryPanel);
+                
+                // Add spacing between entries (except for the last one)
+                if (i < transactions.size() - 1) {
+                    historyPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+                }
             }
+            
+            // Store the first entry for details button
+            currentTransactionEntry = transactions.get(0);
+        }
+        
+        // Calculate and set the preferred height based on content
+        SwingUtilities.invokeLater(() -> {
+            // Calculate height based on number of transactions
+            int totalHeight = transactions.size() * 80;  // Each entry is 80px high
+            if (transactions.size() > 1) {
+                totalHeight += (transactions.size() - 1) * 8;  // Add spacing between entries
+            }
+            
+            // Set minimum height to ensure scrolling works properly
+            int minHeight = Math.max(totalHeight, 518);  // Match the scroll pane height
+            historyPanel.setPreferredSize(new Dimension(308, totalHeight));
+            
+            // Ensure proper repaint
+            history1.revalidate();
+            history1.repaint();
             historyPanel.revalidate();
             historyPanel.repaint();
+            historyScrollPane.revalidate();
+            historyScrollPane.repaint();
         });
     }
     
@@ -156,112 +242,241 @@ public class WalletHistory extends javax.swing.JPanel {
         SwingUtilities.invokeLater(this::refreshHistoryDisplay);
     }
     
-    private void addTransactionItem(final Object[] transaction) {
+    // Placeholder method to provide sample transaction data
+    private java.util.List<Object[]> getPlaceholderTransactions() {
+        java.util.List<Object[]> transactions = new java.util.ArrayList<>();
+        
+        // Sample transaction 1: Top Up
+        Object[] topUp = new Object[6];
+        topUp[0] = "TOP_UP"; // transaction_type
+        topUp[1] = 100.00; // amount
+        topUp[2] = 150.00; // new_balance
+        topUp[3] = "Wallet top-up via GCash"; // description
+        topUp[4] = "REF123456"; // reference_id
+        topUp[5] = new java.sql.Timestamp(System.currentTimeMillis() - 86400000); // yesterday
+        transactions.add(topUp);
+        
+        // Sample transaction 2: Payment
+        Object[] payment = new Object[6];
+        payment[0] = "PAYMENT"; // transaction_type
+        payment[1] = 50.00; // amount
+        payment[2] = 100.00; // new_balance
+        payment[3] = "Payment for charging service"; // description
+        payment[4] = "PAY789123"; // reference_id
+        payment[5] = new java.sql.Timestamp(System.currentTimeMillis() - 43200000); // 12 hours ago
+        transactions.add(payment);
+        
+        // Sample transaction 3: Another Top Up
+        Object[] topUp2 = new Object[6];
+        topUp2[0] = "TOP_UP"; // transaction_type
+        topUp2[1] = 200.00; // amount
+        topUp2[2] = 300.00; // new_balance
+        topUp2[3] = "Wallet top-up via Bank Transfer"; // description
+        topUp2[4] = "REF987654"; // reference_id
+        topUp2[5] = new java.sql.Timestamp(System.currentTimeMillis());
+        transactions.add(topUp2);
+        
+        return transactions;
+    }
+    
+    /**
+     * Method to handle wallet history updates
+     * Implements WalletHistoryUpdateListener interface
+     * @param username The username whose wallet history was updated
+     */
+    @Override
+    public void onWalletHistoryUpdated(String username) {
+        if (username != null && username.equals(currentUsername)) {
+            // Refresh the display with the latest transaction data from the database
+            SwingUtilities.invokeLater(this::refreshHistoryDisplay);
+        }
+    }
+    
+    /**
+     * Creates a panel that looks exactly like your designed history1 panel
+     */
+    private JPanel createHistoryPanelLikeHistory1(final Object[] transaction) {
+        // Create panel with safe template copying
+        JPanel panel = new JPanel();
+        
+        // Use safe defaults if history1 is not available
+        if (history1 != null) {
+            try {
+                panel.setLayout(null); // Always use null layout for absolute positioning
+                panel.setBackground(history1.getBackground());
+                panel.setBorder(history1.getBorder());
+                panel.setPreferredSize(new Dimension(310, 80));
+                panel.setMaximumSize(new Dimension(310, 80));
+                panel.setMinimumSize(new Dimension(310, 80));
+            } catch (Exception e) {
+                // Fallback to safe defaults
+                panel.setLayout(null);
+                panel.setBackground(Color.WHITE);
+                panel.setPreferredSize(new Dimension(310, 80));
+                panel.setMaximumSize(new Dimension(310, 80));
+            }
+        } else {
+            // Safe defaults when template is not available
+            panel.setLayout(null);
+            panel.setBackground(Color.WHITE);
+            panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+            panel.setPreferredSize(new Dimension(310, 80));
+            panel.setMaximumSize(new Dimension(310, 80));
+        }
+        
+        // Create components with safe copying or fallbacks
+        createTransactionComponents(panel, transaction);
+        
+        return panel;
+    }
+    
+    private void createTransactionComponents(JPanel panel, final Object[] transaction) {
         // Transaction data structure: [transaction_type, amount, new_balance, description, reference_id, transaction_date]
         String transactionType = (String) transaction[0];
-        double amount = (Double) transaction[1];
+        double transactionAmount = (Double) transaction[1];
         double newBalance = (Double) transaction[2];
-        String description = (String) transaction[3];
-        
+        String desc = (String) transaction[3];
         java.sql.Timestamp timestamp = (java.sql.Timestamp) transaction[5];
         
-        // Create a panel for a single transaction item
-        JPanel transactionItemPanel = new JPanel();
-        transactionItemPanel.setLayout(new BorderLayout(5, 0));
-        transactionItemPanel.setBackground(Color.WHITE);
-        transactionItemPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
-        transactionItemPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
-        // Set cursor to hand to indicate clickable
-        transactionItemPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        // Set a fixed preferred and maximum height for each transaction item panel
-        int itemHeight = 80; // Increased height for better visibility
-        int itemWidth = 290; // Width of the scroll pane
-        transactionItemPanel.setPreferredSize(new Dimension(itemWidth, itemHeight));
-        transactionItemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, itemHeight));
-
         // Format date and time
         java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
         java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
         String dateStr = dateFormat.format(timestamp);
         String timeStr = timeFormat.format(timestamp);
         
-        // Date label at top
-        JLabel dateLabel = new JLabel(dateStr);
-        dateLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        dateLabel.setForeground(new Color(70, 70, 70));
-
-        // Left panel for details
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.setBackground(Color.WHITE);
-
-        // Time
-        JLabel timeLabel = new JLabel(timeStr);
-        timeLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-        timeLabel.setForeground(Color.DARK_GRAY);
-        timeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Transaction type with color coding
-        String typeDisplay = getTransactionTypeDisplay(transactionType);
-        JLabel typeLabel = new JLabel(typeDisplay);
-        typeLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        typeLabel.setForeground(getTransactionTypeColor(transactionType));
-        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Description preview (first 30 chars + ...)
-        String descriptionPreview = description != null ? description : "";
+        // Time label
+        JLabel timeClone = new JLabel(timeStr);
+        if (time != null) {
+            try {
+                timeClone.setBounds(time.getBounds());
+                timeClone.setFont(time.getFont());
+                timeClone.setForeground(time.getForeground());
+                timeClone.setBackground(time.getBackground());
+                timeClone.setOpaque(time.isOpaque());
+            } catch (Exception e) {
+                timeClone.setBounds(20, 20, 80, 16);
+                timeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+            }
+        } else {
+            timeClone.setBounds(20, 20, 80, 16);
+            timeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+        }
+        panel.add(timeClone);
+        
+        // Amount label
+        String amountText = formatTransactionAmount(transactionType, transactionAmount);
+        JLabel amountClone = new JLabel(amountText);
+        if (amount != null) {
+            try {
+                amountClone.setBounds(amount.getBounds());
+                amountClone.setFont(amount.getFont());
+                amountClone.setForeground(getAmountColor(transactionType));
+                amountClone.setBackground(amount.getBackground());
+                amountClone.setOpaque(amount.isOpaque());
+            } catch (Exception e) {
+                amountClone.setBounds(220, 40, 70, 16);
+                amountClone.setFont(new Font("Arial", Font.BOLD, 12));
+                amountClone.setForeground(getAmountColor(transactionType));
+            }
+        } else {
+            amountClone.setBounds(220, 40, 70, 16);
+            amountClone.setFont(new Font("Arial", Font.BOLD, 12));
+            amountClone.setForeground(getAmountColor(transactionType));
+        }
+        panel.add(amountClone);
+        
+        // Date label
+        JLabel dateClone = new JLabel(dateStr);
+        if (date != null) {
+            try {
+                dateClone.setBounds(date.getBounds());
+                dateClone.setFont(date.getFont());
+                dateClone.setForeground(date.getForeground());
+                dateClone.setBackground(date.getBackground());
+                dateClone.setOpaque(date.isOpaque());
+            } catch (Exception e) {
+                dateClone.setBounds(20, 0, 120, 20);
+                dateClone.setFont(new Font("Arial", Font.BOLD, 14));
+            }
+        } else {
+            dateClone.setBounds(20, 0, 120, 20);
+            dateClone.setFont(new Font("Arial", Font.BOLD, 14));
+        }
+        panel.add(dateClone);
+        
+        // Type label
+        String displayType = getTransactionTypeDisplay(transactionType);
+        JLabel typeClone = new JLabel(displayType);
+        if (type != null) {
+            try {
+                typeClone.setBounds(type.getBounds());
+                typeClone.setFont(type.getFont());
+                typeClone.setForeground(getTransactionTypeColor(transactionType));
+                typeClone.setBackground(type.getBackground());
+                typeClone.setOpaque(type.isOpaque());
+            } catch (Exception e) {
+                typeClone.setBounds(20, 40, 210, 16);
+                typeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+                typeClone.setForeground(getTransactionTypeColor(transactionType));
+            }
+        } else {
+            typeClone.setBounds(20, 40, 210, 16);
+            typeClone.setFont(new Font("Arial", Font.PLAIN, 12));
+            typeClone.setForeground(getTransactionTypeColor(transactionType));
+        }
+        panel.add(typeClone);
+        
+        // Description label
+        String descriptionPreview = desc != null ? desc : "";
         if (descriptionPreview.length() > 30) {
             descriptionPreview = descriptionPreview.substring(0, 30) + "...";
         }
-        JLabel descriptionLabel = new JLabel(descriptionPreview);
-        descriptionLabel.setFont(new Font("Arial", Font.PLAIN, 10));
-        descriptionLabel.setForeground(new Color(80, 80, 80));
-        descriptionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        leftPanel.add(timeLabel);
-        leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
-        leftPanel.add(typeLabel);
-        leftPanel.add(Box.createRigidArea(new Dimension(0, 2)));
-        leftPanel.add(descriptionLabel);
-
-        // Right panel for amount and balance
-        JPanel rightPanel = new JPanel();
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setBackground(Color.WHITE);
-
-        // Amount with proper formatting
-        String amountText = formatTransactionAmount(transactionType, amount);
-        JLabel amountLabel = new JLabel(amountText);
-        amountLabel.setFont(new Font("Arial", Font.BOLD, 13));
-        amountLabel.setForeground(getAmountColor(transactionType));
-        amountLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        rightPanel.add(amountLabel);
-        
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        
-        // New balance
-        JLabel balanceLabel = new JLabel("Balance: ₱" + String.format("%.2f", newBalance));
-        balanceLabel.setFont(new Font("Arial", Font.PLAIN, 10));
-        balanceLabel.setForeground(new Color(100, 100, 100));
-        balanceLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        rightPanel.add(balanceLabel);
-
-        transactionItemPanel.add(dateLabel, BorderLayout.NORTH);
-        transactionItemPanel.add(leftPanel, BorderLayout.WEST);
-        transactionItemPanel.add(rightPanel, BorderLayout.EAST);
-        
-        // Add click listener to show transaction details
-        transactionItemPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                showTransactionDetails(transaction);
+        JLabel descClone = new JLabel(descriptionPreview);
+        if (description != null) {
+            try {
+                descClone.setBounds(description.getBounds());
+                descClone.setFont(description.getFont());
+                descClone.setForeground(description.getForeground());
+                descClone.setBackground(description.getBackground());
+                descClone.setOpaque(description.isOpaque());
+            } catch (Exception e) {
+                descClone.setBounds(20, 60, 220, 16);
+                descClone.setFont(new Font("Arial", Font.PLAIN, 11));
             }
+        } else {
+            descClone.setBounds(20, 60, 220, 16);
+            descClone.setFont(new Font("Arial", Font.PLAIN, 11));
+        }
+        panel.add(descClone);
+        
+        // Details button
+        JButton detailsClone = new JButton();
+        if (details != null) {
+            try {
+                detailsClone.setBounds(details.getBounds());
+                detailsClone.setBorderPainted(details.isBorderPainted());
+                detailsClone.setContentAreaFilled(details.isContentAreaFilled());
+                detailsClone.setFocusPainted(details.isFocusPainted());
+            } catch (Exception e) {
+                detailsClone.setBounds(0, -3, 310, 80);
+                detailsClone.setBorderPainted(false);
+                detailsClone.setContentAreaFilled(false);
+                detailsClone.setFocusPainted(false);
+            }
+        } else {
+            detailsClone.setBounds(0, -3, 310, 80);
+            detailsClone.setBorderPainted(false);
+            detailsClone.setContentAreaFilled(false);
+            detailsClone.setFocusPainted(false);
+        }
+        
+        detailsClone.addActionListener(_ -> {
+            currentTransactionEntry = transaction;
+            showWalletTransactionDetails(transaction);
         });
-
-        historyPanel.add(transactionItemPanel);
+        panel.add(detailsClone);
     }
+
     
     /**
      * Gets display name for transaction type
@@ -304,133 +519,112 @@ public class WalletHistory extends javax.swing.JPanel {
     private JPanel detailsPanel;
    
     
-    private void showTransactionDetails(Object[] transaction) {
+    private void showWalletTransactionDetails(Object[] transaction) {
         // Transaction data: [transaction_type, amount, new_balance, description, reference_id, transaction_date]
         String transactionType = (String) transaction[0];
-        double amount = (Double) transaction[1];
+        double transactionAmount = (Double) transaction[1];
         double newBalance = (Double) transaction[2];
-        String description = (String) transaction[3];
+        String desc = (String) transaction[3];
         String referenceId = (String) transaction[4];
         java.sql.Timestamp timestamp = (java.sql.Timestamp) transaction[5];
         
-        // If details panel already exists, remove it first
-        if (detailsPanel != null) {
-            remove(detailsPanel);
-        }
-        
-        // Keep the history scroll pane visible in the background
-        
-        // Create panel for details - smaller popup in center
-        detailsPanel = new JPanel();
-        detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
-        detailsPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2),
-            new EmptyBorder(15, 15, 15, 15)
-        ));
-        detailsPanel.setBackground(Color.WHITE);
-        detailsPanel.setBounds(75, 200, 220, 300); // Centered smaller popup
-        
-        // Add header - more compact
-        JLabel headerLabel = new JLabel("Transaction Details");
-        headerLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        headerLabel.setForeground(new Color(50, 50, 50));
-        headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        detailsPanel.add(headerLabel);
-        
-        detailsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        
-        // Add transaction type
-        addDetailRow(detailsPanel, "Type", getTransactionTypeDisplay(transactionType));
-        
-        // Add amount
-        addDetailRow(detailsPanel, "Amount", formatTransactionAmount(transactionType, amount));
-        
-        // Add description
-        if (description != null && !description.isEmpty()) {
-            addDetailRow(detailsPanel, "Description", description);
-        }
-        
-        // Add reference ID if available
-        if (referenceId != null && !referenceId.isEmpty()) {
-            addDetailRow(detailsPanel, "Reference", referenceId);
-        }
-        
-        // Add new balance after transaction
-        addDetailRow(detailsPanel, "New Balance", String.format("₱%.2f", newBalance));
-        
-        // Add username
-        addDetailRow(detailsPanel, "User", currentUsername != null ? currentUsername : "Unknown");
-        
-        // Add date and time
-        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
-        java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm:ss");
-        addDetailRow(detailsPanel, "Date", dateFormat.format(timestamp));
-        addDetailRow(detailsPanel, "Time", timeFormat.format(timestamp));
-        
-        detailsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        // Add OK button
-        JButton okButton = new JButton("OK");
-        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        okButton.setFont(new Font("Arial", Font.BOLD, 12));
-        okButton.addActionListener(_ -> {
-            System.out.println("OK button clicked - closing wallet details popup");
-            closeDetailsPanel();
-        });
-        detailsPanel.add(okButton);
-        
-        // Create modal overlay to block all clicks except on detailsPanel
-        if (modalOverlay == null) {
-            modalOverlay = new javax.swing.JPanel();
-            modalOverlay.setBackground(new java.awt.Color(0, 0, 0, 120)); // More visible overlay
-            modalOverlay.setOpaque(false);
+        // Update the designed detailpanel with the transaction information
+        if (detailpanel != null) {
+            // Update transaction type - just the value
+            if (transactionType != null) {
+                this.transactionType.setText(getTransactionTypeDisplay(transactionType));
+            }
             
-            // Add comprehensive mouse listeners to block ALL interactions
-            modalOverlay.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    System.out.println("Modal overlay blocked click - must click OK first!");
-                    e.consume(); // Block the click
-                }
-                
-                @Override
-                public void mousePressed(java.awt.event.MouseEvent e) {
-                    e.consume(); // Block mouse press
-                }
-                
-                @Override
-                public void mouseReleased(java.awt.event.MouseEvent e) {
-                    e.consume(); // Block mouse release
-                }
-            });
+            // Update amount information - just the value
+            if (transactionAmount != 0.0) {
+                this.transactionAmount.setText(formatTransactionAmount(transactionType, transactionAmount));
+            }
             
-            // Block mouse motion events
-            modalOverlay.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-                @Override
-                public void mouseDragged(java.awt.event.MouseEvent e) {
-                    e.consume();
-                }
-                
-                @Override
-                public void mouseMoved(java.awt.event.MouseEvent e) {
-                    e.consume();
-                }
-            });
+            // Update description - just the value
+            if (transactionDesc != null) {
+                transactionDesc.setText(desc != null ? desc : "No description");
+            }
             
-            add(modalOverlay);
+            // Update reference ID - just the value
+            if (refId != null) {
+                refId.setText(referenceId != null ? referenceId : "N/A");
+            }
+            
+            // Update new balance after transaction - just the value
+            if (newBalance != 0.0) {
+                this.newBalance.setText(String.format("₱%.2f", newBalance));
+            }
+            
+            // Update username - just the value
+            if (username != null) {
+                username.setText(currentUsername != null ? currentUsername : "Unknown");
+            }
+            
+            // Format date and time
+            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
+            java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
+            String dateStr = dateFormat.format(timestamp);
+            String timeStr = timeFormat.format(timestamp);
+            
+            // Update date - just the value
+            if (transactionDate != null) {
+                transactionDate.setText(dateStr);
+            }
+            
+            // Update time - just the value
+            if (transactionTime != null) {
+                transactionTime.setText(timeStr);
+            }
+            
+            // Setup OK button action if not already done
+            if (ok != null) {
+                // Remove any existing listeners first
+                for (java.awt.event.ActionListener listener : ok.getActionListeners()) {
+                    ok.removeActionListener(listener);
+                }
+                // Add action listener to close the details
+                ok.addActionListener(_ -> closeDetailsPanel());
+                ok.setText("");
+            }
+            
+            // Create modal overlay to block all clicks except on detailpanel
+            if (modalOverlay == null) {
+                modalOverlay = new javax.swing.JPanel();
+                modalOverlay.setBackground(new java.awt.Color(0, 0, 0, 100)); // Semi-transparent black
+                modalOverlay.setOpaque(false);
+                
+                // Add mouse listener to block all clicks on the overlay
+                modalOverlay.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseClicked(java.awt.event.MouseEvent e) {
+                        // Block all clicks - do nothing
+                        e.consume();
+                    }
+                });
+                
+                // Add mouse motion listener to block drag events too
+                modalOverlay.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                    @Override
+                    public void mouseDragged(java.awt.event.MouseEvent e) {
+                        e.consume();
+                    }
+                });
+                
+                add(modalOverlay);
+            }
+            
+            // Position and show the modal overlay to cover everything
+            modalOverlay.setBounds(0, 0, getWidth(), getHeight());
+            modalOverlay.setVisible(true);
+            
+            // Position the detailpanel in the center of the history area as a popup
+            detailpanel.setBounds(50, 200, 266, 400); // Centered in the history area
+            detailpanel.setVisible(true);
+            
+            // Make sure detailpanel is on top of the modal overlay
+            setComponentZOrder(modalOverlay, 1); // Behind detailpanel
+            setComponentZOrder(detailpanel, 0);   // On top
         }
-        
-        // Position and show the modal overlay to cover everything
-        modalOverlay.setBounds(0, 0, getWidth(), getHeight());
-        modalOverlay.setVisible(true);
-        System.out.println("Created and shown modal overlay for wallet details");
-        
-        // Add the details panel to the phone frame
-        add(detailsPanel);
-        
-        // Make sure detailsPanel is on top of the modal overlay
-        setComponentZOrder(modalOverlay, 1); // Behind detailsPanel
-        setComponentZOrder(detailsPanel, 0);   // On top
         
         // Make sure the background stays behind
         if (jLabel1 != null) {
@@ -442,58 +636,57 @@ public class WalletHistory extends javax.swing.JPanel {
     }
     
     private void closeDetailsPanel() {
-        // Remove the details panel
-        if (detailsPanel != null) {
-            remove(detailsPanel);
-            detailsPanel = null;
+        // Hide the designed detailpanel
+        if (detailpanel != null) {
+            detailpanel.setVisible(false);
         }
         
         // Hide the modal overlay to restore click functionality
         if (modalOverlay != null) {
             modalOverlay.setVisible(false);
-            System.out.println("Hidden modal overlay - wallet clicks restored");
         }
         
         revalidate();
         repaint();
     }
     
-    private void addDetailRow(JPanel panel, String label, String value) {
-        JPanel rowPanel = new JPanel();
-        rowPanel.setLayout(new BorderLayout(10, 0));
-        rowPanel.setBackground(Color.WHITE);
-        rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25)); // More compact
-        rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
-        JLabel labelComponent = new JLabel(label + ":");
-        labelComponent.setFont(new Font("Arial", Font.BOLD, 11)); // Smaller font
-        labelComponent.setForeground(new Color(70, 70, 70));
-        
-        JLabel valueComponent = new JLabel(value);
-        valueComponent.setFont(new Font("Arial", Font.PLAIN, 11)); // Smaller font
-        valueComponent.setForeground(new Color(30, 30, 30));
-        
-        // Special formatting for certain fields
-        if (label.equals("Amount")) {
-            valueComponent.setFont(new Font("Arial", Font.BOLD, 12));
-            valueComponent.setForeground(new Color(0, 120, 0));
-        } else if (label.equals("Type")) {
-            valueComponent.setForeground(new Color(50, 100, 150));
-        } else if (label.equals("Reference")) {
-            valueComponent.setFont(new Font("Arial", Font.BOLD, 10));
-            valueComponent.setForeground(new Color(100, 50, 150));
-        } else if (label.equals("New Balance")) {
-            valueComponent.setFont(new Font("Arial", Font.BOLD, 11));
-            valueComponent.setForeground(new Color(0, 100, 0));
+    // Setup custom code - like ChargeHistory
+    private void setupCustomCode() {
+        try {
+            // Set initial text for labels (safe operations only)
+            if (time != null) time.setText("Loading...");
+            if (amount != null) amount.setText("₱0.00");
+            if (date != null) date.setText("No Date");
+            if (type != null) type.setText("No Transactions");
+            if (description != null) description.setText("0 transactions");
+            
+            // Initially hide the detailpanel
+            if (detailpanel != null) {
+                detailpanel.setVisible(false);
+            }
+            
+            // Position history1 outside visible area (it's used as template)
+            if (history1 != null) {
+                history1.setBounds(400, 160, 310, 80); // Keep it outside view
+                history1.setVisible(true);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error in setupCustomCode: " + e.getMessage());
         }
-        
-        rowPanel.add(labelComponent, BorderLayout.WEST);
-        rowPanel.add(valueComponent, BorderLayout.CENTER);
-        
-        panel.add(rowPanel);
-        panel.add(Box.createRigidArea(new Dimension(0, 5))); // Less spacing
     }
-    ////
+    
+    /**
+     * Fix after design change
+     */
+    public void fixAfterDesignChange() {
+        SwingUtilities.invokeLater(() -> {
+            setupCustomCode();
+            if (currentUsername != null) {
+                refreshHistoryDisplay();
+            }
+        });
+    }
     private void makeDraggable() {
         final Point[] dragPoint = {null};
 
@@ -525,28 +718,239 @@ public class WalletHistory extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        closeButton = new javax.swing.JButton();
+        mainHistoryContainer = new javax.swing.JPanel();
         historyScrollPane = new javax.swing.JScrollPane();
         historyPanel = new javax.swing.JPanel();
+        history1 = new javax.swing.JPanel();
+        details = new javax.swing.JButton();
+        time = new javax.swing.JLabel();
+        amount = new javax.swing.JLabel();
+        date = new javax.swing.JLabel();
+        type = new javax.swing.JLabel();
+        description = new javax.swing.JLabel();
+        detailpanel = new javax.swing.JPanel();
+        headerLabel = new javax.swing.JLabel();
+        transactionType = new javax.swing.JLabel();
+        transactionAmount = new javax.swing.JLabel();
+        transactionDesc = new javax.swing.JLabel();
+        refId = new javax.swing.JLabel();
+        newBalance = new javax.swing.JLabel();
+        username = new javax.swing.JLabel();
+        transactionDate = new javax.swing.JLabel();
+        transactionTime = new javax.swing.JLabel();
+        ok = new javax.swing.JToggleButton();
         profilebutton = new javax.swing.JButton();
-        closeButton = new javax.swing.JButton();
+        historybutton = new javax.swing.JButton();
+        linkbutton = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
-        linkbutton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
-        historyScrollPane.setBorder(null);
-        historyScrollPane.setOpaque(false);
+        closeButton.setContentAreaFilled(false);
+        closeButton.setFocusPainted(false);
+        closeButton.setRequestFocusEnabled(false);
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeButtonActionPerformed(evt);
+            }
+        });
+        add(closeButton);
+        closeButton.setBounds(10, 60, 72, 30);
 
-        historyPanel.setOpaque(false);
-        historyPanel.setLayout(new javax.swing.BoxLayout(historyPanel, javax.swing.BoxLayout.LINE_AXIS));
+        mainHistoryContainer.setBackground(new java.awt.Color(255, 255, 255));
+        mainHistoryContainer.setOpaque(false);
+
+        historyScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+        historyScrollPane.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 220, 220)));
+        historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        historyScrollPane.setOpaque(true);
+        historyScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        
+        // Hide the scrollbar completely
+        JScrollBar verticalScrollBar = historyScrollPane.getVerticalScrollBar();
+        verticalScrollBar.setPreferredSize(new Dimension(0, 0));
+        verticalScrollBar.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(0, 0, 0, 0); // Transparent thumb
+                this.trackColor = new Color(0, 0, 0, 0); // Transparent track
+            }
+            
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                return button;
+            }
+            
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                return button;
+            }
+            
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                // Don't paint the track
+            }
+            
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                // Don't paint the thumb
+            }
+        });
+
+        historyPanel.setBackground(new java.awt.Color(255, 255, 255));
+        historyPanel.setLayout(new javax.swing.BoxLayout(historyPanel, javax.swing.BoxLayout.Y_AXIS));
+        // Set preferred size to allow for scrolling when content exceeds visible area
+        historyPanel.setPreferredSize(new Dimension(308, Short.MAX_VALUE));
         historyScrollPane.setViewportView(historyPanel);
 
-        add(historyScrollPane);
-        historyScrollPane.setBounds(30, 150, 310, 520);
+        javax.swing.GroupLayout mainHistoryContainerLayout = new javax.swing.GroupLayout(mainHistoryContainer);
+        mainHistoryContainer.setLayout(mainHistoryContainerLayout);
+        mainHistoryContainerLayout.setHorizontalGroup(
+            mainHistoryContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mainHistoryContainerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(historyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        mainHistoryContainerLayout.setVerticalGroup(
+            mainHistoryContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mainHistoryContainerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(historyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        add(mainHistoryContainer);
+        mainHistoryContainer.setBounds(20, 130, 320, 530);
+
+        history1.setBackground(new java.awt.Color(255, 255, 255));
+        history1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
+        history1.setLayout(null);
+
+        details.setBorderPainted(false);
+        details.setContentAreaFilled(false);
+        details.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                detailsActionPerformed(evt);
+            }
+        });
+        history1.add(details);
+        details.setBounds(0, 0, 310, 80);
+
+        time.setText("time");
+        history1.add(time);
+        time.setBounds(20, 20, 80, 16);
+
+        amount.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
+        amount.setText("Amount");
+        history1.add(amount);
+        amount.setBounds(220, 40, 70, 16);
+
+        date.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        date.setText("Date");
+        history1.add(date);
+        date.setBounds(20, 0, 120, 20);
+
+        type.setText("Transaction Type");
+        history1.add(type);
+        type.setBounds(20, 40, 210, 16);
+
+        description.setBackground(new java.awt.Color(0, 0, 0));
+        description.setText("Description");
+        history1.add(description);
+        description.setBounds(20, 60, 280, 16);
+
+        add(history1);
+        history1.setBounds(400, 160, 310, 80);
+
+        detailpanel.setBackground(new java.awt.Color(255, 255, 255));
+        detailpanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        detailpanel.setLayout(null);
+
+        headerLabel.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        headerLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        headerLabel.setText("Transaction Details");
+        headerLabel.setForeground(new java.awt.Color(51, 51, 51));
+        detailpanel.add(headerLabel);
+        headerLabel.setBounds(20, 20, 226, 25);
+
+        transactionType.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        transactionType.setText("Type");
+        transactionType.setToolTipText("");
+        transactionType.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(transactionType);
+        transactionType.setBounds(120, 65, 100, 16);
+
+        transactionAmount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        transactionAmount.setText("Amount");
+        transactionAmount.setToolTipText("");
+        transactionAmount.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(transactionAmount);
+        transactionAmount.setBounds(120, 95, 100, 16);
+
+        transactionDesc.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        transactionDesc.setText("Description");
+        transactionDesc.setToolTipText("");
+        transactionDesc.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        detailpanel.add(transactionDesc);
+        transactionDesc.setBounds(60, 120, 160, 16);
+
+        refId.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        refId.setText("Reference");
+        refId.setToolTipText("");
+        detailpanel.add(refId);
+        refId.setBounds(120, 150, 100, 16);
+
+        newBalance.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        newBalance.setText("Balance");
+        newBalance.setToolTipText("");
+        newBalance.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        detailpanel.add(newBalance);
+        newBalance.setBounds(120, 176, 100, 16);
+
+        username.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        username.setText("User");
+        username.setToolTipText("");
+        username.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(username);
+        username.setBounds(120, 204, 100, 16);
+
+        transactionDate.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        transactionDate.setText("Date");
+        transactionDate.setToolTipText("");
+        transactionDate.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(transactionDate);
+        transactionDate.setBounds(120, 228, 100, 16);
+
+        transactionTime.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        transactionTime.setText("Time");
+        transactionTime.setToolTipText("");
+        transactionTime.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        detailpanel.add(transactionTime);
+        transactionTime.setBounds(120, 256, 100, 16);
+
+        ok.setBorder(null);
+        ok.setBorderPainted(false);
+        ok.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                okActionPerformed(evt);
+            }
+        });
+        detailpanel.add(ok);
+        ok.setBounds(20, 340, 220, 30);
+
+        add(detailpanel);
+        detailpanel.setBounds(430, 303, 266, 410);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -558,44 +962,19 @@ public class WalletHistory extends javax.swing.JPanel {
             }
         });
         add(profilebutton);
-        profilebutton.setBounds(260, 680, 40, 40);
+        profilebutton.setBounds(280, 680, 40, 40);
 
-        closeButton.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        closeButton.setToolTipText("Back to Wallet");
-        closeButton.setBorder(null);
-        closeButton.setBorderPainted(false);
-        closeButton.setContentAreaFilled(false);
-        closeButton.addActionListener(new java.awt.event.ActionListener() {
+        historybutton.setBorder(null);
+        historybutton.setBorderPainted(false);
+        historybutton.setContentAreaFilled(false);
+        historybutton.setFocusPainted(false);
+        historybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                closeButtonActionPerformed(evt);
+                historybuttonActionPerformed(evt);
             }
         });
-        add(closeButton);
-        closeButton.setBounds(0, 50, 75, 30);
-
-        charge.setBorder(null);
-        charge.setBorderPainted(false);
-        charge.setContentAreaFilled(false);
-        charge.setFocusPainted(false);
-        charge.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chargeActionPerformed(evt);
-            }
-        });
-        add(charge);
-        charge.setBounds(30, 680, 50, 50);
-
-        homebutton.setBorder(null);
-        homebutton.setBorderPainted(false);
-        homebutton.setContentAreaFilled(false);
-        homebutton.setFocusPainted(false);
-        homebutton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                homebuttonActionPerformed(evt);
-            }
-        });
-        add(homebutton);
-        homebutton.setBounds(160, 680, 60, 40);
+        add(historybutton);
+        historybutton.setBounds(220, 680, 40, 40);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -607,7 +986,31 @@ public class WalletHistory extends javax.swing.JPanel {
             }
         });
         add(linkbutton);
-        linkbutton.setBounds(90, 680, 60, 40);
+        linkbutton.setBounds(110, 680, 40, 40);
+
+        charge.setBorder(null);
+        charge.setBorderPainted(false);
+        charge.setContentAreaFilled(false);
+        charge.setFocusPainted(false);
+        charge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chargeActionPerformed(evt);
+            }
+        });
+        add(charge);
+        charge.setBounds(50, 680, 40, 40);
+
+        homebutton.setBorder(null);
+        homebutton.setBorderPainted(false);
+        homebutton.setContentAreaFilled(false);
+        homebutton.setFocusPainted(false);
+        homebutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                homebuttonActionPerformed(evt);
+            }
+        });
+        add(homebutton);
+        homebutton.setBounds(150, 680, 40, 40);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/wallethistory.png"))); // NOI18N
         add(jLabel1);
@@ -622,20 +1025,15 @@ public class WalletHistory extends javax.swing.JPanel {
         }
     }
 
-    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
-                        break;
-                    }
-                }
-            }
-        });
-    }//GEN-LAST:event_chargeActionPerformed
+    private void detailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detailsActionPerformed
+        if (currentTransactionEntry != null) {
+            showWalletTransactionDetails(currentTransactionEntry);
+        }
+    }//GEN-LAST:event_detailsActionPerformed
+
+    private void okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okActionPerformed
+       
+    }//GEN-LAST:event_okActionPerformed
 
     private void profilebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profilebuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
@@ -652,20 +1050,20 @@ public class WalletHistory extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_profilebuttonActionPerformed
 
-    private void homebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homebuttonActionPerformed
+    private void historybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historybuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 java.awt.Window[] windows = java.awt.Window.getWindows();
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(cephra.Phone.Dashboard.Home.getAppropriateHomePanel());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargeHistory());
                         break;
                     }
                 }
             }
         });
-    }//GEN-LAST:event_homebuttonActionPerformed
+    }//GEN-LAST:event_historybuttonActionPerformed
 
     private void linkbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkbuttonActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
@@ -682,26 +1080,75 @@ public class WalletHistory extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
 
+    private void chargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargeActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.ChargingOption());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_chargeActionPerformed
+
+    private void homebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homebuttonActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(cephra.Phone.Dashboard.Home.getAppropriateHomePanel());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_homebuttonActionPerformed
+
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
-       
+  
+                goBackToPreviousPanel();
+                
     }//GEN-LAST:event_closeButtonActionPerformed
 
-
-   
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel amount;
     private javax.swing.JButton charge;
     private javax.swing.JButton closeButton;
+    private javax.swing.JLabel date;
+    private javax.swing.JLabel description;
+    private javax.swing.JPanel detailpanel;
+    private javax.swing.JButton details;
+    private javax.swing.JLabel headerLabel;
+    private javax.swing.JPanel history1;
     private javax.swing.JPanel historyPanel;
     private javax.swing.JScrollPane historyScrollPane;
+    private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
+    private javax.swing.JPanel mainHistoryContainer;
+    private javax.swing.JLabel newBalance;
+    private javax.swing.JToggleButton ok;
     private javax.swing.JButton profilebutton;
+    private javax.swing.JLabel refId;
+    private javax.swing.JLabel time;
+    private javax.swing.JLabel transactionAmount;
+    private javax.swing.JLabel transactionDate;
+    private javax.swing.JLabel transactionDesc;
+    private javax.swing.JLabel transactionTime;
+    private javax.swing.JLabel transactionType;
+    private javax.swing.JLabel type;
+    private javax.swing.JLabel username;
     // End of variables declaration//GEN-END:variables
     
     // Custom modal overlay to block clicks
-    private javax.swing.JPanel modalOverlay;
+  
 
     @Override
     public void addNotify() {
@@ -721,5 +1168,7 @@ public class WalletHistory extends javax.swing.JPanel {
     public void removeNotify() {
         // Clean up resources when panel is removed
         super.removeNotify();
+        // Unregister from WalletHistoryManager when removed from UI
+        cephra.Phone.Utilities.WalletHistoryManager.removeWalletHistoryUpdateListener(this);
     }
 }
