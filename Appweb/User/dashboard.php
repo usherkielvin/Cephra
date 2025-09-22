@@ -90,19 +90,15 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				position: absolute;
 				top: 15px;
 				right: 15px;
-				background: rgba(0, 0, 0, 0.8);
-				color: white;
+				background: none;
 				border: none;
-				border-radius: 50%;
-				width: 30px;
-				height: 30px;
-				font-size: 18px;
+				color: #333;
+				font-size: 24px;
 				cursor: pointer;
 				z-index: 10001;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				font-weight: bold;
+				padding: 0;
+				min-width: auto;
+				font-weight: normal;
 			}
 
 			/* Animation for popup appearance */
@@ -268,9 +264,9 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 		<!-- Image-based Popup Ad -->
 		<div id="greenPointsPopup" class="popup-overlay" style="display: none;">
 			<div class="popup-content">
-				<button class="close-btn" onclick="closeGreenPointsPopup()">×</button>
 				<img src="images/pop-up.png" alt="Cephra Rewards Popup" class="popup-image" />
 			</div>
+			<button class="close-btn" onclick="closeGreenPointsPopup()">x</button>
 		</div>
 
 		<!-- Scripts -->

@@ -50,13 +50,15 @@ $estimatedMinutes = 5; // Placeholder, replace with actual logic
 </head>
 <body>
     <div id="queuePopup">
-        <h2>Your Queue Ticket</h2>
-        <div class="info"><strong>Ticket ID:</strong> <?php echo htmlspecialchars($currentTicket); ?></div>
-        <div class="info"><strong>Service:</strong> <?php echo htmlspecialchars($currentService); ?></div>
-        <div class="info"><strong>Battery Level:</strong> <?php echo htmlspecialchars($batteryLevel); ?>%</div>
-        <div class="info"><strong>Estimated Wait Time:</strong> <?php echo htmlspecialchars($estimatedMinutes); ?> minutes</div>
-        <button onclick="closePopup()">Close</button>
+        <div class="popup-content">
+            <h2>Your Queue Ticket</h2>
+            <div class="info"><strong>Ticket ID:</strong> <?php echo htmlspecialchars($currentTicket); ?></div>
+            <div class="info"><strong>Service:</strong> <?php echo htmlspecialchars($currentService); ?></div>
+            <div class="info"><strong>Battery Level:</strong> <?php echo htmlspecialchars($batteryLevel); ?>%</div>
+            <div class="info"><strong>Estimated Wait Time:</strong> <?php echo htmlspecialchars($estimatedMinutes); ?> minutes</div>
+        </div>
     </div>
+    <button id="closePopupBtn" onclick="closePopup()">x</button>
 
     <script>
         function closePopup() {

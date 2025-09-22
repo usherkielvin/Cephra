@@ -74,7 +74,7 @@
     (function(){
         // Ensure custom UI dialog is available for feedback
         if (typeof window.showDialog === 'undefined') {
-            window.showDialog = function(title, message) {
+            window.showDialog = function(title, message, callback) {
                 var overlay = document.createElement('div');
                 overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
                 var dialog = document.createElement('div');
@@ -90,7 +90,12 @@
                 var ok = document.createElement('button');
                 ok.textContent = 'OK';
                 ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
-                ok.onclick = function(){ document.body.removeChild(overlay); };
+                ok.onclick = function(){
+                    document.body.removeChild(overlay);
+                    if (callback && typeof callback === 'function') {
+                        callback();
+                    }
+                };
                 footer.appendChild(ok);
                 dialog.appendChild(header);
                 dialog.appendChild(body);

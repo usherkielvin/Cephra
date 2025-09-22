@@ -154,10 +154,10 @@ document.getElementById('forgotPasswordForm').addEventListener('submit', async f
             sessionStorage.setItem('resetEmail', email);
 
             // Show success message - email will be sent automatically
-            showDialog('Success', 'Reset code has been sent to your email address. Please check your inbox and spam folder.');
-
-            // Immediately redirect to verify_code.php after success
-            window.location.href = 'verify_code.php';
+            showDialog('Success', 'Reset code has been sent to your email address. Please check your inbox and spam folder.', function() {
+                // Redirect to verify_code.php only when user clicks OK
+                window.location.href = 'verify_code.php';
+            });
         } else {
             const errorMsg = result.error ? result.error : 'Failed to send reset code.';
             showDialog('Error', errorMsg);
