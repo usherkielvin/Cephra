@@ -1,5 +1,7 @@
 package cephra.Phone.Popups;
 
+import java.awt.*;
+
 public class adsPhone extends javax.swing.JPanel {
     private static final int POPUP_WIDTH = 350;
     private static final int POPUP_HEIGHT = 450;
@@ -8,6 +10,28 @@ public class adsPhone extends javax.swing.JPanel {
     public adsPhone() {
         initComponents();
         setupCloseAction();
+    }
+
+    // Method to disable all components recursively
+    private static void disableAllComponents(Component component) {
+        component.setEnabled(false);
+        if (component instanceof Container) {
+            Container container = (Container) component;
+            for (Component child : container.getComponents()) {
+                disableAllComponents(child);
+            }
+        }
+    }
+    
+    // Method to enable all components recursively
+    private static void enableAllComponents(Component component) {
+        component.setEnabled(true);
+        if (component instanceof Container) {
+            Container container = (Container) component;
+            for (Component child : container.getComponents()) {
+                enableAllComponents(child);
+            }
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -63,6 +87,14 @@ public class adsPhone extends javax.swing.JPanel {
                     int y = (containerH - POPUP_HEIGHT) / 2;
                     instance.setBounds(x, y, POPUP_WIDTH, POPUP_HEIGHT);
 
+                    // Disable the background panel (like AlreadyTicket and LinkFirst)
+                    Component contentPane = phoneFrame.getContentPane();
+                    if (contentPane != null) {
+                        contentPane.setEnabled(false);
+                        // Disable all child components recursively
+                        disableAllComponents(contentPane);
+                    }
+
                     javax.swing.JLayeredPane layeredPane = phoneFrame.getRootPane().getLayeredPane();
                     layeredPane.add(instance, javax.swing.JLayeredPane.MODAL_LAYER);
                     layeredPane.moveToFront(instance);
@@ -78,12 +110,25 @@ public class adsPhone extends javax.swing.JPanel {
         final adsPhone instance = currentInstance;
         if (instance == null) return;
         javax.swing.SwingUtilities.invokeLater(() -> {
-            java.awt.Container parent = instance.getParent();
-            if (parent != null) {
-                parent.remove(instance);
-                parent.revalidate();
-                parent.repaint();
+            if (instance.getParent() != null) {
+                instance.getParent().remove(instance);
             }
+            
+            // Re-enable the background panel (like AlreadyTicket and LinkFirst)
+            for (Window window : Window.getWindows()) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    Component contentPane = phoneFrame.getContentPane();
+                    if (contentPane != null) {
+                        contentPane.setEnabled(true);
+                        // Re-enable all child components recursively
+                        enableAllComponents(contentPane);
+                    }
+                    window.repaint();
+                    break;
+                }
+            }
+            
             currentInstance = null;
         });
     }

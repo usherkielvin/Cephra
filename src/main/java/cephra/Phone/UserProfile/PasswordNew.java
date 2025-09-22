@@ -31,8 +31,10 @@ public class PasswordNew extends javax.swing.JPanel {
         confirmpass = new javax.swing.JPasswordField();
         newpass = new javax.swing.JPasswordField();
         resetsend = new javax.swing.JButton();
+        contactsup = new javax.swing.JButton();
         bg = new javax.swing.JLabel();
 
+        setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
@@ -47,7 +49,7 @@ public class PasswordNew extends javax.swing.JPanel {
             }
         });
         add(See2);
-        See2.setBounds(280, 350, 50, 30);
+        See2.setBounds(280, 400, 50, 30);
 
         See1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
         See1.setBorder(null);
@@ -60,7 +62,7 @@ public class PasswordNew extends javax.swing.JPanel {
             }
         });
         add(See1);
-        See1.setBounds(280, 290, 50, 30);
+        See1.setBounds(280, 307, 50, 30);
 
         confirmpass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         confirmpass.setBorder(null);
@@ -70,7 +72,7 @@ public class PasswordNew extends javax.swing.JPanel {
             }
         });
         add(confirmpass);
-        confirmpass.setBounds(80, 350, 210, 30);
+        confirmpass.setBounds(50, 397, 240, 35);
 
         newpass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         newpass.setBorder(null);
@@ -80,7 +82,7 @@ public class PasswordNew extends javax.swing.JPanel {
             }
         });
         add(newpass);
-        newpass.setBounds(80, 290, 210, 30);
+        newpass.setBounds(50, 305, 240, 35);
 
         resetsend.setBorder(null);
         resetsend.setBorderPainted(false);
@@ -92,7 +94,20 @@ public class PasswordNew extends javax.swing.JPanel {
             }
         });
         add(resetsend);
-        resetsend.setBounds(40, 410, 290, 40);
+        resetsend.setBounds(40, 463, 290, 40);
+
+        contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        contactsup.setBorder(null);
+        contactsup.setBorderPainted(false);
+        contactsup.setContentAreaFilled(false);
+        contactsup.setFocusPainted(false);
+        contactsup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contactsupActionPerformed(evt);
+            }
+        });
+        add(contactsup);
+        contactsup.setBounds(160, 663, 130, 30);
 
         bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PasswordNew.png"))); // NOI18N
         add(bg);
@@ -239,11 +254,17 @@ public class PasswordNew extends javax.swing.JPanel {
         resetsend.doClick();
     }//GEN-LAST:event_confirmpassActionPerformed
 
+    private void contactsupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contactsupActionPerformed
+        javax.swing.JOptionPane.showMessageDialog(this, "Contact support at: support@cephra.com", "Contact Support", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+    }//GEN-LAST:event_contactsupActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See1;
     private javax.swing.JButton See2;
     private javax.swing.JLabel bg;
     private javax.swing.JPasswordField confirmpass;
+    private javax.swing.JButton contactsup;
     private javax.swing.JPasswordField newpass;
     private javax.swing.JButton resetsend;
     // End of variables declaration//GEN-END:variables

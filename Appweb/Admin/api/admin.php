@@ -290,6 +290,93 @@ try {
             }
             break;
 
+        case 'auto-assign-waiting-tickets':
+            // Auto-assign waiting tickets to available bays (like Admin Java)
+            try {
+                $db->beginTransaction();
+                $assigned_count = 0;
+                
+                // Get all waiting tickets
+                $stmt = $db->query("SELECT ticket_id, username, service_type, initial_battery_level FROM queue_tickets WHERE status = 'Waiting' ORDER BY created_at ASC");
+                $waiting_tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                foreach ($waiting_tickets as $ticket) {
+                    $ticket_id = $ticket['ticket_id'];
+                    $username = $ticket['username'];
+                    $service_type = $ticket['service_type'];
+                    $battery_level = $ticket['initial_battery_level'];
+                    
+                    // Determine if it's fast charging
+                    $is_fast_charging = (stripos($service_type, 'fast') !== false) || (stripos($ticket_id, 'FCH') !== false);
+                    
+                    // Find available bay
+                    $bay_type = $is_fast_charging ? 'Fast' : 'Normal';
+                    $bay_stmt = $db->prepare("
+                        SELECT bay_number 
+                        FROM charging_bays 
+                        WHERE status = 'Available' 
+                        AND bay_type = ? 
+                        ORDER BY CAST(SUBSTRING(bay_number, 5) AS UNSIGNED) ASC 
+                        LIMIT 1
+                    ");
+                    $bay_stmt->execute([$bay_type]);
+                    $available_bay = $bay_stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($available_bay) {
+                        $bay_number = $available_bay['bay_number'];
+                        
+                        // Update charging_bays table
+                        $update_bay_stmt = $db->prepare("
+                            UPDATE charging_bays 
+                            SET status = 'Occupied', current_ticket_id = ?, current_username = ?, start_time = NOW() 
+                            WHERE bay_number = ?
+                        ");
+                        $update_bay_stmt->execute([$ticket_id, $username, $bay_number]);
+                        
+                        // Update queue_tickets status to In Progress (like Admin Java)
+                        $update_ticket_stmt = $db->prepare("
+                            UPDATE queue_tickets 
+                            SET status = 'In Progress' 
+                            WHERE ticket_id = ?
+                        ");
+                        $update_ticket_stmt->execute([$ticket_id]);
+                        
+                        // Update waiting_grid (if exists)
+                        $update_waiting_stmt = $db->prepare("
+                            UPDATE waiting_grid 
+                            SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL 
+                            WHERE ticket_id = ?
+                        ");
+                        $update_waiting_stmt->execute([$ticket_id]);
+                        
+                        // Update charging_grid (if exists)
+                        $update_charging_stmt = $db->prepare("
+                            UPDATE charging_grid 
+                            SET ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, start_time = NOW() 
+                            WHERE bay_number = ?
+                        ");
+                        $update_charging_stmt->execute([$ticket_id, $username, $service_type, $battery_level, $bay_number]);
+                        
+                        $assigned_count++;
+                        error_log("Auto-assigned ticket {$ticket_id} to {$bay_number}");
+                    }
+                }
+                
+                $db->commit();
+                
+                echo json_encode([
+                    'success' => true,
+                    'message' => "Auto-assigned {$assigned_count} waiting tickets to available bays",
+                    'assigned_count' => $assigned_count
+                ]);
+                
+            } catch (Exception $e) {
+                $db->rollback();
+                error_log("Error in auto-assign-waiting-tickets: " . $e->getMessage());
+                echo json_encode(['error' => 'Failed to auto-assign waiting tickets: ' . $e->getMessage()]);
+            }
+            break;
+
         case 'progress-to-charging':
             if ($method !== 'POST') {
                 echo json_encode(['error' => 'Method not allowed']);
@@ -481,7 +568,7 @@ try {
             $db->beginTransaction();
             
             try {
-                // Update ticket status to Charging
+                // Update ticket status to Charging (from In Progress)
                 $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Charging' WHERE ticket_id = ?");
                 $result = $stmt->execute([$ticket_id]);
                 
@@ -839,8 +926,8 @@ try {
             // Get range parameter (day, week, month)
             $range = $_GET['range'] ?? 'week';
             $interval = match($range) {
-                'day' => 'INTERVAL 1 DAY',
-                'week' => 'INTERVAL 7 DAY',
+                'day' => 'INTERVAL 7 DAY', // Daily view shows 7 days
+                'week' => 'INTERVAL 14 DAY', // Weekly view shows 2 weeks
                 'month' => 'INTERVAL 30 DAY',
                 default => 'INTERVAL 7 DAY'
             };
@@ -857,17 +944,53 @@ try {
             ");
             $revenue_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Get service usage data (charging sessions)
+            // Get service usage data broken down by service type
             $stmt = $db->query("
                 SELECT
                     DATE(completed_at) as date,
+                    service_type,
                     COUNT(*) as service_count
                 FROM charging_history
                 WHERE completed_at >= DATE_SUB(CURDATE(), $interval)
-                GROUP BY DATE(completed_at)
-                ORDER BY DATE(completed_at)
+                GROUP BY DATE(completed_at), service_type
+                ORDER BY DATE(completed_at), service_type
             ");
-            $service_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $service_data_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Process service data to separate Normal and Fast Charging
+            $service_data = [];
+            $normal_data = [];
+            $fast_data = [];
+            
+            // Create arrays for each service type
+            foreach ($service_data_raw as $row) {
+                $date = $row['date'];
+                $service_type = $row['service_type'];
+                $count = (int)$row['service_count'];
+                
+                // Determine if it's fast charging
+                $is_fast = (stripos($service_type, 'fast') !== false) || (stripos($service_type, 'FCH') !== false);
+                
+                if ($is_fast) {
+                    $fast_data[$date] = $count;
+                } else {
+                    $normal_data[$date] = $count;
+                }
+            }
+            
+            // Get all unique dates from the data
+            $all_dates = array_unique(array_column($service_data_raw, 'date'));
+            sort($all_dates);
+            
+            // Create structured data with all dates
+            foreach ($all_dates as $date) {
+                $service_data[] = [
+                    'date' => $date,
+                    'normal_count' => $normal_data[$date] ?? 0,
+                    'fast_count' => $fast_data[$date] ?? 0,
+                    'service_count' => ($normal_data[$date] ?? 0) + ($fast_data[$date] ?? 0) // Total for backward compatibility
+                ];
+            }
 
             echo json_encode([
                 'success' => true,
@@ -1203,6 +1326,18 @@ try {
                 $grossAmount = $energyUsed * $ratePerKwh * $multiplier;
                 $amount = max($grossAmount, $minimumFee * $multiplier); // Apply minimum fee with multiplier
                 
+                // Calculate charging time minutes (matching Admin Java logic)
+                $batteryNeeded = 100 - $initialBatteryLevel;
+                if ($multiplier > 1.0) {
+                    // Fast charging: 0.8 minutes per 1%
+                    $chargingTimeMinutes = (int)($batteryNeeded * 0.8);
+                } else {
+                    // Normal charging: 1.6 minutes per 1%
+                    $chargingTimeMinutes = (int)($batteryNeeded * 1.6);
+                }
+                
+                error_log("Payment Debug - Charging time calculation: Service='{$ticket['service_type']}', IsFast=" . ($multiplier > 1.0 ? 'Yes' : 'No') . ", InitialBattery={$initialBatteryLevel}%, BatteryNeeded={$batteryNeeded}%, ChargingTime={$chargingTimeMinutes} minutes");
+                
                 // Reference number already determined above
                 
                 // Check if username exists in users table
@@ -1262,7 +1397,7 @@ try {
                         $ticket['service_type'], 
                         $initialBatteryLevel,
                         100, // final_battery_level (always 100% when completed)
-                        0, // charging_time_minutes (not calculated yet)
+                        $chargingTimeMinutes, // charging_time_minutes (calculated using Admin Java logic)
                         $energyUsed, // energy_used (calculated from battery levels)
                         $amount, // total_amount (calculated using Java admin billing system)
                         $reference_number
@@ -1336,7 +1471,7 @@ try {
                 'error' => 'Invalid action',
                 'available_actions' => [
                     'dashboard', 'queue', 'bays', 'users', 'staff', 'staff-activity', 'add-staff', 'toggle-staff-status', 'delete-staff', 'ticket-details',
-                    'process-ticket', 'progress-to-waiting', 'progress-to-charging', 'progress-to-complete',
+                    'process-ticket', 'progress-to-waiting', 'progress-to-charging', 'progress-to-complete', 'auto-assign-waiting-tickets',
                     'mark-payment-paid', 'set-bay-maintenance', 'set-bay-available',
                     'add-user', 'delete-user', 'settings', 'save-settings', 'analytics', 'transactions', 'progress-next-ticket'
                 ]

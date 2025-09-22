@@ -27,15 +27,15 @@ public class EmailOTP extends javax.swing.JPanel {
         setOpaque(false);
         setLayout(null);
 
-        otp.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        otp.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         otp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         otp.setText("878432");
         add(otp);
-        otp.setBounds(217, 141, 70, 20);
+        otp.setBounds(210, 122, 90, 20);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Notif.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 190);
+        jLabel1.setBounds(25, 0, 330, 200);
     }// </editor-fold>//GEN-END:initComponents
 
 

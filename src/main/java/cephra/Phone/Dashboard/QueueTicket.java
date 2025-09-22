@@ -144,7 +144,7 @@ public class QueueTicket extends javax.swing.JPanel {
         batterypercent.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         batterypercent.setText("18% (LOW)");
         add(batterypercent);
-        batterypercent.setBounds(120, 280, 100, 40);
+        batterypercent.setBounds(135, 280, 100, 40);
 
         QTicket.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
         QTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

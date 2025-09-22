@@ -49,10 +49,9 @@ public class PasswordForgot extends javax.swing.JPanel {
             }
         });
         add(Contact_Support_Button);
-        Contact_Support_Button.setBounds(160, 663, 130, 30);
+        Contact_Support_Button.setBounds(185, 663, 130, 30);
 
-        Back_Button.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        Back_Button.setText("back to login");
+        Back_Button.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         Back_Button.setBorder(null);
         Back_Button.setBorderPainted(false);
         Back_Button.setContentAreaFilled(false);
@@ -63,7 +62,7 @@ public class PasswordForgot extends javax.swing.JPanel {
             }
         });
         add(Back_Button);
-        Back_Button.setBounds(120, 440, 120, 23);
+        Back_Button.setBounds(110, 460, 170, 23);
 
         resetsend.setBorder(null);
         resetsend.setBorderPainted(false);
@@ -75,7 +74,7 @@ public class PasswordForgot extends javax.swing.JPanel {
             }
         });
         add(resetsend);
-        resetsend.setBounds(60, 390, 270, 50);
+        resetsend.setBounds(60, 410, 290, 40);
 
         email.setBorder(null);
         email.addActionListener(new java.awt.event.ActionListener() {
@@ -84,18 +83,18 @@ public class PasswordForgot extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(80, 330, 240, 30);
+        email.setBounds(80, 346, 260, 35);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PasswordForgot.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 370, 750);
+        jLabel1.setBounds(20, 0, 360, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE - DO NOT REMOVE - NetBeans will regenerate form code but this method should be preserved
     // Setup label position to prevent NetBeans from changing it
     private void setupLabelPosition() {
         if (jLabel1 != null) {
-            jLabel1.setBounds(-15, 0, 398, 750);
+            jLabel1.setBounds(2, 0, 398, 750);
         }
     }
     
