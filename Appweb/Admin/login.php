@@ -19,16 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn = $db->getConnection();
         
         if ($conn) {
-            // Check admin credentials in staff_records table
-            $stmt = $conn->prepare("SELECT username FROM staff_records WHERE username = ? AND password = ? AND status = 'Active'");
+            // Check admin credentials in staff_records table and ensure Active status
+            $stmt = $conn->prepare("SELECT username, status FROM staff_records WHERE username = ? AND password = ?");
             $stmt->execute([$username, $password]);
             $admin = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($admin) {
-                $_SESSION['admin_logged_in'] = true;
-                $_SESSION['admin_username'] = $username;
-                header("Location: index.php");
-                exit();
+                if (strcasecmp($admin['status'] ?? '', 'Active') === 0) {
+                    $_SESSION['admin_logged_in'] = true;
+                    $_SESSION['admin_username'] = $username;
+                    header("Location: index.php");
+                    exit();
+                } else {
+                    $error_message = "Account is deactivated. Please contact the administrator.";
+                }
             } else {
                 $error_message = "Invalid admin credentials. Please try again.";
             }

@@ -13,7 +13,28 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit();
 }
 
-require_once '../config/database.php';
+// Enforce deactivated staff cannot use API
+try {
+    require_once '../config/database.php';
+    $tmpdb = (new Database())->getConnection();
+    if ($tmpdb && isset($_SESSION['admin_username'])) {
+        $chk = $tmpdb->prepare("SELECT status FROM staff_records WHERE username = ?");
+        $chk->execute([$_SESSION['admin_username']]);
+        $row = $chk->fetch(PDO::FETCH_ASSOC);
+        if (!$row || strcasecmp($row['status'] ?? '', 'Active') !== 0) {
+            session_unset();
+            session_destroy();
+            http_response_code(401);
+            echo json_encode(['error' => 'Account deactivated']);
+            exit();
+        }
+    }
+} catch (Exception $e) {
+    // If validation fails unexpectedly, block access
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit();
+}
 
 $db = (new Database())->getConnection();
 if (!$db) {
@@ -141,6 +162,54 @@ try {
                 'success' => true,
                 'users' => $users
             ]);
+            break;
+
+        case 'staff':
+            $stmt = $db->query("SELECT name, username, email, status, created_at FROM staff_records WHERE username <> 'admin' ORDER BY created_at DESC");
+            $staff = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'staff' => $staff]);
+            break;
+
+        case 'add-staff':
+            if ($method !== 'POST') { echo json_encode(['error' => 'Method not allowed']); break; }
+            $name = $_POST['name'] ?? '';
+            $username = $_POST['username'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+            if (!$name || !$username || !$email || !$password) { echo json_encode(['error' => 'All fields are required']); break; }
+            $chk = $db->prepare('SELECT 1 FROM staff_records WHERE username = ? OR email = ?');
+            $chk->execute([$username, $email]);
+            if ($chk->fetch()) { echo json_encode(['error' => 'Username or email already exists']); break; }
+            $stmt = $db->prepare('INSERT INTO staff_records (name, username, email, status, password) VALUES (?, ?, ?, "Active", ?)');
+            $ok = $stmt->execute([$name, $username, $email, $password]);
+            echo json_encode($ok ? ['success' => true, 'message' => 'Staff added'] : ['error' => 'Failed to add staff']);
+            break;
+
+        case 'toggle-staff-status':
+            if ($method !== 'POST') { echo json_encode(['error' => 'Method not allowed']); break; }
+            $username = $_POST['username'] ?? '';
+            $new_status = $_POST['status'] ?? '';
+            if (!$username || !in_array($new_status, ['Active','Inactive'])) { echo json_encode(['error' => 'Invalid input']); break; }
+            if (strtolower($username) === 'admin') { echo json_encode(['error' => 'Admin account cannot be modified']); break; }
+            $stmt = $db->prepare('UPDATE staff_records SET status = ? WHERE username = ?');
+            $ok = $stmt->execute([$new_status, $username]);
+            echo json_encode($ok ? ['success' => true] : ['error' => 'Failed to update status']);
+            break;
+
+        case 'delete-staff':
+            if ($method !== 'POST') { echo json_encode(['error' => 'Method not allowed']); break; }
+            $username = $_POST['username'] ?? '';
+            if (!$username) { echo json_encode(['error' => 'Username required']); break; }
+            if (strtolower($username) === 'admin') { echo json_encode(['error' => 'Admin account cannot be deleted']); break; }
+            $stmt = $db->prepare('DELETE FROM staff_records WHERE username = ?');
+            $ok = $stmt->execute([$username]);
+            echo json_encode($ok ? ['success' => true, 'message' => 'Staff deleted'] : ['error' => 'Failed to delete staff']);
+            break;
+
+        case 'staff-activity':
+            $stmt = $db->query('SELECT ticket_id, username, service_type, total_amount, served_by, completed_at FROM charging_history ORDER BY completed_at DESC LIMIT 50');
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'activity' => $rows]);
             break;
 
         case 'ticket-details':
@@ -1266,7 +1335,7 @@ try {
             echo json_encode([
                 'error' => 'Invalid action',
                 'available_actions' => [
-                    'dashboard', 'queue', 'bays', 'users', 'ticket-details',
+                    'dashboard', 'queue', 'bays', 'users', 'staff', 'staff-activity', 'add-staff', 'toggle-staff-status', 'delete-staff', 'ticket-details',
                     'process-ticket', 'progress-to-waiting', 'progress-to-charging', 'progress-to-complete',
                     'mark-payment-paid', 'set-bay-maintenance', 'set-bay-available',
                     'add-user', 'delete-user', 'settings', 'save-settings', 'analytics', 'transactions', 'progress-next-ticket'

@@ -25,6 +25,7 @@ public class Help_Center extends javax.swing.JPanel {
         historybutton = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
+        back = new javax.swing.JButton();
         homebutton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
@@ -79,6 +80,18 @@ public class Help_Center extends javax.swing.JPanel {
         });
         add(linkbutton);
         linkbutton.setBounds(110, 680, 40, 40);
+
+        back.setBorder(null);
+        back.setBorderPainted(false);
+        back.setContentAreaFilled(false);
+        back.setFocusPainted(false);
+        back.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backActionPerformed(evt);
+            }
+        });
+        add(back);
+        back.setBounds(30, 50, 40, 40);
 
         homebutton2.setBorder(null);
         homebutton2.setBorderPainted(false);
@@ -152,8 +165,24 @@ public class Help_Center extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
 
+    private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Profile());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_backActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton back;
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;

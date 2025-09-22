@@ -124,6 +124,9 @@ class AdminPanel {
             case 'users':
                 this.loadUsersData();
                 break;
+            case 'staff':
+                this.loadStaffData();
+                break;
             case 'analytics':
                 this.loadAnalyticsData();
                 break;
@@ -133,6 +136,130 @@ class AdminPanel {
             case 'settings':
                 this.loadBusinessData();
                 break;
+        }
+    }
+
+    // (Staff panel removed)
+    // Staff panel methods
+    async loadStaffData() {
+        try {
+            const res = await fetch('api/admin.php?action=staff');
+            const data = await res.json();
+            if (data.success) {
+                this.updateStaffTable(data.staff);
+            } else {
+                this.showError(data.error || 'Failed to load staff');
+            }
+        } catch (e) {
+            console.error('Error loading staff:', e);
+            this.showError('Failed to load staff');
+        }
+    }
+
+    updateStaffTable(staff) {
+        const tbody = document.getElementById('staff-tbody');
+        if (!tbody) return;
+        if (!staff || staff.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-info-circle"></i> No staff found</td></tr>';
+            return;
+        }
+        tbody.innerHTML = staff.map(s => `
+            <tr id="staff-row-${s.username}">
+                <td>${s.name}</td>
+                <td>${s.username}</td>
+                <td>${s.email}</td>
+                <td><span class="status-badge ${s.status.toLowerCase()}">${s.status}</span></td>
+                <td>${this.formatDateTime(s.created_at)}</td>
+                <td>
+                    <button class="btn btn-secondary btn-sm" onclick="if (adminPanel) adminPanel.toggleStaffStatus('${s.username}', '${s.status === 'Active' ? 'Inactive' : 'Active'}')">
+                        <i class="fas fa-toggle-on"></i> ${s.status === 'Active' ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="if (adminPanel) adminPanel.deleteStaff('${s.username}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // staff activity removed
+
+    showAddStaffModal() {
+        const form = document.getElementById('add-staff-form');
+        if (form) form.reset();
+        this.showModal('add-staff-modal');
+    }
+
+    async addStaff() {
+        const payload = {
+            name: document.getElementById('staff-name')?.value || '',
+            username: document.getElementById('staff-username')?.value || '',
+            email: document.getElementById('staff-email')?.value || '',
+            password: document.getElementById('staff-password')?.value || ''
+        };
+        if (!payload.name || !payload.username || !payload.email || !payload.password) {
+            this.showError('Please fill in all fields');
+            return;
+        }
+        try {
+            const res = await fetch('api/admin.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=add-staff&${new URLSearchParams(payload).toString()}`
+            });
+            const data = await res.json();
+            if (data.success) {
+                this.showSuccess('Staff added');
+                this.closeModal('add-staff-modal');
+                this.loadStaffData();
+            } else {
+                this.showError(data.error || 'Failed to add staff');
+            }
+        } catch (e) {
+            console.error('Error adding staff:', e);
+            this.showError('Failed to add staff');
+        }
+    }
+
+    async toggleStaffStatus(username, status) {
+        try {
+            const res = await fetch('api/admin.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=toggle-staff-status&username=${encodeURIComponent(username)}&status=${encodeURIComponent(status)}`
+            });
+            const data = await res.json();
+            if (data.success) {
+                this.showSuccess('Status updated');
+                this.loadStaffData();
+            } else {
+                this.showError(data.error || 'Failed to update');
+            }
+        } catch (e) {
+            console.error('Error toggling status:', e);
+            this.showError('Failed to update');
+        }
+    }
+
+    async deleteStaff(username) {
+        if (!confirm(`Delete staff "${username}"?`)) return;
+        try {
+            const res = await fetch('api/admin.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=delete-staff&username=${encodeURIComponent(username)}`
+            });
+            const data = await res.json();
+            if (data.success) {
+                this.showSuccess('Staff deleted');
+                const row = document.getElementById(`staff-row-${username}`);
+                if (row) row.remove();
+            } else {
+                this.showError(data.error || 'Failed to delete');
+            }
+        } catch (e) {
+            console.error('Error deleting staff:', e);
+            this.showError('Failed to delete');
         }
     }
 
@@ -1586,6 +1713,18 @@ function processNextTicket() {
 function showAddUserModal() {
     if (adminPanel) {
         adminPanel.showAddUserModal();
+    }
+}
+
+function showAddStaffModal() {
+    if (adminPanel) {
+        adminPanel.showAddStaffModal();
+    }
+}
+
+function addStaff() {
+    if (adminPanel) {
+        adminPanel.addStaff();
     }
 }
 

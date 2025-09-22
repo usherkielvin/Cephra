@@ -11,6 +11,27 @@ $conn = $db->getConnection();
 
 // Get admin username
 $admin_username = $_SESSION['admin_username'] ?? 'Admin';
+
+// Re-validate staff status; if deactivated, force logout
+if ($conn && isset($_SESSION['admin_username'])) {
+    try {
+        $stmt = $conn->prepare("SELECT status FROM staff_records WHERE username = ?");
+        $stmt->execute([$_SESSION['admin_username']]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row || strcasecmp($row['status'] ?? '', 'Active') !== 0) {
+            session_unset();
+            session_destroy();
+            header("Location: login.php?deactivated=1");
+            exit();
+        }
+    } catch (Exception $e) {
+        // On error, default to safe behavior: logout
+        session_unset();
+        session_destroy();
+        header("Location: login.php");
+        exit();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,6 +72,10 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                 <li data-panel="users">
                     <i class="fas fa-users"></i>
                     <span>User Management</span>
+                </li>
+                <li data-panel="staff">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Staff Management</span>
                 </li>
                 <li data-panel="analytics">
                     <i class="fas fa-chart-bar"></i>
@@ -217,6 +242,8 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                 </div>
             </div>
 
+            
+
             <!-- User Management Panel -->
             <div class="panel" id="users-panel">
                 <div class="panel-header">
@@ -333,6 +360,44 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
                 </div>
             </div>
 
+            <!-- Staff Management Panel -->
+            <div class="panel" id="staff-panel">
+                <div class="panel-header">
+                    <h2>Staff Management</h2>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" onclick="if (adminPanel) adminPanel.loadStaffData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn btn-success" onclick="showAddStaffModal()">
+                            <i class="fas fa-plus"></i> Add Staff
+                        </button>
+                    </div>
+                </div>
+                <div class="users-container">
+                    <div class="users-table-container">
+                        <table class="users-table" id="staff-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staff-tbody">
+                                <tr>
+                                    <td colspan="6" class="loading">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading staff data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Settings Panel -->
             <div class="panel" id="settings-panel">
                 <div class="panel-header">
@@ -418,6 +483,39 @@ $admin_username = $_SESSION['admin_username'] ?? 'Admin';
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('add-user-modal')">Cancel</button>
                 <button class="btn btn-primary" onclick="addUser()">Add User</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-staff-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Staff</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-staff-form">
+                    <div class="form-group">
+                        <label for="staff-name">Name</label>
+                        <input type="text" id="staff-name" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-username">Username</label>
+                        <input type="text" id="staff-username" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-email">Email</label>
+                        <input type="email" id="staff-email" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-password">Password</label>
+                        <input type="password" id="staff-password" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('add-staff-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addStaff()">Add Staff</button>
             </div>
         </div>
     </div>
