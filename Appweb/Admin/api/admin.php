@@ -1326,6 +1326,18 @@ try {
                 $grossAmount = $energyUsed * $ratePerKwh * $multiplier;
                 $amount = max($grossAmount, $minimumFee * $multiplier); // Apply minimum fee with multiplier
                 
+                // Calculate charging time minutes (matching Admin Java logic)
+                $batteryNeeded = 100 - $initialBatteryLevel;
+                if ($multiplier > 1.0) {
+                    // Fast charging: 0.8 minutes per 1%
+                    $chargingTimeMinutes = (int)($batteryNeeded * 0.8);
+                } else {
+                    // Normal charging: 1.6 minutes per 1%
+                    $chargingTimeMinutes = (int)($batteryNeeded * 1.6);
+                }
+                
+                error_log("Payment Debug - Charging time calculation: Service='{$ticket['service_type']}', IsFast=" . ($multiplier > 1.0 ? 'Yes' : 'No') . ", InitialBattery={$initialBatteryLevel}%, BatteryNeeded={$batteryNeeded}%, ChargingTime={$chargingTimeMinutes} minutes");
+                
                 // Reference number already determined above
                 
                 // Check if username exists in users table
@@ -1385,7 +1397,7 @@ try {
                         $ticket['service_type'], 
                         $initialBatteryLevel,
                         100, // final_battery_level (always 100% when completed)
-                        0, // charging_time_minutes (not calculated yet)
+                        $chargingTimeMinutes, // charging_time_minutes (calculated using Admin Java logic)
                         $energyUsed, // energy_used (calculated from battery levels)
                         $amount, // total_amount (calculated using Java admin billing system)
                         $reference_number
