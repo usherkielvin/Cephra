@@ -7,12 +7,12 @@ public class UnifiedNotification extends javax.swing.JPanel {
 
     private Timer animationTimer;
     private Timer hideTimer;
-    private int yPosition = -110; // Start position (hidden above the screen)
-    private int targetY = 80; // Target position when fully shown (lower down for better visibility)
+    private int yPosition = -70; // Start position (hidden above the screen)
+    private int targetY = 50; // Target position when fully shown (lower down for better visibility)
     private boolean isShowing = false;
     private static final int ANIMATION_SPEED = 5; // Pixels to move per step
     private static final int ANIMATION_DELAY = 10; // Milliseconds between steps
-    private static final int DISPLAY_DURATION = 3000; // Display for 3 seconds
+    private static final int DISPLAY_DURATION = 10000; // Display for 3 seconds
     
     // Notification types
     public static final String TYPE_WAITING = "WAITING";
@@ -101,12 +101,12 @@ public class UnifiedNotification extends javax.swing.JPanel {
             }
         });
         add(jButton1);
-        jButton1.setBounds(0, 0, 330, 60);
+        jButton1.setBounds(0, 10, 330, 60);
 
         statusLabel.setForeground(new java.awt.Color(0, 102, 102));
         statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifWaitingBay.png"))); // NOI18N
         add(statusLabel);
-        statusLabel.setBounds(0, -10, 330, 70);
+        statusLabel.setBounds(0, 0, 330, 70);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -142,7 +142,7 @@ public class UnifiedNotification extends javax.swing.JPanel {
         
         // If currently showing, restart the animation from the top
         if (isShowing) {
-            yPosition = -110;
+            yPosition = -70;
             setLocation(23, yPosition);
             
             // Cancel existing timers
@@ -199,9 +199,7 @@ public class UnifiedNotification extends javax.swing.JPanel {
         animationTimer.start();
     }
     
-    /**
-     * Shows the notification with animation sliding down from the top
-     */
+    //Shows the notification with animation sliding down from the top
     public void showNotification() {
         // Allow re-showing notifications (especially for charging alerts)
         // Cancel any existing timers first
@@ -214,16 +212,14 @@ public class UnifiedNotification extends javax.swing.JPanel {
         
         isShowing = true;
         setVisible(true);
-        yPosition = -110;
+        yPosition = -70;
         setLocation(23, yPosition); // Start off-screen, centered horizontally
         
         // Start the show animation
         showNotificationAnimation();
     }
     
-    /**
-     * Hides the notification with animation sliding up
-     */
+    // Hides the notification with animation sliding up
     public void hideNotification() {
         if (!isShowing) return; // Only hide if showing
         
@@ -236,7 +232,7 @@ public class UnifiedNotification extends javax.swing.JPanel {
         animationTimer = new Timer(ANIMATION_DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (yPosition > -110) {
+                if (yPosition > -70) {
                     yPosition -= ANIMATION_SPEED;
                     setLocation(23, yPosition);
                 } else {
@@ -255,7 +251,7 @@ public class UnifiedNotification extends javax.swing.JPanel {
      * @param frame The parent Phone frame
      */
     public void addToFrame(cephra.Frame.Phone frame) {
-        this.setBounds(23, -110, 330, 70); // Initial position off-screen, centered horizontally
+        this.setBounds(23, -50, 330, 70); // Initial position off-screen, centered horizontally
         frame.getRootPane().getLayeredPane().add(this, JLayeredPane.POPUP_LAYER);
         frame.getRootPane().getLayeredPane().moveToFront(this);
         

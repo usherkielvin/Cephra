@@ -31,11 +31,11 @@ public class EmailOTP extends javax.swing.JPanel {
         otp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         otp.setText("878432");
         add(otp);
-        otp.setBounds(210, 118, 90, 20);
+        otp.setBounds(210, 122, 90, 20);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Notif.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(25, 0, 330, 190);
+        jLabel1.setBounds(25, 0, 330, 200);
     }// </editor-fold>//GEN-END:initComponents
 
 
