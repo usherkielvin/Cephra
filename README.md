@@ -245,38 +245,33 @@ We welcome contributions! Please see our contributing guidelines:
 - **Issues**: Report bugs and request features via GitHub Issues
 - **Scripts**: Use the provided batch scripts for common tasks
 
-## 👨‍💻 Author/Team
+## 👥 Development Team – Cephra QMS
 
-### Project Lead
-**Usher Kielvin Ponce** - Project Lead, Backend Developer & EV Technology Enthusiast
+### 👨‍💻 Project Lead
+**Usher Kielvin Ponce** – Project Lead, Backend Developer & EV Technology Enthusiast
 
-- 💼 **LinkedIn**: [linkedin.com/in/usherkielvinponce](https://linkedin.com/in/usherkielvinponce)
-- 🐙 **GitHub**: [github.com/usherkielvin](https://github.com/usherkielvin)
-- 📧 **Email**: ponceud@students.nu-moa.edu.ph
+- Backend logic & project coordination
+- Manages EV charging system flow
 
-### Development Team
+### 🎨 UI/UX & Web Developer
+**Mark Dwayne P. Dela Cruz** – Web Interface & User Experience
 
-#### 🎨 UI/UX Designer
-**Mark Dwayne P. Dela Cruz** - User Interface & User Experience Design
-- Specializes in mobile-first responsive design
-- Creates intuitive user interfaces for both Java and web applications
+- Designs and develops mobile web interface for customers
+- Focuses on intuitive, responsive layouts
 
-#### 🔧 Backend Developer
-**Dizon S. Dizon** - Backend Development & Database Architecture
-- Expert in Java backend development and database design
-- Handles server-side logic and data management
+### 🔧 Backend Developer
+**Dizon S. Dizon** – Backend Development & Database Architecture
 
-#### 💻 Frontend Developer
-**Kenji A. Hizon** - Frontend Development & Web Technologies
-- Specializes in modern web technologies (HTML5, CSS3, JavaScript)
-- Creates responsive and interactive user interfaces
+- Expert in Java backend development
+- Handles server-side logic and database design
 
-### Team Specializations
-- **Java Development** - Desktop applications and enterprise solutions
-- **Web Development** - Modern PHP, HTML5, CSS3, and JavaScript
-- **Database Design** - MySQL optimization and schema design
-- **EV Technology** - Electric vehicle charging infrastructure
-- **UI/UX Design** - Mobile-first responsive design
+### 💻 Frontend Developer (Java Swing)
+**Kenji A. Hizon** – Desktop Application Interface Developer
+
+- Specializes in Java Swing GUI
+- Focuses on building an intuitive and functional desktop interface
+
+update works
 
 ### Acknowledgments
 - **EV Community** - For inspiration and feedback
