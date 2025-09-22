@@ -62,7 +62,7 @@ public class PasswordForgot extends javax.swing.JPanel {
             }
         });
         add(Back_Button);
-        Back_Button.setBounds(110, 480, 170, 23);
+        Back_Button.setBounds(110, 460, 170, 23);
 
         resetsend.setBorder(null);
         resetsend.setBorderPainted(false);
@@ -83,7 +83,7 @@ public class PasswordForgot extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(100, 346, 240, 35);
+        email.setBounds(80, 346, 260, 35);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PasswordForgot.png"))); // NOI18N
         add(jLabel1);

@@ -31,8 +31,8 @@ public class PasswordNew extends javax.swing.JPanel {
         confirmpass = new javax.swing.JPasswordField();
         newpass = new javax.swing.JPasswordField();
         resetsend = new javax.swing.JButton();
-        bg = new javax.swing.JLabel();
         contactsup = new javax.swing.JButton();
+        bg = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
@@ -96,10 +96,6 @@ public class PasswordNew extends javax.swing.JPanel {
         add(resetsend);
         resetsend.setBounds(40, 463, 290, 40);
 
-        bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PasswordNew.png"))); // NOI18N
-        add(bg);
-        bg.setBounds(0, 0, 370, 750);
-
         contactsup.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         contactsup.setBorder(null);
         contactsup.setBorderPainted(false);
@@ -112,6 +108,10 @@ public class PasswordNew extends javax.swing.JPanel {
         });
         add(contactsup);
         contactsup.setBounds(160, 663, 130, 30);
+
+        bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PasswordNew.png"))); // NOI18N
+        add(bg);
+        bg.setBounds(0, 0, 370, 750);
     }// </editor-fold>//GEN-END:initComponents
 
     // Setup password field properties

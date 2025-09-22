@@ -42,8 +42,9 @@ public class PasswordVerify extends javax.swing.JPanel {
         setLayout(null);
 
         cephramail.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        cephramail.setText("2222");
         add(cephramail);
-        cephramail.setBounds(200, 251, 160, 20);
+        cephramail.setBounds(185, 251, 160, 20);
 
         code6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         code6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
