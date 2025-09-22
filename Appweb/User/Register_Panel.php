@@ -28,60 +28,104 @@
     <link rel="stylesheet" href="css/index.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 </head>
-<body class="auth-page">
-<!-- From Uiverse.io by ammarsaa -->
-<div class="auth-wrapper">
-<form class="form" id="registerForm">
-    <div class="brand" style="margin-bottom:10px;">
-        <img src="images/logo.png" alt="Cephra" class="brand-img" />
-        <span class="brand-text">CEPHRA</span>
-    </div>
-    <p class="title">Register</p>
-    <p class="message" style="opacity:.8">Create your account to get full access to our app.</p>
-        <div class="flex">
-        <label>
-            <input class="input" type="text" id="firstname" name="firstname" placeholder="" required>
-            <span>Firstname</span>
-        </label>
+<body class="auth-page" id="authPage">
+    <!-- Theme Toggle Button -->
+    <button type="button" class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+        <i class="fas fa-sun" id="themeIcon"></i>
+    </button>
 
-        <label>
-            <input class="input" type="text" id="lastname" name="lastname" placeholder="" required>
-            <span>Lastname</span>
-        </label>
-    </div>
-        <label>
-            <input class="input" type="text" id="username" name="username" placeholder="" required>
-            <span>Username</span>
-        </label>
-    <label>
-        <input class="input" type="email" id="email" name="email" placeholder="" required>
-        <span>Email</span>
-    </label>
+    <div class="auth-wrapper">
+        <!-- Left Panel - Branding -->
+        <div class="left-panel">
+            <div class="brand-section">
+                <div class="brand-icon">
+                    <img src="images/logo.png" alt="Cephra" class="brand-logo" />
+                </div>
+                <h1 class="main-title">CEPHRA</h1>
+                <p class="main-subtitle">Your Electric Vehicle Charging Platform</p>
+                <p class="main-description">Create your account to access your charging dashboard and manage your electric vehicle charging sessions.</p>
+            </div>
+        </div>
 
-    <label>
-        <div class="password-input-container">
-            <input class="input" type="password" id="password" name="password" placeholder="" required>
-            <span>Password</span>
-            <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility('password')">
-                <i class="fas fa-eye" id="passwordToggleIcon"></i>
-            </button>
+        <!-- Right Panel - Register Form -->
+        <div class="right-panel">
+            <form class="form" id="registerForm">
+                <div class="form-header">
+                    <h2 class="form-title">Create Account</h2>
+                    <p class="form-subtitle">Enter your information to get started</p>
+                </div>
+
+                <div class="flex">
+                    <div class="form-group">
+                        <label>
+                            <div class="input-container">
+                                <input class="input" type="text" id="firstname" name="firstname" placeholder="" required>
+                                <span>Firstname</span>
+
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <div class="input-container">
+                                <input class="input" type="text" id="lastname" name="lastname" placeholder="" required>
+                                <span>Lastname</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <div class="input-container">
+                            <input class="input" type="text" id="username" name="username" placeholder="" required>
+                            <span>Username</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <div class="input-container">
+                            <input class="input" type="email" id="email" name="email" placeholder="" required>
+                            <span>Email</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <div class="password-input-container">
+                            <input class="input" type="password" id="password" name="password" placeholder="" required>
+                            <span>Password</span>
+                            <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility('password')">
+                                <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <div class="password-input-container">
+                            <input class="input" type="password" id="confirmPassword" name="confirmPassword" placeholder="" required>
+                            <span>Confirm password</span>
+                            <button type="button" class="password-toggle-btn" id="confirmPasswordToggleBtn" onclick="togglePasswordVisibility('confirmPassword')">
+                                <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
+                            </button>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <a href="index.php" class="register-link">Already have an account? Sign in</a>
+                </div>
+
+                <button class="submit" type="submit">Create Account</button>
+            </form>
         </div>
-    </label>
-    <label>
-        <div class="password-input-container">
-            <input class="input" type="password" id="confirmPassword" name="confirmPassword" placeholder="" required>
-            <span>Confirm password</span>
-            <button type="button" class="password-toggle-btn" id="confirmPasswordToggleBtn" onclick="togglePasswordVisibility('confirmPassword')">
-                <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
-            </button>
-        </div>
-    </label>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0 12px 0;">
-        <a href="index.php" class="ds-link">Already have an account? Sign in</a>
     </div>
-    <button class="submit" type="submit">Register</button>
-</form>
-</div>
 
 
 
@@ -129,6 +173,52 @@
                 toggleIcon.className = 'fas fa-eye';
             }
         };
+
+        // Input visibility toggle functionality for text inputs
+        window.toggleInputVisibility = function(fieldId) {
+            const input = document.getElementById(fieldId);
+            const toggleBtn = document.getElementById(fieldId + 'ToggleBtn');
+            const toggleIcon = document.getElementById(fieldId + 'ToggleIcon');
+
+            if (input.type === 'text') {
+                input.type = 'password';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'text';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        };
+
+        // Theme toggle functionality
+        window.toggleTheme = function() {
+            const body = document.getElementById('authPage');
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                themeIcon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-theme');
+                body.classList.add('light-theme');
+                themeIcon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            }
+        };
+
+        // Initialize theme on page load
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const body = document.getElementById('authPage');
+        const themeIcon = document.getElementById('themeIcon');
+
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            themeIcon.className = 'fas fa-moon';
+        } else {
+            body.classList.add('dark-theme');
+            themeIcon.className = 'fas fa-sun';
+        }
     })();
     </script>
 

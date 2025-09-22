@@ -25,32 +25,50 @@
     <meta name="twitter:description" content="Reset your password for Cephra - Your Electric Vehicle Charging Platform" />
     <meta name="twitter:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
 
-    <link rel="stylesheet" href="css/forgot_password.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 </head>
-<body class="auth-page">
+<body class="auth-page" id="authPage">
+    <!-- Theme Toggle Button -->
+    <button type="button" class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+        <i class="fas fa-sun" id="themeIcon"></i>
+    </button>
+
     <div class="auth-wrapper">
-        <form class="form" id="forgotPasswordForm">
-            <div class="brand" style="margin-bottom:10px;">
-                <img src="images/logo.png" alt="Cephra" class="brand-img" />
-                <span class="brand-text">CEPHRA</span>
+        <!-- Left Panel - Branding -->
+        <div class="left-panel">
+            <div class="brand-section">
+                <div class="brand-icon">
+                    <img src="images/logo.png" alt="Cephra" class="brand-logo" />
+                </div>
+                <h1 class="main-title">CEPHRA</h1>
+                <p class="main-subtitle">Your Electric Vehicle Charging Platform</p>
+                <p class="main-description">Reset your password to regain access to your charging dashboard and manage your electric vehicle charging sessions.</p>
             </div>
-            <p class="title">Forgot Password</p>
-            <p class="message" style="opacity:.8">Enter your email address and we'll send you a verification code.</p>
+        </div>
 
-            <div class="flex">
-                <label>
-                    <input class="input" type="email" id="email" name="email" placeholder="" required />
-                    <span>Email Address</span>
-                </label>
-            </div>
+        <!-- Right Panel - Forgot Password Form -->
+        <div class="right-panel">
+            <form class="form" id="forgotPasswordForm">
+                <div class="form-header">
+                    <h2 class="form-title">Reset Password</h2>
+                    <p class="form-subtitle">Enter your email to receive a verification code</p>
+                </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0 12px 0;">
-                <a href="index.php" class="ds-link">Back to Login</a>
-            </div>
+                <div class="form-group">
+                    <label>
+                        <div class="input-container">
+                            <input class="input" type="email" id="email" name="email" placeholder="" required />
+                            <span>Email Address</span>
+                        </div>
+                    </label>
+                </div>
 
-            <button class="submit" type="submit">Send Verification Code</button>
-        </form>
-    </div>
+                <div class="form-actions">
+                    <a href="index.php" class="forgot-link">Back to Login</a>
+                </div>
+
+                <button class="submit" type="submit">Send Verification Code</button>
 
     <script>
     (function(){
@@ -80,6 +98,52 @@
                 overlay.appendChild(dialog);
                 document.body.appendChild(overlay);
             };
+        }
+
+        // Input visibility toggle functionality for email input
+        window.toggleInputVisibility = function(fieldId) {
+            const input = document.getElementById(fieldId);
+            const toggleBtn = document.getElementById(fieldId + 'ToggleBtn');
+            const toggleIcon = document.getElementById(fieldId + 'ToggleIcon');
+
+            if (input.type === 'email') {
+                input.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'email';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        };
+
+        // Theme toggle functionality
+        window.toggleTheme = function() {
+            const body = document.getElementById('authPage');
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                themeIcon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-theme');
+                body.classList.add('light-theme');
+                themeIcon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            }
+        };
+
+        // Initialize theme on page load
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const body = document.getElementById('authPage');
+        const themeIcon = document.getElementById('themeIcon');
+
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            themeIcon.className = 'fas fa-moon';
+        } else {
+            body.classList.add('dark-theme');
+            themeIcon.className = 'fas fa-sun';
         }
     })();
     </script>
