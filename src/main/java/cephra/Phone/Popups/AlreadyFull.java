@@ -11,6 +11,12 @@ public class AlreadyFull extends javax.swing.JPanel {
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
+    // Intro animation fields
+    private boolean isShowingIntro = false;
+    private Timer introTimer;
+    private ImageIcon introGifIcon;
+    private ImageIcon mainImageIcon;
+    
     // Popup dimensions (centered in phone frame)
     private static final int POPUP_WIDTH = 280;
     private static final int POPUP_HEIGHT = 266;
@@ -153,6 +159,12 @@ public class AlreadyFull extends javax.swing.JPanel {
             layeredPane.moveToFront(currentInstance);
             
             currentInstance.setVisible(true);
+            
+            // Start intro animation after popup is visible
+            SwingUtilities.invokeLater(() -> {
+                currentInstance.startIntroAnimation();
+            });
+            
             phoneFrame.repaint();
         });
     }
@@ -166,6 +178,11 @@ public class AlreadyFull extends javax.swing.JPanel {
         AlreadyFull instance = currentInstance;
 
         SwingUtilities.invokeLater(() -> {
+            // Stop intro timer if running
+            if (instance.introTimer != null) {
+                instance.introTimer.stop();
+            }
+            
             if (instance.getParent() != null) {
                 instance.getParent().remove(instance);
             }
@@ -237,8 +254,72 @@ public class AlreadyFull extends javax.swing.JPanel {
      * Constructor for PayPop
      */
     public AlreadyFull() {
+        // Load intro gif and main image
+        loadImages();
         initComponents();
         initializePayPop();
+    }
+    
+    /**
+     * Loads the intro gif and main image icons
+     */
+    private void loadImages() {
+        try {
+            introGifIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/intAlfull.gif"));
+            mainImageIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/AlreadyFull.png"));
+        } catch (Exception e) {
+            System.err.println("Error loading images: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Starts the intro animation sequence
+     */
+    private void startIntroAnimation() {
+        if (jLabel1 == null) {
+            // Fallback to main image if label not available
+            showMainImage();
+            return;
+        }
+        
+        // Create a fresh GIF instance to reset animation
+        ImageIcon freshGifIcon = null;
+        try {
+            freshGifIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/intAlfull.gif"));
+        } catch (Exception e) {
+            System.err.println("Error loading fresh intro gif: " + e.getMessage());
+            showMainImage();
+            return;
+        }
+        
+        isShowingIntro = true;
+        jLabel1.setIcon(freshGifIcon);
+        
+        // Set up timer to forcibly cut GIF and switch to main image after 200ms (0.2 seconds)
+        introTimer = new Timer(200, e -> {
+            // Force stop GIF by clearing icon first, then setting main image
+            jLabel1.setIcon(null);
+            SwingUtilities.invokeLater(() -> {
+                showMainImage();
+            });
+            introTimer.stop();
+        });
+        introTimer.setRepeats(false);
+        introTimer.start();
+    }
+    
+    /**
+     * Shows the main image and ends intro animation
+     */
+    private void showMainImage() {
+        if (jLabel1 != null && mainImageIcon != null) {
+            jLabel1.setIcon(mainImageIcon);
+        }
+        isShowingIntro = false;
+        if (introTimer != null) {
+            introTimer.stop();
+        }
     }
     
     /**
@@ -330,7 +411,7 @@ public class AlreadyFull extends javax.swing.JPanel {
         add(Golink);
         Golink.setBounds(20, 180, 220, 40);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/AlreadyFull.png"))); // NOI18N
+        // Icon will be set by intro animation
         add(jLabel1);
         jLabel1.setBounds(10, 0, 280, 230);
     }// </editor-fold>//GEN-END:initComponents

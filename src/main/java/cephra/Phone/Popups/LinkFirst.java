@@ -8,9 +8,15 @@ public class LinkFirst extends javax.swing.JPanel {
  
     private static LinkFirst currentInstance = null;
     private static String currentTicketId = null;
-    private static boolean isShowing = false;    
+    private static boolean isShowing = false;
+    
+    // Intro animation fields
+    private boolean isShowingIntro = false;
+    private Timer introTimer;
+    private ImageIcon introGifIcon;
+    private ImageIcon mainImageIcon;
     private static final int POPUP_WIDTH = 280;
-    private static final int POPUP_HEIGHT = 200;
+    private static final int POPUP_HEIGHT = 230;
     private static final int PHONE_WIDTH = 350; 
     private static final int PHONE_HEIGHT = 750;   
   
@@ -101,6 +107,8 @@ public class LinkFirst extends javax.swing.JPanel {
             // Request focus to the popup so it can receive events
             SwingUtilities.invokeLater(() -> {
                 currentInstance.requestFocusInWindow();
+                // Start intro animation after popup is visible
+                currentInstance.startIntroAnimation();
             });
             
             phoneFrame.repaint();
@@ -114,6 +122,11 @@ public class LinkFirst extends javax.swing.JPanel {
         LinkFirst instance = currentInstance;
 
         SwingUtilities.invokeLater(() -> {
+            // Stop intro timer if running
+            if (instance.introTimer != null) {
+                instance.introTimer.stop();
+            }
+            
             if (instance.getParent() != null) {
                 instance.getParent().remove(instance);
             }
@@ -141,8 +154,72 @@ public class LinkFirst extends javax.swing.JPanel {
 }
 
     public LinkFirst() {
+        // Load intro gif and main image
+        loadImages();
         initComponents();
         initializePayPop();
+    }
+
+    /**
+     * Loads the intro gif and main image icons
+     */
+    private void loadImages() {
+        try {
+            introGifIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/intLinkf.gif"));
+            mainImageIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/Plslink.png"));
+        } catch (Exception e) {
+            System.err.println("Error loading images: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Starts the intro animation sequence
+     */
+    private void startIntroAnimation() {
+        if (jLabel1 == null) {
+            // Fallback to main image if label not available
+            showMainImage();
+            return;
+        }
+        
+        // Create a fresh GIF instance to reset animation
+        ImageIcon freshGifIcon = null;
+        try {
+            freshGifIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/intLinkf.gif"));
+        } catch (Exception e) {
+            System.err.println("Error loading fresh intro gif: " + e.getMessage());
+            showMainImage();
+            return;
+        }
+        
+        isShowingIntro = true;
+        jLabel1.setIcon(freshGifIcon);
+        
+        // Set up timer to forcibly cut GIF and switch to main image after 200ms (0.2 seconds)
+        introTimer = new Timer(200, e -> {
+            // Force stop GIF by clearing icon first, then setting main image
+            jLabel1.setIcon(null);
+            SwingUtilities.invokeLater(() -> {
+                showMainImage();
+            });
+            introTimer.stop();
+        });
+        introTimer.setRepeats(false);
+        introTimer.start();
+    }
+    
+    /**
+     * Shows the main image and ends intro animation
+     */
+    private void showMainImage() {
+        if (jLabel1 != null && mainImageIcon != null) {
+            jLabel1.setIcon(mainImageIcon);
+        }
+        isShowingIntro = false;
+        if (introTimer != null) {
+            introTimer.stop();
+        }
     }
 
     private void initializePayPop() {
@@ -209,11 +286,11 @@ public class LinkFirst extends javax.swing.JPanel {
             }
         });
         add(notLink);
-        notLink.setBounds(215, 5, 60, 50);
+        notLink.setBounds(215, -7, 60, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Plslink.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(0, 0, 280, 200);
+        jLabel1.setBounds(10, 0, 280, 230);
     }// </editor-fold>//GEN-END:initComponents
 
     private void notLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notLinkActionPerformed
