@@ -549,7 +549,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             modalOverlay.setVisible(true);
             
             // Position the detailpanel in the center of the history area as a popup
-            detailpanel.setBounds(50, 200, 266, 393); // Centered in the history area
+            detailpanel.setBounds(50, 200, 266, 400); // Centered in the history area
             detailpanel.setVisible(true);
             
             // Make sure detailpanel is on top of the modal overlay
@@ -779,69 +779,69 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         ticket.setToolTipText("");
         ticket.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(ticket);
-        ticket.setBounds(120, 62, 100, 16);
+        ticket.setBounds(120, 65, 100, 16);
 
         Customer.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         Customer.setText("jLabel3");
         Customer.setToolTipText("");
         Customer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(Customer);
-        Customer.setBounds(120, 90, 100, 16);
+        Customer.setBounds(120, 95, 100, 16);
 
         typed.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        typed.setText("Normal Charging");
+        typed.setText("NC (GCash)");
         typed.setToolTipText("");
         typed.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         detailpanel.add(typed);
-        typed.setBounds(120, 117, 100, 16);
+        typed.setBounds(120, 120, 100, 16);
 
         kwh.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         kwh.setText("jLabel3");
         kwh.setToolTipText("");
         detailpanel.add(kwh);
-        kwh.setBounds(120, 147, 100, 16);
+        kwh.setBounds(120, 150, 100, 16);
 
         Chargingtime.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         Chargingtime.setText("jLabel3");
         Chargingtime.setToolTipText("");
         Chargingtime.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         detailpanel.add(Chargingtime);
-        Chargingtime.setBounds(120, 174, 100, 16);
+        Chargingtime.setBounds(120, 176, 100, 16);
 
         totalprice.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         totalprice.setText("jLabel3");
         totalprice.setToolTipText("");
         totalprice.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(totalprice);
-        totalprice.setBounds(120, 200, 100, 16);
+        totalprice.setBounds(120, 204, 100, 16);
 
         server.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         server.setText("jLabel3");
         server.setToolTipText("");
         server.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(server);
-        server.setBounds(120, 226, 100, 16);
+        server.setBounds(120, 228, 100, 16);
 
         dated.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         dated.setText("jLabel3");
         dated.setToolTipText("");
         dated.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(dated);
-        dated.setBounds(120, 254, 100, 16);
+        dated.setBounds(120, 256, 100, 16);
 
         timed.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         timed.setText("jLabel3");
         timed.setToolTipText("");
         timed.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(timed);
-        timed.setBounds(120, 278, 100, 16);
+        timed.setBounds(120, 280, 100, 16);
 
         ref.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         ref.setText("jLabel3");
         ref.setToolTipText("");
         ref.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(ref);
-        ref.setBounds(120, 305, 100, 16);
+        ref.setBounds(120, 309, 100, 16);
 
         ok.setBorder(null);
         ok.setBorderPainted(false);
@@ -857,10 +857,10 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ChargingDetailsPOP.png"))); // NOI18N
         ICON.setText("jLabel3");
         detailpanel.add(ICON);
-        ICON.setBounds(0, 0, 266, 393);
+        ICON.setBounds(0, 0, 266, 400);
 
         add(detailpanel);
-        detailpanel.setBounds(430, 310, 266, 393);
+        detailpanel.setBounds(430, 303, 266, 410);
     }// </editor-fold>//GEN-END:initComponents
 
     // CUSTOM CODE SECTION
