@@ -19,7 +19,13 @@ public class Queue extends javax.swing.JPanel {
     public Queue() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(1000, 750));
-        setSize(1000, 750);       
+        setSize(1000, 750);
+        
+        // Initialize custom components after NetBeans generated code
+        initializeCustomComponents();
+    }
+
+    private void initializeCustomComponents() {
         setupDateTimeTimer();    
         
         jtableDesign.apply(queTab);
@@ -1000,8 +1006,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         datetimeStaff.setText(time + " " + date);
     }
 
-
-
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -1051,7 +1056,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         setLayout(null);
 
         Baybutton.setForeground(new java.awt.Color(255, 255, 255));
-        Baybutton.setText("BAYS");
+        Baybutton.setText("BAYS"); // NOI18N
         Baybutton.setBorder(null);
         Baybutton.setBorderPainted(false);
         Baybutton.setContentAreaFilled(false);
@@ -1065,7 +1070,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         Baybutton.setBounds(385, 26, 33, 15);
 
         businessbutton.setForeground(new java.awt.Color(255, 255, 255));
-        businessbutton.setText("BUSINESS OVERVIEW");
+        businessbutton.setText("BUSINESS OVERVIEW"); // NOI18N
         businessbutton.setBorder(null);
         businessbutton.setBorderPainted(false);
         businessbutton.setContentAreaFilled(false);
@@ -1090,7 +1095,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         exitlogin.setBounds(930, 0, 70, 60);
 
         staffbutton.setForeground(new java.awt.Color(255, 255, 255));
-        staffbutton.setText("STAFF RECORDS");
+        staffbutton.setText("STAFF RECORDS"); // NOI18N
         staffbutton.setBorder(null);
         staffbutton.setBorderPainted(false);
         staffbutton.setContentAreaFilled(false);
@@ -1104,7 +1109,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         staffbutton.setBounds(505, 26, 96, 15);
 
         historybutton.setForeground(new java.awt.Color(255, 255, 255));
-        historybutton.setText("HISTORY");
+        historybutton.setText("HISTORY"); // NOI18N
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
         historybutton.setContentAreaFilled(false);
@@ -1125,19 +1130,19 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         Paid.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Paid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Paid.setText("5");
+        Paid.setText("5"); // NOI18N
         panelLists.add(Paid);
         Paid.setBounds(40, 520, 120, 70);
 
         Waitings.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Waitings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Waitings.setText("4");
+        Waitings.setText("4"); // NOI18N
         panelLists.add(Waitings);
         Waitings.setBounds(40, 140, 120, 70);
 
         Charging.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         Charging.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Charging.setText("4");
+        Charging.setText("4"); // NOI18N
         panelLists.add(Charging);
         Charging.setBounds(40, 330, 120, 70);
 
@@ -1148,8 +1153,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null}
             },
-            new String [] {
-                "Ticket", "Customer", "Service", "Status", "Payment", "Action"
+            new String [] { // NOI18N
+                "Ticket", "Customer", "Service", "Status", "Payment", "Action" // NOI18N
             }
         ));
         queTab.setShowHorizontalLines(true);
@@ -1175,7 +1180,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastslot1.setBackground(new java.awt.Color(255, 0, 0));
         fastslot1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         fastslot1.setForeground(new java.awt.Color(0, 230, 118));
-        fastslot1.setText("XXXXXX");
+        fastslot1.setText("XXXXXX"); // NOI18N
         fastslot1.setBorder(null);
         fastslot1.setBorderPainted(false);
         fastslot1.setContentAreaFilled(false);
@@ -1186,8 +1191,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastslot2.setBackground(new java.awt.Color(255, 0, 0));
         fastslot2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         fastslot2.setForeground(new java.awt.Color(0, 230, 118));
-        fastslot2.setText("XXXXXX");
-        fastslot2.setToolTipText("");
+        fastslot2.setText("XXXXXX"); // NOI18N
+        fastslot2.setToolTipText(""); // NOI18N
         fastslot2.setBorder(null);
         fastslot2.setBorderPainted(false);
         fastslot2.setContentAreaFilled(false);
@@ -1198,7 +1203,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         fastslot3.setBackground(new java.awt.Color(255, 0, 0));
         fastslot3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         fastslot3.setForeground(new java.awt.Color(0, 230, 118));
-        fastslot3.setText("XXXXXX");
+        fastslot3.setText("XXXXXX"); // NOI18N
         fastslot3.setBorder(null);
         fastslot3.setBorderPainted(false);
         fastslot3.setContentAreaFilled(false);
@@ -1214,7 +1219,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jButton1.setBackground(new java.awt.Color(255, 0, 0));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton1.setText("XXXXXX");
+        jButton1.setText("XXXXXX"); // NOI18N
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -1229,7 +1234,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jButton2.setBackground(new java.awt.Color(255, 0, 0));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton2.setText("XXXXXX");
+        jButton2.setText("XXXXXX"); // NOI18N
         jButton2.setBorder(null);
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
@@ -1244,7 +1249,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jButton3.setBackground(new java.awt.Color(255, 0, 0));
         jButton3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton3.setText("XXXXXX");
+        jButton3.setText("XXXXXX"); // NOI18N
         jButton3.setBorder(null);
         jButton3.setBorderPainted(false);
         jButton3.setContentAreaFilled(false);
@@ -1259,7 +1264,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jButton4.setBackground(new java.awt.Color(255, 0, 0));
         jButton4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton4.setText("XXXXXX");
+        jButton4.setText("XXXXXX"); // NOI18N
         jButton4.setBorder(null);
         jButton4.setBorderPainted(false);
         jButton4.setContentAreaFilled(false);
@@ -1274,7 +1279,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jButton5.setBackground(new java.awt.Color(255, 0, 0));
         jButton5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton5.setText("XXXXXX");
+        jButton5.setText("XXXXXX"); // NOI18N
         jButton5.setBorder(null);
         jButton5.setBorderPainted(false);
         jButton5.setContentAreaFilled(false);
@@ -1289,7 +1294,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jButton6.setBackground(new java.awt.Color(255, 0, 0));
         jButton6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton6.setText("XXXXXX");
+        jButton6.setText("XXXXXX"); // NOI18N
         jButton6.setBorder(null);
         jButton6.setBorderPainted(false);
         jButton6.setContentAreaFilled(false);
@@ -1304,7 +1309,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jButton7.setBackground(new java.awt.Color(255, 0, 0));
         jButton7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton7.setText("XXXXXX");
+        jButton7.setText("XXXXXX"); // NOI18N
         jButton7.setBorder(null);
         jButton7.setBorderPainted(false);
         jButton7.setContentAreaFilled(false);
@@ -1319,7 +1324,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         jButton8.setBackground(new java.awt.Color(255, 0, 0));
         jButton8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton8.setText("XXXXXX");
+        jButton8.setText("XXXXXX"); // NOI18N
         jButton8.setBorder(null);
         jButton8.setBorderPainted(false);
         jButton8.setContentAreaFilled(false);
@@ -1337,7 +1342,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         normalcharge1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         normalcharge1.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge1.setText("XXXXXX");
+        normalcharge1.setText("XXXXXX"); // NOI18N
         normalcharge1.setBorder(null);
         normalcharge1.setBorderPainted(false);
         normalcharge1.setContentAreaFilled(false);
@@ -1374,7 +1379,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         normalcharge5.setBackground(new java.awt.Color(255, 0, 0));
         normalcharge5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         normalcharge5.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge5.setText("XXXXXX");
+        normalcharge5.setText("XXXXXX"); // NOI18N
         normalcharge5.setBorder(null);
         normalcharge5.setBorderPainted(false);
         normalcharge5.setContentAreaFilled(false);
@@ -1385,7 +1390,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         normalcharge4.setBackground(new java.awt.Color(255, 0, 0));
         normalcharge4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         normalcharge4.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge4.setText("XXXXXX");
+        normalcharge4.setText("XXXXXX"); // NOI18N
         normalcharge4.setBorder(null);
         normalcharge4.setBorderPainted(false);
         normalcharge4.setContentAreaFilled(false);
@@ -1396,7 +1401,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         normalcharge3.setBackground(new java.awt.Color(255, 0, 0));
         normalcharge3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         normalcharge3.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge3.setText("XXXXXX");
+        normalcharge3.setText("XXXXXX"); // NOI18N
         normalcharge3.setBorder(null);
         normalcharge3.setBorderPainted(false);
         normalcharge3.setContentAreaFilled(false);
@@ -1407,7 +1412,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         normalcharge2.setBackground(new java.awt.Color(255, 0, 0));
         normalcharge2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         normalcharge2.setForeground(new java.awt.Color(41, 182, 246));
-        normalcharge2.setText("XXXXXX");
+        normalcharge2.setText("XXXXXX"); // NOI18N
         normalcharge2.setBorder(null);
         normalcharge2.setBorderPainted(false);
         normalcharge2.setContentAreaFilled(false);
@@ -1430,25 +1435,25 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         datetimeStaff.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         datetimeStaff.setForeground(new java.awt.Color(255, 255, 255));
-        datetimeStaff.setText("10:44 AM 17 August, Sunday");
+        datetimeStaff.setText("10:44 AM 17 August, Sunday"); // NOI18N
         add(datetimeStaff);
         datetimeStaff.setBounds(820, 40, 170, 20);
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        labelStaff.setText("Admin!");
+        labelStaff.setText("Admin!"); // NOI18N
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Hello,");
+        jLabel3.setText("Hello,"); // NOI18N
         add(jLabel3);
         jLabel3.setBounds(820, 10, 50, 30);
 
         jLabel1.setForeground(new java.awt.Color(4, 167, 182));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("QUEUE LIST");
+        jLabel1.setText("QUEUE LIST"); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(289, 26, 80, 15);
 
@@ -1492,61 +1497,36 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }//GEN-LAST:event_BaybuttonActionPerformed
 
-    private void nxtnormalbtnActionPerformed(java.awt.event.ActionEvent evt) {}
-    private void nxtfastbtnActionPerformed(java.awt.event.ActionEvent evt) {}
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {}
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {}
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {}
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {}
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {}
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {}
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {}
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {}
-
-    private javax.swing.JButton Baybutton;
-    private javax.swing.JLabel Charging;
-    private javax.swing.JPanel ControlPanel;
-    private javax.swing.JLabel MainIcon;
-    private javax.swing.JLabel Paid;
-    private javax.swing.JLabel Waitings;
-    private javax.swing.JButton businessbutton;
-    private javax.swing.JLabel datetimeStaff;
-    private javax.swing.JButton exitlogin;
-    private javax.swing.JPanel fastpanel;
-    private javax.swing.JButton fastslot1;
-    private javax.swing.JButton fastslot2;
-    private javax.swing.JButton fastslot3;
-    private javax.swing.JButton historybutton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JLabel labelStaff;
-    private javax.swing.JButton normalcharge1;
-    private javax.swing.JButton normalcharge2;
-    private javax.swing.JButton normalcharge3;
-    private javax.swing.JButton normalcharge4;
-    private javax.swing.JButton normalcharge5;
-    private javax.swing.JButton nxtfastbtn;
-    private javax.swing.JButton nxtnormalbtn;
-    private javax.swing.JPanel panelLists;
-    private javax.swing.JLabel queIcon;
-    private javax.swing.JTable queTab;
-    private javax.swing.JButton staffbutton;
+    private void nxtnormalbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nxtnormalbtnActionPerformed
+    }//GEN-LAST:event_nxtnormalbtnActionPerformed
     
+    private void nxtfastbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nxtfastbtnActionPerformed
+    }//GEN-LAST:event_nxtfastbtnActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
     
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jButton2ActionPerformed
+    
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_jButton3ActionPerformed
+    
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_jButton4ActionPerformed
+    
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_jButton5ActionPerformed
+    
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_jButton6ActionPerformed
+    
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    }//GEN-LAST:event_jButton7ActionPerformed
+    
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+    }//GEN-LAST:event_jButton8ActionPerformed
+
     private void initializeGridDisplays() {
         try {
             cephra.Admin.BayManagement.ensureMaintenanceDisplay();
@@ -1743,4 +1723,48 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         
         return isFast ? "Bay-1" : "Bay-4";
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Baybutton;
+    private javax.swing.JLabel Charging;
+    private javax.swing.JPanel ControlPanel;
+    private javax.swing.JLabel MainIcon;
+    private javax.swing.JLabel Paid;
+    private javax.swing.JLabel Waitings;
+    private javax.swing.JButton businessbutton;
+    private javax.swing.JLabel datetimeStaff;
+    private javax.swing.JButton exitlogin;
+    private javax.swing.JPanel fastpanel;
+    private javax.swing.JButton fastslot1;
+    private javax.swing.JButton fastslot2;
+    private javax.swing.JButton fastslot3;
+    private javax.swing.JButton historybutton;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel labelStaff;
+    private javax.swing.JButton normalcharge1;
+    private javax.swing.JButton normalcharge2;
+    private javax.swing.JButton normalcharge3;
+    private javax.swing.JButton normalcharge4;
+    private javax.swing.JButton normalcharge5;
+    private javax.swing.JButton nxtfastbtn;
+    private javax.swing.JButton nxtnormalbtn;
+    private javax.swing.JPanel panelLists;
+    private javax.swing.JLabel queIcon;
+    private javax.swing.JTable queTab;
+    private javax.swing.JButton staffbutton;
+    // End of variables declaration//GEN-END:variables
 }

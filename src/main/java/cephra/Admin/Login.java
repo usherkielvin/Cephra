@@ -19,6 +19,11 @@ public class Login extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
 
+        // Initialize custom components after NetBeans generated code
+        initializeCustomComponents();
+    }
+
+    private void initializeCustomComponents() {
         setupFields();
         setupFilters();
         setupForgotPasswordButton();
@@ -85,7 +90,7 @@ public class Login extends javax.swing.JPanel {
         add(cooldownlabel);
         cooldownlabel.setBounds(520, 510, 160, 0);
 
-        jButton1.setText("Forgot Password?");
+        jButton1.setText("Forgot Password?"); // NOI18N
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -301,6 +306,7 @@ public class Login extends javax.swing.JPanel {
     }
 
 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
     private javax.swing.JLabel cooldownlabel;
     private javax.swing.JButton jButton1;
@@ -308,6 +314,7 @@ public class Login extends javax.swing.JPanel {
     private javax.swing.JButton loginbutton;
     private javax.swing.JPasswordField passfield;
     private javax.swing.JTextField userfield;
+    // End of variables declaration//GEN-END:variables
 
     private static class InputLimitFilter extends DocumentFilter {
         private final int max;
