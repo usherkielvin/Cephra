@@ -1,3 +1,4 @@
+// Registration JavaScript
 function showDialog(title, message) {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
@@ -14,7 +15,7 @@ function showDialog(title, message) {
     const ok = document.createElement('button');
     ok.textContent = 'OK';
     ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
-    ok.onclick = () => document.body.removeChild(overlay);
+    ok.onclick = function() { document.body.removeChild(overlay); };
     footer.appendChild(ok);
     dialog.appendChild(header);
     dialog.appendChild(body);
@@ -45,7 +46,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
     try {
         const formData = new FormData();
-        formData.append('action', 'register');
+        formData.append('action', 'register-user');
         formData.append('firstname', firstname);
         formData.append('lastname', lastname);
         formData.append('username', username);

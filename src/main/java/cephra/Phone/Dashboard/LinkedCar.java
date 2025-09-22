@@ -479,13 +479,13 @@ public class LinkedCar extends javax.swing.JPanel {
         chargingTypeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         chargingTypeLabel.setText("Fast Charging");
         add(chargingTypeLabel);
-        chargingTypeLabel.setBounds(40, 410, 140, 25);
+        chargingTypeLabel.setBounds(30, 410, 150, 25);
 
         chargingTimeLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         chargingTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         chargingTimeLabel.setText("45m");
         add(chargingTimeLabel);
-        chargingTimeLabel.setBounds(20, 440, 180, 50);
+        chargingTimeLabel.setBounds(20, 440, 160, 50);
 
         eco.setText("3hrs 12mins");
         add(eco);

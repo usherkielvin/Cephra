@@ -219,7 +219,7 @@ public class EditProfile extends javax.swing.JPanel {
             }
         });
         add(fname);
-        fname.setBounds(40, 300, 140, 40);
+        fname.setBounds(40, 305, 140, 32);
 
         editpfp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/cam.png"))); // NOI18N
         editpfp.setBorder(null);
@@ -314,7 +314,7 @@ public class EditProfile extends javax.swing.JPanel {
             }
         });
         add(lname);
-        lname.setBounds(200, 302, 120, 40);
+        lname.setBounds(200, 305, 120, 32);
 
         UsernamePhone.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         UsernamePhone.setBorder(null);
@@ -324,7 +324,7 @@ public class EditProfile extends javax.swing.JPanel {
             }
         });
         add(UsernamePhone);
-        UsernamePhone.setBounds(40, 380, 280, 32);
+        UsernamePhone.setBounds(40, 378, 280, 32);
 
         email.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         email.setBorder(null);
@@ -334,7 +334,7 @@ public class EditProfile extends javax.swing.JPanel {
             }
         });
         add(email);
-        email.setBounds(40, 450, 280, 40);
+        email.setBounds(40, 452, 280, 31);
 
         back.setBorder(null);
         back.setBorderPainted(false);

@@ -237,9 +237,10 @@ public class Reciept extends javax.swing.JPanel {
         Download.setBounds(50, 683, 110, 30);
 
         price.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
-        price.setText("PHP 650.00");
+        price.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        price.setText("PHP 650000.00");
         add(price);
-        price.setBounds(85, 280, 210, 40);
+        price.setBounds(45, 280, 280, 40);
 
         RefNumber.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         RefNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

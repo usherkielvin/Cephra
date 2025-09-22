@@ -397,8 +397,19 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
         });
         add(profilebutton);
         profilebutton.setBounds(260, 680, 40, 40);
+
+        closeButton.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        closeButton.setText("←");
+        closeButton.setBorder(null);
+        closeButton.setBorderPainted(false);
+        closeButton.setContentAreaFilled(false);
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeButtonActionPerformed(evt);
+            }
+        });
         add(closeButton);
-        closeButton.setBounds(240, 120, 75, 50);
+        closeButton.setBounds(270, 120, 75, 50);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -555,6 +566,10 @@ public class NotificationHistory extends javax.swing.JPanel implements cephra.Ph
             }
         });
     }//GEN-LAST:event_historybuttonActionPerformed
+
+    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_closeButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

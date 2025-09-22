@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#062635" />
-    
+
     <!-- Open Graph meta tags for social media previews -->
     <meta property="og:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
     <meta property="og:description" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
@@ -18,14 +18,15 @@
     <meta property="og:url" content="https://cephra.ct.ws" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Cephra" />
-    
+
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
     <meta name="twitter:description" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />
     <meta name="twitter:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
-    
+
     <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 </head>
 <body class="auth-page">
     <div class="auth-wrapper">
@@ -43,11 +44,16 @@
                 </label>
             </div>
             <label>
-                <input class="input" type="password" id="password" name="password" placeholder="" required />
-                <span>Password</span>
+                <div class="password-input-container">
+                    <input class="input" type="password" id="password" name="password" placeholder="" required />
+                    <span>Password</span>
+                    <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility()">
+                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                    </button>
+                </div>
             </label>
             <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0 12px 0;">
-                <a href="#" class="ds-link">Forgot password?</a>
+                <a href="forgot_password.php" class="ds-link">Forgot password?</a>
                 <a href="Register_Panel.php" class="ds-link">Register here</a>
             </div>
             <button class="submit" type="submit">Login</button>
@@ -83,6 +89,21 @@
                 document.body.appendChild(overlay);
             };
         }
+
+        // Password toggle functionality
+        window.togglePasswordVisibility = function() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.getElementById('passwordToggleBtn');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        };
     })();
     </script>
 
