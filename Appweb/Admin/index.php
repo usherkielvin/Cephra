@@ -359,12 +359,12 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <table class="transactions-table" id="transactions-table">
                             <thead>
                                 <tr>
-                                    <th>Ticket</th>
-                                    <th>User</th>
-                                    <th>kWh</th>
-                                    <th>Total</th>
-                                    <th>Date and Time</th>
-                                    <th>Reference</th>
+                                    <th id="th-tx-ticket">Ticket</th>
+                                    <th id="th-tx-user">User</th>
+                                    <th id="th-tx-kwh">kWh</th>
+                                    <th id="th-tx-total">Total</th>
+                                    <th id="th-tx-datetime">Date and Time</th>
+                                    <th id="th-tx-reference">Reference</th>
                                 </tr>
                             </thead>
                             <tbody id="transactions-tbody">
@@ -549,19 +549,23 @@ if ($conn && isset($_SESSION['admin_username'])) {
             const i18n = {
                 EN: {
                     'nav-dashboard':'Dashboard','nav-queue':'Queue Management','nav-bays':'Charging Bays','nav-users':'User Management','nav-staff':'Staff Management','nav-analytics':'Analytics','nav-transactions':'Transaction History','nav-settings':'Settings','nav-logout':'Logout',
-                    'queue-header':'Queue Management','bays-header':'Charging Bays Management','users-header':'User Management','analytics-header':'Analytics & Reports','transactions-header':'Transaction History','staff-header':'Staff Management','settings-header':'System Settings'
+                        'queue-header':'Queue Management','bays-header':'Charging Bays Management','users-header':'User Management','analytics-header':'Analytics & Reports','transactions-header':'Transaction History','staff-header':'Staff Management','settings-header':'System Settings',
+                        'th-tx-ticket':'Ticket','th-tx-user':'User','th-tx-kwh':'kWh','th-tx-total':'Total','th-tx-datetime':'Date and Time','th-tx-reference':'Reference'
                 },
                 PH: {
                     'nav-dashboard':'Dashboard','nav-queue':'Pamamahala ng Pila','nav-bays':'Mga Charging Bay','nav-users':'Pamamahala ng User','nav-staff':'Pamamahala ng Staff','nav-analytics':'Analytics','nav-transactions':'Kasaysayan ng Transaksyon','nav-settings':'Mga Setting',
-                    'nav-logout':'Logout','queue-header':'Pamamahala ng Pila','bays-header':'Pamamahala ng Charging Bay','users-header':'Pamamahala ng User','analytics-header':'Analytics at Ulat','transactions-header':'Kasaysayan ng Transaksyon','staff-header':'Pamamahala ng Staff','settings-header':'Mga Setting'
+                        'nav-logout':'Logout','queue-header':'Pamamahala ng Pila','bays-header':'Pamamahala ng Charging Bay','users-header':'Pamamahala ng User','analytics-header':'Analytics at Ulat','transactions-header':'Kasaysayan ng Transaksyon','staff-header':'Pamamahala ng Staff','settings-header':'Mga Setting',
+                        'th-tx-ticket':'Ticket','th-tx-user':'User','th-tx-kwh':'kWh','th-tx-total':'Kabuuan','th-tx-datetime':'Petsa at Oras','th-tx-reference':'Sanggunian'
                 },
                 ES: {
                     'nav-dashboard':'Panel','nav-queue':'Gestión de Cola','nav-bays':'Bahías de Carga','nav-users':'Gestión de Usuarios','nav-staff':'Gestión de Personal','nav-analytics':'Analítica','nav-transactions':'Historial de Transacciones','nav-settings':'Configuración',
-                    'nav-logout':'Salir','queue-header':'Gestión de Cola','bays-header':'Gestión de Bahías de Carga','users-header':'Gestión de Usuarios','analytics-header':'Analítica y Reportes','transactions-header':'Historial de Transacciones','staff-header':'Gestión de Personal','settings-header':'Configuración'
+                        'nav-logout':'Salir','queue-header':'Gestión de Cola','bays-header':'Gestión de Bahías de Carga','users-header':'Gestión de Usuarios','analytics-header':'Analítica y Reportes','transactions-header':'Historial de Transacciones','staff-header':'Gestión de Personal','settings-header':'Configuración',
+                        'th-tx-ticket':'Ticket','th-tx-user':'Usuario','th-tx-kwh':'kWh','th-tx-total':'Total','th-tx-datetime':'Fecha y Hora','th-tx-reference':'Referencia'
                     },
                     ZH: {
                         'nav-dashboard':'仪表盘','nav-queue':'队列管理','nav-bays':'充电车位','nav-users':'用户管理','nav-staff':'员工管理','nav-analytics':'数据分析','nav-transactions':'交易记录','nav-settings':'系统设置','nav-logout':'退出',
-                        'queue-header':'队列管理','bays-header':'充电车位管理','users-header':'用户管理','analytics-header':'数据分析与报表','transactions-header':'交易记录','staff-header':'员工管理','settings-header':'系统设置'
+                        'queue-header':'队列管理','bays-header':'充电车位管理','users-header':'用户管理','analytics-header':'数据分析与报表','transactions-header':'交易记录','staff-header':'员工管理','settings-header':'系统设置',
+                        'th-tx-ticket':'票号','th-tx-user':'用户','th-tx-kwh':'千瓦时','th-tx-total':'总计','th-tx-datetime':'日期时间','th-tx-reference':'参考号'
                 }
             };
 
