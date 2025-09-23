@@ -198,8 +198,8 @@ public class LinkedCar extends javax.swing.JPanel {
                 (ticketStatus.equals("Completed") || ticketStatus.equals("Complete")));
             
             if (isFullyCharged || isChargingCompleted) {
-                // Battery is fully charged or charging completed - show "Not Charging" status
-                chargingTypeLabel.setText("Not Charging");
+                // Battery is fully charged or charging completed - show empty label, show "Fully Charged"
+                chargingTypeLabel.setText("");
                 chargingTimeLabel.setText(isFullyCharged ? "Fully Charged" : "Ready");
                 
                 // System.out.println("LinkedCar: Charging completed - showing 'Not Charging' status for user " + username + 
@@ -211,7 +211,7 @@ public class LinkedCar extends javax.swing.JPanel {
                 String serviceType = getTicketServiceType(queueTicketId);
                 
                 if (serviceType != null) {
-                    // Update charging type label
+                    // Update charging type label when charging
                     if (serviceType.toLowerCase().contains("fast")) {
                         chargingTypeLabel.setText("Fast Charging");
                     } else {
@@ -299,7 +299,7 @@ public class LinkedCar extends javax.swing.JPanel {
     
     // Method to set not charging display when charging is completed or no active ticket
     private void setNotChargingDisplay() {
-        chargingTypeLabel.setText("Not Charging");
+        chargingTypeLabel.setText("");
         chargingTimeLabel.setText("Ready");
     }
     
