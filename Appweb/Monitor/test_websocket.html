@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cephra Monitor WebSocket Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1 {
+            margin-top: 0;
+            color: #0b7fa2;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .connected {
+            background: #e6ffe6;
+            color: #006600;
+            border: 1px solid #00cc00;
+        }
+        .disconnected {
+            background: #ffe6e6;
+            color: #cc0000;
+            border: 1px solid #ff3333;
+        }
+        .connecting {
+            background: #ffffd9;
+            color: #806600;
+            border: 1px solid #ffcc00;
+        }
+        .log {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            margin-bottom: 15px;
+        }
+        .log p {
+            margin: 5px 0;
+            padding: 3px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .log .error {
+            color: #cc0000;
+        }
+        .log .info {
+            color: #0066cc;
+        }
+        .log .success {
+            color: #006600;
+        }
+        button {
+            background: #0b7fa2;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0a6d8c;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cephra Monitor WebSocket Test</h1>
+        
+        <div id="statusContainer" class="status connecting">
+            Status: Initializing...
+        </div>
+        
+        <div class="log" id="log"></div>
+        
+        <div>
+            <button id="connectBtn">Connect</button>
+            <button id="disconnectBtn" disabled>Disconnect</button>
+            <button id="clearLogBtn">Clear Log</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const statusContainer = document.getElementById('statusContainer');
+        const log = document.getElementById('log');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const clearLogBtn = document.getElementById('clearLogBtn');
+        
+        // WebSocket variables
+        let socket = null;
+        let isConnected = false;
+        
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('p');
+            entry.className = type;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        // Update connection status
+        function updateStatus(status, message) {
+            statusContainer.className = `status ${status}`;
+            statusContainer.textContent = `Status: ${message}`;
+            
+            // Update buttons
+            if (status === 'connected') {
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            } else {
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            }
+        }
+        
+        // Connect to WebSocket server
+        function connect() {
+            if (socket) {
+                addLog('Already connected or connecting', 'error');
+                return;
+            }
+            
+            updateStatus('connecting', 'Connecting...');
+            addLog('Attempting to connect to WebSocket server...');
+            
+            try {
+                // Get the current hostname and use it to build the WebSocket URL
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const host = window.location.hostname || 'localhost';
+                const wsUrl = `${protocol}//${host}:8080`;
+                
+                addLog(`Connecting to ${wsUrl}`);
+                
+                // Create WebSocket connection
+                socket = new WebSocket(wsUrl);
+                
+                // Connection opened
+                socket.addEventListener('open', (event) => {
+                    isConnected = true;
+                    updateStatus('connected', 'Connected to WebSocket server');
+                    addLog('WebSocket connection established', 'success');
+                });
+                
+                // Listen for messages
+                socket.addEventListener('message', (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        addLog(`Received data: ${JSON.stringify(data).substring(0, 100)}...`);
+                        
+                        // Display stats if available
+                        if (data.stats) {
+                            const stats = data.stats;
+                            addLog(`Stats: ${stats.available_bays}/${stats.total_bays} bays available, ${stats.queue_count} in queue`, 'info');
+                        }
+                    } catch (e) {
+                        addLog(`Error processing message: ${e.message}`, 'error');
+                    }
+                });
+                
+                // Connection closed
+                socket.addEventListener('close', (event) => {
+                    isConnected = false;
+                    updateStatus('disconnected', 'Disconnected from WebSocket server');
+                    addLog(`WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason || 'No reason provided'}`, 'error');
+                    socket = null;
+                });
+                
+                // Connection error
+                socket.addEventListener('error', (event) => {
+                    updateStatus('disconnected', 'WebSocket error occurred');
+                    addLog('WebSocket error occurred', 'error');
+                });
+                
+            } catch (e) {
+                updateStatus('disconnected', 'Failed to connect');
+                addLog(`Connection error: ${e.message}`, 'error');
+                socket = null;
+            }
+        }
+        
+        // Disconnect from WebSocket server
+        function disconnect() {
+            if (socket) {
+                addLog('Closing WebSocket connection...');
+                socket.close();
+            } else {
+                addLog('No active connection to close', 'error');
+            }
+        }
+        
+        // Event listeners
+        connectBtn.addEventListener('click', connect);
+        disconnectBtn.addEventListener('click', disconnect);
+        clearLogBtn.addEventListener('click', () => {
+            log.innerHTML = '';
+            addLog('Log cleared');
+        });
+        
+        // Initial log
+        addLog('WebSocket test page loaded');
+        addLog('Click "Connect" to establish a WebSocket connection');
+    </script>
+</body>
+</html>
