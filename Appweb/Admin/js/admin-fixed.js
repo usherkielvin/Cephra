@@ -359,6 +359,12 @@ class AdminPanel {
 
         // Auto-remove paid tickets after a delay
         this.autoRemovePaidTickets();
+
+        // Re-apply status filter (keep current selection in effect)
+        try {
+            const sel = document.getElementById('status-filter');
+            if (sel) sel.dispatchEvent(new Event('change'));
+        } catch(_) {}
     }
 
     async loadBaysData() {
@@ -1651,7 +1657,7 @@ class AdminPanel {
                     this.loadUsersData();
                     break;
             }
-        }, 30000);
+        }, 3000);
     }
 
     formatCurrency(amount) {

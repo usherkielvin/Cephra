@@ -122,14 +122,14 @@ if ($conn && isset($_SESSION['admin_username'])) {
                     <div class="current-time" id="current-time"></div>
                     <div class="header-quick">
                         <button class="header-link header-lang" type="button" title="Language">
-                            <i class="fa-solid fa-language"></i>
-                            <span>EN</span>
+                            <span>ENG</span>
                         </button>
                         <div id="langMenu" class="lang-dropdown">
-                            <div class="lang-item" data-lang="EN">🇬🇧 English</div>
-                            <div class="lang-item" data-lang="PH">🇵🇭 Filipino</div>
-                            <div class="lang-item" data-lang="ES">🇪🇸 Español</div>
-                            <div class="lang-item" data-lang="ZH">🇨🇳 中文 (Chinese)</div>
+                            <div class="lang-item" data-lang="EN">English</div>
+                            <div class="lang-item" data-lang="PH">Filipino</div>
+                            <div class="lang-item" data-lang="CEB">Bisaya</div>
+                            <div class="lang-item" data-lang="ES">Español</div>
+                            <div class="lang-item" data-lang="ZH">中文 (Chinese)</div>
                         </div>
                     </div>
                 </div>
@@ -197,19 +197,16 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <button class="btn btn-primary" onclick="refreshQueue()">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
-                        <button class="btn btn-success" onclick="autoAssignWaitingTickets()">
-                            <i class="fas fa-magic"></i> Auto-Assign Waiting
-                        </button>
                     </div>
                 </div>
                 <div class="queue-container">
                     <div class="queue-filters">
                         <select id="status-filter">
                             <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
                             <option value="Waiting">Waiting</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="Charging">Charging</option>
+                            <option value="Complete">Complete</option>
                         </select>
                         <select id="service-filter">
                             <option value="">All Services</option>
@@ -280,12 +277,12 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <table class="users-table" id="users-table">
                             <thead>
                                 <tr>
-                                    <th>Username</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Email</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
+                                    <th id="th-users-username">Username</th>
+                                    <th id="th-users-firstname">First Name</th>
+                                    <th id="th-users-lastname">Last Name</th>
+                                    <th id="th-users-email">Email</th>
+                                    <th id="th-users-created">Created</th>
+                                    <th id="th-users-actions">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="users-tbody">
@@ -397,12 +394,12 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <table class="users-table" id="staff-table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
+                                    <th id="th-staff-name">Name</th>
+                                    <th id="th-staff-username">Username</th>
+                                    <th id="th-staff-email">Email</th>
+                                    <th id="th-staff-status">Status</th>
+                                    <th id="th-staff-created">Created</th>
+                                    <th id="th-staff-actions">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="staff-tbody">
@@ -550,22 +547,37 @@ if ($conn && isset($_SESSION['admin_username'])) {
                 EN: {
                     'nav-dashboard':'Dashboard','nav-queue':'Queue Management','nav-bays':'Charging Bays','nav-users':'User Management','nav-staff':'Staff Management','nav-analytics':'Analytics','nav-transactions':'Transaction History','nav-settings':'Settings','nav-logout':'Logout',
                         'queue-header':'Queue Management','bays-header':'Charging Bays Management','users-header':'User Management','analytics-header':'Analytics & Reports','transactions-header':'Transaction History','staff-header':'Staff Management','settings-header':'System Settings',
-                        'th-tx-ticket':'Ticket','th-tx-user':'User','th-tx-kwh':'kWh','th-tx-total':'Total','th-tx-datetime':'Date and Time','th-tx-reference':'Reference'
+                    'th-tx-ticket':'Ticket','th-tx-user':'User','th-tx-kwh':'kWh','th-tx-total':'Total','th-tx-datetime':'Date and Time','th-tx-reference':'Reference',
+                    'th-users-username':'Username','th-users-firstname':'First Name','th-users-lastname':'Last Name','th-users-email':'Email','th-users-created':'Created','th-users-actions':'Actions',
+                    'th-staff-name':'Name','th-staff-username':'Username','th-staff-email':'Email','th-staff-status':'Status','th-staff-created':'Created','th-staff-actions':'Actions'
                 },
+                CEB: {
+                        'nav-dashboard':'Dashboard','nav-queue':'Pagdumala sa Pila','nav-bays':'Mga Bay sa Charging','nav-users':'Pagdumala sa User','nav-staff':'Pagdumala sa Staff','nav-analytics':'Analitika','nav-transactions':'Kasaysayan sa Transaksiyon','nav-settings':'Mga Setting','nav-logout':'Gawas',
+                        'queue-header':'Pagdumala sa Pila','bays-header':'Pagdumala sa mga Charging Bay','users-header':'Pagdumala sa User','analytics-header':'Analitika ug mga Report','transactions-header':'Kasaysayan sa Transaksiyon','staff-header':'Pagdumala sa Staff','settings-header':'Mga Setting',
+                    'th-tx-ticket':'Tiket','th-tx-user':'Tig-gamit','th-tx-kwh':'kWh','th-tx-total':'Kinatibuk-an','th-tx-datetime':'Petsa ug Oras','th-tx-reference':'Referencia',
+                    'th-users-username':'Username','th-users-firstname':'Ngalan','th-users-lastname':'Apelyido','th-users-email':'Email','th-users-created':'Gibuhat','th-users-actions':'Aksyon',
+                    'th-staff-name':'Ngalan','th-staff-username':'Username','th-staff-email':'Email','th-staff-status':'Status','th-staff-created':'Gibuhat','th-staff-actions':'Aksyon'
+                    },
                 PH: {
                     'nav-dashboard':'Dashboard','nav-queue':'Pamamahala ng Pila','nav-bays':'Mga Charging Bay','nav-users':'Pamamahala ng User','nav-staff':'Pamamahala ng Staff','nav-analytics':'Analytics','nav-transactions':'Kasaysayan ng Transaksyon','nav-settings':'Mga Setting',
                         'nav-logout':'Logout','queue-header':'Pamamahala ng Pila','bays-header':'Pamamahala ng Charging Bay','users-header':'Pamamahala ng User','analytics-header':'Analytics at Ulat','transactions-header':'Kasaysayan ng Transaksyon','staff-header':'Pamamahala ng Staff','settings-header':'Mga Setting',
-                        'th-tx-ticket':'Ticket','th-tx-user':'User','th-tx-kwh':'kWh','th-tx-total':'Kabuuan','th-tx-datetime':'Petsa at Oras','th-tx-reference':'Sanggunian'
+                    'th-tx-ticket':'Ticket','th-tx-user':'User','th-tx-kwh':'kWh','th-tx-total':'Kabuuan','th-tx-datetime':'Petsa at Oras','th-tx-reference':'Sanggunian',
+                    'th-users-username':'Username','th-users-firstname':'Pangalan','th-users-lastname':'Apelyido','th-users-email':'Email','th-users-created':'Nagawa','th-users-actions':'Mga Gawain',
+                    'th-staff-name':'Pangalan','th-staff-username':'Username','th-staff-email':'Email','th-staff-status':'Katayuan','th-staff-created':'Nagawa','th-staff-actions':'Mga Gawain'
                 },
                 ES: {
                     'nav-dashboard':'Panel','nav-queue':'Gestión de Cola','nav-bays':'Bahías de Carga','nav-users':'Gestión de Usuarios','nav-staff':'Gestión de Personal','nav-analytics':'Analítica','nav-transactions':'Historial de Transacciones','nav-settings':'Configuración',
                         'nav-logout':'Salir','queue-header':'Gestión de Cola','bays-header':'Gestión de Bahías de Carga','users-header':'Gestión de Usuarios','analytics-header':'Analítica y Reportes','transactions-header':'Historial de Transacciones','staff-header':'Gestión de Personal','settings-header':'Configuración',
-                        'th-tx-ticket':'Ticket','th-tx-user':'Usuario','th-tx-kwh':'kWh','th-tx-total':'Total','th-tx-datetime':'Fecha y Hora','th-tx-reference':'Referencia'
+                    'th-tx-ticket':'Ticket','th-tx-user':'Usuario','th-tx-kwh':'kWh','th-tx-total':'Total','th-tx-datetime':'Fecha y Hora','th-tx-reference':'Referencia',
+                    'th-users-username':'Usuario','th-users-firstname':'Nombre','th-users-lastname':'Apellido','th-users-email':'Correo','th-users-created':'Creado','th-users-actions':'Acciones',
+                    'th-staff-name':'Nombre','th-staff-username':'Usuario','th-staff-email':'Correo','th-staff-status':'Estado','th-staff-created':'Creado','th-staff-actions':'Acciones'
                     },
-                    ZH: {
+                ZH: {
                         'nav-dashboard':'仪表盘','nav-queue':'队列管理','nav-bays':'充电车位','nav-users':'用户管理','nav-staff':'员工管理','nav-analytics':'数据分析','nav-transactions':'交易记录','nav-settings':'系统设置','nav-logout':'退出',
                         'queue-header':'队列管理','bays-header':'充电车位管理','users-header':'用户管理','analytics-header':'数据分析与报表','transactions-header':'交易记录','staff-header':'员工管理','settings-header':'系统设置',
-                        'th-tx-ticket':'票号','th-tx-user':'用户','th-tx-kwh':'千瓦时','th-tx-total':'总计','th-tx-datetime':'日期时间','th-tx-reference':'参考号'
+                    'th-tx-ticket':'票号','th-tx-user':'用户','th-tx-kwh':'千瓦时','th-tx-total':'总计','th-tx-datetime':'日期时间','th-tx-reference':'参考号',
+                    'th-users-username':'用户名','th-users-firstname':'名','th-users-lastname':'姓','th-users-email':'邮箱','th-users-created':'创建时间','th-users-actions':'操作',
+                    'th-staff-name':'姓名','th-staff-username':'用户名','th-staff-email':'邮箱','th-staff-status':'状态','th-staff-created':'创建时间','th-staff-actions':'操作'
                 }
             };
 
@@ -647,6 +659,50 @@ if ($conn && isset($_SESSION['admin_username'])) {
             applyBtn?.addEventListener('click', ()=>{ menu.style.display='none'; applyFilters(); });
             cancelBtn?.addEventListener('click', ()=>{ menu.style.display='none'; });
             document.addEventListener('click', ()=>{ if(menu) menu.style.display='none'; });
+        })();
+    </script>
+    <script>
+        // Queue Management: status filter (Pending, Waiting, Charging, Complete)
+        (function(){
+            const statusSel = document.getElementById('status-filter');
+            const tbody = document.getElementById('queue-tbody');
+            if (!statusSel || !tbody) return;
+
+            function normalize(v){
+                const x = (v||'').toLowerCase().trim();
+                if (x === 'completed') return 'complete';
+                if (x === 'processing' || x === 'in progress') return 'charging';
+                return x;
+            }
+            function rowStatus(tr){
+                // Primary: status column
+                const statusCell = tr.children[4];
+                let s = normalize(statusCell ? statusCell.textContent : '');
+                if (s) return s;
+                // Fallback: scan entire row text
+                const txt = (tr.textContent||'').toLowerCase();
+                if (txt.includes('pending')) return 'pending';
+                if (txt.includes('waiting')) return 'waiting';
+                if (txt.includes('charging') || txt.includes('in progress') || txt.includes('processing')) return 'charging';
+                if (txt.includes('complete') || txt.includes('completed')) return 'complete';
+                return '';
+            }
+            function applyStatusFilter() {
+                const value = normalize(statusSel.value || '');
+                Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                    if (tr.classList.contains('loading')) return;
+                    const statusText = rowStatus(tr);
+                    const show = !value || statusText === value;
+                    tr.style.display = show ? '' : 'none';
+                });
+            }
+
+            statusSel.addEventListener('change', applyStatusFilter);
+            // Re-apply filter whenever table rows are refreshed
+            const observer = new MutationObserver(applyStatusFilter);
+            observer.observe(tbody, { childList: true });
+            // Initial
+            applyStatusFilter();
         })();
     </script>
 </body>
