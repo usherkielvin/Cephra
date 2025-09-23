@@ -451,10 +451,19 @@ public class PayPop extends javax.swing.JPanel {
             
             if (currentTicket != null && !currentTicket.isEmpty()) {
                 // Set payment method to Cash in the database
-                cephra.Database.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Cash");
+                boolean success = cephra.Database.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Cash");
                 
-                // Mark payment as cash payment in the system
-                cephra.Admin.Utilities.QueueBridge.markPaymentPaid(currentTicket);
+                if (success) {
+                    // Refresh admin table to show the updated payment status
+                    try {
+                        cephra.Admin.Utilities.QueueBridge.reloadFromDatabase();
+                    } catch (Exception e) {
+                        System.err.println("Error refreshing admin table after cash payment: " + e.getMessage());
+                    }
+                }
+                
+                // For cash payments, do NOT mark as paid automatically
+                // Admin will manually mark as paid after receiving cash
             }
             
             // Clear any pending PayPop state since payment is completed

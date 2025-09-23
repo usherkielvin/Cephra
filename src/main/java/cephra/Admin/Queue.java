@@ -34,8 +34,40 @@ public class Queue extends javax.swing.JPanel {
         JTableHeader header = queTab.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         
-        // Register the queue table model so other modules can add rows
-        cephra.Admin.Utilities.QueueBridge.registerModel((DefaultTableModel) queTab.getModel());
+        // Create a custom table model that makes only Action and Payment columns editable
+        DefaultTableModel originalModel = (DefaultTableModel) queTab.getModel();
+        DefaultTableModel customModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Only allow editing of Action and Payment columns
+                String columnName = getColumnName(column);
+                return "Action".equals(columnName) || "Payment".equals(columnName);
+            }
+            
+            @Override
+            public void setValueAt(Object value, int row, int column) {
+                // Only allow setting values for Action and Payment columns
+                String columnName = getColumnName(column);
+                if ("Action".equals(columnName) || "Payment".equals(columnName)) {
+                    super.setValueAt(value, row, column);
+                }
+                // Ignore all other column edits
+            }
+        };
+        
+        // Copy column names from original model
+        for (int i = 0; i < originalModel.getColumnCount(); i++) {
+            customModel.addColumn(originalModel.getColumnName(i));
+        }
+        
+        // Set the custom model
+        queTab.setModel(customModel);
+        
+        // Make the table non-editable by default
+        queTab.setDefaultEditor(Object.class, null);
+        
+        // Register the custom model so other modules can add rows
+        cephra.Admin.Utilities.QueueBridge.registerModel(customModel);
         
         // Setup Action column with an invisible button that shows text "Proceed"
         // Delay setup to ensure table model is ready
@@ -218,16 +250,41 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     return;
                 }
                 if ("Waiting".equalsIgnoreCase(status)) {
-                    boolean assigned = false;
-                    try { 
-                        assigned = tryAssignToAnyAvailableBay(ticket); 
-                    } catch (Throwable t) { 
-                        System.err.println("Queue: assign attempt failed: " + t.getMessage()); 
-                    }
-                    if (assigned) {
-                        setTableStatusToChargingByTicket(ticket);
+                    // Get customer name for popup
+                    String customerName = String.valueOf(queTab.getValueAt(editingRow, Math.min(1, queTab.getColumnCount()-1)));
+                    
+                    // Show popup dialog to user (bay number will be determined after assignment)
+                    boolean userConfirmed = cephra.Phone.Popups.ProceedToBay.showProceedDialog(ticket, "TBD", customerName);
+                    
+                    if (userConfirmed) {
+                        // User confirmed, proceed with bay assignment
+                        boolean assigned = false;
+                        try { 
+                            assigned = tryAssignToAnyAvailableBay(ticket); 
+                        } catch (Throwable t) { 
+                            System.err.println("Queue: assign attempt failed: " + t.getMessage()); 
+                        }
+                        if (assigned) {
+                            setTableStatusToChargingByTicket(ticket);
+                            // Update database status to Charging
+                            try {
+                                cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Charging");
+                                
+                                // Get the assigned bay number and show it to user
+                                String assignedBayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
+                                if (assignedBayNumber != null) {
+                                    // Show the actual bay number to user (no confirmation needed)
+                                    cephra.Phone.Popups.ProceedToBay.showProceedDialog(ticket, assignedBayNumber, customerName, false);
+                                }
+                            } catch (Exception ex) {
+                                System.err.println("Queue: Error updating database status to Charging: " + ex.getMessage());
+                            }
+                        } else {
+                            Queue.this.showBayUnavailableDialog(ticket);
+                        }
                     } else {
-                        Queue.this.showBayUnavailableDialog(ticket);
+                        // User cancelled, ticket remains in Waiting status
+                        System.out.println("User cancelled proceeding to bay for ticket: " + ticket);
                     }
                     updateStatusCounters();
                     return;
@@ -471,10 +528,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 queTab.revalidate();
                 queTab.updateUI();
                 
-                DefaultTableModel currentModel = (DefaultTableModel) queTab.getModel();
-                queTab.setModel(new DefaultTableModel());
-                queTab.setModel(currentModel);
-                
+                // Re-setup columns after data refresh
                 setupActionColumn();
                 setupTicketColumn();
                 
@@ -692,7 +746,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             } else {
                 fastButtons[i].setText("");
                 fastButtons[i].setVisible(true);
-                fastButtons[i].setForeground(new java.awt.Color(255,0,0));
+                fastButtons[i].setForeground(new java.awt.Color(0, 147, 73)); // Green for Fast charging (bays 1-3)
             }
         }
     }
@@ -850,14 +904,23 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                 String ticketId = value == null ? "" : String.valueOf(value).trim();
                 label.setText(ticketId);
                 
-                if (ticketId.contains("P") && (ticketId.startsWith("FCHP") || ticketId.startsWith("NCHP"))) {
-                    label.setForeground(new java.awt.Color(220, 20, 60));
-                    label.setFont(label.getFont().deriveFont(Font.BOLD));
+                // Handle row selection highlighting
+                if (isSelected) {
+                    label.setBackground(table.getSelectionBackground());
+                    label.setForeground(table.getSelectionForeground());
                 } else {
-                    label.setForeground(new java.awt.Color(0, 0, 0));
-                    label.setFont(label.getFont().deriveFont(Font.PLAIN));
+                    label.setBackground(table.getBackground());
+                    // Set text color based on ticket type
+                    if (ticketId.contains("P") && (ticketId.startsWith("FCHP") || ticketId.startsWith("NCHP"))) {
+                        label.setForeground(new java.awt.Color(220, 20, 60));
+                        label.setFont(label.getFont().deriveFont(Font.BOLD));
+                    } else {
+                        label.setForeground(new java.awt.Color(0, 0, 0));
+                        label.setFont(label.getFont().deriveFont(Font.PLAIN));
+                    }
                 }
                 
+                label.setOpaque(true);
                 return label;
             }
         });
@@ -1193,7 +1256,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         fastslot1.setBackground(new java.awt.Color(255, 0, 0));
         fastslot1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        fastslot1.setForeground(new java.awt.Color(51, 51, 255));
+        fastslot1.setForeground(new java.awt.Color(0, 147, 73)); // Green for Fast charging (bays 1-3)
         fastslot1.setText("XXXXXX");
         fastslot1.setBorder(null);
         fastslot1.setBorderPainted(false);
@@ -1204,7 +1267,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         fastslot2.setBackground(new java.awt.Color(255, 0, 0));
         fastslot2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        fastslot2.setForeground(new java.awt.Color(0, 147, 73));
+        fastslot2.setForeground(new java.awt.Color(0, 147, 73)); // Green for Fast charging (bays 1-3)
         fastslot2.setText("XXXXXX");
         fastslot2.setToolTipText("");
         fastslot2.setBorder(null);
@@ -1216,7 +1279,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
 
         fastslot3.setBackground(new java.awt.Color(255, 0, 0));
         fastslot3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        fastslot3.setForeground(new java.awt.Color(0, 147, 73));
+        fastslot3.setForeground(new java.awt.Color(0, 147, 73)); // Green for Fast charging (bays 1-3)
         fastslot3.setText("XXXXXX");
         fastslot3.setBorder(null);
         fastslot3.setBorderPainted(false);
