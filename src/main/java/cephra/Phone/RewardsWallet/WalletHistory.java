@@ -823,7 +823,7 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         transactionDesc.setToolTipText("");
         transactionDesc.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         detailpanel.add(transactionDesc);
-        transactionDesc.setBounds(90, 138, 150, 16);
+        transactionDesc.setBounds(70, 138, 170, 16);
 
         refId.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         refId.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
