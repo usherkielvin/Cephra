@@ -1646,7 +1646,10 @@
         outline: 0;
         border-bottom: 2px solid transparent;
     }
-    #nav>ul>li>a:hover { border-bottom-color: #00c2ce; }
+    
+    #nav>ul>li>a:hover {
+        border-bottom-color: #00c2ce;
+    }
     
     #nav>ul>li.active>a,
     #nav>ul>li.current_page_item>a,
@@ -1843,18 +1846,29 @@
         font-size: 1.5em;
         color: #fff;
     }
+    
     #header h1 a#logo {
-        color:#ffffff;
-        text-decoration:none;
-        font-weight:800;
-        letter-spacing:.06em;
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 800;
+        letter-spacing: .06em;
     }
     /* With inline logo image in anchor, remove decorative circle */
-    #header h1 a#logo:before { content: none; }
-
+    
+    #header h1 a#logo:before {
+        content: none;
+    }
     /* Navigation bar header refinements */
-    #nav>ul { display:flex; gap:.6em; }
-    #nav>ul>li { padding: 0 0.6em; }
+    
+    #nav>ul {
+        display: flex;
+        gap: .6em;
+    }
+    
+    #nav>ul>li {
+        padding: 0 0.6em;
+    }
+    
     #nav>ul>li.active>a,
     #nav>ul>li.current_page_item>a,
     #nav>ul>li.active>span,
@@ -2023,7 +2037,8 @@
             -webkit-transition: -webkit-transform 0.5s ease;
             -ms-transition: -ms-transform 0.5s ease;
             transition: transform 0.5s ease;
-            background: #062635; /* solid dark, no gradients/images */
+            background: #062635;
+            /* solid dark, no gradients/images */
             background-image: none !important;
             box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
             display: block;
@@ -2091,7 +2106,8 @@
             -webkit-transition: -webkit-transform 0.5s ease;
             -ms-transition: -ms-transform 0.5s ease;
             transition: transform 0.5s ease;
-            background-color: #062635; /* solid dark to match navbar */
+            background-color: #062635;
+            /* solid dark to match navbar */
             box-shadow: none;
             display: block;
             height: 100%;
@@ -2116,7 +2132,10 @@
             font-size: 0.95em;
             letter-spacing: 0.075em;
         }
-        #navPanel .link:hover { background-color: #0e3a49; color: #ffffff; }
+        #navPanel .link:hover {
+            background-color: #0e3a49;
+            color: #ffffff;
+        }
         #navPanel .link:first-child {
             border-top: 0;
         }
