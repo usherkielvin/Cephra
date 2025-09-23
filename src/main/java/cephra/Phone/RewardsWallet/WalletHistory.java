@@ -688,7 +688,6 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         type = new javax.swing.JLabel();
         description = new javax.swing.JLabel();
         detailpanel = new javax.swing.JPanel();
-        headerLabel = new javax.swing.JLabel();
         transactionType = new javax.swing.JLabel();
         transactionAmount = new javax.swing.JLabel();
         transactionDesc = new javax.swing.JLabel();
@@ -698,6 +697,8 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         transactionDate = new javax.swing.JLabel();
         transactionTime = new javax.swing.JLabel();
         ok = new javax.swing.JToggleButton();
+        ICONdetailPanel = new javax.swing.JLabel();
+        headerLabel = new javax.swing.JLabel();
         profilebutton = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
@@ -797,80 +798,93 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         history1.setBounds(400, 160, 310, 80);
 
         detailpanel.setBackground(new java.awt.Color(255, 255, 255));
-        detailpanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        detailpanel.setOpaque(false);
         detailpanel.setLayout(null);
 
-        headerLabel.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        headerLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        headerLabel.setText("Transaction Details");
-        headerLabel.setForeground(new java.awt.Color(51, 51, 51));
-        detailpanel.add(headerLabel);
-        headerLabel.setBounds(20, 20, 226, 25);
-
+        transactionType.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         transactionType.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         transactionType.setText("Type");
         transactionType.setToolTipText("");
         transactionType.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(transactionType);
-        transactionType.setBounds(120, 65, 100, 16);
+        transactionType.setBounds(90, 85, 150, 16);
 
+        transactionAmount.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         transactionAmount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         transactionAmount.setText("Amount");
         transactionAmount.setToolTipText("");
         transactionAmount.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(transactionAmount);
-        transactionAmount.setBounds(120, 95, 100, 16);
+        transactionAmount.setBounds(95, 110, 150, 16);
 
+        transactionDesc.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         transactionDesc.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         transactionDesc.setText("Description");
         transactionDesc.setToolTipText("");
         transactionDesc.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         detailpanel.add(transactionDesc);
-        transactionDesc.setBounds(60, 120, 160, 16);
+        transactionDesc.setBounds(90, 138, 150, 16);
 
+        refId.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         refId.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         refId.setText("Reference");
         refId.setToolTipText("");
         detailpanel.add(refId);
-        refId.setBounds(120, 150, 100, 16);
+        refId.setBounds(90, 245, 150, 16);
 
+        newBalance.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         newBalance.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         newBalance.setText("Balance");
         newBalance.setToolTipText("");
         newBalance.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         detailpanel.add(newBalance);
-        newBalance.setBounds(120, 176, 100, 16);
+        newBalance.setBounds(90, 273, 150, 16);
 
+        username.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         username.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         username.setText("User");
         username.setToolTipText("");
         username.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(username);
-        username.setBounds(120, 204, 100, 16);
+        username.setBounds(90, 170, 150, 16);
 
+        transactionDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         transactionDate.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         transactionDate.setText("Date");
         transactionDate.setToolTipText("");
         transactionDate.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(transactionDate);
-        transactionDate.setBounds(120, 228, 100, 16);
+        transactionDate.setBounds(90, 195, 150, 16);
 
+        transactionTime.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         transactionTime.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         transactionTime.setText("Time");
         transactionTime.setToolTipText("");
         transactionTime.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         detailpanel.add(transactionTime);
-        transactionTime.setBounds(120, 256, 100, 16);
+        transactionTime.setBounds(90, 220, 150, 16);
 
         ok.setBorder(null);
         ok.setBorderPainted(false);
+        ok.setContentAreaFilled(false);
         ok.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 okActionPerformed(evt);
             }
         });
         detailpanel.add(ok);
-        ok.setBounds(20, 340, 220, 30);
+        ok.setBounds(20, 330, 220, 40);
+
+        ICONdetailPanel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/TransacWalletDetailsPanelPOP.png"))); // NOI18N
+        detailpanel.add(ICONdetailPanel);
+        ICONdetailPanel.setBounds(0, 0, 266, 410);
+
+        headerLabel.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        headerLabel.setForeground(new java.awt.Color(51, 51, 51));
+        headerLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        headerLabel.setText("Transaction Details");
+        detailpanel.add(headerLabel);
+        headerLabel.setBounds(10, 70, 226, 25);
 
         add(detailpanel);
         detailpanel.setBounds(430, 303, 266, 410);
@@ -1040,6 +1054,7 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
     }//GEN-LAST:event_closeButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel ICONdetailPanel;
     private javax.swing.JLabel amount;
     private javax.swing.JButton charge;
     private javax.swing.JButton closeButton;
