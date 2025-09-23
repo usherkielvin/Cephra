@@ -56,12 +56,12 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                     return;
                 }
                 
-                // Configure scroll pane behavior (keep scrollbars hidden like rewards)
-                historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                // Configure scroll pane behavior (allow vertical scrolling; hide bars visually)
+                historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
                 historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
                 historyScrollPane.getVerticalScrollBar().setUnitIncrement(16);
                 
-                // Hide scrollbars completely
+                // Hide vertical scrollbar (visuals) but keep scrolling behavior
                 if (historyScrollPane.getVerticalScrollBar() != null) {
                     historyScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
                 }
@@ -71,6 +71,21 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                 
                 historyScrollPane.setWheelScrollingEnabled(true);
                 historyScrollPane.putClientProperty("JScrollPane.fastWheelScrolling", Boolean.TRUE);
+                if (historyScrollPane.getViewport() != null) {
+                    historyScrollPane.getViewport().setOpaque(false);
+                }
+
+                // Add padding so content isn't clipped (reserve space on right & bottom)
+                if (history != null) {
+                    java.awt.Insets insets = history.getBorder() instanceof javax.swing.border.EmptyBorder
+                        ? ((javax.swing.border.EmptyBorder) history.getBorder()).getBorderInsets()
+                        : new java.awt.Insets(0, 0, 0, 0);
+                    int top = insets.top;
+                    int left = insets.left;
+                    int bottom = Math.max(12, insets.bottom);
+                    int right = Math.max(10, insets.right);
+                    history.setBorder(javax.swing.BorderFactory.createEmptyBorder(top, left, bottom, right));
+                }
                 
                 // Force a repaint to ensure everything displays correctly
                 historyScrollPane.revalidate();
@@ -651,7 +666,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         historyScrollPane.setBackground(new java.awt.Color(255, 255, 255));
         historyScrollPane.setBorder(null);
         historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         historyScrollPane.setOpaque(false);
 
         history.setBackground(new java.awt.Color(255, 255, 255));
