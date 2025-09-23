@@ -43,6 +43,13 @@ if ($conn && isset($_SESSION['admin_username'])) {
     <link rel="stylesheet" href="css/admin.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .lang-dropdown { position: absolute; right: 10px; top: 60px; background:#fff; color:#0b1e29; border:1px solid rgba(0,0,0,0.1); border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.15); min-width:160px; display:none; z-index:1000; }
+        .lang-dropdown.open { display:block; }
+        .lang-dropdown .lang-item { padding:10px 12px; cursor:pointer; display:flex; align-items:center; gap:8px; }
+        .lang-dropdown .lang-item:hover { background:#f1f7fa; }
+        .header-right { position: relative; }
+    </style>
 </head>
 <body>
     <div class="admin-container">
@@ -59,41 +66,41 @@ if ($conn && isset($_SESSION['admin_username'])) {
             <ul class="sidebar-menu">
                 <li class="active" data-panel="dashboard">
                     <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
+                    <span id="nav-dashboard">Dashboard</span>
                 </li>
                 <li data-panel="queue">
                     <i class="fas fa-list-alt"></i>
-                    <span>Queue Management</span>
+                    <span id="nav-queue">Queue Management</span>
                 </li>
                 <li data-panel="bays">
                     <i class="fas fa-battery-half"></i>
-                    <span>Charging Bays</span>
+                    <span id="nav-bays">Charging Bays</span>
                 </li>
                 <li data-panel="users">
                     <i class="fas fa-users"></i>
-                    <span>User Management</span>
+                    <span id="nav-users">User Management</span>
                 </li>
                 <li data-panel="staff">
                     <i class="fas fa-user-tie"></i>
-                    <span>Staff Management</span>
+                    <span id="nav-staff">Staff Management</span>
                 </li>
                 <li data-panel="analytics">
                     <i class="fas fa-chart-bar"></i>
-                    <span>Analytics</span>
+                    <span id="nav-analytics">Analytics</span>
                 </li>
                 <li data-panel="transactions">
                     <i class="fas fa-receipt"></i>
-                    <span>Transaction History</span>
+                    <span id="nav-transactions">Transaction History</span>
                 </li>
                 <li data-panel="settings">
                     <i class="fas fa-cog"></i>
-                    <span>Settings</span>
+                    <span id="nav-settings">Settings</span>
                 </li>
             </ul>
             <div class="sidebar-footer">
                 <a href="logout.php" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
+                    <span id="nav-logout">Logout</span>
                 </a>
             </div>
         </nav>
@@ -112,31 +119,18 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <i class="fas fa-desktop"></i>
                         <span>Monitor</span>
                     </button>
-                    <div class="status-indicator">
-                        <span class="status-dot online"></span>
-                        <span>System Online</span>
-                    </div>
                     <div class="current-time" id="current-time"></div>
-
-                    <!-- Quick actions aligned to the far right: Register | Login | EN | Download -->
                     <div class="header-quick">
-                        <a class="header-link" href="register.php">
-                            <i class="fa-solid fa-user-plus"></i>
-                            <span>Register</span>
-                        </a>
-                        <span class="header-sep">|</span>
-                        <a class="header-link" href="login.php">
-                            <i class="fa-solid fa-right-to-bracket"></i>
-                            <span>Login</span>
-                        </a>
-                        <span class="header-sep">|</span>
                         <button class="header-link header-lang" type="button" title="Language">
-                            <i class="fa-solid fa-language"></i>
-                            <span>EN</span>
+                            <span>ENG</span>
                         </button>
-                        <button class="header-link header-download" type="button" title="Download">
-                            <i class="fa-solid fa-download"></i>
-                        </button>
+                        <div id="langMenu" class="lang-dropdown">
+                            <div class="lang-item" data-lang="EN">English</div>
+                            <div class="lang-item" data-lang="PH">Filipino</div>
+                            <div class="lang-item" data-lang="CEB">Bisaya</div>
+                            <div class="lang-item" data-lang="ES">Español</div>
+                            <div class="lang-item" data-lang="ZH">中文 (Chinese)</div>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -198,13 +192,10 @@ if ($conn && isset($_SESSION['admin_username'])) {
             <!-- Queue Management Panel -->
             <div class="panel" id="queue-panel">
                 <div class="panel-header">
-                    <h2>Queue Management</h2>
+                    <h2 id="queue-header">Queue Management</h2>
                     <div class="panel-actions">
                         <button class="btn btn-primary" onclick="refreshQueue()">
                             <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                        <button class="btn btn-success" onclick="autoAssignWaitingTickets()">
-                            <i class="fas fa-magic"></i> Auto-Assign Waiting
                         </button>
                     </div>
                 </div>
@@ -212,10 +203,10 @@ if ($conn && isset($_SESSION['admin_username'])) {
                     <div class="queue-filters">
                         <select id="status-filter">
                             <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
                             <option value="Waiting">Waiting</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="Charging">Charging</option>
+                            <option value="Complete">Complete</option>
                         </select>
                         <select id="service-filter">
                             <option value="">All Services</option>
@@ -252,7 +243,7 @@ if ($conn && isset($_SESSION['admin_username'])) {
             <!-- Charging Bays Panel -->
             <div class="panel" id="bays-panel">
                 <div class="panel-header">
-                    <h2>Charging Bays Management</h2>
+                    <h2 id="bays-header">Charging Bays Management</h2>
                     <div class="panel-actions">
                         <button class="btn btn-primary" onclick="refreshBays()">
                             <i class="fas fa-sync-alt"></i> Refresh
@@ -271,7 +262,7 @@ if ($conn && isset($_SESSION['admin_username'])) {
             <!-- User Management Panel -->
             <div class="panel" id="users-panel">
                 <div class="panel-header">
-                    <h2>User Management</h2>
+                    <h2 id="users-header">User Management</h2>
                     <div class="panel-actions">
                         <button class="btn btn-primary" onclick="refreshUsers()">
                             <i class="fas fa-sync-alt"></i> Refresh
@@ -286,12 +277,12 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <table class="users-table" id="users-table">
                             <thead>
                                 <tr>
-                                    <th>Username</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Email</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
+                                    <th id="th-users-username">Username</th>
+                                    <th id="th-users-firstname">First Name</th>
+                                    <th id="th-users-lastname">Last Name</th>
+                                    <th id="th-users-email">Email</th>
+                                    <th id="th-users-created">Created</th>
+                                    <th id="th-users-actions">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="users-tbody">
@@ -309,7 +300,7 @@ if ($conn && isset($_SESSION['admin_username'])) {
             <!-- Analytics Panel -->
             <div class="panel" id="analytics-panel">
                 <div class="panel-header">
-                    <h2>Analytics & Reports</h2>
+                    <h2 id="analytics-header">Analytics & Reports</h2>
                     <div class="panel-actions">
                         <div id="analytics-range-selector"></div>
                     </div>
@@ -331,7 +322,7 @@ if ($conn && isset($_SESSION['admin_username'])) {
             <!-- Transaction History Panel -->
             <div class="panel" id="transactions-panel">
                 <div class="panel-header">
-                    <h2>Transaction History</h2>
+                    <h2 id="transactions-header">Transaction History</h2>
                     <div class="panel-actions">
                         <button class="btn btn-primary" onclick="refreshTransactions()">
                             <i class="fas fa-sync-alt"></i> Refresh
@@ -342,34 +333,35 @@ if ($conn && isset($_SESSION['admin_username'])) {
                     </div>
                 </div>
                 <div class="transactions-container">
-                    <div class="transactions-filters">
-                        <select id="transaction-type-filter">
-                            <option value="">All Transactions</option>
-                            <option value="payment">Payment Transactions</option>
-                            <option value="charging">Charging History</option>
-                        </select>
-                        <select id="transaction-status-filter">
-                            <option value="">All Status</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                        <input type="date" id="transaction-date-from" placeholder="From Date">
-                        <input type="date" id="transaction-date-to" placeholder="To Date">
-                        <button class="btn btn-primary" onclick="filterTransactions()">
-                            <i class="fas fa-filter"></i> Filter
-                        </button>
+                <div class="transactions-filters" style="position:relative; display:flex; gap:10px; align-items:center;">
+                    <input type="text" id="tx-search" placeholder="Search transactions..." style="flex:1; min-width:220px; padding:8px 10px; border:1px solid rgba(0,0,0,0.15); border-radius:8px;" />
+                    <button class="btn btn-primary" id="tx-filter-btn" type="button">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <div id="tx-filter-menu" class="tx-filter-menu" style="position:absolute; right:0; top:42px; background:#fff; color:#0b1e29; border:1px solid rgba(0,0,0,0.1); border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.15); padding:12px; display:none; z-index:1000; min-width:240px;">
+                        <div style="font-weight:600; margin-bottom:8px;">Filters</div>
+                        <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px;"><input type="checkbox" id="tx-fast" checked /> Fast Charging</label>
+                        <label style="display:flex; align-items:center; gap:8px; margin-bottom:10px;"><input type="checkbox" id="tx-normal" checked /> Normal Charging</label>
+                        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+                            <input type="date" id="tx-from" style="flex:1; padding:6px 8px; border:1px solid rgba(0,0,0,0.15); border-radius:8px;" />
+                            <input type="date" id="tx-to" style="flex:1; padding:6px 8px; border:1px solid rgba(0,0,0,0.15); border-radius:8px;" />
+                        </div>
+                        <div style="display:flex; gap:8px; justify-content:flex-end;">
+                            <button type="button" class="btn btn-secondary" id="tx-filter-cancel">Close</button>
+                            <button type="button" class="btn btn-primary" id="tx-filter-apply">Apply</button>
+                        </div>
                     </div>
+                </div>
                     <div class="transactions-table-container">
                         <table class="transactions-table" id="transactions-table">
                             <thead>
                                 <tr>
-                                    <th>Ticket</th>
-                                    <th>User</th>
-                                    <th>kWh</th>
-                                    <th>Total</th>
-                                    <th>Date and Time</th>
-                                    <th>Reference</th>
+                                    <th id="th-tx-ticket">Ticket</th>
+                                    <th id="th-tx-user">User</th>
+                                    <th id="th-tx-kwh">kWh</th>
+                                    <th id="th-tx-total">Total</th>
+                                    <th id="th-tx-datetime">Date and Time</th>
+                                    <th id="th-tx-reference">Reference</th>
                                 </tr>
                             </thead>
                             <tbody id="transactions-tbody">
@@ -387,7 +379,7 @@ if ($conn && isset($_SESSION['admin_username'])) {
             <!-- Staff Management Panel -->
             <div class="panel" id="staff-panel">
                 <div class="panel-header">
-                    <h2>Staff Management</h2>
+                    <h2 id="staff-header">Staff Management</h2>
                     <div class="panel-actions">
                         <button class="btn btn-primary" onclick="if (adminPanel) adminPanel.loadStaffData()">
                             <i class="fas fa-sync-alt"></i> Refresh
@@ -402,12 +394,12 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <table class="users-table" id="staff-table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
+                                    <th id="th-staff-name">Name</th>
+                                    <th id="th-staff-username">Username</th>
+                                    <th id="th-staff-email">Email</th>
+                                    <th id="th-staff-status">Status</th>
+                                    <th id="th-staff-created">Created</th>
+                                    <th id="th-staff-actions">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="staff-tbody">
@@ -425,7 +417,7 @@ if ($conn && isset($_SESSION['admin_username'])) {
             <!-- Settings Panel -->
             <div class="panel" id="settings-panel">
                 <div class="panel-header">
-                    <h2>System Settings</h2>
+                    <h2 id="settings-header">System Settings</h2>
                 </div>
                 <div class="settings-container">
                     <div class="settings-section">
@@ -545,5 +537,173 @@ if ($conn && isset($_SESSION['admin_username'])) {
     </div>
 
     <script src="js/admin-fixed.js?v=<?php echo time(); ?>"></script>
+    <script>
+        // Mini language panel logic
+        (function(){
+            const btn = document.querySelector('.header-lang');
+            const menu = document.getElementById('langMenu');
+            const label = btn ? btn.querySelector('span') : null;
+            const i18n = {
+                EN: {
+                    'nav-dashboard':'Dashboard','nav-queue':'Queue Management','nav-bays':'Charging Bays','nav-users':'User Management','nav-staff':'Staff Management','nav-analytics':'Analytics','nav-transactions':'Transaction History','nav-settings':'Settings','nav-logout':'Logout',
+                        'queue-header':'Queue Management','bays-header':'Charging Bays Management','users-header':'User Management','analytics-header':'Analytics & Reports','transactions-header':'Transaction History','staff-header':'Staff Management','settings-header':'System Settings',
+                    'th-tx-ticket':'Ticket','th-tx-user':'User','th-tx-kwh':'kWh','th-tx-total':'Total','th-tx-datetime':'Date and Time','th-tx-reference':'Reference',
+                    'th-users-username':'Username','th-users-firstname':'First Name','th-users-lastname':'Last Name','th-users-email':'Email','th-users-created':'Created','th-users-actions':'Actions',
+                    'th-staff-name':'Name','th-staff-username':'Username','th-staff-email':'Email','th-staff-status':'Status','th-staff-created':'Created','th-staff-actions':'Actions'
+                },
+                CEB: {
+                        'nav-dashboard':'Dashboard','nav-queue':'Pagdumala sa Pila','nav-bays':'Mga Bay sa Charging','nav-users':'Pagdumala sa User','nav-staff':'Pagdumala sa Staff','nav-analytics':'Analitika','nav-transactions':'Kasaysayan sa Transaksiyon','nav-settings':'Mga Setting','nav-logout':'Gawas',
+                        'queue-header':'Pagdumala sa Pila','bays-header':'Pagdumala sa mga Charging Bay','users-header':'Pagdumala sa User','analytics-header':'Analitika ug mga Report','transactions-header':'Kasaysayan sa Transaksiyon','staff-header':'Pagdumala sa Staff','settings-header':'Mga Setting',
+                    'th-tx-ticket':'Tiket','th-tx-user':'Tig-gamit','th-tx-kwh':'kWh','th-tx-total':'Kinatibuk-an','th-tx-datetime':'Petsa ug Oras','th-tx-reference':'Referencia',
+                    'th-users-username':'Username','th-users-firstname':'Ngalan','th-users-lastname':'Apelyido','th-users-email':'Email','th-users-created':'Gibuhat','th-users-actions':'Aksyon',
+                    'th-staff-name':'Ngalan','th-staff-username':'Username','th-staff-email':'Email','th-staff-status':'Status','th-staff-created':'Gibuhat','th-staff-actions':'Aksyon'
+                    },
+                PH: {
+                    'nav-dashboard':'Dashboard','nav-queue':'Pamamahala ng Pila','nav-bays':'Mga Charging Bay','nav-users':'Pamamahala ng User','nav-staff':'Pamamahala ng Staff','nav-analytics':'Analytics','nav-transactions':'Kasaysayan ng Transaksyon','nav-settings':'Mga Setting',
+                        'nav-logout':'Logout','queue-header':'Pamamahala ng Pila','bays-header':'Pamamahala ng Charging Bay','users-header':'Pamamahala ng User','analytics-header':'Analytics at Ulat','transactions-header':'Kasaysayan ng Transaksyon','staff-header':'Pamamahala ng Staff','settings-header':'Mga Setting',
+                    'th-tx-ticket':'Ticket','th-tx-user':'User','th-tx-kwh':'kWh','th-tx-total':'Kabuuan','th-tx-datetime':'Petsa at Oras','th-tx-reference':'Sanggunian',
+                    'th-users-username':'Username','th-users-firstname':'Pangalan','th-users-lastname':'Apelyido','th-users-email':'Email','th-users-created':'Nagawa','th-users-actions':'Mga Gawain',
+                    'th-staff-name':'Pangalan','th-staff-username':'Username','th-staff-email':'Email','th-staff-status':'Katayuan','th-staff-created':'Nagawa','th-staff-actions':'Mga Gawain'
+                },
+                ES: {
+                    'nav-dashboard':'Panel','nav-queue':'Gestión de Cola','nav-bays':'Bahías de Carga','nav-users':'Gestión de Usuarios','nav-staff':'Gestión de Personal','nav-analytics':'Analítica','nav-transactions':'Historial de Transacciones','nav-settings':'Configuración',
+                        'nav-logout':'Salir','queue-header':'Gestión de Cola','bays-header':'Gestión de Bahías de Carga','users-header':'Gestión de Usuarios','analytics-header':'Analítica y Reportes','transactions-header':'Historial de Transacciones','staff-header':'Gestión de Personal','settings-header':'Configuración',
+                    'th-tx-ticket':'Ticket','th-tx-user':'Usuario','th-tx-kwh':'kWh','th-tx-total':'Total','th-tx-datetime':'Fecha y Hora','th-tx-reference':'Referencia',
+                    'th-users-username':'Usuario','th-users-firstname':'Nombre','th-users-lastname':'Apellido','th-users-email':'Correo','th-users-created':'Creado','th-users-actions':'Acciones',
+                    'th-staff-name':'Nombre','th-staff-username':'Usuario','th-staff-email':'Correo','th-staff-status':'Estado','th-staff-created':'Creado','th-staff-actions':'Acciones'
+                    },
+                ZH: {
+                        'nav-dashboard':'仪表盘','nav-queue':'队列管理','nav-bays':'充电车位','nav-users':'用户管理','nav-staff':'员工管理','nav-analytics':'数据分析','nav-transactions':'交易记录','nav-settings':'系统设置','nav-logout':'退出',
+                        'queue-header':'队列管理','bays-header':'充电车位管理','users-header':'用户管理','analytics-header':'数据分析与报表','transactions-header':'交易记录','staff-header':'员工管理','settings-header':'系统设置',
+                    'th-tx-ticket':'票号','th-tx-user':'用户','th-tx-kwh':'千瓦时','th-tx-total':'总计','th-tx-datetime':'日期时间','th-tx-reference':'参考号',
+                    'th-users-username':'用户名','th-users-firstname':'名','th-users-lastname':'姓','th-users-email':'邮箱','th-users-created':'创建时间','th-users-actions':'操作',
+                    'th-staff-name':'姓名','th-staff-username':'用户名','th-staff-email':'邮箱','th-staff-status':'状态','th-staff-created':'创建时间','th-staff-actions':'操作'
+                }
+            };
+
+            function applyLang(code){
+                const dict = i18n[code] || i18n.EN;
+                Object.keys(dict).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = dict[id];
+                });
+            }
+            if (!btn || !menu) return;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.toggle('open');
+            });
+            document.addEventListener('click', () => menu.classList.remove('open'));
+            menu.addEventListener('click', (e) => {
+                const item = e.target.closest('.lang-item');
+                if (!item) return;
+                const code = item.getAttribute('data-lang') || 'EN';
+                if (label) label.textContent = code;
+                menu.classList.remove('open');
+                // Persist selection (optional)
+                try { localStorage.setItem('admin_lang', code); } catch(_) {}
+                applyLang(code);
+            });
+            // Load persisted selection
+            try {
+                const saved = localStorage.getItem('admin_lang');
+                if (saved && label) label.textContent = saved;
+                applyLang(saved || 'EN');
+            } catch(_) {}
+        })();
+    </script>
+    <script>
+        // Transactions search + filter mini panel
+        (function(){
+            const search = document.getElementById('tx-search');
+            const btn = document.getElementById('tx-filter-btn');
+            const menu = document.getElementById('tx-filter-menu');
+            const applyBtn = document.getElementById('tx-filter-apply');
+            const cancelBtn = document.getElementById('tx-filter-cancel');
+            const tbody = document.getElementById('transactions-tbody');
+            if (!tbody) return;
+
+            function getRowText(tr){
+                return Array.from(tr.querySelectorAll('td')).map(td => (td.textContent||'').toLowerCase()).join(' ');
+            }
+            function passType(tr){
+                // Transactions table does not have a service type column; infer from ticket prefix
+                const ticket = (tr.children[0]?.textContent||'').toUpperCase();
+                const fastOn = document.getElementById('tx-fast')?.checked;
+                const normalOn = document.getElementById('tx-normal')?.checked;
+                if (ticket.startsWith('FCH')) return !!fastOn;   // Fast Charging
+                if (ticket.startsWith('NCH')) return !!normalOn; // Normal Charging
+                // If unknown ticket format, don't filter it out
+                return true;
+            }
+            function passDate(tr){
+                const from = document.getElementById('tx-from')?.value;
+                const to = document.getElementById('tx-to')?.value;
+                const dateText = tr.children[4]?.textContent || '';
+                const d = new Date(dateText);
+                if (from && d < new Date(from)) return false;
+                if (to && d > new Date(to + 'T23:59:59')) return false;
+                return true;
+            }
+            function applyFilters(){
+                const q = (search?.value||'').toLowerCase();
+                Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                    if (tr.classList.contains('loading')) return;
+                    const show = getRowText(tr).includes(q) && passType(tr) && passDate(tr);
+                    tr.style.display = show ? '' : 'none';
+                });
+            }
+
+            search?.addEventListener('input', applyFilters);
+            btn?.addEventListener('click', (e)=>{ e.stopPropagation(); menu.style.display = (menu.style.display==='block'?'none':'block'); });
+            applyBtn?.addEventListener('click', ()=>{ menu.style.display='none'; applyFilters(); });
+            cancelBtn?.addEventListener('click', ()=>{ menu.style.display='none'; });
+            document.addEventListener('click', ()=>{ if(menu) menu.style.display='none'; });
+        })();
+    </script>
+    <script>
+        // Queue Management: status filter (Pending, Waiting, Charging, Complete)
+        (function(){
+            const statusSel = document.getElementById('status-filter');
+            const tbody = document.getElementById('queue-tbody');
+            if (!statusSel || !tbody) return;
+
+            function normalize(v){
+                const x = (v||'').toLowerCase().trim();
+                if (x === 'completed') return 'complete';
+                if (x === 'processing' || x === 'in progress') return 'charging';
+                return x;
+            }
+            function rowStatus(tr){
+                // Primary: status column
+                const statusCell = tr.children[4];
+                let s = normalize(statusCell ? statusCell.textContent : '');
+                if (s) return s;
+                // Fallback: scan entire row text
+                const txt = (tr.textContent||'').toLowerCase();
+                if (txt.includes('pending')) return 'pending';
+                if (txt.includes('waiting')) return 'waiting';
+                if (txt.includes('charging') || txt.includes('in progress') || txt.includes('processing')) return 'charging';
+                if (txt.includes('complete') || txt.includes('completed')) return 'complete';
+                return '';
+            }
+            function applyStatusFilter() {
+                const value = normalize(statusSel.value || '');
+                Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                    if (tr.classList.contains('loading')) return;
+                    const statusText = rowStatus(tr);
+                    const show = !value || statusText === value;
+                    tr.style.display = show ? '' : 'none';
+                });
+            }
+
+            statusSel.addEventListener('change', applyStatusFilter);
+            // Re-apply filter whenever table rows are refreshed
+            const observer = new MutationObserver(applyStatusFilter);
+            observer.observe(tbody, { childList: true });
+            // Initial
+            applyStatusFilter();
+        })();
+    </script>
 </body>
 </html>

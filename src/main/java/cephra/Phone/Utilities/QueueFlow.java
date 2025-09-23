@@ -253,6 +253,8 @@ public final class QueueFlow {
         // Get battery level first to determine priority
         final int initialBatteryPercent = cephra.Database.CephraDB.getUserBatteryLevel(customerName);
         
+        // Capacity is handled later by admin proceed; no need to check here
+        
         // If no ticket was pre-assigned, generate the next ID for the service with priority
         if (currentTicketId == null || currentTicketId.length() == 0) {
             currentTicketId = generatePriorityTicketIdForService(service, initialBatteryPercent);
@@ -261,7 +263,9 @@ public final class QueueFlow {
             updateCountersFromTicket(currentTicketId);
         }
         final String ticket = currentTicketId;
-        // Determine initial status based on battery level - priority tickets go to Waiting
+        // Determine initial status on creation from phone:
+        // - Priority (<20% battery): Waiting
+        // - Otherwise: Pending
         final String status = (initialBatteryPercent < 20) ? "Waiting" : "Pending";
         final String payment = "";
         final String action = "";

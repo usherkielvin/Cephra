@@ -107,7 +107,7 @@ public final class QueueBridge {
         int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
         ticketBattery.put(ticket, new BatteryInfo(userBatteryLevel, 40.0)); // 40kWh capacity
         
-        // Determine priority status - priority tickets go to Waiting
+        // Respect desired flow: Priority (<20%) -> Waiting; else keep provided status (usually Pending)
         String finalStatus = (userBatteryLevel < 20) ? "Waiting" : status;
         
         // Set this as the user's active ticket with correct service type

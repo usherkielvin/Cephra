@@ -66,8 +66,8 @@ try {
             $stmt = $db->query("SELECT COUNT(*) as count FROM queue_tickets WHERE status IN ('Waiting', 'Processing')");
             $stats['queue_count'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
             
-            // Active bays
-            $stmt = $db->query("SELECT COUNT(*) as count FROM charging_bays WHERE status = 'Occupied'");
+            // Active bays (derive from charging_grid)
+            $stmt = $db->query("SELECT COUNT(*) as count FROM charging_grid WHERE ticket_id IS NOT NULL");
             $stats['active_bays'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
             
             // Overall revenue (all time)
@@ -124,17 +124,24 @@ try {
             break;
 
         case 'bays':
-            // Get charging bays
+            // Get charging bays with effective status from charging_grid
             $stmt = $db->query("
-                SELECT 
-                    bay_number,
-                    bay_type,
-                    status,
-                    current_ticket_id,
-                    current_username,
-                    start_time
-                FROM charging_bays 
-                ORDER BY bay_number
+                SELECT
+                    cb.bay_number,
+                    cb.bay_type,
+                    CASE
+                        WHEN cb.status = 'Available'
+                             AND EXISTS (SELECT 1 FROM charging_grid cg
+                                         WHERE cg.bay_number = cb.bay_number
+                                           AND cg.ticket_id IS NOT NULL)
+                        THEN 'Occupied'
+                        ELSE cb.status
+                    END AS status,
+                    COALESCE(cb.current_ticket_id, (SELECT cg.ticket_id FROM charging_grid cg WHERE cg.bay_number = cb.bay_number LIMIT 1)) AS current_ticket_id,
+                    cb.current_username,
+                    cb.start_time
+                FROM charging_bays cb
+                ORDER BY cb.bay_number
             ");
             $bays = $stmt->fetchAll(PDO::FETCH_ASSOC);
             

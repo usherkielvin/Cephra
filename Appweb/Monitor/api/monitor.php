@@ -21,17 +21,24 @@ try {
         throw new Exception('Database connection failed');
     }
     
-    // Get bays data
+    // Get bays data with effective status using charging_grid tickets
     $stmt = $conn->query("
-        SELECT 
-            bay_number,
-            bay_type,
-            status,
-            current_username,
-            current_ticket_id,
-            start_time
-        FROM charging_bays 
-        ORDER BY bay_number
+        SELECT
+            cb.bay_number,
+            cb.bay_type,
+            CASE
+                WHEN cb.status = 'Available'
+                     AND EXISTS (SELECT 1 FROM charging_grid cg
+                                 WHERE cg.bay_number = cb.bay_number
+                                   AND cg.ticket_id IS NOT NULL)
+                THEN 'Occupied'
+                ELSE cb.status
+            END AS status,
+            cb.current_username,
+            COALESCE(cb.current_ticket_id, (SELECT cg.ticket_id FROM charging_grid cg WHERE cg.bay_number = cb.bay_number LIMIT 1)) AS current_ticket_id,
+            cb.start_time
+        FROM charging_bays cb
+        ORDER BY cb.bay_number
     ");
     $bays = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -47,6 +54,33 @@ try {
         ORDER BY created_at ASC
     ");
     $queue = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get waiting_grid (ordered by position/slot)
+    $stmt = $conn->query("
+        SELECT 
+            slot_number,
+            ticket_id,
+            username,
+            service_type,
+            initial_battery_level,
+            position_in_queue
+        FROM waiting_grid
+        ORDER BY COALESCE(position_in_queue, slot_number) ASC
+    ");
+    $waiting_grid = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get charging_grid (bay assignments)
+    $stmt = $conn->query("
+        SELECT 
+            bay_number,
+            ticket_id,
+            username,
+            service_type,
+            start_time
+        FROM charging_grid
+        ORDER BY bay_number
+    ");
+    $charging_grid = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Get recent activity (last 10 tickets)
     $stmt = $conn->query("
@@ -75,6 +109,8 @@ try {
     sendResponse(true, 'Monitor data loaded', [
         'bays' => $bays,
         'queue' => $queue,
+        'waiting_grid' => $waiting_grid,
+        'charging_grid' => $charging_grid,
         'recent_activity' => $recent_activity,
         'stats' => $stats
     ]);
