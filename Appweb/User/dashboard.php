@@ -415,7 +415,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 			.features-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				grid-template-columns: repeat(4, 1fr);
 				gap: 2rem;
 			}
 
@@ -522,6 +522,109 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				.feature-card {
 					padding: 1.5rem;
 				}
+			}
+
+			/* ============================================
+			   MAIN VEHICLE CARD STYLES
+			   ============================================ */
+
+			.main-vehicle-card {
+				background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%);
+				color: white;
+				position: relative;
+				overflow: hidden;
+				border-radius: 20px;
+				padding: 2.5rem;
+				box-shadow: 0 20px 40px rgba(0, 194, 206, 0.3);
+			}
+
+			.main-vehicle-content {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				position: relative;
+				z-index: 2;
+			}
+
+			.vehicle-info {
+				display: flex;
+				align-items: center;
+				gap: 2rem;
+			}
+
+			.feature-icon-large {
+				width: 80px;
+				height: 80px;
+				background: rgba(255, 255, 255, 0.2);
+				border-radius: 20px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 32px;
+				color: white;
+				backdrop-filter: blur(10px);
+			}
+
+			.vehicle-details {
+				flex: 1;
+			}
+
+			.vehicle-stats {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 1rem;
+				margin-top: 1rem;
+			}
+
+			.stat-item {
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+			}
+
+			.stat-label {
+				font-size: 0.9rem;
+				opacity: 0.8;
+				font-weight: 500;
+			}
+
+			.stat-value {
+				font-size: 1.1rem;
+				font-weight: 600;
+			}
+
+			.vehicle-actions {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				align-items: flex-end;
+			}
+
+			.quick-action-btn {
+				background: rgba(255, 255, 255, 0.2);
+				color: white;
+				border: 1px solid rgba(255, 255, 255, 0.3);
+				padding: 0.75rem 1.5rem;
+				border-radius: 25px;
+				cursor: pointer;
+				font-weight: 600;
+				transition: all 0.3s ease;
+				backdrop-filter: blur(10px);
+			}
+
+			.quick-action-btn:hover {
+				background: rgba(255, 255, 255, 0.3);
+				transform: translateY(-2px);
+			}
+
+			.vehicle-bg-pattern {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+				z-index: 1;
 			}
 
 			/* ============================================
@@ -1172,18 +1275,40 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 				<div class="features-grid">
 					<!-- Car Status Feature -->
-					<div class="feature-card">
-						<div class="feature-icon">
-							<i class="fas fa-car"></i>
+					<div class="feature-card main-vehicle-card" style="grid-column: span 4; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; position: relative; overflow: hidden;">
+						<div class="main-vehicle-content">
+							<div class="vehicle-info">
+								<div class="feature-icon-large">
+									<i class="fas fa-car"></i>
+								</div>
+								<div class="vehicle-details">
+									<h3 class="feature-title">Tesla Model 3</h3>
+									<div class="vehicle-stats">
+										<div class="stat-item">
+											<span class="stat-label">Status</span>
+											<span class="stat-value">Connected & Charging</span>
+										</div>
+										<div class="stat-item">
+											<span class="stat-label">Range</span>
+											<span class="stat-value">45 km</span>
+										</div>
+										<div class="stat-item">
+											<span class="stat-label">Time to Full</span>
+											<span class="stat-value">2h 15m</span>
+										</div>
+										<div class="stat-item">
+											<span class="stat-label">Battery</span>
+											<span class="stat-value">67%</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="vehicle-actions">
+								<a href="ChargingPage.php" class="feature-link">View Details →</a>
+								<button class="quick-action-btn" onclick="showChargingOptions()">Quick Charge</button>
+							</div>
 						</div>
-						<h3 class="feature-title">Tesla Model 3</h3>
-						<p class="feature-description">
-							<strong>Status:</strong> Connected & Charging<br>
-							<strong>Remaining Range:</strong> 45 km<br>
-							<strong>Time to Full:</strong> 2h 15m<br>
-							<strong>Battery Level:</strong> 67%
-						</p>
-						<a href="ChargingPage.php" class="feature-link">View Details →</a>
+						<div class="vehicle-bg-pattern"></div>
 					</div>
 
 					<!-- Battery Health Monitor -->
@@ -1216,6 +1341,21 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 						<a href="#" onclick="showRangeCalculator(); return false;" class="feature-link">Calculate Range →</a>
 					</div>
 
+					<!-- Estimated Cost -->
+					<div class="feature-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; position: relative; overflow: hidden;">
+						<div class="feature-icon" style="background: rgba(255, 255, 255, 0.2);">
+							<i class="fas fa-dollar-sign"></i>
+						</div>
+						<h3 class="feature-title">Estimated Cost</h3>
+						<p class="feature-description">
+							<strong>Normal Charge:</strong> ₱45.00<br>
+							<strong>Fast Charge:</strong> ₱75.00<br>
+							<strong>Monthly Savings:</strong> ₱1,250<br>
+							<strong>Green Points:</strong> 340 earned
+						</p>
+						<a href="#" onclick="showEstimatedCost(); return false;" class="feature-link" style="color: white;">View Details →</a>
+					</div>
+
 					<!-- Vehicle Diagnostics -->
 					<div class="feature-card">
 						<div class="feature-icon">
@@ -1231,35 +1371,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 						<a href="#" onclick="showDiagnostics(); return false;" class="feature-link">Run Diagnostics →</a>
 					</div>
 
-					<!-- Multi-Vehicle Management -->
-					<div class="feature-card">
-						<div class="feature-icon">
-							<i class="fas fa-cars"></i>
-						</div>
-						<h3 class="feature-title">Multi-Vehicle Management</h3>
-						<p class="feature-description">
-							<strong>Active Vehicles:</strong> 2 registered<br>
-							<strong>Primary:</strong> Tesla Model 3<br>
-							<strong>Secondary:</strong> Nissan Leaf<br>
-							<strong>Quick Switch:</strong> Available
-						</p>
-						<a href="#" onclick="showVehicleManager(); return false;" class="feature-link">Manage Vehicles →</a>
-					</div>
 
-					<!-- Payment Calculator -->
-					<div class="feature-card">
-						<div class="feature-icon">
-							<i class="fas fa-calculator"></i>
-						</div>
-						<h3 class="feature-title">Payment Calculator</h3>
-						<p class="feature-description">
-							<strong>Normal Charge:</strong> ₱150/session<br>
-							<strong>Fast Charge:</strong> ₱300/session<br>
-							<strong>Current Balance:</strong> ₱1,250<br>
-							<strong>Estimated Cost:</strong> ₱150-300
-						</p>
-						<a href="#" onclick="showPaymentCalculator(); return false;" class="feature-link">Calculate Cost →</a>
-					</div>
 				</div>
 			</div>
 		</section>
@@ -1494,6 +1606,10 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
                 function closeSupportModal() {
                     document.getElementById('supportModal').style.display = 'none';
+                }
+
+                function showEstimatedCost() {
+                    showDialog('Estimated Cost', 'View detailed cost breakdown for your charging sessions:\n\n• Normal Charge: ₱45.00 per session\n• Fast Charge: ₱75.00 per session\n• Monthly Savings: ₱1,250 (based on usage)\n• Green Points: 340 earned this month\n• Total Sessions: 12 completed\n• Energy Consumed: 45.2 kWh\n\nTrack your spending and maximize your savings with our cost analysis tools.');
                 }
 
                 function submitSchedule() {
