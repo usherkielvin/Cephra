@@ -709,6 +709,8 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
 
+        closeButton.setBorder(null);
+        closeButton.setBorderPainted(false);
         closeButton.setContentAreaFilled(false);
         closeButton.setFocusPainted(false);
         closeButton.setRequestFocusEnabled(false);
@@ -718,57 +720,19 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
             }
         });
         add(closeButton);
-        closeButton.setBounds(10, 60, 72, 30);
+        closeButton.setBounds(10, 60, 0, 30);
 
         mainHistoryContainer.setBackground(new java.awt.Color(255, 255, 255));
         mainHistoryContainer.setOpaque(false);
 
         historyScrollPane.setBackground(new java.awt.Color(255, 255, 255));
-        historyScrollPane.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 220, 220)));
+        historyScrollPane.setBorder(null);
         historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        historyScrollPane.setOpaque(true);
-        historyScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        
-        // Hide the scrollbar completely
-        JScrollBar verticalScrollBar = historyScrollPane.getVerticalScrollBar();
-        verticalScrollBar.setPreferredSize(new Dimension(0, 0));
-        verticalScrollBar.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
-            @Override
-            protected void configureScrollBarColors() {
-                this.thumbColor = new Color(0, 0, 0, 0); // Transparent thumb
-                this.trackColor = new Color(0, 0, 0, 0); // Transparent track
-            }
-            
-            @Override
-            protected JButton createDecreaseButton(int orientation) {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(0, 0));
-                return button;
-            }
-            
-            @Override
-            protected JButton createIncreaseButton(int orientation) {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(0, 0));
-                return button;
-            }
-            
-            @Override
-            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-                // Don't paint the track
-            }
-            
-            @Override
-            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
-                // Don't paint the thumb
-            }
-        });
+        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        historyScrollPane.setOpaque(false);
 
         historyPanel.setBackground(new java.awt.Color(255, 255, 255));
         historyPanel.setLayout(new javax.swing.BoxLayout(historyPanel, javax.swing.BoxLayout.Y_AXIS));
-        // Set preferred size to allow for scrolling when content exceeds visible area
-        historyPanel.setPreferredSize(new Dimension(308, Short.MAX_VALUE));
         historyScrollPane.setViewportView(historyPanel);
 
         javax.swing.GroupLayout mainHistoryContainerLayout = new javax.swing.GroupLayout(mainHistoryContainer);
@@ -795,6 +759,7 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         history1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
         history1.setLayout(null);
 
+        details.setBorder(null);
         details.setBorderPainted(false);
         details.setContentAreaFilled(false);
         details.addActionListener(new java.awt.event.ActionListener() {

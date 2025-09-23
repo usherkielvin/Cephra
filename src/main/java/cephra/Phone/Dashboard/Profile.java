@@ -146,7 +146,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(paymethod);
-        paymethod.setBounds(40, 410, 290, 40);
+        paymethod.setBounds(30, 610, 290, 40);
 
         back.setBorder(null);
         back.setBorderPainted(false);
@@ -194,7 +194,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(logout);
-        logout.setBounds(40, 520, 290, 50);
+        logout.setBounds(40, 490, 290, 50);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);
@@ -240,7 +240,7 @@ public class Profile extends javax.swing.JPanel {
             }
         });
         add(Help);
-        Help.setBounds(40, 460, 290, 40);
+        Help.setBounds(40, 420, 290, 40);
 
         Frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/PfpDashboardFrame.png"))); // NOI18N
         add(Frame);

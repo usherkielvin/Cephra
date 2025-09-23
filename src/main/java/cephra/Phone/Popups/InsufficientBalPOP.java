@@ -26,44 +26,44 @@ public class InsufficientBalPOP extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        TopUpBTN = new javax.swing.JButton();
+        InsufficientCurrBal = new javax.swing.JLabel();
+        InsufficientRequiredAmount = new javax.swing.JLabel();
+        InsufficientShortage = new javax.swing.JLabel();
+        EXT = new javax.swing.JButton();
         ICON = new javax.swing.JLabel();
 
         setLayout(null);
 
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        add(jButton1);
-        jButton1.setBounds(60, 293, 210, 35);
+        TopUpBTN.setBorder(null);
+        TopUpBTN.setBorderPainted(false);
+        TopUpBTN.setContentAreaFilled(false);
+        add(TopUpBTN);
+        TopUpBTN.setBounds(60, 293, 210, 35);
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel1.setText("jLabel1");
-        add(jLabel1);
-        jLabel1.setBounds(180, 169, 100, 16);
+        InsufficientCurrBal.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        InsufficientCurrBal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        InsufficientCurrBal.setText("jLabel1");
+        add(InsufficientCurrBal);
+        InsufficientCurrBal.setBounds(180, 169, 100, 16);
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("jLabel2");
-        add(jLabel2);
-        jLabel2.setBounds(180, 193, 100, 16);
+        InsufficientRequiredAmount.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        InsufficientRequiredAmount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        InsufficientRequiredAmount.setText("jLabel2");
+        add(InsufficientRequiredAmount);
+        InsufficientRequiredAmount.setBounds(180, 193, 100, 16);
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel3.setText("jLabel3");
-        add(jLabel3);
-        jLabel3.setBounds(180, 217, 100, 16);
+        InsufficientShortage.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        InsufficientShortage.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        InsufficientShortage.setText("jLabel3");
+        add(InsufficientShortage);
+        InsufficientShortage.setBounds(180, 217, 100, 16);
 
-        jButton2.setBorder(null);
-        jButton2.setBorderPainted(false);
-        jButton2.setContentAreaFilled(false);
-        add(jButton2);
-        jButton2.setBounds(260, 30, 30, 30);
+        EXT.setBorder(null);
+        EXT.setBorderPainted(false);
+        EXT.setContentAreaFilled(false);
+        add(EXT);
+        EXT.setBounds(260, 30, 30, 30);
 
         ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/InsufficientBalPOP.png"))); // NOI18N
         add(ICON);
@@ -72,11 +72,11 @@ public class InsufficientBalPOP extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton EXT;
     private javax.swing.JLabel ICON;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel InsufficientCurrBal;
+    private javax.swing.JLabel InsufficientRequiredAmount;
+    private javax.swing.JLabel InsufficientShortage;
+    private javax.swing.JButton TopUpBTN;
     // End of variables declaration//GEN-END:variables
 }

@@ -47,11 +47,11 @@ public class adsPhone extends javax.swing.JPanel {
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
         add(jButton1);
-        jButton1.setBounds(305, 10, 40, 30);
+        jButton1.setBounds(260, 70, 30, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/adsPhone.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(10, 0, 350, 450);
+        jLabel1.setBounds(60, 70, 230, 300);
     }// </editor-fold>//GEN-END:initComponents
 
     private void setupCloseAction() {
