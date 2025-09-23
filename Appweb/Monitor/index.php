@@ -215,8 +215,9 @@
         .toolbar { 
             margin-left:auto; 
             display:flex; 
-            gap:10px; 
+            gap:12px; 
             align-items:center; 
+            flex-wrap: wrap;
         }
         .btn { 
             background:transparent; 
@@ -240,9 +241,14 @@
             gap:8px; 
             cursor:pointer; 
             font-size:13px; 
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: visible;
+            padding: 4px 6px;
+            border-radius: 8px;
         }
         .toolbar label input[type="checkbox"] { 
-            margin:0; 
+            margin:0 8px 0 0; 
             accent-color: var(--accent);
         }
         .pager { 
@@ -271,8 +277,11 @@
             opacity: 0;
             transition: transform 0.4s ease, opacity 0.4s ease;
             text-align: center;
-            max-width: 80%;
+            max-width: 95%;
             border: 2px solid var(--bg);
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
         
         .announcement-toast.show {
@@ -494,11 +503,9 @@
         <span class="logo"><img src="../Admin/images/MONU.png" alt="Cephra" /></span>
         Cephra Live Monitor <span id="ts" class="ts"></span>
         <div class="toolbar">
+            <label class="muted" style="white-space:nowrap;"><input type="checkbox" id="announcerChk" checked /> Bay Announcer</label>
             <button class="btn" id="fullscreenBtn">Fullscreen Bays</button>
             <button class="btn" id="themeBtn">Toggle Theme</button>
-            <label class="muted"><input type="checkbox" id="announcerChk" checked /> Bay Announcer</label>
-            <label class="muted"><input type="checkbox" id="announceNewChk" checked /> Announce New Tickets</label>
-            <button class="btn" id="installBtn" style="display:none;">Install</button>
         </div>
     </h1>
 
@@ -530,24 +537,8 @@
 
 
     <script>
-        // PWA install and SW registration
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const btn = document.getElementById('installBtn');
-            btn.style.display = 'inline-block';
-            btn.onclick = async () => {
-                btn.style.display = 'none';
-                deferredPrompt.prompt();
-                await deferredPrompt.userChoice.catch(()=>{});
-                deferredPrompt = null;
-            };
-        });
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('../User/sw.js').catch(()=>{});
-        }
-
+        // Simplified header: only Bay Announcer toggle retained
+        
         let currentQueue = [];
         let lastBays = {};
         let lastQueueTickets = new Set(); // Track tickets that were already announced
@@ -561,20 +552,24 @@
         const reconnectDelay = 3000; // 3 seconds
         let isFirstLoad = true; // Flag to track first data load
 
+        // Toolbar simplified to single Bay Announcer toggle
+        // Theme toggle
         function setTheme(light) {
             document.body.classList.toggle('light', !!light);
         }
-
         document.getElementById('themeBtn').onclick = () => setTheme(!document.body.classList.contains('light'));
-        
+
         // Fullscreen functionality
         let isFullscreen = false;
-        document.getElementById('fullscreenBtn').onclick = () => {
-            isFullscreen = !isFullscreen;
-            document.body.classList.toggle('fullscreen-mode', isFullscreen);
-            document.getElementById('fullscreenBtn').textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Bays';
-        };
-
+        const fsBtn = document.getElementById('fullscreenBtn');
+        if (fsBtn) {
+            fsBtn.onclick = () => {
+                isFullscreen = !isFullscreen;
+                document.body.classList.toggle('fullscreen-mode', isFullscreen);
+                fsBtn.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Bays';
+            };
+        }
+        
         // WebSocket connection
         function connectWebSocket() {
             // Get the current hostname and use it to build the WebSocket URL
@@ -589,10 +584,10 @@
             socket.addEventListener('open', (event) => {
                 console.log('WebSocket connected');
                 isConnected = true;
-                reconnectAttempts = 0;
+                // connected
                 clearInterval(reconnectInterval);
                 reconnectInterval = null;
-                updateConnectionStatus(true);
+                // updateConnectionStatus(true); // Removed
             });
             
             // Listen for messages
@@ -634,7 +629,7 @@
             socket.addEventListener('close', (event) => {
                 console.log('WebSocket disconnected');
                 isConnected = false;
-                updateConnectionStatus(false);
+                // updateConnectionStatus(false); // Removed
                 socket = null;
                 
                 // Attempt to reconnect if not already trying
@@ -651,7 +646,7 @@
             socket.addEventListener('error', (event) => {
                 console.error('WebSocket error', event);
                 isConnected = false;
-                updateConnectionStatus(false);
+                // updateConnectionStatus(false); // Removed
             });
         }
         
@@ -668,13 +663,7 @@
             }
         }
         
-        function updateConnectionStatus(connected) {
-            const statusElement = document.getElementById('connectionStatus');
-            if (statusElement) {
-                statusElement.className = connected ? 'connection-status connected' : 'connection-status disconnected';
-                statusElement.title = connected ? 'Real-time connection active' : 'Connection lost, using fallback';
-            }
-        }
+        // Connection status indicator removed
         
         let pollingInterval = null;
         
@@ -740,7 +729,13 @@
 
         function renderBays(bays) {
             const wrap = document.getElementById('bays');
-            wrap.innerHTML = bays.map(b => {
+            const bayMap = {};
+            (bays || []).forEach(b => { bayMap[b.bay_number] = b; });
+
+            const bayIds = ['Bay-1','Bay-2','Bay-3','Bay-4','Bay-5','Bay-6','Bay-7','Bay-8'];
+            wrap.innerHTML = bayIds.map(id => {
+                const fallbackType = (id === 'Bay-1' || id === 'Bay-2' || id === 'Bay-3') ? 'Fast' : 'Normal';
+                const b = bayMap[id] || { bay_number: id, bay_type: fallbackType, status: 'Available', current_ticket_id: '', current_username: '' };
                 const ticket = b.current_ticket_id || '';
                 const user = b.current_username || '';
                 const type = b.bay_type ? ` <small class=\"muted\">(${b.bay_type})</small>` : '';
@@ -1008,8 +1003,7 @@
             // Debug log to help troubleshoot
             console.log('Waiting ticket announcement:', message, {ticketId});
             
-            // Only announce if the announceNewChk is checked
-            if (document.getElementById('announceNewChk').checked) {
+            if (document.getElementById('announcerChk').checked) {
                 speak(message);
             }
         }
@@ -1021,8 +1015,7 @@
             // Debug log to help troubleshoot
             console.log('Ticket done announcement:', message, {ticketId, bayNumber});
             
-            // Only announce if the announceNewChk is checked
-            if (document.getElementById('announceNewChk').checked) {
+            if (document.getElementById('announcerChk').checked) {
                 speak(message);
             }
         }
@@ -1034,43 +1027,17 @@
             // Debug log to help troubleshoot
             console.log('Ticket assigned announcement:', message, {ticketId, bayNumber});
             
-            // Only announce if the announceNewChk is checked
-            if (document.getElementById('announceNewChk').checked) {
+            if (document.getElementById('announcerChk').checked) {
                 speak(message);
             }
         }
         
 
-        // Add connection status indicator to the toolbar
-        const toolbar = document.querySelector('.toolbar');
-        const connectionStatus = document.createElement('div');
-        connectionStatus.id = 'connectionStatus';
-        connectionStatus.className = 'connection-status';
-        connectionStatus.title = 'Connecting...';
-        toolbar.appendChild(connectionStatus);
+        // Removed connection status indicator
         
-        // Add CSS for connection status indicator
-        const style = document.createElement('style');
-        style.textContent = `
-            .connection-status {
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background-color: #888;
-                margin-left: 10px;
-                transition: background-color 0.3s ease;
-                position: relative;
-            }
-            .connection-status.connected {
-                background-color: #0c3;
-                box-shadow: 0 0 5px #0c3;
-            }
-            .connection-status.disconnected {
-                background-color: #f55;
-                box-shadow: 0 0 5px #f55;
-            }
-        `;
-        document.head.appendChild(style);
+        // Render placeholders immediately and fetch a snapshot for faster first paint
+        renderBays([]);
+        fetchSnapshot();
         
         // Initialize connection
         if ('WebSocket' in window) {
