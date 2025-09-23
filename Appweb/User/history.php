@@ -72,109 +72,130 @@ if ($conn) {
 				</div>
 			</header>
 
-			<div id="main-wrapper">
-				<div class="wrapper style1">
-					<div class="inner">
-						<section class="container box feature2">
-							<header class="major">
-								<h2>Transaction History</h2>
-							</header>
+			<!-- History Section -->
+			<section class="history-section" style="padding: 100px 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+				<div class="container">
+					<div class="section-header" style="text-align: center; margin-bottom: 60px;">
+						<h2 class="section-title" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Transaction History</h2>
+						<p class="section-description" style="font-size: 1.2rem; color: rgba(26, 32, 44, 0.8); max-width: 600px; margin: 0 auto;">View and manage your payment transaction records</p>
+					</div>
 
-							<!-- Search and Filter Section -->
-							<div class="section-header">
-								<h3>Transaction History</h3>
-								<p>Search and filter your transaction records</p>
-							</div>
-							<div class="search-filter-section">
-								<div class="search-bar">
-									<input type="text" id="searchInput" class="search-input" placeholder="Search transactions...">
-									<i class="fas fa-search search-icon"></i>
-								</div>
-								<div class="filter-controls">
-									<select id="statusFilter" class="filter-select">
-										<option value="all">All Status</option>
-										<option value="completed">Completed</option>
-										<option value="pending">Pending</option>
-										<option value="failed">Failed</option>
-									</select>
-									<select id="methodFilter" class="filter-select">
-										<option value="all">All Methods</option>
-										<option value="cash">Cash</option>
-										<option value="gcash">GCash</option>
-									</select>
-									<button id="clearFilters" class="filter-button">Clear</button>
-								</div>
-							</div>
+					<!-- Search and Filter Section -->
+					<div class="search-filter-section" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); margin-bottom: 2rem;">
+						<div class="search-bar" style="position: relative; flex: 1; max-width: 400px; margin-bottom: 1rem;">
+							<input type="text" id="searchInput" class="search-input" placeholder="Search transactions..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; background: rgba(248, 250, 252, 0.5);">
+							<i class="fas fa-search search-icon" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: rgba(26, 32, 44, 0.5); font-size: 0.9rem;"></i>
+						</div>
+						<div class="filter-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+							<select id="statusFilter" class="filter-select" style="padding: 0.75rem 1rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; background: rgba(248, 250, 252, 0.5); color: #1a202c; transition: all 0.3s ease; min-width: 120px;">
+								<option value="all">All Status</option>
+								<option value="completed">Completed</option>
+								<option value="pending">Pending</option>
+								<option value="failed">Failed</option>
+							</select>
+							<select id="methodFilter" class="filter-select" style="padding: 0.75rem 1rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; background: rgba(248, 250, 252, 0.5); color: #1a202c; transition: all 0.3s ease; min-width: 120px;">
+								<option value="all">All Methods</option>
+								<option value="cash">Cash</option>
+								<option value="gcash">GCash</option>
+							</select>
+							<button id="clearFilters" class="filter-button" style="background: transparent; color: #00c2ce; border: 2px solid #00c2ce; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">Clear Filters</button>
+						</div>
+					</div>
 
-							<!-- History Table -->
-							<div class="history-table-container">
-								<?php if (empty($payments)): ?>
-									<div class="no-data">
-										<h3>No Transactions Yet</h3>
-										<p>You haven't made any payments. Start by linking your account.</p>
-									</div>
-								<?php else: ?>
-									<table class="history-table">
-										<thead>
-											<tr>
-												<th>Transaction ID</th>
-												<th>Status</th>
-												<th>Amount</th>
-												<th>Method</th>
-												<th>Reference</th>
-												<th>Date</th>
-												<th>Action</th>
-											</tr>
-										</thead>
-										<tbody>
-											<?php foreach ($payments as $p): ?>
-												<?php
-													$when = $p['processed_at'] ?? '';
-													$whenFmt = $when;
-													try {
-														$dt = new DateTime($when);
-														$whenFmt = $dt->format('M d, Y h:i A');
-													} catch (Exception $e) {}
-												?>
-												<tr data-status="<?php echo htmlspecialchars(strtolower($p['transaction_status'] ?? '')); ?>" data-method="<?php echo htmlspecialchars(strtolower($p['payment_method'] ?? '')); ?>" data-date="<?php echo htmlspecialchars($p['processed_at'] ?? ''); ?>">
-													<td><?php echo htmlspecialchars($p['ticket_id']); ?></td>
-													<td>
-														<span class="status-badge status-<?php echo htmlspecialchars(strtolower($p['transaction_status'] ?? '')); ?>">
-															<?php echo htmlspecialchars($p['transaction_status'] ?? ''); ?>
-														</span>
-													</td>
-													<td>₱<?php echo number_format((float)($p['amount'] ?? 0), 2); ?></td>
-													<td><?php echo htmlspecialchars($p['payment_method'] ?? ''); ?></td>
-													<td><?php echo htmlspecialchars($p['reference_number'] ?? ''); ?></td>
-													<td><?php echo htmlspecialchars($whenFmt); ?></td>
-													<td>
-														<button class="action-button" onclick="showDetails('<?php echo htmlspecialchars($p['ticket_id']); ?>')">
-															<i class="fas fa-eye"></i>
-														</button>
-													</td>
-												</tr>
-											<?php endforeach; ?>
-										</tbody>
-									</table>
-								<?php endif; ?>
+					<!-- History Table -->
+					<div class="history-table-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); overflow-y: auto; overflow-x: hidden; position: relative; max-height: 600px;">
+						<style>
+							.history-table-container::-webkit-scrollbar {
+								width: 8px;
+							}
+							.history-table-container::-webkit-scrollbar-track {
+								background: rgba(26, 32, 44, 0.1);
+								border-radius: 4px;
+							}
+							.history-table-container::-webkit-scrollbar-thumb {
+								background: #00c2ce;
+								border-radius: 4px;
+							}
+							.history-table-container::-webkit-scrollbar-thumb:hover {
+								background: #009cb4;
+							}
+							/* Natural table sizing */
+							.history-table {
+								width: 100%;
+								min-width: unset;
+							}
+							/* Mobile responsiveness */
+							@media (max-width: 600px) {
+								.history-table-container {
+									padding: 1rem;
+									border-radius: 15px;
+									max-height: 500px;
+								}
+								.history-table {
+									font-size: 0.8rem;
+								}
+								.history-table th,
+								.history-table td {
+									padding: 0.75rem 0.5rem;
+									white-space: nowrap;
+								}
+								.history-table th {
+									font-size: 0.75rem;
+								}
+							}
+						</style>
+						<?php if (empty($payments)): ?>
+							<div class="no-data" style="text-align: center; padding: 3rem 2rem; color: rgba(26, 32, 44, 0.7);">
+								<h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #1a202c;">No Transactions Yet</h3>
+								<p style="font-size: 1rem; margin: 0;">You haven't made any payments. Start by linking your account.</p>
 							</div>
+						<?php else: ?>
+							<table class="history-table" style="width: 100%; border-collapse: collapse; margin: 0; font-size: 0.9rem; background: transparent; table-layout: auto;">
+								<thead>
+									<tr>
+										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Transaction ID</th>
+										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Status</th>
+										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Amount</th>
+										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Method</th>
+										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Reference</th>
+										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Date</th>
+										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php foreach ($payments as $payment): ?>
+										<tr data-status="<?php echo strtolower($payment['transaction_status']); ?>" data-method="<?php echo strtolower($payment['payment_method']); ?>">
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['ticket_id']); ?></td>
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">
+												<span class="status-badge status-<?php echo strtolower($payment['transaction_status']); ?>">
+													<?php echo htmlspecialchars(ucfirst($payment['transaction_status'])); ?>
+												</span>
+											</td>
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">₱<?php echo number_format($payment['amount'], 2); ?></td>
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars(ucfirst($payment['payment_method'])); ?></td>
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['reference_number'] ?: 'N/A'); ?></td>
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars(date('M d, Y H:i', strtotime($payment['processed_at']))); ?></td>
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">
+												<button class="action-button" onclick="showDetails('<?php echo htmlspecialchars($payment['ticket_id']); ?>')" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; border: none; border-radius: 6px; padding: 0.5rem 0.75rem; cursor: pointer; transition: all 0.3s ease; font-size: 0.8rem;">View</button>
+											</td>
+										</tr>
+									<?php endforeach; ?>
+								</tbody>
+							</table>
+						<?php endif; ?>
+					</div>
+				</div>
+			</section>
 
-							<!-- Transaction Details Modal -->
-							<div id="transactionModal" class="modal">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h3>Transaction Details</h3>
-										<button class="modal-close" onclick="closeModal()">
-											<i class="fas fa-times"></i>
-										</button>
-									</div>
-									<div class="modal-body" id="modalBody">
-										<!-- Transaction details will be loaded here -->
-									</div>
-								</div>
-							</div>
-
-						</section>
+			<!-- Transaction Details Modal -->
+			<div id="transactionModal" class="modal">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3>Transaction Details</h3>
+						<button class="modal-close" onclick="closeModal()">&times;</button>
+					</div>
+					<div class="modal-body" id="modalBody">
+						<!-- Transaction details will be populated here -->
 					</div>
 				</div>
 			</div>
@@ -225,6 +246,7 @@ if ($conn) {
 				</div>
 			</footer>
 		</div>
+
 		<!-- Scripts -->
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/jquery.dropotron.min.js"></script>

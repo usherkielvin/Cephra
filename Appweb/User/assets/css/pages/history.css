@@ -1,4 +1,4 @@
-/* Transaction History Page Styles - Consistent with index.php design */
+/* Transaction History Page Styles - Consistent with profile.php design */
 
 
 /* Main container styling */
@@ -12,9 +12,10 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin-top: 2rem;
     margin-bottom: 3rem;
-    overflow: hidden;
-    max-height: 500px;
     overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 500px;
+    scroll-behavior: smooth;
 }
 
 
@@ -37,23 +38,24 @@ header.major h2 {
     margin-bottom: 2rem;
     padding: 1.5rem;
     border-radius: 12px;
-    color: #1a1a2e;
+    color: #1a202c;
 }
 
-.section-header h3 {
-    margin: 0 0 0.5rem 0;
+.section-title {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #1a1a2e;
-    text-shadow: 0 2px 4px rgba(0, 194, 206, 0.1);
-    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-.section-header p {
-    margin: 0;
-    font-size: 1rem;
-    opacity: 0.9;
-    color: rgba(26, 26, 46, 0.8);
+.section-description {
+    font-size: 1.2rem;
+    color: rgba(26, 32, 44, 0.8);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 
@@ -263,13 +265,13 @@ header.major h2 {
 .no-data {
     text-align: center;
     padding: 3rem 2rem;
-    color: rgba(26, 26, 46, 0.7);
+    color: rgba(26, 32, 44, 0.7);
 }
 
 .no-data h3 {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
-    color: #1a1a2e;
+    color: #1a202c;
 }
 
 .no-data p {
@@ -358,7 +360,7 @@ header.major h2 {
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(26, 26, 46, 0.1);
+    border-bottom: 1px solid rgba(26, 32, 44, 0.1);
 }
 
 .detail-row:last-child {
@@ -367,12 +369,12 @@ header.major h2 {
 
 .detail-label {
     font-weight: 600;
-    color: #1a1a2e;
+    color: #1a202c;
     font-size: 0.9rem;
 }
 
 .detail-value {
-    color: rgba(26, 26, 46, 0.8);
+    color: rgba(26, 32, 44, 0.8);
     font-size: 0.9rem;
     text-align: right;
     flex: 1;
