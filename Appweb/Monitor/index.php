@@ -262,16 +262,17 @@
             transform: translateX(-50%) translateY(100px);
             background: var(--accent);
             color: var(--bg);
-            padding: 12px 20px;
+            padding: 15px 25px;
             border-radius: 10px;
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 18px;
+            font-weight: 600;
             box-shadow: var(--shadow-lg);
             z-index: 1000;
             opacity: 0;
             transition: transform 0.4s ease, opacity 0.4s ease;
             text-align: center;
             max-width: 80%;
+            border: 2px solid var(--bg);
         }
         
         .announcement-toast.show {
@@ -496,6 +497,7 @@
             <button class="btn" id="fullscreenBtn">Fullscreen Bays</button>
             <button class="btn" id="themeBtn">Toggle Theme</button>
             <label class="muted"><input type="checkbox" id="announcerChk" checked /> Bay Announcer</label>
+            <label class="muted"><input type="checkbox" id="announceNewChk" checked /> Announce New Tickets</label>
             <button class="btn" id="installBtn" style="display:none;">Install</button>
         </div>
     </h1>
@@ -557,6 +559,7 @@
         let reconnectInterval = null;
         const maxReconnectAttempts = 5;
         const reconnectDelay = 3000; // 3 seconds
+        let isFirstLoad = true; // Flag to track first data load
 
         function setTheme(light) {
             document.body.classList.toggle('light', !!light);
@@ -597,6 +600,23 @@
                 try {
                     const data = JSON.parse(event.data);
                     if (data && !data.error) {
+                        // Initialize lastQueueTickets with current queue tickets on first load
+                        if (lastQueueTickets.size === 0 && data.queue && data.queue.length > 0) {
+                            // Add all current tickets to the set to prevent re-announcing
+                            data.queue.forEach(ticket => {
+                                if (ticket.ticket_id) {
+                                    lastQueueTickets.add(ticket.ticket_id);
+                                    // Only announce if this is not the first load
+                                    if (!isFirstLoad) {
+                                        announceWaitingTicket(ticket.ticket_id);
+                                    }
+                                }
+                            });
+                        }
+                        
+                        // After first load, set flag to false
+                        isFirstLoad = false;
+                        
                         handleAlerts(data);
                         renderBays(data.bays || []);
                         currentQueue = data.queue || [];
@@ -681,6 +701,23 @@
                 const res = await fetch('api/monitor.php', { cache: 'no-store' });
                 const data = await res.json();
                 if (data && !data.error) {
+                    // Initialize lastQueueTickets with current queue tickets on first load
+                    if (lastQueueTickets.size === 0 && data.queue && data.queue.length > 0) {
+                        // Add all current tickets to the set to prevent re-announcing
+                        data.queue.forEach(ticket => {
+                            if (ticket.ticket_id) {
+                                lastQueueTickets.add(ticket.ticket_id);
+                                // Only announce if this is not the first load
+                                if (!isFirstLoad) {
+                                    announceWaitingTicket(ticket.ticket_id);
+                                }
+                            }
+                        });
+                    }
+                    
+                    // After first load, set flag to false
+                    isFirstLoad = false;
+                    
                     handleAlerts(data);
                     renderBays(data.bays || []);
                     currentQueue = data.queue || [];
@@ -745,6 +782,9 @@
         document.getElementById('prevPage').onclick = () => { if (page > 1) { page--; renderQueuePage(); } };
         document.getElementById('nextPage').onclick = () => { const total = Math.max(1, Math.ceil(currentQueue.length / pageSize)); if (page < total) { page++; renderQueuePage(); } };
 
+        // Track tickets that were previously in bays
+        let ticketsInBays = new Map(); // Map of ticketId -> bayNumber
+        
         function handleAlerts(data) {
             const bays = data.bays || [];
             const currentQueue = data.queue || [];
@@ -758,6 +798,7 @@
                 if (prev !== now) {
                     // Parse previous state for TTS announcement
                     let prevStatus = '';
+                    let prevTicketId = '';
                     let newStatus = b.status || '';
                     let newTicketId = b.current_ticket_id || '';
                     let newUsername = b.current_username || '';
@@ -765,6 +806,21 @@
                     if (prev) {
                         const prevParts = prev.split('|');
                         prevStatus = prevParts[0] || '';
+                        prevTicketId = prevParts[1] || '';
+                    }
+                    
+                    // Track tickets in bays
+                    if (prevTicketId && !newTicketId && prevStatus === 'occupied' && newStatus === 'available') {
+                        // Ticket is done charging
+                        announceTicketDone(prevTicketId, b.bay_number);
+                    }
+                    
+                    // Update ticket tracking
+                    if (prevTicketId) {
+                        ticketsInBays.delete(prevTicketId);
+                    }
+                    if (newTicketId) {
+                        ticketsInBays.set(newTicketId, b.bay_number);
                     }
                     
                     // Only announce if we have a previous state and status actually changed
@@ -773,7 +829,8 @@
                     }
                 }
                 lastBays[key] = now;
-            });
+             });
+            
             
             // Check for new waiting tickets
             currentQueue.forEach(ticket => {
@@ -782,42 +839,58 @@
                     // New ticket in waiting queue
                     announceWaitingTicket(ticketId);
                     lastQueueTickets.add(ticketId);
+                    // Ensure the announcement is visible even if the user hasn't charged yet
+                    console.log('New waiting ticket detected:', ticketId);
                 }
             });
             
-            // Clean up tickets that are no longer in waiting queue
+            // Check for tickets that moved from waiting to a bay
             const currentTicketIds = new Set(currentQueue.map(t => t.ticket_id).filter(id => id));
             for (let ticketId of lastQueueTickets) {
                 if (!currentTicketIds.has(ticketId)) {
+                    // Ticket is no longer in waiting queue
+                    // Check if it's now in a bay
+                    const bayNumber = ticketsInBays.get(ticketId);
+                    if (bayNumber) {
+                        // Ticket moved from waiting to a bay
+                        announceTicketAssigned(ticketId, bayNumber);
+                    }
                     lastQueueTickets.delete(ticketId);
                 }
             }
         }
 
         // Improved text-to-speech functionality with better voice selection and audio feedback
+        // Function to show a visual toast notification
+        function showToast(text) {
+            // Create visual feedback for announcement
+            const announcementElement = document.createElement('div');
+            announcementElement.className = 'announcement-toast';
+            announcementElement.textContent = text;
+            document.body.appendChild(announcementElement);
+            
+            // Animate in
+            setTimeout(() => {
+                announcementElement.classList.add('show');
+            }, 10);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                announcementElement.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(announcementElement);
+                }, 500);
+            }, 4000);
+        }
+        
         function speak(text) {
+            // Always show the toast notification
+            showToast(text);
+            
+            // Only speak if announcer is enabled
             if (document.getElementById('announcerChk').checked && 'speechSynthesis' in window) {
                 // Stop any current speech
                 speechSynthesis.cancel();
-                
-                // Create visual feedback for announcement
-                const announcementElement = document.createElement('div');
-                announcementElement.className = 'announcement-toast';
-                announcementElement.textContent = text;
-                document.body.appendChild(announcementElement);
-                
-                // Animate in
-                setTimeout(() => {
-                    announcementElement.classList.add('show');
-                }, 10);
-                
-                // Remove after animation completes
-                setTimeout(() => {
-                    announcementElement.classList.remove('show');
-                    setTimeout(() => {
-                        document.body.removeChild(announcementElement);
-                    }, 500);
-                }, 4000);
                 
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.9;  // Slightly faster but still clear
@@ -908,9 +981,9 @@
                 
                 // Create clear announcements for each status change
                 if (newStatus.toLowerCase() === 'available') {
-                    message = `Bay ${bayNumber} is now available`;
+                    message = ` ${bayNumber} is now available`;
                 } else if (newStatus.toLowerCase() === 'occupied') {
-                    message = `Bay ${bayNumber} is now occupied`;
+                    message = ` ${bayNumber} is now occupied`;
                     if (username) {
                         message += ` by ${username}`;
                     }
@@ -918,7 +991,7 @@
                         message += ` with ticket ${ticketId}`;
                     }
                 } else if (newStatus.toLowerCase() === 'maintenance') {
-                    message = `Bay ${bayNumber} is now under maintenance`;
+                    message = ` ${bayNumber} is now under maintenance`;
                 }
                 
                 // Debug log to help troubleshoot
@@ -930,12 +1003,41 @@
         
         function announceWaitingTicket(ticketId) {
             // Simple announcement: just the ticket number
-            const message = `Ticket ${ticketId}`;
+            const message = `Ticket ${ticketId} is now waiting`;
             
             // Debug log to help troubleshoot
             console.log('Waiting ticket announcement:', message, {ticketId});
             
-            speak(message);
+            // Only announce if the announceNewChk is checked
+            if (document.getElementById('announceNewChk').checked) {
+                speak(message);
+            }
+        }
+        
+        function announceTicketDone(ticketId, bayNumber) {
+            // Announcement for when a ticket is done charging
+            const message = `Ticket ${ticketId} is done charging at Bay ${bayNumber}`;
+            
+            // Debug log to help troubleshoot
+            console.log('Ticket done announcement:', message, {ticketId, bayNumber});
+            
+            // Only announce if the announceNewChk is checked
+            if (document.getElementById('announceNewChk').checked) {
+                speak(message);
+            }
+        }
+        
+        function announceTicketAssigned(ticketId, bayNumber) {
+            // Announcement for when a ticket is assigned to a bay
+            const message = `Ticket ${ticketId} is now assigned to Bay ${bayNumber}`;
+            
+            // Debug log to help troubleshoot
+            console.log('Ticket assigned announcement:', message, {ticketId, bayNumber});
+            
+            // Only announce if the announceNewChk is checked
+            if (document.getElementById('announceNewChk').checked) {
+                speak(message);
+            }
         }
         
 
