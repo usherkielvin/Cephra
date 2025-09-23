@@ -66,6 +66,10 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Make header span full width and remove right padding so actions hit the edge */
+/* Revert container to default sizing defined above */
+/* (No header-specific container override) */
+
 .header.scrolled {
     background: rgba(255, 255, 255, 0.98);
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
@@ -106,6 +110,9 @@ body {
     gap: 2rem;
     align-items: center;
 }
+
+/* Revert layout: keep default spacing without forcing edge alignment */
+/* (No flex push rules) */
 
 .nav-link {
     color: var(--text-secondary);

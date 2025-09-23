@@ -41,14 +41,23 @@
                 <nav class="nav">
                     <ul class="nav-list">
                         <li><a href="#charging" class="nav-link">Charging</a></li>
-                        <li><a href="#platforms" class="nav-link">Platforms</a></li>
-                        <li><a href="#support" class="nav-link">Support</a></li>
-                        <li><a href="#analysis" class="nav-link">Analytics</a></li>
+                        <li><a href="#link-car" class="nav-link">Link Car</a></li>
+                        <li><a href="#rewards" class="nav-link">Rewards</a></li>
+                        <li><a href="#history" class="nav-link">History</a></li>
                     </ul>
                 </nav>
 
                 <!-- Auth and Feature Buttons -->
                 <div class="header-actions">
+                    <!-- Auth Buttons (left within the right group) -->
+                    <div class="auth-buttons">
+                        <a href="Register_Panel.php" class="nav-link auth-link">Register</a>
+                        <a href="login.php" class="nav-link auth-link">Login</a>
+                    </div>
+
+                    <!-- Separator -->
+                    <span class="header-separator">|</span>
+
                     <!-- Language Selector -->
                     <div class="language-selector">
                         <button class="language-btn" id="languageBtn">
@@ -62,7 +71,7 @@
                         </div>
                     </div>
 
-                    <!-- Download App Button -->
+                    <!-- Download App Button (furthest right) -->
                     <div class="download-app">
                         <button class="download-btn" id="downloadBtn">
                             <i class="fas fa-download"></i>
@@ -77,15 +86,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Separator -->
-                    <span class="header-separator">|</span>
-
-                    <!-- Auth Buttons -->
-                    <div class="auth-buttons">
-                        <a href="Register_Panel.php" class="nav-link auth-link">Register</a>
-                        <a href="login.php" class="nav-link auth-link">Login</a>
-                    </div>
                 </div>
 
                 <!-- Mobile Menu -->
@@ -98,13 +98,13 @@
                                     <a href="#charging" class="mobile-nav-link">Charging</a>
                                 </li>
                                 <li class="mobile-nav-item">
-                                    <a href="#platforms" class="mobile-nav-link">Platforms</a>
+                                    <a href="#link-car" class="mobile-nav-link">Link Car</a>
                                 </li>
                                 <li class="mobile-nav-item">
-                                    <a href="#support" class="mobile-nav-link">Support</a>
+                                    <a href="#rewards" class="mobile-nav-link">Rewards</a>
                                 </li>
                                 <li class="mobile-nav-item">
-                                    <a href="#analysis" class="mobile-nav-link">Analytics</a>
+                                    <a href="#history" class="mobile-nav-link">History</a>
                                 </li>
                             </ul>
                         </div>

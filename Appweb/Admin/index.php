@@ -117,6 +117,27 @@ if ($conn && isset($_SESSION['admin_username'])) {
                         <span>System Online</span>
                     </div>
                     <div class="current-time" id="current-time"></div>
+
+                    <!-- Quick actions aligned to the far right: Register | Login | EN | Download -->
+                    <div class="header-quick">
+                        <a class="header-link" href="register.php">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Register</span>
+                        </a>
+                        <span class="header-sep">|</span>
+                        <a class="header-link" href="login.php">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span>Login</span>
+                        </a>
+                        <span class="header-sep">|</span>
+                        <button class="header-link header-lang" type="button" title="Language">
+                            <i class="fa-solid fa-language"></i>
+                            <span>EN</span>
+                        </button>
+                        <button class="header-link header-download" type="button" title="Download">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                    </div>
                 </div>
             </header>
 
