@@ -352,6 +352,8 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
+    flex: 1;
+    justify-content: flex-end;
 }
 
 .status-indicator {
@@ -381,6 +383,40 @@ body {
     font-size: 14px;
     color: #666;
     font-weight: 500;
+}
+
+/* Header quick actions on the far right */
+.header-quick {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 20px;
+}
+
+.header-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary-color);
+    background: transparent;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.header-link:hover {
+    background: var(--light-color);
+}
+
+.header-sep {
+    color: #c9c9c9;
+}
+
+.header-download {
+    padding: 6px 8px;
 }
 
 
