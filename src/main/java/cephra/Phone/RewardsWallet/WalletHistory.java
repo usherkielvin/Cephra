@@ -4,7 +4,6 @@ package cephra.Phone.RewardsWallet;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import cephra.Phone.Utilities.WalletHistoryManager.WalletHistoryUpdateListener;
@@ -221,8 +220,7 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
                 totalHeight += (transactions.size() - 1) * 8;  // Add spacing between entries
             }
             
-            // Set minimum height to ensure scrolling works properly
-            int minHeight = Math.max(totalHeight, 518);  // Match the scroll pane height
+            // Set preferred size to enable scrolling when content exceeds visible area
             historyPanel.setPreferredSize(new Dimension(308, totalHeight));
             
             // Ensure proper repaint
@@ -242,42 +240,6 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         SwingUtilities.invokeLater(this::refreshHistoryDisplay);
     }
     
-    // Placeholder method to provide sample transaction data
-    private java.util.List<Object[]> getPlaceholderTransactions() {
-        java.util.List<Object[]> transactions = new java.util.ArrayList<>();
-        
-        // Sample transaction 1: Top Up
-        Object[] topUp = new Object[6];
-        topUp[0] = "TOP_UP"; // transaction_type
-        topUp[1] = 100.00; // amount
-        topUp[2] = 150.00; // new_balance
-        topUp[3] = "Wallet top-up via GCash"; // description
-        topUp[4] = "REF123456"; // reference_id
-        topUp[5] = new java.sql.Timestamp(System.currentTimeMillis() - 86400000); // yesterday
-        transactions.add(topUp);
-        
-        // Sample transaction 2: Payment
-        Object[] payment = new Object[6];
-        payment[0] = "PAYMENT"; // transaction_type
-        payment[1] = 50.00; // amount
-        payment[2] = 100.00; // new_balance
-        payment[3] = "Payment for charging service"; // description
-        payment[4] = "PAY789123"; // reference_id
-        payment[5] = new java.sql.Timestamp(System.currentTimeMillis() - 43200000); // 12 hours ago
-        transactions.add(payment);
-        
-        // Sample transaction 3: Another Top Up
-        Object[] topUp2 = new Object[6];
-        topUp2[0] = "TOP_UP"; // transaction_type
-        topUp2[1] = 200.00; // amount
-        topUp2[2] = 300.00; // new_balance
-        topUp2[3] = "Wallet top-up via Bank Transfer"; // description
-        topUp2[4] = "REF987654"; // reference_id
-        topUp2[5] = new java.sql.Timestamp(System.currentTimeMillis());
-        transactions.add(topUp2);
-        
-        return transactions;
-    }
     
     /**
      * Method to handle wallet history updates
@@ -334,7 +296,6 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         // Transaction data structure: [transaction_type, amount, new_balance, description, reference_id, transaction_date]
         String transactionType = (String) transaction[0];
         double transactionAmount = (Double) transaction[1];
-        double newBalance = (Double) transaction[2];
         String desc = (String) transaction[3];
         java.sql.Timestamp timestamp = (java.sql.Timestamp) transaction[5];
         
@@ -515,9 +476,6 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
         return transactionType.equals("TOP_UP") ? 
                new Color(0, 150, 0) : new Color(200, 0, 0);
     }
-/////
-    private JPanel detailsPanel;
-   
     
     private void showWalletTransactionDetails(Object[] transaction) {
         // Transaction data: [transaction_type, amount, new_balance, description, reference_id, transaction_date]

@@ -12,9 +12,7 @@ public class AlreadyTicket extends javax.swing.JPanel {
     private static boolean isShowing = false;
     
     // Intro animation fields
-    private boolean isShowingIntro = false;
     private Timer introTimer;
-    private ImageIcon introGifIcon;
     private ImageIcon mainImageIcon;
     
     // Popup dimensions (centered in phone frame)
@@ -39,9 +37,6 @@ public class AlreadyTicket extends javax.swing.JPanel {
      * @return true if PayPop can be shown
      */
     public static boolean canShowPayPop(String ticketId, String customerUsername) {
-        System.out.println("- Ticket ID: '" + ticketId + "'");
-        System.out.println("- Customer Username: '" + customerUsername + "'");
-        System.out.println("- Currently showing: " + isShowing);
         
         // Allow reappearing - if already showing, hide first then show again
         if (isShowing) {
@@ -265,7 +260,6 @@ public class AlreadyTicket extends javax.swing.JPanel {
      */
     private void loadImages() {
         try {
-            introGifIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/IntroAltick.gif"));
             mainImageIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/AlreadyhaveTicket.png"));
         } catch (Exception e) {
             System.err.println("Error loading images: " + e.getMessage());
@@ -293,11 +287,10 @@ public class AlreadyTicket extends javax.swing.JPanel {
             return;
         }
         
-        isShowingIntro = true;
         jLabel1.setIcon(freshGifIcon);
         
         // Set up timer to forcibly cut GIF and switch to main image after 200ms (0.2 seconds)
-        introTimer = new Timer(200, e -> {
+        introTimer = new Timer(200, _ -> {
             // Force stop GIF by clearing icon first, then setting main image
             jLabel1.setIcon(null);
             SwingUtilities.invokeLater(() -> {
@@ -316,7 +309,6 @@ public class AlreadyTicket extends javax.swing.JPanel {
         if (jLabel1 != null && mainImageIcon != null) {
             jLabel1.setIcon(mainImageIcon);
         }
-        isShowingIntro = false;
         if (introTimer != null) {
             introTimer.stop();
         }
@@ -417,7 +409,6 @@ public class AlreadyTicket extends javax.swing.JPanel {
 
     private void GolinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GolinkActionPerformed
        
-             System.out.println("AlreadyTicket Ok button clicked - closing popup");
         
         // Simply hide this popup panel
         hidepop();

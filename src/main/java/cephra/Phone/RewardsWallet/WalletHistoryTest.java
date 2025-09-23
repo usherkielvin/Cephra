@@ -1,11 +1,7 @@
 package cephra.Phone.RewardsWallet;
 
 import javax.swing.*;
-import java.awt.*;
 
-/**
- * Test class to demonstrate the improved WalletHistory panel
- */
 public class WalletHistoryTest {
     
     public static void main(String[] args) {
