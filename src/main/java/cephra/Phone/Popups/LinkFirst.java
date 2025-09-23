@@ -271,7 +271,7 @@ public class LinkFirst extends javax.swing.JPanel {
             }
         });
         add(Golink);
-        Golink.setBounds(80, 140, 110, 40);
+        Golink.setBounds(30, 180, 230, 40);
 
         notLink.setBorderPainted(false);
         notLink.setContentAreaFilled(false);
@@ -297,10 +297,7 @@ public class LinkFirst extends javax.swing.JPanel {
     private void GolinkActionPerformed(java.awt.event.ActionEvent evt) {
         System.out.println("LinkFirst Ok button clicked - navigating to link panel");
         
-        // Hide this popup first
-        hidepop();
-        
-        // Navigate to LinkConnect.java panel
+        // Navigate to LinkConnect.java panel first, then hide popup
         SwingUtilities.invokeLater(() -> {
             java.awt.Window[] windows = java.awt.Window.getWindows();
             for (java.awt.Window window : windows) {
@@ -310,6 +307,11 @@ public class LinkFirst extends javax.swing.JPanel {
                     break;
                 }
             }
+            
+            // Hide popup after navigation is complete
+            SwingUtilities.invokeLater(() -> {
+                hidepop();
+            });
         });
     }
 

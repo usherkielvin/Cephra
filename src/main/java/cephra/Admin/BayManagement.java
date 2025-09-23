@@ -1154,14 +1154,14 @@ public class BayManagement extends javax.swing.JPanel {
                             
                             if (serviceType != null) {
                                 if (serviceType.equalsIgnoreCase("Fast") || ticketId.startsWith("FCH")) {
-                                    return java.awt.Color.GREEN;
+                                    return new java.awt.Color(0, 147, 73); // Green for Fast charging (bays 1-3)
                                 }
                                 if (serviceType.equalsIgnoreCase("Normal") || ticketId.startsWith("NCH")) {
-                                    return new java.awt.Color(0, 120, 215); // Blue for NCH
+                                    return new java.awt.Color(22, 130, 146); // Blue for Normal charging (bays 4-8)
                                 }
                             }
                             // default occupied color
-                            return java.awt.Color.GREEN;
+                            return new java.awt.Color(0, 147, 73); // Green for Fast charging (bays 1-3)
                         }
 
                         // Available/empty
