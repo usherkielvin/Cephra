@@ -1751,7 +1751,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				</div>
 
 				<div class="activity-actions">
-					<a href="history.php" class="activity-link">View All Activity →</a>
+					<a href="history.php" class="activity-link">View All →</a>
 				</div>
 			</div>
 		</section>
