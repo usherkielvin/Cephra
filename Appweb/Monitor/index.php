@@ -18,36 +18,36 @@
     <meta name="theme-color" content="#0b1e29" />
     <style>
         :root {
-            --bg:#0b1e29; 
-            --panel:#0e2230; 
-            --card:#122938; 
-            --text:#e7f6fa; 
-            --muted:#9fb6bf; 
-            --accent:#9adcf0;
-            --accent-hover:#b5e8f7;
-            --avail:#0c3; 
-            --availText:#041; 
-            --occ:#3cf; 
-            --occText:#002; 
-            --maint:#f55; 
-            --maintText:#200;
-            --shadow-sm: 0 2px 5px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 10px rgba(0,0,0,0.15);
-            --shadow-lg: 0 8px 20px rgba(0,0,0,0.2);
+            --bg: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --panel: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            --card: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            --text: #ffffff;
+            --muted: #b0c4de;
+            --accent: #00d4aa;
+            --accent-hover: #00e6b8;
+            --avail: #00d4aa;
+            --availText: #ffffff;
+            --occ: #ff6b6b;
+            --occText: #ffffff;
+            --maint: #ffa500;
+            --maintText: #ffffff;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 10px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 20px rgba(0,0,0,0.4);
             --transition-fast: all 0.2s ease;
             --transition-normal: all 0.3s ease;
         }
-        .light { 
-            --bg:#f6fbfd; 
-            --panel:#ffffff; 
-            --card:#f1f7fa; 
-            --text:#0b1e29; 
-            --muted:#557; 
-            --accent:#0b7fa2;
-            --accent-hover:#0a6d8c;
-            --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 20px rgba(0,0,0,0.12);
+        .light {
+            --bg: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+            --panel: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+            --card: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+            --text: #1e3c72;
+            --muted: #6c757d;
+            --accent: #007bff;
+            --accent-hover: #0056b3;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 10px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 20px rgba(0,0,0,0.2);
         }
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
@@ -92,20 +92,21 @@
             grid-template-rows: repeat(auto-fit, minmax(200px, auto)); 
             gap: 20px; 
         }
-        .bay { 
-            background:var(--card); 
-            border-radius: 16px; 
-            padding: 18px; 
-            border:1px solid rgba(255,255,255,0.1); 
-            min-width: 0; 
-            height: 200px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            box-shadow: var(--shadow-md); 
+        .bay {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-width: 0;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-md);
             transition: var(--transition-normal);
             position: relative;
             overflow: hidden;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
         }
         .bay:hover { 
             transform: translateY(-5px); 
@@ -179,14 +180,15 @@
             align-items:flex-start; 
             flex-wrap: wrap; 
         }
-        .panel { 
-            background:var(--panel); 
-            border:1px solid rgba(255,255,255,0.1); 
-            border-radius:16px; 
-            padding:20px; 
-            flex:1 1 320px; 
-            min-width: 0; 
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            flex: 1 1 320px;
+            min-width: 0;
             box-shadow: var(--shadow-md);
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
         }
         table { 
             width:100%; 
