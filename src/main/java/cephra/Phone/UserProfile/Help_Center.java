@@ -21,6 +21,9 @@ public class Help_Center extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        faqs = new javax.swing.JButton();
+        emailus = new javax.swing.JButton();
+        contact = new javax.swing.JButton();
         charge = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         profilebutton = new javax.swing.JButton();
@@ -32,6 +35,42 @@ public class Help_Center extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(350, 750));
         setPreferredSize(new java.awt.Dimension(350, 750));
         setLayout(null);
+
+        faqs.setBorder(null);
+        faqs.setBorderPainted(false);
+        faqs.setContentAreaFilled(false);
+        faqs.setFocusPainted(false);
+        faqs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                faqsActionPerformed(evt);
+            }
+        });
+        add(faqs);
+        faqs.setBounds(30, 560, 320, 50);
+
+        emailus.setBorder(null);
+        emailus.setBorderPainted(false);
+        emailus.setContentAreaFilled(false);
+        emailus.setFocusPainted(false);
+        emailus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailusActionPerformed(evt);
+            }
+        });
+        add(emailus);
+        emailus.setBounds(30, 510, 320, 50);
+
+        contact.setBorder(null);
+        contact.setBorderPainted(false);
+        contact.setContentAreaFilled(false);
+        contact.setFocusPainted(false);
+        contact.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contactActionPerformed(evt);
+            }
+        });
+        add(contact);
+        contact.setBounds(30, 450, 320, 50);
 
         charge.setBorder(null);
         charge.setBorderPainted(false);
@@ -180,10 +219,51 @@ public class Help_Center extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_backActionPerformed
 
+    private void contactActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contactActionPerformed
+        String title = "Contact Us";
+        String message = "You can call us on these numbers:\n\n" +
+                "- 09276103411\n" +
+                "- 09178694260";
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                message,
+                title,
+                javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
+    }//GEN-LAST:event_contactActionPerformed
+
+    private void emailusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailusActionPerformed
+        String title = "Email Us";
+        String message = "cephra.industries@gmail.com";
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                message,
+                title,
+                javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
+    }//GEN-LAST:event_emailusActionPerformed
+
+    private void faqsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_faqsActionPerformed
+        String title = "FAQs";
+        String message = "What is Dizon's full name?\n" +
+                "Dizon is his firstname and lastname.\n\n" +
+                "What is his middle initial?\n" +
+                "His middle initial is Selosa.";
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                message,
+                title,
+                javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
+    }//GEN-LAST:event_faqsActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton back;
     private javax.swing.JButton charge;
+    private javax.swing.JButton contact;
+    private javax.swing.JButton emailus;
+    private javax.swing.JButton faqs;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;

@@ -54,14 +54,21 @@ public final class QueueBridge {
             records.clear(); // Clear existing records
             
             for (Object[] dbTicket : dbTickets) {
+                // Normalize payment status: when status is Complete and not Paid, force Pending
+                String status = String.valueOf(dbTicket[4] == null ? "" : dbTicket[4]).trim();
+                String payment = String.valueOf(dbTicket[5] == null ? "" : dbTicket[5]).trim();
+                if ("Complete".equalsIgnoreCase(status) && !"Paid".equalsIgnoreCase(payment)) {
+                    payment = "Pending";
+                }
+
                 // Convert database format to queue format
                 Object[] queueRecord = {
                     dbTicket[0], // ticket_id
                     dbTicket[1], // reference_number (or generate if null)
                     dbTicket[2], // username
                     dbTicket[3], // service_type
-                    dbTicket[4], // status
-                    dbTicket[5], // payment_status
+                    status,      // status (normalized)
+                    payment,     // payment_status (normalized)
                     dbTicket[6], // priority
                     dbTicket[7], // initial_battery_level
                     "" // action (empty for now)

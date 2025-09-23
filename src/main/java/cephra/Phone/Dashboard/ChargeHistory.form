@@ -69,7 +69,7 @@
               <Border info="null"/>
             </Property>
             <Property name="horizontalScrollBarPolicy" type="int" value="31"/>
-            <Property name="verticalScrollBarPolicy" type="int" value="21"/>
+            <Property name="verticalScrollBarPolicy" type="int" value="22"/>
             <Property name="opaque" type="boolean" value="false"/>
           </Properties>
 
