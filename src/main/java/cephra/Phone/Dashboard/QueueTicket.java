@@ -372,6 +372,8 @@ public class QueueTicket extends javax.swing.JPanel {
     private void checkstatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkstatusActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                // Allow ticket creation even if capacity is full; QueueFlow will set status appropriately
+
                 // Push current selection to Admin and store in memory list
                 cephra.Phone.Utilities.QueueFlow.addCurrentToAdminAndStore(cephra.Database.CephraDB.getCurrentUsername());
                 java.awt.Window[] windows = java.awt.Window.getWindows();

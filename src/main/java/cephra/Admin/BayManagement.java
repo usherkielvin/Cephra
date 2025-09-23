@@ -60,14 +60,22 @@ public class BayManagement extends javax.swing.JPanel {
     public static boolean isBayAvailableForCharging(int bayNumber) {
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
              java.sql.PreparedStatement pstmt = conn.prepareStatement(
-                 "SELECT cb.status, cb.current_ticket_id FROM charging_bays cb WHERE cb.bay_number = ?")) {
-            
+                 "SELECT cb.status, cb.current_ticket_id, " +
+                 "       EXISTS (SELECT 1 FROM charging_grid cg WHERE cg.bay_number = cb.bay_number AND cg.ticket_id IS NOT NULL) AS has_grid_ticket " +
+                 "FROM charging_bays cb WHERE cb.bay_number = ?")) {
+
             pstmt.setString(1, "Bay-" + bayNumber);
             try (java.sql.ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     String status = rs.getString("status");
                     String ticketId = rs.getString("current_ticket_id");
-                    return "Available".equals(status) && (ticketId == null || ticketId.isEmpty());
+                    boolean hasTicketInGrid = false;
+                    try { hasTicketInGrid = rs.getBoolean("has_grid_ticket"); } catch (Exception ignore) {}
+
+                    boolean inMaintenance = "Maintenance".equalsIgnoreCase(status);
+                    boolean hasTicketInBay = ticketId != null && !ticketId.isEmpty();
+
+                    return !inMaintenance && "Available".equalsIgnoreCase(status) && !hasTicketInBay && !hasTicketInGrid;
                 }
             }
         } catch (Exception e) {
@@ -630,10 +638,7 @@ public class BayManagement extends javax.swing.JPanel {
                     // Update all grid displays with new maintenance status
                     updateAllBayGridDisplays();
                     
-                    // If bay became available, try to auto-assign waiting tickets
-                    if (isSelected) {
-                        autoAssignWaitingTickets();
-                    }                   
+                    // Do not auto-assign on availability; keep tickets visible in waiting grid until admin proceeds
                 }
             });
         }
@@ -1066,6 +1071,7 @@ public class BayManagement extends javax.swing.JPanel {
             // Update Queue instance if registered
             if (queueInstance != null) {
                 queueInstance.refreshGridDisplays();
+                queueInstance.refreshWaitingGrid();
             }
             
             // Update Monitor instance if registered
@@ -1275,6 +1281,12 @@ public class BayManagement extends javax.swing.JPanel {
             // Load maintenance status from database
             loadMaintenanceStatusFromDatabase();
             
+            // Ensure waiting grid table and slots exist
+            ensureWaitingGridInitialized();
+
+            // Ensure waiting_grid reflects all queue tickets with status=Waiting
+            syncWaitingGridFromQueue();
+            
             // Update all grid displays with current status
             updateAllBayGridDisplays();
             
@@ -1284,6 +1296,58 @@ public class BayManagement extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }   
+
+    // Backfill waiting_grid from queue_tickets where status is Waiting but not yet in waiting_grid
+    private static void syncWaitingGridFromQueue() {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            try (java.sql.PreparedStatement ps = conn.prepareStatement(
+                    "SELECT qt.ticket_id, qt.username, qt.service_type, qt.initial_battery_level " +
+                    "FROM queue_tickets qt " +
+                    "LEFT JOIN waiting_grid wg ON wg.ticket_id = qt.ticket_id " +
+                    "WHERE qt.status='Waiting' AND wg.ticket_id IS NULL " +
+                    "ORDER BY qt.created_at, qt.ticket_id")) {
+                try (java.sql.ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String ticketId = rs.getString("ticket_id");
+                        String username = rs.getString("username");
+                        String serviceType = rs.getString("service_type");
+                        int batteryLevel = rs.getInt("initial_battery_level");
+                        addTicketToWaitingGrid(ticketId, username, serviceType, batteryLevel);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error syncing waiting grid from queue: " + e.getMessage());
+        }
+    }
+
+    // Ensure waiting_grid table exists and has 10 slots
+    private static void ensureWaitingGridInitialized() {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             java.sql.Statement stmt = conn.createStatement()) {
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS waiting_grid (
+                    slot_number INT PRIMARY KEY,
+                    ticket_id VARCHAR(20) NULL,
+                    username VARCHAR(50) NULL,
+                    service_type VARCHAR(20) NULL,
+                    initial_battery_level INT NULL,
+                    position_in_queue INT NULL
+                )
+            """);
+
+            // Insert 10 slots if not present
+            for (int i = 1; i <= 10; i++) {
+                try (java.sql.PreparedStatement ps = conn.prepareStatement(
+                        "INSERT IGNORE INTO waiting_grid (slot_number) VALUES (?)")) {
+                    ps.setInt(1, i);
+                    ps.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error ensuring waiting_grid initialization: " + e.getMessage());
+        }
+    }
    
     private static void loadMaintenanceStatusFromDatabase() {
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
