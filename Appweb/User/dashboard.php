@@ -278,6 +278,100 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				transform: rotate(-45deg) translate(6px, -6px);
 			}
 
+			/* Mobile Menu Styles */
+			.mobile-menu {
+				position: fixed;
+				top: 0;
+				right: -100%;
+				width: 280px;
+				height: 100vh;
+				background: rgba(255, 255, 255, 0.98);
+				backdrop-filter: blur(20px);
+				border-left: 1px solid var(--border-color);
+				z-index: 999;
+				transition: right 0.3s ease;
+				box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+			}
+
+			.mobile-menu.active {
+				right: 0;
+			}
+
+			.mobile-menu-content {
+				padding: 80px 2rem 2rem;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+			}
+
+			.mobile-nav-list {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.mobile-nav-link {
+				color: var(--text-primary);
+				text-decoration: none;
+				font-weight: 500;
+				padding: 1rem;
+				border-radius: 8px;
+				transition: all 0.3s ease;
+				display: block;
+			}
+
+			.mobile-nav-link:hover {
+				background: var(--bg-secondary);
+				color: var(--primary-color);
+			}
+
+			.mobile-header-actions {
+				margin-top: auto;
+				padding-top: 2rem;
+				border-top: 1px solid var(--border-color);
+			}
+
+			.mobile-auth-link {
+				color: var(--text-secondary);
+				text-decoration: none;
+				font-weight: 500;
+				padding: 1rem;
+				border-radius: 8px;
+				transition: all 0.3s ease;
+				display: block;
+				text-align: center;
+				background: var(--gradient-primary);
+				color: white;
+			}
+
+			.mobile-auth-link:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 5px 15px var(--shadow-medium);
+			}
+
+			/* Mobile Menu Overlay */
+			.mobile-menu-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.5);
+				z-index: 998;
+				opacity: 0;
+				visibility: hidden;
+				transition: all 0.3s ease;
+			}
+
+			.mobile-menu-overlay.active {
+				opacity: 1;
+				visibility: visible;
+			}
+
 			/* Dashboard Hero Section */
 			.dashboard-hero {
 				background: var(--gradient-secondary);
@@ -419,6 +513,10 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				gap: 2rem;
 			}
 
+			.main-vehicle-card {
+				grid-column: span 4;
+			}
+
 			.feature-card {
 				background: var(--bg-card);
 				border-radius: 20px;
@@ -488,6 +586,10 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 					display: none;
 				}
 
+				.header-actions {
+					display: none;
+				}
+
 				.mobile-menu-toggle {
 					display: flex;
 				}
@@ -510,7 +612,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				}
 			}
 
-			@media (max-width: 480px) {
+			@media (max-width: 690px) {
 				.dashboard-hero {
 					padding: 60px 0;
 				}
@@ -521,6 +623,10 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 				.feature-card {
 					padding: 1.5rem;
+				}
+
+				.main-vehicle-card {
+					grid-column: 1;
 				}
 			}
 
@@ -1098,6 +1204,13 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 			}
 
 			/* Enhanced Responsive Design */
+			@media (max-width: 1200px) {
+				.features-grid {
+					grid-template-columns: repeat(3, 1fr);
+					gap: 1.5rem;
+				}
+			}
+
 			@media (max-width: 992px) {
 				.stats-grid {
 					grid-template-columns: repeat(2, 1fr);
@@ -1105,30 +1218,56 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 				.features-grid {
 					grid-template-columns: repeat(2, 1fr);
+					gap: 1.5rem;
 				}
 
 				.status-grid {
 					grid-template-columns: 1fr;
 				}
+
+				/* Improve feature card spacing on tablet */
+				.feature-card {
+					padding: 1.5rem;
+				}
+
+				.feature-icon {
+					width: 50px;
+					height: 50px;
+					font-size: 20px;
+				}
+
+				.feature-title {
+					font-size: 1.3rem;
+				}
 			}
 
-			@media (max-width: 768px) {
+			@media (max-width: 780px) {
 				.stats-grid {
 					grid-template-columns: 1fr;
+					gap: 1rem;
 				}
 
 				.features-grid {
 					grid-template-columns: 1fr;
+					gap: 1.5rem;
+					padding: 0 1rem;
+				}
+
+				.status-grid {
+					grid-template-columns: 1fr;
+					gap: 1rem;
 				}
 
 				.stat-card {
 					flex-direction: column;
 					text-align: center;
 					gap: 1rem;
+					padding: 1.5rem;
 				}
 
 				.support-options {
 					grid-template-columns: 1fr;
+					gap: 1rem;
 				}
 
 				.station-item {
@@ -1141,6 +1280,77 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 					flex-direction: row;
 					width: 100%;
 					justify-content: space-between;
+				}
+
+				/* Optimize feature cards for mobile */
+				.feature-card {
+					padding: 1.5rem;
+					margin-bottom: 1rem;
+					border-radius: 15px;
+					box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1);
+				}
+
+				.feature-icon {
+					width: 50px;
+					height: 50px;
+					font-size: 20px;
+					margin-bottom: 1rem;
+				}
+
+				.feature-title {
+					font-size: 1.25rem;
+					margin-bottom: 0.75rem;
+					line-height: 1.3;
+				}
+
+				.feature-description {
+					font-size: 0.95rem;
+					line-height: 1.5;
+				}
+
+				/* Improve main vehicle card on mobile */
+				.main-vehicle-card {
+					padding: 1.5rem;
+					margin: 0 1rem;
+				}
+
+				.main-vehicle-content {
+					flex-direction: column;
+					gap: 1.5rem;
+					text-align: center;
+				}
+
+				.vehicle-info {
+					flex-direction: column;
+					gap: 1rem;
+				}
+
+				.feature-icon-large {
+					width: 60px;
+					height: 60px;
+					font-size: 24px;
+				}
+
+				.vehicle-stats {
+					grid-template-columns: 1fr;
+					gap: 0.75rem;
+				}
+
+				.vehicle-actions {
+					align-items: center;
+				}
+
+				/* Additional mobile grid improvements */
+				.section-header {
+					margin-bottom: 2rem;
+				}
+
+				.section-title {
+					font-size: 2rem;
+				}
+
+				.section-description {
+					font-size: 1.1rem;
 				}
 			}
 
@@ -1164,6 +1374,98 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 				.session-number {
 					font-size: 1.5rem;
 				}
+
+				/* Enhanced features grid for 480px and below */
+				.features-grid {
+					grid-template-columns: 1fr;
+					gap: 1rem;
+					padding: 0 0.5rem;
+				}
+
+				.feature-card {
+					padding: 1rem;
+					margin-bottom: 0.75rem;
+					border-radius: 12px;
+					box-shadow: 0 3px 10px rgba(0, 194, 206, 0.08);
+				}
+
+				.feature-icon {
+					width: 40px;
+					height: 40px;
+					font-size: 16px;
+					margin-bottom: 0.75rem;
+				}
+
+				.feature-title {
+					font-size: 1.1rem;
+					margin-bottom: 0.5rem;
+					line-height: 1.2;
+				}
+
+				.feature-description {
+					font-size: 0.9rem;
+					line-height: 1.4;
+				}
+
+				/* Improve main vehicle card for small screens */
+				.main-vehicle-card {
+					padding: 1rem;
+					margin: 0 0.5rem;
+					grid-column: 1; /* Reset span to fit single column */
+				}
+
+				.main-vehicle-content {
+					flex-direction: column;
+					gap: 1rem;
+					text-align: center;
+				}
+
+				.vehicle-info {
+					flex-direction: column;
+					gap: 0.75rem;
+				}
+
+				.feature-icon-large {
+					width: 50px;
+					height: 50px;
+					font-size: 20px;
+				}
+
+				.vehicle-stats {
+					grid-template-columns: 1fr;
+					gap: 0.5rem;
+				}
+
+				.vehicle-actions {
+					align-items: center;
+				}
+
+				/* Additional improvements for small screens */
+				.section-header {
+					margin-bottom: 1.5rem;
+				}
+
+				.section-title {
+					font-size: 1.75rem;
+				}
+
+				.section-description {
+					font-size: 1rem;
+				}
+
+				/* Optimize dashboard hero for small screens */
+				.dashboard-hero {
+					padding: 40px 0;
+				}
+
+				.dashboard-greeting {
+					font-size: 1.5rem;
+				}
+
+				.dashboard-actions {
+					flex-direction: column;
+					gap: 1rem;
+				}
 			}
 		</style>
 	</head>
@@ -1181,7 +1483,6 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 					<!-- Navigation -->
 					<nav class="nav">
 						<ul class="nav-list">
-							<li><a href="dashboard.php" class="nav-link">Home</a></li>
 							<li><a href="#" onclick="openMonitorWeb(); return false;" class="nav-link">Monitor</a></li>
 							<li><a href="link.php" class="nav-link">Link</a></li>
 							<li><a href="history.php" class="nav-link">History</a></li>
@@ -1202,6 +1503,21 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 						<span></span>
 						<span></span>
 					</button>
+				</div>
+			</div>
+
+			<!-- Mobile Menu -->
+			<div class="mobile-menu" id="mobileMenu">
+				<div class="mobile-menu-content">
+					<ul class="mobile-nav-list">
+						<li><a href="#" onclick="openMonitorWeb(); return false;" class="mobile-nav-link">Monitor</a></li>
+						<li><a href="link.php" class="mobile-nav-link">Link</a></li>
+						<li><a href="history.php" class="mobile-nav-link">History</a></li>
+						<li><a href="profile.php" class="mobile-nav-link">Profile</a></li>
+					</ul>
+					<div class="mobile-header-actions">
+						<a href="profile_logout.php" class="mobile-auth-link">Logout</a>
+					</div>
 				</div>
 			</div>
 		</header>
@@ -1236,10 +1552,10 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 				<div class="status-grid">
 					<div class="status-card">
-						<h4 class="status-title">Station Status</h4>
+						<h4 class="status-title">System Status</h4>
 						<div class="status-indicator">
 							<span class="status-dot active"></span>
-							<span class="status-text">All stations operational</span>
+							<span class="status-text">All system operational</span>
 						</div>
 						<p class="status-description">All charging stations are currently online and available.</p>
 					</div>
@@ -1275,7 +1591,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 				<div class="features-grid">
 					<!-- Car Status Feature -->
-					<div class="feature-card main-vehicle-card" style="grid-column: span 4; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; position: relative; overflow: hidden;">
+					<div class="feature-card main-vehicle-card" style="background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; position: relative; overflow: hidden;">
 						<div class="main-vehicle-content">
 							<div class="vehicle-info">
 								<div class="feature-icon-large">
@@ -1304,8 +1620,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 								</div>
 							</div>
 							<div class="vehicle-actions">
-								<a href="ChargingPage.php" class="feature-link">View Details →</a>
-								<button class="quick-action-btn" onclick="showChargingOptions()">Quick Charge</button>
+								<button class="quick-action-btn" onclick="showChargingOptions()">Charge Now</button>
 							</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
@@ -1342,8 +1657,8 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 					</div>
 
 					<!-- Estimated Cost -->
-					<div class="feature-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; position: relative; overflow: hidden;">
-						<div class="feature-icon" style="background: rgba(255, 255, 255, 0.2);">
+					<div class="feature-card">
+						<div class="feature-icon">
 							<i class="fas fa-dollar-sign"></i>
 						</div>
 						<h3 class="feature-title">Estimated Cost</h3>
@@ -1353,7 +1668,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 							<strong>Monthly Savings:</strong> ₱1,250<br>
 							<strong>Green Points:</strong> 340 earned
 						</p>
-						<a href="#" onclick="showEstimatedCost(); return false;" class="feature-link" style="color: white;">View Details →</a>
+						<a href="#" onclick="showEstimatedCost(); return false;" class="feature-link">View Details →</a>
 					</div>
 
 					<!-- Vehicle Diagnostics -->
@@ -1386,7 +1701,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 				<div class="features-grid">
 					<!-- Rewards Feature -->
-					<div class="feature-card">
+					<div class="feature-card" style="grid-column: span 2;">
 						<div class="feature-icon">
 							<i class="fas fa-gift"></i>
 						</div>
@@ -1399,7 +1714,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 					</div>
 
 					<!-- Wallet Feature -->
-					<div class="feature-card">
+					<div class="feature-card" style="grid-column: span 2;">
 						<div class="feature-icon">
 							<i class="fas fa-wallet"></i>
 						</div>
@@ -1419,7 +1734,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 			<div class="container">
 				<div class="section-header">
 					<h2 class="section-title">Recent Activity</h2>
-					<p class="section-description">Your latest charging sessions and updates</p>
+					<p class="section-description">Your latest charging sessions and transactions</p>
 				</div>
 
 				<div class="activity-list" id="recentActivity">
@@ -1707,10 +2022,83 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                     }, 30000);
                 }
 
+                // Mobile Menu Toggle Functionality
+                function initMobileMenu() {
+                    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                    const mobileMenu = document.getElementById('mobileMenu');
+                    const mobileMenuOverlay = document.createElement('div');
+                    mobileMenuOverlay.className = 'mobile-menu-overlay';
+                    mobileMenuOverlay.id = 'mobileMenuOverlay';
+                    document.body.appendChild(mobileMenuOverlay);
+
+                    // Toggle mobile menu
+                    function toggleMobileMenu() {
+                        const isActive = mobileMenu.classList.contains('active');
+
+                        if (isActive) {
+                            closeMobileMenu();
+                        } else {
+                            openMobileMenu();
+                        }
+                    }
+
+                    // Open mobile menu
+                    function openMobileMenu() {
+                        mobileMenu.classList.add('active');
+                        mobileMenuToggle.classList.add('active');
+                        mobileMenuOverlay.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+
+                        // Add click handlers
+                        mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+                        document.addEventListener('keydown', handleEscapeKey);
+                    }
+
+                    // Close mobile menu
+                    function closeMobileMenu() {
+                        mobileMenu.classList.remove('active');
+                        mobileMenuToggle.classList.remove('active');
+                        mobileMenuOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+
+                        // Remove event listeners
+                        mobileMenuOverlay.removeEventListener('click', closeMobileMenu);
+                        document.removeEventListener('keydown', handleEscapeKey);
+                    }
+
+                    // Handle escape key
+                    function handleEscapeKey(e) {
+                        if (e.key === 'Escape') {
+                            closeMobileMenu();
+                        }
+                    }
+
+                    // Add click handler to toggle button
+                    mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+
+                    // Add click handlers to mobile menu links
+                    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+                    mobileNavLinks.forEach(link => {
+                        link.addEventListener('click', closeMobileMenu);
+                    });
+
+                    // Close menu when clicking outside on mobile
+                    $(document).on('click', function(e) {
+                        if (window.innerWidth <= 768) {
+                            if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                                if (mobileMenu.classList.contains('active')) {
+                                    closeMobileMenu();
+                                }
+                            }
+                        }
+                    });
+                }
+
                 // Initialize dashboard features
                 $(document).ready(function() {
                     loadDashboardStats();
                     updateLiveStatus();
+                    initMobileMenu(); // Initialize mobile menu functionality
 
                     // Intersection Observer for animations
                     const observerOptions = {
