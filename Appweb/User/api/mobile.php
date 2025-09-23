@@ -129,6 +129,31 @@ try {
             ]);
             break;
 
+        case "live-status":
+            // Public live status for user dashboard (no admin session required)
+            try {
+                // Current queue: Waiting + Processing (matches Admin dashboard semantics)
+                $q = $db->query("SELECT COUNT(*) AS c FROM queue_tickets WHERE status IN ('Waiting','Processing')");
+                $queue_count = (int)($q->fetch(PDO::FETCH_ASSOC)['c'] ?? 0);
+
+                // Active sessions: charging bays in use derived from charging_grid
+                $a = $db->query("SELECT COUNT(*) AS c FROM charging_grid WHERE ticket_id IS NOT NULL");
+                $active_bays = (int)($a->fetch(PDO::FETCH_ASSOC)['c'] ?? 0);
+
+                // Simple ETA heuristic: 1 minute per vehicle waiting
+                $eta_minutes = max(0, $queue_count);
+
+                echo json_encode([
+                    "success" => true,
+                    "queue_count" => $queue_count,
+                    "active_bays" => $active_bays,
+                    "estimated_wait_minutes" => $eta_minutes
+                ]);
+            } catch (Exception $e) {
+                echo json_encode(["success" => false, "error" => $e->getMessage()]);
+            }
+            break;
+
         case "create-ticket":
             if ($method !== "POST") {
                 echo json_encode([
