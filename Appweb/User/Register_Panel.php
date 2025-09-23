@@ -119,7 +119,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="index.php" class="register-link">Already have an account? Sign in</a>
+                    <a href="login.php" class="register-link">Already have an account? Sign in</a>
                 </div>
 
                 <button class="submit" type="submit">Create Account</button>

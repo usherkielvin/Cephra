@@ -1,37 +1,21 @@
-# Vantage Markets Design Integration - TODO
+# OTP Fix Plan
 
-## Phase 1: File Structure Changes ✅
-- [x] Rename existing `index.php` to `login.php`
-- [x] Create new `index.php` with Vantage Markets-inspired design
-- [x] Update any internal links that reference `index.php`
+## Steps to Fix OTP Storage Issue
 
-## Phase 2: Design Implementation ✅
-- [x] Create new `index.php` with Vantage Markets design structure
-- [x] Implement dark header with navigation
-- [x] Create hero section (no email signup as requested)
-- [x] Add Cephra-themed promotional cards section
-- [x] Maintain Cephra logo design
-- [x] Implement new color scheme
+1. **Check for Scheduled Cleanup** - Already done via search_files, no cron jobs found.
+2. **Set Correct Timezone in PHP** - Add timezone setting to Appweb/User/api/forgot_password.php.
+3. **Temporarily Disable OTP Cleanup** - Comment out cleanup calls in test_otp_cleanup.php and Appweb/User/api/forgot_password_updated.php.
+4. **Update Database Connection for Timezone** - Modify Appweb/User/config/database.php to set PDO timezone.
+5. **Test OTP Storage** - Run a test to generate and store OTP.
+6. **Verify Expiration Logic** - Check if expiration works correctly.
 
-## Phase 3: Technical Implementation ✅
-- [x] Create new CSS file for Vantage Markets styling
-- [x] Implement dark theme with professional gradients
-- [x] Add responsive design for mobile devices
-- [x] Add smooth animations and transitions
-
-## Phase 4: Testing & Refinement ✅
-- [x] Cross-browser testing
-- [x] Verify all links work correctly
-- [x] Performance optimization
-- [x] Mobile responsiveness testing
-
-## Files Modified/Created:
-- ✅ `Appweb/User/login.php` (renamed from index.php)
-- ✅ `Appweb/User/index.php` (new file with Vantage design)
-- ✅ `Appweb/User/css/vantage-style.css` (new styling)
-
-## Next Steps:
-- Test the new design functionality
-- Verify all links and navigation work properly
-- Ensure mobile responsiveness
-- Performance optimization if needed
+## Progress
+- [x] Step 1: Check for Scheduled Cleanup
+- [x] Step 2: Set Correct Timezone in PHP
+- [x] Step 3: Temporarily Disable OTP Cleanup
+- [x] Step 4: Update Database Connection for Timezone
+- [x] Step 5: Test OTP Storage
+- [x] Step 6: Verify Expiration Logic
+- [x] Added missing reset-password case to API
+- [x] Updated to store passwords in plain text (no hashing)
+- [x] Created and ran comprehensive test

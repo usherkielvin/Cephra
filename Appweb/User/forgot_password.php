@@ -65,7 +65,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="index.php" class="forgot-link">Back to Login</a>
+                    <a href="login.php" class="forgot-link">Back to Login</a>
                 </div>
 
                 <button class="submit" type="submit">Send Verification Code</button>

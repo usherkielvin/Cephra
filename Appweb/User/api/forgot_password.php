@@ -1,5 +1,6 @@
 <?php
 // Forgot Password API - FINAL FIXED VERSION
+date_default_timezone_set('UTC'); // Set timezone to UTC to fix expires_at handling
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST");

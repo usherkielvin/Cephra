@@ -118,11 +118,11 @@ try {
 
                 $mail->send();
 
-                // Clean up expired codes after successful email send
-                $cleanedCount = cleanupExpiredOTPCodes($db);
-                if ($cleanedCount > 0) {
-                    error_log("OTP Cleanup: Cleaned up $cleanedCount expired codes after successful reset request");
-                }
+                // Clean up expired codes after successful email send - TEMPORARILY DISABLED
+                // $cleanedCount = cleanupExpiredOTPCodes($db);
+                // if ($cleanedCount > 0) {
+                //     error_log("OTP Cleanup: Cleaned up $cleanedCount expired codes after successful reset request");
+                // }
 
                 echo json_encode([
                     "success" => true,
@@ -220,11 +220,11 @@ try {
 
                 $mail->send();
 
-                // Clean up expired codes after successful email send
-                $cleanedCount = cleanupExpiredOTPCodes($db);
-                if ($cleanedCount > 0) {
-                    error_log("OTP Cleanup: Cleaned up $cleanedCount expired codes after successful resend");
-                }
+                // Clean up expired codes after successful email send - TEMPORARILY DISABLED
+                // $cleanedCount = cleanupExpiredOTPCodes($db);
+                // if ($cleanedCount > 0) {
+                //     error_log("OTP Cleanup: Cleaned up $cleanedCount expired codes after successful resend");
+                // }
 
                 echo json_encode([
                     "success" => true,
@@ -314,17 +314,88 @@ try {
             $stmt = $db->prepare("INSERT INTO password_reset_tokens (username, token, expires_at, used) VALUES (?, ?, ?, 0)");
             $stmt->execute([$username, $temp_token, $token_expires]);
 
-            // Clean up expired codes after successful verification
-            $cleanedCount = cleanupExpiredOTPCodes($db);
-            if ($cleanedCount > 0) {
-                error_log("OTP Cleanup: Cleaned up $cleanedCount expired codes after successful verification");
-            }
+            // Clean up expired codes after successful verification - TEMPORARILY DISABLED
+            // $cleanedCount = cleanupExpiredOTPCodes($db);
+            // if ($cleanedCount > 0) {
+            //     error_log("OTP Cleanup: Cleaned up $cleanedCount expired codes after successful verification");
+            // }
 
             echo json_encode([
                 "success" => true,
                 "message" => "Code verified successfully",
                 "temp_token" => $temp_token
             ]);
+            break;
+
+        case "reset-password":
+            if ($method !== "POST") {
+                echo json_encode(["success" => false, "error" => "Method not allowed"]);
+                break;
+            }
+
+            $temp_token = $_POST["temp_token"] ?? "";
+            $new_password = $_POST["new_password"] ?? "";
+
+            if (!$temp_token) {
+                echo json_encode(["success" => false, "error" => "Invalid or missing token"]);
+                break;
+            }
+
+            if (!$new_password || strlen($new_password) < 8) {
+                echo json_encode(["success" => false, "error" => "Password must be at least 8 characters long"]);
+                break;
+            }
+
+            // Validate password strength
+            if (!preg_match('/[A-Z]/', $new_password) ||
+                !preg_match('/[a-z]/', $new_password) ||
+                !preg_match('/\d/', $new_password)) {
+                echo json_encode(["success" => false, "error" => "Password must contain at least one uppercase letter, one lowercase letter, and one number"]);
+                break;
+            }
+
+            // Verify the temporary token
+            $stmt = $db->prepare("SELECT username, expires_at FROM password_reset_tokens WHERE token = ? AND used = 0");
+            $stmt->execute([$temp_token]);
+            $tokenData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$tokenData) {
+                echo json_encode(["success" => false, "error" => "Invalid or expired token"]);
+                break;
+            }
+
+            // Check if token has expired
+            $expiresAt = new DateTime($tokenData['expires_at']);
+            $now = new DateTime();
+            if ($now > $expiresAt) {
+                echo json_encode(["success" => false, "error" => "Token has expired. Please request a new password reset."]);
+                break;
+            }
+
+            $username = $tokenData['username'];
+
+            // Store the new password (no hashing)
+            $plain_password = $new_password;
+
+            // Update the user's password
+            $stmt = $db->prepare("UPDATE users SET password = ? WHERE username = ?");
+            $result = $stmt->execute([$plain_password, $username]);
+
+            if ($result) {
+                // Mark the token as used
+                $stmt = $db->prepare("UPDATE password_reset_tokens SET used = 1 WHERE token = ?");
+                $stmt->execute([$temp_token]);
+
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Password reset successfully"
+                ]);
+            } else {
+                echo json_encode([
+                    "success" => false,
+                    "error" => "Failed to update password. Please try again."
+                ]);
+            }
             break;
 
         default:

@@ -51,7 +51,7 @@ try {
         }
     }
 
-    $cleanedCount = cleanupExpiredOTPCodes($db);
+    // $cleanedCount = cleanupExpiredOTPCodes($db); // TEMPORARILY DISABLED
 
     echo "<p><strong>Cleanup Result:</strong> $cleanedCount expired codes deleted</p>";
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cephra - Ultimate EV Charging Platform</title>
+    <title>Cephra EV Charging Platform</title>
     <link rel="icon" type="image/png" href="images/logo.png?v=2" />
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
@@ -41,9 +41,8 @@
                 <nav class="nav">
                     <ul class="nav-list">
                         <li><a href="#charging" class="nav-link">Charging</a></li>
-                        <li><a href="#link-car" class="nav-link">Link Car</a></li>
-                        <li><a href="#rewards" class="nav-link">Rewards</a></li>
-                        <li><a href="#history" class="nav-link">History</a></li>
+                        <li><a href="#promotions" class="nav-link">Offers</a></li>
+                        <li><a href="#features" class="nav-link">About</a></li>
                     </ul>
                 </nav>
 
@@ -98,13 +97,10 @@
                                     <a href="#charging" class="mobile-nav-link">Charging</a>
                                 </li>
                                 <li class="mobile-nav-item">
-                                    <a href="#link-car" class="mobile-nav-link">Link Car</a>
+                                    <a href="#promotions" class="mobile-nav-link">Offers</a>
                                 </li>
                                 <li class="mobile-nav-item">
-                                    <a href="#rewards" class="mobile-nav-link">Rewards</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="#history" class="mobile-nav-link">History</a>
+                                    <a href="#features" class="mobile-nav-link">About</a>
                                 </li>
                             </ul>
                         </div>
@@ -181,7 +177,7 @@
                     fast, and reliable charging solutions.
                 </p>
                 <div class="hero-actions">
-                    <a href="dashboard.php" class="btn btn-cta">Start Charging</a>
+                    <a href="register_panel.php" class="btn btn-cta">Start Charging</a>
                     <a href="#features" class="btn btn-outline">Learn More</a>
                 </div>
             </div>
@@ -207,7 +203,7 @@
                         AI-powered charging optimization that adapts to your vehicle's needs
                         and grid conditions for maximum efficiency.
                     </p>
-                    <a href="dashboard.php" class="feature-link">Experience Smart Charging →</a>
+                    <a href="Register_Panel.php" class="feature-link">Experience Smart Charging →</a>
                 </div>
 
                 <!-- Feature 2: Real-time Monitoring -->
@@ -220,7 +216,7 @@
                         Track your charging sessions, energy consumption, and costs in real-time
                         with detailed analytics and insights.
                     </p>
-                    <a href="dashboard.php" class="feature-link">View Analytics →</a>
+                    <a href="Register_Panel.php" class="feature-link">View Analytics →</a>
                 </div>
 
                 <!-- Feature 3: Rewards Program -->
@@ -233,7 +229,76 @@
                         Earn points on every charge and unlock exclusive benefits, discounts,
                         and premium features as you charge more.
                     </p>
-                    <a href="dashboard.php" class="feature-link">Join Rewards →</a>
+                    <a href="Register_Panel.php" class="feature-link">Join Rewards →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Charging Types Section -->
+    <section class="charging-types" id="charging">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Choose Your Charging Speed</h2>
+                <p class="section-description">Select the perfect charging option for your needs</p>
+            </div>
+
+            <div class="charging-grid">
+                <!-- Charging Type 1: Normal Charging -->
+                <div class="charging-card">
+                    <div class="charging-icon">
+                        <i class="fas fa-battery-half"></i>
+                    </div>
+                    <h3 class="charging-title">Normal Charging</h3>
+                    <p class="charging-description">
+                        Perfect for regular charging when you're not in a rush. Ideal for everyday use,
+                        overnight charging at home, or during extended parking periods. Provides
+                        steady, reliable charging without putting stress on your vehicle's battery.
+                    </p>
+                    <div class="charging-specs">
+                        <span class="spec-item">3-7 kW</span>
+                        <span class="spec-item">2-3 hours</span>
+                    </div>
+                    <a href="Register_Panel.php" class="charging-link">Start Normal Charging →</a>
+                </div>
+
+                <!-- Charging Type 2: Fast Charging -->
+                <div class="charging-card">
+                    <div class="charging-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="charging-title">Fast Charging</h3>
+                    <p class="charging-description">
+                        When time is of the essence, fast charging delivers rapid power
+                        to get you back on the road quickly. Perfect for lunch breaks,
+                        shopping stops, or quick top-ups during long drives. Our advanced
+                        fast charging technology provides optimal charging curves to maximize
+                        efficiency while protecting your battery health.
+                    </p>
+                    <div class="charging-specs">
+                        <span class="spec-item">50-150 kW</span>
+                        <span class="spec-item">20-40 minutes</span>
+                    </div>
+                    <a href="Register_Panel.php" class="charging-link">Start Fast Charging →</a>
+                </div>
+
+                <!-- Charging Type 3: Priority Charging -->
+                <div class="charging-card">
+                    <div class="charging-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="charging-title">Priority Charging</h3>
+                    <p class="charging-description">
+                        When your battery drops below 20%, priority charging automatically activates
+                        for fire protection and vehicle safety. This ensures your EV gets immediate
+                        attention with maximum charging speed and guaranteed availability, protecting
+                        both your vehicle and ensuring your safety on the road.
+                    </p>
+                    <div class="charging-specs">
+                        <span class="spec-item">Priority</span>
+                        <span class="spec-item">10-30 minutes</span>
+                    </div>
+                    <a href="Register_Panel.php" class="charging-link">Get Priority Access →</a>
                 </div>
             </div>
         </div>
@@ -254,16 +319,16 @@
                         <div class="promo-icon">
                             <i class="fas fa-battery-full"></i>
                         </div>
-                        <div class="promo-label">Limited Offer</div>
+                        <div class="promo-label">Rewards</div>
                     </div>
-                    <h3 class="promo-title">13% Bonus Credits</h3>
+                    <h3 class="promo-title">Cephra Rewards</h3>
                     <p class="promo-description">
-                        Get 13% bonus credits on your first wallet top-up.
+                        Get Cephra credits on your first charge with us.
                         Perfect for frequent chargers looking to maximize savings.
                     </p>
                     <div class="promo-footer">
-                        <a href="Register_Panel.php" class="btn btn-promo">Claim Offer</a>
-                        <div class="promo-validity">Valid until Dec 31, 2024</div>
+                        <a href="Register_Panel.php" class="btn btn-promo">Claim now</a>
+                        <div class="promo-validity">Valid until Dec 31, 2025</div>
                     </div>
                 </div>
 
@@ -275,14 +340,14 @@
                         </div>
                         <div class="promo-label">Premium</div>
                     </div>
-                    <h3 class="promo-title">Premium Access</h3>
+                    <h3 class="promo-title">Fast Charging</h3>
                     <p class="promo-description">
-                        Unlock priority charging, advanced analytics, and exclusive
-                        station reservations with our premium membership.
+                        Unlock priority charging, advanced charging technology, and
+                         quality service for our premium clients.
                     </p>
                     <div class="promo-footer">
-                        <a href="Register_Panel.php" class="btn btn-promo">Upgrade Now</a>
-                        <div class="promo-validity">30-day free trial</div>
+                        <a href="Register_Panel.php" class="btn btn-promo">Book Now</a>
+                        <div class="promo-validity">Try Now</div>
                     </div>
                 </div>
 
@@ -326,10 +391,9 @@
                 <div class="footer-section">
                     <h4 class="footer-title">Platform</h4>
                     <ul class="footer-links">
-                        <li><a href="dashboard.php">Dashboard</a></li>
-                        <li><a href="#charging">Smart Charging</a></li>
-                        <li><a href="#analysis">Analytics</a></li>
-                        <li><a href="login.php">Login</a></li>
+                        <li><a href="dashboard.php">Facebook</a></li>
+                        <li><a href="#charging">Youtube</a></li>
+                        <li><a href="#analysis">Email</a></li>
                     </ul>
                 </div>
 
@@ -338,8 +402,6 @@
                     <ul class="footer-links">
                         <li><a href="#support">Help Center</a></li>
                         <li><a href="#contact">Contact Us</a></li>
-                        <li><a href="#status">System Status</a></li>
-                        <li><a href="#api">API Documentation</a></li>
                     </ul>
                 </div>
 
@@ -347,15 +409,13 @@
                     <h4 class="footer-title">Company</h4>
                     <ul class="footer-links">
                         <li><a href="#about">About Us</a></li>
-                        <li><a href="#careers">Careers</a></li>
-                        <li><a href="#press">Press Kit</a></li>
-                        <li><a href="#security">Security</a></li>
+                        <li><a href="#careers">Our Team</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2024 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+                <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
             </div>
         </div>
     </footer>
@@ -406,7 +466,7 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.feature-card, .promo-card').forEach(card => {
+        document.querySelectorAll('.feature-card, .promo-card, .charging-card').forEach(card => {
             observer.observe(card);
         });
 
