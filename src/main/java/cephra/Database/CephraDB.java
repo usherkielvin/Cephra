@@ -912,7 +912,7 @@ public class CephraDB {
             // Determine priority based on battery level (priority 1 for <20%, priority 0 for >=20%)
             int priority = (initialBatteryLevel < 20) ? 1 : 0;
             
-            // Determine initial status - priority tickets go to Waiting
+            // Respect flow: Priority -> Waiting; otherwise keep provided status (usually Pending)
             String initialStatus = (priority == 1) ? "Waiting" : status;
             
             // Now insert the queue ticket with priority information
@@ -930,13 +930,13 @@ public class CephraDB {
                 
                 int rowsAffected = stmt.executeUpdate();
                 
-                // If this is a priority ticket (Waiting status), also add it to waiting grid
-                if (rowsAffected > 0 && priority == 1) {
+                // If initial status is Waiting (priority or manually set), also add it to waiting grid
+                if (rowsAffected > 0 && "Waiting".equalsIgnoreCase(initialStatus)) {
                     try {
                         cephra.Admin.BayManagement.addTicketToWaitingGrid(ticketId, username, serviceType, initialBatteryLevel);
-                        System.out.println("CephraDB: Priority ticket " + ticketId + " automatically added to waiting grid");
+                        System.out.println("CephraDB: Ticket " + ticketId + " added to waiting grid (status=Waiting)");
                     } catch (Exception e) {
-                        System.err.println("CephraDB: Failed to add priority ticket " + ticketId + " to waiting grid: " + e.getMessage());
+                        System.err.println("CephraDB: Failed to add ticket " + ticketId + " to waiting grid: " + e.getMessage());
                     }
                 }
                 
