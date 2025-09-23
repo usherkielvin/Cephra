@@ -41,16 +41,116 @@
                 <nav class="nav">
                     <ul class="nav-list">
                         <li><a href="#charging" class="nav-link">Charging</a></li>
-                        <li><a href="#platforms" class="nav-link">Platforms</a></li>
-                        <li><a href="#support" class="nav-link">Support</a></li>
-                        <li><a href="#analysis" class="nav-link">Analytics</a></li>
+                        <li><a href="#link-car" class="nav-link">Link Car</a></li>
+                        <li><a href="#rewards" class="nav-link">Rewards</a></li>
+                        <li><a href="#history" class="nav-link">History</a></li>
                     </ul>
                 </nav>
 
-                <!-- Auth Buttons -->
-                <div class="auth-buttons">
-                    <a href="Register_Panel.php" class="btn btn-secondary">Register</a>
-                    <a href="login.php" class="btn btn-primary">Login</a>
+                <!-- Auth and Feature Buttons -->
+                <div class="header-actions">
+                    <!-- Auth Buttons (left within the right group) -->
+                    <div class="auth-buttons">
+                        <a href="Register_Panel.php" class="nav-link auth-link">Register</a>
+                        <a href="login.php" class="nav-link auth-link">Login</a>
+                    </div>
+
+                    <!-- Separator -->
+                    <span class="header-separator">|</span>
+
+                    <!-- Language Selector -->
+                    <div class="language-selector">
+                        <button class="language-btn" id="languageBtn">
+                            <span class="language-text">EN</span>
+                            <i class="fas fa-chevron-down language-arrow"></i>
+                        </button>
+                        <div class="language-dropdown" id="languageDropdown">
+                            <div class="language-option" data-lang="en">English</div>
+                            <div class="language-option" data-lang="es">Español</div>
+                            <div class="language-option" data-lang="fr">Français</div>
+                        </div>
+                    </div>
+
+                    <!-- Download App Button (furthest right) -->
+                    <div class="download-app">
+                        <button class="download-btn" id="downloadBtn">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <div class="qr-popup" id="qrPopup">
+                            <div class="qr-content">
+                                <h4>Download Cephra App</h4>
+                                <div class="qr-code">
+                                    <img src="images/qr.png" alt="QR Code - Download Cephra App" width="120" height="120" style="display: block; border-radius: 8px;" />
+                                </div>
+                                <p>Scan to download the Cephra mobile app</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu -->
+                <div class="mobile-menu" id="mobileMenu">
+                    <div class="mobile-menu-content">
+                        <!-- Mobile Navigation -->
+                        <div class="mobile-nav">
+                            <ul class="mobile-nav-list">
+                                <li class="mobile-nav-item">
+                                    <a href="#charging" class="mobile-nav-link">Charging</a>
+                                </li>
+                                <li class="mobile-nav-item">
+                                    <a href="#link-car" class="mobile-nav-link">Link Car</a>
+                                </li>
+                                <li class="mobile-nav-item">
+                                    <a href="#rewards" class="mobile-nav-link">Rewards</a>
+                                </li>
+                                <li class="mobile-nav-item">
+                                    <a href="#history" class="mobile-nav-link">History</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Mobile Header Actions -->
+                        <div class="mobile-header-actions">
+                            <!-- Mobile Language Selector -->
+                            <div class="mobile-language-selector">
+                                <div class="language-selector">
+                                    <button class="language-btn" id="mobileLanguageBtn">
+                                        <span class="language-text">EN</span>
+                                        <i class="fas fa-chevron-down language-arrow"></i>
+                                    </button>
+                                    <div class="language-dropdown" id="mobileLanguageDropdown">
+                                        <div class="language-option" data-lang="en">English</div>
+                                        <div class="language-option" data-lang="es">Español</div>
+                                        <div class="language-option" data-lang="fr">Français</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Download App -->
+                            <div class="mobile-download-app">
+                                <div class="download-app">
+                                    <button class="download-btn" id="mobileDownloadBtn">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <div class="qr-popup" id="mobileQrPopup">
+                                        <div class="qr-content">
+                                            <h4>Download Cephra App</h4>
+                                            <div class="qr-code">
+                                                <img src="images/qr.png" alt="QR Code - Download Cephra App" width="120" height="120" style="display: block; border-radius: 8px;" />
+                                            </div>
+                                            <p>Scan to download the Cephra mobile app</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Auth Buttons -->
+                            <div class="mobile-auth-buttons">
+                                <a href="Register_Panel.php" class="nav-link auth-link">Register</a>
+                                <a href="login.php" class="nav-link auth-link">Login</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Mobile Menu Toggle -->
@@ -263,7 +363,8 @@
     <script>
         // Mobile menu toggle
         document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-            document.querySelector('.nav').classList.toggle('nav-open');
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('mobile-menu-open');
             this.classList.toggle('active');
         });
 
@@ -307,6 +408,145 @@
 
         document.querySelectorAll('.feature-card, .promo-card').forEach(card => {
             observer.observe(card);
+        });
+
+        // Language Selector Functionality
+        const languageBtn = document.getElementById('languageBtn');
+        const languageDropdown = document.getElementById('languageDropdown');
+        const languageOptions = document.querySelectorAll('.language-option');
+
+        // Load saved language preference
+        function loadLanguagePreference() {
+            const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+            updateLanguageDisplay(savedLang);
+        }
+
+        // Update language display
+        function updateLanguageDisplay(lang) {
+            const languageText = document.querySelector('.language-text');
+            const langMap = {
+                'en': 'EN',
+                'es': 'ES',
+                'fr': 'FR'
+            };
+            languageText.textContent = langMap[lang] || 'EN';
+            localStorage.setItem('selectedLanguage', lang);
+        }
+
+        // Toggle language dropdown
+        languageBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            languageDropdown.classList.toggle('show');
+            languageBtn.classList.toggle('active');
+        });
+
+        // Handle language selection
+        languageOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const selectedLang = this.dataset.lang;
+                updateLanguageDisplay(selectedLang);
+                languageDropdown.classList.remove('show');
+                languageBtn.classList.remove('active');
+
+                // Here you would typically make an API call to save to database
+                console.log('Language changed to:', selectedLang);
+                // TODO: Add database integration here
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!languageBtn.contains(e.target) && !languageDropdown.contains(e.target)) {
+                languageDropdown.classList.remove('show');
+                languageBtn.classList.remove('active');
+            }
+        });
+
+        // QR Code Popup Functionality
+        const downloadBtn = document.getElementById('downloadBtn');
+        const qrPopup = document.getElementById('qrPopup');
+
+        // Show QR popup on hover
+        downloadBtn.addEventListener('mouseenter', function() {
+            qrPopup.classList.add('show');
+        });
+
+        // Hide QR popup when mouse leaves both button and popup
+        downloadBtn.addEventListener('mouseleave', function(e) {
+            // Delay hiding to allow mouse to move to popup
+            setTimeout(() => {
+                if (!downloadBtn.matches(':hover') && !qrPopup.matches(':hover')) {
+                    qrPopup.classList.remove('show');
+                }
+            }, 100);
+        });
+
+        // Hide QR popup when mouse leaves popup
+        qrPopup.addEventListener('mouseleave', function() {
+            qrPopup.classList.remove('show');
+        });
+
+        // Mobile Language Selector Functionality
+        const mobileLanguageBtn = document.getElementById('mobileLanguageBtn');
+        const mobileLanguageDropdown = document.getElementById('mobileLanguageDropdown');
+        const mobileLanguageOptions = mobileLanguageDropdown.querySelectorAll('.language-option');
+
+        // Toggle mobile language dropdown
+        mobileLanguageBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileLanguageDropdown.classList.toggle('show');
+            mobileLanguageBtn.classList.toggle('active');
+        });
+
+        // Handle mobile language selection
+        mobileLanguageOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const selectedLang = this.dataset.lang;
+                updateLanguageDisplay(selectedLang);
+                mobileLanguageDropdown.classList.remove('show');
+                mobileLanguageBtn.classList.remove('active');
+
+                // Also update desktop language display
+                const desktopLanguageText = document.querySelector('#languageBtn .language-text');
+                if (desktopLanguageText) {
+                    const langMap = { 'en': 'EN', 'es': 'ES', 'fr': 'FR' };
+                    desktopLanguageText.textContent = langMap[selectedLang] || 'EN';
+                }
+
+                console.log('Language changed to:', selectedLang);
+            });
+        });
+
+        // Mobile QR Code Popup Functionality
+        const mobileDownloadBtn = document.getElementById('mobileDownloadBtn');
+        const mobileQrPopup = document.getElementById('mobileQrPopup');
+
+        // Show mobile QR popup on click
+        mobileDownloadBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileQrPopup.classList.toggle('show');
+        });
+
+        // Hide mobile QR popup when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!mobileDownloadBtn.contains(e.target) && !mobileQrPopup.contains(e.target)) {
+                mobileQrPopup.classList.remove('show');
+            }
+        });
+
+        // Close mobile menu when clicking on mobile nav links
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                mobileMenu.classList.remove('mobile-menu-open');
+                mobileMenuToggle.classList.remove('active');
+            });
+        });
+
+        // Initialize language preference on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLanguagePreference();
         });
     </script>
 </body>

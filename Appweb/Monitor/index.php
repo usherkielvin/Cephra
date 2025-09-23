@@ -18,33 +18,266 @@
     <meta name="theme-color" content="#0b1e29" />
     <style>
         :root {
-            --bg:#0b1e29; --panel:#0e2230; --card:#122938; --text:#e7f6fa; --muted:#9fb6bf; --accent:#9adcf0;
-            --avail:#0c3; --availText:#041; --occ:#3cf; --occText:#002; --maint:#f55; --maintText:#200;
+            --bg:#0b1e29; 
+            --panel:#0e2230; 
+            --card:#122938; 
+            --text:#e7f6fa; 
+            --muted:#9fb6bf; 
+            --accent:#9adcf0;
+            --accent-hover:#b5e8f7;
+            --avail:#0c3; 
+            --availText:#041; 
+            --occ:#3cf; 
+            --occText:#002; 
+            --maint:#f55; 
+            --maintText:#200;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 10px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 20px rgba(0,0,0,0.2);
+            --transition-fast: all 0.2s ease;
+            --transition-normal: all 0.3s ease;
         }
-        .light { --bg:#f6fbfd; --panel:#ffffff; --card:#f1f7fa; --text:#0b1e29; --muted:#557; --accent:#0b7fa2; }
-        body { font-family: Arial, sans-serif; margin: 0; padding: 12px; background:var(--bg); color:var(--text); transition: background .2s,color .2s; }
-        h1 { margin: 0 0 12px; font-size: 22px; display:flex; align-items:center; gap:8px; flex-wrap: wrap; }
-        .logo { width:32px; height:32px; border-radius:4px; overflow:hidden; display:inline-block; background:transparent; }
-        .logo img { width:100%; height:100%; object-fit:contain; object-position:center; display:block; background:transparent; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); gap: 12px; }
-        .bay { background:var(--card); border-radius: 12px; padding: 12px; border:1px solid rgba(255,255,255,0.08); min-width: 0; height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
-        .bay h3 { margin: 0 0 8px; font-size: 18px; color:var(--accent); word-break: break-word; }
-        .badge { display:inline-block; padding:6px 10px; border-radius: 999px; font-size: 13px; }
-        .available { background:var(--avail); color:var(--availText); font-size: 16px; font-weight: bold; padding: 8px 12px; }
-        .occupied { background:var(--occ); color:var(--occText); }
-        .maintenance { background:var(--maint); color:var(--maintText); }
-        .row { margin-top: 16px; display:flex; gap:12px; align-items:flex-start; flex-wrap: wrap; }
-        .panel { background:var(--panel); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; flex:1 1 320px; min-width: 0; }
-        table { width:100%; border-collapse: collapse; }
-        th, td { text-align:left; padding:8px; border-bottom:1px solid rgba(255,255,255,0.06); font-size: 14px; }
-        th { color:var(--accent); }
-        .muted { color:var(--muted); font-size: 12px; }
-        .ts { font-size: 12px; color:var(--muted); margin-left:8px; }
-        .toolbar { margin-left:auto; display:flex; gap:8px; align-items:center; }
-        .btn { background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.25); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; }
-        .toolbar label { display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px; }
-        .toolbar label input[type="checkbox"] { margin:0; }
-        .pager { display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap: wrap; }
+        .light { 
+            --bg:#f6fbfd; 
+            --panel:#ffffff; 
+            --card:#f1f7fa; 
+            --text:#0b1e29; 
+            --muted:#557; 
+            --accent:#0b7fa2;
+            --accent-hover:#0a6d8c;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            background:var(--bg); 
+            color:var(--text); 
+            transition: var(--transition-normal); 
+            line-height: 1.5;
+        }
+        h1 { 
+            margin: 0 0 15px; 
+            font-size: 24px; 
+            display:flex; 
+            align-items:center; 
+            gap:10px; 
+            flex-wrap: wrap; 
+            font-weight: 600;
+        }
+        .logo { 
+            width:36px; 
+            height:36px; 
+            border-radius:6px; 
+            overflow:hidden; 
+            display:inline-block; 
+            background:transparent; 
+            box-shadow: var(--shadow-sm);
+        }
+        .logo img { 
+            width:100%; 
+            height:100%; 
+            object-fit:contain; 
+            object-position:center; 
+            display:block; 
+            background:transparent; 
+            transition: var(--transition-fast);
+        }
+        .logo:hover img { transform: scale(1.05); }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(auto-fit, minmax(200px, auto)); 
+            gap: 20px; 
+        }
+        .bay { 
+            background:var(--card); 
+            border-radius: 16px; 
+            padding: 18px; 
+            border:1px solid rgba(255,255,255,0.1); 
+            min-width: 0; 
+            height: 200px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            box-shadow: var(--shadow-md); 
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        .bay:hover { 
+            transform: translateY(-5px); 
+            box-shadow: var(--shadow-lg);
+        }
+        .bay::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+            opacity: 0.7;
+        }
+        .bay h3 { 
+            margin: 0 0 12px; 
+            font-size: 20px; 
+            color:var(--accent); 
+            word-break: break-word; 
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .bay-info {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        .info-label {
+            color: var(--muted);
+            font-weight: 500;
+        }
+        .info-value {
+            font-weight: 500;
+        }
+        .badge { 
+            display:inline-block; 
+            padding:8px 14px; 
+            border-radius: 999px; 
+            font-size: 14px; 
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
+        }
+        .available { 
+            background:var(--avail); 
+            color:var(--availText); 
+            font-size: 16px; 
+            font-weight: bold; 
+            padding: 10px 16px; 
+        }
+        .occupied { 
+            background:var(--occ); 
+            color:var(--occText); 
+        }
+        .maintenance { 
+            background:var(--maint); 
+            color:var(--maintText); 
+        }
+        .row { 
+            margin-top: 20px; 
+            display:flex; 
+            gap:20px; 
+            align-items:flex-start; 
+            flex-wrap: wrap; 
+        }
+        .panel { 
+            background:var(--panel); 
+            border:1px solid rgba(255,255,255,0.1); 
+            border-radius:16px; 
+            padding:20px; 
+            flex:1 1 320px; 
+            min-width: 0; 
+            box-shadow: var(--shadow-md);
+        }
+        table { 
+            width:100%; 
+            border-collapse: collapse; 
+        }
+        th, td { 
+            text-align:left; 
+            padding:10px; 
+            border-bottom:1px solid rgba(255,255,255,0.08); 
+            font-size: 14px; 
+        }
+        th { 
+            color:var(--accent); 
+            font-weight: 600;
+        }
+        .muted { 
+            color:var(--muted); 
+            font-size: 13px; 
+        }
+        .ts { 
+            font-size: 13px; 
+            color:var(--muted); 
+            margin-left:10px; 
+            font-weight: normal;
+        }
+        .toolbar { 
+            margin-left:auto; 
+            display:flex; 
+            gap:10px; 
+            align-items:center; 
+        }
+        .btn { 
+            background:transparent; 
+            color:var(--text); 
+            border:1px solid rgba(255,255,255,0.3); 
+            border-radius:10px; 
+            padding:8px 14px; 
+            cursor:pointer; 
+            font-size:13px; 
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+        .btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+        .toolbar label { 
+            display:flex; 
+            align-items:center; 
+            gap:8px; 
+            cursor:pointer; 
+            font-size:13px; 
+        }
+        .toolbar label input[type="checkbox"] { 
+            margin:0; 
+            accent-color: var(--accent);
+        }
+        .pager { 
+            display:flex; 
+            gap:8px; 
+            align-items:center; 
+            margin-top:12px; 
+            flex-wrap: wrap; 
+            justify-content: center;
+        }
+        
+        /* Announcement toast styling */
+        .announcement-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent);
+            color: var(--bg);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .announcement-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
         .pager .btn { padding:4px 8px; }
         
         /* Fullscreen styles */
@@ -88,7 +321,7 @@
             box-sizing: border-box;
         }
         .fullscreen-mode .bay { 
-            padding: 20px; 
+            padding: 25px; 
             font-size: 16px; 
             height: 100%; 
             width: 100%;
@@ -96,9 +329,10 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border-radius: 15px;
+            border-radius: 20px;
             margin: 0;
             box-sizing: border-box;
+            box-shadow: var(--shadow-lg);
         }
         .fullscreen-mode .bay h3 { 
             font-size: 18px; 
@@ -213,27 +447,43 @@
             .fullscreen-mode .available { font-size: 20px; padding: 14px 20px; }
         }
         
+        /* Improved responsive design for different screen sizes */
         @media (max-width: 420px) {
             body { padding: 8px; }
-            .grid { gap: 10px; grid-template-columns: 1fr; grid-template-rows: repeat(auto-fit, minmax(180px, auto)); }
-            .bay { padding:10px; height: 180px; }
-            .bay h3 { font-size: 16px; }
+            h1 { font-size: 18px; margin-bottom: 10px; }
+            .toolbar { flex-direction: column; align-items: flex-start; }
+            .toolbar .btn { width: 100%; margin-bottom: 5px; }
+            .grid { gap: 12px; grid-template-columns: 1fr; grid-template-rows: repeat(auto-fit, minmax(170px, auto)); }
+            .bay { padding: 12px; height: 170px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s; }
+            .bay:active { transform: scale(0.98); }
+            .bay h3 { font-size: 16px; margin-bottom: 10px; }
             .available { font-size: 14px; font-weight: bold; padding: 6px 10px; }
-            th, td { font-size: 13px; }
+            .panel { padding: 10px; }
+            th, td { font-size: 12px; padding: 6px; }
+            .pager { justify-content: center; }
         }
         @media (min-width: 421px) and (max-width: 640px) {
-            .grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(auto-fit, minmax(190px, auto)); }
-            .bay { height: 190px; }
+            body { padding: 10px; }
+            h1 { font-size: 20px; }
+            .toolbar { flex-wrap: wrap; }
+            .grid { gap: 15px; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(auto-fit, minmax(180px, auto)); }
+            .bay { padding: 15px; height: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s; }
+            .bay:hover { transform: translateY(-3px); }
             .available { font-size: 15px; font-weight: bold; padding: 7px 11px; }
+            .panel { padding: 12px; }
         }
         @media (min-width: 641px) and (max-width: 1024px) {
-            .grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
-            .bay { height: 200px; }
+            body { padding: 12px; }
+            .grid { gap: 18px; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
+            .bay { padding: 16px; height: 200px; box-shadow: 0 3px 8px rgba(0,0,0,0.12); transition: transform 0.2s, box-shadow 0.2s; }
+            .bay:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
             .available { font-size: 16px; font-weight: bold; padding: 8px 12px; }
         }
         @media (min-width: 1025px) {
-            .grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
-            .bay { height: 200px; }
+            body { padding: 15px; }
+            .grid { gap: 20px; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
+            .bay { padding: 18px; height: 200px; box-shadow: 0 3px 10px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; }
+            .bay:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
             .available { font-size: 16px; font-weight: bold; padding: 8px 12px; }
         }
     </style>
@@ -301,6 +551,12 @@
         let lastQueueTickets = new Set(); // Track tickets that were already announced
         let page = 1;
         const pageSize = 10;
+        let socket = null;
+        let isConnected = false;
+        let reconnectAttempts = 0;
+        let reconnectInterval = null;
+        const maxReconnectAttempts = 5;
+        const reconnectDelay = 3000; // 3 seconds
 
         function setTheme(light) {
             document.body.classList.toggle('light', !!light);
@@ -316,6 +572,110 @@
             document.getElementById('fullscreenBtn').textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Bays';
         };
 
+        // WebSocket connection
+        function connectWebSocket() {
+            // Get the current hostname and use it to build the WebSocket URL
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.hostname;
+            const wsUrl = `${protocol}//${host}:8080`;
+            
+            // Create WebSocket connection
+            socket = new WebSocket(wsUrl);
+            
+            // Connection opened
+            socket.addEventListener('open', (event) => {
+                console.log('WebSocket connected');
+                isConnected = true;
+                reconnectAttempts = 0;
+                clearInterval(reconnectInterval);
+                reconnectInterval = null;
+                updateConnectionStatus(true);
+            });
+            
+            // Listen for messages
+            socket.addEventListener('message', (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data && !data.error) {
+                        handleAlerts(data);
+                        renderBays(data.bays || []);
+                        currentQueue = data.queue || [];
+                        renderQueuePage();
+                        document.getElementById('ts').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    } else {
+                        console.error('Monitor error', data.error);
+                    }
+                } catch (e) {
+                    console.error('Error processing WebSocket message', e);
+                }
+            });
+            
+            // Connection closed
+            socket.addEventListener('close', (event) => {
+                console.log('WebSocket disconnected');
+                isConnected = false;
+                updateConnectionStatus(false);
+                socket = null;
+                
+                // Attempt to reconnect if not already trying
+                if (!reconnectInterval && reconnectAttempts < maxReconnectAttempts) {
+                    reconnectInterval = setInterval(attemptReconnect, reconnectDelay);
+                } else if (reconnectAttempts >= maxReconnectAttempts) {
+                    // Fall back to polling if max reconnect attempts reached
+                    console.log('Max reconnect attempts reached, falling back to polling');
+                    startPolling();
+                }
+            });
+            
+            // Connection error
+            socket.addEventListener('error', (event) => {
+                console.error('WebSocket error', event);
+                isConnected = false;
+                updateConnectionStatus(false);
+            });
+        }
+        
+        function attemptReconnect() {
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+                connectWebSocket();
+            } else {
+                clearInterval(reconnectInterval);
+                reconnectInterval = null;
+                console.log('Max reconnect attempts reached, falling back to polling');
+                startPolling();
+            }
+        }
+        
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (statusElement) {
+                statusElement.className = connected ? 'connection-status connected' : 'connection-status disconnected';
+                statusElement.title = connected ? 'Real-time connection active' : 'Connection lost, using fallback';
+            }
+        }
+        
+        let pollingInterval = null;
+        
+        function startPolling() {
+            if (!pollingInterval) {
+                console.log('Starting polling fallback');
+                // Fetch immediately
+                fetchSnapshot();
+                // Then set up interval
+                pollingInterval = setInterval(fetchSnapshot, 3000);
+            }
+        }
+        
+        function stopPolling() {
+            if (pollingInterval) {
+                console.log('Stopping polling');
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }
+        
         async function fetchSnapshot() {
             try {
                 const res = await fetch('api/monitor.php', { cache: 'no-store' });
@@ -351,7 +711,10 @@
                 <div class="bay">
                     <h3>${b.bay_number}${type}</h3>
                     <div>${statusBadge(b.status)}</div>
-                    <div class="muted" style="margin-top:6px;">Ticket: ${ticket || '-'} | User: ${user || '-'}</div>
+                    <div class="bay-info">
+                        <div class="info-row"><span class="info-label">Ticket:</span> <span class="info-value">${ticket || '-'}</span></div>
+                        <div class="info-row"><span class="info-label">User:</span> <span class="info-value">${user || '-'}</span></div>
+                    </div>
                 </div>`;
             }).join('');
         }
@@ -431,31 +794,101 @@
             }
         }
 
+        // Improved text-to-speech functionality with better voice selection and audio feedback
         function speak(text) {
             if (document.getElementById('announcerChk').checked && 'speechSynthesis' in window) {
                 // Stop any current speech
                 speechSynthesis.cancel();
                 
+                // Create visual feedback for announcement
+                const announcementElement = document.createElement('div');
+                announcementElement.className = 'announcement-toast';
+                announcementElement.textContent = text;
+                document.body.appendChild(announcementElement);
+                
+                // Animate in
+                setTimeout(() => {
+                    announcementElement.classList.add('show');
+                }, 10);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    announcementElement.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(announcementElement);
+                    }, 500);
+                }, 4000);
+                
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.8;
-                utterance.pitch = 1.0;
-                utterance.volume = 0.8;
+                utterance.rate = 0.9;  // Slightly faster but still clear
+                utterance.pitch = 1.1; // Slightly higher pitch for clarity
+                utterance.volume = 1.0; // Full volume
                 
-                // Try to use a female voice if available
-                const voices = speechSynthesis.getVoices();
-                const femaleVoice = voices.find(voice => 
-                    voice.name.includes('Female') || 
-                    voice.name.includes('female') || 
-                    voice.name.includes('Zira') ||
-                    voice.name.includes('Susan') ||
-                    voice.name.includes('Karen') ||
-                    voice.name.includes('Microsoft Zira')
-                );
-                if (femaleVoice) {
-                    utterance.voice = femaleVoice;
+                // Get all available voices
+                let voices = [];
+                
+                // Handle the case where voices might not be loaded yet
+                const loadVoices = () => {
+                    voices = speechSynthesis.getVoices();
+                    
+                    // Try to find the best voice in this order of preference
+                    const preferredVoices = [
+                        // First try to find specific high-quality voices
+                        'Microsoft Zira',
+                        'Google UK English Female',
+                        'Samantha',
+                        'Karen',
+                        'Susan',
+                        // Then any female voice
+                        'Female',
+                        'female'
+                    ];
+                    
+                    // Try to find a preferred voice
+                    let selectedVoice = null;
+                    for (const preferred of preferredVoices) {
+                        const found = voices.find(voice => 
+                            voice.name.includes(preferred) && voice.localService
+                        );
+                        if (found) {
+                            selectedVoice = found;
+                            break;
+                        }
+                    }
+                    
+                    // If no preferred voice with localService, try without localService restriction
+                    if (!selectedVoice) {
+                        for (const preferred of preferredVoices) {
+                            const found = voices.find(voice => 
+                                voice.name.includes(preferred)
+                            );
+                            if (found) {
+                                selectedVoice = found;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // If still no voice, use the first available
+                    if (!selectedVoice && voices.length > 0) {
+                        selectedVoice = voices[0];
+                    }
+                    
+                    if (selectedVoice) {
+                        utterance.voice = selectedVoice;
+                    }
+                    
+                    // Speak the text
+                    speechSynthesis.speak(utterance);
+                };
+                
+                // If voices are already loaded, use them
+                if (speechSynthesis.getVoices().length > 0) {
+                    loadVoices();
+                } else {
+                    // Otherwise wait for them to load
+                    speechSynthesis.onvoiceschanged = loadVoices;
                 }
-                
-                speechSynthesis.speak(utterance);
             }
         }
         
@@ -506,8 +939,60 @@
         }
         
 
-        fetchSnapshot();
-        setInterval(fetchSnapshot, 3000);
+        // Add connection status indicator to the toolbar
+        const toolbar = document.querySelector('.toolbar');
+        const connectionStatus = document.createElement('div');
+        connectionStatus.id = 'connectionStatus';
+        connectionStatus.className = 'connection-status';
+        connectionStatus.title = 'Connecting...';
+        toolbar.appendChild(connectionStatus);
+        
+        // Add CSS for connection status indicator
+        const style = document.createElement('style');
+        style.textContent = `
+            .connection-status {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: #888;
+                margin-left: 10px;
+                transition: background-color 0.3s ease;
+                position: relative;
+            }
+            .connection-status.connected {
+                background-color: #0c3;
+                box-shadow: 0 0 5px #0c3;
+            }
+            .connection-status.disconnected {
+                background-color: #f55;
+                box-shadow: 0 0 5px #f55;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize connection
+        if ('WebSocket' in window) {
+            // WebSockets are supported, try to connect
+            connectWebSocket();
+        } else {
+            // WebSockets are not supported, fall back to polling
+            console.log('WebSockets not supported, using polling');
+            startPolling();
+        }
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                // Page is now visible, reconnect if needed
+                if (!socket && !pollingInterval) {
+                    if ('WebSocket' in window) {
+                        connectWebSocket();
+                    } else {
+                        startPolling();
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
