@@ -235,20 +235,16 @@ public class ChargingOption extends javax.swing.JPanel {
         
         // Allow proceeding even if fast charging bays are occupied/unavailable; ticket will be handled by queue
        
-       // Set Fast Charging service before switching to QueueTicket panel
+       // Set Fast Charging service and show proceed popup instead of full panel
        cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Fast Charging");
-       SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.QueueTicket());
-                        break;
-                    }
-                }
-            }
-        });
+       // Temporarily hide the banner/background label to avoid overlap artifacts
+       boolean hadLabel = (jLabel1 != null && jLabel1.isVisible());
+       if (jLabel1 != null) jLabel1.setVisible(false);
+       try {
+           cephra.Phone.Popups.ChargingQueueProceed.showPopup();
+       } finally {
+           if (jLabel1 != null && hadLabel) jLabel1.setVisible(true);
+       }
     }//GEN-LAST:event_fastchargeActionPerformed
 
     private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
@@ -275,20 +271,15 @@ public class ChargingOption extends javax.swing.JPanel {
         
         // Allow proceeding even if normal charging bays are occupied/unavailable; ticket will be handled by queue
         
-        // Set Normal Charging service before switching to QueueTicket panel
+        // Set Normal Charging service and show proceed popup instead of full panel
         cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Normal Charging");
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.QueueTicket());
-                        break;
-                    }
-                }
-            }
-        });
+        boolean hadLabel2 = (jLabel1 != null && jLabel1.isVisible());
+        if (jLabel1 != null) jLabel1.setVisible(false);
+        try {
+            cephra.Phone.Popups.ChargingQueueProceed.showPopup();
+        } finally {
+            if (jLabel1 != null && hadLabel2) jLabel1.setVisible(true);
+        }
     }//GEN-LAST:event_normalchargeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

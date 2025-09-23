@@ -1848,8 +1848,8 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                             dataType: 'json',
                             success: function(response) {
                                 if (response.success) {
-                                    // Show queue ticket popup
-                                    showQueueTicketPopup(response);
+                                    // Show QueueTicketProceed popup
+                                    showQueueTicketProceedPopup(response);
                                 } else if (response.error) {
                                     showDialog('Charging', response.error);
                                 }
@@ -1865,20 +1865,22 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                         });
                     }
 
-                    function showQueueTicketPopup(response) {
+                    function showQueueTicketProceedPopup(response) {
                         if (response.success) {
                             var ticketId = response.ticketId;
                             var serviceType = response.serviceType;
                             var batteryLevel = response.batteryLevel;
 
-                            // Create popup HTML
-                            var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 300px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
-                            popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Your Queue Ticket</h2>';
+                            // Create popup HTML (QueueTicketProceed)
+                            var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 320px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
+                            popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Queue Ticket Proceed</h2>';
                             popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
                             popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
                             popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
                             popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
-                            popupHtml += '<button onclick="closePopup()" style="display: block; margin: 15px auto 0; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>';
+                            popupHtml += '<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">';
+                            popupHtml += '<button onclick="closePopup()" style="padding: 10px 16px; background: #00a389; color: white; border: none; border-radius: 6px; cursor: pointer;">OK</button>';
+                            popupHtml += '</div>';
                             popupHtml += '</div>';
 
                             // Append to body
