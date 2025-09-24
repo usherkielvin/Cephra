@@ -21,11 +21,23 @@ public class EmailOTP extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        toPassEmail = new javax.swing.JButton();
         otp = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setOpaque(false);
         setLayout(null);
+
+        toPassEmail.setBorder(null);
+        toPassEmail.setBorderPainted(false);
+        toPassEmail.setContentAreaFilled(false);
+        toPassEmail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                toPassEmailActionPerformed(evt);
+            }
+        });
+        add(toPassEmail);
+        toPassEmail.setBounds(20, 50, 330, 100);
 
         otp.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         otp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -38,10 +50,26 @@ public class EmailOTP extends javax.swing.JPanel {
         jLabel1.setBounds(25, 0, 330, 200);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void toPassEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_toPassEmailActionPerformed
+         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PasswordEmail());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_toPassEmailActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel otp;
+    private javax.swing.JButton toPassEmail;
     // End of variables declaration//GEN-END:variables
     
     /**
