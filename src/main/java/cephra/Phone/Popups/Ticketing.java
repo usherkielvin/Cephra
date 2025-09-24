@@ -7,20 +7,14 @@ import java.awt.event.*;
 
 public class Ticketing extends javax.swing.JPanel {
     
-    // Static state management to prevent multiple instances
     private static Ticketing currentInstance = null;
     private static boolean isShowing = false;
     
-    // Popup dimensions (centered in phone frame)
     private static final int POPUP_WIDTH = 270;
     private static final int POPUP_HEIGHT = 390;
-    private static final int PHONE_WIDTH = 350; // fallback if frame size not yet realized
-    private static final int PHONE_HEIGHT = 750; // fallback if frame size not yet realized
+    private static final int PHONE_WIDTH = 350; 
+    private static final int PHONE_HEIGHT = 750;
     
-    /**
-     * Checks if Ticketing popup is currently showing
-     * @return true if popup is showing
-     */
     public static boolean isPopupShowing() {
         return isShowing;
     }

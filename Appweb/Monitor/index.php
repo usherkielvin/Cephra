@@ -251,6 +251,26 @@
             align-items:center; 
             flex-wrap: wrap;
         }
+        /* Burger button (hidden by default, visible on small screens) */
+        .burger {
+            display:none;
+            margin-left:auto;
+            width:36px; height:28px;
+            border:1px solid rgba(255,255,255,0.3);
+            border-radius:8px;
+            background:transparent;
+            align-items:center; justify-content:center;
+            cursor:pointer;
+        }
+        .burger span {
+            display:block; width:18px; height:2px; background:var(--text);
+            position:relative;
+        }
+        .burger span::before, .burger span::after {
+            content:""; position:absolute; left:0; width:18px; height:2px; background:var(--text);
+        }
+        .burger span::before { top:-6px; }
+        .burger span::after  { top: 6px; }
         .btn { 
             background:transparent; 
             color:var(--text); 
@@ -671,11 +691,13 @@
         }
         
         /* Improved responsive design for different screen sizes */
-        @media (max-width: 420px) {
+        @media (max-width: 640px) {
             body { padding: 8px; }
             h1 { font-size: 18px; margin-bottom: 10px; }
-            .toolbar { flex-direction: column; align-items: flex-start; }
-            .toolbar .btn { width: 100%; margin-bottom: 5px; }
+            .burger { display:flex; }
+            .toolbar { display:none; width:100%; margin-top:8px; }
+            .toolbar.show { display:flex; flex-direction: column; align-items: stretch; }
+            .toolbar .btn, .toolbar label { width: 100%; }
             .grid { gap: 12px; grid-template-columns: 1fr; grid-template-rows: repeat(auto-fit, minmax(170px, auto)); }
             .bay { padding: 12px; height: 170px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s; }
             .bay:active { transform: scale(0.98); }
@@ -715,7 +737,8 @@
     <h1>
         <span class="logo"><img src="../Admin/images/MONU.png" alt="Cephra" /></span>
         Cephra Live Monitor <span id="ts" class="ts"></span>
-        <div class="toolbar">
+        <button class="burger" id="burgerBtn" aria-label="Menu"><span></span></button>
+        <div class="toolbar" id="toolbarWrap">
             <label class="muted" style="white-space:nowrap;"><input type="checkbox" id="announcerChk" checked /> Bay Announcer</label>
             <label class="muted" style="white-space:nowrap; margin-left: 10px;">
                 Volume: <input type="range" id="volumeSlider" min="0" max="100" value="80" style="width: 60px; margin: 0 5px;" />
@@ -724,7 +747,6 @@
                 Speed: <input type="range" id="speedSlider" min="50" max="200" value="90" style="width: 60px; margin: 0 5px;" />
             </label>
             <button class="btn" id="testTTSBtn">Test TTS</button>
-            <button class="btn" id="fullscreenBtn">Fullscreen Bays</button>
             <button class="btn" id="themeBtn">Toggle Theme</button>
             <button class="btn" id="languageBtn">EN</button>
         </div>
@@ -959,10 +981,18 @@
             });
         }
 
-        // Fullscreen functionality with dark mode
-        let isFullscreen = false;
+        // Responsive burger toggle
+        const burgerBtn = document.getElementById('burgerBtn');
+        const toolbarWrap = document.getElementById('toolbarWrap');
+        if (burgerBtn && toolbarWrap) {
+            burgerBtn.addEventListener('click', () => {
+                toolbarWrap.classList.toggle('show');
+            });
+        }
+
+        // Theme / display state
+        let isFullscreen = false; // kept for possible future re-enable
         let isDarkMode = true; // Default to dark mode
-        const fsBtn = document.getElementById('fullscreenBtn');
         const themeBtn = document.getElementById('themeBtn');
         
         // Load saved theme preference
@@ -975,20 +1005,7 @@
             isDarkMode = false;
         }
         
-        if (fsBtn) {
-            fsBtn.onclick = () => {
-                isFullscreen = !isFullscreen;
-                document.body.classList.toggle('fullscreen-mode', isFullscreen);
-                
-                if (isFullscreen) {
-                    createFullscreenUI();
-                } else {
-                    removeFullscreenUI();
-                }
-                
-                fsBtn.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Bays';
-            };
-        }
+        // Fullscreen temporarily disabled per request
         
         function createFullscreenUI() {
             // Create fullscreen header
