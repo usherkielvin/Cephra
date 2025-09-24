@@ -47,6 +47,8 @@ public class WaitingBayPOP extends javax.swing.JPanel {
         ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/WaitingBayPOP.png"))); // NOI18N
         add(ICON);
         ICON.setBounds(50, 40, 270, 320);
+		// Ensure the invisible OK button stays on top and receives clicks
+		setComponentZOrder(OKBTN, 0);
     }// </editor-fold>//GEN-END:initComponents
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed

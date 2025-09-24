@@ -52,10 +52,19 @@ public class Ticketing extends javax.swing.JPanel {
      * @return true if popup was shown successfully
      */
     public static boolean showPopup() {
-        // Allow reappearing - if already showing, hide first then show again
-        if (isShowing) {
-            hidePopup();
-        }
+        // If any other modal popup is showing, do not override it
+        try {
+            if (cephra.Phone.Popups.CustomPopupManager.isPopupShowing()) return false;
+        } catch (Throwable ignore) {}
+        try {
+            if (cephra.Phone.Popups.AlreadyFull.isPopupShowing()) return false;
+        } catch (Throwable ignore) {}
+        try {
+            if (cephra.Phone.Popups.LinkFirst.isPopupShowing()) return false;
+        } catch (Throwable ignore) {}
+
+        // Allow reappearing - if Ticketing already showing, hide first then show again
+        if (isShowing) { hidePopup(); }
         
         // Validate user is logged in
         if (!cephra.Database.CephraDB.isUserLoggedIn()) {

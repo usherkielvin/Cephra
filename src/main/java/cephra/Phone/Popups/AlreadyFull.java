@@ -30,6 +30,9 @@ public class AlreadyFull extends javax.swing.JPanel {
         return isShowing && ticketId != null && ticketId.equals(currentTicketId);
     }
     
+    // Added: check if popup is showing regardless of ticket
+    public static boolean isPopupShowing() { return isShowing; }
+    
     /**
      * Validates if PayPop can be shown for the given ticket and user
      * @param ticketId the ticket ID

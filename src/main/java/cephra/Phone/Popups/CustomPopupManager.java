@@ -509,10 +509,20 @@ public class CustomPopupManager {
      */
     public static void executeCallback() {
         userConfirmed = true;
+        boolean closedByCallback = false;
         if (currentCallback != null) {
-            currentCallback.run();
+            try {
+                currentCallback.run();
+                // After running, check if popup was closed by callback
+                closedByCallback = (currentPopup == null || !isShowing);
+            } catch (Exception ex) {
+                System.err.println("executeCallback error: " + ex.getMessage());
+            }
         }
-        // Don't hide here - let the callback handle the popup transitions
+        // If no callback or still showing, hide to ensure button responds
+        if (!closedByCallback) {
+            hideCustomPopup();
+        }
     }
     
     /**

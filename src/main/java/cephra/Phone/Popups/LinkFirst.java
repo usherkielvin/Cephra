@@ -22,6 +22,9 @@ public class LinkFirst extends javax.swing.JPanel {
         return isShowing && ticketId != null && ticketId.equals(currentTicketId);
     }
     
+    // Added: check if popup is showing regardless of ticket
+    public static boolean isPopupShowing() { return isShowing; }
+    
     public static boolean canShowPayPop(String ticketId, String customerUsername) { return true; }
     
     // Method to disable all components recursively

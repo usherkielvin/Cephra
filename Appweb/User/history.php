@@ -30,7 +30,7 @@ if ($conn) {
 		<link rel="apple-touch-icon" href="images/logo.png?v=2" />
 		<link rel="manifest" href="manifest.webmanifest" />
 		<meta name="theme-color" content="#062635" />
-		<link rel="stylesheet" href="css/vantage-style.css" />
+        <link rel="stylesheet" href="css/vantage-style.css" />
 		<link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 		<link rel="stylesheet" href="assets/css/pages/history.css" />
 	</head>
@@ -48,17 +48,17 @@ if ($conn) {
 						<!-- Navigation -->
 						<nav class="nav">
 							<ul class="nav-list">
-								<li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-								<li><a href="link.php" class="nav-link">Link</a></li>
-								<li class="current_page_item"><a href="history.php" class="nav-link">History</a></li>
-								<li><a href="profile.php" class="nav-link">Profile</a></li>
+                                <li><a href="dashboard.php" class="nav-link" data-i18n="navDashboard">Dashboard</a></li>
+                                <li><a href="link.php" class="nav-link" data-i18n="navLink">Link</a></li>
+                                <li class="current_page_item"><a href="history.php" class="nav-link" data-i18n="navHistory">History</a></li>
+                                <li><a href="profile.php" class="nav-link" data-i18n="navProfile">Profile</a></li>
 							</ul>
 						</nav>
 
 						<!-- Header Actions -->
 						<div class="header-actions">
 							<div class="auth-buttons">
-								<a href="dashboard.php" class="nav-link auth-link">Back</a>
+                                <a href="dashboard.php" class="nav-link auth-link" data-i18n="navBack">Back</a>
 							</div>
 						</div>
 
@@ -75,30 +75,30 @@ if ($conn) {
 			<!-- History Section -->
 			<section class="history-section" style="padding: 100px 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
 				<div class="container">
-					<div class="section-header" style="text-align: center; margin-bottom: 60px;">
-						<h2 class="section-title" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Transaction History</h2>
-						<p class="section-description" style="font-size: 1.2rem; color: rgba(26, 32, 44, 0.8); max-width: 600px; margin: 0 auto;">View and manage your payment transaction records</p>
+                    <div class="section-header" style="text-align: center; margin-bottom: 60px;">
+                        <h2 class="section-title" data-i18n="historyTitle" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Transaction History</h2>
+                        <p class="section-description" data-i18n="historySubtitle" style="font-size: 1.2rem; color: rgba(26, 32, 44, 0.8); max-width: 600px; margin: 0 auto;">View and manage your payment transaction records</p>
 					</div>
 
 					<!-- Search and Filter Section -->
 					<div class="search-filter-section" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); margin-bottom: 2rem;">
-						<div class="search-bar" style="position: relative; flex: 1; max-width: 400px; margin-bottom: 1rem;">
-							<input type="text" id="searchInput" class="search-input" placeholder="Search transactions..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; background: rgba(248, 250, 252, 0.5);">
+                        <div class="search-bar" style="position: relative; flex: 1; max-width: 400px; margin-bottom: 1rem;">
+                            <input type="text" id="searchInput" class="search-input" placeholder="Search transactions..." data-i18n="searchPlaceholder" style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; background: rgba(248, 250, 252, 0.5);">
 							<i class="fas fa-search search-icon" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: rgba(26, 32, 44, 0.5); font-size: 0.9rem;"></i>
 						</div>
 						<div class="filter-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-							<select id="statusFilter" class="filter-select" style="padding: 0.75rem 1rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; background: rgba(248, 250, 252, 0.5); color: #1a202c; transition: all 0.3s ease; min-width: 120px;">
-								<option value="all">All Status</option>
-								<option value="completed">Completed</option>
-								<option value="pending">Pending</option>
-								<option value="failed">Failed</option>
+                            <select id="statusFilter" class="filter-select" style="padding: 0.75rem 1rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; background: rgba(248, 250, 252, 0.5); color: #1a202c; transition: all 0.3s ease; min-width: 120px;">
+                                <option value="all" data-i18n="filterAllStatus">All Status</option>
+                                <option value="completed" data-i18n="filterCompleted">Completed</option>
+                                <option value="pending" data-i18n="filterPending">Pending</option>
+                                <option value="failed" data-i18n="filterFailed">Failed</option>
 							</select>
-							<select id="methodFilter" class="filter-select" style="padding: 0.75rem 1rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; background: rgba(248, 250, 252, 0.5); color: #1a202c; transition: all 0.3s ease; min-width: 120px;">
-								<option value="all">All Methods</option>
-								<option value="cash">Cash</option>
-								<option value="gcash">GCash</option>
+                            <select id="methodFilter" class="filter-select" style="padding: 0.75rem 1rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; background: rgba(248, 250, 252, 0.5); color: #1a202c; transition: all 0.3s ease; min-width: 120px;">
+                                <option value="all" data-i18n="filterAllMethods">All Methods</option>
+                                <option value="cash" data-i18n="filterCash">Cash</option>
+                                <option value="gcash" data-i18n="filterGCash">GCash</option>
 							</select>
-							<button id="clearFilters" class="filter-button" style="background: transparent; color: #00c2ce; border: 2px solid #00c2ce; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">Clear Filters</button>
+                            <button id="clearFilters" class="filter-button" data-i18n="clearFilters" style="background: transparent; color: #00c2ce; border: 2px solid #00c2ce; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">Clear Filters</button>
 						</div>
 					</div>
 
@@ -144,22 +144,22 @@ if ($conn) {
 								}
 							}
 						</style>
-						<?php if (empty($payments)): ?>
-							<div class="no-data" style="text-align: center; padding: 3rem 2rem; color: rgba(26, 32, 44, 0.7);">
-								<h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #1a202c;">No Transactions Yet</h3>
-								<p style="font-size: 1rem; margin: 0;">You haven't made any payments. Start by linking your account.</p>
-							</div>
+                        <?php if (empty($payments)): ?>
+                            <div class="no-data" style="text-align: center; padding: 3rem 2rem; color: rgba(26, 32, 44, 0.7);">
+                                <h3 data-i18n="noTransactions" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #1a202c;">No Transactions Yet</h3>
+                                <p data-i18n="noTransactionsHint" style="font-size: 1rem; margin: 0;">You haven't made any payments. Start by linking your account.</p>
+                            </div>
 						<?php else: ?>
 							<table class="history-table" style="width: 100%; border-collapse: collapse; margin: 0; font-size: 0.9rem; background: transparent; table-layout: auto;">
 								<thead>
 									<tr>
-										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Transaction ID</th>
-										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Status</th>
-										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Amount</th>
-										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Method</th>
-										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Reference</th>
-										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Date</th>
-										<th style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Actions</th>
+                                        <th data-i18n="thTransactionId" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Transaction ID</th>
+                                        <th data-i18n="thStatus" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Status</th>
+                                        <th data-i18n="thAmount" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Amount</th>
+                                        <th data-i18n="thMethod" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Method</th>
+                                        <th data-i18n="thReference" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Reference</th>
+                                        <th data-i18n="thDate" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Date</th>
+                                        <th data-i18n="thActions" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Actions</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -175,9 +175,9 @@ if ($conn) {
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars(ucfirst($payment['payment_method'])); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['reference_number'] ?: 'N/A'); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars(date('M d, Y H:i', strtotime($payment['processed_at']))); ?></td>
-											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">
-												<button class="action-button" onclick="showDetails('<?php echo htmlspecialchars($payment['ticket_id']); ?>')" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; border: none; border-radius: 6px; padding: 0.5rem 0.75rem; cursor: pointer; transition: all 0.3s ease; font-size: 0.8rem;">View</button>
-											</td>
+                                            <td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">
+                                                <button class="action-button" onclick="showDetails('<?php echo htmlspecialchars($payment['ticket_id']); ?>')" data-i18n="view" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; border: none; border-radius: 6px; padding: 0.5rem 0.75rem; cursor: pointer; transition: all 0.3s ease; font-size: 0.8rem;">View</button>
+                                            </td>
 										</tr>
 									<?php endforeach; ?>
 								</tbody>
@@ -188,10 +188,10 @@ if ($conn) {
 			</section>
 
 			<!-- Transaction Details Modal -->
-			<div id="transactionModal" class="modal">
+            <div id="transactionModal" class="modal">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h3>Transaction Details</h3>
+                        <h3 data-i18n="modalTitle">Transaction Details</h3>
 						<button class="modal-close" onclick="closeModal()">&times;</button>
 					</div>
 					<div class="modal-body" id="modalBody">
@@ -214,12 +214,12 @@ if ($conn) {
 							</p>
 						</div>
 
-						<div class="footer-section">
+                        <div class="footer-section">
 							<h4 class="footer-title">Platform</h4>
 							<ul class="footer-links">
-								<li><a href="dashboard.php">Dashboard</a></li>
-								<li><a href="link.php">Link</a></li>
-								<li><a href="history.php">History</a></li>
+                                <li><a href="dashboard.php" data-i18n="navDashboard">Dashboard</a></li>
+                                <li><a href="link.php" data-i18n="navLink">Link</a></li>
+                                <li><a href="history.php" data-i18n="navHistory">History</a></li>
 							</ul>
 						</div>
 
@@ -247,13 +247,14 @@ if ($conn) {
 			</footer>
 		</div>
 
-		<!-- Scripts -->
+        <!-- Scripts -->
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/jquery.dropotron.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
+        <script src="assets/js/i18n.js"></script>
 		<script>
 			// Mobile menu toggle
 			document.getElementById('mobileMenuToggle').addEventListener('click', function() {
@@ -355,36 +356,38 @@ if ($conn) {
 					}
 				});
 
-				if (transactionData) {
+                if (transactionData) {
 					const modalBody = document.getElementById('modalBody');
-					modalBody.innerHTML = `
-						<div class="transaction-details">
-							<div class="detail-row">
-								<span class="detail-label">Transaction ID:</span>
-								<span class="detail-value">${transactionData.id}</span>
-							</div>
-							<div class="detail-row">
-								<span class="detail-label">Status:</span>
-								<span class="detail-value">${transactionData.status}</span>
-							</div>
-							<div class="detail-row">
-								<span class="detail-label">Amount:</span>
-								<span class="detail-value">${transactionData.amount}</span>
-							</div>
-							<div class="detail-row">
-								<span class="detail-label">Payment Method:</span>
-								<span class="detail-value">${transactionData.method}</span>
-							</div>
-							<div class="detail-row">
-								<span class="detail-label">Reference Number:</span>
-								<span class="detail-value">${transactionData.reference}</span>
-							</div>
-							<div class="detail-row">
-								<span class="detail-label">Date & Time:</span>
-								<span class="detail-value">${transactionData.date}</span>
-							</div>
-						</div>
-					`;
+                    const d = window.CephraI18n ? window.CephraI18n.dict[(window.CephraI18n.getLang&&window.CephraI18n.getLang())||'en'] : null;
+                    const label = (k, fallback) => d && d[k] ? d[k] : fallback;
+                    modalBody.innerHTML = `
+                        <div class="transaction-details">
+                            <div class="detail-row">
+                                <span class="detail-label" data-i18n="modalId">${label('modalId','Transaction ID:')}</span>
+                                <span class="detail-value">${transactionData.id}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" data-i18n="modalStatus">${label('modalStatus','Status:')}</span>
+                                <span class="detail-value">${transactionData.status}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" data-i18n="modalAmount">${label('modalAmount','Amount:')}</span>
+                                <span class="detail-value">${transactionData.amount}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" data-i18n="modalMethod">${label('modalMethod','Payment Method:')}</span>
+                                <span class="detail-value">${transactionData.method}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" data-i18n="modalReference">${label('modalReference','Reference Number:')}</span>
+                                <span class="detail-value">${transactionData.reference}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" data-i18n="modalDate">${label('modalDate','Date & Time:')}</span>
+                                <span class="detail-value">${transactionData.date}</span>
+                            </div>
+                        </div>
+                    `;
 
 					// Show modal
 					const modal = document.getElementById('transactionModal');
@@ -413,9 +416,10 @@ if ($conn) {
 			document.getElementById('clearFilters').addEventListener('click', clearFilters);
 			document.getElementById('searchInput').addEventListener('input', applySearch);
 
-			// Initialize filters on page load
+            // Initialize filters on page load
 			document.addEventListener('DOMContentLoaded', function() {
 				applyFilters();
+                if (window.CephraI18n && window.CephraI18n.apply){ window.CephraI18n.apply(); }
 			});
 		</script>
 	</body>

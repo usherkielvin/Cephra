@@ -42,8 +42,8 @@
                     <img src="images/logo.png" alt="Cephra" class="brand-logo" />
                 </div>
                 <h1 class="main-title">CEPHRA</h1>
-                <p class="main-subtitle">Your Electric Vehicle Charging Platform</p>
-                <p class="main-description">Sign in to access your charging dashboard and manage your electric vehicle charging sessions.</p>
+                <p class="main-subtitle" data-i18n="brandSubtitle">Your Electric Vehicle Charging Platform</p>
+                <p class="main-description" data-i18n="brandLoginDesc">Sign in to access your charging dashboard and manage your electric vehicle charging sessions.</p>
             </div>
         </div>
 
@@ -51,15 +51,15 @@
         <div class="right-panel">
             <form class="form" id="loginForm">
                 <div class="form-header">
-                    <h2 class="form-title">Sign In</h2>
-                    <p class="form-subtitle">Enter your credentials to access your account</p>
+                    <h2 class="form-title" data-i18n="loginTitle">Sign In</h2>
+                    <p class="form-subtitle" data-i18n="loginSubtitle">Enter your credentials to access your account</p>
                 </div>
 
                 <div class="form-group">
                     <label>
                         <div class="username-input-container">
-                            <input class="input" type="text" id="username" name="username" placeholder="" required />
-                            <span>Username</span>
+                            <input class="input" type="text" id="username" name="username" placeholder="" required data-i18n="username" />
+                            <span data-i18n="username">Username</span>
 
                         </div>
                     </label>
@@ -68,8 +68,8 @@
                 <div class="form-group">
                     <label>
                         <div class="password-input-container">
-                            <input class="input" type="password" id="password" name="password" placeholder="" required />
-                            <span>Password</span>
+                            <input class="input" type="password" id="password" name="password" placeholder="" required data-i18n="password" />
+                            <span data-i18n="password">Password</span>
                             <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility()">
                                 <i class="fas fa-eye" id="passwordToggleIcon"></i>
                             </button>
@@ -78,11 +78,11 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="forgot_password.php" class="forgot-link">Forgot password?</a>
-                    <a href="Register_Panel.php" class="register-link">Create account</a>
+                    <a href="forgot_password.php" class="forgot-link" data-i18n="forgotPassword">Forgot password?</a>
+                    <a href="Register_Panel.php" class="register-link" data-i18n="createAccountLink">Create account</a>
                 </div>
 
-                <button class="submit" type="submit">Sign In</button>
+                <button class="submit" type="submit" data-i18n="submitLogin">Sign In</button>
             </form>
         </div>
     </div>
@@ -180,6 +180,7 @@
     })();
     </script>
 
+    <script src="assets/js/i18n.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

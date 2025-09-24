@@ -42,8 +42,8 @@
                     <img src="images/logo.png" alt="Cephra" class="brand-logo" />
                 </div>
                 <h1 class="main-title">CEPHRA</h1>
-                <p class="main-subtitle">Your Electric Vehicle Charging Platform</p>
-                <p class="main-description">Create your account to access your charging dashboard and manage your electric vehicle charging sessions.</p>
+                <p class="main-subtitle" data-i18n="brandSubtitle">Your Electric Vehicle Charging Platform</p>
+                <p class="main-description" data-i18n="brandRegisterDesc">Create your account to access your charging dashboard and manage your electric vehicle charging sessions.</p>
             </div>
         </div>
 
@@ -51,16 +51,16 @@
         <div class="right-panel">
             <form class="form" id="registerForm">
                 <div class="form-header">
-                    <h2 class="form-title">Create Account</h2>
-                    <p class="form-subtitle">Enter your information to get started</p>
+                    <h2 class="form-title" data-i18n="registerTitle">Create Account</h2>
+                    <p class="form-subtitle" data-i18n="registerSubtitle">Enter your information to get started</p>
                 </div>
 
                 <div class="flex">
                     <div class="form-group">
                         <label>
                             <div class="input-container">
-                                <input class="input" type="text" id="firstname" name="firstname" placeholder="" required>
-                                <span>Firstname</span>
+                                <input class="input" type="text" id="firstname" name="firstname" placeholder="" required data-i18n="firstname">
+                                <span data-i18n="firstname">Firstname</span>
 
                             </div>
                         </label>
@@ -69,8 +69,8 @@
                     <div class="form-group">
                         <label>
                             <div class="input-container">
-                                <input class="input" type="text" id="lastname" name="lastname" placeholder="" required>
-                                <span>Lastname</span>
+                                <input class="input" type="text" id="lastname" name="lastname" placeholder="" required data-i18n="lastname">
+                                <span data-i18n="lastname">Lastname</span>
                             </div>
                         </label>
                     </div>
@@ -79,8 +79,8 @@
                 <div class="form-group">
                     <label>
                         <div class="input-container">
-                            <input class="input" type="text" id="username" name="username" placeholder="" required>
-                            <span>Username</span>
+                            <input class="input" type="text" id="username" name="username" placeholder="" required data-i18n="username">
+                            <span data-i18n="username">Username</span>
                         </div>
                     </label>
                 </div>
@@ -88,8 +88,8 @@
                 <div class="form-group">
                     <label>
                         <div class="input-container">
-                            <input class="input" type="email" id="email" name="email" placeholder="" required>
-                            <span>Email</span>
+                            <input class="input" type="email" id="email" name="email" placeholder="" required data-i18n="email">
+                            <span data-i18n="email">Email</span>
                         </div>
                     </label>
                 </div>
@@ -97,8 +97,8 @@
                 <div class="form-group">
                     <label>
                         <div class="password-input-container">
-                            <input class="input" type="password" id="password" name="password" placeholder="" required>
-                            <span>Password</span>
+                            <input class="input" type="password" id="password" name="password" placeholder="" required data-i18n="password">
+                            <span data-i18n="password">Password</span>
                             <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility('password')">
                                 <i class="fas fa-eye" id="passwordToggleIcon"></i>
                             </button>
@@ -109,8 +109,8 @@
                 <div class="form-group">
                     <label>
                         <div class="password-input-container">
-                            <input class="input" type="password" id="confirmPassword" name="confirmPassword" placeholder="" required>
-                            <span>Confirm password</span>
+                            <input class="input" type="password" id="confirmPassword" name="confirmPassword" placeholder="" required data-i18n="confirmPassword">
+                            <span data-i18n="confirmPassword">Confirm password</span>
                             <button type="button" class="password-toggle-btn" id="confirmPasswordToggleBtn" onclick="togglePasswordVisibility('confirmPassword')">
                                 <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
                             </button>
@@ -119,10 +119,10 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="login.php" class="register-link">Already have an account? Sign in</a>
+                    <a href="login.php" class="register-link" data-i18n="alreadyHaveAccount">Already have an account? Sign in</a>
                 </div>
 
-                <button class="submit" type="submit">Create Account</button>
+                <button class="submit" type="submit" data-i18n="submitRegister">Create Account</button>
             </form>
         </div>
     </div>
@@ -222,6 +222,7 @@
     })();
     </script>
 
+    <script src="assets/js/i18n.js"></script>
     <script src="register_script.js"></script>
 </body>
 </html>
