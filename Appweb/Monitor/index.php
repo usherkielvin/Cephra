@@ -39,7 +39,7 @@
             --transition-fast: all 0.2s ease;
             --transition-normal: all 0.3s ease;
         }
-        .light {
+        .light { 
             /* Light Mode */
             --bg: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
             --panel: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
@@ -61,9 +61,9 @@
         }
         .dark-fullscreen {
             /* Enhanced Dark Mode for Fullscreen */
-            --bg: linear-gradient(135deg, #000000 0%, #0f1419 100%);
-            --panel: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
-            --card: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            --bg: linear-gradient(135deg, #0a0e13 0%, #1a202c 100%);
+            --panel: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            --card: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
             --text: #ffffff;
             --muted: #a0aec0;
             --accent: #00d4aa;
@@ -122,12 +122,12 @@
             grid-template-rows: repeat(auto-fit, minmax(200px, auto)); 
             gap: 20px; 
         }
-        .bay {
+        .bay { 
             background: var(--card);
-            border-radius: 16px;
-            padding: 18px;
+            border-radius: 16px; 
+            padding: 18px; 
             border: 1px solid var(--border);
-            min-width: 0;
+            min-width: 0; 
             height: 200px; 
             display: flex; 
             flex-direction: column; 
@@ -322,7 +322,7 @@
         }
         .pager .btn { padding:4px 8px; }
         
-        /* Fullscreen styles */
+        /* Fullscreen Mode - Completely Different UI */
         .fullscreen-mode { 
             position: fixed; 
             top: 0; 
@@ -330,85 +330,249 @@
             width: 100vw; 
             height: 100vh; 
             z-index: 1000; 
-            background: var(--bg); 
-            padding: 10px; 
-            overflow-y: auto; 
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
             box-sizing: border-box;
-            color: var(--text);
+            color: #ffffff;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
-        .fullscreen-mode.dark-theme {
-            background: var(--bg);
+        
+        /* Hide default elements in fullscreen */
+        .fullscreen-mode h1,
+        .fullscreen-mode .toolbar,
+        .fullscreen-mode .row {
+            display: none !important;
         }
-        .fullscreen-mode h1 { 
-            margin-bottom: 10px; 
+        
+        /* Fullscreen Header */
+        .fullscreen-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            border-bottom: 2px solid #00d4aa;
+            z-index: 10;
+        }
+        
+        .fullscreen-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .fullscreen-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #00d4aa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
             font-size: 18px;
-            flex-wrap: wrap;
         }
-        .fullscreen-mode .toolbar {
-            flex-wrap: wrap;
-            gap: 5px;
-            color: var(--text);
+        
+        .fullscreen-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
-        .fullscreen-mode .toolbar .btn {
-            padding: 4px 8px;
-            font-size: 11px;
-            background: var(--accent);
-            color: var(--text);
-            border: 1px solid var(--border);
+        
+        .fullscreen-btn {
+            background: #00d4aa;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .fullscreen-mode .toolbar .btn:hover {
-            background: var(--accent-hover);
+        
+        .fullscreen-btn:hover {
+            background: #00e6b8;
+            transform: translateY(-1px);
         }
-        .fullscreen-mode .toolbar label {
-            display: none;
+        
+        .fullscreen-btn.exit {
+            background: #ff6b6b;
+            color: #fff;
         }
-        .fullscreen-mode .row { display: none; }
-        .fullscreen-mode .grid { 
+        
+        .fullscreen-btn.exit:hover {
+            background: #ff5252;
+        }
+        
+        /* Fullscreen Grid - Different Layout */
+        .fullscreen-grid {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: grid;
             grid-template-columns: repeat(4, 1fr); 
             grid-template-rows: repeat(2, 1fr); 
-            gap: 30px; 
-            padding: 25px;
-            height: calc(100vh - 80px);
-            width: 100%;
-            box-sizing: border-box;
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
         }
-        .fullscreen-mode .bay { 
-            padding: 25px; 
-            font-size: 16px; 
-            height: 100%; 
-            width: 100%;
-            min-height: 180px;
+        
+        /* Fullscreen Bay Cards - Completely Different Design */
+        .fullscreen-bay {
+            background: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
+            border-radius: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border-radius: 20px;
-            margin: 0;
-            box-sizing: border-box;
-            box-shadow: var(--shadow-lg);
-            border: 2px solid var(--border);
-            transition: var(--transition-normal);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .fullscreen-mode .bay:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+        
+        .fullscreen-bay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #00d4aa;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
-        .fullscreen-mode .bay h3 { 
+        
+        .fullscreen-bay.occupied::before {
+            background: #ff6b6b;
+            transform: scaleX(1);
+        }
+        
+        .fullscreen-bay.available::before {
+            background: #48bb78;
+            transform: scaleX(1);
+        }
+        
+        .fullscreen-bay:hover {
+            transform: translateY(-5px);
+            border-color: #00d4aa;
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.3);
+        }
+        
+        .fullscreen-bay-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .fullscreen-bay-title {
+            color: #ffffff;
             font-size: 18px; 
-            margin-bottom: 8px; 
+            font-weight: 600;
+            margin: 0;
         }
-        .fullscreen-mode .badge { 
-            padding: 6px 10px; 
+        
+        .fullscreen-bay-type {
+            color: #a0aec0;
+            font-size: 12px;
+            background: rgba(160, 174, 192, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .fullscreen-bay-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .fullscreen-status-badge {
+            padding: 12px 20px;
+            border-radius: 25px;
             font-size: 14px; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .fullscreen-mode .available { 
-            font-size: 16px; 
-            font-weight: bold; 
-            padding: 8px 12px; 
+        
+        .fullscreen-status-badge.available {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
         }
-        .fullscreen-mode .muted { 
+        
+        .fullscreen-status-badge.occupied {
+            background: linear-gradient(135deg, #ff6b6b 0%, #e53e3e 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .fullscreen-bay-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .fullscreen-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .fullscreen-detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .fullscreen-detail-label {
+            color: #a0aec0;
             font-size: 12px; 
-            margin-top: 8px; 
+            font-weight: 500;
+        }
+        
+        .fullscreen-detail-value {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* Fullscreen Responsive */
+        @media (max-width: 1200px) {
+            .fullscreen-grid {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .fullscreen-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .fullscreen-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(8, 1fr);
+            }
         }
         
         /* Fullscreen responsive styles */
@@ -712,7 +876,7 @@
             document.body.classList.toggle('light', !!light);
         }
         document.getElementById('themeBtn').onclick = () => setTheme(!document.body.classList.contains('light'));
-        
+
         // Language toggle functionality
         const languageBtn = document.getElementById('languageBtn');
         languageBtn.onclick = () => {
@@ -816,15 +980,128 @@
                 isFullscreen = !isFullscreen;
                 document.body.classList.toggle('fullscreen-mode', isFullscreen);
                 
-                // Apply enhanced dark mode in fullscreen
-                if (isFullscreen && isDarkMode) {
-                    document.body.classList.add('dark-fullscreen');
+                if (isFullscreen) {
+                    createFullscreenUI();
                 } else {
-                    document.body.classList.remove('dark-fullscreen');
+                    removeFullscreenUI();
                 }
                 
                 fsBtn.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Bays';
             };
+        }
+        
+        function createFullscreenUI() {
+            // Create fullscreen header
+            const header = document.createElement('div');
+            header.className = 'fullscreen-header';
+            header.innerHTML = `
+                <div class="fullscreen-title">
+                    <div class="fullscreen-logo">C</div>
+                    <span>Cephra Live Monitor</span>
+                </div>
+                <div class="fullscreen-controls">
+                    <button class="fullscreen-btn" id="fullscreenThemeBtn">${isDarkMode ? 'Light' : 'Dark'}</button>
+                    <button class="fullscreen-btn" id="fullscreenLangBtn">${currentLanguage}</button>
+                    <button class="fullscreen-btn exit" id="fullscreenExitBtn">Exit</button>
+                </div>
+            `;
+            
+            // Create fullscreen grid
+            const grid = document.createElement('div');
+            grid.className = 'fullscreen-grid';
+            grid.id = 'fullscreen-grid';
+            
+            document.body.appendChild(header);
+            document.body.appendChild(grid);
+            
+            // Add event listeners for fullscreen controls
+            document.getElementById('fullscreenExitBtn').onclick = () => {
+                isFullscreen = false;
+                document.body.classList.remove('fullscreen-mode');
+                removeFullscreenUI();
+                fsBtn.textContent = 'Fullscreen Bays';
+            };
+            
+            document.getElementById('fullscreenThemeBtn').onclick = () => {
+                isDarkMode = !isDarkMode;
+                document.getElementById('fullscreenThemeBtn').textContent = isDarkMode ? 'Light' : 'Dark';
+                // Update theme in main UI too
+                if (themeBtn) {
+                    themeBtn.click();
+                }
+            };
+            
+            document.getElementById('fullscreenLangBtn').onclick = () => {
+                if (languageBtn) {
+                    languageBtn.click();
+                }
+                document.getElementById('fullscreenLangBtn').textContent = currentLanguage;
+            };
+            
+            // Render bays in fullscreen
+            renderFullscreenBays();
+        }
+        
+        function removeFullscreenUI() {
+            const header = document.querySelector('.fullscreen-header');
+            const grid = document.querySelector('.fullscreen-grid');
+            if (header) header.remove();
+            if (grid) grid.remove();
+        }
+        
+        function renderFullscreenBays() {
+            const grid = document.getElementById('fullscreen-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            // Get current bay data
+            const bays = currentQueue.length > 0 ? 
+                Array.from({length: 8}, (_, i) => {
+                    const bayNum = i + 1;
+                    const bayData = lastBays[`Bay-${bayNum}`];
+                    return {
+                        bay_number: bayNum,
+                        status: bayData?.status || 'available',
+                        ticket_id: bayData?.ticket_id || '-',
+                        username: bayData?.username || '-',
+                        service_type: bayNum <= 3 ? 'Fast' : 'Normal'
+                    };
+                }) : 
+                Array.from({length: 8}, (_, i) => ({
+                    bay_number: i + 1,
+                    status: 'available',
+                    ticket_id: '-',
+                    username: '-',
+                    service_type: i < 3 ? 'Fast' : 'Normal'
+                }));
+            
+            bays.forEach(bay => {
+                const bayElement = document.createElement('div');
+                bayElement.className = `fullscreen-bay ${bay.status}`;
+                bayElement.innerHTML = `
+                    <div class="fullscreen-bay-header">
+                        <h3 class="fullscreen-bay-title">Bay-${bay.bay_number}</h3>
+                        <span class="fullscreen-bay-type">${bay.service_type}</span>
+                    </div>
+                    <div class="fullscreen-bay-status">
+                        <div class="fullscreen-status-badge ${bay.status}">
+                            ${bay.status === 'available' ? 'Available' : 'Occupied'}
+                        </div>
+                    </div>
+                    <div class="fullscreen-bay-details">
+                        <div class="fullscreen-detail-item">
+                            <span class="fullscreen-detail-label">Ticket:</span>
+                            <span class="fullscreen-detail-value">${bay.ticket_id}</span>
+                        </div>
+                        <div class="fullscreen-detail-item">
+                            <span class="fullscreen-detail-label">User:</span>
+                            <span class="fullscreen-detail-value">${bay.username}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(bayElement);
+            });
         }
         
         // Enhanced theme toggle
@@ -845,10 +1122,14 @@
                 }
                 
                 // Update fullscreen theme if in fullscreen
-                if (isFullscreen && isDarkMode) {
-                    document.body.classList.add('dark-fullscreen');
-                } else {
-                    document.body.classList.remove('dark-fullscreen');
+                if (isFullscreen) {
+                    if (isDarkMode) {
+                        document.body.classList.add('dark-fullscreen');
+                        document.body.classList.remove('light');
+                    } else {
+                        document.body.classList.remove('dark-fullscreen');
+                        document.body.classList.add('light');
+                    }
                 }
             };
             
@@ -903,6 +1184,11 @@
                         currentQueue = data.queue || [];
                         renderQueuePage();
                         document.getElementById('ts').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        
+                        // Update fullscreen UI if active
+                        if (isFullscreen) {
+                            renderFullscreenBays();
+                        }
                     } else {
                         console.error('Monitor error', data.error);
                     }
@@ -998,6 +1284,11 @@
                     currentQueue = data.queue || [];
                     renderQueuePage();
                     document.getElementById('ts').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    // Update fullscreen UI if active
+                    if (isFullscreen) {
+                        renderFullscreenBays();
+                    }
                 } else {
                     console.error('Monitor error', data.error);
                 }
@@ -1217,8 +1508,17 @@
                             preferredVoices = [
                                 'Filipino',
                                 'Tagalog',
+                                'Microsoft Maria - Filipino (Philippines)',
+                                'Microsoft Rosa - Filipino (Philippines)',
+                                'Google Filipino',
+                                'Google Tagalog',
+                                'Filipino (Philippines)',
+                                'Tagalog (Philippines)',
+                                'Filipino Female',
+                                'Tagalog Female',
+                                'Filipino Male',
+                                'Tagalog Male',
                                 'English (Philippines)',
-                                'Microsoft Zira - English (United States)',
                                 'English (US)',
                                 'English'
                             ];
@@ -1227,10 +1527,18 @@
                             preferredVoices = [
                                 'Cebuano',
                                 'Bisaya',
+                                'Microsoft Cebuano - Cebuano (Philippines)',
+                                'Google Cebuano',
+                                'Google Bisaya',
+                                'Cebuano (Philippines)',
+                                'Bisaya (Philippines)',
+                                'Cebuano Female',
+                                'Bisaya Female',
+                                'Cebuano Male',
+                                'Bisaya Male',
                                 'Filipino',
                                 'Tagalog',
                                 'English (Philippines)',
-                                'Microsoft Zira - English (United States)',
                                 'English (US)',
                                 'English'
                             ];
@@ -1296,6 +1604,23 @@
                         }
                     }
                     
+                    // Strategy 2.5: Special Filipino/Bisaya native language matching
+                    if (!selectedVoice && (currentLang === 'fil' || currentLang === 'ceb')) {
+                        const nativeKeywords = currentLang === 'fil' 
+                            ? ['filipino', 'tagalog', 'philippines']
+                            : ['cebuano', 'bisaya', 'filipino', 'tagalog', 'philippines'];
+                        
+                        for (const keyword of nativeKeywords) {
+                            const found = voices.find(voice => 
+                                voice.name.toLowerCase().includes(keyword) && voice.localService
+                            );
+                            if (found) {
+                                selectedVoice = found;
+                                break;
+                            }
+                        }
+                    }
+                    
                     // Strategy 3: Language code match
                     if (!selectedVoice) {
                         const found = voices.find(voice => 
@@ -1339,6 +1664,23 @@
                         );
                         if (found) {
                             selectedVoice = found;
+                        }
+                    }
+                    
+                    // Strategy 7: Special Filipino/Bisaya native language fallback (without localService restriction)
+                    if (!selectedVoice && (currentLang === 'fil' || currentLang === 'ceb')) {
+                        const nativeKeywords = currentLang === 'fil' 
+                            ? ['filipino', 'tagalog', 'philippines']
+                            : ['cebuano', 'bisaya', 'filipino', 'tagalog', 'philippines'];
+                        
+                        for (const keyword of nativeKeywords) {
+                            const found = voices.find(voice => 
+                                voice.name.toLowerCase().includes(keyword)
+                            );
+                            if (found) {
+                                selectedVoice = found;
+                                break;
+                            }
                         }
                     }
                     
