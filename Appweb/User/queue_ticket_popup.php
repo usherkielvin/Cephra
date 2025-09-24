@@ -46,24 +46,56 @@ $estimatedMinutes = 5; // Placeholder, replace with actual logic
 <html>
 <head>
     <title>Queue Ticket</title>
-    <link rel="stylesheet" href="css/pages/queue_ticket_popup.css" />
+    <link rel="stylesheet" href="assets/css/pages/queue_ticket_popup.css" />
 </head>
 <body>
-    <div id="queuePopup">
-        <div class="popup-content">
-            <h2>Your Queue Ticket</h2>
-            <div class="info"><strong>Ticket ID:</strong> <?php echo htmlspecialchars($currentTicket); ?></div>
-            <div class="info"><strong>Service:</strong> <?php echo htmlspecialchars($currentService); ?></div>
-            <div class="info"><strong>Battery Level:</strong> <?php echo htmlspecialchars($batteryLevel); ?>%</div>
-            <div class="info"><strong>Estimated Wait Time:</strong> <?php echo htmlspecialchars($estimatedMinutes); ?> minutes</div>
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h3>Queue Ticket</h3>
+                <button class="close-btn" onclick="closePopup()">&times;</button>
+            </div>
+            <div class="popup-body">
+                <div class="ticket-info">
+                    <div class="info-row">
+                        <span class="label">Ticket ID:</span>
+                        <span class="value"><?php echo htmlspecialchars($currentTicket); ?></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Service:</span>
+                        <span class="value"><?php echo htmlspecialchars($currentService); ?></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Battery:</span>
+                        <span class="value"><?php echo htmlspecialchars($batteryLevel); ?>%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Wait Time:</span>
+                        <span class="value"><?php echo htmlspecialchars($estimatedMinutes); ?> min</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <button id="closePopupBtn" onclick="closePopup()">x</button>
 
     <script>
         function closePopup() {
-            document.getElementById('queuePopup').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
         }
+        
+        // Close popup when clicking outside
+        document.getElementById('popupOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+        
+        // Close popup with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePopup();
+            }
+        });
     </script>
 </body>
 </html>

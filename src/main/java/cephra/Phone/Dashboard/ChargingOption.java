@@ -13,16 +13,6 @@ public class ChargingOption extends javax.swing.JPanel {
         setupLabelPosition(); // Set label position
         makeDraggable();
         
-        // Check if user has active ticket and disable buttons if needed
-        checkAndDisableChargeButtons();
-        
-        // Refresh when this panel becomes visible
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            @Override
-            public void componentShown(java.awt.event.ComponentEvent e) {
-                checkAndDisableChargeButtons();
-            }
-        });
     }
 
     private void makeDraggable() {
@@ -212,74 +202,19 @@ public class ChargingOption extends javax.swing.JPanel {
     }//GEN-LAST:event_homebuttonActionPerformed
 
     private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
-       // Check if user already has an active ticket
-       String username = cephra.Database.CephraDB.getCurrentUsername();
-       if (cephra.Database.CephraDB.hasActiveTicket(username)) {
-            // Show custom AlreadyTicket panel instead of JOptionPane
-            cephra.Phone.Popups.AlreadyTicket.showPayPop(null, username);
-            return;
-        }
-        // Check if car is linked
-        if (!cephra.Phone.Utilities.AppState.isCarLinked) {
-            // Show custom LinkFirst panel instead of JOptionPane
-            cephra.Phone.Popups.LinkFirst.showPayPop(null, username);
-            return;
-        }
-        // Prevent charging if battery is already full
-        int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
-        if (batteryLevel >= 100) {
-            // Show custom AlreadyFull panel instead of JOptionPane
-            cephra.Phone.Popups.AlreadyFull.showPayPop(null, username);
-            return;
-        }
+        // Set Fast Charging service and show ticketing popup
+        cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Fast Charging");
         
-        // Allow proceeding even if fast charging bays are occupied/unavailable; ticket will be handled by queue
-       
-       // Set Fast Charging service and show proceed popup instead of full panel
-       cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Fast Charging");
-       // Temporarily hide the banner/background label to avoid overlap artifacts
-       boolean hadLabel = (jLabel1 != null && jLabel1.isVisible());
-       if (jLabel1 != null) jLabel1.setVisible(false);
-       try {
-           cephra.Phone.Popups.ChargingQueueProceed.showPopup();
-       } finally {
-           if (jLabel1 != null && hadLabel) jLabel1.setVisible(true);
-       }
+        // Show ticketing popup (uses layered pane like AlreadyFull)
+        cephra.Phone.Popups.Ticketing.showPopup();
     }//GEN-LAST:event_fastchargeActionPerformed
 
     private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
-        // Check if user already has an active ticket
-        String username = cephra.Database.CephraDB.getCurrentUsername();
-        if (cephra.Database.CephraDB.hasActiveTicket(username)) {
-            // Show custom AlreadyTicket panel instead of JOptionPane
-            cephra.Phone.Popups.AlreadyTicket.showPayPop(null, username);
-            return;
-        }
-        // Check if car is linked
-        if (!cephra.Phone.Utilities.AppState.isCarLinked) {
-            // Show custom LinkFirst panel instead of JOptionPane
-            cephra.Phone.Popups.LinkFirst.showPayPop(null, username);
-            return;
-        }
-        // Prevent charging if battery is already full
-        int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
-        if (batteryLevel >= 100) {
-            // Show custom AlreadyFull panel instead of JOptionPane
-            cephra.Phone.Popups.AlreadyFull.showPayPop(null, username);
-            return;
-        }
-        
-        // Allow proceeding even if normal charging bays are occupied/unavailable; ticket will be handled by queue
-        
-        // Set Normal Charging service and show proceed popup instead of full panel
+        // Set Normal Charging service and show ticketing popup
         cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Normal Charging");
-        boolean hadLabel2 = (jLabel1 != null && jLabel1.isVisible());
-        if (jLabel1 != null) jLabel1.setVisible(false);
-        try {
-            cephra.Phone.Popups.ChargingQueueProceed.showPopup();
-        } finally {
-            if (jLabel1 != null && hadLabel2) jLabel1.setVisible(true);
-        }
+        
+        // Show ticketing popup (uses layered pane like AlreadyFull)
+        cephra.Phone.Popups.Ticketing.showPopup();
     }//GEN-LAST:event_normalchargeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -292,21 +227,6 @@ public class ChargingOption extends javax.swing.JPanel {
     private javax.swing.JButton profilebutton;
     // End of variables declaration//GEN-END:variables
     
-    private void checkAndDisableChargeButtons() {
-        // Always keep buttons enabled; gating is handled in action listeners with dialogs
-        fastcharge.setEnabled(true);
-        normalcharge.setEnabled(true);
-        
-        // Reset button appearance to normal
-        fastcharge.setBackground(null);
-        normalcharge.setBackground(null);
-        fastcharge.setForeground(java.awt.Color.WHITE);
-        normalcharge.setForeground(java.awt.Color.WHITE);
-        
-        // No tooltips to avoid gray hints
-        fastcharge.setToolTipText(null);
-        normalcharge.setToolTipText(null);
-    }
 
     @Override
     public void addNotify() {
