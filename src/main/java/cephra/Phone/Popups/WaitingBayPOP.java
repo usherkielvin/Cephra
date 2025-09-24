@@ -23,6 +23,7 @@ public class WaitingBayPOP extends javax.swing.JPanel {
 
         TicketNumber = new javax.swing.JLabel();
         OKBTN = new javax.swing.JButton();
+        CANCEL = new javax.swing.JButton();
         ICON = new javax.swing.JLabel();
 
         setLayout(null);
@@ -31,7 +32,7 @@ public class WaitingBayPOP extends javax.swing.JPanel {
         TicketNumber.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         TicketNumber.setText("NCH04");
         add(TicketNumber);
-        TicketNumber.setBounds(170, 233, 120, 35);
+        TicketNumber.setBounds(150, 233, 120, 35);
 
         OKBTN.setBorder(null);
         OKBTN.setBorderPainted(false);
@@ -42,11 +43,17 @@ public class WaitingBayPOP extends javax.swing.JPanel {
             }
         });
         add(OKBTN);
-        OKBTN.setBounds(30, 220, 310, 120);
+        OKBTN.setBounds(160, 310, 120, 30);
+
+        CANCEL.setBorder(null);
+        CANCEL.setBorderPainted(false);
+        CANCEL.setContentAreaFilled(false);
+        add(CANCEL);
+        CANCEL.setBounds(40, 310, 110, 30);
 
         ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/WaitingBayPOP.png"))); // NOI18N
         add(ICON);
-        ICON.setBounds(50, 40, 270, 320);
+        ICON.setBounds(25, 40, 270, 320);
     }// </editor-fold>//GEN-END:initComponents
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
@@ -55,6 +62,7 @@ public class WaitingBayPOP extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton CANCEL;
     private javax.swing.JLabel ICON;
     private javax.swing.JButton OKBTN;
     private javax.swing.JLabel TicketNumber;
