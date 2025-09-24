@@ -36,13 +36,22 @@ public class WaitingBayPOP extends javax.swing.JPanel {
         OKBTN.setBorder(null);
         OKBTN.setBorderPainted(false);
         OKBTN.setContentAreaFilled(false);
+        OKBTN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OKBTNActionPerformed(evt);
+            }
+        });
         add(OKBTN);
-        OKBTN.setBounds(80, 307, 210, 33);
+        OKBTN.setBounds(30, 220, 310, 120);
 
         ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/WaitingBayPOP.png"))); // NOI18N
         add(ICON);
         ICON.setBounds(50, 40, 270, 320);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
+        cephra.Phone.Popups.CustomPopupManager.executeCallback();
+    }//GEN-LAST:event_OKBTNActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

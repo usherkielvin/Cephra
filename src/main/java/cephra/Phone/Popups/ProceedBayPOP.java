@@ -21,12 +21,23 @@ public class ProceedBayPOP extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        OKBTN = new javax.swing.JButton();
         BayNumber = new javax.swing.JLabel();
         TicketNumber = new javax.swing.JLabel();
-        OKBTN = new javax.swing.JButton();
         ICON = new javax.swing.JLabel();
 
         setLayout(null);
+
+        OKBTN.setBorder(null);
+        OKBTN.setBorderPainted(false);
+        OKBTN.setContentAreaFilled(false);
+        OKBTN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OKBTNActionPerformed(evt);
+            }
+        });
+        add(OKBTN);
+        OKBTN.setBounds(80, 246, 210, 110);
 
         BayNumber.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         BayNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -40,16 +51,15 @@ public class ProceedBayPOP extends javax.swing.JPanel {
         add(TicketNumber);
         TicketNumber.setBounds(170, 238, 120, 35);
 
-        OKBTN.setBorder(null);
-        OKBTN.setBorderPainted(false);
-        OKBTN.setContentAreaFilled(false);
-        add(OKBTN);
-        OKBTN.setBounds(80, 312, 210, 34);
-
         ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ProceedBayPOP.png"))); // NOI18N
         add(ICON);
         ICON.setBounds(50, 40, 270, 330);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
+        System.out.println("ProceedBayPOP OK button clicked!");
+        cephra.Phone.Popups.CustomPopupManager.hideCurrentPopup();
+    }//GEN-LAST:event_OKBTNActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

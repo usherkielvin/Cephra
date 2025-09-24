@@ -255,10 +255,11 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         // Get customer name for popup
                         String customerName = String.valueOf(queTab.getValueAt(rowSnapshot, Math.min(1, queTab.getColumnCount()-1)));
                         
-                        // Show popup dialog to user (bay number will be determined after assignment)
-                        boolean userConfirmed = cephra.Phone.Popups.ProceedToBay.showProceedDialog(ticket, "TBD", customerName);
-                        
-                        if (userConfirmed) {
+                        // Show waiting bay popup to user (bay number will be determined after assignment)
+                        cephra.Phone.Popups.CustomPopupManager.showWaitingBayPopup(ticket, customerName, () -> {
+                            // Hide the WaitingBayPOP first
+                            cephra.Phone.Popups.CustomPopupManager.hideCustomPopup();
+                            
                             // User confirmed, proceed with bay assignment
                             boolean assigned = false;
                             try { 
@@ -275,8 +276,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                     // Get the assigned bay number and show it to user
                                     String assignedBayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                                     if (assignedBayNumber != null) {
-                                        // Show the actual bay number to user (no confirmation needed)
-                                        cephra.Phone.Popups.ProceedToBay.showProceedDialog(ticket, assignedBayNumber, customerName, false);
+                                        // Show the actual bay number to user (informational only)
+                                        cephra.Phone.Popups.CustomPopupManager.showProceedBayPopupInfo(ticket, assignedBayNumber, customerName);
                                     }
                                 } catch (Exception ex) {
                                     System.err.println("Queue: Error updating database status to Charging: " + ex.getMessage());
@@ -284,10 +285,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             } else {
                                 Queue.this.showBayUnavailableDialog(ticket);
                             }
-                        } else {
-                            // User cancelled, ticket remains in Waiting status
-                            System.out.println("User cancelled proceeding to bay for ticket: " + ticket);
-                        }
+                        });
                         updateStatusCounters();
                         return;
                     }
