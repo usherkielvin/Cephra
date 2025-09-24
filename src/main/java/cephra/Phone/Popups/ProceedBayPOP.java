@@ -37,23 +37,23 @@ public class ProceedBayPOP extends javax.swing.JPanel {
             }
         });
         add(OKBTN);
-        OKBTN.setBounds(80, 246, 210, 110);
+        OKBTN.setBounds(55, 316, 210, 30);
 
         BayNumber.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         BayNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         BayNumber.setText("BAY 01");
         add(BayNumber);
-        BayNumber.setBounds(60, 110, 250, 100);
+        BayNumber.setBounds(35, 110, 250, 100);
 
         TicketNumber.setFont(new java.awt.Font("Segoe UI", 0, 26)); // NOI18N
         TicketNumber.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         TicketNumber.setText("NCH04");
         add(TicketNumber);
-        TicketNumber.setBounds(170, 238, 120, 35);
+        TicketNumber.setBounds(150, 238, 120, 35);
 
         ICON.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/ProceedBayPOP.png"))); // NOI18N
         add(ICON);
-        ICON.setBounds(50, 40, 270, 330);
+        ICON.setBounds(25, 40, 270, 330);
     }// </editor-fold>//GEN-END:initComponents
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
