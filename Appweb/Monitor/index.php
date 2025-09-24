@@ -506,6 +506,7 @@
             <label class="muted" style="white-space:nowrap;"><input type="checkbox" id="announcerChk" checked /> Bay Announcer</label>
             <button class="btn" id="fullscreenBtn">Fullscreen Bays</button>
             <button class="btn" id="themeBtn">Toggle Theme</button>
+            <button class="btn" id="languageBtn">EN</button>
         </div>
     </h1>
 
@@ -539,6 +540,58 @@
     <script>
         // Simplified header: only Bay Announcer toggle retained
         
+        // Language support
+        const languages = {
+            'EN': { name: 'English', code: 'en' },
+            'ZH': { name: '中文 (Chinese)', code: 'zh' },
+            'FIL': { name: 'Filipino', code: 'fil' },
+            'CEB': { name: 'Bisaya', code: 'ceb' },
+            'ES': { name: 'Español', code: 'es' }
+        };
+        
+        let currentLanguage = 'EN';
+        let languageIndex = 0;
+        const languageKeys = Object.keys(languages);
+        
+        // TTS messages for different languages
+        const ttsMessages = {
+            'EN': {
+                waiting: 'Ticket {ticketId} is now waiting',
+                done: 'Ticket {ticketId} is done charging at Bay {bayNumber}',
+                assigned: 'Ticket {ticketId} is now assigned to Bay {bayNumber}',
+                available: 'Bay {bayNumber} is now available',
+                maintenance: 'Bay {bayNumber} is under maintenance'
+            },
+            'ZH': {
+                waiting: '票据 {ticketId} 现在正在等待',
+                done: '票据 {ticketId} 在 {bayNumber} 号充电桩充电完成',
+                assigned: '票据 {ticketId} 现在已分配到 {bayNumber} 号充电桩',
+                available: '{bayNumber} 号充电桩现在可用',
+                maintenance: '{bayNumber} 号充电桩正在维护中'
+            },
+            'FIL': {
+                waiting: 'Tiket {ticketId} ay naghihintay na',
+                done: 'Tapos na ang pagkarga ng Tiket {ticketId} sa Bay {bayNumber}',
+                assigned: 'Nakatalaga na ang Tiket {ticketId} sa Bay {bayNumber}',
+                available: 'Available na ang Bay {bayNumber}',
+                maintenance: 'Under maintenance ang Bay {bayNumber}'
+            },
+            'CEB': {
+                waiting: 'Tiket {ticketId} naghulat na',
+                done: 'Nahuman na ang pag-charge sa Tiket {ticketId} sa Bay {bayNumber}',
+                assigned: 'Nakatalaga na ang Tiket {ticketId} sa Bay {bayNumber}',
+                available: 'Available na ang Bay {bayNumber}',
+                maintenance: 'Under maintenance ang Bay {bayNumber}'
+            },
+            'ES': {
+                waiting: 'Boleto {ticketId} está ahora esperando',
+                done: 'Boleto {ticketId} terminó de cargar en la Bahía {bayNumber}',
+                assigned: 'Boleto {ticketId} ahora está asignado a la Bahía {bayNumber}',
+                available: 'La Bahía {bayNumber} está ahora disponible',
+                maintenance: 'La Bahía {bayNumber} está en mantenimiento'
+            }
+        };
+        
         let currentQueue = [];
         let lastBays = {};
         let lastQueueTickets = new Set(); // Track tickets that were already announced
@@ -558,6 +611,38 @@
             document.body.classList.toggle('light', !!light);
         }
         document.getElementById('themeBtn').onclick = () => setTheme(!document.body.classList.contains('light'));
+        
+        // Language toggle functionality
+        const languageBtn = document.getElementById('languageBtn');
+        languageBtn.onclick = () => {
+            languageIndex = (languageIndex + 1) % languageKeys.length;
+            currentLanguage = languageKeys[languageIndex];
+            languageBtn.textContent = currentLanguage;
+            
+            // Visual feedback
+            languageBtn.style.backgroundColor = '#4CAF50';
+            setTimeout(() => {
+                languageBtn.style.backgroundColor = '';
+            }, 500);
+            
+            // Save language preference
+            localStorage.setItem('monitor_language', currentLanguage);
+            
+            // Announce language change
+            const langName = languages[currentLanguage].name;
+            speak(`Language changed to ${langName}`);
+            
+            console.log('Language changed to:', langName);
+        };
+        
+        // Load saved language preference
+        const savedLang = localStorage.getItem('monitor_language') || 'EN';
+        const savedIndex = languageKeys.indexOf(savedLang);
+        if (savedIndex !== -1) {
+            languageIndex = savedIndex;
+            currentLanguage = savedLang;
+            languageBtn.textContent = currentLanguage;
+        }
 
         // Fullscreen functionality
         let isFullscreen = false;
@@ -878,7 +963,7 @@
             }, 4000);
         }
         
-        function speak(text) {
+        function speak(text, messageType = null, variables = {}) {
             // Always show the toast notification
             showToast(text);
             
@@ -887,7 +972,17 @@
                 // Stop any current speech
                 speechSynthesis.cancel();
                 
-                const utterance = new SpeechSynthesisUtterance(text);
+                // Use localized message if messageType is provided
+                let messageToSpeak = text;
+                if (messageType && ttsMessages[currentLanguage] && ttsMessages[currentLanguage][messageType]) {
+                    messageToSpeak = ttsMessages[currentLanguage][messageType];
+                    // Replace variables in the message
+                    for (const [key, value] of Object.entries(variables)) {
+                        messageToSpeak = messageToSpeak.replace(`{${key}}`, value);
+                    }
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(messageToSpeak);
                 utterance.rate = 0.9;  // Slightly faster but still clear
                 utterance.pitch = 1.1; // Slightly higher pitch for clarity
                 utterance.volume = 1.0; // Full volume
@@ -899,18 +994,33 @@
                 const loadVoices = () => {
                     voices = speechSynthesis.getVoices();
                     
-                    // Try to find the best voice in this order of preference
-                    const preferredVoices = [
-                        // First try to find specific high-quality voices
-                        'Microsoft Zira',
-                        'Google UK English Female',
-                        'Samantha',
-                        'Karen',
-                        'Susan',
-                        // Then any female voice
-                        'Female',
-                        'female'
-                    ];
+                    // Try to find the best voice based on current language
+                    const currentLang = languages[currentLanguage].code;
+                    let preferredVoices = [];
+                    
+                    // Language-specific voice preferences
+                    switch (currentLang) {
+                        case 'zh':
+                            preferredVoices = ['Chinese', 'Mandarin', 'Cantonese', 'Microsoft Huihui'];
+                            break;
+                        case 'fil':
+                        case 'ceb':
+                            preferredVoices = ['Filipino', 'Tagalog', 'Cebuano', 'English']; // Fallback to English
+                            break;
+                        case 'es':
+                            preferredVoices = ['Spanish', 'Español', 'Microsoft Helena', 'Microsoft Sabina'];
+                            break;
+                        default: // English
+                            preferredVoices = [
+                                'Microsoft Zira',
+                                'Google UK English Female',
+                                'Samantha',
+                                'Karen',
+                                'Susan',
+                                'Female',
+                                'female'
+                            ];
+                    }
                     
                     // Try to find a preferred voice
                     let selectedVoice = null;
@@ -1004,7 +1114,7 @@
             console.log('Waiting ticket announcement:', message, {ticketId});
             
             if (document.getElementById('announcerChk').checked) {
-                speak(message);
+                speak(message, 'waiting', { ticketId });
             }
         }
         
@@ -1016,7 +1126,7 @@
             console.log('Ticket done announcement:', message, {ticketId, bayNumber});
             
             if (document.getElementById('announcerChk').checked) {
-                speak(message);
+                speak(message, 'done', { ticketId, bayNumber });
             }
         }
         
@@ -1028,7 +1138,7 @@
             console.log('Ticket assigned announcement:', message, {ticketId, bayNumber});
             
             if (document.getElementById('announcerChk').checked) {
-                speak(message);
+                speak(message, 'assigned', { ticketId, bayNumber });
             }
         }
         

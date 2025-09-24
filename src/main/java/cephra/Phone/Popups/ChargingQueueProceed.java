@@ -1,7 +1,6 @@
 
 package cephra.Phone.Popups;
 
-
 public class ChargingQueueProceed extends javax.swing.JPanel {
 
   

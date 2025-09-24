@@ -32,6 +32,7 @@ public class Monitor extends javax.swing.JFrame {
             }
         });
         
+        
         // Initialize displayButtons array AFTER initComponents() so buttons exist
         displayButtons = new JButton[] {
             jButton1, jButton2, jButton3, jButton4,
@@ -638,6 +639,7 @@ public class Monitor extends javax.swing.JFrame {
             setScaledBounds(jPanel1, ORIG_FAST, s);
             setScaledBounds(b1, ORIG_B1, s);
             setScaledBounds(IconTV, ORIG_BG, s);
+            
             // Scale fonts
             int fs = Math.max(12, (int)Math.round(BASE_FONT * s));
             setFontSize(f1, fs); setFontSize(f2, fs); setFontSize(f3, fs);
@@ -661,4 +663,5 @@ public class Monitor extends javax.swing.JFrame {
         Font f = comp.getFont();
         if (f != null && f.getSize() != size) comp.setFont(f.deriveFont((float)size));
     }
+    
 }
