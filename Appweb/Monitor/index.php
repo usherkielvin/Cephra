@@ -18,36 +18,66 @@
     <meta name="theme-color" content="#0b1e29" />
     <style>
         :root {
-            --bg: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            --panel: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
-            --card: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
-            --text: #ffffff;
-            --muted: #b0c4de;
+            /* Dark Mode - Default */
+            --bg: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
+            --panel: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            --card: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            --text: #f7fafc;
+            --muted: #a0aec0;
             --accent: #00d4aa;
             --accent-hover: #00e6b8;
-            --avail: #00d4aa;
+            --avail: #48bb78;
             --availText: #ffffff;
-            --occ: #ff6b6b;
+            --occ: #f56565;
             --occText: #ffffff;
-            --maint: #ffa500;
+            --maint: #ed8936;
             --maintText: #ffffff;
-            --shadow-sm: 0 2px 5px rgba(0,0,0,0.2);
-            --shadow-md: 0 4px 10px rgba(0,0,0,0.3);
-            --shadow-lg: 0 8px 20px rgba(0,0,0,0.4);
+            --border: rgba(255,255,255,0.1);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
             --transition-fast: all 0.2s ease;
             --transition-normal: all 0.3s ease;
         }
         .light {
-            --bg: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
-            --panel: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
-            --card: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
-            --text: #1e3c72;
-            --muted: #6c757d;
-            --accent: #007bff;
-            --accent-hover: #0056b3;
-            --shadow-sm: 0 2px 5px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 10px rgba(0,0,0,0.15);
-            --shadow-lg: 0 8px 20px rgba(0,0,0,0.2);
+            /* Light Mode */
+            --bg: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            --panel: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+            --card: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+            --text: #2d3748;
+            --muted: #718096;
+            --accent: #3182ce;
+            --accent-hover: #2c5aa0;
+            --avail: #38a169;
+            --availText: #ffffff;
+            --occ: #e53e3e;
+            --occText: #ffffff;
+            --maint: #dd6b20;
+            --maintText: #ffffff;
+            --border: rgba(0,0,0,0.1);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .dark-fullscreen {
+            /* Enhanced Dark Mode for Fullscreen */
+            --bg: linear-gradient(135deg, #000000 0%, #0f1419 100%);
+            --panel: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
+            --card: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            --text: #ffffff;
+            --muted: #a0aec0;
+            --accent: #00d4aa;
+            --accent-hover: #00e6b8;
+            --avail: #48bb78;
+            --availText: #ffffff;
+            --occ: #f56565;
+            --occText: #ffffff;
+            --maint: #ed8936;
+            --maintText: #ffffff;
+            --border: rgba(255,255,255,0.15);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
         }
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
@@ -96,13 +126,13 @@
             background: var(--card);
             border-radius: 16px;
             padding: 18px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
             min-width: 0;
-            height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: var(--shadow-md);
+            height: 200px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            box-shadow: var(--shadow-md); 
             transition: var(--transition-normal);
             position: relative;
             overflow: hidden;
@@ -180,13 +210,13 @@
             align-items:flex-start; 
             flex-wrap: wrap; 
         }
-        .panel {
+        .panel { 
             background: var(--panel);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px;
             padding: 20px;
             flex: 1 1 320px;
-            min-width: 0;
+            min-width: 0; 
             box-shadow: var(--shadow-md);
             background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
         }
@@ -304,6 +334,10 @@
             padding: 10px; 
             overflow-y: auto; 
             box-sizing: border-box;
+            color: var(--text);
+        }
+        .fullscreen-mode.dark-theme {
+            background: var(--bg);
         }
         .fullscreen-mode h1 { 
             margin-bottom: 10px; 
@@ -313,10 +347,17 @@
         .fullscreen-mode .toolbar {
             flex-wrap: wrap;
             gap: 5px;
+            color: var(--text);
         }
         .fullscreen-mode .toolbar .btn {
             padding: 4px 8px;
             font-size: 11px;
+            background: var(--accent);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .fullscreen-mode .toolbar .btn:hover {
+            background: var(--accent-hover);
         }
         .fullscreen-mode .toolbar label {
             display: none;
@@ -345,6 +386,12 @@
             margin: 0;
             box-sizing: border-box;
             box-shadow: var(--shadow-lg);
+            border: 2px solid var(--border);
+            transition: var(--transition-normal);
+        }
+        .fullscreen-mode .bay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
         }
         .fullscreen-mode .bay h3 { 
             font-size: 18px; 
@@ -506,6 +553,13 @@
         Cephra Live Monitor <span id="ts" class="ts"></span>
         <div class="toolbar">
             <label class="muted" style="white-space:nowrap;"><input type="checkbox" id="announcerChk" checked /> Bay Announcer</label>
+            <label class="muted" style="white-space:nowrap; margin-left: 10px;">
+                Volume: <input type="range" id="volumeSlider" min="0" max="100" value="80" style="width: 60px; margin: 0 5px;" />
+            </label>
+            <label class="muted" style="white-space:nowrap;">
+                Speed: <input type="range" id="speedSlider" min="50" max="200" value="90" style="width: 60px; margin: 0 5px;" />
+            </label>
+            <button class="btn" id="testTTSBtn">Test TTS</button>
             <button class="btn" id="fullscreenBtn">Fullscreen Bays</button>
             <button class="btn" id="themeBtn">Toggle Theme</button>
             <button class="btn" id="languageBtn">EN</button>
@@ -555,44 +609,89 @@
         let languageIndex = 0;
         const languageKeys = Object.keys(languages);
         
-        // TTS messages for different languages
+        // Enhanced TTS messages for different languages
         const ttsMessages = {
             'EN': {
-                waiting: 'Ticket {ticketId} is now waiting',
-                done: 'Ticket {ticketId} is done charging at Bay {bayNumber}',
-                assigned: 'Ticket {ticketId} is now assigned to Bay {bayNumber}',
-                available: 'Bay {bayNumber} is now available',
-                maintenance: 'Bay {bayNumber} is under maintenance'
+                waiting: 'Ticket {ticketId} is now waiting in queue',
+                done: 'Ticket {ticketId} charging completed at Bay {bayNumber}. Please disconnect your vehicle',
+                assigned: 'Ticket {ticketId} assigned to Bay {bayNumber}. Please proceed to your charging bay',
+                available: 'Bay {bayNumber} is now available for charging',
+                maintenance: 'Bay {bayNumber} is under maintenance. Please use another bay',
+                charging_started: 'Charging started for ticket {ticketId} at Bay {bayNumber}',
+                queue_position: 'You are position {position} in the queue',
+                welcome: 'Welcome to Cephra charging station',
+                thank_you: 'Thank you for using Cephra charging station',
+                payment_success: 'Payment successful. Please proceed to Bay {bayNumber}',
+                payment_failed: 'Payment failed. Please try again',
+                emergency: 'Emergency stop activated at Bay {bayNumber}',
+                system_error: 'System error detected. Please contact support'
             },
             'ZH': {
-                waiting: '票据 {ticketId} 现在正在等待',
-                done: '票据 {ticketId} 在 {bayNumber} 号充电桩充电完成',
-                assigned: '票据 {ticketId} 现在已分配到 {bayNumber} 号充电桩',
-                available: '{bayNumber} 号充电桩现在可用',
-                maintenance: '{bayNumber} 号充电桩正在维护中'
+                waiting: '票据 {ticketId} 现在正在队列中等待',
+                done: '票据 {ticketId} 在 {bayNumber} 号充电桩充电完成。请断开您的车辆',
+                assigned: '票据 {ticketId} 已分配到 {bayNumber} 号充电桩。请前往您的充电桩',
+                available: '{bayNumber} 号充电桩现在可用于充电',
+                maintenance: '{bayNumber} 号充电桩正在维护中。请使用其他充电桩',
+                charging_started: '票据 {ticketId} 在 {bayNumber} 号充电桩开始充电',
+                queue_position: '您在队列中的位置是第 {position} 位',
+                welcome: '欢迎使用Cephra充电站',
+                thank_you: '感谢您使用Cephra充电站',
+                payment_success: '支付成功。请前往 {bayNumber} 号充电桩',
+                payment_failed: '支付失败。请重试',
+                emergency: '{bayNumber} 号充电桩紧急停止已激活',
+                system_error: '检测到系统错误。请联系技术支持'
             },
             'FIL': {
-                waiting: 'Tiket {ticketId} ay naghihintay na',
-                done: 'Tapos na ang pagkarga ng Tiket {ticketId} sa Bay {bayNumber}',
-                assigned: 'Nakatalaga na ang Tiket {ticketId} sa Bay {bayNumber}',
-                available: 'Available na ang Bay {bayNumber}',
-                maintenance: 'Under maintenance ang Bay {bayNumber}'
+                waiting: 'Tiket {ticketId} ay naghihintay na sa pila',
+                done: 'Tapos na ang pagkarga ng Tiket {ticketId} sa Bay {bayNumber}. Pakidisconnect ang inyong sasakyan',
+                assigned: 'Nakatalaga na ang Tiket {ticketId} sa Bay {bayNumber}. Pumunta sa inyong charging bay',
+                available: 'Available na ang Bay {bayNumber} para sa pagkarga',
+                maintenance: 'Under maintenance ang Bay {bayNumber}. Gumamit ng ibang bay',
+                charging_started: 'Nagsimula na ang pagkarga ng Tiket {ticketId} sa Bay {bayNumber}',
+                queue_position: 'Ikaw ay nasa position {position} sa pila',
+                welcome: 'Maligayang pagdating sa Cephra charging station',
+                thank_you: 'Salamat sa paggamit ng Cephra charging station',
+                payment_success: 'Successful ang bayad. Pumunta sa Bay {bayNumber}',
+                payment_failed: 'Failed ang bayad. Subukan ulit',
+                emergency: 'Emergency stop na-activate sa Bay {bayNumber}',
+                system_error: 'May system error. Tawagan ang support'
             },
             'CEB': {
-                waiting: 'Tiket {ticketId} naghulat na',
-                done: 'Nahuman na ang pag-charge sa Tiket {ticketId} sa Bay {bayNumber}',
-                assigned: 'Nakatalaga na ang Tiket {ticketId} sa Bay {bayNumber}',
-                available: 'Available na ang Bay {bayNumber}',
-                maintenance: 'Under maintenance ang Bay {bayNumber}'
+                waiting: 'Tiket {ticketId} naghulat na sa pila',
+                done: 'Nahuman na ang pag-charge sa Tiket {ticketId} sa Bay {bayNumber}. Pakidisconnect ang inyong sakyanan',
+                assigned: 'Nakatalaga na ang Tiket {ticketId} sa Bay {bayNumber}. Adto sa inyong charging bay',
+                available: 'Available na ang Bay {bayNumber} para sa pag-charge',
+                maintenance: 'Under maintenance ang Bay {bayNumber}. Gamit ang lain nga bay',
+                charging_started: 'Nagsugod na ang pag-charge sa Tiket {ticketId} sa Bay {bayNumber}',
+                queue_position: 'Ikaw naa sa position {position} sa pila',
+                welcome: 'Maayong pag-abot sa Cephra charging station',
+                thank_you: 'Salamat sa pag-gamit sa Cephra charging station',
+                payment_success: 'Successful ang bayad. Adto sa Bay {bayNumber}',
+                payment_failed: 'Failed ang bayad. Sulayi usab',
+                emergency: 'Emergency stop na-activate sa Bay {bayNumber}',
+                system_error: 'Naay system error. Tawagi ang support'
             },
             'ES': {
-                waiting: 'Boleto {ticketId} está ahora esperando',
-                done: 'Boleto {ticketId} terminó de cargar en la Bahía {bayNumber}',
-                assigned: 'Boleto {ticketId} ahora está asignado a la Bahía {bayNumber}',
-                available: 'La Bahía {bayNumber} está ahora disponible',
-                maintenance: 'La Bahía {bayNumber} está en mantenimiento'
+                waiting: 'Boleto {ticketId} está ahora esperando en la cola',
+                done: 'Boleto {ticketId} terminó de cargar en la Bahía {bayNumber}. Por favor desconecte su vehículo',
+                assigned: 'Boleto {ticketId} ahora está asignado a la Bahía {bayNumber}. Por favor diríjase a su bahía',
+                available: 'La Bahía {bayNumber} está ahora disponible para cargar',
+                maintenance: 'La Bahía {bayNumber} está en mantenimiento. Por favor use otra bahía',
+                charging_started: 'La carga comenzó para el boleto {ticketId} en la Bahía {bayNumber}',
+                queue_position: 'Usted está en la posición {position} en la cola',
+                welcome: 'Bienvenido a la estación de carga Cephra',
+                thank_you: 'Gracias por usar la estación de carga Cephra',
+                payment_success: 'Pago exitoso. Por favor proceda a la Bahía {bayNumber}',
+                payment_failed: 'Pago fallido. Por favor intente de nuevo',
+                emergency: 'Parada de emergencia activada en la Bahía {bayNumber}',
+                system_error: 'Error del sistema detectado. Por favor contacte soporte'
             }
         };
+        
+        // TTS Settings
+        let ttsVolume = 0.8;
+        let ttsRate = 0.9;
+        let ttsPitch = 1.1;
         
         let currentQueue = [];
         let lastBays = {};
@@ -645,16 +744,116 @@
             currentLanguage = savedLang;
             languageBtn.textContent = currentLanguage;
         }
+        
+        // Initialize TTS controls
+        const volumeSlider = document.getElementById('volumeSlider');
+        const speedSlider = document.getElementById('speedSlider');
+        
+        // Load saved TTS settings
+        const savedVolume = localStorage.getItem('monitor_tts_volume');
+        const savedSpeed = localStorage.getItem('monitor_tts_speed');
+        
+        if (savedVolume) {
+            ttsVolume = parseFloat(savedVolume);
+            volumeSlider.value = Math.round(ttsVolume * 100);
+        }
+        
+        if (savedSpeed) {
+            ttsRate = parseFloat(savedSpeed);
+            speedSlider.value = Math.round(ttsRate * 100);
+        }
+        
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            ttsVolume = e.target.value / 100;
+            localStorage.setItem('monitor_tts_volume', ttsVolume.toString());
+        });
+        
+        // Speed control
+        speedSlider.addEventListener('input', (e) => {
+            ttsRate = e.target.value / 100;
+            localStorage.setItem('monitor_tts_speed', ttsRate.toString());
+        });
+        
+        // Test TTS button
+        const testTTSBtn = document.getElementById('testTTSBtn');
+        if (testTTSBtn) {
+            testTTSBtn.addEventListener('click', () => {
+                // Test different announcement types
+                const testMessages = [
+                    () => announceWelcome(),
+                    () => announceQueuePosition(1),
+                    () => announceChargingStarted('TEST001', 1),
+                    () => announceTicketDone('TEST001', 1),
+                    () => announceBayAvailable(1),
+                    () => announcePaymentSuccess(1)
+                ];
+                
+                // Cycle through test messages
+                const randomIndex = Math.floor(Math.random() * testMessages.length);
+                testMessages[randomIndex]();
+            });
+        }
 
-        // Fullscreen functionality
+        // Fullscreen functionality with dark mode
         let isFullscreen = false;
+        let isDarkMode = true; // Default to dark mode
         const fsBtn = document.getElementById('fullscreenBtn');
+        const themeBtn = document.getElementById('themeBtn');
+        
+        // Load saved theme preference
+        const savedTheme = localStorage.getItem('monitor_theme') || 'dark';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            isDarkMode = true;
+        } else {
+            document.body.classList.add('light');
+            isDarkMode = false;
+        }
+        
         if (fsBtn) {
             fsBtn.onclick = () => {
                 isFullscreen = !isFullscreen;
                 document.body.classList.toggle('fullscreen-mode', isFullscreen);
+                
+                // Apply enhanced dark mode in fullscreen
+                if (isFullscreen && isDarkMode) {
+                    document.body.classList.add('dark-fullscreen');
+                } else {
+                    document.body.classList.remove('dark-fullscreen');
+                }
+                
                 fsBtn.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Bays';
             };
+        }
+        
+        // Enhanced theme toggle
+        if (themeBtn) {
+            themeBtn.onclick = () => {
+                isDarkMode = !isDarkMode;
+                
+                if (isDarkMode) {
+                    document.body.classList.remove('light');
+                    document.body.classList.add('dark-theme');
+                    themeBtn.textContent = 'Light Mode';
+                    localStorage.setItem('monitor_theme', 'dark');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    document.body.classList.add('light');
+                    themeBtn.textContent = 'Dark Mode';
+                    localStorage.setItem('monitor_theme', 'light');
+                }
+                
+                // Update fullscreen theme if in fullscreen
+                if (isFullscreen && isDarkMode) {
+                    document.body.classList.add('dark-fullscreen');
+                } else {
+                    document.body.classList.remove('dark-fullscreen');
+                }
+            };
+            
+            // Set initial button text
+            themeBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
         }
         
         // WebSocket connection
@@ -985,9 +1184,9 @@
                 }
                 
                 const utterance = new SpeechSynthesisUtterance(messageToSpeak);
-                utterance.rate = 0.9;  // Slightly faster but still clear
-                utterance.pitch = 1.1; // Slightly higher pitch for clarity
-                utterance.volume = 1.0; // Full volume
+                utterance.rate = ttsRate;  // Use user-controlled rate
+                utterance.pitch = ttsPitch; // Use user-controlled pitch
+                utterance.volume = ttsVolume; // Use user-controlled volume
                 
                 // Get all available voices
                 let voices = [];
@@ -996,39 +1195,87 @@
                 const loadVoices = () => {
                     voices = speechSynthesis.getVoices();
                     
-                    // Try to find the best voice based on current language
+                    // Enhanced voice selection based on current language
                     const currentLang = languages[currentLanguage].code;
                     let preferredVoices = [];
                     
-                    // Language-specific voice preferences
+                    // Language-specific voice preferences with better matching
                     switch (currentLang) {
                         case 'zh':
-                            preferredVoices = ['Chinese', 'Mandarin', 'Cantonese', 'Microsoft Huihui'];
+                            preferredVoices = [
+                                'Microsoft Huihui - Chinese (Simplified, PRC)',
+                                'Microsoft Yaoyao - Chinese (Simplified, PRC)',
+                                'Chinese (Simplified)',
+                                'Chinese (Mandarin)',
+                                'Mandarin Chinese',
+                                'Chinese',
+                                'Huihui',
+                                'Yaoyao'
+                            ];
                             break;
                         case 'fil':
+                            preferredVoices = [
+                                'Filipino',
+                                'Tagalog',
+                                'English (Philippines)',
+                                'Microsoft Zira - English (United States)',
+                                'English (US)',
+                                'English'
+                            ];
+                            break;
                         case 'ceb':
-                            preferredVoices = ['Filipino', 'Tagalog', 'Cebuano', 'English']; // Fallback to English
+                            preferredVoices = [
+                                'Cebuano',
+                                'Bisaya',
+                                'Filipino',
+                                'Tagalog',
+                                'English (Philippines)',
+                                'Microsoft Zira - English (United States)',
+                                'English (US)',
+                                'English'
+                            ];
                             break;
                         case 'es':
-                            preferredVoices = ['Spanish', 'Español', 'Microsoft Helena', 'Microsoft Sabina'];
+                            preferredVoices = [
+                                'Microsoft Helena - Spanish (Spain)',
+                                'Microsoft Sabina - Spanish (Mexico)',
+                                'Microsoft Laura - Spanish (Spain)',
+                                'Spanish (Spain)',
+                                'Spanish (Mexico)',
+                                'Spanish (Latin America)',
+                                'Español',
+                                'Spanish',
+                                'Helena',
+                                'Sabina',
+                                'Laura'
+                            ];
                             break;
                         default: // English
                             preferredVoices = [
-                                'Microsoft Zira',
-                                'Google UK English Female',
-                                'Samantha',
-                                'Karen',
-                                'Susan',
-                                'Female',
-                                'female'
-                            ];
+                                'Microsoft Zira - English (United States)',
+                                'Microsoft Hazel - English (Great Britain)',
+                                'Microsoft Susan - English (United States)',
+                        'Google UK English Female',
+                                'Google US English Female',
+                        'Samantha',
+                        'Karen',
+                        'Susan',
+                                'Zira',
+                                'Hazel',
+                                'English (US)',
+                                'English (UK)',
+                        'Female',
+                        'female'
+                    ];
                     }
                     
-                    // Try to find a preferred voice
+                    // Enhanced voice selection with multiple matching strategies
                     let selectedVoice = null;
+                    
+                    // Strategy 1: Exact name match with localService
                     for (const preferred of preferredVoices) {
                         const found = voices.find(voice => 
-                            voice.name.includes(preferred) && voice.localService
+                            voice.name === preferred && voice.localService
                         );
                         if (found) {
                             selectedVoice = found;
@@ -1036,16 +1283,62 @@
                         }
                     }
                     
-                    // If no preferred voice with localService, try without localService restriction
+                    // Strategy 2: Contains match with localService
                     if (!selectedVoice) {
                         for (const preferred of preferredVoices) {
                             const found = voices.find(voice => 
-                                voice.name.includes(preferred)
+                                voice.name.toLowerCase().includes(preferred.toLowerCase()) && voice.localService
                             );
                             if (found) {
                                 selectedVoice = found;
                                 break;
                             }
+                        }
+                    }
+                    
+                    // Strategy 3: Language code match
+                    if (!selectedVoice) {
+                        const found = voices.find(voice => 
+                            voice.lang.startsWith(currentLang) && voice.localService
+                        );
+                        if (found) {
+                            selectedVoice = found;
+                        }
+                    }
+                    
+                    // Strategy 4: Exact name match without localService restriction
+                    if (!selectedVoice) {
+                        for (const preferred of preferredVoices) {
+                            const found = voices.find(voice => 
+                                voice.name === preferred
+                            );
+                            if (found) {
+                                selectedVoice = found;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Strategy 5: Contains match without localService restriction
+                    if (!selectedVoice) {
+                        for (const preferred of preferredVoices) {
+                            const found = voices.find(voice => 
+                                voice.name.toLowerCase().includes(preferred.toLowerCase())
+                            );
+                            if (found) {
+                                selectedVoice = found;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Strategy 6: Language code match without localService restriction
+                    if (!selectedVoice) {
+                        const found = voices.find(voice => 
+                            voice.lang.startsWith(currentLang)
+                        );
+                        if (found) {
+                            selectedVoice = found;
                         }
                     }
                     
@@ -1120,6 +1413,96 @@
             }
         }
         
+        function announceChargingStarted(ticketId, bayNumber) {
+            const message = `Charging started for ticket ${ticketId} at Bay ${bayNumber}`;
+            console.log('Charging started announcement:', message, {ticketId, bayNumber});
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'charging_started', { ticketId, bayNumber });
+            }
+        }
+        
+        function announceQueuePosition(position) {
+            const message = `You are position ${position} in the queue`;
+            console.log('Queue position announcement:', message, {position});
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'queue_position', { position });
+            }
+        }
+        
+        function announceWelcome() {
+            const message = 'Welcome to Cephra charging station';
+            console.log('Welcome announcement:', message);
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'welcome', {});
+            }
+        }
+        
+        function announceThankYou() {
+            const message = 'Thank you for using Cephra charging station';
+            console.log('Thank you announcement:', message);
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'thank_you', {});
+            }
+        }
+        
+        function announcePaymentSuccess(bayNumber) {
+            const message = `Payment successful. Please proceed to Bay ${bayNumber}`;
+            console.log('Payment success announcement:', message, {bayNumber});
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'payment_success', { bayNumber });
+            }
+        }
+        
+        function announcePaymentFailed() {
+            const message = 'Payment failed. Please try again';
+            console.log('Payment failed announcement:', message);
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'payment_failed', {});
+            }
+        }
+        
+        function announceEmergencyStop(bayNumber) {
+            const message = `Emergency stop activated at Bay ${bayNumber}`;
+            console.log('Emergency stop announcement:', message, {bayNumber});
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'emergency', { bayNumber });
+            }
+        }
+        
+        function announceSystemError() {
+            const message = 'System error detected. Please contact support';
+            console.log('System error announcement:', message);
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'system_error', {});
+            }
+        }
+        
+        function announceBayAvailable(bayNumber) {
+            const message = `Bay ${bayNumber} is now available for charging`;
+            console.log('Bay available announcement:', message, {bayNumber});
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'available', { bayNumber });
+            }
+        }
+        
+        function announceBayMaintenance(bayNumber) {
+            const message = `Bay ${bayNumber} is under maintenance. Please use another bay`;
+            console.log('Bay maintenance announcement:', message, {bayNumber});
+            
+            if (document.getElementById('announcerChk').checked) {
+                speak(message, 'maintenance', { bayNumber });
+            }
+        }
+        
         function announceTicketDone(ticketId, bayNumber) {
             // Announcement for when a ticket is done charging
             const message = `Ticket ${ticketId} is done charging at Bay ${bayNumber}`;
@@ -1150,6 +1533,11 @@
         // Render placeholders immediately and fetch a snapshot for faster first paint
         renderBays([]);
         fetchSnapshot();
+        
+        // Welcome announcement on page load (with delay to allow voices to load)
+        setTimeout(() => {
+            announceWelcome();
+        }, 2000);
         
         // Initialize connection
         if ('WebSocket' in window) {
