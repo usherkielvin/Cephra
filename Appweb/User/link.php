@@ -12,35 +12,14 @@ $conn = $db->getConnection();
 
 $username = $_SESSION['username'];
 
-// Check if car is already linked and user has battery level
-$isCarLinked = false;
-$hasBatteryData = false;
-$currentBatteryLevel = null;
-
+// Check car_index from users table
+$carIndex = null;
 if ($conn) {
-    // Check if user has battery data (equivalent to car being linked)
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM battery_levels WHERE username = :username");
+    $stmt = $conn->prepare("SELECT car_index FROM users WHERE username = :username");
     $stmt->bindParam(':username', $username);
     $stmt->execute();
-    $hasBatteryData = $stmt->fetchColumn() > 0;
-
-    if ($hasBatteryData) {
-        // Get battery level
-        $stmt = $conn->prepare("SELECT battery_level FROM battery_levels WHERE username = :username");
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $batteryLevel = (int)($result['battery_level'] ?? -1);
-        $currentBatteryLevel = $batteryLevel;
-
-        if ($batteryLevel > 0 && $batteryLevel < 100) {
-            // Car is linked and battery is initialized but not at 100% - keep Link panel visible
-            $isCarLinked = true;
-        } else if ($batteryLevel == 100) {
-            // Battery at 100% - car is considered unlinked since no charging needed
-            $isCarLinked = false;
-        }
-    }
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $carIndex = $result['car_index'] ?? null;
 }
 
 // Handle form submissions
@@ -48,30 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['link_car'])) {
         // Link car functionality
         if ($conn) {
-            // Initialize battery to random level (15-50%)
-            $newBatteryLevel = 15 + rand(0, 35); // 15 to 50
-
-            if (!$hasBatteryData) {
-                // No record yet -> insert
-                $stmt = $conn->prepare("INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (:username, :battery_level, :initial_battery_level, 40.0)");
-                $stmt->bindParam(':username', $username);
-                $stmt->bindParam(':battery_level', $newBatteryLevel);
-                $stmt->bindParam(':initial_battery_level', $newBatteryLevel);
-            } else if ($currentBatteryLevel <= 0) {
-                // Record exists but unlinked sentinel (-1) -> update
-                $stmt = $conn->prepare("UPDATE battery_levels SET battery_level = :battery_level, initial_battery_level = :battery_level WHERE username = :username");
-                $stmt->bindParam(':username', $username);
-                $stmt->bindParam(':battery_level', $newBatteryLevel);
-            } else {
-                // Already linked -> nothing to do
-                $stmt = null;
-            }
-
-            if ($stmt && $stmt->execute()) {
+            // Generate random car_index between 1-10
+            $newCarIndex = rand(1, 10);
+            $stmt = $conn->prepare("UPDATE users SET car_index = :car_index WHERE username = :username");
+            $stmt->bindParam(':car_index', $newCarIndex);
+            $stmt->bindParam(':username', $username);
+            if ($stmt->execute()) {
                 $_SESSION['car_linked'] = true;
-                header("Location: dashboard.php");
+                header("Location: link.php"); // Refresh to show "With Car"
                 exit();
-            } elseif ($stmt) {
+            } else {
                 $error = "Failed to link car. Please try again.";
             }
         }
@@ -88,73 +53,158 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#062635" />
-    <link rel="stylesheet" href="css/main.css" />
-    <link rel="stylesheet" href="css/pages/link.css" />
+    <link rel="stylesheet" href="css/vantage-style.css" />
+    <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+    <link rel="stylesheet" href="assets/css/pages/link.css" />
 </head>
 <body class="homepage is-preload">
     <div id="page-wrapper">
-        <!-- Header -->
-        <div id="header-wrapper">
-            <!-- Header -->
-            <header id="header">
-                <div class="inner">
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
                     <!-- Logo -->
-                    <h1>
-                        <a href="dashboard.php" id="logo" style="display:inline-flex;align-items:center;gap:8px;"><img src="images/logo.png" alt="Cephra" style="width:28px;height:28px;border-radius:6px;object-fit:cover;vertical-align:middle;" /><span>Cephra</span></a>
-                    </h1>
-                    <!-- Nav -->
-                    <nav id="nav">
-                        <ul>
-                            <li><a href="dashboard.php">Home</a></li>
-                            <li class="current_page_item"><a href="link.php">Link</a></li>
-                            <li><a href="history.php">History</a></li>
-                            <li><a href="profile.php">Profile</a></li>
+                    <div class="logo">
+                        <img src="images/logo.png" alt="Cephra" class="logo-img" />
+                        <span class="logo-text">CEPHRA</span>
+                    </div>
+
+                    <!-- Navigation -->
+                    <nav class="nav">
+                        <ul class="nav-list">
+                            <li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
+                            <li class="current_page_item"><a href="link.php" class="nav-link">Link</a></li>
+                            <li><a href="history.php" class="nav-link">History</a></li>
+                            <li><a href="profile.php" class="nav-link">Profile</a></li>
                         </ul>
                     </nav>
-                </div>
-            </header>
-        </div>
 
-        <!-- Main Content -->
-        <div id="main-wrapper">
-            <div class="wrapper style1">
-                <div class="inner">
-                    <div class="link-container">
-                        <?php if (!empty($isCarLinked)): ?>
-                            <h2>Your Vehicle is Linked</h2>
-                            <p>Porsche connected. You're ready to charge.</p>
-                            <img src="images/ads.png" alt="Porsche" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px;">
-                            <div style="display:flex; gap:12px; justify-content:center;">
-                                <a href="dashboard.php" class="button">Go to Dashboard</a>
-                                <a href="ChargingPage.php" class="button alt">Start Charging</a>
-                            </div>
-                        <?php else: ?>
-                            <h2>Link Your Electric Vehicle</h2>
-                            <p>Connect your EV to start charging at Cephra stations</p>
-                            <img src="images/ConnectCar.gif" alt="Connect Car" style="max-width: 100%; height: auto; margin: 20px 0;">
-                            <form method="post" id="linkForm">
-                                <div class="terms-checkbox">
-                                    <input type="checkbox" id="terms" name="terms" required>
-                                    <label for="terms">By linking, I agree to the <a href="#" onclick="showTerms(); return false;">Terms & Conditions</a></label>
-                                </div>
-                                <?php if (isset($error)): ?>
-                                    <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-                                <?php endif; ?>
-                                <button type="submit" name="link_car" class="link-button" id="linkBtn" disabled>
-                                    Link My Car
-                                </button>
-                            </form>
-                        <?php endif; ?>
-                        <div class="panel-nav" style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
-                            <a class="button alt" href="profile.php">Prev: Profile</a>
-                            <a class="button" href="history.php">Next: History</a>
+                    <!-- Header Actions -->
+                    <div class="header-actions">
+                        <div class="auth-buttons">
+                            <a href="dashboard.php" class="nav-link auth-link">Back</a>
                         </div>
                     </div>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
                 </div>
             </div>
-        </div>
+        </header>
 
-        
+        <!-- Link Section -->
+        <section class="link-section" style="padding: 100px 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+            <div class="container">
+                <div class="section-header" style="text-align: center; margin-bottom: 60px;">
+                    <h2 class="section-title" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Link Your Car</h2>
+                    <p class="section-description" style="font-size: 1.2rem; color: rgba(26, 32, 44, 0.8); max-width: 600px; margin: 0 auto;">Connect your electric vehicle to start charging at Cephra stations</p>
+                </div>
+
+                <div class="link-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); max-width: 600px; margin: 0 auto;">
+                    <?php if (is_null($carIndex) || $carIndex == 0): ?>
+                        <!-- No Car Design -->
+                        <h3 style="text-align: center; margin-bottom: 1rem; color: #1a202c;">Link Your Electric Vehicle</h3>
+                        <p style="text-align: center; margin-bottom: 2rem; color: rgba(26, 32, 44, 0.7);">Connect your EV to start charging at Cephra stations</p>
+                        <img src="images/ConnectCar.gif" alt="Connect Car" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px; display: block; margin-left: auto; margin-right: auto;">
+                        <form method="post" id="linkForm">
+                            <div class="terms-checkbox" style="margin-bottom: 1rem;">
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <label for="terms">By linking, I agree to the <a href="#" onclick="showTerms(); return false;">Terms & Conditions</a></label>
+                            </div>
+                            <?php if (isset($error)): ?>
+                                <div class="error-message" style="color: red; margin-bottom: 1rem;"><?php echo htmlspecialchars($error); ?></div>
+                            <?php endif; ?>
+                            <button type="submit" name="link_car" class="link-button" id="linkBtn" disabled style="width: 100%; padding: 0.75rem; background: #cccccc; color: white; border: none; border-radius: 8px; cursor: not-allowed; transition: all 0.3s ease;">
+                                Link My Car
+                            </button>
+                        </form>
+                    <?php else: ?>
+                        <!-- With Car Design -->
+                        <h3 style="text-align: center; margin-bottom: 1rem; color: #1a202c;">Your Vehicle is Linked</h3>
+                        <p style="text-align: center; margin-bottom: 2rem; color: rgba(26, 32, 44, 0.7);">Porsche connected. You're ready to charge.</p>
+                        <img src="images/ads.png" alt="Porsche" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px; display: block; margin-left: auto; margin-right: auto;">
+                        <div class="car-details" style="margin-top: 2rem;">
+                            <div class="detail-row" style="margin-bottom: 1rem;">
+                                <span class="detail-label">Car Model:</span>
+                                <span class="detail-value">Porsche <?php echo $carIndex; ?></span>
+                            </div>
+                            <div class="detail-row" style="margin-bottom: 1rem;">
+                                <span class="detail-label">Performance:</span>
+                                <span class="detail-value"><?php echo rand(200, 400); ?> HP</span>
+                            </div>
+                            <div class="detail-row" style="margin-bottom: 1rem;">
+                                <span class="detail-label">Kms Remaining:</span>
+                                <span class="detail-value"><?php echo rand(50, 300); ?> km</span>
+                            </div>
+                            <div class="detail-row" style="margin-bottom: 1rem;">
+                                <span class="detail-label">Time to Charge:</span>
+                                <span class="detail-value"><?php echo rand(20, 60); ?> minutes</span>
+                            </div>
+                            <div class="detail-row" style="margin-bottom: 1rem;">
+                                <span class="detail-label">Battery Level:</span>
+                                <div class="progress-bar" style="width: 100%; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                    <div class="progress-fill" style="height: 20px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); width: <?php echo rand(20, 100); ?>%; transition: width 0.3s ease;"></div>
+                                </div>
+                                <span class="progress-text" style="display: block; text-align: center; margin-top: 0.5rem;"><?php echo rand(20, 100); ?>%</span>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:12px; justify-content:center; margin-top: 2rem;">
+                            <a href="dashboard.php" class="button">Go to Dashboard</a>
+                            <a href="ChargingPage.php" class="button alt">Start Charging</a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <div class="footer-logo">
+                            <img src="images/logo.png" alt="Cephra" class="footer-logo-img" />
+                            <span class="footer-logo-text">CEPHRA</span>
+                        </div>
+                        <p class="footer-description">
+                            Your ultimate electric vehicle charging platform,
+                            powering the future of sustainable transportation.
+                        </p>
+                    </div>
+
+                    <div class="footer-section">
+                        <h4 class="footer-title">Platform</h4>
+                        <ul class="footer-links">
+                            <li><a href="dashboard.php">Dashboard</a></li>
+                            <li><a href="link.php">Link</a></li>
+                            <li><a href="history.php">History</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-section">
+                        <h4 class="footer-title">Support</h4>
+                        <ul class="footer-links">
+                            <li><a href="#support">Help Center</a></li>
+                            <li><a href="#contact">Contact Us</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-section">
+                        <h4 class="footer-title">Company</h4>
+                        <ul class="footer-links">
+                            <li><a href="#about">About Us</a></li>
+                            <li><a href="#team">Our Team</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- Scripts -->
@@ -166,30 +216,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="assets/js/main.js"></script>
 
     <script>
-        function showDialog(title, message) {
-            const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
-            const dialog = document.createElement('div');
-            dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
-            const header = document.createElement('div');
-            header.style.cssText = 'background:#00c2ce;color:#fff;padding:12px 16px;font-weight:700';
-            header.textContent = title || 'Notice';
-            const body = document.createElement('div');
-            body.style.cssText = 'padding:16px;color:#333;line-height:1.5;';
-            body.textContent = message || '';
-            const footer = document.createElement('div');
-            footer.style.cssText = 'padding:12px 16px;display:flex;justify-content:flex-end;gap:8px;background:#f7f7f7;';
-            const ok = document.createElement('button');
-            ok.textContent = 'OK';
-            ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
-            ok.onclick = () => document.body.removeChild(overlay);
-            footer.appendChild(ok);
-            dialog.appendChild(header);
-            dialog.appendChild(body);
-            dialog.appendChild(footer);
-            overlay.appendChild(dialog);
-            document.body.appendChild(overlay);
-        }
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            const nav = document.querySelector('.nav');
+            nav.classList.toggle('mobile-menu-open');
+            this.classList.toggle('active');
+        });
+
+        // Enable/disable button based on terms checkbox
+        document.getElementById('terms').addEventListener('change', function() {
+            const linkBtn = document.getElementById('linkBtn');
+            if (this.checked) {
+                linkBtn.disabled = false;
+                linkBtn.style.background = '#4CAF50';
+                linkBtn.style.cursor = 'pointer';
+            } else {
+                linkBtn.disabled = true;
+                linkBtn.style.background = '#cccccc';
+                linkBtn.style.cursor = 'not-allowed';
+            }
+        });
+
         function showTerms() {
             const termsText = `CEPHRA EV LINKING TERMS AND CONDITIONS
 Effective Date: <?php echo date('Y-m-d'); ?>
@@ -233,7 +280,6 @@ Cephra Support — support@cephra.com | +63 2 8XXX XXXX
 
 By checking "I agree", you confirm you have read and accept these Terms.`;
 
-            // Create modal dialog
             const modal = document.createElement('div');
             modal.style.cssText = `
                 position: fixed;
@@ -268,50 +314,6 @@ By checking "I agree", you confirm you have read and accept these Terms.`;
             modal.appendChild(modalContent);
             document.body.appendChild(modal);
         }
-
-        // Form validation
-        document.getElementById('linkForm').addEventListener('submit', function(e) {
-            const termsCheckbox = document.getElementById('terms');
-            if (!termsCheckbox.checked) {
-                e.preventDefault();
-                showDialog('Terms Required', 'You must agree to the Terms & Conditions before linking your car.');
-                return false;
-            }
-        });
-
-        // Enable/disable button based on terms checkbox
-        document.getElementById('terms').addEventListener('change', function() {
-            const linkBtn = document.getElementById('linkBtn');
-            if (this.checked) {
-                linkBtn.disabled = false;
-                linkBtn.style.background = '#4CAF50';
-                linkBtn.style.cursor = 'pointer';
-            } else {
-                linkBtn.disabled = true;
-                linkBtn.style.background = '#cccccc';
-                linkBtn.style.cursor = 'not-allowed';
-            }
-        });
-
-        // Initialize button state on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const termsCheckbox = document.getElementById('terms');
-            const linkBtn = document.getElementById('linkBtn');
-            if (!termsCheckbox.checked) {
-                linkBtn.disabled = true;
-                linkBtn.style.background = '#cccccc';
-                linkBtn.style.cursor = 'not-allowed';
-            }
-            // Ensure click triggers submission when enabled
-            linkBtn.addEventListener('click', function(e) {
-                if (!termsCheckbox.checked) {
-                    e.preventDefault();
-                    showDialog('Link Vehicle', 'Please agree to the Terms & Conditions to continue.');
-                    return false;
-                }
-                // allow normal form submit
-            });
-        });
     </script>
 </body>
 </html>
