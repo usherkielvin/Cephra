@@ -6,21 +6,15 @@ public final class AppState {
     public static boolean isCarLinked = false;
     
     /**
-     * Initialize the car linking state based on database battery level
-     * Car is considered linked if user has battery data and battery is not 100%
-     * When battery is 100%, car is considered "unlinked" since no charging is needed
+     * Initialize the car linking state based on database user car assignment.
+     * A car is considered linked if the user has a non-null car_index in the users table.
      */
     public static void initializeCarLinkingState() {
         try {
             String username = cephra.Database.CephraDB.getCurrentUsername();
             if (username != null && !username.isEmpty()) {
-                int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
-                // Car is linked if battery exists and is not 100% (meaning it needs charging)
-                isCarLinked = (batteryLevel != -1 && batteryLevel < 100);
-                // If battery is 100%, ensure car is considered unlinked
-                if (batteryLevel == 100) {
-                    isCarLinked = false;
-                }
+                int carIndex = cephra.Database.CephraDB.getUserCarIndex(username);
+                isCarLinked = (carIndex != -1);
             }
         } catch (Exception e) {
             System.err.println("Error initializing car linking state: " + e.getMessage());

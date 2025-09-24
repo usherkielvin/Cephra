@@ -37,7 +37,21 @@ public class AlreadyTicket extends javax.swing.JPanel {
      * @return true if PayPop can be shown
      */
     public static boolean canShowPayPop(String ticketId, String customerUsername) {
-        
+        // If latest ticket status is not open (Pending/Waiting/Charging), do not show
+        try {
+            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
+            if (currentUser != null && !currentUser.trim().isEmpty()) {
+                String status = cephra.Database.CephraDB.getUserCurrentTicketStatus(currentUser);
+                if (status != null) {
+                    String s = status.trim().toLowerCase();
+                    boolean isOpen = ("pending".equals(s) || "waiting".equals(s) || "charging".equals(s));
+                    if (!isOpen) {
+                        return false;
+                    }
+                }
+            }
+        } catch (Throwable ignore) {}
+
         // Allow reappearing - if already showing, hide first then show again
         if (isShowing) {
             hidepop();

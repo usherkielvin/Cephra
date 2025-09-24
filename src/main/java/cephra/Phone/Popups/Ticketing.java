@@ -265,7 +265,19 @@ public class Ticketing extends javax.swing.JPanel {
         // OK button - create ticket
         okBTN.addActionListener(_ -> {
             try {
-                cephra.Phone.Utilities.QueueFlow.addCurrentToAdminAndStore(cephra.Database.CephraDB.getCurrentUsername());
+                String username = cephra.Database.CephraDB.getCurrentUsername();
+                String existingTicket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
+
+                // If user already has an active or pending ticket, show the AlreadyTicket popup
+                if (cephra.Phone.Utilities.QueueFlow.hasActiveTicket() ||
+                    (existingTicket != null && existingTicket.trim().length() > 0)) {
+                    hidePopup();
+                    cephra.Phone.Popups.AlreadyTicket.showPayPop(existingTicket, username);
+                    return;
+                }
+
+                // Otherwise proceed to create a new ticket
+                cephra.Phone.Utilities.QueueFlow.addCurrentToAdminAndStore(username);
                 hidePopup();
             } catch (Throwable t) {
                 System.err.println("Ticketing OK error: " + t.getMessage());

@@ -202,18 +202,88 @@ public class ChargingOption extends javax.swing.JPanel {
     }//GEN-LAST:event_homebuttonActionPerformed
 
     private void fastchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastchargeActionPerformed
+        // If car isn't linked, show LinkFirst popup instead of Ticketing
+        boolean linked = false;
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            int carIndex = (username == null || username.isEmpty()) ? -1 : cephra.Database.CephraDB.getUserCarIndex(username);
+            linked = (carIndex != -1);
+        } catch (Throwable ignore) {}
+        if (!linked) {
+            String username = null;
+            try { username = cephra.Database.CephraDB.getCurrentUsername(); } catch (Throwable ignore) {}
+            cephra.Phone.Popups.LinkFirst.showPayPop(null, username);
+            return;
+        }
+        // If user already has an active/pending ticket, show AlreadyTicket
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            String status = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
+            String existingTicket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
+            boolean isOpen = false;
+            if (status != null) {
+                String s = status.trim().toLowerCase();
+                isOpen = ("pending".equals(s) || "waiting".equals(s) || "charging".equals(s));
+            }
+            if (isOpen && existingTicket != null && existingTicket.trim().length() > 0) {
+                cephra.Phone.Popups.AlreadyTicket.showPayPop(existingTicket, username);
+                return;
+            }
+        } catch (Throwable ignore) {}
+        // Battery guard: if user's battery is already full, show AlreadyFull popup
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            int batteryLevel = (username == null || username.isEmpty()) ? -1 : cephra.Database.CephraDB.getUserBatteryLevel(username);
+            if (batteryLevel >= 100) {
+                cephra.Phone.Popups.AlreadyFull.showPayPop(null, username);
+                return;
+            }
+        } catch (Throwable ignore) {}
         // Set Fast Charging service and show ticketing popup
         cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Fast Charging");
-        
-        // Show ticketing popup (uses layered pane like AlreadyFull)
         cephra.Phone.Popups.Ticketing.showPopup();
     }//GEN-LAST:event_fastchargeActionPerformed
 
     private void normalchargeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalchargeActionPerformed
+        // If car isn't linked, show LinkFirst popup instead of Ticketing
+        boolean linked = false;
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            int carIndex = (username == null || username.isEmpty()) ? -1 : cephra.Database.CephraDB.getUserCarIndex(username);
+            linked = (carIndex != -1);
+        } catch (Throwable ignore) {}
+        if (!linked) {
+            String username = null;
+            try { username = cephra.Database.CephraDB.getCurrentUsername(); } catch (Throwable ignore) {}
+            cephra.Phone.Popups.LinkFirst.showPayPop(null, username);
+            return;
+        }
+        // If user already has an active/pending ticket, show AlreadyTicket
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            String status = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
+            String existingTicket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
+            boolean isOpen = false;
+            if (status != null) {
+                String s = status.trim().toLowerCase();
+                isOpen = ("pending".equals(s) || "waiting".equals(s) || "charging".equals(s));
+            }
+            if (isOpen && existingTicket != null && existingTicket.trim().length() > 0) {
+                cephra.Phone.Popups.AlreadyTicket.showPayPop(existingTicket, username);
+                return;
+            }
+        } catch (Throwable ignore) {}
+        // Battery guard: if user's battery is already full, show AlreadyFull popup
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            int batteryLevel = (username == null || username.isEmpty()) ? -1 : cephra.Database.CephraDB.getUserBatteryLevel(username);
+            if (batteryLevel >= 100) {
+                cephra.Phone.Popups.AlreadyFull.showPayPop(null, username);
+                return;
+            }
+        } catch (Throwable ignore) {}
         // Set Normal Charging service and show ticketing popup
         cephra.Phone.Utilities.QueueFlow.setCurrentServiceOnly("Normal Charging");
-        
-        // Show ticketing popup (uses layered pane like AlreadyFull)
         cephra.Phone.Popups.Ticketing.showPopup();
     }//GEN-LAST:event_normalchargeActionPerformed
 

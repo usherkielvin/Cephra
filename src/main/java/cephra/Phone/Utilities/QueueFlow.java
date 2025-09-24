@@ -98,12 +98,26 @@ public final class QueueFlow {
     }
 
     public static String getCurrentTicketId() {
-        // If we have an in-memory ticket, return it
+        // Validate any in-memory ticket against database status; clear if completed/cancelled
+        try {
+            String currentUserForValidation = cephra.Database.CephraDB.getCurrentUsername();
+            if (currentUserForValidation != null && !currentUserForValidation.trim().isEmpty()) {
+                String latestStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(currentUserForValidation);
+                if (latestStatus != null) {
+                    String s = latestStatus.trim().toLowerCase();
+                    boolean isOpen = ("pending".equals(s) || "waiting".equals(s) || "charging".equals(s));
+                    if (!isOpen) {
+                        currentTicketId = "";
+                    }
+                }
+            }
+        } catch (Exception ignore) {}
+
         if (currentTicketId != null && !currentTicketId.trim().isEmpty()) {
             return currentTicketId;
         }
-        
-        // Otherwise, try to get from database
+
+        // Otherwise, try to get from database fresh
         try {
             String currentUser = cephra.Database.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.trim().isEmpty()) {
@@ -122,6 +136,8 @@ public final class QueueFlow {
                     currentTicketId = queueTicket;
                     return queueTicket;
                 }
+                // No active/pending, ensure memory is cleared
+                currentTicketId = "";
             }
         } catch (Exception e) {
             System.err.println("Error getting current ticket ID from database: " + e.getMessage());
@@ -203,12 +219,26 @@ public final class QueueFlow {
     }
     
     public static boolean hasActiveTicket() {
-        // First check in-memory current ticket
+        // Validate in-memory ticket with DB status; treat completed/cancelled as not active
+        try {
+            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
+            if (currentUser != null && !currentUser.trim().isEmpty()) {
+                String latestStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(currentUser);
+                if (latestStatus != null) {
+                    String s = latestStatus.trim().toLowerCase();
+                    boolean isOpen = ("pending".equals(s) || "waiting".equals(s) || "charging".equals(s));
+                    if (!isOpen) {
+                        currentTicketId = "";
+                    }
+                }
+            }
+        } catch (Exception ignore) {}
+
         if (currentTicketId != null && !currentTicketId.trim().isEmpty()) {
             return true;
         }
-        
-        // If no in-memory ticket, check database for current user's active ticket
+
+        // If no in-memory ticket, check database for current user's active/pending ticket
         try {
             String currentUser = cephra.Database.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.trim().isEmpty()) {
@@ -227,6 +257,8 @@ public final class QueueFlow {
                     currentTicketId = queueTicket;
                     return true;
                 }
+                // No active/pending, ensure memory is cleared
+                currentTicketId = "";
             }
         } catch (Exception e) {
             System.err.println("Error checking active ticket in database: " + e.getMessage());

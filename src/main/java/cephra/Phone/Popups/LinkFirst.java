@@ -50,7 +50,16 @@ public class LinkFirst extends javax.swing.JPanel {
     }
    
     public static boolean showPayPop(String ticketId, String customerUsername) {
-        
+        // Do not show if user already has a linked car
+        try {
+            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
+            if (currentUser != null && !currentUser.isEmpty()) {
+                int carIndex = cephra.Database.CephraDB.getUserCarIndex(currentUser);
+                if (carIndex != -1) {
+                    return false;
+                }
+            }
+        } catch (Throwable ignore) {}
         if (!canShowPayPop(ticketId, customerUsername)) {
             return false;
         }

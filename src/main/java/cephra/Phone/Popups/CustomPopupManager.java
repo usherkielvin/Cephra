@@ -510,16 +510,42 @@ public class CustomPopupManager {
     public static void executeCallback() {
         userConfirmed = true;
         boolean closedByCallback = false;
+        String usernameForNext = null;
+        String ticketForNext = currentTicketId;
+        try { usernameForNext = cephra.Database.CephraDB.getCurrentUsername(); } catch (Throwable ignore) {}
         if (currentCallback != null) {
             try {
                 currentCallback.run();
                 // After running, check if popup was closed by callback
                 closedByCallback = (currentPopup == null || !isShowing);
+                // If popup is closed (Waiting hidden) and we don't yet show ProceedBay, try to show with actual assigned bay
+                if (!isPopupShowing()) {
+                    try {
+                        String assignedBay = cephra.Admin.BayManagement.getBayNumberByTicket(ticketForNext);
+                        if (assignedBay != null && usernameForNext != null && !usernameForNext.trim().isEmpty()) {
+                            showProceedBayPopupInfo(ticketForNext, assignedBay, usernameForNext);
+                            closedByCallback = true;
+                        }
+                    } catch (Throwable ignore) {}
+                }
             } catch (Exception ex) {
                 System.err.println("executeCallback error: " + ex.getMessage());
             }
+        } else {
+            // Fallback: no callback provided. Hide WaitingBayPOP and show ProceedBayPOP with TBD bay.
+            try {
+                String username = usernameForNext;
+                String ticketId = ticketForNext;
+                hideCustomPopup();
+                if (ticketId != null && username != null && !username.trim().isEmpty()) {
+                    String assignedBay = null;
+                    try { assignedBay = cephra.Admin.BayManagement.getBayNumberByTicket(ticketId); } catch (Throwable ignore) {}
+                    showProceedBayPopupInfo(ticketId, (assignedBay != null ? assignedBay : "TBD"), username);
+                    closedByCallback = true;
+                }
+            } catch (Throwable ignore) {}
         }
-        // If no callback or still showing, hide to ensure button responds
+        // If still showing, hide to ensure button responds
         if (!closedByCallback) {
             hideCustomPopup();
         }

@@ -48,6 +48,11 @@ public class WaitingBayPOP extends javax.swing.JPanel {
         CANCEL.setBorder(null);
         CANCEL.setBorderPainted(false);
         CANCEL.setContentAreaFilled(false);
+        CANCEL.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CANCELActionPerformed(evt);
+            }
+        });
         add(CANCEL);
         CANCEL.setBounds(40, 310, 110, 30);
 
@@ -58,7 +63,32 @@ public class WaitingBayPOP extends javax.swing.JPanel {
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
         cephra.Phone.Popups.CustomPopupManager.executeCallback();
+        // Fallback: if no popup is showing after callback, ensure ProceedBay appears with TBD bay
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    if (!cephra.Phone.Popups.CustomPopupManager.isPopupShowing()) {
+                        String username = cephra.Database.CephraDB.getCurrentUsername();
+                        String ticket = (username == null || username.isEmpty())
+                                ? null
+                                : cephra.Database.CephraDB.getUserCurrentTicketId(username);
+                        if (ticket == null || ticket.trim().isEmpty()) {
+                            ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
+                        }
+                        String assignedBay = null;
+                        try { assignedBay = cephra.Admin.BayManagement.getBayNumberByTicket(ticket); } catch (Throwable ignore) {}
+                        if (username != null && !username.isEmpty()) {
+                            cephra.Phone.Popups.CustomPopupManager.showProceedBayPopupInfo(ticket, (assignedBay != null ? assignedBay : "TBD"), username);
+                        }
+                    }
+                } catch (Throwable ignore) {}
+            }
+        });
     }//GEN-LAST:event_OKBTNActionPerformed
+
+    private void CANCELActionPerformed(java.awt.event.ActionEvent evt) {
+        cephra.Phone.Popups.CustomPopupManager.hideCustomPopup();
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
