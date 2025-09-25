@@ -174,6 +174,21 @@ if ($conn) {
 						</button>
 					</div>
         </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-content">
+                <ul class="mobile-nav-list">
+                    <li><a href="dashboard.php" class="mobile-nav-link">Dashboard</a></li>
+                    <li><a href="link.php" class="mobile-nav-link">Link</a></li>
+                    <li><a href="history.php" class="mobile-nav-link">History</a></li>
+                    <li><a href="profile.php" class="mobile-nav-link">Profile</a></li>
+                </ul>
+                <div class="mobile-header-actions">
+                    <a href="dashboard.php" class="mobile-auth-link">Back</a>
+                </div>
+            </div>
+        </div>
     </header>
 
     <!-- Profile Section -->
@@ -239,7 +254,7 @@ if ($conn) {
                             <!-- Online Status Indicator (Bottom Left) -->
                             <div style="position: absolute; bottom: 10px; left: 10px; width: 20px; height: 20px; background: #4CAF50; border: 3px solid white; border-radius: 50%; z-index: 10;"></div>
                             <!-- Camera Icon for Photo Upload (Bottom Right, Overlapping Photo) -->
-                            <button type="button" onclick="document.getElementById('profilePhotoInput').click()" style="position: absolute; bottom: 5px; right: 5px; width: 40px; height: 40px; background: rgba(0, 194, 206, 0.9); color: white; border: 3px solid white; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 20;">
+                            <button type="button" onclick="openProfileUploadModal()" style="position: absolute; bottom: 5px; right: 5px; width: 40px; height: 40px; background: rgba(0, 194, 206, 0.9); color: white; border: 3px solid white; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 20;">
                                 <i class="fas fa-camera"></i>
                             </button>
                         </div>
@@ -319,8 +334,8 @@ if ($conn) {
                             <button type="button" onclick="window.location.href='forgot_password.php'" class="btn-reset-password" style="background: transparent; color: #FF9800; border: 2px solid #FF9800; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
                                 <i class="fas fa-key"></i> Reset Password
                             </button>
-                            <button type="button" onclick="window.location.href='dashboard.php'" class="btn-back" style="background: transparent; color: #00c2ce; border: 2px solid #00c2ce; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
-                                <i class="fas fa-arrow-left"></i> Back
+                            <button type="button" onclick="window.location.href='index.php'" class="btn-back" style="background: transparent; color: #00c2ce; border: 2px solid #00c2ce; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                                <i class="fas fa-arrow-left"></i> Logout
                             </button>
                         </div>
                     </form>
@@ -328,6 +343,49 @@ if ($conn) {
             </div>
         </div>
     </section>
+
+    <!-- Profile Photo Upload Modal -->
+    <div id="profileUploadModal" class="modal">
+        <div class="modal-overlay" onclick="closeProfileUploadModal()"></div>
+        <div class="modal-content" style="max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="text-align: center; padding: 1.5rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1);">
+                <h3 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #1a202c;">Update Profile Photo</h3>
+                <button class="modal-close" onclick="closeProfileUploadModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6c757d;">&times;</button>
+            </div>
+            <form method="POST" enctype="multipart/form-data" id="profileUploadForm">
+                <div class="modal-body" style="padding: 2rem; display: flex; flex-direction: column; align-items: center;">
+                    <div class="crop-container" style="margin-bottom: 2rem; text-align: center;">
+                        <div style="position: relative; display: inline-block; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 194, 206, 0.15);">
+                            <canvas id="cropCanvas" width="250" height="250" style="display: block; background: #f8fafc;"></canvas>
+                            <div id="cropOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: rgba(0, 194, 206, 0.1); display: none;"></div>
+                        </div>
+                        <p style="text-align: center; margin-top: 1rem; color: #1a202c; font-size: 0.9rem; font-weight: 500;">Drag to select crop area</p>
+                        <div id="cropInstructions" style="text-align: center; margin-top: 0.5rem; color: rgba(26, 32, 44, 0.6); font-size: 0.8rem; display: none;">Click "Apply Crop" to confirm your selection</div>
+                    </div>
+                    <div class="form-group" style="width: 100%; margin-bottom: 2rem;">
+                        <input type="file" id="profilePhotoInput" name="profile_photo" accept="image/*" required style="width: 100%; padding: 0.75rem; border: 2px dashed rgba(0, 194, 206, 0.3); border-radius: 8px; font-size: 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease;" onchange="loadImageForCrop(event)">
+                        <small style="color: rgba(26, 32, 44, 0.6); display: block; margin-top: 0.25rem; text-align: center;">Supported: JPEG, PNG, GIF (Max 5MB)</small>
+                    </div>
+                    <div class="crop-controls" style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem;">
+                        <button type="button" id="cropBtn" class="crop-btn" onclick="cropImage()" style="display: none; background: #00c2ce; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 194, 206, 0.3);">
+                            <i class="fas fa-crop"></i> Apply Crop
+                        </button>
+                        <button type="button" class="crop-btn reset-btn" onclick="resetCrop()" style="display: none; background: transparent; color: #ff6b6b; border: 2px solid #ff6b6b; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                    </div>
+                    <div class="form-actions" style="display: flex; gap: 1rem; justify-content: center; width: 100%;">
+                        <button type="submit" name="upload_photo" class="btn-primary" style="background: #00c2ce; color: white; border: none; padding: 0.75rem 2rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; flex: 1; max-width: 200px; box-shadow: 0 4px 15px rgba(0, 194, 206, 0.3);">
+                            <i class="fas fa-upload"></i> Upload Photo
+                        </button>
+                        <button type="button" onclick="closeProfileUploadModal()" class="btn-cancel" style="background: transparent; color: #6c757d; border: 2px solid #6c757d; padding: 0.75rem 2rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; flex: 1; max-width: 200px;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -386,7 +444,11 @@ if ($conn) {
         // Mobile Menu Toggle Functionality
         function initMobileMenu() {
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            if (!mobileMenuToggle) return; // Exit if no mobile menu toggle
+
             const mobileMenu = document.getElementById('mobileMenu');
+            if (!mobileMenu) return; // Exit if no mobile menu
+
             const mobileMenuOverlay = document.createElement('div');
             mobileMenuOverlay.className = 'mobile-menu-overlay';
             mobileMenuOverlay.id = 'mobileMenuOverlay';
@@ -444,7 +506,7 @@ if ($conn) {
             });
 
             // Close menu when clicking outside on mobile
-            $(document).on('click', function(e) {
+            document.addEventListener('click', function(e) {
                 if (window.innerWidth <= 768) {
                     if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
                         if (mobileMenu.classList.contains('active')) {
@@ -479,26 +541,269 @@ if ($conn) {
             }
         });
 
-        // Add animation on scroll for feature cards
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+        // Profile Upload Modal Functions
+        function openProfileUploadModal() {
+            console.log('Camera button clicked - opening modal');
+            const modal = document.getElementById('profileUploadModal');
+            if (!modal) {
+                console.error('Modal element not found');
+                return;
+            }
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            // Reset form and crop state
+            const form = document.getElementById('profileUploadForm');
+            if (form) {
+                form.reset();
+            }
+            resetCrop();
+            document.getElementById('cropBtn').style.display = 'none';
+            document.querySelector('.reset-btn').style.display = 'none';
+        }
 
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-in');
+        function closeProfileUploadModal() {
+            document.getElementById('profileUploadModal').style.display = 'none';
+            document.getElementById('profileUploadModal').classList.remove('show');
+            document.body.style.overflow = '';
+            // Reset crop state
+            resetCrop();
+            document.getElementById('cropBtn').style.display = 'none';
+        }
+
+        let originalImage = null;
+        let cropCanvas = null;
+        let cropCtx = null;
+        let isDragging = false;
+        let startX, startY, endX, endY;
+        let cropApplied = false;
+        let animationFrameId = null;
+
+        function loadImageForCrop(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        originalImage = img;
+                        cropCanvas = document.getElementById('cropCanvas');
+                        cropCtx = cropCanvas.getContext('2d');
+                        cropApplied = false;
+                        resetCrop();
+                        drawImage();
+                        document.getElementById('cropBtn').style.display = 'none'; // Hide initially
+                        document.querySelector('.reset-btn').style.display = 'none';
+                        document.getElementById('cropInstructions').style.display = 'block';
+                        document.getElementById('cropOverlay').style.display = 'block';
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function drawImage() {
+            if (!cropCanvas || !cropCtx || !originalImage) return;
+
+            const canvasSize = 250;
+            const imgSize = Math.min(originalImage.width, originalImage.height);
+            const scale = canvasSize / imgSize;
+            const scaledWidth = originalImage.width * scale;
+            const scaledHeight = originalImage.height * scale;
+            const x = (canvasSize - scaledWidth) / 2;
+            const y = (canvasSize - scaledHeight) / 2;
+
+            cropCtx.clearRect(0, 0, canvasSize, canvasSize);
+            cropCtx.drawImage(originalImage, x, y, scaledWidth, scaledHeight);
+
+            // Draw crop rectangle with enhanced styling
+            if (startX !== undefined && endX !== undefined) {
+                const width = Math.abs(endX - startX);
+                const height = Math.abs(endY - startY);
+                const rectX = Math.min(startX, endX);
+                const rectY = Math.min(startY, endY);
+
+                // Draw semi-transparent overlay outside crop area
+                cropCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                cropCtx.fillRect(0, 0, canvasSize, canvasSize);
+
+                // Clear the crop area
+                cropCtx.clearRect(rectX, rectY, width, height);
+                cropCtx.drawImage(originalImage, x, y, scaledWidth, scaledHeight);
+
+                // Draw crop border
+                cropCtx.strokeStyle = '#00c2ce';
+                cropCtx.lineWidth = 3;
+                cropCtx.strokeRect(rectX, rectY, width, height);
+
+                // Draw corner handles
+                const handleSize = 8;
+                cropCtx.fillStyle = '#00c2ce';
+                // Top-left
+                cropCtx.fillRect(rectX - handleSize/2, rectY - handleSize/2, handleSize, handleSize);
+                // Top-right
+                cropCtx.fillRect(rectX + width - handleSize/2, rectY - handleSize/2, handleSize, handleSize);
+                // Bottom-left
+                cropCtx.fillRect(rectX - handleSize/2, rectY + height - handleSize/2, handleSize, handleSize);
+                // Bottom-right
+                cropCtx.fillRect(rectX + width - handleSize/2, rectY + height - handleSize/2, handleSize, handleSize);
+
+                // Draw grid lines inside crop area
+                cropCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                cropCtx.lineWidth = 1;
+                const gridSize = Math.min(width, height) / 3;
+                for (let i = 1; i < 3; i++) {
+                    // Vertical lines
+                    cropCtx.beginPath();
+                    cropCtx.moveTo(rectX + (width * i / 3), rectY);
+                    cropCtx.lineTo(rectX + (width * i / 3), rectY + height);
+                    cropCtx.stroke();
+                    // Horizontal lines
+                    cropCtx.beginPath();
+                    cropCtx.moveTo(rectX, rectY + (height * i / 3));
+                    cropCtx.lineTo(rectX + width, rectY + (height * i / 3));
+                    cropCtx.stroke();
                 }
-            });
-        }, observerOptions);
+            }
+        }
 
-        document.querySelectorAll('.profile-container, .alert').forEach(card => {
-            observer.observe(card);
+        function cropImage() {
+            if (!cropCanvas || !cropCtx || !originalImage) return;
+
+            const canvasSize = 250;
+            const imgSize = Math.min(originalImage.width, originalImage.height);
+            const scale = canvasSize / imgSize;
+            const scaledWidth = originalImage.width * scale;
+            const scaledHeight = originalImage.height * scale;
+            const x = (canvasSize - scaledWidth) / 2;
+            const y = (canvasSize - scaledHeight) / 2;
+
+            if (startX === undefined || endX === undefined) {
+                // No crop selection, use center square
+                const size = Math.min(scaledWidth, scaledHeight);
+                startX = x + (scaledWidth - size) / 2;
+                startY = y + (scaledHeight - size) / 2;
+                endX = startX + size;
+                endY = startY + size;
+            }
+
+            const cropWidth = Math.abs(endX - startX);
+            const cropHeight = Math.abs(endY - startY);
+            const cropSize = Math.min(cropWidth, cropHeight);
+            const cropX = Math.min(startX, endX);
+            const cropY = Math.min(startY, endY);
+
+            // Create cropped image
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = cropSize;
+            croppedCanvas.height = cropSize;
+            const croppedCtx = croppedCanvas.getContext('2d');
+
+            // Calculate source coordinates
+            const sourceX = (cropX - x) / scale;
+            const sourceY = (cropY - y) / scale;
+            const sourceSize = cropSize / scale;
+
+            croppedCtx.drawImage(originalImage, sourceX, sourceY, sourceSize, sourceSize, 0, 0, cropSize, cropSize);
+
+            // Convert to blob and set as form data
+            croppedCanvas.toBlob(function(blob) {
+                const fileInput = document.getElementById('profilePhotoInput');
+                const file = new File([blob], 'cropped_image.png', { type: 'image/png' });
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                fileInput.files = dt.files;
+
+                // Show success feedback
+                cropApplied = true;
+                document.getElementById('cropBtn').innerHTML = '<i class="fas fa-check"></i> Crop Applied';
+                document.getElementById('cropBtn').style.background = '#4CAF50';
+                document.getElementById('cropInstructions').textContent = 'Crop applied successfully! Ready to upload.';
+                document.getElementById('cropInstructions').style.color = '#4CAF50';
+
+                setTimeout(() => {
+                    document.getElementById('cropBtn').innerHTML = '<i class="fas fa-crop"></i> Apply Crop';
+                    document.getElementById('cropBtn').style.background = '#00c2ce';
+                }, 2000);
+            });
+        }
+
+        function resetCrop() {
+            startX = startY = endX = endY = undefined;
+            cropApplied = false;
+            drawImage();
+            document.getElementById('cropInstructions').textContent = 'Click "Apply Crop" to confirm your selection';
+            document.getElementById('cropInstructions').style.color = 'rgba(26, 32, 44, 0.6)';
+            document.getElementById('cropBtn').style.display = 'none';
+            document.querySelector('.reset-btn').style.display = 'none';
+
+            // Add visual feedback for reset
+            const resetBtn = document.querySelector('.reset-btn');
+            resetBtn.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                resetBtn.style.transform = 'scale(1)';
+            }, 150);
+        }
+
+        // Enhanced mouse events for cropping
+        document.getElementById('cropCanvas').addEventListener('mousedown', function(e) {
+            isDragging = true;
+            const rect = cropCanvas.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            endX = startX;
+            endY = startY;
+            drawImage();
         });
 
-        // Initialize dashboard features
-        $(document).ready(function() {
+        document.getElementById('cropCanvas').addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            const rect = cropCanvas.getBoundingClientRect();
+            endX = Math.max(0, Math.min(250, e.clientX - rect.left));
+            endY = Math.max(0, Math.min(250, e.clientY - rect.top));
+
+            // Throttle drawing with requestAnimationFrame
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            animationFrameId = requestAnimationFrame(() => {
+                drawImage();
+                animationFrameId = null;
+            });
+        });
+
+        document.getElementById('cropCanvas').addEventListener('mouseup', function() {
+            isDragging = false;
+            // Ensure minimum crop size
+            if (startX !== undefined && endX !== undefined) {
+                const width = Math.abs(endX - startX);
+                const height = Math.abs(endY - startY);
+                if (width < 50 || height < 50) {
+                    // Reset if crop area is too small
+                    resetCrop();
+                    alert('Please select a larger crop area (minimum 50x50 pixels)');
+                } else {
+                    // Show crop controls only when a valid crop area is selected
+                    document.getElementById('cropBtn').style.display = 'inline-block';
+                    document.querySelector('.reset-btn').style.display = 'inline-block';
+                }
+            }
+        });
+
+        document.getElementById('cropCanvas').addEventListener('mouseleave', function() {
+            isDragging = false;
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeProfileUploadModal();
+            }
+        });
+
+        // Initialize profile page features
+        document.addEventListener('DOMContentLoaded', function() {
             initMobileMenu(); // Initialize mobile menu functionality
 
             // Intersection Observer for animations
@@ -521,93 +826,21 @@ if ($conn) {
             });
 
             // Add click handlers for modal triggers
-            $(document).on('click', function(e) {
-                // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                // Close modal when clicking outside
                 if (e.target.classList.contains('modal-overlay')) {
-                    closeStationsModal();
-                    closeScheduleModal();
-                    closeSupportModal();
+                    closeProfileUploadModal();
                 }
             });
 
-            // Add keyboard support for modals
-            $(document).on('keydown', function(e) {
+            // Add keyboard support for modal
+            document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    closeStationsModal();
-                    closeScheduleModal();
-                    closeSupportModal();
+                    closeProfileUploadModal();
                 }
             });
         });
 
-        // Simple i18n dictionary covering all visible strings on this page
-        const i18n = {
-            en: {
-                TitleMain: 'Cephra',
-                TitleAccent: 'Ultimate',
-                TitleSub: 'Charging Platform',
-                HeroDesc: 'An award-winning EV charging platform trusted by 50,000+ drivers. Experience the future of electric vehicle charging with intelligent, fast, and reliable charging solutions.',
-                Charging: 'Charging',
-                Offers: 'Offers',
-                About: 'About',
-                Register: 'Register',
-                Login: 'Login',
-                StartCharging: 'Start Charging',
-                LearnMore: 'Learn More',
-                WhyChoose: 'Why Choose Cephra?',
-                WhyDesc: 'Experience the next generation of EV charging technology',
-                SmartCharging: 'Smart Charging',
-                SmartLink: 'Experience Smart Charging →',
-                RealTime: 'Real-time Monitoring',
-                RealTimeLink: 'View Analytics →',
-                Rewards: 'Cephra Rewards',
-                RewardsLink: 'Join Rewards →',
-                ChooseSpeed: 'Choose Your Charging Speed',
-                ChooseDesc: 'Select the perfect charging option for your needs',
-                NormalCharging: 'Normal Charging',
-                NormalDesc: "Perfect for regular charging when you're not in a rush. Ideal for everyday use, overnight charging at home, or during extended parking periods. Provides steady, reliable charging without putting stress on your vehicle's battery.",
-                NormalSpec1: '3-7 kW',
-                NormalSpec2: '2-3 hours',
-                NormalLink: 'Start Normal Charging →',
-                FastCharging: 'Fast Charging',
-                FastDesc: 'When time is of the essence, fast charging delivers rapid power to get you back on the road quickly. Perfect for lunch breaks, shopping stops, or quick top-ups during long drives. Our advanced fast charging technology provides optimal charging curves to maximize efficiency while protecting your battery health.',
-                FastSpec1: '50-150 kW',
-                FastSpec2: '20-40 minutes',
-                FastLink: 'Start Fast Charging →',
-                PriorityCharging: 'Priority Charging',
-                PriorityDesc: 'When your battery drops below 20%, priority charging automatically activates for fire protection and vehicle safety. This ensures your EV gets immediate attention with maximum charging speed and guaranteed availability, protecting both your vehicle and ensuring your safety on the road.',
-                PrioritySpec1: 'Priority',
-                PrioritySpec2: '10-30 minutes',
-                PriorityLink: 'Get Priority Access →',
-                ExclusiveOffers: 'Exclusive Offers',
-                ExclusiveDesc: 'Limited-time promotions designed for EV enthusiasts',
-                RewardsPromo: 'Cephra Rewards',
-                RewardsDesc: 'Get Cephra credits on your first charge with us. Perfect for frequent chargers looking to maximize savings.',
-                ClaimNow: 'Claim now',
-                PremiumTitle: 'Fast Charging',
-                PremiumDesc: 'Unlock priority charging, advanced charging technology, and quality service for our premium clients.',
-                BookNow: 'Book Now',
-                TryNow: 'Try Now',
-                ContestTitle: 'EV Champion 2025',
-                ContestDesc: 'Join our annual charging contest. Top chargers win premium subscriptions, exclusive merchandise, and charging credits.',
-                JoinContest: 'Join Contest',
-                RegistrationOpen: 'Registration open',
-                ValidUntil: 'Valid until',
-                Platform: 'Platform',
-                Support: 'Support',
-                Company: 'Company'
-            },
-            fil: {
-                TitleMain: 'Cephra',
-                TitleAccent: 'Ultimate',
-                TitleSub: 'Charging Platform',
-                HeroDesc: 'Gantimpalang EV charging platform na pinagkakatiwalaan ng 50,000+ na drayber. Damhin ang kinabukasan ng pagkarga—matalino, mabilis, at maaasahan.',
-                Charging: 'Karga',
-                Offers: 'Alok',
-                About: 'Tungkol',
-                Register: 'Magrehistro',
-                Login: 'Mag-login',
-                StartCharging: 'Simulan ang Pagkarga',
-                LearnMore: 'Alamin Pa',
-                WhyChoose: 'Bakit Piliin ang Cephra?',
-                WhyDesc: 'Maraming-bagong henerasyon ng teknolohiya sa EV charging',
+    </script>
+</body>
+</html>

@@ -1,32 +1,10 @@
-                    # Redesign history.php Plan - COMPLETED
+# Profile Picture Upload Modal Implementation
 
-## Steps Completed:
-1. [x] Update the Header Structure: Replace with modern header matching index.php
-2. [x] Redesign the Main Content Area: Transform payment history into table-based layout with filters
-3. [x] Modernize Styling and CSS: Switch to vantage-style.css and update history.css with table styles
-4. [x] Enhance Responsiveness and Interactivity: Add mobile features, filtering, and hover effects
-5. [x] Update Footer and Overall Structure: Align with index.php style
-6. [x] Test and Verify: Ensure page loads correctly
-
-## Additional Features Added:
-- [x] Changed navbar "Logout" to "Back" linking to dashboard.php
-- [x] Added table-based layout with columns: ID, Status, Amount, Method, Reference, Date, Action
-- [x] Implemented filtering functionality (Status, Method, Date filters)
-- [x] Added status badges with color coding
-- [x] Added action buttons for each transaction row
-
-## Latest Improvements:
-- [x] Enhanced history container design with modern styling and gradients
-- [x] Redesigned filter buttons with gradient backgrounds and hover effects
-- [x] Removed panel navigation section as requested
-- [x] Improved responsive design with multiple breakpoints (1024px, 768px, 600px, 480px)
-- [x] Added iOS-friendly font sizes to prevent zoom on mobile
-- [x] Enhanced table styling with better hover effects and modern design
-- [x] **FIXED**: Corrected CSS file path from `css/pages/history.css` to `assets/css/pages/history.css`
-
-# Remove Placeholders from Forms Plan
-
-## Steps:
-1. [x] Edit Appweb/User/login.php: Remove empty placeholder="" from username and password inputs.
-2. [x] Edit Appweb/User/Register_Panel.php: Remove empty placeholder="" from firstname, lastname, username, email, password, and confirmPassword inputs.
-3. [x] Verify the changes by reviewing the updated files and ensuring forms render correctly.
+## Tasks
+- [ ] Add hidden file input with id 'profilePhotoInput' in profile.php
+- [ ] Change camera button onclick to open upload modal instead of clicking input
+- [ ] Add HTML for profile upload modal with file input, preview, upload/cancel buttons
+- [ ] Add JavaScript for modal control (open/close), file selection handling, image preview
+- [ ] Add CSS styles for modal to match page design (white bg, gradients, rounded corners)
+- [ ] Test upload functionality and ensure success/error messages display
+- [ ] Ensure mobile responsiveness for modal
