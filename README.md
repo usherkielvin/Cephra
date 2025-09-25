@@ -63,17 +63,19 @@ Cephra/
 │   └── resources/
 │       ├── db/init.sql             # Database schema and initial data
 │       └── cephra/Photos/          # Application images and icons
-├── 📁 mobileweb/                    # Mobile Web Interface
-│   ├── assets/                     # CSS, JS, and web assets
-│   ├── images/                     # Web interface images
-│   ├── ChargingPage.php           # Main charging interface
-│   ├── dashboard.php              # User dashboard
-│   └── charge_action.php          # Charging request processing
-├── 📁 api/                         # PHP API Backend
-│   ├── index.php                  # Main API endpoint
-│   ├── mobile.php                 # Mobile API
-│   ├── view-queue.php             # Queue monitoring
-│   └── .php-preview-router.php    # Development router
+├── 📁 Appweb/                       # Web Interface Components
+│   ├── Admin/                      # Admin web interface
+│   ├── Monitor/                    # Queue monitor web interface
+│   └── User/                       # Customer web interface
+│       ├── assets/                 # CSS, JS, and web assets
+│       ├── images/                 # Web interface images
+│       ├── api/                    # PHP API endpoints
+│       ├── config/                 # Database and configuration files
+│       ├── css/                    # Stylesheets
+│       ├── ChargingPage.php       # Main charging interface
+│       ├── dashboard.php          # User dashboard
+│       ├── link.php               # Vehicle linking interface
+│       └── *.php                  # Other PHP pages
 ├── 📁 config/                      # Configuration Files
 │   ├── database.php               # Database configuration
 │   └── nb-configuration.xml       # NetBeans project settings
@@ -271,12 +273,157 @@ We welcome contributions! Please see our contributing guidelines:
 - Specializes in Java Swing GUI
 - Focuses on building an intuitive and functional desktop interface
 
-update works
+## 🔄 API Documentation
 
-### Acknowledgments
-- **EV Community** - For inspiration and feedback
-- **Open Source Contributors** - For the amazing tools and libraries
-- **Beta Testers** - For helping refine the user experience
+### Core Endpoints
+
+#### Mobile API (`api/mobile.php`)
+- **GET** `/api/mobile.php?action=get_queue` - Retrieve current queue status
+- **POST** `/api/mobile.php?action=join_queue` - Join charging queue
+- **POST** `/api/mobile.php?action=leave_queue` - Leave current queue
+- **GET** `/api/mobile.php?action=get_history` - Get user's charging history
+
+#### Web Interface APIs
+- **POST** `/api/check_email.php` - Email validation for registration
+- **POST** `/api/forgot_password.php` - Password reset functionality
+- **GET** `/api/view-queue.php` - Public queue monitoring
+
+### Authentication
+- Session-based authentication for web interface
+- Username/password validation
+- Secure password hashing with bcrypt
+
+## 🧪 Testing
+
+### Automated Testing
+- Unit tests for Java components
+- Integration tests for database operations
+- API endpoint testing with Postman collections
+
+### Manual Testing Guidelines
+- See `docs/TESTING.md` for comprehensive testing procedures
+- User acceptance testing for new features
+- Cross-browser compatibility testing
+
+## 🚀 Deployment
+
+### Production Setup
+1. **Server Requirements**
+   - Apache/Nginx web server
+   - PHP 8.0+ with PDO extension
+   - MySQL 8.0+ database
+   - Java 21 runtime for admin panel
+
+2. **Security Configuration**
+   - SSL certificate installation
+   - Database connection encryption
+   - Secure session management
+   - Input validation and sanitization
+
+3. **Performance Optimization**
+   - Database query optimization
+   - Caching implementation
+   - CDN for static assets
+   - Load balancing for high traffic
+
+## 📊 Monitoring & Analytics
+
+### System Monitoring
+- Real-time queue length tracking
+- Charging station utilization reports
+- Payment transaction analytics
+- User activity logs
+
+### Performance Metrics
+- Average queue wait times
+- Charging session completion rates
+- System uptime and availability
+- User satisfaction scores
+
+## 🔐 Security Features
+
+### Data Protection
+- Encrypted database connections
+- Secure password storage (bcrypt hashing)
+- XSS protection in web forms
+- CSRF protection for API endpoints
+
+### Access Control
+- Role-based access (Admin, Staff, Customer)
+- Session timeout management
+- IP-based restrictions for admin panel
+- Audit logging for sensitive operations
+
+## 🐛 Troubleshooting
+
+### Common Issues
+- **Database Connection Errors**: Check MySQL credentials in `config/database.php`
+- **Java Application Won't Start**: Verify Java 21 installation and Maven dependencies
+- **Web Interface Not Loading**: Ensure Apache is running and files are in correct directory
+- **Queue Sync Issues**: Check WebSocket connections and API endpoints
+
+### Debug Mode
+- Enable debug logging in Java application
+- PHP error reporting in web interface
+- Database query logging for performance issues
+
+## 📈 Roadmap
+
+### Upcoming Features
+- [ ] Mobile app development (React Native)
+- [ ] Advanced analytics dashboard
+- [ ] Multi-language support (i18n)
+- [ ] Integration with third-party EV APIs
+- [ ] Automated testing suite expansion
+- [ ] Cloud deployment support
+
+### Version History
+- **v1.0.0** - Initial release with core functionality
+- **v1.1.0** - Web interface enhancements
+- **v1.2.0** - API improvements and bug fixes
+- **v2.0.0** - Planned major update with mobile app
+
+## 🤝 Contributing Guidelines
+
+### Code Standards
+- Java: Follow Google Java Style Guide
+- PHP: PSR-12 coding standards
+- HTML/CSS: Consistent indentation and semantic markup
+- Commit messages: Clear, descriptive, and prefixed with type
+
+### Development Workflow
+1. Create feature branch from `main`
+2. Implement changes with proper testing
+3. Submit pull request with detailed description
+4. Code review and approval process
+5. Merge to main branch
+
+## 📞 Contact & Support
+
+### Development Team
+- **Project Lead**: Usher Kielvin Ponce
+- **Web Developer**: Mark Dwayne P. Dela Cruz
+- **Backend Developer**: Dizon S. Dizon
+- **Java Developer**: Kenji A. Hizon
+
+### Support Channels
+- **GitHub Issues**: Bug reports and feature requests
+- **Documentation**: Comprehensive guides in `docs/` folder
+- **Email**: support@cephra-project.com (placeholder)
+
+## 🙏 Acknowledgments
+
+### Open Source Libraries
+- **Java Swing** - Desktop GUI framework
+- **MySQL Connector/J** - Database connectivity
+- **PHP PDO** - Database abstraction layer
+- **Font Awesome** - Icon library
+- **Bootstrap** - CSS framework
+
+### Community Support
+- **EV Enthusiasts** - For valuable feedback and testing
+- **Open Source Community** - For tools and inspiration
+- **Educational Institutions** - For providing development environment
 
 ---
 
