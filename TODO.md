@@ -1,4 +1,4 @@
-# Redesign history.php Plan - COMPLETED
+                    # Redesign history.php Plan - COMPLETED
 
 ## Steps Completed:
 1. [x] Update the Header Structure: Replace with modern header matching index.php
@@ -23,3 +23,10 @@
 - [x] Added iOS-friendly font sizes to prevent zoom on mobile
 - [x] Enhanced table styling with better hover effects and modern design
 - [x] **FIXED**: Corrected CSS file path from `css/pages/history.css` to `assets/css/pages/history.css`
+
+# Remove Placeholders from Forms Plan
+
+## Steps:
+1. [x] Edit Appweb/User/login.php: Remove empty placeholder="" from username and password inputs.
+2. [x] Edit Appweb/User/Register_Panel.php: Remove empty placeholder="" from firstname, lastname, username, email, password, and confirmPassword inputs.
+3. [x] Verify the changes by reviewing the updated files and ensuring forms render correctly.

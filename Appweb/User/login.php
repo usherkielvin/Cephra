@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -58,7 +58,7 @@
                 <div class="form-group">
                     <label>
                         <div class="username-input-container">
-                            <input class="input" type="text" id="username" name="username" placeholder="" required data-i18n="username" />
+                            <input class="input" type="text" id="username" name="username" required data-i18n="username" />
                             <span data-i18n="username">Username</span>
 
                         </div>
@@ -68,7 +68,7 @@
                 <div class="form-group">
                     <label>
                         <div class="password-input-container">
-                            <input class="input" type="password" id="password" name="password" placeholder="" required data-i18n="password" />
+                            <input class="input" type="password" id="password" name="password" required data-i18n="password" />
                             <span data-i18n="password">Password</span>
                             <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility()">
                                 <i class="fas fa-eye" id="passwordToggleIcon"></i>

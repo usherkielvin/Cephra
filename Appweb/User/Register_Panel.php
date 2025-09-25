@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -59,7 +59,7 @@
                     <div class="form-group">
                         <label>
                             <div class="input-container">
-                                <input class="input" type="text" id="firstname" name="firstname" placeholder="" required data-i18n="firstname">
+                                <input class="input" type="text" id="firstname" name="firstname" required data-i18n="firstname">
                                 <span data-i18n="firstname">Firstname</span>
 
                             </div>
@@ -69,7 +69,7 @@
                     <div class="form-group">
                         <label>
                             <div class="input-container">
-                                <input class="input" type="text" id="lastname" name="lastname" placeholder="" required data-i18n="lastname">
+                                <input class="input" type="text" id="lastname" name="lastname" required data-i18n="lastname">
                                 <span data-i18n="lastname">Lastname</span>
                             </div>
                         </label>
@@ -79,7 +79,7 @@
                 <div class="form-group">
                     <label>
                         <div class="input-container">
-                            <input class="input" type="text" id="username" name="username" placeholder="" required data-i18n="username">
+                            <input class="input" type="text" id="username" name="username" required data-i18n="username">
                             <span data-i18n="username">Username</span>
                         </div>
                     </label>
@@ -88,7 +88,7 @@
                 <div class="form-group">
                     <label>
                         <div class="input-container">
-                            <input class="input" type="email" id="email" name="email" placeholder="" required data-i18n="email">
+                            <input class="input" type="email" id="email" name="email" required data-i18n="email">
                             <span data-i18n="email">Email</span>
                         </div>
                     </label>
@@ -97,7 +97,7 @@
                 <div class="form-group">
                     <label>
                         <div class="password-input-container">
-                            <input class="input" type="password" id="password" name="password" placeholder="" required data-i18n="password">
+                            <input class="input" type="password" id="password" name="password" required data-i18n="password">
                             <span data-i18n="password">Password</span>
                             <button type="button" class="password-toggle-btn" id="passwordToggleBtn" onclick="togglePasswordVisibility('password')">
                                 <i class="fas fa-eye" id="passwordToggleIcon"></i>
@@ -109,7 +109,7 @@
                 <div class="form-group">
                     <label>
                         <div class="password-input-container">
-                            <input class="input" type="password" id="confirmPassword" name="confirmPassword" placeholder="" required data-i18n="confirmPassword">
+                            <input class="input" type="password" id="confirmPassword" name="confirmPassword" required data-i18n="confirmPassword">
                             <span data-i18n="confirmPassword">Confirm password</span>
                             <button type="button" class="password-toggle-btn" id="confirmPasswordToggleBtn" onclick="togglePasswordVisibility('confirmPassword')">
                                 <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
