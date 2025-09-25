@@ -9,17 +9,47 @@ $db = new Database();
 $conn = $db->getConnection();
 if ($conn) {
     $username = $_SESSION['username'];
-    $stmt = $conn->prepare("SELECT firstname FROM users WHERE username = :username");
+    $stmt = $conn->prepare("SELECT firstname, car_index FROM users WHERE username = :username");
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $firstname = $user ? $user['firstname'] : 'User';
+$car_index = $user ? $user['car_index'] : null;
+
+// Vehicle data based on car_index
+$vehicle_data = null;
+if ($car_index && $car_index >= 1 && $car_index <= 10) {
+    // Placeholder models - will be updated with specific EV brands later
+    $models = [
+        1 => 'EV Model 1',
+        2 => 'EV Model 2',
+        3 => 'EV Model 3',
+        4 => 'EV Model 4',
+        5 => 'EV Model 5',
+        6 => 'EV Model 6',
+        7 => 'EV Model 7',
+        8 => 'EV Model 8',
+        9 => 'EV Model 9',
+        10 => 'EV Model 10'
+    ];
+
+    $vehicle_data = [
+        'model' => $models[$car_index],
+        'status' => 'Connected & Charging',
+        'range' => rand(30, 200) . ' km',
+        'time_to_full' => rand(1, 4) . 'h ' . rand(0, 59) . 'm',
+        'battery_level' => rand(20, 100) . '%'
+    ];
+}
 
 echo "<!-- DEBUG: Session username: " . htmlspecialchars($_SESSION['username']) . " -->";
 echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
+echo "<!-- DEBUG: Fetched car_index: " . htmlspecialchars($car_index) . " -->";
+echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data)) . " -->";
 
 } else {
     $firstname = 'User';
+    $car_index = null;
 }
 ?>
 <!DOCTYPE html>
@@ -1591,6 +1621,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 
 				<div class="features-grid">
 					<!-- Car Status Feature -->
+					<?php if ($vehicle_data): ?>
 					<div class="feature-card main-vehicle-card" style="background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; position: relative; overflow: hidden;">
 						<div class="main-vehicle-content">
 							<div class="vehicle-info">
@@ -1598,23 +1629,23 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 									<i class="fas fa-car"></i>
 								</div>
 								<div class="vehicle-details">
-									<h3 class="feature-title">Tesla Model 3</h3>
+									<h3 class="feature-title"><?php echo htmlspecialchars($vehicle_data['model']); ?></h3>
 									<div class="vehicle-stats">
 										<div class="stat-item">
 											<span class="stat-label">Status</span>
-											<span class="stat-value">Connected & Charging</span>
+											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['status']); ?></span>
 										</div>
 										<div class="stat-item">
 											<span class="stat-label">Range</span>
-											<span class="stat-value">45 km</span>
+											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['range']); ?></span>
 										</div>
 										<div class="stat-item">
 											<span class="stat-label">Time to Full</span>
-											<span class="stat-value">2h 15m</span>
+											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['time_to_full']); ?></span>
 										</div>
 										<div class="stat-item">
 											<span class="stat-label">Battery</span>
-											<span class="stat-value">67%</span>
+											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['battery_level']); ?></span>
 										</div>
 									</div>
 								</div>
@@ -1625,7 +1656,18 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 						</div>
 						<div class="vehicle-bg-pattern"></div>
 					</div>
+					<?php else: ?>
+					<div class="feature-card main-vehicle-card" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); color: white; position: relative; overflow: hidden; text-align: center; padding: 4rem 2rem;">
+						<div class="feature-icon-large" style="margin: 0 auto 1rem; background: rgba(255, 255, 255, 0.2);">
+							<i class="fas fa-car" style="font-size: 32px;"></i>
+						</div>
+						<h3 class="feature-title" style="text-align: center; font-size: 1.8rem; margin-bottom: 1rem;">No Vehicle Linked</h3>
+<p style="font-size: 1rem; opacity: 0.9; margin-bottom: 2rem;">Link your vehicle in the Profile section to get started with charging.</p>
+<a href="link.php" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.3s ease; backdrop-filter: blur(10px);">Link Vehicle</a>
+					</div>
+					<?php endif; ?>
 
+					<?php if ($vehicle_data): ?>
 					<!-- Battery Health Monitor -->
 					<div class="feature-card">
 						<div class="feature-icon">
@@ -1685,7 +1727,7 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 						</p>
 						<a href="#" onclick="showDiagnostics(); return false;" class="feature-link">Run Diagnostics →</a>
 					</div>
-
+					<?php endif; ?>
 
 				</div>
 			</div>
