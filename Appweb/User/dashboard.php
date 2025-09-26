@@ -1488,6 +1488,8 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							<li><a href="link.php" class="nav-link">Link</a></li>
 							<li><a href="history.php" class="nav-link">History</a></li>
 							<li><a href="profile.php" class="nav-link">Profile</a></li>
+							<li><a href="rewards.php" class="nav-link">Rewards</a></li>
+							<li><a href="wallet.php" class="nav-link">Wallet</a></li>
 						</ul>
 					</nav>
 
@@ -1515,6 +1517,8 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 						<li><a href="link.php" class="mobile-nav-link">Link</a></li>
 						<li><a href="history.php" class="mobile-nav-link">History</a></li>
 						<li><a href="profile.php" class="mobile-nav-link">Profile</a></li>
+						<li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
+						<li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
 					</ul>
 					<div class="mobile-header-actions">
 						<a href="profile_logout.php" class="mobile-auth-link">Logout</a>
