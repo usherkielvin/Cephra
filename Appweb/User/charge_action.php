@@ -56,6 +56,17 @@ if ($activeTicketCount > 0) {
     exit();
 }
 
+// Also block if user already has a ticket in queue (Waiting/Pending/Processing)
+$stmt = $conn->prepare("SELECT COUNT(*) FROM queue_tickets WHERE username = :username AND status IN ('Waiting','Pending','Processing')");
+$stmt->bindParam(':username', $username);
+$stmt->execute();
+$queuedCount = $stmt->fetchColumn();
+
+if ($queuedCount > 0) {
+    echo json_encode(['error' => 'You already have a ticket in queue. Please wait until it is processed.']);
+    exit();
+}
+
 // Check if car is linked (assuming car linking is tracked in users table or separate table)
 // For now, we'll assume car is linked if user exists and has battery level data
 $stmt = $conn->prepare("SELECT COUNT(*) FROM battery_levels WHERE username = :username");
@@ -88,19 +99,22 @@ $queueServiceType = ($serviceType === 'Fast Charging') ? 'Fast Charging' : 'Norm
 // Determine priority based on battery level (priority 1 for <20%, priority 0 for >=20%)
 $priority = ($batteryLevel < 20) ? 1 : 0;
 
-// Generate ticket ID using DB-driven increment across both tables
+// Generate ticket ID using a single shared counter per service (Fast/Normal),
+// counting across priority/non-priority and across queue, active, and history
 $basePrefix = ($serviceType === 'Fast Charging') ? 'FCH' : 'NCH';
 $ticketPrefix = ($priority == 1) ? $basePrefix . 'P' : $basePrefix;
-$prefixPattern = $ticketPrefix . '%';
+$prefixPatternBase = $basePrefix . '%'; // includes both e.g. FCH### and FCHP###
 
-// Compute the next number based on the greatest ticket suffix present in either queue_tickets or active_tickets
+// Compute the next number using the last 3 digits across all relevant tables
 $sql = "SELECT GREATEST(
-            IFNULL((SELECT MAX(CAST(SUBSTRING(ticket_id," . (strlen($ticketPrefix) + 1) . ") AS UNSIGNED)) FROM queue_tickets WHERE ticket_id LIKE :prefix1), 0),
-            IFNULL((SELECT MAX(CAST(SUBSTRING(ticket_id," . (strlen($ticketPrefix) + 1) . ") AS UNSIGNED)) FROM active_tickets WHERE ticket_id LIKE :prefix2), 0)
+            IFNULL((SELECT MAX(CAST(RIGHT(ticket_id, 3) AS UNSIGNED)) FROM queue_tickets WHERE ticket_id LIKE :p1), 0),
+            IFNULL((SELECT MAX(CAST(RIGHT(ticket_id, 3) AS UNSIGNED)) FROM active_tickets WHERE ticket_id LIKE :p2), 0),
+            IFNULL((SELECT MAX(CAST(RIGHT(ticket_id, 3) AS UNSIGNED)) FROM charging_history WHERE ticket_id LIKE :p3), 0)
         ) AS max_num";
 $stmt = $conn->prepare($sql);
-$stmt->bindParam(':prefix1', $prefixPattern);
-$stmt->bindParam(':prefix2', $prefixPattern);
+$stmt->bindParam(':p1', $prefixPatternBase);
+$stmt->bindParam(':p2', $prefixPatternBase);
+$stmt->bindParam(':p3', $prefixPatternBase);
 $stmt->execute();
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 $nextNum = (isset($row['max_num']) ? (int)$row['max_num'] : 0) + 1;
@@ -110,7 +124,7 @@ $ticketId = $ticketPrefix . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
 // Ticket stays in Pending state until routed to a bay by Admin
 $bayNumber = null;
 
-// Determine initial status - priority tickets go to Waiting
+// Determine initial status (mirror Java): priority -> Waiting, others -> Pending
 $initialStatus = ($priority == 1) ? 'Waiting' : 'Pending';
 
 // First, record the ticket in queue_tickets so it appears on Admin Queue
@@ -155,8 +169,7 @@ if ($priority == 1) {
     }
 }
 
-// Do NOT create an active_tickets entry at ticket creation time.
-// Active ticket should be created only by Admin when assigning to a bay (Queue flow)
+// Do not auto-create active_tickets here; Admin assignment handles bay routing (follows Java)
 
 // Set current service in session
 $_SESSION['currentService'] = $serviceType;

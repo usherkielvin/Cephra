@@ -174,22 +174,81 @@ try {
                 ]);
                 break;
             }
+
+            // Block if user already has active or queued ticket
+            // Active ticket check
+            $stmt = $db->prepare("SELECT COUNT(*) FROM active_tickets WHERE username = ?");
+            $stmt->execute([$username]);
+            if ((int)$stmt->fetchColumn() > 0) {
+                echo json_encode([
+                    "success" => false,
+                    "error" => "You already have an active charging ticket. Please complete your current session first."
+                ]);
+                break;
+            }
+
+            // Queued ticket check (Waiting/Pending/Processing)
+            $stmt = $db->prepare("SELECT COUNT(*) FROM queue_tickets WHERE username = ? AND status IN ('Waiting','Pending','Processing')");
+            $stmt->execute([$username]);
+            if ((int)$stmt->fetchColumn() > 0) {
+                echo json_encode([
+                    "success" => false,
+                    "error" => "You already have a ticket in queue. Please wait until it is processed."
+                ]);
+                break;
+            }
             
-            // Generate ticket ID
-            $ticket_id = "TKT" . date("Ymd") . rand(1000, 9999);
-            
-            // Insert new ticket
-            $stmt = $db->prepare("
-                INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level) 
-                VALUES (?, ?, ?, 'Waiting', 'Pending', ?)
-            ");
-            $result = $stmt->execute([$ticket_id, $username, $service_type, $battery_level]);
-            
-            if ($result) {
+            // Normalize service type to expected labels
+            $queueServiceType = ($service_type === 'Fast Charging') ? 'Fast Charging' : 'Normal Charging';
+
+            // Determine priority based on battery level (<20% => priority)
+            $battery_level = (int)$battery_level;
+            $priority = ($battery_level < 20) ? 1 : 0;
+
+            // Build ticket prefix consistent with web + Java logic
+            $basePrefix = ($queueServiceType === 'Fast Charging') ? 'FCH' : 'NCH';
+            $ticketPrefix = ($priority === 1) ? ($basePrefix . 'P') : $basePrefix; // e.g., FCH, FCHP, NCH, NCHP
+            $prefixPatternBase = $basePrefix . '%';
+
+            // Compute next incremental number across queue_tickets, active_tickets, and charging_history
+            $sql = "SELECT GREATEST(
+                        IFNULL((SELECT MAX(CAST(RIGHT(ticket_id, 3) AS UNSIGNED)) FROM queue_tickets WHERE ticket_id LIKE :p1), 0),
+                        IFNULL((SELECT MAX(CAST(RIGHT(ticket_id, 3) AS UNSIGNED)) FROM active_tickets WHERE ticket_id LIKE :p2), 0),
+                        IFNULL((SELECT MAX(CAST(RIGHT(ticket_id, 3) AS UNSIGNED)) FROM charging_history WHERE ticket_id LIKE :p3), 0)
+                    ) AS max_num";
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':p1', $prefixPatternBase, PDO::PARAM_STR);
+            $stmt->bindValue(':p2', $prefixPatternBase, PDO::PARAM_STR);
+            $stmt->bindValue(':p3', $prefixPatternBase, PDO::PARAM_STR);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $nextNum = (isset($row['max_num']) ? (int)$row['max_num'] : 0) + 1;
+            $ticket_id = $ticketPrefix . str_pad($nextNum, 3, '0', STR_PAD_LEFT); // e.g., FCH001, NCHP012
+
+            // Initial status alignment (priority tickets go to Waiting)
+            $initialStatus = ($priority === 1) ? 'Waiting' : 'Pending';
+
+            // Insert into queue_tickets
+            $stmt = $db->prepare(
+                "INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level, priority)
+                 VALUES (:ticket_id, :username, :service_type, :status, '', :battery_level, :priority)"
+            );
+            $ok = $stmt->execute([
+                ':ticket_id' => $ticket_id,
+                ':username' => $username,
+                ':service_type' => $queueServiceType,
+                ':status' => $initialStatus,
+                ':battery_level' => $battery_level,
+                ':priority' => $priority
+            ]);
+
+            if ($ok) {
                 echo json_encode([
                     "success" => true,
                     "message" => "Ticket created successfully",
-                    "ticket_id" => $ticket_id
+                    "ticket_id" => $ticket_id,
+                    "serviceType" => $queueServiceType,
+                    "batteryLevel" => $battery_level
                 ]);
             } else {
                 echo json_encode([
