@@ -184,8 +184,8 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                 <div class="footer-section">
                     <h4 class="footer-title">Support</h4>
                     <ul class="footer-links">
-                        <li><a href="#support">Help Center</a></li>
-                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="help_center.php">Help Center</a></li>
+                        <li><a href="contact_us.php">Contact Us</a></li>
                     </ul>
                 </div>
 

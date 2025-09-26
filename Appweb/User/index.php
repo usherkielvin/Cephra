@@ -396,9 +396,9 @@
                 <div class="footer-section">
                     <h4 class="footer-title">Platform</h4>
                     <ul class="footer-links">
-                        <li><a href="dashboard.php">Facebook</a></li>
-                        <li><a href="#charging">Youtube</a></li>
-                        <li><a href="#analysis">Email</a></li>
+                        <li><a href="dashboard.php">Dashboard</a></li>
+                        <li><a href="ChargingPage.php">Charging</a></li>
+                        <li><a href="history.php">History</a></li>
                     </ul>
                 </div>
 

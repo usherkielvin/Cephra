@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <h4 class="footer-title">Platform</h4>
                         <ul class="footer-links">
                             <li><a href="dashboard.php">Dashboard</a></li>
-                            <li><a href="link.php">Link</a></li>
+                            <li><a href="ChargingPage.php">Charging</a></li>
                             <li><a href="history.php">History</a></li>
                         </ul>
                     </div>
@@ -186,16 +186,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="footer-section">
                         <h4 class="footer-title">Support</h4>
                         <ul class="footer-links">
-                            <li><a href="#support">Help Center</a></li>
-                            <li><a href="#contact">Contact Us</a></li>
+                            <li><a href="help_center.php">Help Center</a></li>
+                            <li><a href="contact_us.php">Contact Us</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-section">
                         <h4 class="footer-title">Company</h4>
                         <ul class="footer-links">
-                            <li><a href="#about">About Us</a></li>
-                            <li><a href="#team">Our Team</a></li>
+                            <li><a href="about_us.php">About Us</a></li>
+                            <li><a href="our_team.php">Our Team</a></li>
                         </ul>
                     </div>
                 </div>
