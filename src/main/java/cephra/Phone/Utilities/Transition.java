@@ -21,7 +21,7 @@ public class Transition extends javax.swing.JPanel {
          new Timer(3200, _ -> {
                 java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Transition.this);
         if (w instanceof cephra.Frame.Phone) {
-            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.UserProfile.Phonelogin());
+            ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.UserProfile.User_Login());
         }
                
              

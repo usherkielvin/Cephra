@@ -119,7 +119,6 @@ public class Profile extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        paymethod = new javax.swing.JButton();
         back = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
@@ -137,16 +136,6 @@ public class Profile extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
-
-        paymethod.setBorderPainted(false);
-        paymethod.setContentAreaFilled(false);
-        paymethod.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                paymethodActionPerformed(evt);
-            }
-        });
-        add(paymethod);
-        paymethod.setBounds(30, 610, 290, 40);
 
         back.setBorder(null);
         back.setBorderPainted(false);
@@ -376,7 +365,7 @@ public class Profile extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
                         break;
                     }
                 }
@@ -436,7 +425,7 @@ public class Profile extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.Settings());
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Home());
                         break;
                     }
                 }
@@ -453,28 +442,13 @@ public class Profile extends javax.swing.JPanel {
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Phone) {
                         cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.EditProfile());
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.Edit_Profile());
                         break;
                     }
                 }
             }
         });       
     }//GEN-LAST:event_EditProfileActionPerformed
-
-    private void paymethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymethodActionPerformed
-       SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.PaymentMethod());
-                        break;
-                    }
-                }
-            }
-        });       
-    }//GEN-LAST:event_paymethodActionPerformed
 
     private void fitTextToLabel(JLabel label) {
         String text = label.getText();
@@ -510,7 +484,6 @@ public class Profile extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton linkbutton;
     private javax.swing.JButton logout;
-    private javax.swing.JButton paymethod;
     // End of variables declaration//GEN-END:variables
 
     @Override

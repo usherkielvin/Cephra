@@ -4,16 +4,16 @@ package cephra.Phone.UserProfile;
 import javax.swing.Timer;
 
 
-public class Intro extends javax.swing.JPanel {
+public class Intro_Animation extends javax.swing.JPanel {
 
 
-    public Intro() {
+    public Intro_Animation() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
         
            new Timer(8000, _ -> {
-                java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Intro.this);
+                java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(Intro_Animation.this);
         if (w instanceof cephra.Frame.Phone) {
             ((cephra.Frame.Phone) w).switchPanel(new cephra.Phone.UserProfile.Loading_Screen());
         }

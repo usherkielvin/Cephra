@@ -14,9 +14,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 
-public class EditProfile extends javax.swing.JPanel {
+public class Edit_Profile extends javax.swing.JPanel {
 
-    public EditProfile() {
+    public Edit_Profile() {
         initComponents();
          setPreferredSize(new Dimension(370, 750));
         setSize(370, 750);
@@ -69,7 +69,7 @@ public class EditProfile extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (dragPoint[0] != null) {
-                    Window window = SwingUtilities.getWindowAncestor(EditProfile.this);
+                    Window window = SwingUtilities.getWindowAncestor(Edit_Profile.this);
                     if (window != null) {
                         Point currentLocation = window.getLocation();
                         window.setLocation(
@@ -441,14 +441,14 @@ public class EditProfile extends javax.swing.JPanel {
             public void run() {
                 try {
                     // Step 1: Select image file using simple drag and drop interface
-                    java.io.File selectedFile = cephra.Phone.Utilities.SimpleDragDropSelector.showDialog(EditProfile.this);
+                    java.io.File selectedFile = cephra.Phone.Utilities.SimpleDragDropSelector.showDialog(Edit_Profile.this);
                     if (selectedFile == null) {
                         return; // User cancelled file selection
                     }
 
 
                     // Step 2: Open crop dialog
-                    java.awt.image.BufferedImage croppedImage = cephra.Phone.Utilities.ImageUtils.openCropDialog(EditProfile.this, selectedFile);
+                    java.awt.image.BufferedImage croppedImage = cephra.Phone.Utilities.ImageUtils.openCropDialog(Edit_Profile.this, selectedFile);
                     if (croppedImage == null) {
                         return; // User cancelled cropping
                     }
@@ -457,7 +457,7 @@ public class EditProfile extends javax.swing.JPanel {
                     // Step 3: Convert to Base64 and save to database
                     String base64Image = cephra.Phone.Utilities.ImageUtils.imageToBase64(croppedImage, "png");
                     if (base64Image == null) {
-                        javax.swing.JOptionPane.showMessageDialog(EditProfile.this,
+                        javax.swing.JOptionPane.showMessageDialog(Edit_Profile.this,
                             "Failed to process the cropped image.",
                             "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                         return;
@@ -466,7 +466,7 @@ public class EditProfile extends javax.swing.JPanel {
                     // Step 4: Save to database
                     String currentUsername = cephra.Database.CephraDB.getCurrentUsername();
                     if (currentUsername == null || currentUsername.trim().isEmpty()) {
-                        javax.swing.JOptionPane.showMessageDialog(EditProfile.this,
+                        javax.swing.JOptionPane.showMessageDialog(Edit_Profile.this,
                             "No user is currently logged in.",
                             "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                         return;
@@ -478,19 +478,19 @@ public class EditProfile extends javax.swing.JPanel {
                         // Update the profile image display immediately
                         updateProfileImageDisplay();
                         
-                        javax.swing.JOptionPane.showMessageDialog(EditProfile.this,
+                        javax.swing.JOptionPane.showMessageDialog(Edit_Profile.this,
                             "Profile picture updated successfully!",
                             "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 
                     } else {
-                        javax.swing.JOptionPane.showMessageDialog(EditProfile.this,
+                        javax.swing.JOptionPane.showMessageDialog(Edit_Profile.this,
                             "Failed to save profile picture to database.",
                             "Database Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    javax.swing.JOptionPane.showMessageDialog(EditProfile.this,
+                    javax.swing.JOptionPane.showMessageDialog(Edit_Profile.this,
                         "An unexpected error occurred: " + e.getMessage(),
                         "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                 }

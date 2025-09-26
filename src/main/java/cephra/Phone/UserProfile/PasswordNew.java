@@ -200,14 +200,14 @@ public class PasswordNew extends javax.swing.JPanel {
                 javax.swing.JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
                 // Reset the email for the next session
                 cephra.Phone.Utilities.AppSessionState.userEmailForReset = null;
-                // Navigate to Phonelogin after OK is clicked
+                // Navigate to User_Login after OK is clicked
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         java.awt.Window[] windows = java.awt.Window.getWindows();
                         for (java.awt.Window window : windows) {
                             if (window instanceof cephra.Frame.Phone) {
                                 cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                                phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
+                                phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
                                 break;
                             }
                         }

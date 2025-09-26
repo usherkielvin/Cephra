@@ -373,7 +373,7 @@ public class Register extends javax.swing.JPanel {
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
+                    phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
                     break;
                 }
             }
@@ -424,13 +424,13 @@ public class Register extends javax.swing.JPanel {
         // Registration successful
         JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
-        // Navigate to Phonelogin after OK is clicked
+        // Navigate to User_Login after OK is clicked
         SwingUtilities.invokeLater(() -> {
             Window[] windows = Window.getWindows();
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
+                    phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
                     break;
                 }
             }

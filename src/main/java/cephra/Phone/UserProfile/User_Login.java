@@ -5,13 +5,13 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
-public class Phonelogin extends javax.swing.JPanel {
+public class User_Login extends javax.swing.JPanel {
     private int loginAttempts = 0;
     private final int MAX_ATTEMPTS = 3;
     private Timer cooldownTimer;
     private int cooldownSeconds = 30;
 
-    public Phonelogin() {
+    public User_Login() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(370, 750));
         setSize(370, 750);
@@ -300,7 +300,7 @@ public class Phonelogin extends javax.swing.JPanel {
                 if (username != null) {
                     username.requestFocusInWindow();
                 }
-                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(Phonelogin.this);
+                javax.swing.JRootPane root = javax.swing.SwingUtilities.getRootPane(User_Login.this);
                 if (root != null && loginhome != null) {
                     root.setDefaultButton(loginhome);
                 }
@@ -348,7 +348,7 @@ public class Phonelogin extends javax.swing.JPanel {
         });
     }
 
-    // Add this inner class at the end of your Phonelogin class (before the last closing brace)
+    // Add this inner class at the end of your User_Login class (before the last closing brace)
     private static class InputLimitFilter extends DocumentFilter {
         private final int max;
         private final boolean username;

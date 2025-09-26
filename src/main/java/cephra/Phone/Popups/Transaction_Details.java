@@ -8,12 +8,12 @@ package cephra.Phone.Popups;
  *
  * @author Kenji
  */
-public class Topup_Details extends javax.swing.JPanel {
+public class Transaction_Details extends javax.swing.JPanel {
 
     /**
      * Creates new form TransacHistoryDetails
      */
-    public Topup_Details() {
+    public Transaction_Details() {
         initComponents();
     }
 

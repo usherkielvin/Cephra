@@ -85,7 +85,6 @@ public class EditProfile extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
@@ -96,18 +95,6 @@ public class EditProfile extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
-
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        jButton1.setFocusPainted(false);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        add(jButton1);
-        jButton1.setBounds(295, 53, 40, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -233,20 +220,6 @@ public class EditProfile extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_linkbuttonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.awt.Window[] windows = java.awt.Window.getWindows();
-                for (java.awt.Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.Settings());
-                        break;
-                    }
-                }
-            }
-        });       
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     private void addpicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addpicActionPerformed
        
@@ -327,7 +300,6 @@ public class EditProfile extends javax.swing.JPanel {
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton linkbutton;
     // End of variables declaration//GEN-END:variables
 

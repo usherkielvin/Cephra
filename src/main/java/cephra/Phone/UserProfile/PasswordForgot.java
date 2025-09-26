@@ -215,7 +215,7 @@ if (cephra.Database.CephraDB.findUserByEmail(emailText) != null) {
                     for (java.awt.Window window : windows) {
                         if (window instanceof cephra.Frame.Phone) {
                             cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                            phoneFrame.switchPanel(new cephra.Phone.UserProfile.Phonelogin());
+                            phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
                             break;
                         }
                     }
