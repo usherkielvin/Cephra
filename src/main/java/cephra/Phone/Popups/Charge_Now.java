@@ -1,23 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package cephra.Phone.Popups;
 
-/**
- *
- * @author Kenji
- */
 public class Charge_Now extends javax.swing.JPanel {
 
-    /**
-     * Creates new form WaitingBayPOP
-     */
     public Charge_Now() {
         initComponents();
-    }
-
-   
+    } 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -48,6 +35,11 @@ public class Charge_Now extends javax.swing.JPanel {
         CANCEL.setBorder(null);
         CANCEL.setBorderPainted(false);
         CANCEL.setContentAreaFilled(false);
+        CANCEL.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CANCELActionPerformed(evt);
+            }
+        });
         add(CANCEL);
         CANCEL.setBounds(40, 310, 110, 30);
 
@@ -81,10 +73,9 @@ public class Charge_Now extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_OKBTNActionPerformed
 
-    private void CANCELActionPerformed(java.awt.event.ActionEvent evt) {
+    private void CANCELActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CANCELActionPerformed
         cephra.Phone.Utilities.CustomPopupManager.hideCustomPopup();
-    }
-
+    }//GEN-LAST:event_CANCELActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CANCEL;
