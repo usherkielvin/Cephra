@@ -156,6 +156,10 @@ body {
     max-width: 500px;
 }
 
+.light-theme .brand-section {
+    color: var(--text-primary);
+}
+
 .brand-icon {
     margin-bottom: 30px;
 }

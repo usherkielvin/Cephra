@@ -1,4 +1,4 @@
-/* Index (Login) page specific styles - Cephra palette with split-screen design */
+/* Register Panel page specific styles - Cephra palette with split-screen design */
 
 
 /* CSS Custom Properties for Theme Support */
@@ -154,6 +154,10 @@ body {
     text-align: center;
     color: white;
     max-width: 500px;
+}
+
+.light-theme .brand-section {
+    color: var(--text-primary);
 }
 
 .brand-icon {

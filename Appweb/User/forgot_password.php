@@ -25,7 +25,7 @@
     <meta name="twitter:description" content="Reset your password for Cephra - Your Electric Vehicle Charging Platform" />
     <meta name="twitter:image" content="https://cephra.ct.ws/images/thumbnail.png?v=1" />
 
-    <link rel="stylesheet" href="css/index.css" />
+<link rel="stylesheet" href="css/forgot_password.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 </head>
 <body class="auth-page" id="authPage">
