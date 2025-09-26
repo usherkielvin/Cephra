@@ -230,21 +230,6 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 				color: var(--primary-color);
 			}
 
-			.nav-link::after {
-				content: '';
-				position: absolute;
-				bottom: -5px;
-				left: 0;
-				width: 0;
-				height: 2px;
-				background: var(--gradient-primary);
-				transition: width 0.3s ease;
-			}
-
-			.nav-link:hover::after {
-				width: 100%;
-			}
-
 			.header-actions {
 				display: flex;
 				align-items: center;
@@ -262,21 +247,6 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 
 			.auth-link:hover {
 				color: var(--primary-color);
-			}
-
-			.auth-link::after {
-				content: '';
-				position: absolute;
-				bottom: 0;
-				left: 0;
-				width: 0;
-				height: 2px;
-				background: var(--primary-color);
-				transition: width 0.3s ease;
-			}
-
-			.auth-link:hover::after {
-				width: 100%;
 			}
 
 			.mobile-menu-toggle {
@@ -746,6 +716,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 				font-weight: 600;
 				transition: all 0.3s ease;
 				backdrop-filter: blur(10px);
+				text-decoration: none;
 			}
 
 			.quick-action-btn:hover {
@@ -1558,7 +1529,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
             <div class="hero-content">
                 <h1 class="hero-title">
                     <span class="hero-title-main">Cephra</span>
-                    <span class="hero-title-accent">Ultimate</span>
+                    <span class="hero-title-accent"></span>
                     <span class="hero-title-sub">Ultimate Charging Platform</span>
                 </h1>
                 <p class="hero-description">
@@ -1651,7 +1622,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 								</div>
 							</div>
 							<div class="vehicle-actions">
-								<button class="quick-action-btn" onclick="showChargingOptions()">Charge Now</button>
+								<a class="quick-action-btn" href="ChargingPage.php">Charge Now</a>
 							</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
