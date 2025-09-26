@@ -39,6 +39,9 @@ public class LinkedCar extends javax.swing.JPanel {
         // Set random car image for user
         setRandomCarImage();
         
+        // Set plate number for user
+        setUserPlateNumber();
+        
         // Ensure car positioning follows NetBeans form settings
         ensureCarPositioning();
         
@@ -365,6 +368,7 @@ public class LinkedCar extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        plateNumber = new javax.swing.JLabel();
         car = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         profilebutton = new javax.swing.JButton();
@@ -384,6 +388,10 @@ public class LinkedCar extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
+
+        plateNumber.setText("NBH3261");
+        add(plateNumber);
+        plateNumber.setBounds(240, 230, 70, 30);
 
         car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.png"))); // NOI18N
         car.setPreferredSize(new java.awt.Dimension(301, 226));
@@ -596,6 +604,7 @@ public class LinkedCar extends javax.swing.JPanel {
     private javax.swing.JLabel km;
     private javax.swing.JButton linkbutton;
     private javax.swing.JLabel normal;
+    private javax.swing.JLabel plateNumber;
     private javax.swing.JButton profilebutton;
     private javax.swing.JLabel sports;
     // End of variables declaration//GEN-END:variables
@@ -667,6 +676,41 @@ public class LinkedCar extends javax.swing.JPanel {
         }
     }
     
+    // Method to set plate number for the current user
+    private void setUserPlateNumber() {
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            if (username != null && !username.isEmpty()) {
+                // Get user's plate number from database
+                String userPlateNumber = cephra.Database.CephraDB.getUserPlateNumber(username);
+                
+                // If no plate number assigned yet, generate a new unique one
+                if (userPlateNumber == null) {
+                    userPlateNumber = cephra.Database.CephraDB.generateUniquePlateNumber();
+                    cephra.Database.CephraDB.setUserPlateNumber(username, userPlateNumber);
+                    System.out.println("LinkedCar: Generated and assigned plate number " + userPlateNumber + " to user " + username);
+                }
+                
+                // Set the plate number on the label
+                if (userPlateNumber != null) {
+                    plateNumber.setText(userPlateNumber);
+                    System.out.println("LinkedCar: Set plate number label to " + userPlateNumber + " for user " + username);
+                } else {
+                    plateNumber.setText("ABC0000"); // Fallback display
+                    System.err.println("LinkedCar: Failed to get or generate plate number for user " + username + " - using fallback");
+                }
+            } else {
+                plateNumber.setText("ABC0000"); // Default when no user logged in
+                System.out.println("LinkedCar: No user logged in - using default plate number");
+            }
+        } catch (Exception e) {
+            System.err.println("Error setting plate number: " + e.getMessage());
+            e.printStackTrace();
+            // Fallback to default plate number on error
+            plateNumber.setText("ABC0000");
+        }
+    }
+    
     @Override
     public void addNotify() {
         super.addNotify();
@@ -674,6 +718,7 @@ public class LinkedCar extends javax.swing.JPanel {
         SwingUtilities.invokeLater(() -> {
             refreshBatteryDisplay();
             setRandomCarImage(); // Also refresh car image
+            setUserPlateNumber(); // Also refresh plate number
             ensureCarPositioning(); // Ensure positioning is maintained
         });
     }
