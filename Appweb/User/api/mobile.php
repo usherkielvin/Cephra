@@ -110,6 +110,89 @@ try {
             ]);
             break;
 
+        case "wallet-balance":
+            // Returns wallet balance and latest transactions
+            $username = $_GET["username"] ?? $_POST["username"] ?? "";
+            if (!$username) {
+                echo json_encode(["success" => false, "error" => "Username required"]);
+                break;
+            }
+            try {
+                // Balance
+                $stmt = $db->prepare("SELECT balance FROM wallet_balance WHERE username = ?");
+                $stmt->execute([$username]);
+                $balRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                $balance = $balRow ? (float)$balRow['balance'] : 0.0;
+
+                // Latest 10 transactions
+                $stmt = $db->prepare("SELECT transaction_type, amount, description, reference_id, transaction_date FROM wallet_transactions WHERE username = ? ORDER BY transaction_date DESC LIMIT 10");
+                $stmt->execute([$username]);
+                $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                echo json_encode(["success" => true, "balance" => $balance, "transactions" => $transactions]);
+            } catch (Exception $e) {
+                echo json_encode(["success" => false, "error" => $e->getMessage()]);
+            }
+            break;
+
+        case "wallet-history":
+            // Returns full wallet history (paginated in future)
+            $username = $_GET["username"] ?? $_POST["username"] ?? "";
+            if (!$username) {
+                echo json_encode(["success" => false, "error" => "Username required"]);
+                break;
+            }
+            try {
+                $stmt = $db->prepare("SELECT transaction_type, amount, description, reference_id, transaction_date FROM wallet_transactions WHERE username = ? ORDER BY transaction_date DESC LIMIT 50");
+                $stmt->execute([$username]);
+                echo json_encode(["success" => true, "transactions" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            } catch (Exception $e) {
+                echo json_encode(["success" => false, "error" => $e->getMessage()]);
+            }
+            break;
+
+        case "wallet-topup":
+            if ($method !== "POST") {
+                echo json_encode(["success" => false, "error" => "Method not allowed"]);
+                break;
+            }
+            $username = $_POST["username"] ?? "";
+            $amount = (float)($_POST["amount"] ?? 0);
+            if (!$username || $amount <= 0) {
+                echo json_encode(["success" => false, "error" => "Username and positive amount required"]);
+                break;
+            }
+            try {
+                // Fetch current balance
+                $db->beginTransaction();
+                $stmt = $db->prepare("SELECT balance FROM wallet_balance WHERE username = ? FOR UPDATE");
+                $stmt->execute([$username]);
+                $balRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                $current = $balRow ? (float)$balRow['balance'] : 0.0;
+                $new = $current + $amount;
+
+                // Update or insert balance
+                if ($balRow) {
+                    $stmt = $db->prepare("UPDATE wallet_balance SET balance = ?, updated_at = CURRENT_TIMESTAMP WHERE username = ?");
+                    $stmt->execute([$new, $username]);
+                } else {
+                    $stmt = $db->prepare("INSERT INTO wallet_balance (username, balance) VALUES (?, ?)");
+                    $stmt->execute([$username, $new]);
+                }
+
+                // Insert wallet transaction
+                $reference = 'WT' . date('YmdHis') . rand(100, 999);
+                $stmt = $db->prepare("INSERT INTO wallet_transactions (username, transaction_type, amount, previous_balance, new_balance, description, reference_id, transaction_date) VALUES (?, 'TOPUP', ?, ?, ?, 'Wallet top-up', ?, NOW())");
+                $stmt->execute([$username, $amount, $current, $new, $reference]);
+
+                $db->commit();
+                echo json_encode(["success" => true, "balance" => $new, "reference" => $reference]);
+            } catch (Exception $e) {
+                if ($db->inTransaction()) { $db->rollBack(); }
+                echo json_encode(["success" => false, "error" => $e->getMessage()]);
+            }
+            break;
+
         case "available-bays":
             // Get available charging bays
             $stmt = $db->query("

@@ -442,69 +442,9 @@ if ($conn) {
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <!-- Logo -->
-                <div class="logo">
-                    <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                    <span class="logo-text">CEPHRA</span>
-                </div>
+    <?php include __DIR__ . '/partials/header.php'; ?>
 
-                <!-- Points Display -->
-                <div class="points-display">
-                    <i class="fas fa-star"></i>
-                    <?php echo $total_points; ?> pts
-                </div>
-
-                <!-- Navigation -->
-                <nav class="nav">
-                    <ul class="nav-list">
-                        <li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-                        <li><a href="link.php" class="nav-link">Link</a></li>
-                        <li><a href="history.php" class="nav-link">History</a></li>
-                        <li><a href="profile.php" class="nav-link">Profile</a></li>
-                        <li><a href="rewards.php" class="nav-link">Rewards</a></li>
-                        <li><a href="wallet.php" class="nav-link">Wallet</a></li>
-                    </ul>
-                </nav>
-
-                <!-- Header Actions -->
-                <div class="header-actions">
-                    <div class="auth-buttons">
-                        <a href="profile_logout.php" class="nav-link auth-link">Logout</a>
-                    </div>
-                </div>
-
-                <!-- Mobile Menu Toggle -->
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div class="mobile-menu" id="mobileMenu">
-            <div class="mobile-menu-content">
-                <ul class="mobile-nav-list">
-                    <li><a href="dashboard.php" class="mobile-nav-link">Dashboard</a></li>
-                    <li><a href="link.php" class="mobile-nav-link">Link</a></li>
-                    <li><a href="history.php" class="mobile-nav-link">History</a></li>
-                    <li><a href="profile.php" class="mobile-nav-link">Profile</a></li>
-                    <li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
-                    <li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
-                </ul>
-                <div class="mobile-header-actions">
-                    <a href="profile_logout.php" class="mobile-auth-link">Logout</a>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Rewards Hero Section -->
+    <!-- Rewards Hero Section (show points inside panel, not navbar) -->
     <section class="rewards-hero">
         <div class="container">
             <h1 class="rewards-greeting">
@@ -513,6 +453,12 @@ if ($conn) {
             <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; position: relative; z-index: 2;">
                 Earn and redeem points for exclusive perks as you charge with Cephra.
             </p>
+            <div style="margin-top:16px;display:flex;justify-content:center;">
+                <div class="points-display" style="position:static;background: var(--gradient-primary);color:#fff;padding:0.75rem 1.5rem;border-radius:25px;font-weight:600;box-shadow:0 5px 15px var(--shadow-medium);">
+                    <i class="fas fa-star" style="margin-right:8px"></i>
+                    <?php echo $total_points; ?> pts
+                </div>
+            </div>
         </div>
     </section>
 

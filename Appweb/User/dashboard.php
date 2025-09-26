@@ -1474,31 +1474,77 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 		<!-- Header -->
 		<header class="header">
 			<div class="container">
-				<div class="header-content">
+            <div class="header-content" style="display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;">
 					<!-- Logo -->
-					<div class="logo">
+                        <div class="logo" style="display:flex;align-items:center;gap:12px;margin-right:16px;">
 						<img src="images/logo.png" alt="Cephra" class="logo-img" />
 						<span class="logo-text">CEPHRA</span>
 					</div>
 
 					<!-- Navigation -->
-					<nav class="nav">
-						<ul class="nav-list">
+                        <nav class="nav" style="flex:1;">
+                            <ul class="nav-list" style="display:flex;gap:1.25rem;align-items:center;">
 							<li><a href="#" onclick="openMonitorWeb(); return false;" class="nav-link">Monitor</a></li>
 							<li><a href="link.php" class="nav-link">Link</a></li>
 							<li><a href="history.php" class="nav-link">History</a></li>
-							<li><a href="profile.php" class="nav-link">Profile</a></li>
-							<li><a href="rewards.php" class="nav-link">Rewards</a></li>
 							<li><a href="wallet.php" class="nav-link">Wallet</a></li>
+							<li><a href="rewards.php" class="nav-link">Rewards</a></li>
 						</ul>
 					</nav>
 
 					<!-- Header Actions -->
-					<div class="header-actions">
-						<div class="auth-buttons">
-							<a href="profile_logout.php" class="nav-link auth-link">Logout</a>
-						</div>
-					</div>
+                        <div class="header-actions" style="display:flex;align-items:center;gap:12px;margin-left:auto;">
+                            <!-- Wallet button -->
+                            <a href="wallet.php" title="Wallet" style="display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;">
+                                <i class="fas fa-wallet" aria-hidden="true" style="font-size:18px;"></i>
+                            </a>
+                            <!-- Notification bell -->
+                            <div class="notifications" style="position:relative;">
+                                <button id="notifBtn" title="Notifications" style="display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;">
+                                    <i class="fas fa-bell" aria-hidden="true" style="font-size:18px;"></i>
+                                </button>
+                            </div>
+                            <!-- Language selector (globe icon only) placed to the right of Download -->
+                            <div class="language-selector" style="position:relative;">
+                                <button class="language-btn" id="languageBtn" title="Language" style="display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;">
+                                    <i class="fas fa-globe" aria-hidden="true" style="font-size:18px;line-height:1;"></i>
+                                </button>
+                                <div class="language-dropdown" id="languageDropdown" style="position:absolute;top:28px;right:0;">
+                                    <div class="language-option" data-lang="en">English</div>
+                                    <div class="language-option" data-lang="fil">Filipino</div>
+                                    <div class="language-option" data-lang="ceb">Bisaya</div>
+                                    <div class="language-option" data-lang="zh">中文</div>
+                                </div>
+                            </div>
+                            <?php
+                            // Compute avatar source
+                            $pfpSrc = 'images/logo.png';
+                            if ($conn) {
+                                try {
+                                    $stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
+                                    $stmt2->bindParam(':u', $username);
+                                    $stmt2->execute();
+                                    $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                                    if ($row2 && !empty($row2['profile_picture'])) {
+                                        $pp = $row2['profile_picture'];
+                                        if (strpos($pp, 'data:image') === 0) {
+                                            $pfpSrc = $pp;
+                                        } elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
+                                            $pfpSrc = 'data:image/png;base64,' . $pp;
+                                        } elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
+                                            $path = 'uploads/profile_pictures/' . $pp;
+                                            if (file_exists(__DIR__ . '/' . $path)) {
+                                                $pfpSrc = $path;
+                                            }
+                                        }
+                                    }
+                                } catch (Exception $e) { /* ignore */ }
+                            }
+                            ?>
+                            <a href="profile.php" title="Profile" style="display:inline-flex;width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid rgba(0,0,0,0.08);">
+                                <img src="<?php echo htmlspecialchars($pfpSrc); ?>" alt="Profile" style="width:100%;height:100%;object-fit:cover;display:block;" />
+                            </a>
+                        </div>
 
 					<!-- Mobile Menu Toggle -->
 					<button class="mobile-menu-toggle" id="mobileMenuToggle">
@@ -1788,6 +1834,53 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+    <script>
+        // Dashboard header: Language dropdown and Download QR like index.php
+        (function(){
+            const languageBtn = document.getElementById('languageBtn');
+            const languageDropdown = document.getElementById('languageDropdown');
+            if (languageBtn && languageDropdown) {
+                languageBtn.addEventListener('click', function(e){
+                    e.stopPropagation();
+                    languageDropdown.classList.toggle('show');
+                    languageBtn.classList.toggle('active');
+                });
+                languageDropdown.querySelectorAll('.language-option').forEach(opt => {
+                    opt.addEventListener('click', function(){
+                        languageDropdown.classList.remove('show');
+                        languageBtn.classList.remove('active');
+                        // Persist choice (same as index)
+                        const lang = this.dataset.lang || 'en';
+                        localStorage.setItem('selectedLanguage', lang);
+                    });
+                });
+                document.addEventListener('click', function(e){
+                    if (!languageBtn.contains(e.target) && !languageDropdown.contains(e.target)) {
+                        languageDropdown.classList.remove('show');
+                        languageBtn.classList.remove('active');
+                    }
+                });
+            }
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            const qrPopup = document.getElementById('qrPopup');
+            if (downloadBtn && qrPopup) {
+                downloadBtn.addEventListener('mouseenter', function(){
+                    qrPopup.classList.add('show');
+                });
+                downloadBtn.addEventListener('mouseleave', function(){
+                    setTimeout(()=>{
+                        if (!downloadBtn.matches(':hover') && !qrPopup.matches(':hover')) {
+                            qrPopup.classList.remove('show');
+                        }
+                    }, 100);
+                });
+                qrPopup.addEventListener('mouseleave', function(){
+                    qrPopup.classList.remove('show');
+                });
+            }
+        })();
+    </script>
 
             <script>
                 function showDialog(title, message) {
