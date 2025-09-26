@@ -2561,6 +2561,11 @@ public class CephraDB {
                     if (rs.next()) {
                         String profilePicture = rs.getString("profile_picture");
                         if (profilePicture != null && !profilePicture.trim().isEmpty()) {
+                            // If it's a file path (web upload), convert to Base64 data URI
+                            if (profilePicture.endsWith(".jpg") || profilePicture.endsWith(".jpeg") || 
+                                profilePicture.endsWith(".png") || profilePicture.endsWith(".gif")) {
+                                return convertWebImageToDataUri(profilePicture);
+                            }
                             return profilePicture;
                         }
                     }
@@ -2572,6 +2577,45 @@ public class CephraDB {
         }
         
         return null;
+    }
+    
+    /**
+     * Converts a web-uploaded image file to Base64 data URI format
+     * @param filename the filename of the uploaded image
+     * @return Base64 data URI string, or null if conversion fails
+     */
+    private static String convertWebImageToDataUri(String filename) {
+        try {
+            // Construct the full path to the uploaded image
+            String webPath = "C:/xampp/htdocs/Cephra/Appweb/User/uploads/profile_pictures/" + filename;
+            java.io.File imageFile = new java.io.File(webPath);
+            
+            if (!imageFile.exists()) {
+                System.out.println("CephraDB: Web image file not found: " + webPath);
+                return null;
+            }
+            
+            // Read the image file and convert to Base64
+            byte[] imageBytes = java.nio.file.Files.readAllBytes(imageFile.toPath());
+            String base64String = java.util.Base64.getEncoder().encodeToString(imageBytes);
+            
+            // Determine MIME type based on file extension
+            String mimeType = "image/png"; // default
+            if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) {
+                mimeType = "image/jpeg";
+            } else if (filename.toLowerCase().endsWith(".gif")) {
+                mimeType = "image/gif";
+            }
+            
+            // Return as data URI
+            String dataUri = "data:" + mimeType + ";base64," + base64String;
+            System.out.println("CephraDB: Successfully converted web image to data URI: " + filename);
+            return dataUri;
+            
+        } catch (Exception e) {
+            System.err.println("CephraDB: Error converting web image to data URI: " + e.getMessage());
+            return null;
+        }
     }
     
     /**

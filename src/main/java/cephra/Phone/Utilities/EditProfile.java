@@ -1,4 +1,4 @@
-package cephra.Phone.Dashboard;
+package cephra.Phone.Utilities;
 
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -30,7 +30,29 @@ public class EditProfile extends javax.swing.JPanel {
         try {
             String profilePictureBase64 = cephra.Database.CephraDB.getCurrentUserProfilePicture();
             if (profilePictureBase64 != null && !profilePictureBase64.trim().isEmpty()) {
-                java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                // Handle different profile picture formats
+                java.awt.image.BufferedImage profileImage = null;
+                
+                if (profilePictureBase64.startsWith("data:image")) {
+                    // Data URI format: data:image/png;base64,{base64string}
+                    int commaIndex = profilePictureBase64.indexOf(',');
+                    if (commaIndex != -1) {
+                        String base64Data = profilePictureBase64.substring(commaIndex + 1);
+                        profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(base64Data);
+                    }
+                } else if (profilePictureBase64.startsWith("iVBORw0KGgo")) {
+                    // Raw Base64 format: {base64string}
+                    profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                } else if (profilePictureBase64.endsWith(".jpg") || profilePictureBase64.endsWith(".jpeg") || 
+                          profilePictureBase64.endsWith(".png") || profilePictureBase64.endsWith(".gif")) {
+                    // File path format: filename.jpg (from web uploads)
+                    // Skip loading file path images in Java app - they're for web only
+                    System.out.println("EditProfile: Skipping file path profile picture: " + profilePictureBase64);
+                    profileImage = null;
+                } else {
+                    // Try as raw Base64 (fallback)
+                    profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                }
                 if (profileImage != null) {
                     // Create a circular profile picture that fits the Profile label (110x110)
                     java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 110);
@@ -40,7 +62,8 @@ public class EditProfile extends javax.swing.JPanel {
                         System.out.println("EditProfile: Loaded current profile picture");
                     }
                 } else {
-                    System.err.println("EditProfile: Failed to decode profile picture from Base64");
+                    // No profile image loaded (could be file path format or invalid data)
+                    System.out.println("EditProfile: No profile image to display");
                 }
             } else {
                 // No profile picture set, clear the label
@@ -85,6 +108,7 @@ public class EditProfile extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton1 = new javax.swing.JButton();
         historybutton = new javax.swing.JButton();
         homebutton = new javax.swing.JButton();
         linkbutton = new javax.swing.JButton();
@@ -95,6 +119,18 @@ public class EditProfile extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
+
+        jButton1.setBorder(null);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.setFocusPainted(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        add(jButton1);
+        jButton1.setBounds(295, 53, 40, 40);
 
         historybutton.setBorder(null);
         historybutton.setBorderPainted(false);
@@ -253,6 +289,9 @@ public class EditProfile extends javax.swing.JPanel {
                         return;
                     }
                     
+                    // Add data URI prefix for web compatibility
+                    String dataUriImage = "data:image/png;base64," + base64Image;
+                    
                     // Step 4: Save to database
                     String currentUsername = cephra.Database.CephraDB.getCurrentUsername();
                     if (currentUsername == null || currentUsername.trim().isEmpty()) {
@@ -262,7 +301,7 @@ public class EditProfile extends javax.swing.JPanel {
                         return;
                     }
                     
-                    boolean saved = cephra.Database.CephraDB.saveUserProfilePicture(currentUsername, base64Image);
+                    boolean saved = cephra.Database.CephraDB.saveUserProfilePicture(currentUsername, dataUriImage);
                     if (saved) {
                         // Step 5: Update UI to show new profile picture
                         java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(croppedImage, 110);
@@ -293,6 +332,20 @@ public class EditProfile extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_addpicActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+                for (java.awt.Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.Dashboard.Profile());
+                        break;
+                    }
+                }
+            }
+        });
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Profile;
@@ -300,6 +353,7 @@ public class EditProfile extends javax.swing.JPanel {
     private javax.swing.JButton charge;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton linkbutton;
     // End of variables declaration//GEN-END:variables
 

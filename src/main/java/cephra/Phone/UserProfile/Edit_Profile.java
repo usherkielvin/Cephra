@@ -599,13 +599,36 @@ public class Edit_Profile extends javax.swing.JPanel {
             String profilePictureBase64 = cephra.Database.CephraDB.getCurrentUserProfilePicture();
             
             if (profilePictureBase64 != null && !profilePictureBase64.trim().isEmpty()) {
-                java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                // Handle different profile picture formats
+                java.awt.image.BufferedImage profileImage = null;
+                
+                if (profilePictureBase64.startsWith("data:image")) {
+                    // Data URI format: data:image/png;base64,{base64string}
+                    int commaIndex = profilePictureBase64.indexOf(',');
+                    if (commaIndex != -1) {
+                        String base64Data = profilePictureBase64.substring(commaIndex + 1);
+                        profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(base64Data);
+                    }
+                } else if (profilePictureBase64.startsWith("iVBORw0KGgo")) {
+                    // Raw Base64 format: {base64string}
+                    profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                } else if (profilePictureBase64.endsWith(".jpg") || profilePictureBase64.endsWith(".jpeg") || 
+                          profilePictureBase64.endsWith(".png") || profilePictureBase64.endsWith(".gif")) {
+                    // File path format: filename.jpg (from web uploads)
+                    // Skip loading file path images in Java app - they're for web only
+                    System.out.println("Edit_Profile: Skipping file path profile picture: " + profilePictureBase64);
+                    profileImage = null;
+                } else {
+                    // Try as raw Base64 (fallback)
+                    profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                }
                 
                 if (profileImage != null) {
                     java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 110);
                     Profile.setIcon(new javax.swing.ImageIcon(circularImage));
                 } else {
-                    System.err.println("Failed to load profile image from base64");
+                    // No profile image loaded (could be file path format or invalid data)
+                    System.out.println("No profile image to display, using default");
                     setDefaultProfileImage();
                 }
             } else {
@@ -655,8 +678,17 @@ public class Edit_Profile extends javax.swing.JPanel {
             String profilePictureBase64 = cephra.Database.CephraDB.getCurrentUserProfilePicture();
             
             if (profilePictureBase64 != null && !profilePictureBase64.trim().isEmpty()) {
+                // Extract Base64 part from data URI if it's in data URI format
+                String base64Data = profilePictureBase64;
+                if (profilePictureBase64.startsWith("data:image")) {
+                    int commaIndex = profilePictureBase64.indexOf(',');
+                    if (commaIndex != -1) {
+                        base64Data = profilePictureBase64.substring(commaIndex + 1);
+                    }
+                }
+                // If it's already raw Base64 (starts with iVBORw0KGgo), use it as is
                 // Convert base64 to image
-                java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(base64Data);
                 
                 if (profileImage != null) {
                     // Create circular image for display

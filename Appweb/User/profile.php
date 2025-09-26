@@ -244,9 +244,24 @@ if ($conn) {
                     <div class="photo-container" style="text-align: center; position: relative;">
                         <!-- Profile Photo -->
                         <div class="profile-photo" style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 1rem; border: 4px solid #00c2ce; position: relative; overflow: visible;">
-                            <?php if ($profilePicture && file_exists('uploads/profile_pictures/' . $profilePicture)): ?>
-                                <img src="uploads/profile_pictures/<?php echo htmlspecialchars($profilePicture); ?>" alt="Profile Photo" id="profilePhoto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            <?php if ($profilePicture): ?>
+                                <?php if (strpos($profilePicture, 'data:image') === 0): ?>
+                                    <!-- Data URI format from Java app -->
+                                    <img src="<?php echo htmlspecialchars($profilePicture); ?>" alt="Profile Photo" id="profilePhoto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                <?php elseif (strpos($profilePicture, 'iVBORw0KGgo') === 0): ?>
+                                    <!-- Raw Base64 format from old Java app -->
+                                    <img src="data:image/png;base64,<?php echo htmlspecialchars($profilePicture); ?>" alt="Profile Photo" id="profilePhoto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                <?php elseif (file_exists('uploads/profile_pictures/' . $profilePicture)): ?>
+                                    <!-- File path from web upload -->
+                                    <img src="uploads/profile_pictures/<?php echo htmlspecialchars($profilePicture); ?>" alt="Profile Photo" id="profilePhoto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                <?php else: ?>
+                                    <!-- Fallback placeholder -->
+                                    <div class="photo-placeholder" style="width: 100%; height: 100%; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; border-radius: 50%;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                <?php endif; ?>
                             <?php else: ?>
+                                <!-- No profile picture -->
                                 <div class="photo-placeholder" style="width: 100%; height: 100%; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; border-radius: 50%;">
                                     <i class="fas fa-user"></i>
                                 </div>

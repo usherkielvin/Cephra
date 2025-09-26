@@ -58,7 +58,29 @@ public class Profile extends javax.swing.JPanel {
         try {
             String profilePictureBase64 = cephra.Database.CephraDB.getCurrentUserProfilePicture();
             if (profilePictureBase64 != null && !profilePictureBase64.trim().isEmpty()) {
-                java.awt.image.BufferedImage profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                // Handle different profile picture formats
+                java.awt.image.BufferedImage profileImage = null;
+                
+                if (profilePictureBase64.startsWith("data:image")) {
+                    // Data URI format: data:image/png;base64,{base64string}
+                    int commaIndex = profilePictureBase64.indexOf(',');
+                    if (commaIndex != -1) {
+                        String base64Data = profilePictureBase64.substring(commaIndex + 1);
+                        profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(base64Data);
+                    }
+                } else if (profilePictureBase64.startsWith("iVBORw0KGgo")) {
+                    // Raw Base64 format: {base64string}
+                    profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                } else if (profilePictureBase64.endsWith(".jpg") || profilePictureBase64.endsWith(".jpeg") || 
+                          profilePictureBase64.endsWith(".png") || profilePictureBase64.endsWith(".gif")) {
+                    // File path format: filename.jpg (from web uploads)
+                    // Skip loading file path images in Java app - they're for web only
+                    System.out.println("Profile: Skipping file path profile picture: " + profilePictureBase64);
+                    profileImage = null;
+                } else {
+                    // Try as raw Base64 (fallback)
+                    profileImage = cephra.Phone.Utilities.ImageUtils.base64ToImage(profilePictureBase64);
+                }
                 if (profileImage != null) {
                     // Create a circular profile picture that fits the ProfilePicture label (110x110)
                     java.awt.image.BufferedImage circularImage = cephra.Phone.Utilities.ImageUtils.createCircularImage(profileImage, 128);
@@ -67,7 +89,8 @@ public class Profile extends javax.swing.JPanel {
                         Profile.setIcon(new javax.swing.ImageIcon(circularImage));
                     }
                 } else {
-                    System.err.println("Profile: Failed to decode profile picture from Base64");
+                    // No profile image loaded (could be file path format or invalid data)
+                    System.out.println("Profile: No profile image to display");
                 }
             } else {
                 // No profile picture set, clear the label
