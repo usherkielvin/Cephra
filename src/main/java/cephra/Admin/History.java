@@ -48,7 +48,7 @@ public class History extends javax.swing.JPanel {
         jTable1.getColumnModel().getColumn(1).setPreferredWidth(120); // Customer
         jTable1.getColumnModel().getColumn(2).setPreferredWidth(60);  // KWh
         jTable1.getColumnModel().getColumn(3).setPreferredWidth(80);  // Total
-        jTable1.getColumnModel().getColumn(4).setPreferredWidth(100); // Served By
+        jTable1.getColumnModel().getColumn(4).setPreferredWidth(120); // Plate Number
         jTable1.getColumnModel().getColumn(5).setPreferredWidth(100); // Date & Time (reduced for compact format)
         jTable1.getColumnModel().getColumn(6).setPreferredWidth(100); // Reference
         
@@ -102,12 +102,10 @@ public class History extends javax.swing.JPanel {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Ticket", "Customer", "KWh", "Total", "Served By", "Date & Time", "Reference"
+                "Ticket", "Customer", "KWh", "Total", "Plate Number", "Date & Time", "Reference"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -330,25 +328,21 @@ public class History extends javax.swing.JPanel {
                 double usedFraction = (finalBatteryLevel - initialBatteryLevel) / 100.0;
                 double kwhUsed = usedFraction * batteryCapacityKWh;
 
-                // Get payment method from payment transactions table
-                String paymentMethod = cephra.Database.CephraDB.getPaymentMethodForTicket((String) record[0]);
-                if (paymentMethod == null) paymentMethod = "Cash"; // Default fallback
-
-                // Get the admin username who served this transaction
-                String servedBy = cephra.Database.CephraDB.getCurrentAdminUsername();
-                if (servedBy == null || servedBy.trim().isEmpty()) {
-                    servedBy = "Admin"; // Fallback if no admin logged in
+                // Get the user's plate number
+                String plateNumber = cephra.Database.CephraDB.getUserPlateNumber((String) record[1]);
+                if (plateNumber == null || plateNumber.trim().isEmpty()) {
+                    plateNumber = "N/A"; // Default fallback if no plate number
                 }
 
                 // Convert database format to admin history format
-                // Columns: Ticket, Customer, KWh, Total, Served By, Date & Time, Reference
+                // Columns: Ticket, Customer, KWh, Total, Plate Number, Date & Time, Reference
                 // Database format: [ticket_id, username, service_type, initial_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, completed_at]
                 Object[] adminRecord = {
                     record[0], // ticket_id
                     record[1], // username
                     String.format("%.1f kWh", kwhUsed), // KWh used
                     String.format("%.2f", record[6]), // Total amount (total_amount is at index 6)
-                    servedBy + " (" + paymentMethod + ")", // served_by with payment method
+                    plateNumber, // plate number
                     formatDateTimeForDisplay(record[8]), // completed_at (completed_at is at index 8)
                     record[7] // reference_number (reference_number is at index 7)
                 };

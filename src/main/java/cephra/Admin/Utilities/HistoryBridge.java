@@ -54,12 +54,18 @@ public final class HistoryBridge {
         int initialBatteryLevel = (Integer) dbRecord[3];
         double kwhUsed = (100 - initialBatteryLevel) / 100.0 * 40.0; // 40kWh capacity
         
+        // Get the user's plate number
+        String plateNumber = cephra.Database.CephraDB.getUserPlateNumber((String) dbRecord[1]);
+        if (plateNumber == null || plateNumber.trim().isEmpty()) {
+            plateNumber = "N/A"; // Default fallback if no plate number
+        }
+        
         return new Object[]{
             dbRecord[0], // Ticket ID
             dbRecord[1], // Customer username
             String.format("%.1f kWh", kwhUsed),
             String.format("%.2f", dbRecord[6]), // Total amount
-            getCurrentAdminUsername() + " (" + getPaymentMethodForTicket((String) dbRecord[0]) + ")",
+            plateNumber, // Plate number
             formatDateTimeForDisplay(dbRecord[8]), // Completion date/time
             dbRecord[7] // Reference number
         };

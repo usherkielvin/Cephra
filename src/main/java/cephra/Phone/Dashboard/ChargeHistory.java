@@ -500,7 +500,11 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                 System.err.println("Error getting served by from admin history: " + e.getMessage());
             }
             if (server != null) {
-                server.setText(servedBy);
+            //    server.setText(servedBy);
+             String username = cephra.Database.CephraDB.getCurrentUsername();
+             String userPlateNumber = cephra.Database.CephraDB.getUserPlateNumber(username);
+               server.setText(userPlateNumber);
+               
             }
             
             // Update date - just the value

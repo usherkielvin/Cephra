@@ -688,16 +688,16 @@ public class LinkedCar extends javax.swing.JPanel {
                 if (userPlateNumber == null) {
                     userPlateNumber = cephra.Database.CephraDB.generateUniquePlateNumber();
                     cephra.Database.CephraDB.setUserPlateNumber(username, userPlateNumber);
-                    System.out.println("LinkedCar: Generated and assigned plate number " + userPlateNumber + " to user " + username);
+                   // System.out.println("LinkedCar: Generated and assigned plate number " + userPlateNumber + " to user " + username);
                 }
                 
                 // Set the plate number on the label
                 if (userPlateNumber != null) {
                     plateNumber.setText(userPlateNumber);
-                    System.out.println("LinkedCar: Set plate number label to " + userPlateNumber + " for user " + username);
+                  //  System.out.println("LinkedCar: Set plate number label to " + userPlateNumber + " for user " + username);
                 } else {
                     plateNumber.setText("ABC0000"); // Fallback display
-                    System.err.println("LinkedCar: Failed to get or generate plate number for user " + username + " - using fallback");
+                  //  System.err.println("LinkedCar: Failed to get or generate plate number for user " + username + " - using fallback");
                 }
             } else {
                 plateNumber.setText("ABC0000"); // Default when no user logged in
