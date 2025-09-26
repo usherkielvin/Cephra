@@ -378,46 +378,46 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <img src="images/logo.png" alt="Cephra" class="footer-logo-img" />
-                        <span class="footer-logo-text">CEPHRA</span>
-                    </div>
-                    <p class="footer-description">
-                        Your ultimate electric vehicle charging platform,
-                        powering the future of sustainable transportation.
-                    </p>
-                </div>
+		<!-- Footer -->
+		<footer class="footer">
+			<div class="container">
+				<div class="footer-content">
+					<div class="footer-section">
+						<div class="footer-logo">
+							<img src="images/logo.png" alt="Cephra" class="footer-logo-img" />
+							<span class="footer-logo-text">CEPHRA</span>
+						</div>
+						<p class="footer-description">
+							Your ultimate electric vehicle charging platform,
+							powering the future of sustainable transportation.
+						</p>
+					</div>
 
-                <div class="footer-section">
-                    <h4 class="footer-title">Platform</h4>
-                    <ul class="footer-links">
-                        <li><a href="dashboard.php">Dashboard</a></li>
-                        <li><a href="ChargingPage.php">Charging</a></li>
-                        <li><a href="history.php">History</a></li>
-                    </ul>
-                </div>
+					<div class="footer-section">
+						<h4 class="footer-title">Platform</h4>
+						<ul class="footer-links">
+							<li><a href="">Dashboard</a></li>
+							<li><a href="">Charging</a></li>
+							<li><a href="">History</a></li>
+						</ul>
+					</div>
 
-                <div class="footer-section">
-                    <h4 class="footer-title">Support</h4>
-                    <ul class="footer-links">
-                        <li><a href="#support">Help Center</a></li>
-                        <li><a href="#contact">Contact Us</a></li>
-                    </ul>
-                </div>
+					<div class="footer-section">
+						<h4 class="footer-title">Support</h4>
+						<ul class="footer-links">
+							<li><a href="help_center.php">Help Center</a></li>
+							<li><a href="contact_us.php">Contact Us</a></li>
+						</ul>
+					</div>
 
-                <div class="footer-section">
-                    <h4 class="footer-title">Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#careers">Our Team</a></li>
-                    </ul>
-                </div>
-            </div>
+					<div class="footer-section">
+						<h4 class="footer-title">Company</h4>
+						<ul class="footer-links">
+							<li><a href="about_us.php">About Us</a></li>
+							<li><a href="our_team.php">Our Team</a></li>
+						</ul>
+					</div>
+				</div>
 
             <div class="footer-bottom">
                 <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
