@@ -610,37 +610,108 @@ public class Pending_Payment extends javax.swing.JPanel {
     }
     
     /**
-     * Shows insufficient balance message with option to top-up
+     * Shows insufficient balance using Need_Topup panel
      * @param requiredAmount the amount required for payment
      */
     private void showInsufficientBalanceMessage(double requiredAmount) {
         String currentUser = cephra.Database.CephraDB.getCurrentUsername();
         double currentBalance = cephra.Database.CephraDB.getUserWalletBalance(currentUser);
+        double shortage = requiredAmount - currentBalance;
         
         SwingUtilities.invokeLater(() -> {
-            String message = String.format(
-                "Insufficient wallet balance!\n\n" +
-                "Current Balance: ₱%.2f\n" +
-                "Required Amount: ₱%.2f\n" +
-                "Shortage: ₱%.2f\n\n" +
-                "Please top up your wallet to proceed with payment.",
-                currentBalance, requiredAmount, (requiredAmount - currentBalance)
-            );
+            // Hide current Pending_Payment
+            hidePayPop();
             
-            int option = JOptionPane.showOptionDialog(
-                this,
-                message,
-                "Insufficient Balance",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE,
-                null,
-                new String[]{"Top Up Wallet", "Cancel"},
-                "Top Up Wallet"
-            );
-            
-            if (option == 0) { // Top Up Wallet selected
-                navigateToTopUp();
+            // Show Need_Topup panel with balance information
+            showNeedTopupPanel(currentBalance, requiredAmount, shortage);
+        });
+    }
+    
+    /**
+     * Shows the Need_Topup panel with balance information
+     * @param currentBalance the current wallet balance
+     * @param requiredAmount the amount required for payment
+     * @param shortage the shortage amount
+     */
+    private void showNeedTopupPanel(double currentBalance, double requiredAmount, double shortage) {
+        try {
+            // Find Phone frame
+            Window[] windows = Window.getWindows();
+            for (Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    
+                    // Create Need_Topup panel
+                    cephra.Phone.Popups.Need_Topup needTopupPanel = new cephra.Phone.Popups.Need_Topup();
+                    
+                    // Set balance information on labels
+                    needTopupPanel.setBalanceInfo(currentBalance, requiredAmount, shortage);
+                    
+                    // Set as current instance
+                    setCurrentNeedTopupInstance(needTopupPanel);
+                    
+                    // Show centered on phone frame
+                    showCenteredNeedTopup(phoneFrame, needTopupPanel);
+                    break;
+                }
             }
+        } catch (Exception e) {
+            System.err.println("Error showing Need_Topup panel: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Sets the current Need_Topup instance for static access
+     * @param needTopupPanel the Need_Topup panel instance
+     */
+    private void setCurrentNeedTopupInstance(cephra.Phone.Popups.Need_Topup needTopupPanel) {
+        try {
+            // Use reflection to set the static currentInstance field
+            java.lang.reflect.Field field = cephra.Phone.Popups.Need_Topup.class.getDeclaredField("currentInstance");
+            field.setAccessible(true);
+            field.set(null, needTopupPanel);
+            
+            // Set the isShowing flag
+            java.lang.reflect.Field showingField = cephra.Phone.Popups.Need_Topup.class.getDeclaredField("isShowing");
+            showingField.setAccessible(true);
+            showingField.set(null, true);
+        } catch (Exception e) {
+            System.err.println("Error setting Need_Topup instance: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Shows Need_Topup panel centered on the Phone frame
+     * @param phoneFrame the Phone frame to center on
+     * @param needTopupPanel the Need_Topup panel to show
+     */
+    private void showCenteredNeedTopup(cephra.Frame.Phone phoneFrame, cephra.Phone.Popups.Need_Topup needTopupPanel) {
+        SwingUtilities.invokeLater(() -> {
+            // Set panel properties
+            needTopupPanel.setPreferredSize(new Dimension(330, 370));
+            needTopupPanel.setSize(330, 370);
+            needTopupPanel.setOpaque(false);
+            
+            // Determine phone content size (fallback to constants if not realized yet)
+            int containerW = phoneFrame.getContentPane() != null ? phoneFrame.getContentPane().getWidth() : 0;
+            int containerH = phoneFrame.getContentPane() != null ? phoneFrame.getContentPane().getHeight() : 0;
+            if (containerW <= 0) containerW = 350;
+            if (containerH <= 0) containerH = 750;
+            
+            // Center the panel on the phone frame
+            int x = (containerW - 330) / 2;
+            int y = (containerH - 370) / 2;
+            
+            needTopupPanel.setBounds(x, y, 330, 370);
+            
+            // Add to layered pane so it appears on top of current panel
+            JLayeredPane layeredPane = phoneFrame.getRootPane().getLayeredPane();
+            layeredPane.add(needTopupPanel, JLayeredPane.MODAL_LAYER);
+            layeredPane.moveToFront(needTopupPanel);
+            
+            needTopupPanel.setVisible(true);
+            phoneFrame.repaint();
         });
     }
     
@@ -685,30 +756,6 @@ public class Pending_Payment extends javax.swing.JPanel {
         });
     }
     
-    /**
-     * Navigates to TopUp screen while preserving Pending_Payment state
-     */
-    private void navigateToTopUp() {
-        SwingUtilities.invokeLater(() -> {
-            // Store the current Pending_Payment state before hiding
-            String currentUser = cephra.Database.CephraDB.getCurrentUsername();
-            if (currentUser != null && currentTicketId != null) {
-                isPendingTopUpReturn = true;
-                pendingTicketId = currentTicketId;
-                pendingCustomerUsername = currentUser;
-            }
-            
-            hidePayPop(); // Hide the current Pending_Payment
-            Window[] windows = Window.getWindows();
-            for (Window window : windows) {
-                if (window instanceof cephra.Frame.Phone) {
-                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.RewardsWallet.Topup());
-                    break;
-                }
-            }
-        });
-    }
     
 
 
