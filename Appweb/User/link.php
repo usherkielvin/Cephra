@@ -59,41 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="homepage is-preload">
     <div id="page-wrapper">
-        <header class="header">
-            <div class="container">
-                <div class="header-content">
-                    <!-- Logo -->
-                    <div class="logo">
-                        <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                        <span class="logo-text">CEPHRA</span>
-                    </div>
-
-                    <!-- Navigation -->
-                    <nav class="nav">
-                        <ul class="nav-list">
-                            <li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-                            <li class="current_page_item"><a href="link.php" class="nav-link">Link</a></li>
-                            <li><a href="history.php" class="nav-link">History</a></li>
-                            <li><a href="profile.php" class="nav-link">Profile</a></li>
-                        </ul>
-                    </nav>
-
-                    <!-- Header Actions -->
-                    <div class="header-actions">
-                        <div class="auth-buttons">
-                            <a href="dashboard.php" class="nav-link auth-link">Back</a>
-                        </div>
-                    </div>
-
-                    <!-- Mobile Menu Toggle -->
-                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-                </div>
-            </div>
-        </header>
+        <?php include __DIR__ . '/partials/header.php'; ?>
 
         <!-- Link Section -->
         <section class="link-section" style="padding: 100px 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">

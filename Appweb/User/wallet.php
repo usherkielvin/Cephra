@@ -12,14 +12,14 @@ $balance = 0.00;
 $transactions = [];
 if ($conn) {
     $username = $_SESSION['username'];
-    // Fetch balance
-    $stmt = $conn->prepare("SELECT total_points FROM user_points WHERE username = :username");
+    // Fetch balance from wallet_balance (shared with Java)
+    $stmt = $conn->prepare("SELECT balance FROM wallet_balance WHERE username = :username");
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $balance = $result ? (float)$result['total_points'] : 0.00;
+    $balance = $result ? (float)$result['balance'] : 0.00;
 
-    // Fetch latest 3 transactions
+    // Fetch latest 3 wallet transactions
     $stmt = $conn->prepare("SELECT transaction_type, amount, description, reference_id, transaction_date FROM wallet_transactions WHERE username = :username ORDER BY transaction_date DESC LIMIT 3");
     $stmt->bindParam(':username', $username);
     $stmt->execute();
@@ -486,6 +486,16 @@ if ($conn) {
             border-color: var(--primary-color);
         }
 
+        /* Remove native number input spinners (arrows) */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+
         .modal-actions {
             display: flex;
             gap: 1rem;
@@ -601,61 +611,7 @@ if ($conn) {
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <!-- Logo -->
-                <div class="logo">
-                    <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                    <span class="logo-text">CEPHRA</span>
-                </div>
-
-                <!-- Navigation -->
-                <nav class="nav">
-                    <ul class="nav-list">
-                        <li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-                        <li><a href="link.php" class="nav-link">Link</a></li>
-                        <li><a href="history.php" class="nav-link">History</a></li>
-                        <li><a href="profile.php" class="nav-link">Profile</a></li>
-                        <li><a href="rewards.php" class="nav-link">Rewards</a></li>
-                        <li><a href="wallet.php" class="nav-link">Wallet</a></li>
-                    </ul>
-                </nav>
-
-                <!-- Header Actions -->
-                <div class="header-actions">
-                    <div class="auth-buttons">
-                        <a href="profile_logout.php" class="nav-link auth-link">Logout</a>
-                    </div>
-                </div>
-
-                <!-- Mobile Menu Toggle -->
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div class="mobile-menu" id="mobileMenu">
-            <div class="mobile-menu-content">
-                <ul class="mobile-nav-list">
-                    <li><a href="dashboard.php" class="mobile-nav-link">Dashboard</a></li>
-                    <li><a href="link.php" class="mobile-nav-link">Link</a></li>
-                    <li><a href="history.php" class="mobile-nav-link">History</a></li>
-                    <li><a href="profile.php" class="mobile-nav-link">Profile</a></li>
-                    <li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
-                    <li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
-                </ul>
-                <div class="mobile-header-actions">
-                    <a href="profile_logout.php" class="mobile-auth-link">Logout</a>
-                </div>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/partials/header.php'; ?>
 
     <!-- Wallet Hero Section -->
     <section class="wallet-hero">
@@ -682,14 +638,7 @@ if ($conn) {
 
             <div class="wallet-buttons">
                 <button class="wallet-btn" onclick="showTopupModal()">Topup</button>
-                <a href="history.php" class="wallet-btn">History</a>
-                <div class="dropdown">
-                    <button class="wallet-btn" onclick="toggleMoreDropdown()">More</button>
-                    <div class="dropdown-content" id="moreDropdown">
-                        <a href="#" onclick="alert('Withdraw feature coming soon!')">Withdraw</a>
-                        <a href="#" onclick="alert('Settings feature coming soon!')">Settings</a>
-                    </div>
-                </div>
+                <a href="wallet_history.php" class="wallet-btn">History</a>
             </div>
         </div>
     </section>
@@ -734,7 +683,7 @@ if ($conn) {
             <form id="topupForm">
                 <div class="form-group">
                     <label class="form-label" for="topupAmount">Amount (₱)</label>
-                    <input type="number" id="topupAmount" name="amount" class="form-input" min="1" step="0.01" required placeholder="Enter amount">
+                    <input type="number" id="topupAmount" name="amount" class="form-input" min="1" step="0.01" required placeholder="Enter amount" style="width:100%;">
                 </div>
                 <div class="modal-actions">
                     <button type="submit" class="btn-primary">Topup</button>
@@ -868,7 +817,7 @@ if ($conn) {
                 balanceText.textContent = originalBalance;
                 eyeToggle.innerHTML = '<i class="fas fa-eye"></i>';
             } else {
-                balanceText.textContent = '****';
+                balanceText.textContent = '••••';
                 eyeToggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
             }
         });
@@ -884,30 +833,32 @@ if ($conn) {
             document.body.style.overflow = '';
         }
 
-        // Topup Form Submit
-        document.getElementById('topupForm').addEventListener('submit', function(e) {
+        // Topup Form Submit -> calls wallet-topup API
+        document.getElementById('topupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const amount = document.getElementById('topupAmount').value;
-            alert(`Topup of ₱${amount} processed! (Placeholder - API integration needed)`);
-            closeTopupModal();
-            // Reload to update balance (in real app, update via AJAX)
-            location.reload();
-        });
-
-        // More Dropdown
-        function toggleMoreDropdown() {
-            const dropdown = document.getElementById('moreDropdown');
-            dropdown.classList.toggle('show');
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('moreDropdown');
-            const btn = e.target.closest('.wallet-btn');
-            if (!btn || !btn.textContent.includes('More')) {
-                dropdown.classList.remove('show');
+            const amountInput = document.getElementById('topupAmount');
+            const amount = Number(amountInput.value);
+            if (!amount || amount <= 0) return;
+            try {
+                const resp = await fetch('api/mobile.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ action: 'wallet-topup', username: '<?php echo htmlspecialchars($_SESSION['username']); ?>', amount: String(amount) })
+                });
+                const data = await resp.json();
+                if (data && data.success) {
+                    // Update balance text without full reload
+                    balanceText.textContent = '₱' + Number(data.balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    closeTopupModal();
+                } else {
+                    alert(data && data.error ? data.error : 'Topup failed');
+                }
+            } catch (err) {
+                alert('Topup failed: ' + err.message);
             }
         });
+
+        // Removed More dropdown per design
 
         // Header scroll effect
         window.addEventListener('scroll', function() {

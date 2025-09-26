@@ -161,12 +161,8 @@ if ($conn) {
 							</ul>
 						</nav>
 
-						<!-- Header Actions -->
-						<div class="header-actions">
-							<div class="auth-buttons">
-								<a href="dashboard.php" class="nav-link auth-link">Back</a>
-							</div>
-						</div>
+						<!-- Header Actions (none on profile) -->
+						<div class="header-actions"></div>
 
 						<!-- Mobile Menu Toggle -->
 						<button class="mobile-menu-toggle" id="mobileMenuToggle">
@@ -188,9 +184,7 @@ if ($conn) {
                     <li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
                     <li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
                 </ul>
-                <div class="mobile-header-actions">
-                    <a href="dashboard.php" class="mobile-auth-link">Back</a>
-                </div>
+				<div class="mobile-header-actions"></div>
             </div>
         </div>
     </header>
