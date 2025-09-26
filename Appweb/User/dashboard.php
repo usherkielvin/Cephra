@@ -230,21 +230,6 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 				color: var(--primary-color);
 			}
 
-			.nav-link::after {
-				content: '';
-				position: absolute;
-				bottom: -5px;
-				left: 0;
-				width: 0;
-				height: 2px;
-				background: var(--gradient-primary);
-				transition: width 0.3s ease;
-			}
-
-			.nav-link:hover::after {
-				width: 100%;
-			}
-
 			.header-actions {
 				display: flex;
 				align-items: center;
@@ -262,21 +247,6 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 
 			.auth-link:hover {
 				color: var(--primary-color);
-			}
-
-			.auth-link::after {
-				content: '';
-				position: absolute;
-				bottom: 0;
-				left: 0;
-				width: 0;
-				height: 2px;
-				background: var(--primary-color);
-				transition: width 0.3s ease;
-			}
-
-			.auth-link:hover::after {
-				width: 100%;
 			}
 
 			.mobile-menu-toggle {
@@ -746,6 +716,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 				font-weight: 600;
 				transition: all 0.3s ease;
 				backdrop-filter: blur(10px);
+				text-decoration: none;
 			}
 
 			.quick-action-btn:hover {
@@ -1558,8 +1529,8 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
             <div class="hero-content">
                 <h1 class="hero-title">
                     <span class="hero-title-main">Cephra</span>
-                    <span class="hero-title-accent">Ultimate</span>
-                    <span class="hero-title-sub">Charging Platform</span>
+                    <span class="hero-title-accent"></span>
+                    <span class="hero-title-sub">Ultimate Charging Platform</span>
                 </h1>
                 <p class="hero-description">
                     An award-winning EV charging platform trusted by 50,000+ drivers.
@@ -1651,7 +1622,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 								</div>
 							</div>
 							<div class="vehicle-actions">
-								<button class="quick-action-btn" onclick="showChargingOptions()">Charge Now</button>
+								<a class="quick-action-btn" href="ChargingPage.php">Charge Now</a>
 							</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
@@ -1969,6 +1940,26 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 
                 function showEstimatedCost() {
                     showDialog('Estimated Cost', 'View detailed cost breakdown for your charging sessions:\n\n• Normal Charge: ₱45.00 per session\n• Fast Charge: ₱75.00 per session\n• Monthly Savings: ₱1,250 (based on usage)\n• Green Points: 340 earned this month\n• Total Sessions: 12 completed\n• Energy Consumed: 45.2 kWh\n\nTrack your spending and maximize your savings with our cost analysis tools.');
+                }
+
+                function showBatteryHealth() {
+                    showDialog('Battery Health Monitor', 'Detailed battery health information:\n\n• Health Score: 92% (Excellent)\n• Degradation: 8% over 2 years\n• Temperature: Optimal (25°C)\n• Cycles: 340/1000 remaining\n• Voltage: 3.7V per cell\n• Capacity: 95% of original\n\nRecommendations:\n- Continue current usage patterns\n- Schedule maintenance in 6 months\n- Monitor temperature during fast charging');
+                }
+
+                function showRangeCalculator() {
+                    showDialog('Range Calculator', 'Calculate your remaining range:\n\nCurrent Conditions:\n• Battery Level: 45%\n• Highway Range: 38 km\n• City Range: 52 km\n• Weather Impact: -5 km (rain)\n• Temperature Impact: -3 km (cold)\n\nEstimated Total Range: 42 km\n\nFactors affecting range:\n- Driving style: 15% impact\n- Speed: 20% impact\n- Weather: 10% impact\n- Temperature: 8% impact\n\nTips to maximize range:\n- Maintain steady speed\n- Use regenerative braking\n- Keep tires properly inflated');
+                }
+
+                function showDiagnostics() {
+                    showDialog('Vehicle Diagnostics', 'System diagnostic results:\n\n✓ Battery Management System: Normal\n✓ Charging System: Normal\n✓ Motor Controller: Normal\n✓ Thermal Management: Normal\n✓ Communication Module: Normal\n✓ Safety Systems: Normal\n\nLast Diagnostic Run: 2 hours ago\nNext Scheduled: Due in 1,200 km\n\nNo issues detected. All systems operating within normal parameters.\n\nFor detailed reports, visit your service center or use the mobile app.');
+                }
+
+                function showChargingOptions() {
+                    showDialog('Charging Options', 'Select your charging option:\n\n• Normal Charging: ₱45.00 (Standard rate)\n• Fast Charging: ₱75.00 (Express rate)\n\nClick "Start Charging" to proceed to the charging page.');
+                    // Optionally redirect after dialog
+                    setTimeout(() => {
+                        window.location.href = 'ChargingPage.php';
+                    }, 3000);
                 }
 
                 function submitSchedule() {
@@ -2344,16 +2335,16 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 					<div class="footer-section">
 						<h4 class="footer-title">Support</h4>
 						<ul class="footer-links">
-							<li><a href="#" onclick="showSupportModal(); return false;">Help Center</a></li>
-							<li><a href="profile.php">Contact Us</a></li>
+							<li><a href="help_center.php">Help Center</a></li>
+							<li><a href="contact_us.php">Contact Us</a></li>
 						</ul>
 					</div>
 
 					<div class="footer-section">
 						<h4 class="footer-title">Company</h4>
 						<ul class="footer-links">
-							<li><a href="profile.php">About Us</a></li>
-							<li><a href="profile.php">Our Team</a></li>
+							<li><a href="about_us.php">About Us</a></li>
+							<li><a href="our_team.php">Our Team</a></li>
 						</ul>
 					</div>
 				</div>
