@@ -14,7 +14,7 @@ $username = $_SESSION['username'];
 
 $payments = [];
 if ($conn) {
-	$stmt = $conn->prepare("SELECT ticket_id, amount, payment_method, reference_number, transaction_status, processed_at FROM payment_transactions WHERE username = :username ORDER BY processed_at DESC LIMIT 20");
+	$stmt = $conn->prepare("SELECT pt.ticket_id, pt.amount, pt.payment_method, pt.reference_number, pt.transaction_status, pt.processed_at, ch.service_type FROM payment_transactions pt LEFT JOIN charging_history ch ON pt.ticket_id = ch.ticket_id WHERE pt.username = :username ORDER BY pt.processed_at DESC LIMIT 20");
 	$stmt->bindParam(':username', $username);
 	$stmt->execute();
 	$payments = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -88,10 +88,9 @@ if ($conn) {
 						</div>
 						<div class="filter-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                             <select id="statusFilter" class="filter-select" style="padding: 0.75rem 1rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; background: rgba(248, 250, 252, 0.5); color: #1a202c; transition: all 0.3s ease; min-width: 120px;">
-                                <option value="all" data-i18n="filterAllStatus">All Status</option>
-                                <option value="completed" data-i18n="filterCompleted">Completed</option>
-                                <option value="pending" data-i18n="filterPending">Pending</option>
-                                <option value="failed" data-i18n="filterFailed">Failed</option>
+                                <option value="all" data-i18n="filterAllChargeTypes">All Charge Types</option>
+                                <option value="normal" data-i18n="filterNormalCharge">Normal Charge</option>
+                                <option value="fast" data-i18n="filterFastCharge">Fast Charge</option>
 							</select>
                             <select id="methodFilter" class="filter-select" style="padding: 0.75rem 1rem; border: 1px solid rgba(26, 32, 44, 0.1); border-radius: 8px; font-size: 1rem; background: rgba(248, 250, 252, 0.5); color: #1a202c; transition: all 0.3s ease; min-width: 120px;">
                                 <option value="all" data-i18n="filterAllMethods">All Methods</option>
@@ -164,7 +163,7 @@ if ($conn) {
 								</thead>
 								<tbody>
 									<?php foreach ($payments as $payment): ?>
-										<tr data-status="<?php echo strtolower($payment['transaction_status']); ?>" data-method="<?php echo strtolower($payment['payment_method']); ?>">
+										<tr data-status="<?php echo strtolower($payment['transaction_status']); ?>" data-method="<?php echo strtolower($payment['payment_method']); ?>" data-charge-type="<?php echo strtolower(explode(' ', $payment['service_type'])[0]); ?>">
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['ticket_id']); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">
 												<span class="status-badge status-<?php echo strtolower($payment['transaction_status']); ?>">
@@ -296,10 +295,10 @@ if ($conn) {
 				rows.forEach(row => {
 					let showRow = true;
 
-					// Status filter
+					// Charge type filter
 					if (statusFilter !== 'all') {
-						const rowStatus = row.getAttribute('data-status');
-						if (rowStatus !== statusFilter) {
+						const rowChargeType = row.getAttribute('data-charge-type');
+						if (rowChargeType !== statusFilter) {
 							showRow = false;
 						}
 					}
