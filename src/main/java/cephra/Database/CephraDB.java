@@ -583,6 +583,166 @@ public class CephraDB {
         }
     }
     
+    // Plate number management methods
+    public static String getUserPlateNumber(String username) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // First check if plate_number column exists in users table
+            if (!columnExists(conn, "users", "plate_number")) {
+                // Add the column if it doesn't exist
+                addPlateNumberColumn(conn);
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT plate_number FROM users WHERE username = ?")) {
+                
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String plateNumber = rs.getString("plate_number");
+                        if (rs.wasNull() || plateNumber == null || plateNumber.trim().isEmpty()) {
+                            // NULL or empty value means no plate number assigned yet
+                            System.out.println("CephraDB: No plate number found for " + username + " - returning null");
+                            return null;
+                        }
+                        System.out.println("CephraDB: Retrieved plate number for " + username + ": " + plateNumber);
+                        return plateNumber;
+                    } else {
+                        System.out.println("CephraDB: User " + username + " not found - returning null");
+                        return null;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting plate number: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public static void setUserPlateNumber(String username, String plateNumber) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // First check if plate_number column exists in users table
+            if (!columnExists(conn, "users", "plate_number")) {
+                // Add the column if it doesn't exist
+                addPlateNumberColumn(conn);
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE users SET plate_number = ? WHERE username = ?")) {
+                
+                stmt.setString(1, plateNumber);
+                stmt.setString(2, username);
+                
+                int rowsAffected = stmt.executeUpdate();
+                System.out.println("CephraDB: Set plate number for " + username + " to " + plateNumber + " (rows affected: " + rowsAffected + ")");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error setting plate number: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    public static String generateUniquePlateNumber() {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // First check if plate_number column exists in users table
+            if (!columnExists(conn, "users", "plate_number")) {
+                // Add the column if it doesn't exist
+                addPlateNumberColumn(conn);
+            }
+            
+            Random random = new Random();
+            String plateNumber;
+            boolean isUnique = false;
+            int attempts = 0;
+            int maxAttempts = 100;
+            
+            do {
+                // Generate plate number with random letters and numbers (e.g., XYZ1234, ABC5678)
+                // 3 random letters followed by 4 random digits
+                StringBuilder sb = new StringBuilder();
+                
+                // Generate 3 random letters (A-Z)
+                for (int i = 0; i < 3; i++) {
+                    char randomLetter = (char) ('A' + random.nextInt(26));
+                    sb.append(randomLetter);
+                }
+                
+                // Generate 4 random digits (0-9)
+                for (int i = 0; i < 4; i++) {
+                    int randomDigit = random.nextInt(10);
+                    sb.append(randomDigit);
+                }
+                
+                plateNumber = sb.toString();
+                
+                // Check if this plate number already exists
+                try (PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT COUNT(*) FROM users WHERE plate_number = ?")) {
+                    stmt.setString(1, plateNumber);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            isUnique = (rs.getInt(1) == 0); // Unique if count is 0
+                        }
+                    }
+                }
+                
+                attempts++;
+                if (attempts >= maxAttempts) {
+                    System.err.println("CephraDB: Warning - Could not generate unique plate number after " + maxAttempts + " attempts");
+                    break;
+                }
+            } while (!isUnique);
+            
+            System.out.println("CephraDB: Generated unique plate number: " + plateNumber + " (attempts: " + attempts + ")");
+            return plateNumber;
+            
+        } catch (SQLException e) {
+            System.err.println("Error generating unique plate number: " + e.getMessage());
+            e.printStackTrace();
+            // Return a fallback plate number with random letters and timestamp
+            Random random = new Random();
+            String fallbackLetters = "";
+            for (int i = 0; i < 3; i++) {
+                fallbackLetters += (char) ('A' + random.nextInt(26));
+            }
+            String fallback = fallbackLetters + String.valueOf(System.currentTimeMillis() % 10000);
+            System.out.println("CephraDB: Using fallback plate number: " + fallback);
+            return fallback;
+        }
+    }
+    
+    // Helper method to add plate_number column to users table
+    private static void addPlateNumberColumn(Connection conn) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "ALTER TABLE users ADD COLUMN plate_number VARCHAR(10) DEFAULT NULL UNIQUE")) {
+            stmt.executeUpdate();
+            System.out.println("CephraDB: Added plate_number column to users table");
+            
+            // Also add index for better performance
+            try (PreparedStatement indexStmt = conn.prepareStatement(
+                    "CREATE INDEX idx_users_plate_number ON users(plate_number)")) {
+                indexStmt.executeUpdate();
+                System.out.println("CephraDB: Added index for plate_number column");
+            } catch (SQLException indexEx) {
+                // Index might already exist, check error message
+                if (indexEx.getMessage().contains("Duplicate key name")) {
+                    System.out.println("CephraDB: plate_number index already exists");
+                } else {
+                    System.err.println("Error adding plate_number index: " + indexEx.getMessage());
+                }
+            }
+        } catch (SQLException e) {
+            // Column might already exist, check error message
+            if (e.getMessage().contains("Duplicate column name")) {
+                System.out.println("CephraDB: plate_number column already exists");
+            } else {
+                System.err.println("Error adding plate_number column: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+    
     // Method to check for duplicate battery level entries for a user
     public static void checkDuplicateBatteryLevels(String username) {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
