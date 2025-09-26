@@ -183,7 +183,6 @@
                                     <input type="text" class="code-input" maxlength="1" id="code6" />
                                 </div>
                             </div>
-                            <span>Verification Code</span>
                         </div>
                     </label>
                 </div>

@@ -152,7 +152,7 @@ body {
     position: relative;
     z-index: 2;
     text-align: center;
-    color: white;
+    color: var(--text-primary);
     max-width: 500px;
 }
 
