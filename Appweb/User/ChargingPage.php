@@ -36,255 +36,327 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 		<link rel="icon" type="image/png" href="images/logo.png?v=2" />
 		<link rel="apple-touch-icon" href="images/logo.png?v=2" />
 		<link rel="manifest" href="manifest.webmanifest" />
-		<meta name="theme-color" content="#062635" />
-		<link rel="stylesheet" href="css/main.css" />
+		<meta name="theme-color" content="#1a1a2e" />
+	<link rel="stylesheet" href="css/vantage-style.css" />
+	<link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 	</head>
-	<body class="homepage is-preload">
-		<div id="page-wrapper">
+	<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+                <div class="header-content">
+						<!-- Logo -->
+						<div class="logo">
+							<img src="images/logo.png" alt="Cephra" class="logo-img">
+							<span class="logo-text">CEPHRA</span>
+						</div>
 
-			<!-- Header -->
-				<div id="header-wrapper">
-					<!-- Header -->
-						<header id="header">
-							<div class="inner">
+						<!-- Navigation -->
+						<nav class="nav">
+							<ul class="nav-list">
+								<li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
+								<li><a href="link.php" class="nav-link">Link</a></li>
+								<li><a href="history.php" class="nav-link">History</a></li>
+								<li class="current_page_item"><a href="profile.php" class="nav-link">Profile</a></li>
+							</ul>
+						</nav>
 
-								<!-- Logo -->
-									<h1>
-									
-									<a href="dashboard.php" id="logo" style="display:inline-flex;align-items:center;gap:8px;"><img src="images/logo.png" alt="Cephra" style="width:28px;height:28px;border-radius:6px;object-fit:cover;vertical-align:middle;" /><span>Cephra</span></a>
-									</h1>
-
-								<!-- Nav -->
-									<nav id="nav">
-										<ul>
-											<li class="current_page_item"><a href="dashboard.php">Home</a></li>
-											<li><a href="link.php">Link</a></li>
-											<li><a href="history.php">History</a></li>
-											<li><a href="profile.php">Profile</a></li>
-										</ul>
-									</nav>
-
-							</div>
-						</header>
-
-				</div>
-
-			<!-- Main Wrapper -->
-				<div id="main-wrapper">
-					<div class="wrapper style1">
-						<div class="inner">
-
-							
-
-							<!-- Feature 2 -->
-								<section class="container box feature2">
-									<div class="row">
-										<div class="col-6 col-12-medium">
-											<section>
-												<header class="major">
-													<h2>Normal Charging</h2>
-													<p>Reliable and steady power for your device, ensuring safe and consistent charging at a standard speed.</p>
-												</header>
-												
-												<footer>
-													
-													<a href="charge_action.php" id="normalChargeBtn" class="button medium alt icon solid fa-info-circle">Charge Now</a>
-												</footer>
-											</section>
-										</div>
-										<div class="col-6 col-12-medium">
-											<section>
-												<header class="major">
-													<h2>Fast Charging</h2>
-													<p>Boost your power in less time with high-speed charging, designed for efficiency without compromising safety.</p>
-												</header>
-												
-												<footer>
-													
-													<a href="charge_action.php" id="fastChargeBtn" class="button medium alt icon solid fa-info-circle">Charge Now</a>
-												</footer>
-											</section>
-										</div>
-									</div>
-								</section>
-
-							</div>
-					</div>
-					
-			<!-- Footer Wrapper -->
-				<div id="footer-wrapper">
-					<footer id="footer" class="container">
-						<div class="row">
-
-
-								<!-- About -->
-									<section>
-										<h2><strong>Cephra</strong> by CephraCorp</h2>
-										<p>Hi! This is <strong>Cephra</strong>, a free, fully responsive site for charging your
-										electric vehicle. its built on HTML5 and CSS3 </a>.
-										</p>
-									</section>
-
-								<!-- Contact -->
-									<section>
-										<h2>Get in touch</h2>
-										<div>
-											<div class="row">
-												<div class="col-6 col-12-small">
-													<dl class="contact">
-														<dt>Twitter</dt>
-														<dd><a href="https://www.x.com/@Cephra">@Cephra</a></dd>
-														<dt>Facebook</dt>
-														<dd><a href="https://www.facebook.com/CephraCorp">facebook.com/CephraCorp</a></dd>
-														<dt>WWW</dt>
-														<dd><a href="https://www.cephra.com">CephraCorp.tld</a></dd>
-														<dt>Email</dt>
-														<dd><a href="mailto:admin@cephra.com">admin@Cephra.gmail.com</a></dd>
-													</dl>
-												</div>
-												<div class="col-6 col-12-small">
-													<dl class="contact">
-														<dt>Address</dt>
-														<dd>
-															Coral Way St.<br />
-															Moa Complex, Pasay City<br />
-															PH
-														</dd>
-														<dt>Phone</dt>
-														<dd>(000) 000-0000</dd>
-													</dl>
-												</div>
-											</div>
-										</div>
-									</section>
-
-							</div>
-							<div class="col-12">
-								<div id="copyright">
-									<ul class="menu">
-										<li>&copy; Cephra. All rights reserved</li><li>Design: <a href="http://html5up.net">Cephra Designer</a></li>
-									</ul>
-								</div>
+						<!-- Header Actions -->
+						<div class="header-actions">
+							<div class="auth-buttons">
+								<a href="dashboard.php" class="nav-link auth-link">Back</a>
 							</div>
 						</div>
-					</footer>
-				</div>
 
-		</div>
+						<!-- Mobile Menu Toggle -->
+						<button class="mobile-menu-toggle" id="mobileMenuToggle">
+							<span></span>
+							<span></span>
+							<span></span>
+						</button>
+					</div>
+        </div>
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.dropotron.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-content">
+                <!-- Mobile Navigation -->
+                <div class="mobile-nav">
+                    <ul class="mobile-nav-list">
+                        <li class="mobile-nav-item">
+                            <a href="dashboard.php" class="mobile-nav-link current">Home</a>
+                        </li>
+                        <li class="mobile-nav-item">
+                            <a href="link.php" class="mobile-nav-link">Link</a>
+                        </li>
+                        <li class="mobile-nav-item">
+                            <a href="history.php" class="mobile-nav-link">History</a>
+                        </li>
+                        <li class="mobile-nav-item">
+                            <a href="profile.php" class="mobile-nav-link">Profile</a>
+                        </li>
+                    </ul>
+                </div>
 
-			<script>
-				function showDialog(title, message) {
-					const overlay = document.createElement('div');
-					overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
-					const dialog = document.createElement('div');
-					dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
-					const header = document.createElement('div');
-					header.style.cssText = 'background:#00c2ce;color:#fff;padding:12px 16px;font-weight:700';
-					header.textContent = title || 'Notice';
-					const body = document.createElement('div');
-					body.style.cssText = 'padding:16px;color:#333;line-height:1.5;';
-					body.textContent = message || '';
-					const footer = document.createElement('div');
-					footer.style.cssText = 'padding:12px 16px;display:flex;justify-content:flex-end;gap:8px;background:#f7f7f7;';
-					const ok = document.createElement('button');
-					ok.textContent = 'OK';
-					ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
-					ok.onclick = () => document.body.removeChild(overlay);
-					footer.appendChild(ok);
-					dialog.appendChild(header);
-					dialog.appendChild(body);
-					dialog.appendChild(footer);
-					overlay.appendChild(dialog);
-					document.body.appendChild(overlay);
-				}
-				$(document).ready(function() {
-					// Normal Charge Button Click Handler
-					$('#normalChargeBtn').click(function(e) {
-						e.preventDefault();
-						processChargeRequest('Normal Charging');
-					});
-					
-					// Fast Charge Button Click Handler
-					$('#fastChargeBtn').click(function(e) {
-						e.preventDefault();
-						processChargeRequest('Fast Charging');
-					});
-					
-					function processChargeRequest(serviceType) {
-						// Force exact service type strings expected by backend
-						let serviceTypeMapped = '';
-						if (serviceType === 'Normal Charging' || serviceType === 'normal charging') {
-							serviceTypeMapped = 'Normal Charging';
-						} else if (serviceType === 'Fast Charging' || serviceType === 'fast charging') {
-							serviceTypeMapped = 'Fast Charging';
-						} else {
-							serviceTypeMapped = serviceType; // fallback
-						}
-						
-						// Disable buttons during processing
-						$('#normalChargeBtn, #fastChargeBtn').prop('disabled', true);
-						
-						$.ajax({
-							url: 'charge_action.php',
-							type: 'POST',
-							data: { serviceType: serviceTypeMapped },
-							dataType: 'json',
-                            success: function(response) {
-								if (response.success) {
-                                    // Show QueueTicketProceed popup
-                                    showQueueTicketProceedPopup(response);
-								} else if (response.error) {
-									showDialog('Charging', response.error);
-								}
-							},
-							error: function(xhr, status, error) {
-								showDialog('Charging', 'An error occurred while processing your request. Please try again.');
-								console.error('AJAX Error:', error);
-							},
-							complete: function() {
-								// Re-enable buttons
-								$('#normalChargeBtn, #fastChargeBtn').prop('disabled', false);
-							}
-						});
-					}
-					
-                    function showQueueTicketProceedPopup(response) {
-						if (response.success) {
-							var ticketId = response.ticketId;
-							var serviceType = response.serviceType;
-							var batteryLevel = response.batteryLevel;
-							
-                            // Create popup HTML (QueueTicketProceed)
-                            var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 320px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
-                            popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Queue Ticket Proceed</h2>';
-							popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
-							popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
-							popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
-                            popupHtml += '<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">';
-                            popupHtml += '<button onclick="closePopup()" style="padding: 10px 16px; background: #00a389; color: white; border: none; border-radius: 6px; cursor: pointer;">OK</button>';
-                            popupHtml += '</div>';
-							popupHtml += '</div>';
-							
-							// Append to body
-							$('body').append(popupHtml);
-						}
-					}
-					
-					// Function to close popup (defined globally)
-					window.closePopup = function() {
-						$('#queuePopup').remove();
-					};
-				});
-			</script>
-			
-		</body>
- 	</html>
+                <!-- Mobile User Actions -->
+                <div class="mobile-header-actions">
+                    <a href="profile.php" class="nav-link auth-link">Profile</a>
+                    <a href="profile_logout.php" class="nav-link auth-link">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Charging Section -->
+    <section class="charging-types">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Choose Your Charging Speed</h2>
+                <p class="section-description">Select the perfect charging option for your needs</p>
+            </div>
+
+            <div class="charging-grid">
+                <!-- Normal Charging Card -->
+                <div class="charging-card">
+                    <div class="charging-icon">
+                        <i class="fas fa-battery-half"></i>
+                    </div>
+                    <h3 class="charging-title">Normal Charging</h3>
+                    <p class="charging-description">
+                        Perfect for regular charging when you're not in a rush. Ideal for everyday use,
+                        overnight charging at home, or during extended parking periods. Provides
+                        steady, reliable charging without putting stress on your vehicle's battery.
+                    </p>
+                    <div class="charging-specs">
+                        <span class="spec-item">3-7 kW</span>
+                        <span class="spec-item">2-3 hours</span>
+                    </div>
+                    <a href="#" id="normalChargeBtn" class="charging-link" onclick="processChargeRequest('Normal Charging'); return false;">Start Normal Charging →</a>
+                </div>
+
+                <!-- Fast Charging Card -->
+                <div class="charging-card">
+                    <div class="charging-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="charging-title">Fast Charging</h3>
+                    <p class="charging-description">
+                        When time is of the essence, fast charging delivers rapid power
+                        to get you back on the road quickly. Perfect for lunch breaks,
+                        shopping stops, or quick top-ups during long drives. Our advanced
+                        fast charging technology provides optimal charging curves to maximize
+                        efficiency while protecting your battery health.
+                    </p>
+                    <div class="charging-specs">
+                        <span class="spec-item">50-150 kW</span>
+                        <span class="spec-item">20-40 minutes</span>
+                    </div>
+                    <a href="#" id="fastChargeBtn" class="charging-link" onclick="processChargeRequest('Fast Charging'); return false;">Start Fast Charging →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="images/logo.png" alt="Cephra" class="footer-logo-img" />
+                        <span class="footer-logo-text">CEPHRA</span>
+                    </div>
+                    <p class="footer-description">
+                        Your ultimate electric vehicle charging platform,
+                        powering the future of sustainable transportation.
+                    </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Platform</h4>
+                    <ul class="footer-links">
+                        <li><a href="dashboard.php">Dashboard</a></li>
+                        <li><a href="link.php">Link Device</a></li>
+                        <li><a href="history.php">History</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#support">Help Center</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="profile.php">Profile</a></li>
+                        <li><a href="profile_logout.php">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('mobile-menu-open');
+            this.classList.toggle('active');
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Add animation on scroll for charging cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.charging-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Close mobile menu when clicking on mobile nav links
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                mobileMenu.classList.remove('mobile-menu-open');
+                mobileMenuToggle.classList.remove('active');
+            });
+        });
+
+        // Charging functionality
+        function showDialog(title, message) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
+            const dialog = document.createElement('div');
+            dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
+            const header = document.createElement('div');
+            header.style.cssText = 'background:#00c2ce;color:#fff;padding:12px 16px;font-weight:700';
+            header.textContent = title || 'Notice';
+            const body = document.createElement('div');
+            body.style.cssText = 'padding:16px;color:#333;line-height:1.5;';
+            body.textContent = message || '';
+            const footer = document.createElement('div');
+            footer.style.cssText = 'padding:12px 16px;display:flex;justify-content:flex-end;gap:8px;background:#f7f7f7;';
+            const ok = document.createElement('button');
+            ok.textContent = 'OK';
+            ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
+            ok.onclick = () => document.body.removeChild(overlay);
+            footer.appendChild(ok);
+            dialog.appendChild(header);
+            dialog.appendChild(body);
+            dialog.appendChild(footer);
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+        }
+
+        function processChargeRequest(serviceType) {
+            // Force exact service type strings expected by backend
+            let serviceTypeMapped = '';
+            if (serviceType === 'Normal Charging' || serviceType === 'normal charging') {
+                serviceTypeMapped = 'Normal Charging';
+            } else if (serviceType === 'Fast Charging' || serviceType === 'fast charging') {
+                serviceTypeMapped = 'Fast Charging';
+            } else {
+                serviceTypeMapped = serviceType; // fallback
+            }
+
+            // Disable links during processing
+            document.querySelectorAll('.charging-link').forEach(link => link.style.pointerEvents = 'none');
+
+            fetch('charge_action.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'serviceType=' + encodeURIComponent(serviceTypeMapped)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showQueueTicketProceedPopup(data);
+                } else if (data.error) {
+                    showDialog('Charging', data.error);
+                }
+            })
+            .catch(error => {
+                showDialog('Charging', 'An error occurred while processing your request. Please try again.');
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                // Re-enable links
+                document.querySelectorAll('.charging-link').forEach(link => link.style.pointerEvents = 'auto');
+            });
+        }
+
+        function showQueueTicketProceedPopup(response) {
+            if (response.success) {
+                var ticketId = response.ticketId;
+                var serviceType = response.serviceType;
+                var batteryLevel = response.batteryLevel;
+
+                // Create popup HTML (QueueTicketProceed)
+                var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 320px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
+                popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Queue Ticket Proceed</h2>';
+                popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
+                popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
+                popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
+                popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
+                popupHtml += '<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">';
+                popupHtml += '<button onclick="closePopup()" style="padding: 10px 16px; background: #00a389; color: white; border: none; border-radius: 6px; cursor: pointer;">OK</button>';
+                popupHtml += '</div>';
+                popupHtml += '</div>';
+
+                // Append to body
+                document.body.insertAdjacentHTML('beforeend', popupHtml);
+            }
+        }
+
+        // Function to close popup (defined globally)
+        window.closePopup = function() {
+            const popup = document.getElementById('queuePopup');
+            if (popup) popup.remove();
+        };
+    </script>
+</body>
+</html>
