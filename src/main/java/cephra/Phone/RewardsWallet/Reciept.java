@@ -51,7 +51,7 @@ public class Reciept extends javax.swing.JPanel {
 
     private void populateAmounts() {
         try {
-            // Try to get ticket ID from PayPop first (most recent payment)
+            // Try to get ticket ID from Pending_Payment first (most recent payment)
             String ticket = getTicketFromPayPop();
             boolean isPayPopPayment = (ticket != null && !ticket.isEmpty());
             
@@ -61,14 +61,14 @@ public class Reciept extends javax.swing.JPanel {
             }
             if (ticket == null || ticket.isEmpty()) return;
             
-            // Get amount - prioritize PayPop payment amount for online payments
+            // Get amount - prioritize Pending_Payment payment amount for online payments
             double amount = 0.0;
             if (isPayPopPayment) {
-                // For PayPop payments, get the actual payment amount from PayPop
-                amount = cephra.Phone.Popups.PayPop.getPaymentAmount();
+                // For Pending_Payment payments, get the actual payment amount from Pending_Payment
+                amount = cephra.Phone.Popups.Pending_Payment.getPaymentAmount();
             }
             
-            // If PayPop amount is not available or 0, try other sources
+            // If Pending_Payment amount is not available or 0, try other sources
             if (amount <= 0) {
                 // Get amount from charging history since ticket may have been removed from queue
                 amount = getAmountFromChargingHistory(ticket);
@@ -79,7 +79,7 @@ public class Reciept extends javax.swing.JPanel {
             }
             
             
-            // Handle reference number - hide for PayPop payments
+            // Handle reference number - hide for Pending_Payment payments
             String refNumber = "";
             if (!isPayPopPayment) {
                 // Get reference number from queue bridge first (most up-to-date)
@@ -119,12 +119,12 @@ public class Reciept extends javax.swing.JPanel {
             
             // Handle reference number display - show reference for all payments
             if (isPayPopPayment) {
-                // For PayPop payments, use the ticket ID as reference or get from PayPop
-                RefNumber.setText(ticket); // Use ticket ID as reference for PayPop payments
+                // For Pending_Payment payments, use the ticket ID as reference or get from Pending_Payment
+                RefNumber.setText(ticket); // Use ticket ID as reference for Pending_Payment payments
                 jLabel8.setText("Ref. Number: "); // Show the label
             } else {
                 RefNumber.setText(refNumber); // Use admin queue reference number
-                jLabel8.setText("Ref. Number: "); // Show the label for non-PayPop payments
+                jLabel8.setText("Ref. Number: "); // Show the label for non-Pending_Payment payments
             }
             
             NumTicket.setText(ticket); // Use FCH ticket number
@@ -175,13 +175,13 @@ public class Reciept extends javax.swing.JPanel {
     }
     
     /**
-     * Gets the ticket ID from PayPop if available
-     * @return the ticket ID from PayPop, or null if not available
+     * Gets the ticket ID from Pending_Payment if available
+     * @return the ticket ID from Pending_Payment, or null if not available
      */
     private String getTicketFromPayPop() {
         try {
-            // Try to get the ticket ID from PayPop's current instance
-            String ticketId = cephra.Phone.Popups.PayPop.getCurrentTicketId();
+            // Try to get the ticket ID from Pending_Payment's current instance
+            String ticketId = cephra.Phone.Popups.Pending_Payment.getCurrentTicketId();
             if (ticketId != null && !ticketId.trim().isEmpty()) {
                 return ticketId;
             }

@@ -4,9 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class LinkFirst extends javax.swing.JPanel { 
+public class Link_First extends javax.swing.JPanel { 
  
-    private static LinkFirst currentInstance = null;
+    private static Link_First currentInstance = null;
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
@@ -77,7 +77,7 @@ public class LinkFirst extends javax.swing.JPanel {
     
     private static void showCenteredPayPop(cephra.Frame.Phone phoneFrame, String ticketId) {
         SwingUtilities.invokeLater(() -> {
-            currentInstance = new LinkFirst();
+            currentInstance = new Link_First();
             currentTicketId = ticketId;
             isShowing = true;
             
@@ -129,7 +129,7 @@ public class LinkFirst extends javax.swing.JPanel {
     public static void hidepop() {
     if (currentInstance != null && isShowing) {
         
-        LinkFirst instance = currentInstance;
+        Link_First instance = currentInstance;
 
         SwingUtilities.invokeLater(() -> {
             // Stop intro timer if running
@@ -163,7 +163,7 @@ public class LinkFirst extends javax.swing.JPanel {
     }
 }
 
-    public LinkFirst() {
+    public Link_First() {
         // Load intro gif and main image
         loadImages();
         initComponents();

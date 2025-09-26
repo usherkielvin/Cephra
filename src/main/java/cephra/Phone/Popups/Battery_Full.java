@@ -4,10 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class AlreadyFull extends javax.swing.JPanel {
+public class Battery_Full extends javax.swing.JPanel {
     
     // Static state management to prevent multiple instances
-    private static AlreadyFull currentInstance = null;
+    private static Battery_Full currentInstance = null;
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
@@ -118,7 +118,7 @@ public class AlreadyFull extends javax.swing.JPanel {
      */
     private static void showCenteredPayPop(cephra.Frame.Phone phoneFrame, String ticketId) {
         SwingUtilities.invokeLater(() -> {
-            currentInstance = new AlreadyFull();
+            currentInstance = new Battery_Full();
             currentTicketId = ticketId;
             isShowing = true;
             // Push ticket id to UI immediately (fallback to admin queue model if needed)
@@ -173,7 +173,7 @@ public class AlreadyFull extends javax.swing.JPanel {
     public static void hidepop() {
     if (currentInstance != null && isShowing) {
         // Capture a local reference to avoid race conditions
-        AlreadyFull instance = currentInstance;
+        Battery_Full instance = currentInstance;
 
         SwingUtilities.invokeLater(() -> {
             // Stop intro timer if running
@@ -251,7 +251,7 @@ public class AlreadyFull extends javax.swing.JPanel {
     /**
      * Constructor for PayPop
      */
-    public AlreadyFull() {
+    public Battery_Full() {
         // Load intro gif and main image
         loadImages();
         initComponents();
@@ -406,7 +406,7 @@ public class AlreadyFull extends javax.swing.JPanel {
         add(Golink);
         Golink.setBounds(20, 180, 220, 40);
 
-        // Icon will be set by intro animation
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/AlreadyFull.png"))); // NOI18N
         add(jLabel1);
         jLabel1.setBounds(10, 0, 280, 230);
     }// </editor-fold>//GEN-END:initComponents

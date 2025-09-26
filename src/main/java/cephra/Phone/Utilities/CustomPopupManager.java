@@ -1,12 +1,14 @@
-package cephra.Phone.Popups;
+package cephra.Phone.Utilities;
 
+import cephra.Phone.Popups.Bay_Number;
+import cephra.Phone.Popups.Charge_Now;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 /**
- * Manages custom popup panels (ProceedBayPOP and WaitingBayPOP) 
- * to replace the default ProceedToBay dialog
+ * Manages custom popup panels (Bay_Number and Charge_Now) 
+ for bay assignment and waiting notifications
  */
 public class CustomPopupManager {
     
@@ -24,7 +26,7 @@ public class CustomPopupManager {
     private static final int PHONE_HEIGHT = 750; // fallback if frame size not yet realized
     
     /**
-     * Shows ProceedBayPOP for when a bay is assigned (informational only)
+     * Shows Bay_Number for when a bay is assigned (informational only)
      * @param ticketId the ticket ID
      * @param bayNumber the bay number
      * @param username the username
@@ -35,7 +37,7 @@ public class CustomPopupManager {
     }
     
     /**
-     * Shows ProceedBayPOP for when a bay is assigned (informational only, no return value needed)
+     * Shows Bay_Number for when a bay is assigned (informational only, no return value needed)
      * @param ticketId the ticket ID
      * @param bayNumber the bay number
      * @param username the username
@@ -77,9 +79,9 @@ public class CustomPopupManager {
             return;
         }
         
-        // Create ProceedBayPOP panel
-        currentPopup = new ProceedBayPOP();
-        setupProceedBayPopupInfo((ProceedBayPOP) currentPopup, ticketId, bayNumber);
+        // Create Bay_Number panel
+        currentPopup = new Bay_Number();
+        setupProceedBayPopupInfo((Bay_Number) currentPopup, ticketId, bayNumber);
         
         // Show the popup (informational only, no return value)
         showCenteredPopup(phoneFrame, currentPopup);
@@ -90,7 +92,7 @@ public class CustomPopupManager {
     }
     
     /**
-     * Shows WaitingBayPOP for when waiting for bay assignment
+     * Shows Charge_Now for when waiting for bay assignment
      * @param ticketId the ticket ID
      * @param username the username
      * @param callback callback to execute when user responds
@@ -132,9 +134,9 @@ public class CustomPopupManager {
             return;
         }
         
-        // Create WaitingBayPOP panel
-        currentPopup = new WaitingBayPOP();
-        setupWaitingBayPopupWithCallback((WaitingBayPOP) currentPopup, ticketId, callback);
+        // Create Charge_Now panel
+        currentPopup = new Charge_Now();
+        setupWaitingBayPopupWithCallback((Charge_Now) currentPopup, ticketId, callback);
         
         // Show the popup
         showCenteredPopup(phoneFrame, currentPopup);
@@ -149,7 +151,7 @@ public class CustomPopupManager {
      * @param ticketId the ticket ID
      * @param bayNumber the bay number (or "TBD" for waiting)
      * @param username the username
-     * @param isProceedBay true for ProceedBayPOP, false for WaitingBayPOP
+     * @param isProceedBay true for Bay_Number, false for Charge_Now
      * @return true if user confirmed (OK), false if cancelled
      */
     private static boolean showCustomPopup(String ticketId, String bayNumber, String username, boolean isProceedBay) {
@@ -191,11 +193,11 @@ public class CustomPopupManager {
         
         // Create the appropriate popup panel
         if (isProceedBay) {
-            currentPopup = new ProceedBayPOP();
-            setupProceedBayPopup((ProceedBayPOP) currentPopup, ticketId, bayNumber);
+            currentPopup = new Bay_Number();
+            setupProceedBayPopup((Bay_Number) currentPopup, ticketId, bayNumber);
         } else {
-            currentPopup = new WaitingBayPOP();
-            setupWaitingBayPopup((WaitingBayPOP) currentPopup, ticketId);
+            currentPopup = new Charge_Now();
+            setupWaitingBayPopup((Charge_Now) currentPopup, ticketId);
         }
         
         // Show the popup
@@ -209,12 +211,12 @@ public class CustomPopupManager {
     }
     
     /**
-     * Sets up ProceedBayPOP with dynamic content
+     * Sets up Bay_Number with dynamic content
      */
-    private static void setupProceedBayPopup(ProceedBayPOP popup, String ticketId, String bayNumber) {
+    private static void setupProceedBayPopup(Bay_Number popup, String ticketId, String bayNumber) {
         // Update bay number display using reflection since field is now private
         try {
-            java.lang.reflect.Field bayField = ProceedBayPOP.class.getDeclaredField("BayNumber");
+            java.lang.reflect.Field bayField = Bay_Number.class.getDeclaredField("BayNumber");
             bayField.setAccessible(true);
             javax.swing.JLabel bayLabel = (javax.swing.JLabel) bayField.get(popup);
             if (bayNumber != null && !bayNumber.equals("TBD")) {
@@ -228,7 +230,7 @@ public class CustomPopupManager {
         
         // Update ticket number using reflection since field is now private
         try {
-            java.lang.reflect.Field ticketField = ProceedBayPOP.class.getDeclaredField("TicketNumber");
+            java.lang.reflect.Field ticketField = Bay_Number.class.getDeclaredField("TicketNumber");
             ticketField.setAccessible(true);
             javax.swing.JLabel ticketLabel = (javax.swing.JLabel) ticketField.get(popup);
             if (ticketId != null) {
@@ -240,7 +242,7 @@ public class CustomPopupManager {
         
         // Keep button transparent but ensure it's clickable using reflection
         try {
-            java.lang.reflect.Field buttonField = ProceedBayPOP.class.getDeclaredField("OKBTN");
+            java.lang.reflect.Field buttonField = Bay_Number.class.getDeclaredField("OKBTN");
             buttonField.setAccessible(true);
             javax.swing.JButton button = (javax.swing.JButton) buttonField.get(popup);
             button.setContentAreaFilled(false);
@@ -254,12 +256,12 @@ public class CustomPopupManager {
     }
     
     /**
-     * Sets up ProceedBayPOP with dynamic content (informational only)
+     * Sets up Bay_Number with dynamic content (informational only)
      */
-    private static void setupProceedBayPopupInfo(ProceedBayPOP popup, String ticketId, String bayNumber) {
+    private static void setupProceedBayPopupInfo(Bay_Number popup, String ticketId, String bayNumber) {
         // Update bay number display using reflection since field is now private
         try {
-            java.lang.reflect.Field bayField = ProceedBayPOP.class.getDeclaredField("BayNumber");
+            java.lang.reflect.Field bayField = Bay_Number.class.getDeclaredField("BayNumber");
             bayField.setAccessible(true);
             javax.swing.JLabel bayLabel = (javax.swing.JLabel) bayField.get(popup);
             if (bayNumber != null && !bayNumber.equals("TBD")) {
@@ -273,7 +275,7 @@ public class CustomPopupManager {
         
         // Update ticket number using reflection since field is now private
         try {
-            java.lang.reflect.Field ticketField = ProceedBayPOP.class.getDeclaredField("TicketNumber");
+            java.lang.reflect.Field ticketField = Bay_Number.class.getDeclaredField("TicketNumber");
             ticketField.setAccessible(true);
             javax.swing.JLabel ticketLabel = (javax.swing.JLabel) ticketField.get(popup);
             if (ticketId != null) {
@@ -285,7 +287,7 @@ public class CustomPopupManager {
         
         // Keep button transparent but ensure it's clickable using reflection
         try {
-            java.lang.reflect.Field buttonField = ProceedBayPOP.class.getDeclaredField("OKBTN");
+            java.lang.reflect.Field buttonField = Bay_Number.class.getDeclaredField("OKBTN");
             buttonField.setAccessible(true);
             javax.swing.JButton button = (javax.swing.JButton) buttonField.get(popup);
             button.setContentAreaFilled(false);
@@ -299,12 +301,12 @@ public class CustomPopupManager {
     }
     
     /**
-     * Sets up WaitingBayPOP with dynamic content
+     * Sets up Charge_Now with dynamic content
      */
-    private static void setupWaitingBayPopup(WaitingBayPOP popup, String ticketId) {
+    private static void setupWaitingBayPopup(Charge_Now popup, String ticketId) {
         // Update ticket number using reflection since field is now private
         try {
-            java.lang.reflect.Field ticketField = WaitingBayPOP.class.getDeclaredField("TicketNumber");
+            java.lang.reflect.Field ticketField = Charge_Now.class.getDeclaredField("TicketNumber");
             ticketField.setAccessible(true);
             javax.swing.JLabel ticketLabel = (javax.swing.JLabel) ticketField.get(popup);
             if (ticketId != null) {
@@ -316,7 +318,7 @@ public class CustomPopupManager {
         
         // Keep button transparent but ensure it's clickable using reflection
         try {
-            java.lang.reflect.Field buttonField = WaitingBayPOP.class.getDeclaredField("OKBTN");
+            java.lang.reflect.Field buttonField = Charge_Now.class.getDeclaredField("OKBTN");
             buttonField.setAccessible(true);
             javax.swing.JButton button = (javax.swing.JButton) buttonField.get(popup);
             button.setContentAreaFilled(false);
@@ -330,12 +332,12 @@ public class CustomPopupManager {
     }
     
     /**
-     * Sets up WaitingBayPOP with dynamic content and callback
+     * Sets up Charge_Now with dynamic content and callback
      */
-    private static void setupWaitingBayPopupWithCallback(WaitingBayPOP popup, String ticketId, Runnable callback) {
+    private static void setupWaitingBayPopupWithCallback(Charge_Now popup, String ticketId, Runnable callback) {
         // Update ticket number using reflection since field is now private
         try {
-            java.lang.reflect.Field ticketField = WaitingBayPOP.class.getDeclaredField("TicketNumber");
+            java.lang.reflect.Field ticketField = Charge_Now.class.getDeclaredField("TicketNumber");
             ticketField.setAccessible(true);
             javax.swing.JLabel ticketLabel = (javax.swing.JLabel) ticketField.get(popup);
             if (ticketId != null) {
@@ -347,7 +349,7 @@ public class CustomPopupManager {
         
         // Keep button transparent but ensure it's clickable using reflection
         try {
-            java.lang.reflect.Field buttonField = WaitingBayPOP.class.getDeclaredField("OKBTN");
+            java.lang.reflect.Field buttonField = Charge_Now.class.getDeclaredField("OKBTN");
             buttonField.setAccessible(true);
             javax.swing.JButton button = (javax.swing.JButton) buttonField.get(popup);
             button.setContentAreaFilled(false);
@@ -503,9 +505,9 @@ public class CustomPopupManager {
     }
     
     /**
-     * Executes the current callback (for WaitingBayPOP)
-     * This method should be called from the WaitingBayPOP.OKBTNActionPerformed method
-     * The callback will handle showing ProceedBayPOP and hiding WaitingBayPOP
+     * Executes the current callback (for Charge_Now)
+ This method should be called from the Charge_Now.OKBTNActionPerformed method
+ The callback will handle showing Bay_Number and hiding Charge_Now
      */
     public static void executeCallback() {
         userConfirmed = true;
@@ -532,7 +534,7 @@ public class CustomPopupManager {
                 System.err.println("executeCallback error: " + ex.getMessage());
             }
         } else {
-            // Fallback: no callback provided. Hide WaitingBayPOP and show ProceedBayPOP with TBD bay.
+            // Fallback: no callback provided. Hide Charge_Now and show Bay_Number with TBD bay.
             try {
                 String username = usernameForNext;
                 String ticketId = ticketForNext;
@@ -552,8 +554,8 @@ public class CustomPopupManager {
     }
     
     /**
-     * Hides the current popup (for informational popups like ProceedBayPOP)
-     * This method should be called from the ProceedBayPOP.OKBTNActionPerformed method
+     * Hides the current popup (for informational popups like Bay_Number)
+ This method should be called from the Bay_Number.OKBTNActionPerformed method
      */
     public static void hideCurrentPopup() {
         System.out.println("hideCurrentPopup() called");

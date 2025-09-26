@@ -2,12 +2,12 @@ package cephra.Phone.Popups;
 
 import java.awt.*;
 
-public class adsPhone extends javax.swing.JPanel {
+public class Ad_Rewards extends javax.swing.JPanel {
     private static final int POPUP_WIDTH = 350;
     private static final int POPUP_HEIGHT = 450;
-    private static volatile adsPhone currentInstance;
+    private static volatile Ad_Rewards currentInstance;
 
-    public adsPhone() {
+    public Ad_Rewards() {
         initComponents();
         setupCloseAction();
     }
@@ -77,7 +77,7 @@ public class adsPhone extends javax.swing.JPanel {
                 if (window instanceof cephra.Frame.Phone) {
                     cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
 
-                    adsPhone instance = new adsPhone();
+                    Ad_Rewards instance = new Ad_Rewards();
                     currentInstance = instance;
 
                     int containerW = phoneFrame.getContentPane() != null ? phoneFrame.getContentPane().getWidth() : 370;
@@ -107,7 +107,7 @@ public class adsPhone extends javax.swing.JPanel {
     }
 
     public static void hidePopup() {
-        final adsPhone instance = currentInstance;
+        final Ad_Rewards instance = currentInstance;
         if (instance == null) return;
         javax.swing.SwingUtilities.invokeLater(() -> {
             if (instance.getParent() != null) {

@@ -366,7 +366,7 @@ public class PasswordVerify extends javax.swing.JPanel {
         // Set flag to show notification for resend
         cephra.Phone.Utilities.AppSessionState.showOtpNotification = true;
         
-        // Show EmailOTP popup with new OTP
+        // Show Email_OTP popup with new OTP
         showEmailOTPPopup();
     }//GEN-LAST:event_resendActionPerformed
 
@@ -504,7 +504,7 @@ public class PasswordVerify extends javax.swing.JPanel {
     // Custom variables
     
     /**
-     * Shows EmailOTP popup with current OTP code
+     * Shows Email_OTP popup with current OTP code
      */
     private void showEmailOTPPopup() {
         // Get the current OTP code
@@ -516,8 +516,8 @@ public class PasswordVerify extends javax.swing.JPanel {
             if (window instanceof cephra.Frame.Phone) {
                 cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
                 
-                // Create EmailOTP panel
-                cephra.Phone.Popups.EmailOTP emailOTPPanel = new cephra.Phone.Popups.EmailOTP();
+                // Create Email_OTP panel
+                cephra.Phone.Popups.Email_OTP emailOTPPanel = new cephra.Phone.Popups.Email_OTP();
                 
                 // Set the OTP code in the panel
                 emailOTPPanel.setOTPCode(currentOTP);

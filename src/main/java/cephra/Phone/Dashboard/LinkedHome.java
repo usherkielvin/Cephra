@@ -517,7 +517,7 @@ public class LinkedHome extends javax.swing.JPanel {
     }//GEN-LAST:event_profilebuttonActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // Show PayPop payment popup when PENDING button is clicked
+        // Show Pending_Payment payment popup when PENDING button is clicked
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -527,8 +527,8 @@ public class LinkedHome extends javax.swing.JPanel {
                         // Get user's current ticket ID
                         String ticketId = cephra.Database.CephraDB.getUserCurrentTicketId(username);
                         if (ticketId != null && !ticketId.isEmpty()) {
-                            // Show PayPop for this ticket
-                            boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticketId, username);
+                            // Show Pending_Payment for this ticket
+                            boolean success = cephra.Phone.Popups.Pending_Payment.showPayPop(ticketId, username);
                             if (!success) {
                                 System.err.println("HOMELINKED: Failed to show PayPop for ticket " + ticketId);
                             }

@@ -3,7 +3,7 @@ package cephra.Phone.Popups;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class UnifiedNotification extends javax.swing.JPanel {
+public class Notification extends javax.swing.JPanel {
 
     private Timer animationTimer;
     private Timer hideTimer;
@@ -25,7 +25,7 @@ public class UnifiedNotification extends javax.swing.JPanel {
     private String ticketId = "";
     private String bayNumber = "";
     
-    public UnifiedNotification() {
+    public Notification() {
         initComponents();
         setOpaque(false);
         setVisible(false); // Start hidden

@@ -181,7 +181,7 @@ public class Phonelogin extends javax.swing.JPanel {
                             cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
                             phoneFrame.switchPanel(cephra.Phone.Dashboard.Home.getAppropriateHomePanel());
                             // Show ads phone panel after 1 second
-                            cephra.Phone.Popups.adsPhone.showAfterDelayOnPhone(1000);
+                            cephra.Phone.Popups.Ad_Rewards.showAfterDelayOnPhone(1000);
                             break;
                         }
                     }

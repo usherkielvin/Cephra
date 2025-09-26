@@ -8,12 +8,12 @@ package cephra.Phone.Popups;
  *
  * @author Kenji
  */
-public class ProceedBayPOP extends javax.swing.JPanel {
+public class Bay_Number extends javax.swing.JPanel {
 
     /**
      * Creates new form ProceedBayPOP
      */
-    public ProceedBayPOP() {
+    public Bay_Number() {
         initComponents();
     }
 
@@ -58,7 +58,7 @@ public class ProceedBayPOP extends javax.swing.JPanel {
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
         System.out.println("ProceedBayPOP OK button clicked!");
-        cephra.Phone.Popups.CustomPopupManager.hideCurrentPopup();
+        cephra.Phone.Utilities.CustomPopupManager.hideCurrentPopup();
     }//GEN-LAST:event_OKBTNActionPerformed
 
 

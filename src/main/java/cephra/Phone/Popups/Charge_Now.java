@@ -8,12 +8,12 @@ package cephra.Phone.Popups;
  *
  * @author Kenji
  */
-public class WaitingBayPOP extends javax.swing.JPanel {
+public class Charge_Now extends javax.swing.JPanel {
 
     /**
      * Creates new form WaitingBayPOP
      */
-    public WaitingBayPOP() {
+    public Charge_Now() {
         initComponents();
     }
 
@@ -48,11 +48,6 @@ public class WaitingBayPOP extends javax.swing.JPanel {
         CANCEL.setBorder(null);
         CANCEL.setBorderPainted(false);
         CANCEL.setContentAreaFilled(false);
-        CANCEL.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CANCELActionPerformed(evt);
-            }
-        });
         add(CANCEL);
         CANCEL.setBounds(40, 310, 110, 30);
 
@@ -62,12 +57,12 @@ public class WaitingBayPOP extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
-        cephra.Phone.Popups.CustomPopupManager.executeCallback();
+        cephra.Phone.Utilities.CustomPopupManager.executeCallback();
         // Fallback: if no popup is showing after callback, ensure ProceedBay appears with TBD bay
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    if (!cephra.Phone.Popups.CustomPopupManager.isPopupShowing()) {
+                    if (!cephra.Phone.Utilities.CustomPopupManager.isPopupShowing()) {
                         String username = cephra.Database.CephraDB.getCurrentUsername();
                         String ticket = (username == null || username.isEmpty())
                                 ? null
@@ -78,7 +73,7 @@ public class WaitingBayPOP extends javax.swing.JPanel {
                         String assignedBay = null;
                         try { assignedBay = cephra.Admin.BayManagement.getBayNumberByTicket(ticket); } catch (Throwable ignore) {}
                         if (username != null && !username.isEmpty()) {
-                            cephra.Phone.Popups.CustomPopupManager.showProceedBayPopupInfo(ticket, (assignedBay != null ? assignedBay : "TBD"), username);
+                            cephra.Phone.Utilities.CustomPopupManager.showProceedBayPopupInfo(ticket, (assignedBay != null ? assignedBay : "TBD"), username);
                         }
                     }
                 } catch (Throwable ignore) {}
@@ -87,7 +82,7 @@ public class WaitingBayPOP extends javax.swing.JPanel {
     }//GEN-LAST:event_OKBTNActionPerformed
 
     private void CANCELActionPerformed(java.awt.event.ActionEvent evt) {
-        cephra.Phone.Popups.CustomPopupManager.hideCustomPopup();
+        cephra.Phone.Utilities.CustomPopupManager.hideCustomPopup();
     }
 
 

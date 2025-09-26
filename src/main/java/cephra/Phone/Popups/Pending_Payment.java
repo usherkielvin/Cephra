@@ -4,14 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class PayPop extends javax.swing.JPanel {
+public class Pending_Payment extends javax.swing.JPanel {
     
     // Static state management to prevent multiple instances
-    private static PayPop currentInstance = null;
+    private static Pending_Payment currentInstance = null;
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
-    // PayPop persistence state for top-up flow
+    // Pending_Payment persistence state for top-up flow
     private static boolean isPendingTopUpReturn = false;
     private static String pendingTicketId = null;
     private static String pendingCustomerUsername = null;
@@ -24,24 +24,24 @@ public class PayPop extends javax.swing.JPanel {
     private static final int PHONE_HEIGHT = 750; // fallback if frame size not yet realized
     
     /**
-     * Checks if PayPop is currently showing for a specific ticket
+     * Checks if Pending_Payment is currently showing for a specific ticket
      * @param ticketId the ticket ID to check
-     * @return true if PayPop is showing for this ticket
+     * @return true if Pending_Payment is showing for this ticket
      */
     public static boolean isShowingForTicket(String ticketId) {
         return isShowing && ticketId != null && ticketId.equals(currentTicketId);
     }
     
     /**
-     * Checks if there's a PayPop pending to be restored after top-up
-     * @return true if PayPop should be restored
+     * Checks if there's a Pending_Payment pending to be restored after top-up
+     * @return true if Pending_Payment should be restored
      */
     public static boolean hasPendingPayPop() {
         return isPendingTopUpReturn && pendingTicketId != null && pendingCustomerUsername != null;
     }
     
     /**
-     * Gets the current ticket ID from PayPop
+     * Gets the current ticket ID from Pending_Payment
      * @return the current ticket ID, or null if not available
      */
     public static String getCurrentTicketId() {
@@ -49,7 +49,7 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Gets the payment amount from PayPop's last payment
+     * Gets the payment amount from Pending_Payment's last payment
      * @return the payment amount, or 0.0 if not available
      */
     public static double getPaymentAmount() {
@@ -57,8 +57,8 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Restores PayPop after returning from top-up if there was a pending payment
-     * @return true if PayPop was restored successfully
+     * Restores Pending_Payment after returning from top-up if there was a pending payment
+     * @return true if Pending_Payment was restored successfully
      */
     public static boolean restorePayPopAfterTopUp() {
         if (!hasPendingPayPop()) {
@@ -73,12 +73,12 @@ public class PayPop extends javax.swing.JPanel {
         // Clear the pending state
         clearPendingState();
         
-        // Show the PayPop again
+        // Show the Pending_Payment again
         return showPayPop(ticketId, username);
     }
     
     /**
-     * Clears the pending PayPop state
+     * Clears the pending Pending_Payment state
      */
     private static void clearPendingState() {
         isPendingTopUpReturn = false;
@@ -87,10 +87,10 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Validates if PayPop can be shown for the given ticket and user
+     * Validates if Pending_Payment can be shown for the given ticket and user
      * @param ticketId the ticket ID
      * @param customerUsername the customer username
-     * @return true if PayPop can be shown
+     * @return true if Pending_Payment can be shown
      */
     public static boolean canShowPayPop(String ticketId, String customerUsername) {
         
@@ -119,10 +119,10 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Shows PayPop with validation
+     * Shows Pending_Payment with validation
      * @param ticketId the ticket ID
      * @param customerUsername the customer username
-     * @return true if PayPop was shown successfully
+     * @return true if Pending_Payment was shown successfully
      */
     public static boolean showPayPop(String ticketId, String customerUsername) {
         
@@ -130,7 +130,7 @@ public class PayPop extends javax.swing.JPanel {
             return false;
         }
         
-        // Find Phone frame and show centered PayPop
+        // Find Phone frame and show centered Pending_Payment
         Window[] windows = Window.getWindows();
         for (Window window : windows) {
             if (window instanceof cephra.Frame.Phone) {
@@ -143,13 +143,13 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Shows PayPop centered on the Phone frame
+     * Shows Pending_Payment centered on the Phone frame
      * @param phoneFrame the Phone frame to center on
      * @param ticketId the ticket ID
      */
     private static void showCenteredPayPop(cephra.Frame.Phone phoneFrame, String ticketId) {
         SwingUtilities.invokeLater(() -> {
-            currentInstance = new PayPop();
+            currentInstance = new Pending_Payment();
             currentTicketId = ticketId;
             isShowing = true;
             // Push ticket id to UI immediately (fallback to admin queue model if needed)
@@ -168,7 +168,7 @@ public class PayPop extends javax.swing.JPanel {
             if (containerW <= 0) containerW = PHONE_WIDTH;
             if (containerH <= 0) containerH = PHONE_HEIGHT;
             
-            // Center the PayPop on the phone frame
+            // Center the Pending_Payment on the phone frame
             int x = (containerW - POPUP_WIDTH) / 2;
             int y = (containerH - POPUP_HEIGHT) / 2;
             
@@ -185,12 +185,12 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Hides the PayPop and cleans up resources
+     * Hides the Pending_Payment and cleans up resources
      */
     public static void hidePayPop() {
     if (currentInstance != null && isShowing) {
         // Capture a local reference to avoid race conditions
-        PayPop instance = currentInstance;
+        Pending_Payment instance = currentInstance;
 
         SwingUtilities.invokeLater(() -> {
             if (instance.getParent() != null) {
@@ -260,13 +260,13 @@ public class PayPop extends javax.swing.JPanel {
     /**
      * Constructor for PayPop
      */
-    public PayPop() {
+    public Pending_Payment() {
         initComponents();
         initializePayPop();
     }
     
     /**
-     * Initializes PayPop components and data
+     * Initializes Pending_Payment components and data
      */
     private void initializePayPop() {
         // Match popup panel to background image and remove excess white by making it transparent
@@ -308,7 +308,7 @@ public class PayPop extends javax.swing.JPanel {
     }
 
     /**
-     * Updates PayPop labels with current ticket data and amounts
+     * Updates Pending_Payment labels with current ticket data and amounts
      */
     private void updateTextWithAmount() {
         try {
@@ -389,6 +389,7 @@ public class PayPop extends javax.swing.JPanel {
         payonline = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
+        setOpaque(false);
         setLayout(null);
 
         TICKETNUMBER.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -466,10 +467,10 @@ public class PayPop extends javax.swing.JPanel {
                 // Admin will manually mark as paid after receiving cash
             }
             
-            // Clear any pending PayPop state since payment is completed
+            // Clear any pending Pending_Payment state since payment is completed
             clearPendingState();
             
-            // Hide PayPop and navigate to Home
+            // Hide Pending_Payment and navigate to Home
             hidePayPop();
             navigateToHome();
             
@@ -566,7 +567,7 @@ public class PayPop extends javax.swing.JPanel {
             return false;
         }
         
-        // No need to validate ticket status - PayPop only shows when ticket is completed
+        // No need to validate ticket status - Pending_Payment only shows when ticket is completed
         
         // Process wallet payment
         boolean walletPaymentSuccess = cephra.Database.CephraDB.processWalletPayment(currentUser, currentTicket, paymentAmount);
@@ -579,7 +580,7 @@ public class PayPop extends javax.swing.JPanel {
         // Process payment through existing system - markPaymentPaidOnline already handles everything
         cephra.Admin.Utilities.QueueBridge.markPaymentPaidOnline(currentTicket);
         
-        // Clear any pending PayPop state since payment is completed successfully
+        // Clear any pending Pending_Payment state since payment is completed successfully
         clearPendingState();
         
         // Note: markPaymentPaidOnline already handles:
@@ -685,11 +686,11 @@ public class PayPop extends javax.swing.JPanel {
     }
     
     /**
-     * Navigates to TopUp screen while preserving PayPop state
+     * Navigates to TopUp screen while preserving Pending_Payment state
      */
     private void navigateToTopUp() {
         SwingUtilities.invokeLater(() -> {
-            // Store the current PayPop state before hiding
+            // Store the current Pending_Payment state before hiding
             String currentUser = cephra.Database.CephraDB.getCurrentUsername();
             if (currentUser != null && currentTicketId != null) {
                 isPendingTopUpReturn = true;
@@ -697,7 +698,7 @@ public class PayPop extends javax.swing.JPanel {
                 pendingCustomerUsername = currentUser;
             }
             
-            hidePayPop(); // Hide the current PayPop
+            hidePayPop(); // Hide the current Pending_Payment
             Window[] windows = Window.getWindows();
             for (Window window : windows) {
                 if (window instanceof cephra.Frame.Phone) {

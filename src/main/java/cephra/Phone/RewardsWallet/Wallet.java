@@ -15,8 +15,8 @@ public class Wallet extends javax.swing.JPanel {
         
         
         SwingUtilities.invokeLater(() -> {
-            if (cephra.Phone.Popups.PayPop.hasPendingPayPop()) {
-                cephra.Phone.Popups.PayPop.restorePayPopAfterTopUp();
+            if (cephra.Phone.Popups.Pending_Payment.hasPendingPayPop()) {
+                cephra.Phone.Popups.Pending_Payment.restorePayPopAfterTopUp();
             }
             
             

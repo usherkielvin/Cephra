@@ -8,12 +8,12 @@ package cephra.Phone.Popups;
  *
  * @author usher
  */
-public class EmailOTP extends javax.swing.JPanel {
+public class Email_OTP extends javax.swing.JPanel {
 
     /**
      * Creates new form EmailOTP
      */
-    public EmailOTP() {
+    public Email_OTP() {
         initComponents();
     }
 
@@ -134,7 +134,7 @@ public class EmailOTP extends javax.swing.JPanel {
                     ((javax.swing.Timer) evt.getSource()).stop();
                     java.awt.Container parent = getParent();
                     if (parent != null) {
-                        parent.remove(EmailOTP.this);
+                        parent.remove(Email_OTP.this);
                         parent.repaint();
                     }
                 }

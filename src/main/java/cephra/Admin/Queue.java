@@ -14,7 +14,7 @@ public class Queue extends javax.swing.JPanel {
     private int buttonCount = 0;
     
     // Static notification instance to allow updates
-    private static cephra.Phone.Popups.UnifiedNotification staticNotification = null;
+    private static cephra.Phone.Popups.Notification staticNotification = null;
 
     public Queue() {
         initComponents();
@@ -256,9 +256,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         String customerName = String.valueOf(queTab.getValueAt(rowSnapshot, Math.min(1, queTab.getColumnCount()-1)));
                         
                         // Show waiting bay popup to user (bay number will be determined after assignment)
-                        cephra.Phone.Popups.CustomPopupManager.showWaitingBayPopup(ticket, customerName, () -> {
+                        cephra.Phone.Utilities.CustomPopupManager.showWaitingBayPopup(ticket, customerName, () -> {
                             // Hide the WaitingBayPOP first
-                            cephra.Phone.Popups.CustomPopupManager.hideCustomPopup();
+                            cephra.Phone.Utilities.CustomPopupManager.hideCustomPopup();
                             
                             // User confirmed, proceed with bay assignment
                             boolean assigned = false;
@@ -277,7 +277,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                     String assignedBayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
                                     if (assignedBayNumber != null) {
                                         // Show the actual bay number to user (informational only)
-                                        cephra.Phone.Popups.CustomPopupManager.showProceedBayPopupInfo(ticket, assignedBayNumber, customerName);
+                                        cephra.Phone.Utilities.CustomPopupManager.showProceedBayPopupInfo(ticket, assignedBayNumber, customerName);
                                     }
                                 } catch (Exception ex) {
                                     System.err.println("Queue: Error updating database status to Charging: " + ex.getMessage());
@@ -317,7 +317,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         
                         if ("Pending".equalsIgnoreCase(payment)) {
                             try {
-                                boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticket, customer);
+                                boolean success = cephra.Phone.Popups.Pending_Payment.showPayPop(ticket, customer);
                                 if (!success) { 
                                     System.err.println("Queue: PayPop failed to open for ticket " + ticket); 
                                 }
@@ -340,7 +340,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             }
                             
                             try {
-                                boolean success = cephra.Phone.Popups.PayPop.showPayPop(ticket, customer);
+                                boolean success = cephra.Phone.Popups.Pending_Payment.showPayPop(ticket, customer);
                                 if (!success) { 
                                     System.err.println("Queue: PayPop failed to open for ticket " + ticket); 
                                 }
@@ -992,8 +992,8 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                                 cephra.Admin.Utilities.QueueBridge.markPaymentPaid(ticket);
                                 
                                 try {
-                                    if (cephra.Phone.Popups.PayPop.isShowingForTicket(ticket)) {
-                                        cephra.Phone.Popups.PayPop.hidePayPop();
+                                    if (cephra.Phone.Popups.Pending_Payment.isShowingForTicket(ticket)) {
+                                        cephra.Phone.Popups.Pending_Payment.hidePayPop();
                                     }
                                 } catch (Exception ex) {
                                     System.err.println("Error hiding PayPop: " + ex.getMessage());
@@ -1633,9 +1633,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
     
   
-    private static cephra.Phone.Popups.UnifiedNotification getOrCreateUnifiedNotification(cephra.Frame.Phone phoneFrame) {
+    private static cephra.Phone.Popups.Notification getOrCreateUnifiedNotification(cephra.Frame.Phone phoneFrame) {
         if (staticNotification == null) {
-            staticNotification = new cephra.Phone.Popups.UnifiedNotification();
+            staticNotification = new cephra.Phone.Popups.Notification();
             staticNotification.addToFrame(phoneFrame);
         }
         return staticNotification;
@@ -1694,23 +1694,23 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     return;
                 }
                 
-                cephra.Phone.Popups.UnifiedNotification unifiedNotif = getOrCreateUnifiedNotification(phoneFrame);
+                cephra.Phone.Popups.Notification unifiedNotif = getOrCreateUnifiedNotification(phoneFrame);
                 
                 switch (notificationType) {
                     case "TICKET_WAITING":
-                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_WAITING, ticketId, bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.Notification.TYPE_WAITING, ticketId, bayNumber);
                         break;
                         
                     case "TICKET_PENDING":
-                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_PENDING, ticketId, bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.Notification.TYPE_PENDING, ticketId, bayNumber);
                         break;
                         
                     case "MY_TURN":
-                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_MY_TURN, ticketId, bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.Notification.TYPE_MY_TURN, ticketId, bayNumber);
                         break;
                         
                     case "FULL_CHARGE":
-                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.UnifiedNotification.TYPE_DONE, ticketId, bayNumber);
+                        unifiedNotif.updateAndShowNotification(cephra.Phone.Popups.Notification.TYPE_DONE, ticketId, bayNumber);
                         break;
                         
                     default:

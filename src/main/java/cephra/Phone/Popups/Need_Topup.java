@@ -8,12 +8,12 @@ package cephra.Phone.Popups;
  *
  * @author Kenji
  */
-public class InsufficientBalPOP extends javax.swing.JPanel {
+public class Need_Topup extends javax.swing.JPanel {
 
     /**
      * Creates new form InsufficientBalPOP
      */
-    public InsufficientBalPOP() {
+    public Need_Topup() {
         initComponents();
     }
 

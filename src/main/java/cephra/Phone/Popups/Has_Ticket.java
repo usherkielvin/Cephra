@@ -4,10 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class AlreadyTicket extends javax.swing.JPanel {
+public class Has_Ticket extends javax.swing.JPanel {
     
     // Static state management to prevent multiple instances
-    private static AlreadyTicket currentInstance = null;
+    private static Has_Ticket currentInstance = null;
     private static String currentTicketId = null;
     private static boolean isShowing = false;
     
@@ -129,7 +129,7 @@ public class AlreadyTicket extends javax.swing.JPanel {
      */
     private static void showCenteredPayPop(cephra.Frame.Phone phoneFrame, String ticketId) {
         SwingUtilities.invokeLater(() -> {
-            currentInstance = new AlreadyTicket();
+            currentInstance = new Has_Ticket();
             currentTicketId = ticketId;
             isShowing = true;
             // Push ticket id to UI immediately (fallback to admin queue model if needed)
@@ -184,7 +184,7 @@ public class AlreadyTicket extends javax.swing.JPanel {
     public static void hidepop() {
     if (currentInstance != null && isShowing) {
         // Capture a local reference to avoid race conditions
-        AlreadyTicket instance = currentInstance;
+        Has_Ticket instance = currentInstance;
 
         SwingUtilities.invokeLater(() -> {
             // Stop intro timer if running
@@ -262,7 +262,7 @@ public class AlreadyTicket extends javax.swing.JPanel {
     /**
      * Constructor for PayPop
      */
-    public AlreadyTicket() {
+    public Has_Ticket() {
         // Load intro gif and main image
         loadImages();
         initComponents();

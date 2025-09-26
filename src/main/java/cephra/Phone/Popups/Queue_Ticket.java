@@ -5,9 +5,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Ticketing extends javax.swing.JPanel {
+public class Queue_Ticket extends javax.swing.JPanel {
     
-    private static Ticketing currentInstance = null;
+    private static Queue_Ticket currentInstance = null;
     private static boolean isShowing = false;
     
     private static final int POPUP_WIDTH = 270;
@@ -42,22 +42,22 @@ public class Ticketing extends javax.swing.JPanel {
     }
     
     /**
-     * Shows Ticketing popup with validation
+     * Shows Queue_Ticket popup with validation
      * @return true if popup was shown successfully
      */
     public static boolean showPopup() {
         // If any other modal popup is showing, do not override it
         try {
-            if (cephra.Phone.Popups.CustomPopupManager.isPopupShowing()) return false;
+            if (cephra.Phone.Utilities.CustomPopupManager.isPopupShowing()) return false;
         } catch (Throwable ignore) {}
         try {
-            if (cephra.Phone.Popups.AlreadyFull.isPopupShowing()) return false;
+            if (cephra.Phone.Popups.Battery_Full.isPopupShowing()) return false;
         } catch (Throwable ignore) {}
         try {
-            if (cephra.Phone.Popups.LinkFirst.isPopupShowing()) return false;
+            if (cephra.Phone.Popups.Link_First.isPopupShowing()) return false;
         } catch (Throwable ignore) {}
 
-        // Allow reappearing - if Ticketing already showing, hide first then show again
+        // Allow reappearing - if Queue_Ticket already showing, hide first then show again
         if (isShowing) { hidePopup(); }
         
         // Validate user is logged in
@@ -78,12 +78,12 @@ public class Ticketing extends javax.swing.JPanel {
     }
     
     /**
-     * Shows Ticketing popup centered on the Phone frame
+     * Shows Queue_Ticket popup centered on the Phone frame
      * @param phoneFrame the Phone frame to center on
      */
     private static void showCenteredPopup(cephra.Frame.Phone phoneFrame) {
         SwingUtilities.invokeLater(() -> {
-            currentInstance = new Ticketing();
+            currentInstance = new Queue_Ticket();
             isShowing = true;
             
             // Populate labels based on QueueFlow / DB
@@ -121,12 +121,12 @@ public class Ticketing extends javax.swing.JPanel {
     }
     
     /**
-     * Hides the Ticketing popup and cleans up resources
+     * Hides the Queue_Ticket popup and cleans up resources
      */
     public static void hidePopup() {
         if (currentInstance != null && isShowing) {
             // Capture a local reference to avoid race conditions
-            Ticketing instance = currentInstance;
+            Queue_Ticket instance = currentInstance;
 
             SwingUtilities.invokeLater(() -> {
                 if (instance.getParent() != null) {
@@ -154,7 +154,7 @@ public class Ticketing extends javax.swing.JPanel {
         }
     }
     
-    public Ticketing() {
+    public Queue_Ticket() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(POPUP_WIDTH, POPUP_HEIGHT));
         setSize(POPUP_WIDTH, POPUP_HEIGHT);
@@ -246,6 +246,11 @@ public class Ticketing extends javax.swing.JPanel {
         cancelTixBTN.setBorder(null);
         cancelTixBTN.setBorderPainted(false);
         cancelTixBTN.setContentAreaFilled(false);
+        cancelTixBTN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelTixBTNActionPerformed(evt);
+            }
+        });
         add(cancelTixBTN);
         cancelTixBTN.setBounds(20, 335, 220, 35);
 
@@ -253,6 +258,16 @@ public class Ticketing extends javax.swing.JPanel {
         add(Icon);
         Icon.setBounds(0, 0, 270, 390);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cancelTixBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelTixBTNActionPerformed
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            cephra.Database.CephraDB.clearActiveTicket(username);
+        } catch (Throwable t) {
+            System.err.println("Ticketing Cancel error: " + t.getMessage());
+        }
+        hidePopup();
+    }//GEN-LAST:event_cancelTixBTNActionPerformed
 
     // Action listeners for buttons
     private void setupActionListeners() {
@@ -262,11 +277,11 @@ public class Ticketing extends javax.swing.JPanel {
                 String username = cephra.Database.CephraDB.getCurrentUsername();
                 String existingTicket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
 
-                // If user already has an active or pending ticket, show the AlreadyTicket popup
+                // If user already has an active or pending ticket, show the Has_Ticket popup
                 if (cephra.Phone.Utilities.QueueFlow.hasActiveTicket() ||
                     (existingTicket != null && existingTicket.trim().length() > 0)) {
                     hidePopup();
-                    cephra.Phone.Popups.AlreadyTicket.showPayPop(existingTicket, username);
+                    cephra.Phone.Popups.Has_Ticket.showPayPop(existingTicket, username);
                     return;
                 }
 
@@ -279,12 +294,10 @@ public class Ticketing extends javax.swing.JPanel {
         });
         
         // Cancel button - clear ticket and hide panel
-        cancelTixBTN.addActionListener(_ -> {
-            try {
-                String username = cephra.Database.CephraDB.getCurrentUsername();
-                cephra.Database.CephraDB.clearActiveTicket(username);
-            } catch (Throwable t) {}
-            hidePopup();
+        cancelTixBTN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelTixBTNActionPerformed(evt);
+            }
         });
     }
 
