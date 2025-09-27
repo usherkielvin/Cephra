@@ -251,6 +251,7 @@ public class LinkedHome extends javax.swing.JPanel {
     private void initComponents() {
 
         jButton1 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         Status = new javax.swing.JLabel();
         LoggedName = new javax.swing.JLabel();
         CAR = new javax.swing.JLabel();
@@ -263,7 +264,6 @@ public class LinkedHome extends javax.swing.JPanel {
         profilebutton = new javax.swing.JButton();
         rewards = new javax.swing.JButton();
         wallet = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
@@ -275,13 +275,12 @@ public class LinkedHome extends javax.swing.JPanel {
         jButton1.setContentAreaFilled(false);
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
         add(jButton1);
         jButton1.setBounds(31, 336, 307, 65);
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/curvedgif.gif"))); // NOI18N
+        add(jLabel2);
+        jLabel2.setBounds(20, 400, 340, 196);
 
         Status.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Status.setForeground(new java.awt.Color(255, 255, 255));
@@ -398,10 +397,6 @@ public class LinkedHome extends javax.swing.JPanel {
         });
         add(wallet);
         wallet.setBounds(190, 600, 150, 70);
-
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/demovid.gif"))); // NOI18N
-        add(jLabel2);
-        jLabel2.setBounds(30, 400, 310, 196);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Home_LINKED.png"))); // NOI18N
         jLabel1.setPreferredSize(new java.awt.Dimension(350, 750));
