@@ -54,10 +54,11 @@ public final class HistoryBridge {
         int initialBatteryLevel = (Integer) dbRecord[3];
         double kwhUsed = (100 - initialBatteryLevel) / 100.0 * 40.0; // 40kWh capacity
         
-        // Get the user's plate number
-        String plateNumber = cephra.Database.CephraDB.getUserPlateNumber((String) dbRecord[1]);
-        if (plateNumber == null || plateNumber.trim().isEmpty()) {
-            plateNumber = "N/A"; // Default fallback if no plate number
+        // Use plate number from database record if available, otherwise show "N/A"
+        // This avoids making additional database calls for each record
+        String plateNumber = "N/A"; // Default fallback
+        if (dbRecord.length > 9 && dbRecord[9] != null) {
+            plateNumber = String.valueOf(dbRecord[9]);
         }
         
         return new Object[]{
@@ -69,16 +70,6 @@ public final class HistoryBridge {
             formatDateTimeForDisplay(dbRecord[8]), // Completion date/time
             dbRecord[7] // Reference number
         };
-    }
-    
-    private static String getPaymentMethodForTicket(String ticketId) {
-        String paymentMethod = cephra.Database.CephraDB.getPaymentMethodForTicket(ticketId);
-        return (paymentMethod != null) ? paymentMethod : "Cash";
-    }
-    
-    private static String getCurrentAdminUsername() {
-        String servedBy = cephra.Database.CephraDB.getCurrentAdminUsername();
-        return (servedBy != null && !servedBy.trim().isEmpty()) ? servedBy : "Admin";
     }
     
     private static String formatDateTimeForDisplay(Object timestamp) {

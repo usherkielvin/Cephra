@@ -98,10 +98,8 @@ public class BayManagement extends javax.swing.JPanel {
             for (int i = 0; i < 3; i++) {
                 int bayNumber = i + 1;
                 if (isBayAvailableForCharging(bayNumber)) {
-                    System.out.println("Found available fast charging bay: Bay-" + bayNumber);
                     return bayNumber;
                 } else {
-                    System.out.println("Bay-" + bayNumber + " is not available (offline or occupied)");
                 }
             }
         } else {
@@ -109,14 +107,11 @@ public class BayManagement extends javax.swing.JPanel {
             for (int i = 0; i < 5; i++) {
                 int bayNumber = i + 4;
                 if (isBayAvailableForCharging(bayNumber)) {
-                    System.out.println("Found available normal charging bay: Bay-" + bayNumber);
                     return bayNumber;
                 } else {
-                    System.out.println("Bay-" + bayNumber + " is not available (offline or occupied)");
                 }
             }
         }
-        System.out.println("No available " + (isFastCharging ? "fast" : "normal") + " charging bays found");
         return -1; // No available bay found
     }
     
@@ -938,7 +933,6 @@ public class BayManagement extends javax.swing.JPanel {
             int bayNumber = findNextAvailableBay(isFastCharging);
             
             if (bayNumber == -1) {
-                System.out.println("No available " + (isFastCharging ? "fast" : "normal") + " charging bays for ticket " + ticketId);
                 return -1;
             }
             
@@ -1476,12 +1470,10 @@ public class BayManagement extends javax.swing.JPanel {
                 isFastCharging = svc.contains("fast");
             }
             if (!hasChargingCapacity(isFastCharging)) {
-                System.out.println("No available charging bays for " + serviceType + " service. Ticket " + ticketId + " cannot be added to waiting grid.");
                 return -1;
             }
             
             // Add ticket to waiting grid (admin will process via proceed button)
-            System.out.println("Adding ticket " + ticketId + " to waiting grid for admin processing");
             try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
                  java.sql.PreparedStatement pstmt = conn.prepareStatement(
                      "UPDATE waiting_grid SET ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, position_in_queue = ? WHERE slot_number = ? AND ticket_id IS NULL")) {
@@ -1502,7 +1494,6 @@ public class BayManagement extends javax.swing.JPanel {
                 
                 int rowsUpdated = pstmt.executeUpdate();
                 if (rowsUpdated > 0) {
-                    System.out.println("Ticket " + ticketId + " added to waiting grid slot " + availableSlot);
                     return availableSlot;
                 }
             }
@@ -1590,7 +1581,6 @@ public class BayManagement extends javax.swing.JPanel {
                 }
                 
                 conn.commit();
-                System.out.println("Ticket " + ticketId + " moved from waiting grid to Bay-" + bayNumber + " and status updated to In Progress");
                 
                 // Notify Queue and Monitor to refresh their displays
                 notifyGridDisplayUpdate();
@@ -1925,7 +1915,6 @@ public class BayManagement extends javax.swing.JPanel {
                                 updateAllBayGridDisplays();
                             }
                         } else {
-                            System.out.println("No available " + (isFastCharging ? "fast" : "normal") + " charging bays for ticket " + ticketId);
                         }
                     }
                 }
@@ -1937,7 +1926,6 @@ public class BayManagement extends javax.swing.JPanel {
         }
     }   
     public static boolean clearChargingBayForCompletedTicket(String ticketId) {
-        System.out.println("BayManagement: Clearing charging bay for completed ticket " + ticketId);
         
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -1947,20 +1935,17 @@ public class BayManagement extends javax.swing.JPanel {
                 try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
                         "UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?")) {
                     pstmt.setString(1, ticketId);
-                    int bayRowsUpdated = pstmt.executeUpdate();
-                    System.out.println("BayManagement: Cleared charging bay for ticket " + ticketId + " - rows updated: " + bayRowsUpdated);
+                    pstmt.executeUpdate();
                 }
                 
                 // Clear charging_grid table
                 try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
                         "UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?")) {
                     pstmt.setString(1, ticketId);
-                    int gridRowsUpdated = pstmt.executeUpdate();
-                    System.out.println("BayManagement: Cleared charging grid for ticket " + ticketId + " - rows updated: " + gridRowsUpdated);
+                    pstmt.executeUpdate();
                 }
                 
                 conn.commit();
-                System.out.println("BayManagement: Successfully cleared charging bay and grid for ticket " + ticketId);
                 
                 // Notify Queue and Monitor to refresh their displays
                 notifyGridDisplayUpdate();

@@ -296,7 +296,7 @@ public class LinkedHome extends javax.swing.JPanel {
         add(LoggedName);
         LoggedName.setBounds(30, 100, 300, 50);
 
-        CAR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/C9.1.png"))); // NOI18N
+        CAR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.1.png"))); // NOI18N
         add(CAR);
         CAR.setBounds(31, 173, 307, 209);
 

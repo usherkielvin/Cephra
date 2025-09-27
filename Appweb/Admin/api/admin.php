@@ -1366,14 +1366,15 @@ try {
                     INSERT INTO payment_transactions (
                         ticket_id, username, amount, payment_method, 
                         reference_number, transaction_status, processed_at
-                    ) VALUES (?, ?, ?, ?, ?, 'Completed', NOW())
+                    ) VALUES (?, ?, ?, ?, ?, ?, NOW())
                 ");
                 $payment_result = $payment_stmt->execute([
                     $ticket_id,
                     $ticket['username'],
                     $amount,
                     $ticket['payment_method'] ?? 'Cash',
-                    $reference_number
+                    $reference_number,
+                    'Completed'
                 ]);
                 
                 if (!$payment_result) {

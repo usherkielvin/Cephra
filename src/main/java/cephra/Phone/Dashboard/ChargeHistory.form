@@ -317,7 +317,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JLabel" name="typed">
+        <Component class="javax.swing.JLabel" name="paymentmethod">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="text" type="java.lang.String" value="NC (GCash)"/>

@@ -331,13 +331,11 @@ public final class QueueFlow {
         if (serviceName.toLowerCase().contains("fast")) {
             String prefix = isPriority ? "FCHP" : "FCH";
             String ticket = formatTicket(prefix, nextFastNumber);
-            System.out.println("QueueFlow: Generated " + (isPriority ? "Priority" : "Normal") + " Fast ticket: " + ticket + " (counter: " + nextFastNumber + ")");
             return ticket;
         }
         if (serviceName.toLowerCase().contains("normal")) {
             String prefix = isPriority ? "NCHP" : "NCH";
             String ticket = formatTicket(prefix, nextNormalNumber);
-            System.out.println("QueueFlow: Generated " + (isPriority ? "Priority" : "Normal") + " Normal ticket: " + ticket + " (counter: " + nextNormalNumber + ")");
             return ticket;
         }
         // default fall-back

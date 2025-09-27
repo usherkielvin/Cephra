@@ -4,8 +4,6 @@ import java.sql.*;
 import java.util.*;
 import java.time.*;
 import java.time.format.*;
-import java.awt.*;
-import javax.swing.*;
 
 /**
  * CephraDB - Main database management class for the Cephra charging station system.
@@ -602,13 +600,10 @@ public class CephraDB {
                         String plateNumber = rs.getString("plate_number");
                         if (rs.wasNull() || plateNumber == null || plateNumber.trim().isEmpty()) {
                             // NULL or empty value means no plate number assigned yet
-                            System.out.println("CephraDB: No plate number found for " + username + " - returning null");
                             return null;
                         }
-                        System.out.println("CephraDB: Retrieved plate number for " + username + ": " + plateNumber);
                         return plateNumber;
                     } else {
-                        System.out.println("CephraDB: User " + username + " not found - returning null");
                         return null;
                     }
                 }
@@ -710,7 +705,6 @@ public class CephraDB {
                 }
             } while (!isUnique);
             
-            System.out.println("CephraDB: Generated unique plate number: " + plateNumber + " (attempts: " + attempts + ")");
             return plateNumber;
             
         } catch (SQLException e) {
@@ -774,7 +768,6 @@ public class CephraDB {
                         System.err.println("CephraDB: WARNING - Found " + count + " battery level entries for user " + username);
                         logBatteryLevelDetails(conn, username);
                     } else {
-                        System.out.println("CephraDB: Found " + count + " battery level entry for user " + username);
                     }
                 }
             }
@@ -1240,7 +1233,6 @@ public class CephraDB {
                 
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("CephraDB: Successfully updated status to '" + status + "' for ticket " + ticketId);
                     return true;
                 } else {
                     System.err.println("CephraDB: No rows affected when updating status for ticket " + ticketId);
@@ -1286,7 +1278,6 @@ public class CephraDB {
                 
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("CephraDB: Successfully updated payment method to '" + paymentMethod + "' for ticket " + ticketId);
                     return true;
                 } else {
                     System.err.println("CephraDB: No rows affected when updating payment method for ticket " + ticketId);
@@ -1519,9 +1510,11 @@ public class CephraDB {
         java.util.List<Object[]> history = new ArrayList<>();
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT ticket_id, username, service_type, initial_battery_level, charging_time_minutes, " +
-                     "energy_used, total_amount, reference_number, completed_at FROM charging_history " +
-                     "ORDER BY completed_at DESC")) {
+                     "SELECT ch.ticket_id, ch.username, ch.service_type, ch.initial_battery_level, ch.charging_time_minutes, " +
+                     "ch.energy_used, ch.total_amount, ch.reference_number, ch.completed_at, u.plate_number " +
+                     "FROM charging_history ch " +
+                     "LEFT JOIN users u ON ch.username = u.username " +
+                     "ORDER BY ch.completed_at DESC")) {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -1534,7 +1527,8 @@ public class CephraDB {
                         rs.getDouble("energy_used"),
                         rs.getDouble("total_amount"),
                         rs.getString("reference_number"),
-                        rs.getTimestamp("completed_at")
+                        rs.getTimestamp("completed_at"),
+                        rs.getString("plate_number") // Now includes plate number
                     };
                     history.add(row);
                 }
@@ -1808,7 +1802,6 @@ public class CephraDB {
                 stmt.setString(1, ticketId);
                 int bayRowsUpdated = stmt.executeUpdate();
                 if (bayRowsUpdated > 0) {
-                    System.out.println("CephraDB: Cleared charging bay for ticket " + ticketId + " - rows updated: " + bayRowsUpdated);
                 }
             }
             
@@ -1818,7 +1811,6 @@ public class CephraDB {
                 stmt.setString(1, ticketId);
                 int gridRowsUpdated = stmt.executeUpdate();
                 if (gridRowsUpdated > 0) {
-                    System.out.println("CephraDB: Cleared charging grid for ticket " + ticketId + " - rows updated: " + gridRowsUpdated);
                 }
             }
             
@@ -1840,7 +1832,6 @@ public class CephraDB {
                 stmt.setString(1, username);
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("CephraDB: Updated battery level to 100% for user " + username + " after charging completion");
                 } else {
                     // If no battery level record exists, create one with 100%
                     try (PreparedStatement insertStmt = conn.prepareStatement(
@@ -1853,8 +1844,7 @@ public class CephraDB {
                 }
                 
                 // Verify the battery level was updated correctly
-                int verifyBattery = getUserBatteryLevel(username);
-                System.out.println("CephraDB: Verified battery level after update: " + verifyBattery + "% for user " + username);
+                getUserBatteryLevel(username);
             }
             
             // 4. Add reward points for all payments (1 PHP = 0.05 points)
@@ -1907,7 +1897,6 @@ public class CephraDB {
             addToAdminHistory(ticketId, username, totalAmount, referenceNumber);
             
             conn.commit(); // Commit transaction
-            System.out.println("CephraDB: Successfully committed payment transaction for ticket " + ticketId);
             
             // Clear charging bay and grid after successful payment
             cephra.Admin.BayManagement.clearChargingBayForCompletedTicket(ticketId);
@@ -1918,8 +1907,7 @@ public class CephraDB {
                 verifyStmt.setString(1, ticketId);
                 try (ResultSet rs = verifyStmt.executeQuery()) {
                     if (rs.next()) {
-                        int count = rs.getInt(1);
-                        System.out.println("CephraDB: Verification - ticket " + ticketId + " found in charging_history: " + count + " records");
+                        rs.getInt(1);
                     }
                 }
             } catch (Exception verifyEx) {
@@ -1929,7 +1917,6 @@ public class CephraDB {
             // Notify phone history that a new entry has been added
             try {
                 cephra.Phone.Utilities.HistoryManager.notifyHistoryUpdate(username);
-                System.out.println("CephraDB: Notified phone history for user: " + username);
             } catch (Exception e) {
                 System.err.println("CephraDB: Error notifying phone history: " + e.getMessage());
             }
@@ -1948,6 +1935,260 @@ public class CephraDB {
             
         } catch (SQLException e) {
             System.err.println("Error processing payment transaction: " + e.getMessage());
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    System.err.println("CephraDB: Rolled back payment transaction for ticket " + ticketId);
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error rolling back transaction: " + rollbackEx.getMessage());
+                }
+            }
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("Error closing connection: " + e.getMessage());
+                }
+            }
+        }
+    }
+    
+    // Method to process payment transaction with all related database operations in a single transaction - SKIP wallet processing
+    public static boolean processPaymentTransactionSkipWallet(String ticketId, String username, String serviceType,
+                                                  int initialBatteryLevel, int chargingTimeMinutes, 
+                                                  double totalAmount, String paymentMethod, String referenceNumber) {
+        // Validate input parameters
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid ticket ID for payment transaction");
+            return false;
+        }
+        if (username == null || username.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid username for payment transaction");
+            return false;
+        }
+        if (serviceType == null || serviceType.trim().isEmpty()) {
+            System.err.println("CephraDB: Invalid service type for payment transaction");
+            return false;
+        }
+        if (totalAmount < 0) {
+            System.err.println("CephraDB: Invalid amount for payment transaction: " + totalAmount);
+            return false;
+        }
+        
+        Connection conn = null;
+        try {
+            conn = cephra.Database.DatabaseConnection.getConnection();
+            if (conn == null) {
+                System.err.println("CephraDB: Could not establish database connection for payment transaction");
+                return false;
+            }
+            conn.setAutoCommit(false); // Start transaction
+            
+            // 1. Add to charging history
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO charging_history (ticket_id, username, service_type, " +
+                    "initial_battery_level, final_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, served_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                
+                stmt.setString(1, ticketId);
+                stmt.setString(2, username);
+                stmt.setString(3, serviceType);
+                stmt.setInt(4, initialBatteryLevel);
+                stmt.setInt(5, 100); // Final battery level is always 100% when completed
+                stmt.setInt(6, chargingTimeMinutes);
+                
+                // Calculate energy used in kWh based on battery levels
+                double batteryCapacityKWh = 40.0; // 40kWh capacity
+                double usedFraction = (100.0 - initialBatteryLevel) / 100.0;
+                double energyUsed = usedFraction * batteryCapacityKWh;
+                stmt.setDouble(7, energyUsed);
+                
+                stmt.setDouble(8, totalAmount);
+                stmt.setString(9, referenceNumber != null ? referenceNumber : "");
+                
+                // Get the actual admin username who is currently logged in
+                String adminUsername = getCurrentAdminUsername();
+                if (adminUsername == null || adminUsername.trim().isEmpty()) {
+                    adminUsername = "Admin"; // Fallback if no admin logged in
+                }
+                stmt.setString(10, adminUsername);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected <= 0) {
+                    System.err.println("CephraDB: Failed to insert charging history for ticket " + ticketId);
+                    conn.rollback();
+                    return false;
+                }
+            }
+            
+            // 2. Add payment transaction record (with plate number)
+            String userPlateNumber = ensureUserHasPlateNumber(username);
+            
+            String paymentSQL;
+            if (userPlateNumber != null) {
+                paymentSQL = "INSERT INTO payment_transactions (ticket_id, username, amount, " +
+                            "payment_method, reference_number, plate_number) VALUES (?, ?, ?, ?, ?, ?)";
+            } else {
+                paymentSQL = "INSERT INTO payment_transactions (ticket_id, username, amount, " +
+                            "payment_method, reference_number) VALUES (?, ?, ?, ?, ?)";
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(paymentSQL)) {
+                stmt.setString(1, ticketId);
+                stmt.setString(2, username);
+                stmt.setDouble(3, totalAmount);
+                stmt.setString(4, paymentMethod != null ? paymentMethod : "Cash");
+                stmt.setString(5, referenceNumber != null ? referenceNumber : "");
+                
+                if (userPlateNumber != null) {
+                    stmt.setString(6, userPlateNumber);
+                }
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected <= 0) {
+                    System.err.println("CephraDB: Failed to insert payment transaction for ticket " + ticketId);
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            // Backfill plate number if it was missing at insert time
+            if (userPlateNumber == null) {
+                try (PreparedStatement upd = conn.prepareStatement(
+                        "UPDATE payment_transactions pt JOIN users u ON pt.username = u.username " +
+                        "SET pt.plate_number = u.plate_number WHERE pt.ticket_id = ? AND pt.plate_number IS NULL")) {
+                    upd.setString(1, ticketId);
+                    upd.executeUpdate();
+                } catch (SQLException bfEx) {
+                    System.err.println("CephraDB: Failed to backfill plate_number in payment_transactions for ticket " + ticketId + ": " + bfEx.getMessage());
+                }
+            }
+            
+            // 3. Remove from queue_tickets table
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "DELETE FROM queue_tickets WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected <= 0) {
+                    System.err.println("CephraDB: Warning - No queue ticket found to remove for ticket " + ticketId);
+                    // Don't fail the transaction if ticket wasn't in queue_tickets
+                } else {
+                }
+            }
+            
+            // 3.1. Clear active ticket (if exists)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "DELETE FROM active_tickets WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                stmt.executeUpdate(); // Don't fail if no active ticket exists
+            }
+            
+            // 3.2. Clear charging bays and charging grid for this ticket
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+            }
+            
+            // 3.3. Update user battery level to 100% in battery_levels table
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE battery_levels SET battery_level = 100 WHERE username = ?")) {
+                
+                stmt.setString(1, username);
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                } else {
+                    // If no battery level record exists, create one with 100%
+                    try (PreparedStatement insertStmt = conn.prepareStatement(
+                            "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, 100, 100, 40.0)")) {
+                        
+                        insertStmt.setString(1, username);
+                        insertStmt.executeUpdate();
+                        System.out.println("CephraDB: Created battery level record with 100% for user " + username + " after charging completion");
+                    }
+                }
+            }
+            
+            // 3.4. Verify the battery level was updated correctly
+            try {
+                getUserBatteryLevel(username);
+            } catch (Exception e) {
+                System.err.println("CephraDB: Error verifying battery level: " + e.getMessage());
+            }
+            
+            // 4. Add reward points for all payments (1 PHP = 0.05 points)
+            if (totalAmount > 0) {
+                try {
+                    // Calculate points (1 PHP = 0.05 points)
+                    int pointsToAdd = (int) Math.round(totalAmount * 0.05);
+                    
+                    // Direct SQL to update user_points table
+                    try (PreparedStatement pointsStmt = conn.prepareStatement(
+                            "INSERT INTO user_points (username, total_points, lifetime_earned, lifetime_spent) " +
+                            "VALUES (?, ?, ?, 0) " +
+                            "ON DUPLICATE KEY UPDATE " +
+                            "total_points = total_points + ?, " +
+                            "lifetime_earned = lifetime_earned + ?")) {
+                        
+                        pointsStmt.setString(1, username);
+                        pointsStmt.setInt(2, pointsToAdd);
+                        pointsStmt.setInt(3, pointsToAdd);
+                        pointsStmt.setInt(4, pointsToAdd);
+                        pointsStmt.setInt(5, pointsToAdd);
+                        
+                        pointsStmt.executeUpdate();
+                    }
+                } catch (Exception pointsEx) {
+                    System.err.println("CephraDB: Error adding points for payment: " + pointsEx.getMessage());
+                    // Don't fail the transaction if points addition fails
+                }
+            }
+            
+            // 5. Add to admin history (if HistoryBridge is available)
+            addToAdminHistory(ticketId, username, totalAmount, referenceNumber);
+            
+            conn.commit(); // Commit transaction
+            
+            // Clear charging bay and grid after successful payment
+            cephra.Admin.BayManagement.clearChargingBayForCompletedTicket(ticketId);
+            
+            // Verify that the ticket was added to charging history
+            try (PreparedStatement verifyStmt = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM charging_history WHERE ticket_id = ?")) {
+                verifyStmt.setString(1, ticketId);
+                try (ResultSet rs = verifyStmt.executeQuery()) {
+                    if (rs.next()) {
+                        rs.getInt(1);
+                    }
+                }
+            } catch (Exception verifyEx) {
+                System.err.println("CephraDB: Error verifying ticket in charging_history: " + verifyEx.getMessage());
+            }
+            
+            // Notify phone history that a new entry has been added
+            try {
+                cephra.Phone.Utilities.HistoryManager.notifyHistoryUpdate(username);
+            } catch (Exception e) {
+                System.err.println("CephraDB: Error notifying phone history: " + e.getMessage());
+            }
+            
+            // Refresh admin history table to show the new completed ticket
+            try {
+                cephra.Admin.Utilities.HistoryBridge.refreshHistoryTable();
+            } catch (Exception e) {
+                System.err.println("CephraDB: Error refreshing admin history table: " + e.getMessage());
+            }
+            
+            return true;
+            
+        } catch (SQLException e) {
+            System.err.println("Error processing payment transaction (skip wallet): " + e.getMessage());
             e.printStackTrace();
             if (conn != null) {
                 try {
@@ -2551,7 +2792,6 @@ public class CephraDB {
             // The Wallet panel preview uses getLatestWalletTransactions (LIMIT 5), but WalletHistory uses getWalletTransactionHistory (LIMIT 20)
             
             conn.commit(); // Commit transaction
-            System.out.println("Wallet balance updated successfully for " + username + ": " + currentBalance + " → " + newBalance);
             return true;
             
         } catch (SQLException e) {
@@ -2856,7 +3096,6 @@ public class CephraDB {
             
             // Return as data URI
             String dataUri = "data:" + mimeType + ";base64," + base64String;
-            System.out.println("CephraDB: Successfully converted web image to data URI: " + filename);
             return dataUri;
             
         } catch (Exception e) {
