@@ -1,24 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package cephra.Phone.Popups;
 
-/**
- *
- * @author Kenji
- */
 public class Transaction_Details extends javax.swing.JPanel {
 
-    /**
-     * Creates new form TransacHistoryDetails
-     */
     public Transaction_Details() {
         initComponents();
     }
-
-   
-   
+  
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
