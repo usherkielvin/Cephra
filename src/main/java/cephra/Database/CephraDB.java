@@ -642,6 +642,22 @@ public class CephraDB {
             e.printStackTrace();
         }
     }
+
+    // Ensures the user has a plate number; generates and saves one if missing
+    private static String ensureUserHasPlateNumber(String username) {
+        try {
+            String plate = getUserPlateNumber(username);
+            if (plate == null || plate.trim().isEmpty()) {
+                String generated = generateUniquePlateNumber();
+                setUserPlateNumber(username, generated);
+                return generated;
+            }
+            return plate;
+        } catch (Exception ex) {
+            System.err.println("CephraDB: Failed to ensure plate number for user " + username + ": " + ex.getMessage());
+            return null;
+        }
+    }
     
     public static String generateUniquePlateNumber() {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
@@ -859,10 +875,19 @@ public class CephraDB {
                 return; // Cannot set active ticket if table doesn't exist
             }
             
-            try (PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status) VALUES (?, ?, ?, ?, ?, ?) " +
-                     "ON DUPLICATE KEY UPDATE ticket_id = ?, service_type = ?, initial_battery_level = ?, current_battery_level = ?, status = ?")) {
-                
+            // Ensure user has a plate number
+            String userPlateNumber = ensureUserHasPlateNumber(username);
+            
+            String insertSQL;
+            if (userPlateNumber != null) {
+                insertSQL = "INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status, plate_number) VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                           "ON DUPLICATE KEY UPDATE ticket_id = ?, service_type = ?, initial_battery_level = ?, current_battery_level = ?, status = ?, plate_number = ?";
+            } else {
+                insertSQL = "INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, status) VALUES (?, ?, ?, ?, ?, ?) " +
+                           "ON DUPLICATE KEY UPDATE ticket_id = ?, service_type = ?, initial_battery_level = ?, current_battery_level = ?, status = ?";
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(insertSQL)) {
                 // Get user's current battery level
                 int batteryLevel = getUserBatteryLevel(username);
                 
@@ -872,13 +897,35 @@ public class CephraDB {
                 stmt.setInt(4, batteryLevel);
                 stmt.setInt(5, batteryLevel);
                 stmt.setString(6, "Active");
-                stmt.setString(7, ticketId);
-                stmt.setString(8, "Normal");
-                stmt.setInt(9, batteryLevel);
-                stmt.setInt(10, batteryLevel);
-                stmt.setString(11, "Active");
+                
+                if (userPlateNumber != null) {
+                    stmt.setString(7, userPlateNumber);
+                    stmt.setString(8, ticketId);
+                    stmt.setString(9, "Normal");
+                    stmt.setInt(10, batteryLevel);
+                    stmt.setInt(11, batteryLevel);
+                    stmt.setString(12, "Active");
+                    stmt.setString(13, userPlateNumber);
+                } else {
+                    stmt.setString(7, ticketId);
+                    stmt.setString(8, "Normal");
+                    stmt.setInt(9, batteryLevel);
+                    stmt.setInt(10, batteryLevel);
+                    stmt.setString(11, "Active");
+                }
                 
                 stmt.executeUpdate();
+
+                // Backfill plate number if it was missing at insert time
+                if (userPlateNumber == null) {
+                    try (PreparedStatement upd = conn.prepareStatement(
+                        "UPDATE active_tickets atc JOIN users u ON atc.username = u.username SET atc.plate_number = u.plate_number WHERE atc.ticket_id = ? AND atc.plate_number IS NULL")) {
+                        upd.setString(1, ticketId);
+                        upd.executeUpdate();
+                    } catch (SQLException bfEx) {
+                        System.err.println("CephraDB: Failed to backfill plate_number in active_tickets for ticket " + ticketId + ": " + bfEx.getMessage());
+                    }
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error setting active ticket: " + e.getMessage());
@@ -895,10 +942,19 @@ public class CephraDB {
                 return; // Cannot set active ticket if table doesn't exist
             }
             
-            try (PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, bay_number, status) VALUES (?, ?, ?, ?, ?, ?, ?) " +
-                     "ON DUPLICATE KEY UPDATE service_type = ?, initial_battery_level = ?, current_battery_level = ?, bay_number = ?, status = ?")) {
-                
+            // Ensure user has a plate number
+            String userPlateNumber = ensureUserHasPlateNumber(username);
+            
+            String insertSQL;
+            if (userPlateNumber != null) {
+                insertSQL = "INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, bay_number, status, plate_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
+                           "ON DUPLICATE KEY UPDATE service_type = ?, initial_battery_level = ?, current_battery_level = ?, bay_number = ?, status = ?, plate_number = ?";
+            } else {
+                insertSQL = "INSERT INTO active_tickets (username, ticket_id, service_type, initial_battery_level, current_battery_level, bay_number, status) VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                           "ON DUPLICATE KEY UPDATE service_type = ?, initial_battery_level = ?, current_battery_level = ?, bay_number = ?, status = ?";
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(insertSQL)) {
                 stmt.setString(1, username);
                 stmt.setString(2, ticketId);
                 stmt.setString(3, serviceType);
@@ -906,11 +962,22 @@ public class CephraDB {
                 stmt.setInt(5, initialBatteryLevel);
                 stmt.setString(6, bayNumber);
                 stmt.setString(7, "Active");
-                stmt.setString(8, serviceType);
-                stmt.setInt(9, initialBatteryLevel);
-                stmt.setInt(10, initialBatteryLevel);
-                stmt.setString(11, bayNumber);
-                stmt.setString(12, "Active");
+                
+                if (userPlateNumber != null) {
+                    stmt.setString(8, userPlateNumber);
+                    stmt.setString(9, serviceType);
+                    stmt.setInt(10, initialBatteryLevel);
+                    stmt.setInt(11, initialBatteryLevel);
+                    stmt.setString(12, bayNumber);
+                    stmt.setString(13, "Active");
+                    stmt.setString(14, userPlateNumber);
+                } else {
+                    stmt.setString(8, serviceType);
+                    stmt.setInt(9, initialBatteryLevel);
+                    stmt.setInt(10, initialBatteryLevel);
+                    stmt.setString(11, bayNumber);
+                    stmt.setString(12, "Active");
+                }
                 
                 stmt.executeUpdate();
                 
@@ -1075,11 +1142,20 @@ public class CephraDB {
             // Respect flow: Priority -> Waiting; otherwise keep provided status (usually Pending)
             String initialStatus = (priority == 1) ? "Waiting" : status;
             
-            // Now insert the queue ticket with priority information
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO queue_tickets (ticket_id, username, service_type, status, " +
-                    "payment_status, initial_battery_level, priority) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
-                
+            // Ensure user has a plate number and fetch it
+            String userPlateNumber = ensureUserHasPlateNumber(username);
+            
+            // Now insert the queue ticket with priority information and plate number
+            String insertSQL;
+            if (userPlateNumber != null) {
+                insertSQL = "INSERT INTO queue_tickets (ticket_id, username, service_type, status, " +
+                           "payment_status, initial_battery_level, priority, plate_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            } else {
+                insertSQL = "INSERT INTO queue_tickets (ticket_id, username, service_type, status, " +
+                           "payment_status, initial_battery_level, priority) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(insertSQL)) {
                 stmt.setString(1, ticketId);
                 stmt.setString(2, username);
                 stmt.setString(3, serviceType);
@@ -1088,7 +1164,23 @@ public class CephraDB {
                 stmt.setInt(6, initialBatteryLevel);
                 stmt.setInt(7, priority);
                 
+                // Add plate number if available
+                if (userPlateNumber != null) {
+                    stmt.setString(8, userPlateNumber);
+                }
+                
                 int rowsAffected = stmt.executeUpdate();
+
+                // Backfill plate number immediately if it was missing at insert
+                if (userPlateNumber == null) {
+                    try (PreparedStatement upd = conn.prepareStatement(
+                        "UPDATE queue_tickets qt JOIN users u ON qt.username = u.username SET qt.plate_number = u.plate_number WHERE qt.ticket_id = ? AND qt.plate_number IS NULL")) {
+                        upd.setString(1, ticketId);
+                        upd.executeUpdate();
+                    } catch (SQLException bfEx) {
+                        System.err.println("CephraDB: Failed to backfill plate_number in queue_tickets for ticket " + ticketId + ": " + bfEx.getMessage());
+                    }
+                }
                 
                 // If initial status is Waiting (priority or manually set), also add it to waiting grid
                 if (rowsAffected > 0 && "Waiting".equalsIgnoreCase(initialStatus)) {
@@ -1486,20 +1578,45 @@ public class CephraDB {
     // Payment transaction methods
         public static boolean addPaymentTransaction(String ticketId, String username, double amount, 
                                                String paymentMethod, String referenceNumber) {
-        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO payment_transactions (ticket_id, username, amount, " +
-                     "payment_method, reference_number) VALUES (?, ?, ?, ?, ?)")) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // Get user's plate number
+            String userPlateNumber = getUserPlateNumber(username);
             
-            stmt.setString(1, ticketId);
-            stmt.setString(2, username);
-            stmt.setDouble(3, amount);
-            stmt.setString(4, paymentMethod);
-            stmt.setString(5, referenceNumber);
+            String insertSQL;
+            if (userPlateNumber != null) {
+                insertSQL = "INSERT INTO payment_transactions (ticket_id, username, amount, " +
+                           "payment_method, reference_number, plate_number) VALUES (?, ?, ?, ?, ?, ?)";
+            } else {
+                insertSQL = "INSERT INTO payment_transactions (ticket_id, username, amount, " +
+                           "payment_method, reference_number) VALUES (?, ?, ?, ?, ?)";
+            }
+        
+            try (PreparedStatement stmt = conn.prepareStatement(insertSQL)) {
+                stmt.setString(1, ticketId);
+                stmt.setString(2, username);
+                stmt.setDouble(3, amount);
+                stmt.setString(4, paymentMethod);
+                stmt.setString(5, referenceNumber);
+            
+                if (userPlateNumber != null) {
+                    stmt.setString(6, userPlateNumber);
+                }
             
             int rowsAffected = stmt.executeUpdate();
+
+            // Backfill plate number if it was missing at insert time
+            if (userPlateNumber == null) {
+                try (PreparedStatement upd = conn.prepareStatement(
+                    "UPDATE payment_transactions pt JOIN users u ON pt.username = u.username SET pt.plate_number = u.plate_number WHERE pt.ticket_id = ? AND pt.plate_number IS NULL")) {
+                    upd.setString(1, ticketId);
+                    upd.executeUpdate();
+                } catch (SQLException bfEx) {
+                    System.err.println("CephraDB: Failed to backfill plate_number in payment_transactions for ticket " + ticketId + ": " + bfEx.getMessage());
+                }
+            }
+
             return rowsAffected > 0;
-            
+            }
         } catch (SQLException e) {
             System.err.println("Error adding payment transaction: " + e.getMessage());
             e.printStackTrace();
@@ -1617,21 +1734,46 @@ public class CephraDB {
             }
             
             // 2. Add payment transaction record
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO payment_transactions (ticket_id, username, amount, " +
-                    "payment_method, reference_number) VALUES (?, ?, ?, ?, ?)")) {
-                
+            // Ensure user has a plate number
+            String userPlateNumber = ensureUserHasPlateNumber(username);
+            
+            String paymentSQL;
+            if (userPlateNumber != null) {
+                paymentSQL = "INSERT INTO payment_transactions (ticket_id, username, amount, " +
+                            "payment_method, reference_number, plate_number) VALUES (?, ?, ?, ?, ?, ?)";
+            } else {
+                paymentSQL = "INSERT INTO payment_transactions (ticket_id, username, amount, " +
+                            "payment_method, reference_number) VALUES (?, ?, ?, ?, ?)";
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(paymentSQL)) {
                 stmt.setString(1, ticketId);
                 stmt.setString(2, username);
                 stmt.setDouble(3, totalAmount);
                 stmt.setString(4, paymentMethod != null ? paymentMethod : "Cash");
                 stmt.setString(5, referenceNumber != null ? referenceNumber : "");
                 
+                if (userPlateNumber != null) {
+                    stmt.setString(6, userPlateNumber);
+                }
+                
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected <= 0) {
                     System.err.println("CephraDB: Failed to insert payment transaction for ticket " + ticketId);
                     conn.rollback();
                     return false;
+                }
+            }
+
+            // Backfill plate number if it was missing at insert time
+            if (userPlateNumber == null) {
+                try (PreparedStatement upd = conn.prepareStatement(
+                        "UPDATE payment_transactions pt JOIN users u ON pt.username = u.username " +
+                        "SET pt.plate_number = u.plate_number WHERE pt.ticket_id = ? AND pt.plate_number IS NULL")) {
+                    upd.setString(1, ticketId);
+                    upd.executeUpdate();
+                } catch (SQLException bfEx) {
+                    System.err.println("CephraDB: Failed to backfill plate_number in payment_transactions for ticket " + ticketId + ": " + bfEx.getMessage());
                 }
             }
             
@@ -1800,7 +1942,7 @@ public class CephraDB {
             }
             
             // Refresh Porsche screen to show updated 100% battery level
-            refreshPorscheScreen(username);
+         //   refreshPorscheScreen(username);
             
             return true;
             
@@ -2170,23 +2312,25 @@ public class CephraDB {
             
         } catch (SQLException e) {
             System.err.println("Error cleaning up admin from users table: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    
+
     // Helper method to add record to admin history
     private static void addToAdminHistory(String ticketId, String username, double totalAmount, String referenceNumber) {
         try {
-            String adminUsername = getCurrentAdminUsername();
-            if (adminUsername == null || adminUsername.trim().isEmpty()) {
-                adminUsername = "Admin"; // Fallback if no admin logged in
+            // Show plate number in Admin History (replacing Served By)
+            String plateNumber = getUserPlateNumber(username);
+            if (plateNumber == null) {
+                plateNumber = "";
             }
-            
+
             Object[] historyRow = new Object[] {
                 ticketId,
                 username,
                 String.format("%.2f", (totalAmount / 100.0) * 40.0), // kWh calculation
                 String.format("%.2f", totalAmount),
-                adminUsername,
+                plateNumber,
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")),
                 referenceNumber != null ? referenceNumber : ""
             };
@@ -2194,63 +2338,6 @@ public class CephraDB {
         } catch (Throwable t) {
             // Ignore if HistoryBridge is not available
         }
-    }
-    
-    // Helper method to refresh Porsche screen
-    private static void refreshPorscheScreen(String username) {
-        try {
-            SwingUtilities.invokeLater(() -> {
-                Window[] windows = Window.getWindows();
-                for (Window window : windows) {
-                    if (window instanceof cephra.Frame.Phone) {
-                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                        if (phoneFrame.isVisible()) {
-                            Component[] components = phoneFrame.getContentPane().getComponents();
-                            for (Component comp : components) {
-                                if (comp instanceof cephra.Phone.Dashboard.LinkedCar) {
-                                    cephra.Phone.Dashboard.LinkedCar porschePanel = (cephra.Phone.Dashboard.LinkedCar) comp;
-                                    porschePanel.refreshBatteryDisplay();
-                                    System.out.println("CephraDB: Refreshed Porsche screen to show 100% battery for user " + username);
-                                    return;
-                                }
-                            }
-                            
-                            // If PorscheTaycan is not found in current components, try to find it recursively
-                            try {
-                                Component currentPanel = findPorscheTaycanPanel(phoneFrame.getContentPane());
-                                if (currentPanel instanceof cephra.Phone.Dashboard.LinkedCar) {
-                                    cephra.Phone.Dashboard.LinkedCar porschePanel = (cephra.Phone.Dashboard.LinkedCar) currentPanel;
-                                    porschePanel.refreshBatteryDisplay();
-                                    System.out.println("CephraDB: Refreshed Porsche screen (found recursively) to show 100% battery for user " + username);
-                                    return;
-                                }
-                            } catch (Exception panelEx) {
-                                System.err.println("CephraDB: Could not refresh current panel: " + panelEx.getMessage());
-                            }
-                        }
-                    }
-                }
-                System.out.println("CephraDB: Porsche screen not found for refresh - user may not be on Porsche screen");
-            });
-        } catch (Exception e) {
-            System.err.println("CephraDB: Error refreshing Porsche screen: " + e.getMessage());
-        }
-    }
-    
-    // Helper method to find PorscheTaycan panel recursively in a container
-    private static Component findPorscheTaycanPanel(Container container) {
-        for (Component comp : container.getComponents()) {
-            if (comp instanceof cephra.Phone.Dashboard.LinkedCar) {
-                return comp;
-            }
-            if (comp instanceof Container) {
-                Component found = findPorscheTaycanPanel((Container) comp);
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
     }
     
     // Method to validate and ensure database integrity
