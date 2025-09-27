@@ -1,4 +1,4 @@
-package cephra.Admin;
+    package cephra.Admin;
 
 import java.awt.*;
 import javax.swing.*;
@@ -12,6 +12,7 @@ public class History extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(1000, 750);
         setupDateTimeTimer();
+        jTable1.setShowVerticalLines(false);
         
         // Add hover effects to navigation buttons
         ButtonHoverEffect.addHoverEffect(Baybutton);
@@ -23,6 +24,10 @@ public class History extends javax.swing.JPanel {
         jtableDesign.apply(jTable1);
         jtableDesign.makeScrollPaneTransparent(jScrollPane1);
         jScrollPane1.setViewportView(jTable1);
+        
+        // Ensure vertical lines are completely removed
+        jTable1.setShowVerticalLines(false);
+        jTable1.setIntercellSpacing(new Dimension(0, 0));
         
         adminHistorySRCH.setOpaque(false);
         adminHistorySRCH.setBackground(new Color(0, 0, 0, 0));
@@ -102,10 +107,12 @@ public class History extends javax.swing.JPanel {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Ticket", "Customer", "KWh", "Total", "Plate Number", "Date & Time", "Reference"
+                "Ticket", "Customer", "KWh", "Total", "Served By", "Date & Time", "Reference"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -116,11 +123,11 @@ public class History extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS); // Disable horizontal scrolling
-        jTable1.setAutoscrolls(true); // Enable auto-scrolling for mouse wheel
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        jTable1.setAutoscrolls(false);
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
-        // jTable1.setPreferredSize(new java.awt.Dimension(980, 550)); // Match scrollpane size - removed to allow proper scrolling
+        jTable1.setPreferredSize(new java.awt.Dimension(525, 139));
         jTable1.setRequestFocusEnabled(false);
         jTable1.setShowHorizontalLines(true);
         jTable1.getTableHeader().setResizingAllowed(false);
@@ -206,9 +213,7 @@ public class History extends javax.swing.JPanel {
 
         labelStaff.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         labelStaff.setForeground(new java.awt.Color(255, 255, 255));
-        // Set the staff first name instead of "Admin!"
-        String firstName = getStaffFirstNameFromDB();
-        labelStaff.setText(firstName + "!");
+        labelStaff.setText("Admin!");
         add(labelStaff);
         labelStaff.setBounds(870, 10, 70, 30);
         add(adminHistorySRCH);

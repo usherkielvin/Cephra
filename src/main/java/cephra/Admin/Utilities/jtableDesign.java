@@ -12,7 +12,7 @@ public class jtableDesign {
         table.setShowVerticalLines(false); // hide vertical lines
         table.setShowHorizontalLines(true); // Show horizontal lines
         table.setGridColor(Color.WHITE); 
-        table.setIntercellSpacing(new Dimension(1, 0)); // Add spacing for vertical lines
+        table.setIntercellSpacing(new Dimension(0, 0)); // Remove spacing to eliminate vertical lines
 
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.setForeground(new Color(50, 50, 50));
