@@ -57,7 +57,6 @@ public class Bay_Number extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
-        System.out.println("ProceedBayPOP OK button clicked!");
         cephra.Phone.Utilities.CustomPopupManager.hideCurrentPopup();
     }//GEN-LAST:event_OKBTNActionPerformed
 

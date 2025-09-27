@@ -272,7 +272,6 @@ public class Pending_Payment extends javax.swing.JPanel {
         // Match popup panel to background image and remove excess white by making it transparent
         setPreferredSize(new Dimension(POPUP_WIDTH, POPUP_HEIGHT));
         setSize(POPUP_WIDTH, POPUP_HEIGHT);
-        setOpaque(false);
         setupCloseButton();
         
         // Update labels with actual ticket data after components are initialized
@@ -322,7 +321,6 @@ public class Pending_Payment extends javax.swing.JPanel {
                 ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
             }
             if (ticket == null || ticket.isEmpty()) {
-                System.err.println("PayPop: No current ticket found");
                 return;
             }
             
@@ -387,9 +385,8 @@ public class Pending_Payment extends javax.swing.JPanel {
         TotalBill = new javax.swing.JLabel();
         Cash = new javax.swing.JButton();
         payonline = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        bg = new javax.swing.JLabel();
 
-        setOpaque(false);
         setLayout(null);
 
         TICKETNUMBER.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -429,9 +426,9 @@ public class Pending_Payment extends javax.swing.JPanel {
         add(payonline);
         payonline.setBounds(140, 210, 110, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/CASH.png"))); // NOI18N
-        add(jLabel1);
-        jLabel1.setBounds(0, 0, 280, 280);
+        bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/CASH.png"))); // NOI18N
+        add(bg);
+        bg.setBounds(0, 0, 280, 280);
     }// </editor-fold>//GEN-END:initComponents
 
     /**
@@ -502,7 +499,9 @@ public class Pending_Payment extends javax.swing.JPanel {
                             // Set payment method to Online in the database
                             cephra.Database.CephraDB.updateQueueTicketPaymentMethod(currentTicket, "Online");
                             
-                            cephra.Admin.Utilities.QueueBridge.markPaymentPaidOnline(currentTicket);
+                            // Process the complete payment transaction (history, ticket removal, etc.)
+                            // but skip wallet payment since it's already been processed
+                            cephra.Admin.Utilities.QueueBridge.markPaymentPaidOnlineSkipWallet(currentTicket);
                         }
                     } catch (Throwable ignore) {}
                 }
@@ -577,17 +576,12 @@ public class Pending_Payment extends javax.swing.JPanel {
             return false;
         }
         
-        // Process payment through existing system - markPaymentPaidOnline already handles everything
-        cephra.Admin.Utilities.QueueBridge.markPaymentPaidOnline(currentTicket);
-        
-        // Clear any pending Pending_Payment state since payment is completed successfully
+        // Clear any pending Pending_Payment state since wallet payment is completed successfully
         clearPendingState();
         
-        // Note: markPaymentPaidOnline already handles:
-        // - Payment processing and database updates
-        // - Charging bay and grid clearing
-        // - History addition
-        // - UI refresh
+        // Note: The actual payment processing (markPaymentPaidOnline) will be handled
+        // in the payonlineActionPerformed method after this returns true
+        // to avoid double processing of the same payment
         
         // No need to show success message - receipt panel will display the information
         return true;
@@ -691,7 +685,6 @@ public class Pending_Payment extends javax.swing.JPanel {
             // Set panel properties
             needTopupPanel.setPreferredSize(new Dimension(330, 370));
             needTopupPanel.setSize(330, 370);
-            needTopupPanel.setOpaque(false);
             
             // Determine phone content size (fallback to constants if not realized yet)
             int containerW = phoneFrame.getContentPane() != null ? phoneFrame.getContentPane().getWidth() : 0;
@@ -721,7 +714,7 @@ public class Pending_Payment extends javax.swing.JPanel {
      * @param e the exception
      */
     private void handlePaymentError(Exception e) {
-        showErrorMessage("Failed to process GCash payment.\nError: " + e.getMessage() + "\nPlease try again or contact support.");
+        showErrorMessage("Failed to process online payment.\nError: " + e.getMessage() + "\nPlease try again or contact support.");
     }
     
     /**
@@ -766,7 +759,7 @@ public class Pending_Payment extends javax.swing.JPanel {
     private javax.swing.JLabel ChargingDue;
     private javax.swing.JLabel TICKETNUMBER;
     private javax.swing.JLabel TotalBill;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel bg;
     private javax.swing.JLabel kWh;
     private javax.swing.JButton payonline;
     // End of variables declaration//GEN-END:variables

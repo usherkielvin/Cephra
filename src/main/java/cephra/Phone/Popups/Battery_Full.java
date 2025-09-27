@@ -374,7 +374,6 @@ public class Battery_Full extends javax.swing.JPanel {
                 ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
             }
             if (ticket == null || ticket.isEmpty()) {
-                System.err.println("PayPop: No current ticket found");
                 return;
             }
             
@@ -412,7 +411,6 @@ public class Battery_Full extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void GolinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GolinkActionPerformed
-      System.out.println("AlreadyFull Ok button clicked - closing popup");
         
         // Simply hide this popup panel
         hidepop();

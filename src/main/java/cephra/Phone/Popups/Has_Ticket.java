@@ -385,7 +385,6 @@ public class Has_Ticket extends javax.swing.JPanel {
                 ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
             }
             if (ticket == null || ticket.isEmpty()) {
-                System.err.println("PayPop: No current ticket found");
                 return;
             }
             

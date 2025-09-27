@@ -401,7 +401,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
             }
             
             // Update service type - show full service type names
-            if (typed != null) {
+            if (paymentmethod != null) {
                 String serviceType = entry.getServiceType();
                 String displayType;
                 
@@ -449,7 +449,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                     displayType = "Normal Charging"; // Default fallback
                 }
                 
-                typed.setText(displayType);
+                paymentmethod.setText(displayType);
             }
             
             // Update kWh information (get from admin history record) - just the value
@@ -481,8 +481,6 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                 totalprice.setText(entry.getTotal());
             }
             
-            // Update served by information - just the value
-            String servedBy = "Admin"; // Default fallback
             try {
                 java.util.List<Object[]> adminRecords = cephra.Admin.Utilities.HistoryBridge.getRecordsForUser(cephra.Database.CephraDB.getCurrentUsername());
                 if (adminRecords != null) {
@@ -490,7 +488,6 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
                         if (record.length >= 5 && entry.getTicketId().equals(String.valueOf(record[0]))) {
                             String servedByValue = String.valueOf(record[4]); // Served By is at index 4
                             if (servedByValue != null && !servedByValue.equals("null")) {
-                                servedBy = servedByValue;
                             }
                             break;
                         }
@@ -649,7 +646,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         detailpanel = new javax.swing.JPanel();
         ticket = new javax.swing.JLabel();
         Customer = new javax.swing.JLabel();
-        typed = new javax.swing.JLabel();
+        paymentmethod = new javax.swing.JLabel();
         kwh = new javax.swing.JLabel();
         Chargingtime = new javax.swing.JLabel();
         totalprice = new javax.swing.JLabel();
@@ -670,7 +667,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         historyScrollPane.setBackground(new java.awt.Color(255, 255, 255));
         historyScrollPane.setBorder(null);
         historyScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        historyScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         historyScrollPane.setOpaque(false);
 
         history.setBackground(new java.awt.Color(255, 255, 255));
@@ -807,12 +804,12 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
         detailpanel.add(Customer);
         Customer.setBounds(120, 95, 100, 16);
 
-        typed.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        typed.setText("NC (GCash)");
-        typed.setToolTipText("");
-        typed.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        detailpanel.add(typed);
-        typed.setBounds(120, 120, 100, 16);
+        paymentmethod.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        paymentmethod.setText("NC (GCash)");
+        paymentmethod.setToolTipText("");
+        paymentmethod.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        detailpanel.add(paymentmethod);
+        paymentmethod.setBounds(120, 120, 100, 16);
 
         kwh.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         kwh.setText("jLabel3");
@@ -1019,6 +1016,7 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
     private javax.swing.JButton linkbutton;
     private javax.swing.JPanel mainHistoryContainer;
     private javax.swing.JToggleButton ok;
+    private javax.swing.JLabel paymentmethod;
     private javax.swing.JLabel price;
     private javax.swing.JButton profilebutton;
     private javax.swing.JLabel ref;
@@ -1028,7 +1026,6 @@ public class ChargeHistory extends javax.swing.JPanel implements cephra.Phone.Ut
     private javax.swing.JLabel timed;
     private javax.swing.JLabel totalprice;
     private javax.swing.JLabel type;
-    private javax.swing.JLabel typed;
     // End of variables declaration//GEN-END:variables
 
     @Override

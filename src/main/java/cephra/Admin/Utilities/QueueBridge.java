@@ -308,9 +308,14 @@ public final class QueueBridge {
         markPaymentPaidWithMethod(ticket, "Cash");
     }
     
-    /** Mark a payment as Paid and add history (GCash payment - Online) */
+    /** Mark a payment as Paid and add history (Online payment) */
     public static void markPaymentPaidOnline(final String ticket) {
-        markPaymentPaidWithMethod(ticket, "GCash");
+        markPaymentPaidWithMethod(ticket, "Online");
+    }
+    
+    /** Mark a payment as Paid and add history (Online payment) - Skip wallet processing since it's already done */
+    public static void markPaymentPaidOnlineSkipWallet(final String ticket) {
+        markPaymentPaidWithMethodSkipWallet(ticket, "Online");
     }
     
     /** Mark a payment as Paid and add history with specified payment method */
@@ -445,6 +450,117 @@ public final class QueueBridge {
         }
         
         // Note: Table model is now updated BEFORE database operations in updateTableModelForPayment()
+    }
+    
+    /** Mark a payment as Paid and add history with specified payment method - Skip wallet processing */
+    private static void markPaymentPaidWithMethodSkipWallet(final String ticket, final String paymentMethod) {
+        if (ticket == null || ticket.trim().isEmpty()) {
+            System.err.println("QueueBridge: Invalid ticket ID");
+            return;
+        }
+
+        boolean foundInRecords = false;
+        boolean incrementCounter = false;
+        boolean alreadyPaid = false;
+        String customerName = "";
+        String serviceName = "";
+        String referenceNumber = "";
+
+        // Check if payment has already been processed for this ticket
+        for (Object[] r : records) {
+            if (r != null && ticket.equals(String.valueOf(r[0]))) {
+                String prev = String.valueOf(r[5]); // Payment is index 5
+                if ("Paid".equalsIgnoreCase(prev)) {
+                    alreadyPaid = true;
+                    break;
+                }
+                if (!"Paid".equalsIgnoreCase(prev)) {
+                    incrementCounter = true;
+                }
+                r[5] = "Paid";
+                // Generate a new unique reference number for this payment
+                referenceNumber = generateReference();
+                r[1] = referenceNumber; // Store in the original reference field
+                foundInRecords = true;
+                customerName = String.valueOf(r[2]);
+                serviceName = String.valueOf(r[3]);
+                break;
+            }
+        }
+
+        // If already paid, don't process again
+        if (alreadyPaid) {
+            return;
+        }
+
+        if (incrementCounter) totalPaidCount++;
+
+        if (foundInRecords) {
+            try {
+                // Check if payment already exists in database to prevent duplicates
+                if (cephra.Database.CephraDB.isPaymentAlreadyProcessed(ticket)) {
+                    try {
+                        removeTicket(ticket);
+                        triggerHardRefresh();
+                        triggerPanelSwitchRefresh();
+                    } catch (Throwable ignore) {}
+                    return;
+                }
+                
+                // Calculate charging details
+                BatteryInfo batteryInfo = getTicketBatteryInfo(ticket);
+                int initialBatteryLevel = batteryInfo != null ? batteryInfo.initialPercent : 20;
+                int chargingTimeMinutes = computeEstimatedMinutes(ticket);
+                double totalAmount = computeAmountDue(ticket);
+                
+                // Use a single database transaction to ensure consistency - SKIP wallet processing
+                boolean dbSuccess = cephra.Database.CephraDB.processPaymentTransactionSkipWallet(
+                    ticket, customerName, serviceName, initialBatteryLevel, 
+                    chargingTimeMinutes, totalAmount, paymentMethod, referenceNumber
+                );
+                
+                if (dbSuccess) {
+                    // Add a longer delay to ensure database operations complete before UI updates
+                    javax.swing.Timer refreshTimer = new javax.swing.Timer(200, _ -> {
+                        try {
+                            // Remove ticket from queue
+                            removeTicket(ticket);
+                            
+                            // Trigger multiple refresh approaches to ensure UI updates
+                            triggerHardRefresh();
+                            triggerPanelSwitchRefresh();
+                        } catch (Throwable t) {
+                            System.err.println("QueueBridge: Error removing ticket after online payment: " + t.getMessage());
+                        }
+                    });
+                    refreshTimer.setRepeats(false);
+                    refreshTimer.start();
+                } else {
+                    System.err.println("QueueBridge: Failed to process payment transaction for ticket " + ticket);
+                    // Revert the payment status in the records array
+                    for (Object[] r : records) {
+                        if (r != null && ticket.equals(String.valueOf(r[0]))) {
+                            r[5] = "Pending"; // Revert payment status
+                            r[1] = ""; // Clear reference number
+                            break;
+                        }
+                    }
+                }
+                
+            } catch (Throwable t) {
+                System.err.println("QueueBridge: Error processing payment completion: " + t.getMessage());
+                t.printStackTrace();
+                
+                // Revert any changes made to the records array
+                for (Object[] r : records) {
+                    if (r != null && ticket.equals(String.valueOf(r[0]))) {
+                        r[5] = "Pending"; // Revert payment status
+                        r[1] = ""; // Clear reference number
+                        break;
+                    }
+                }
+            }
+        }
     }
     
     private static String generateReference() {

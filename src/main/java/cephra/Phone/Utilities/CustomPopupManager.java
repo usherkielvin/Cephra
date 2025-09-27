@@ -558,7 +558,6 @@ public class CustomPopupManager {
  This method should be called from the Bay_Number.OKBTNActionPerformed method
      */
     public static void hideCurrentPopup() {
-        System.out.println("hideCurrentPopup() called");
         hideCustomPopup();
     }
     
