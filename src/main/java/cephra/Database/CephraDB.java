@@ -1844,7 +1844,7 @@ public class CephraDB {
                 }
                 
                 // Verify the battery level was updated correctly
-                int verifyBattery = getUserBatteryLevel(username);
+                getUserBatteryLevel(username);
             }
             
             // 4. Add reward points for all payments (1 PHP = 0.05 points)
@@ -1907,7 +1907,7 @@ public class CephraDB {
                 verifyStmt.setString(1, ticketId);
                 try (ResultSet rs = verifyStmt.executeQuery()) {
                     if (rs.next()) {
-                        int count = rs.getInt(1);
+                        rs.getInt(1);
                     }
                 }
             } catch (Exception verifyEx) {
@@ -2094,7 +2094,6 @@ public class CephraDB {
                     "UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?")) {
                 
                 stmt.setString(1, ticketId);
-                int bayRowsUpdated = stmt.executeUpdate();
             }
             
             // 3.3. Update user battery level to 100% in battery_levels table
@@ -2118,7 +2117,7 @@ public class CephraDB {
             
             // 3.4. Verify the battery level was updated correctly
             try {
-                int verifyBattery = getUserBatteryLevel(username);
+                getUserBatteryLevel(username);
             } catch (Exception e) {
                 System.err.println("CephraDB: Error verifying battery level: " + e.getMessage());
             }
@@ -2165,7 +2164,7 @@ public class CephraDB {
                 verifyStmt.setString(1, ticketId);
                 try (ResultSet rs = verifyStmt.executeQuery()) {
                     if (rs.next()) {
-                        int count = rs.getInt(1);
+                        rs.getInt(1);
                     }
                 }
             } catch (Exception verifyEx) {

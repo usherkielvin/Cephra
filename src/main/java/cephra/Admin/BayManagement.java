@@ -1935,14 +1935,14 @@ public class BayManagement extends javax.swing.JPanel {
                 try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
                         "UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?")) {
                     pstmt.setString(1, ticketId);
-                    int bayRowsUpdated = pstmt.executeUpdate();
+                    pstmt.executeUpdate();
                 }
                 
                 // Clear charging_grid table
                 try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
                         "UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?")) {
                     pstmt.setString(1, ticketId);
-                    int gridRowsUpdated = pstmt.executeUpdate();
+                    pstmt.executeUpdate();
                 }
                 
                 conn.commit();
