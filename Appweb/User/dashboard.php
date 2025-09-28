@@ -9,12 +9,13 @@ $db = new Database();
 $conn = $db->getConnection();
 if ($conn) {
     $username = $_SESSION['username'];
-    $stmt = $conn->prepare("SELECT firstname, car_index FROM users WHERE username = :username");
+    $stmt = $conn->prepare("SELECT firstname, car_index, plate_number FROM users WHERE username = :username");
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
+$plate_number = $user ? $user['plate_number'] : null;
 
 // Fetch battery level from database
 $db_battery_level = null;
@@ -81,7 +82,8 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
         'range' => $vehicle_specs[$car_index]['range'],
         'time_to_full' => $vehicle_specs[$car_index]['time_to_full'],
         'battery_level' => $db_battery_level ?? $vehicle_specs[$car_index]['battery_level'],
-        'image' => $car_images[$car_index]
+        'image' => $car_images[$car_index],
+        'plate_number' => $plate_number
     ];
 
     // Calculate range and time_to_full based on battery level
@@ -205,7 +207,7 @@ if ($conn) {
 				position: relative;
 				width: 90%;
 				max-width: 400px;
-				max-height: 85vh;
+				max-height: 59vh;
 				border-radius: 20px;
 				overflow: hidden;
 				display: flex;
@@ -224,19 +226,24 @@ if ($conn) {
 				border-radius: 20px;
 			}
 
-			.close-btn {
+.close-btn {
 				position: absolute;
-				top: 15px;
-				right: 15px;
+				top: 26px;
+				right: 32px;
 				background: none;
 				border: none;
-				color: #333;
-				font-size: 24px;
+				color: white;
+				font-size: 40px;
 				cursor: pointer;
 				z-index: 10001;
 				padding: 0;
 				min-width: auto;
 				font-weight: normal;
+				transition: color 0.3s ease;
+			} 
+
+			.close-btn:hover {
+				color: #00c2ce;
 			}
 
 			@keyframes popupSlideIn {
@@ -1885,6 +1892,10 @@ if ($conn) {
 											<span class="stat-label">Battery</span>
 											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['battery_level']); ?></span>
 										</div>
+										<div class="stat-item">
+											<span class="stat-label">Plate Number</span>
+											<span class="stat-value"><?php echo htmlspecialchars($plate_number ?: 'Not Set'); ?></span>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -2049,8 +2060,8 @@ if ($conn) {
 		<div id="greenPointsPopup" class="popup-overlay" style="display: none;">
 			<div class="popup-content">
 				<img src="images/pop-up.png" alt="Cephra Rewards Popup" class="popup-image" />
+				<button class="close-btn" onclick="closeGreenPointsPopup()">×</button>
 			</div>
-			<button class="close-btn" onclick="closeGreenPointsPopup()">×</button>
 		</div>
 
 		<!-- Stations Modal -->

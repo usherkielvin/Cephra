@@ -21,3 +21,22 @@
    - Update TODO.md after each step.
 
 Task completed successfully.
+
+# Task: Add plate number feature to main-vehicle-card in dashboard.php
+
+## Breakdown of Steps
+
+1. **[x] Modify PHP query to fetch plate_number from users table.**
+   - Update the SELECT statement to include plate_number.
+
+2. **[x] Add plate_number to vehicle_data array.**
+   - Assign the fetched plate_number to the vehicle_data.
+
+3. **[x] Add Plate Number stat-item in the HTML.**
+   - Insert a new div with stat-label "Plate Number" and stat-value displaying the plate_number or "Not Set".
+
+4. **[x] Test and verify the display.**
+   - Ensure the plate number shows correctly in the dashboard.
+   - Update TODO.md after each step.
+
+Task completed successfully.
