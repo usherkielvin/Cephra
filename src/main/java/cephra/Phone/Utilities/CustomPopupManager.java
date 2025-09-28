@@ -666,40 +666,37 @@ public class CustomPopupManager {
             
             System.out.println("executeCallback: currentTicketId after manual hide: " + currentTicketId);
             
-            // First assign a bay and get the bay number, then show Bay_Number popup
+            // Find available bay for display (don't assign yet)
             if (ticketId != null) {
-                System.out.println("executeCallback: Attempting bay assignment for ticketId: " + ticketId);
-                
-                // Try to assign a bay first
-                boolean assigned = false;
-                String assignedBayNumber = "TBD";
+                // Determine ticket type to find the correct bay
+                boolean isFastCharging = false;
+                String serviceType = null;
                 try {
-                    // Find next available bay
-                    int availableBay = cephra.Admin.BayManagement.findNextAvailableBay(false); // false for regular charging
-                    if (availableBay > 0) {
-                        // Assign ticket to the available bay
-                        assigned = cephra.Admin.BayManagement.assignTicketToBay(ticketId, username, availableBay);
-                        if (assigned) {
-                            assignedBayNumber = String.format("%02d", availableBay);
-                            System.out.println("executeCallback: Bay assigned successfully - Bay: " + assignedBayNumber);
-                        } else {
-                            System.out.println("executeCallback: Failed to assign ticket to bay");
-                            assignedBayNumber = "Assignment Failed";
-                        }
-                    } else {
-                        System.out.println("executeCallback: No bay available for assignment");
-                        assignedBayNumber = "No Bay Available";
-                    }
+                    serviceType = cephra.Admin.Utilities.QueueBridge.getTicketService(ticketId);
                 } catch (Exception e) {
-                    System.err.println("executeCallback: Error during bay assignment: " + e.getMessage());
-                    e.printStackTrace();
-                    assignedBayNumber = "Error";
+                    System.err.println("executeCallback: Error getting service type: " + e.getMessage());
                 }
                 
-                // Show Bay_Number popup with the actual bay number
-                System.out.println("executeCallback: Showing Bay_Number popup with ticketId: " + ticketId + ", bayNumber: " + assignedBayNumber);
-                showBayNumberPopupDirect(ticketId, assignedBayNumber);
-                System.out.println("executeCallback: Bay_Number popup should now be visible with bay: " + assignedBayNumber);
+                if (serviceType != null && serviceType.toLowerCase().contains("fast")) {
+                    isFastCharging = true;
+                } else if (ticketId != null && ticketId.toUpperCase().startsWith("FCH")) {
+                    isFastCharging = true;
+                }
+                
+                // Find available bay for display (don't assign yet)
+                String bayDisplay = "TBD";
+                if (cephra.Admin.BayManagement.hasChargingCapacity(isFastCharging)) {
+                    int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(isFastCharging);
+                    if (bayNumber > 0) {
+                        bayDisplay = String.format("%02d", bayNumber);
+                        System.out.println("executeCallback: Will assign to bay " + bayNumber + " for " + (isFastCharging ? "fast" : "normal") + " charging");
+                    }
+                }
+                
+                System.out.println("executeCallback: Showing Bay_Number popup with ticketId: " + ticketId + " and bay: " + bayDisplay);
+                // Show Bay_Number popup with actual bay number - assignment will happen when user clicks OK
+                showBayNumberPopupDirect(ticketId, bayDisplay);
+                System.out.println("executeCallback: Bay_Number popup should now be visible with bay: " + bayDisplay);
                 
             } else {
                 System.err.println("executeCallback: Warning - Could not show Bay_Number popup - missing ticketId");
@@ -751,25 +748,83 @@ public class CustomPopupManager {
         try {
             System.out.println("executeBayAssignmentCallback: Processing ticketId: " + ticketId);
             
-            // Update database status to Charging
+            // Determine ticket type and assign to appropriate bay
+            boolean assigned = false;
+            String serviceType = null;
+            
             try {
-                System.out.println("executeBayAssignmentCallback: Updating ticket status to Charging");
-                boolean dbUpdated = cephra.Database.CephraDB.updateQueueTicketStatus(ticketId, "Charging");
-                System.out.println("executeBayAssignmentCallback: Database update result: " + dbUpdated);
-            } catch (Exception ex) {
-                System.err.println("executeBayAssignmentCallback: Error updating database status: " + ex.getMessage());
-                ex.printStackTrace();
+                serviceType = cephra.Admin.Utilities.QueueBridge.getTicketService(ticketId);
+            } catch (Exception e) {
+                System.err.println("executeBayAssignmentCallback: Error getting service type: " + e.getMessage());
             }
             
-            // Note: Admin queue table update is handled by the original callback from Queue.java
+            // Determine if it's fast charging
+            boolean isFastCharging = false;
+            if (serviceType != null && serviceType.toLowerCase().contains("fast")) {
+                isFastCharging = true;
+            } else if (ticketId != null && ticketId.toUpperCase().startsWith("FCH")) {
+                isFastCharging = true;
+            }
             
-            // Execute the original callback if available (for additional processing)
-            if (currentCallback != null) {
-                System.out.println("executeBayAssignmentCallback: Executing original callback");
-                currentCallback.run();
-                System.out.println("executeBayAssignmentCallback: Original callback completed");
+            // Debug: Check individual bay availability
+            System.out.println("executeBayAssignmentCallback: Checking individual bay availability for " + (isFastCharging ? "fast" : "normal") + " charging:");
+            if (isFastCharging) {
+                for (int i = 1; i <= 3; i++) {
+                    boolean available = cephra.Admin.BayManagement.isBayAvailableForCharging(i);
+                    System.out.println("  Bay " + i + ": " + (available ? "AVAILABLE" : "OCCUPIED/OFFLINE"));
+                }
             } else {
-                System.out.println("executeBayAssignmentCallback: No original callback available");
+                for (int i = 4; i <= 8; i++) {
+                    boolean available = cephra.Admin.BayManagement.isBayAvailableForCharging(i);
+                    System.out.println("  Bay " + i + ": " + (available ? "AVAILABLE" : "OCCUPIED/OFFLINE"));
+                }
+            }
+            
+            // Find available bay for the specific type only (don't assign yet)
+            int bayNumber = -1;
+            if (cephra.Admin.BayManagement.hasChargingCapacity(isFastCharging)) {
+                bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(isFastCharging);
+                System.out.println("executeBayAssignmentCallback: Found available bay " + bayNumber + " for " + (isFastCharging ? "fast" : "normal") + " charging");
+            } else {
+                System.err.println("executeBayAssignmentCallback: No charging capacity available for " + (isFastCharging ? "fast" : "normal") + " charging");
+            }
+            
+            // Now assign the ticket to the found bay
+            if (bayNumber > 0) {
+                assigned = cephra.Admin.BayManagement.moveTicketFromWaitingToCharging(ticketId, bayNumber);
+                System.out.println("executeBayAssignmentCallback: Assignment result: " + assigned + " to bay " + bayNumber);
+            } else {
+                System.err.println("executeBayAssignmentCallback: No available bay found for " + (isFastCharging ? "fast" : "normal") + " charging");
+                assigned = false;
+            }
+            
+            if (assigned) {
+                System.out.println("executeBayAssignmentCallback: Successfully assigned ticket to bay");
+                
+                // Update database status to Charging
+                try {
+                    System.out.println("executeBayAssignmentCallback: Updating ticket status to Charging");
+                    boolean dbUpdated = cephra.Database.CephraDB.updateQueueTicketStatus(ticketId, "Charging");
+                    System.out.println("executeBayAssignmentCallback: Database update result: " + dbUpdated);
+                } catch (Exception ex) {
+                    System.err.println("executeBayAssignmentCallback: Error updating database status: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+                
+                // Execute the original callback if available (for additional processing)
+                if (currentCallback != null) {
+                    System.out.println("executeBayAssignmentCallback: Executing original callback");
+                    currentCallback.run();
+                    System.out.println("executeBayAssignmentCallback: Original callback completed");
+                } else {
+                    System.out.println("executeBayAssignmentCallback: No original callback available");
+                }
+            } else {
+                System.err.println("executeBayAssignmentCallback: Failed to assign ticket to any available bay");
+                // Still execute callback to remove from waiting grid
+                if (currentCallback != null) {
+                    currentCallback.run();
+                }
             }
             
             // Hide the popup

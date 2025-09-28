@@ -1107,6 +1107,32 @@ public class CephraDB {
         return null; // No ticket found
     }
     
+    // Method to get current ticket payment status for a user
+    public static String getUserCurrentTicketPaymentStatus(String username) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            if (!tableExists(conn, "queue_tickets")) {
+                System.err.println("Warning: queue_tickets table does not exist.");
+                return null; // No table means no tickets
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT payment_status FROM queue_tickets WHERE username = ? ORDER BY created_at DESC LIMIT 1")) {
+                stmt.setString(1, username);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String paymentStatus = rs.getString("payment_status");
+                        return paymentStatus;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting user current ticket payment status: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null; // No ticket found
+    }
+    
     // Queue ticket management methods
     public static boolean addQueueTicket(String ticketId, String username, String serviceType, 
                                        String status, String paymentStatus, int initialBatteryLevel) {
@@ -1393,6 +1419,24 @@ public class CephraDB {
             
         } catch (SQLException e) {
             System.err.println("Error updating queue ticket payment: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean updateQueueTicketPaymentStatus(String ticketId, String paymentStatus) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE queue_tickets SET payment_status = ? WHERE ticket_id = ?")) {
+            
+            stmt.setString(1, paymentStatus);
+            stmt.setString(2, ticketId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error updating queue ticket payment status: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -1814,6 +1858,17 @@ public class CephraDB {
                 }
             }
             
+            // 3.5.2. Clear waiting grid for this ticket (if it exists there)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                int waitingGridRowsUpdated = stmt.executeUpdate();
+                if (waitingGridRowsUpdated > 0) {
+                    System.out.println("CephraDB: Removed ticket " + ticketId + " from waiting_grid table");
+                }
+            }
+            
             // 3.6. Remove ticket from queue_tickets table (move to history)
             try (PreparedStatement stmt = conn.prepareStatement(
                     "DELETE FROM queue_tickets WHERE ticket_id = ?")) {
@@ -1961,6 +2016,8 @@ public class CephraDB {
     public static boolean processPaymentTransactionSkipWallet(String ticketId, String username, String serviceType,
                                                   int initialBatteryLevel, int chargingTimeMinutes, 
                                                   double totalAmount, String paymentMethod, String referenceNumber) {
+        System.out.println("CephraDB: Starting online payment processing for ticket " + ticketId + " by user " + username);
+        
         // Validate input parameters
         if (ticketId == null || ticketId.trim().isEmpty()) {
             System.err.println("CephraDB: Invalid ticket ID for payment transaction");
@@ -2094,6 +2151,29 @@ public class CephraDB {
                     "UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?")) {
                 
                 stmt.setString(1, ticketId);
+                int bayRowsUpdated = stmt.executeUpdate();
+                if (bayRowsUpdated > 0) {
+                }
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                int gridRowsUpdated = stmt.executeUpdate();
+                if (gridRowsUpdated > 0) {
+                }
+            }
+            
+            // 3.2.1. Clear waiting grid for this ticket (if it exists there)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticketId);
+                int waitingGridRowsUpdated = stmt.executeUpdate();
+                if (waitingGridRowsUpdated > 0) {
+                    System.out.println("CephraDB: Removed ticket " + ticketId + " from waiting_grid table (skip wallet)");
+                }
             }
             
             // 3.3. Update user battery level to 100% in battery_levels table
@@ -2185,6 +2265,7 @@ public class CephraDB {
                 System.err.println("CephraDB: Error refreshing admin history table: " + e.getMessage());
             }
             
+            System.out.println("CephraDB: Online payment processing completed successfully for ticket " + ticketId);
             return true;
             
         } catch (SQLException e) {

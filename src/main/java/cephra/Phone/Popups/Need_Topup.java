@@ -24,6 +24,11 @@ public class Need_Topup extends javax.swing.JPanel {
     public Need_Topup() {
         initComponents();
         setupActionListeners();
+        
+        // Make the background image label transparent
+        if (ICON != null) {
+            ICON.setOpaque(false);
+        }
     }
     
     /**
@@ -153,6 +158,7 @@ public class Need_Topup extends javax.swing.JPanel {
         EXT = new javax.swing.JButton();
         ICON = new javax.swing.JLabel();
 
+        setOpaque(false);
         setLayout(null);
 
         TopUpBTN.setBorder(null);

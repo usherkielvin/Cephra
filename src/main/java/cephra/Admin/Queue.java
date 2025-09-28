@@ -276,10 +276,23 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             System.err.println("Queue: Error updating database status: " + ex.getMessage());
                         }
                         
+                        // Remove from waiting grid if it exists there
+                        try {
+                            cephra.Admin.BayManagement.removeTicketFromWaitingGrid(ticket);
+                        } catch (Exception ex) {
+                            System.err.println("Queue: Error removing ticket from waiting grid: " + ex.getMessage());
+                        }
+                        
                         try { 
                             ensurePaymentPending(ticket); 
                             if (paymentCol >= 0) {
                                 queTab.setValueAt("Pending", rowSnapshot, paymentCol);
+                            }
+                            
+                            // Also update the database to set payment status to Pending
+                            boolean paymentStatusUpdated = cephra.Database.CephraDB.updateQueueTicketPaymentStatus(ticket, "Pending");
+                            if (!paymentStatusUpdated) {
+                                System.err.println("Queue: Failed to update payment status to Pending in database for ticket " + ticket);
                             }
                         } catch (Exception ex) { 
                             System.err.println("Failed to set payment pending: " + ex.getMessage()); 
@@ -499,22 +512,15 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void nextNormalTicket() {
         String ticket = findNextTicketByType("NCH");
         if (ticket != null) {
-            boolean assigned = assignToNormalSlot(ticket);
-            if (assigned) {
-                setTableStatusToChargingByTicket(ticket);
-                removeTicketFromGrid(ticket);
-                
-                String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
-                String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
-                if (customerName != null) {
-                    triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this,
-                    "Normal Charge Bays 1-5 are full!\nTicket " + ticket + " remains in waiting queue.",
-                    "Normal Charge Bays Full",
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
+            // Get customer name for popup
+            String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
+            
+            // Show waiting bay popup to user (same as Proceed button)
+            cephra.Phone.Utilities.CustomPopupManager.showWaitingBayPopup(ticket, customerName, () -> {
+                // Bay assignment and status update are handled in executeBayAssignmentCallback
+                // This callback is just for cleanup if needed
+                System.out.println("Next Normal callback: Bay assignment handled by executeBayAssignmentCallback");
+            });
         }
         updateStatusCounters();
     }
@@ -522,60 +528,19 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void nextFastTicket() {
         String ticket = findNextTicketByType("FCH");
         if (ticket != null) {
-            boolean assigned = assignToFastSlot(ticket);
-            if (assigned) {
-                setTableStatusToChargingByTicket(ticket);
-                removeTicketFromGrid(ticket);
-                
-                String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
-                String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
-                if (customerName != null) {
-                    triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this,
-                    "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue.",
-                    "Fast Charge Bays Full",
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
+            // Get customer name for popup
+            String customerName = cephra.Database.CephraDB.getCustomerByTicket(ticket);
+            
+            // Show waiting bay popup to user (same as Proceed button)
+            cephra.Phone.Utilities.CustomPopupManager.showWaitingBayPopup(ticket, customerName, () -> {
+                // Bay assignment and status update are handled in executeBayAssignmentCallback
+                // This callback is just for cleanup if needed
+                System.out.println("Next Fast callback: Bay assignment handled by executeBayAssignmentCallback");
+            });
         }
         updateStatusCounters();
     }
     
-    private void showBayUnavailableDialog(String ticket) {
-        boolean isFastCharging = ticket.toUpperCase().startsWith("FCH");
-        
-        String message;
-        String title;
-        
-        if (isFastCharging) {
-            message = """
-                      All Fast Charging Bays (1-3) are currently occupied or in maintenance!
-                      
-                      Ticket """ + ticket + " will remain in the waiting queue.\n" +
-                     "Please wait for a fast charging bay to become available.";
-            title = "Fast Charging Bays Unavailable";
-            /* message = "All Fast Charging Bays (1-3) are currently occupied or in maintenance!\n\n" +
-                     "Ticket " + ticket + " will remain in the waiting queue.\n" +
-                     "Please wait for a fast charging bay to become available.";
-            title = "Fast Charging Bays Unavailable";*/
-            
-        } else {
-            message = """
-                      All Normal Charging Bays (4-8) are currently occupied or in maintenance!
-                      
-                      Ticket """ + ticket + " will remain in the waiting queue.\n" +
-                     "Please wait for a normal charging bay to become available.";
-            title = "Normal Charging Bays Unavailable";
-            
-            /* message = "All Normal Charging Bays (4-8) are currently occupied or in maintenance!\n\n" +
-                     "Ticket " + ticket + " will remain in the waiting queue.\n" +
-                     "Please wait for a normal charging bay to become available.";
-            title = "Normal Charging Bays Unavailable";*/
-        }
-        
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
-    }
     
     private String findNextTicketByType(String type) {
         String lowestTicket = null;
@@ -603,6 +568,12 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         return lowestTicket;
     }
     
+    
+
+    // Expose waiting grid refresh for external callers (e.g., BayManagement)
+    public void refreshWaitingGrid() {
+        initializeWaitingGridFromDatabase();
+    }
     private void removeTicketFromGrid(String ticket) {
         for (int i = 0; i < buttonCount; i++) {
             if (gridButtons[i].getText().equals(ticket)) {
@@ -641,12 +612,44 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             monitorInstance.updateDisplay(buttonTexts);
         }
     }
-
-    // Expose waiting grid refresh for external callers (e.g., BayManagement)
-    public void refreshWaitingGrid() {
-        initializeWaitingGridFromDatabase();
+    
+ @SuppressWarnings("unused")
+    private boolean assignToFastSlot(String ticket) {
+        if (!cephra.Admin.BayManagement.hasChargingCapacity(true)) {
+            return false;
+        }
+        
+        int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(true);
+        
+        if (bayNumber > 0) {
+            if (cephra.Admin.BayManagement.moveTicketFromWaitingToCharging(ticket, bayNumber)) {
+                updateLocalFastButtons(cephra.Admin.BayManagement.getFastChargingGridTexts(), 
+                                     cephra.Admin.BayManagement.getFastChargingGridColors());
+                updateMonitorFastGrid();
+                return true;
+            }
+        }
+        return false;
     }
-     
+@SuppressWarnings("unused")
+    private boolean assignToNormalSlot(String ticket) {
+        if (!cephra.Admin.BayManagement.hasChargingCapacity(false)) {
+            return false;
+        }
+        
+        int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(false);
+        
+        if (bayNumber > 0) {
+            if (cephra.Admin.BayManagement.moveTicketFromWaitingToCharging(ticket, bayNumber)) {
+                updateLocalNormalButtons(cephra.Admin.BayManagement.getNormalChargingGridTexts(), 
+                                       cephra.Admin.BayManagement.getNormalChargingGridColors());
+                updateMonitorNormalGrid();
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void updateMonitorFastGrid() {
         if (monitorInstance != null) {
             String[] fastTickets = cephra.Admin.BayManagement.getFastChargingGridTexts();
@@ -654,6 +657,16 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             
             monitorInstance.updateFastGrid(fastTickets);
             updateLocalFastButtons(fastTickets, fastColors);
+        }
+    }
+
+    private void updateMonitorNormalGrid() {
+        if (monitorInstance != null) {
+            String[] normalTickets = cephra.Admin.BayManagement.getNormalChargingGridTexts();
+            java.awt.Color[] normalColors = cephra.Admin.BayManagement.getNormalChargingGridColors();
+            
+            monitorInstance.updateNormalGrid(normalTickets);
+            updateLocalNormalButtons(normalTickets, normalColors);
         }
     }
     
@@ -675,15 +688,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
      
-    private void updateMonitorNormalGrid() {
-        if (monitorInstance != null) {
-            String[] normalTickets = cephra.Admin.BayManagement.getNormalChargingGridTexts();
-            java.awt.Color[] normalColors = cephra.Admin.BayManagement.getNormalChargingGridColors();
-            
-            monitorInstance.updateNormalGrid(normalTickets);
-            updateLocalNormalButtons(normalTickets, normalColors);
-        }
-    }
     
     private void updateLocalNormalButtons(String[] texts, java.awt.Color[] colors) {
         JButton[] normalButtons = {normalcharge1, normalcharge2, normalcharge3, normalcharge4, normalcharge5};
@@ -703,61 +707,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
         }
     }
 
-    private boolean assignToNormalSlot(String ticket) {
-        if (!cephra.Admin.BayManagement.hasChargingCapacity(false)) {
-            return false;
-        }
-        
-        int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(false);
-        
-        if (bayNumber > 0) {
-            if (cephra.Admin.BayManagement.moveTicketFromWaitingToCharging(ticket, bayNumber)) {
-                updateLocalNormalButtons(cephra.Admin.BayManagement.getNormalChargingGridTexts(), 
-                                       cephra.Admin.BayManagement.getNormalChargingGridColors());
-                updateMonitorNormalGrid();
-                return true;
-            }
-        }
-        return false;
-    }
 
-    private boolean assignToFastSlot(String ticket) {
-        if (!cephra.Admin.BayManagement.hasChargingCapacity(true)) {
-            return false;
-        }
-        
-        int bayNumber = cephra.Admin.BayManagement.findNextAvailableBay(true);
-        
-        if (bayNumber > 0) {
-            if (cephra.Admin.BayManagement.moveTicketFromWaitingToCharging(ticket, bayNumber)) {
-                updateLocalFastButtons(cephra.Admin.BayManagement.getFastChargingGridTexts(), 
-                                     cephra.Admin.BayManagement.getFastChargingGridColors());
-                updateMonitorFastGrid();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean tryAssignToAnyAvailableBay(String ticket) {
-        String service = null;
-        try {
-            service = cephra.Admin.Utilities.QueueBridge.getTicketService(ticket);
-        } catch (Throwable ignore) {}
-
-        boolean prefersFast = false;
-        if (service != null) {
-            prefersFast = service.toLowerCase().contains("fast");
-        } else if (ticket != null) {
-            prefersFast = ticket.toUpperCase().startsWith("FCH");
-        }
-
-        if (prefersFast) {
-            return assignToFastSlot(ticket);
-        } else {
-            return assignToNormalSlot(ticket);
-        }
-    }
 
 
     public void setTableStatusToChargingByTicket(String ticket) {
