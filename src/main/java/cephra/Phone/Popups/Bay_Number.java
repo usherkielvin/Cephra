@@ -57,7 +57,30 @@ public class Bay_Number extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
-        cephra.Phone.Utilities.CustomPopupManager.hideCurrentPopup();
+        System.out.println("Bay_Number OK button clicked");
+        
+        // Trigger bay assignment and waiting → charging transition
+        try {
+            // Get current ticket ID
+            String ticketId = cephra.Phone.Utilities.CustomPopupManager.getCurrentTicketId();
+            System.out.println("Bay_Number OK: Retrieved ticketId: " + ticketId);
+            
+            if (ticketId != null && !ticketId.trim().isEmpty()) {
+                System.out.println("Bay_Number OK: Executing bay assignment callback");
+                // Execute the bay assignment callback that was originally in Charge_Now
+                cephra.Phone.Utilities.CustomPopupManager.executeBayAssignmentCallback(ticketId);
+                System.out.println("Bay_Number OK: Callback executed successfully");
+            } else {
+                System.out.println("Bay_Number OK: No ticket ID found, hiding popup");
+                // Fallback: just hide popup if no ticket ID
+                cephra.Phone.Utilities.CustomPopupManager.hideCurrentPopup();
+            }
+        } catch (Exception e) {
+            System.err.println("Error in Bay_Number OK button: " + e.getMessage());
+            e.printStackTrace();
+            // Ensure popup is hidden even if there's an error
+            cephra.Phone.Utilities.CustomPopupManager.hideCurrentPopup();
+        }
     }//GEN-LAST:event_OKBTNActionPerformed
 
 
