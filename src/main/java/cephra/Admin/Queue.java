@@ -307,7 +307,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             try {
                                 boolean success = cephra.Phone.Popups.Pending_Payment.showPayPop(ticket, customer);
                                 if (!success) { 
-                                    System.err.println("Queue: PayPop failed to open for ticket " + ticket); 
+                                    System.err.println("Queue: PayPop failed to open for ticket " + ticket + " - user " + customer + " is not logged in to process payment"); 
                                 }
                             } catch (Throwable t) {
                                 System.err.println("Error showing PayPop: " + t.getMessage());
@@ -330,7 +330,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             try {
                                 boolean success = cephra.Phone.Popups.Pending_Payment.showPayPop(ticket, customer);
                                 if (!success) { 
-                                    System.err.println("Queue: PayPop failed to open for ticket " + ticket); 
+                                    System.err.println("Queue: PayPop failed to open for ticket " + ticket + " - user " + customer + " is not logged in to process payment"); 
                                 }
                             } catch (Throwable t) {
                                 System.err.println("Error showing PayPop: " + t.getMessage());
@@ -574,6 +574,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     public void refreshWaitingGrid() {
         initializeWaitingGridFromDatabase();
     }
+    @SuppressWarnings("unused")
     private void removeTicketFromGrid(String ticket) {
         for (int i = 0; i < buttonCount; i++) {
             if (gridButtons[i].getText().equals(ticket)) {

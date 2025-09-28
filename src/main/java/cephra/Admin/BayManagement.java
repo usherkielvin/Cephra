@@ -1540,7 +1540,8 @@ public class BayManagement extends javax.swing.JPanel {
                             serviceType = rs.getString("service_type");
                             batteryLevel = rs.getInt("initial_battery_level");
                         } else {
-                            System.out.println("BayManagement: Ticket " + ticketId + " not found in waiting grid");
+                            // Ticket not in waiting grid - this is normal for some scenarios
+                            // (e.g., user not logged in, ticket already processed, etc.)
                             return false;
                         }
                     }
@@ -1642,7 +1643,8 @@ public class BayManagement extends javax.swing.JPanel {
                         
                         return true;
                     } else {
-                        System.out.println("BayManagement: Ticket " + ticketId + " not found in waiting grid");
+                        // Ticket not in waiting grid - this is normal for some scenarios
+                        // (e.g., user not logged in, ticket already processed, etc.)
                         conn.commit();
                         return false;
                     }

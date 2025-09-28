@@ -415,19 +415,16 @@ public final class QueueBridge {
                         try {
                             // Remove ticket from queue (same as manual payment)
                             removeTicket(ticket);
-                            System.out.println("QueueBridge: Ticket removed from memory records");
                             
                             // Try to refresh admin UI if available, but don't fail if admin is not open
                             try {
                                 triggerHardRefresh();
-                                System.out.println("QueueBridge: Admin UI refresh attempted");
                             } catch (Exception e) {
                                 System.out.println("QueueBridge: Admin UI refresh failed (admin may not be open): " + e.getMessage());
                             }
                             
                             try {
                                 triggerPanelSwitchRefresh();
-                                System.out.println("QueueBridge: Panel switch refresh attempted");
                             } catch (Exception e) {
                                 System.out.println("QueueBridge: Panel switch refresh failed (admin may not be open): " + e.getMessage());
                             }
@@ -551,19 +548,16 @@ public final class QueueBridge {
                         try {
                             // Remove ticket from queue
                             removeTicket(ticket);
-                            System.out.println("QueueBridge: Ticket removed from memory records");
                             
                             // Try to refresh admin UI if available, but don't fail if admin is not open
                             try {
                                 triggerHardRefresh();
-                                System.out.println("QueueBridge: Admin UI refresh attempted");
                             } catch (Exception e) {
                                 System.out.println("QueueBridge: Admin UI refresh failed (admin may not be open): " + e.getMessage());
                             }
                             
                             try {
                                 triggerPanelSwitchRefresh();
-                                System.out.println("QueueBridge: Panel switch refresh attempted");
                             } catch (Exception e) {
                                 System.out.println("QueueBridge: Panel switch refresh failed (admin may not be open): " + e.getMessage());
                             }
@@ -631,7 +625,6 @@ public final class QueueBridge {
                             
                             // Trigger hard refresh
                             queuePanel.hardRefreshTable();
-                            System.out.println("QueueBridge: Hard refresh completed successfully");
                             break;
                         } else {
                             System.out.println("QueueBridge: Admin frame found but Queue panel not found");
@@ -680,7 +673,6 @@ public final class QueueBridge {
                             // Force table refresh
                             queuePanel.hardRefreshTable();
                             
-                            System.out.println("QueueBridge: Panel switch refresh completed successfully");
                             break;
                         } else {
                             System.out.println("QueueBridge: Admin frame found but Queue panel not found for panel switch refresh");
