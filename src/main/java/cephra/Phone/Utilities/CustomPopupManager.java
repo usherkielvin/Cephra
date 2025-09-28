@@ -693,6 +693,25 @@ public class CustomPopupManager {
                     }
                 }
                 
+                // If no bay is available, show admin popup instead of Bay_Number popup
+                if ("TBD".equals(bayDisplay)) {
+                    String ticketType = isFastCharging ? "Fast Charging (FCH)" : "Normal Charging (NCH)";
+                    String bayRange = isFastCharging ? "bays 1-3" : "bays 4-8";
+                    
+                    // Show admin popup about bays being full
+                    showAdminBaysFullPopup(ticketType, bayRange);
+                    
+                    // Reset all popup states to allow new popups
+                    currentPopup = null;
+                    isShowing = false;
+                    currentTicketId = null;
+                    currentCallback = null;
+                    isExecutingCallback = false;
+                    isShowingPopup = false; // Reset the flag that prevents duplicate calls
+                    
+                    return;
+                }
+                
                 System.out.println("executeCallback: Showing Bay_Number popup with ticketId: " + ticketId + " and bay: " + bayDisplay);
                 // Show Bay_Number popup with actual bay number - assignment will happen when user clicks OK
                 showBayNumberPopupDirect(ticketId, bayDisplay);
@@ -737,6 +756,38 @@ public class CustomPopupManager {
     public static String getCurrentTicketId() {
         System.out.println("getCurrentTicketId: Returning: " + currentTicketId);
         return currentTicketId;
+    }
+    
+    /**
+     * Shows admin popup when bays are full
+     * @param ticketType the type of ticket (Fast Charging or Normal Charging)
+     * @param bayRange the range of bays for this ticket type
+     */
+    private static void showAdminBaysFullPopup(String ticketType, String bayRange) {
+        String message = "All " + ticketType + " bays (" + bayRange + ") are currently full.\n\n" +
+                        "Please wait for a bay to become available before proceeding.";
+        
+        // Find Admin frame to center the dialog
+        javax.swing.JFrame adminFrame = null;
+        for (java.awt.Window window : java.awt.Window.getWindows()) {
+            if (window instanceof cephra.Frame.Admin) {
+                adminFrame = (cephra.Frame.Admin) window;
+                break;
+            }
+        }
+        
+        // Create custom icon
+        javax.swing.ImageIcon icon = new javax.swing.ImageIcon(
+            cephra.Phone.Utilities.CustomPopupManager.class.getResource("/cephra/Cephra Images/smalllogo.png")
+        );
+        
+        javax.swing.JOptionPane.showMessageDialog(
+            adminFrame, // Center on admin frame
+            message,
+            "Bays Currently Full",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE,
+            icon // Use custom icon instead of default
+        );
     }
     
     /**
