@@ -37,11 +37,12 @@ if ($username && $conn) {
             <!-- Logo -->
             <div class="logo" style="display:flex;align-items:center;gap:12px;margin-right:16px;">
                 <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                <span class="logo-text">CEP</span>
+                <span class="logo-text">CEPHRA</span>
             </div>
             <!-- Navigation -->
             <nav class="nav" style="flex:1;">
                 <ul class="nav-list" style="display:flex;gap:1.25rem;align-items:center;">
+                    <li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
                     <li><a href="#" onclick="openMonitorWeb && openMonitorWeb(); return false;" class="nav-link">Monitor</a></li>
                     <li><a href="link.php" class="nav-link">Link</a></li>
                     <li><a href="history.php" class="nav-link">History</a></li>

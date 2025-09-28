@@ -1542,33 +1542,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							</button>
 						</div>
 						<!-- Language selector (globe icon only) placed to the right of Download -->
-						<div class="language-selector" style="position: relative;">
-							<button class="language-btn"
-									id="languageBtn"
-									title="Language"
-									style="display: inline-flex;
-										   align-items: center;
-										   justify-content: center;
-										   width: auto;
-										   height: auto;
-										   border: none;
-										   background: transparent;
-										   color: inherit;
-										   cursor: pointer;
-										   padding: 4px;">
-								<i class="fas fa-globe" aria-hidden="true" style="font-size: 18px; line-height: 1;"></i>
-							</button>
-							<div class="language-dropdown"
-								 id="languageDropdown"
-								 style="position: absolute;
-										top: 28px;
-										right: 0;">
-								<div class="language-option" data-lang="en">English</div>
-								<div class="language-option" data-lang="fil">Filipino</div>
-								<div class="language-option" data-lang="ceb">Bisaya</div>
-								<div class="language-option" data-lang="zh">中文</div>
-							</div>
-						</div>
+
 						<?php
 						// Compute avatar source
 						$pfpSrc = 'images/logo.png';
@@ -1594,21 +1568,56 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							} catch (Exception $e) { /* ignore */ }
 						}
 						?>
-						<a href="profile.php"
-						   title="Profile"
-						   style="display: inline-flex;
-								  width: 38px;
-								  height: 38px;
-								  border-radius: 50%;
-								  overflow: hidden;
-								  border: 2px solid rgba(0, 0, 0, 0.08);">
-							<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
-								 alt="Profile"
-								 style="width: 100%;
-										height: 100%;
-										object-fit: cover;
-										display: block;" />
-						</a>
+						<div class="profile-container" style="position: relative;">
+							<button class="profile-btn" id="profileBtn"
+								   title="Profile Menu"
+								   style="display: inline-flex;
+										  width: 38px;
+										  height: 38px;
+										  border-radius: 50%;
+										  overflow: hidden;
+										  border: 2px solid rgba(0, 0, 0, 0.08);
+										  background: transparent;
+										  cursor: pointer;
+										  padding: 0;">
+								<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
+									 alt="Profile"
+									 style="width: 100%;
+											height: 100%;
+											object-fit: cover;
+											display: block;" />
+							</button>
+							<ul class="profile-dropdown" id="profileDropdown"
+								style="position: absolute;
+									   top: 100%;
+									   right: 0;
+									   background: white;
+									   border: 1px solid rgba(0, 0, 0, 0.1);
+									   border-radius: 8px;
+									   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+									   min-width: 120px;
+									   list-style: none;
+									   padding: 0;
+									   margin: 0;
+									   z-index: 1001;
+									   display: none;">
+								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
+									<a href="profile.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Profile</a>
+								</li>
+								<li style="position: relative; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
+									<a href="#" id="languageMenuItem" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Language</a>
+                                    <ul class="language-sub-dropdown" id="languageSubDropdown" style="position: absolute; top: 0; right: 100%; left: auto; background: white; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); min-width: 120px; list-style: none; padding: 0; margin: 0; display: none;">
+										<li><a href="#" onclick="setLanguage('en'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">English</a></li>
+										<li><a href="#" onclick="setLanguage('fil'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Filipino</a></li>
+										<li><a href="#" onclick="setLanguage('ceb'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Bisaya</a></li>
+										<li><a href="#" onclick="setLanguage('zh'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">中文</a></li>
+									</ul>
+								</li>
+								<li>
+									<a href="profile_logout.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Logout</a>
+								</li>
+							</ul>
+						</div>
 					</div>
 
 					<!-- Mobile Menu Toggle -->
@@ -2022,53 +2031,78 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-    <script>
-        // Dashboard header: Language dropdown and Download QR like index.php
-        (function(){
-            const languageBtn = document.getElementById('languageBtn');
-            const languageDropdown = document.getElementById('languageDropdown');
-            if (languageBtn && languageDropdown) {
-                languageBtn.addEventListener('click', function(e){
+            <script>
+                // Profile dropdown functionality
+                (function() {
+                    const profileBtn = document.getElementById('profileBtn');
+                    const profileDropdown = document.getElementById('profileDropdown');
+                    const languageMenuItem = document.getElementById('languageMenuItem');
+                    const languageSubDropdown = document.getElementById('languageSubDropdown');
+
+                    if (profileBtn && profileDropdown) {
+                        profileBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const isVisible = profileDropdown.style.display === 'block';
+                            profileDropdown.style.display = isVisible ? 'none' : 'block';
+                        });
+
+                        // Close dropdown when clicking outside
+                        document.addEventListener('click', function(e) {
+                            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                                profileDropdown.style.display = 'none';
+                            }
+                        });
+
+            // Language sub-dropdown toggle
+            if (languageMenuItem && languageSubDropdown) {
+                languageMenuItem.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    languageDropdown.classList.toggle('show');
-                    languageBtn.classList.toggle('active');
+                    const isVisible = languageSubDropdown.style.display === 'block';
+                    languageSubDropdown.style.display = isVisible ? 'none' : 'block';
                 });
-                languageDropdown.querySelectorAll('.language-option').forEach(opt => {
-                    opt.addEventListener('click', function(){
-                        languageDropdown.classList.remove('show');
-                        languageBtn.classList.remove('active');
-                        // Persist choice (same as index)
-                        const lang = this.dataset.lang || 'en';
-                        localStorage.setItem('selectedLanguage', lang);
-                    });
-                });
-                document.addEventListener('click', function(e){
-                    if (!languageBtn.contains(e.target) && !languageDropdown.contains(e.target)) {
-                        languageDropdown.classList.remove('show');
-                        languageBtn.classList.remove('active');
+                // Close sub-dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!languageMenuItem.contains(e.target) && !languageSubDropdown.contains(e.target)) {
+                        languageSubDropdown.style.display = 'none';
                     }
                 });
             }
+        }
 
-            const downloadBtn = document.getElementById('downloadBtn');
-            const qrPopup = document.getElementById('qrPopup');
-            if (downloadBtn && qrPopup) {
-                downloadBtn.addEventListener('mouseenter', function(){
-                    qrPopup.classList.add('show');
-                });
-                downloadBtn.addEventListener('mouseleave', function(){
-                    setTimeout(()=>{
-                        if (!downloadBtn.matches(':hover') && !qrPopup.matches(':hover')) {
-                            qrPopup.classList.remove('show');
-                        }
-                    }, 100);
-                });
-                qrPopup.addEventListener('mouseleave', function(){
-                    qrPopup.classList.remove('show');
-                });
+
+
+        // Set language function
+        window.setLanguage = function(lang) {
+            localStorage.setItem('selectedLanguage', lang);
+            if (typeof translateDashboard === 'function') {
+                translateDashboard();
             }
-        })();
-    </script>
+            // Close dropdowns
+            if (profileDropdown) profileDropdown.style.display = 'none';
+            if (languageSubDropdown) languageSubDropdown.style.display = 'none';
+            if (languageDropdown) languageDropdown.style.display = 'none';
+        };
+
+                    // Download QR hover (if exists)
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    const qrPopup = document.getElementById('qrPopup');
+                    if (downloadBtn && qrPopup) {
+                        downloadBtn.addEventListener('mouseenter', function(){
+                            qrPopup.classList.add('show');
+                        });
+                        downloadBtn.addEventListener('mouseleave', function(){
+                            setTimeout(()=>{
+                                if (!downloadBtn.matches(':hover') && !qrPopup.matches(':hover')) {
+                                    qrPopup.classList.remove('show');
+                                }
+                            }, 100);
+                        });
+                        qrPopup.addEventListener('mouseleave', function(){
+                            qrPopup.classList.remove('show');
+                        });
+                    }
+                })();
+            </script>
 
             <script>
                 function showDialog(title, message) {
