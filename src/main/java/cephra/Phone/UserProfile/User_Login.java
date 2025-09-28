@@ -82,7 +82,7 @@ public class User_Login extends javax.swing.JPanel {
             }
         });
         add(reghere);
-        reghere.setBounds(220, 667, 80, 30);
+        reghere.setBounds(215, 667, 80, 30);
 
         forgotpass.setForeground(new java.awt.Color(0, 204, 204));
         forgotpass.setText("Forgot password?");
