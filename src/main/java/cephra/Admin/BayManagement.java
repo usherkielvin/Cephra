@@ -1621,6 +1621,45 @@ public class BayManagement extends javax.swing.JPanel {
         return false;
     }
     
+    public static boolean removeTicketFromWaitingGrid(String ticketId) {
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            
+            try {
+                // Remove from waiting grid
+                try (java.sql.PreparedStatement pstmt = conn.prepareStatement(
+                        "UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?")) {
+                    pstmt.setString(1, ticketId);
+                    int rowsAffected = pstmt.executeUpdate();
+                    
+                    if (rowsAffected > 0) {
+                        System.out.println("BayManagement: Removed ticket " + ticketId + " from waiting grid");
+                        
+                        conn.commit();
+                        
+                        // Notify Queue to refresh waiting grid display
+                        notifyGridDisplayUpdate();
+                        
+                        return true;
+                    } else {
+                        System.out.println("BayManagement: Ticket " + ticketId + " not found in waiting grid");
+                        conn.commit();
+                        return false;
+                    }
+                }
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (Exception e) {
+            System.out.println("BayManagement: Error removing ticket " + ticketId + " from waiting grid: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     public static String[] getWaitingGridTickets() {
         String[] tickets = new String[10];
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();

@@ -164,20 +164,30 @@ public class LinkedHome extends javax.swing.JPanel {
                         }
                         Status.setText(displayStatus);
                         
-                        // Show PENDING button only when status is "Complete"
+                        // Show PENDING button when status is "Complete" (regardless of payment status)
+                        // Only hide it if payment status is explicitly "Paid"
                         if ("Complete".equals(displayStatus)) {
-                            jButton1.setVisible(true);
+                            // Check payment status, but default to showing button for completed tickets
+                            String paymentStatus = cephra.Database.CephraDB.getUserCurrentTicketPaymentStatus(username);
+                            
+                            // Hide button only if payment status is explicitly "Paid"
+                            if ("Paid".equalsIgnoreCase(paymentStatus)) {
+                                PENDINGPAYMENT.setVisible(false);
+                            } else {
+                                // Show button for all other cases (Pending, null, empty, etc.)
+                                PENDINGPAYMENT.setVisible(true);
+                            }
                         } else {
-                            jButton1.setVisible(false);
+                            PENDINGPAYMENT.setVisible(false);
                         }
                     } else {
                         // No ticket found - show Unavailable
                         Status.setText("Unavailable");
-                        jButton1.setVisible(false);
+                        PENDINGPAYMENT.setVisible(false);
                     }
                 } else {
                     Status.setText("Unavailable");
-                    jButton1.setVisible(false);
+                    PENDINGPAYMENT.setVisible(false);
                 }
             }
         } catch (Exception e) {
@@ -254,7 +264,7 @@ public class LinkedHome extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
+        PENDINGPAYMENT = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         Status = new javax.swing.JLabel();
         LoggedName = new javax.swing.JLabel();
@@ -275,15 +285,20 @@ public class LinkedHome extends javax.swing.JPanel {
 
         setLayout(null);
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/pending.png"))); // NOI18N
-        jButton1.setAlignmentY(0.0F);
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        add(jButton1);
-        jButton1.setBounds(31, 336, 307, 65);
+        PENDINGPAYMENT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/pending.png"))); // NOI18N
+        PENDINGPAYMENT.setAlignmentY(0.0F);
+        PENDINGPAYMENT.setBorder(null);
+        PENDINGPAYMENT.setBorderPainted(false);
+        PENDINGPAYMENT.setContentAreaFilled(false);
+        PENDINGPAYMENT.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        PENDINGPAYMENT.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        PENDINGPAYMENT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PENDINGPAYMENTActionPerformed(evt);
+            }
+        });
+        add(PENDINGPAYMENT);
+        PENDINGPAYMENT.setBounds(31, 336, 307, 65);
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/curvedgif.gif"))); // NOI18N
         add(jLabel2);
@@ -529,7 +544,8 @@ public class LinkedHome extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_profilebuttonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+    private void PENDINGPAYMENTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PENDINGPAYMENTActionPerformed
         // Show Pending_Payment payment popup when PENDING button is clicked
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -556,17 +572,17 @@ public class LinkedHome extends javax.swing.JPanel {
                 }
             }
         });
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_PENDINGPAYMENTActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel CAR;
     private javax.swing.JLabel LoggedName;
     private javax.swing.JButton Notifications;
+    private javax.swing.JButton PENDINGPAYMENT;
     private javax.swing.JLabel Status;
     private javax.swing.JButton charge;
     private javax.swing.JLabel filler;
     private javax.swing.JButton historybutton;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JButton linkbutton;
