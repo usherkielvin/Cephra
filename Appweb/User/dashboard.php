@@ -1481,14 +1481,15 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							gap: 16px;
 							width: 100%;">
 					<!-- Logo -->
-					<div class="logo"
-						 style="display: flex;
-								align-items: center;
-								gap: 12px;
-								margin-right: 16px;">
-						<img src="images/logo.png" alt="Cephra" class="logo-img" />
-						<span class="logo-text">CEPHRA</span>
-					</div>
+            <a href="dashboard.php" class="logo"
+               style="display: flex;
+                      align-items: center;
+                      gap: 12px;
+                      margin-right: 16px;
+                      text-decoration: none;">
+                <img src="images/logo.png" alt="Cephra" class="logo-img" />
+                <span class="logo-text">CEPHRA</span>
+            </a>
 
 					<!-- Navigation -->
 					<nav class="nav" style="flex: 1;">
@@ -1507,7 +1508,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 					<div class="header-actions"
 						 style="display: flex;
 								align-items: center;
-								gap: 12px;
+								gap: 24px;
 								margin-left: auto;">
 						<!-- Wallet button -->
 						<a href="wallet.php"
@@ -1524,23 +1525,74 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 								  padding: 4px;">
 							<i class="fas fa-wallet" aria-hidden="true" style="font-size: 18px;"></i>
 						</a>
-						<!-- Notification bell -->
-						<div class="notifications" style="position: relative;">
-							<button id="notifBtn"
-									title="Notifications"
-									style="display: inline-flex;
-										   align-items: center;
-										   justify-content: center;
-										   width: auto;
-										   height: auto;
-										   border: none;
-										   background: transparent;
-										   color: inherit;
-										   cursor: pointer;
-										   padding: 4px;">
-								<i class="fas fa-bell" aria-hidden="true" style="font-size: 18px;"></i>
-							</button>
-						</div>
+                <!-- Notification bell -->
+                <div class="notifications" style="position: relative;">
+                    <button id="notifBtn"
+                            title="Notifications"
+                            style="display: inline-flex;
+                                   align-items: center;
+                                   justify-content: center;
+                                   width: auto;
+                                   height: auto;
+                                   border: none;
+                                   background: transparent;
+                                   color: inherit;
+                                   cursor: pointer;
+                                   padding: 4px;
+                                   position: relative;">
+                        <i class="fas fa-bell" aria-hidden="true" style="font-size: 18px;"></i>
+                        <span class="notification-badge" style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #ff4757; border-radius: 50%; display: block;"></span>
+                    </button>
+                    <div class="notification-dropdown" id="notificationDropdown"
+                         style="display: none;
+                                position: absolute;
+                                top: 100%;
+                                right: 0;
+                                background: white;
+                                border: 1px solid var(--border-color);
+                                border-radius: 8px;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                                min-width: 280px;
+                                max-width: 320px;
+                                z-index: 1001;
+                                max-height: 300px;
+                                overflow-y: auto;
+                                margin-top: 8px;">
+                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-info-circle" style="color: var(--primary-color); font-size: 16px; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Welcome to Cephra!</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your personalized dashboard is ready to use.</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Just now</div>
+                            </div>
+                        </div>
+                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-bolt" style="color: #28a745; font-size: 16px; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Charging Session Complete</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your EV has finished charging at Station A.</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-gift" style="color: #ff6b6b; font-size: 16px; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">New Rewards Available</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">You've earned 50 Green Points from your last charge.</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">1 day ago</div>
+                            </div>
+                        </div>
+                        <div class="notification-item" style="padding: 12px 16px; cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-tools" style="color: #ffa502; font-size: 16px; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">System Maintenance Scheduled</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Station B will be under maintenance tomorrow.</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 						<!-- Language selector (globe icon only) placed to the right of Download -->
 
 						<?php
@@ -2070,6 +2122,27 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
         }
 
 
+
+// Notification dropdown functionality
+(function() {
+    const notifBtn = document.getElementById('notifBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+
+    if (notifBtn && notificationDropdown) {
+        notifBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isVisible = notificationDropdown.style.display === 'block';
+            notificationDropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notifBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.style.display = 'none';
+            }
+        });
+    }
+})();
 
         // Set language function
         window.setLanguage = function(lang) {

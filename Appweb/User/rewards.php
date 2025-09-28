@@ -227,7 +227,7 @@ if ($conn) {
         }
 
         .rewards-section {
-            padding: 80px 0;
+            padding: 40px 0;
             background: var(--bg-secondary);
         }
 
@@ -243,38 +243,21 @@ if ($conn) {
             text-align: center;
         }
 
-        .swipe-container {
-            overflow-x: auto;
-            overflow-y: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
             padding: 1rem 0;
-        }
-
-        .swipe-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .swipe-track {
-            display: flex;
-            gap: 1.5rem;
-            padding: 0 1rem;
-            min-width: max-content;
         }
 
         .reward-card {
             background: var(--bg-card);
             border-radius: 20px;
-            padding: 1.5rem;
+            padding: 2rem;
             text-align: center;
-            min-width: 160px;
-            flex-shrink: 0;
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px var(--shadow-light);
-            scroll-snap-align: start;
         }
 
         .reward-card:hover {
@@ -284,8 +267,8 @@ if ($conn) {
         }
 
         .reward-card img {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 15px;
             object-fit: cover;
             margin-bottom: 1rem;
@@ -400,6 +383,98 @@ if ($conn) {
             text-decoration: none;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--bg-card);
+            margin: 15% auto;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            text-align: center;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: var(--text-secondary);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--primary-color);
+        }
+
+        .modal h2 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .pickup {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .pickup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-medium);
+        }
+
+        .deliver {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .deliver:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .nav-list {
                 display: none;
@@ -438,6 +513,20 @@ if ($conn) {
                 width: 60px;
                 height: 60px;
             }
+
+            .modal-content {
+                margin: 20% auto;
+                padding: 1.5rem;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -453,9 +542,9 @@ if ($conn) {
             <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; position: relative; z-index: 2;">
                 Earn and redeem points for exclusive perks as you charge with Cephra.
             </p>
-            <div style="margin-top:16px;display:flex;justify-content:center;">
-                <div class="points-display" style="position:static;background: var(--gradient-primary);color:#fff;padding:0.75rem 1.5rem;border-radius:25px;font-weight:600;box-shadow:0 5px 15px var(--shadow-medium);">
-                    <i class="fas fa-star" style="margin-right:8px"></i>
+            <div style="margin-top:4rem;display:flex;justify-content:center;">
+                <div class="points-display" style="position:static;background: var(--gradient-primary);color:#fff;padding:1rem 1.75rem;border-radius:25px;font-weight:600;box-shadow:0 5px 15px var(--shadow-medium);">
+                    <i class="fas fa-star" style="margin-right:12px;font-size:1.1rem;"></i>
                     <?php echo $total_points; ?> pts
                 </div>
             </div>
@@ -467,38 +556,36 @@ if ($conn) {
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Reward Categories</h2>
-                <p class="section-description">Swipe to explore available rewards in each category</p>
+                <p class="section-description">Explore available rewards in each category</p>
             </div>
 
             <!-- Essentials Category -->
             <div class="category">
                 <h3>Exclusive Essentials</h3>
-                <div class="swipe-container" id="essentials-swipe">
-                    <div class="swipe-track">
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Powerbank">
-                            <h4>Powerbank</h4>
-                            <p>50 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Umbrella">
-                            <h4>Umbrella</h4>
-                            <p>35 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Charger">
-                            <h4>Charger</h4>
-                            <p>40 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Case">
-                            <h4>Case</h4>
-                            <p>30 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
+                <div class="rewards-grid">
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Powerbank">
+                        <h4>Powerbank</h4>
+                        <p>50 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Umbrella">
+                        <h4>Umbrella</h4>
+                        <p>35 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Charger">
+                        <h4>Charger</h4>
+                        <p>40 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Case">
+                        <h4>Case</h4>
+                        <p>30 pts</p>
+                        <button class="redeem-btn">Redeem</button>
                     </div>
                 </div>
             </div>
@@ -506,32 +593,30 @@ if ($conn) {
             <!-- Wearables Category -->
             <div class="category">
                 <h3>Exclusive Wearables</h3>
-                <div class="swipe-container" id="wearables-swipe">
-                    <div class="swipe-track">
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="T-Shirt">
-                            <h4>T-Shirt</h4>
-                            <p>70 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Hoodie">
-                            <h4>Hoodie</h4>
-                            <p>100 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Cap">
-                            <h4>Cap</h4>
-                            <p>50 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Socks">
-                            <h4>Socks</h4>
-                            <p>25 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
+                <div class="rewards-grid">
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="T-Shirt">
+                        <h4>T-Shirt</h4>
+                        <p>70 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Hoodie">
+                        <h4>Hoodie</h4>
+                        <p>100 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Cap">
+                        <h4>Cap</h4>
+                        <p>50 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Socks">
+                        <h4>Socks</h4>
+                        <p>25 pts</p>
+                        <button class="redeem-btn">Redeem</button>
                     </div>
                 </div>
             </div>
@@ -539,32 +624,30 @@ if ($conn) {
             <!-- Sips Category -->
             <div class="category">
                 <h3>Refreshing Sips</h3>
-                <div class="swipe-container" id="sips-swipe">
-                    <div class="swipe-track">
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Coffee">
-                            <h4>Coffee</h4>
-                            <p>20 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Tea">
-                            <h4>Tea</h4>
-                            <p>15 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Juice">
-                            <h4>Juice</h4>
-                            <p>18 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Water">
-                            <h4>Water</h4>
-                            <p>10 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
+                <div class="rewards-grid">
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Coffee">
+                        <h4>Coffee</h4>
+                        <p>20 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Tea">
+                        <h4>Tea</h4>
+                        <p>15 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Juice">
+                        <h4>Juice</h4>
+                        <p>18 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Water">
+                        <h4>Water</h4>
+                        <p>10 pts</p>
+                        <button class="redeem-btn">Redeem</button>
                     </div>
                 </div>
             </div>
@@ -572,84 +655,76 @@ if ($conn) {
             <!-- Boost Category -->
             <div class="category">
                 <h3>Energy Boost</h3>
-                <div class="swipe-container" id="boost-swipe">
-                    <div class="swipe-track">
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Energy Drink">
-                            <h4>Energy Drink</h4>
-                            <p>50 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Vitamin">
-                            <h4>Vitamin</h4>
-                            <p>30 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Snack">
-                            <h4>Snack</h4>
-                            <p>25 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
-                        <div class="reward-card">
-                            <img src="images/logo.png" alt="Boost Pack">
-                            <h4>Boost Pack</h4>
-                            <p>80 pts</p>
-                            <button class="redeem-btn">Redeem</button>
-                        </div>
+                <div class="rewards-grid">
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Energy Drink">
+                        <h4>Energy Drink</h4>
+                        <p>50 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Vitamin">
+                        <h4>Vitamin</h4>
+                        <p>30 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Snack">
+                        <h4>Snack</h4>
+                        <p>25 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/logo.png" alt="Boost Pack">
+                        <h4>Boost Pack</h4>
+                        <p>80 pts</p>
+                        <button class="redeem-btn">Redeem</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <img src="images/logo.png" alt="Cephra" class="footer-logo-img" />
-                        <span class="footer-logo-text">CEPHRA</span>
-                    </div>
-                    <p class="footer-description">
-                        Your ultimate electric vehicle charging platform,
-                        powering the future of sustainable transportation.
-                    </p>
-                </div>
-
-                <div class="footer-section">
-                    <h4 class="footer-title">Platform</h4>
-                    <ul class="footer-links">
-                        <li><a href="dashboard.php">Dashboard</a></li>
-                        <li><a href="ChargingPage.php">Charging</a></li>
-                        <li><a href="history.php">History</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h4 class="footer-title">Support</h4>
-                    <ul class="footer-links">
-                        <li><a href="help_center.php">Help Center</a></li>
-                        <li><a href="contact_us.php">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h4 class="footer-title">Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="about_us.php">About Us</a></li>
-                        <li><a href="our_team.php">Our Team</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+    <!-- Redeem Success Modal -->
+    <div id="redeem-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Reward Redeemed Successfully!</h2>
+            <p>Your points have been deducted and the reward is now yours.</p>
+            <p>How would you like to receive your reward?</p>
+            <div class="modal-buttons">
+                <button id="pickup-btn" class="modal-btn pickup">Pickup at Store</button>
+                <button id="deliver-btn" class="modal-btn deliver">Deliver to My House</button>
             </div>
         </div>
-    </footer>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Order Confirmed!</h2>
+            <p id="success-message">Your reward has been processed successfully.</p>
+            <div class="modal-buttons">
+                <button id="success-ok-btn" class="modal-btn pickup">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Redeem Failed</h2>
+            <p id="error-message">An error occurred while processing your request.</p>
+            <div class="modal-buttons">
+                <button id="error-ok-btn" class="modal-btn deliver">OK</button>
+            </div>
+        </div>
+    </div>
+
+		<!-- Footer -->
+		<?php include __DIR__ . '/partials/footer.php'; ?>
 
     <!-- Scripts -->
     <script src="assets/js/jquery.min.js"></script>
@@ -716,62 +791,147 @@ if ($conn) {
             });
         }
 
-        // Swipe Functionality
+        // Initialize page functionality
         document.addEventListener('DOMContentLoaded', function() {
             initMobileMenu();
 
-            const swipeContainers = document.querySelectorAll('.swipe-container');
-            swipeContainers.forEach(container => {
-                let startX = 0;
-                let currentX = 0;
+            // Modal functionality
+            const redeemModal = document.getElementById('redeem-modal');
+            const successModal = document.getElementById('success-modal');
+            const errorModal = document.getElementById('error-modal');
+            const closeBtns = document.querySelectorAll('.close-modal');
+            const pickupBtn = document.getElementById('pickup-btn');
+            const deliverBtn = document.getElementById('deliver-btn');
+            const successOkBtn = document.getElementById('success-ok-btn');
+            const errorOkBtn = document.getElementById('error-ok-btn');
 
-                container.addEventListener('touchstart', function(e) {
-                    startX = e.touches[0].clientX;
-                    currentX = container.scrollLeft;
-                });
+            let currentReward = null;
 
-                container.addEventListener('touchmove', function(e) {
-                    if (!startX) return;
-                    const deltaX = startX - e.touches[0].clientX;
-                    container.scrollLeft = currentX + deltaX * 0.8; // Smooth scrolling factor
-                });
-
-                container.addEventListener('touchend', function() {
-                    startX = 0;
-                });
-
-                // Mouse support for desktop
-                container.addEventListener('mousedown', function(e) {
-                    startX = e.clientX;
-                    currentX = container.scrollLeft;
-                    container.style.cursor = 'grabbing';
-                });
-
-                container.addEventListener('mousemove', function(e) {
-                    if (startX === 0) return;
-                    const deltaX = startX - e.clientX;
-                    container.scrollLeft = currentX + deltaX * 0.8;
-                });
-
-                container.addEventListener('mouseup', function() {
-                    startX = 0;
-                    container.style.cursor = 'grab';
-                });
-
-                container.addEventListener('mouseleave', function() {
-                    startX = 0;
-                    container.style.cursor = 'default';
-                });
-
-                // Set grab cursor
-                container.style.cursor = 'grab';
-            });
-
-            // Redeem button handlers (placeholder)
+            // Redeem button handlers
             document.querySelectorAll('.redeem-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    alert('Reward redeemed! Points deducted from your total.');
+                    // Get reward details from the card
+                    const card = this.closest('.reward-card');
+                    const rewardName = card.querySelector('h4').textContent;
+                    const rewardPointsText = card.querySelector('p').textContent;
+                    const pointsRequired = parseInt(rewardPointsText.replace(' pts', ''));
+
+                    // Check if user has enough points first
+                    const currentPointsText = document.querySelector('.points-display').textContent;
+                    const currentPointsMatch = currentPointsText.match(/(\d+)/);
+                    const currentPoints = currentPointsMatch ? parseInt(currentPointsMatch[1]) : 0;
+
+                    if (currentPoints < pointsRequired) {
+                        // Show error modal for insufficient points
+                        const errorMessage = document.getElementById('error-message');
+                        errorMessage.textContent = `You don't have enough points. You need ${pointsRequired} points but you only have ${currentPoints} points.`;
+                        errorModal.style.display = 'block';
+                        document.body.style.overflow = 'hidden';
+                        return;
+                    }
+
+                    currentReward = {
+                        name: rewardName,
+                        points: pointsRequired
+                    };
+
+                    // Show redeem modal
+                    redeemModal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
                 });
+            });
+
+            // Close modal handlers
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    redeemModal.style.display = 'none';
+                    successModal.style.display = 'none';
+                    errorModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            });
+
+            // Close modal when clicking outside
+            [redeemModal, successModal, errorModal].forEach(modal => {
+                window.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+
+            // Function to handle redemption
+            function handleRedemption(deliveryType) {
+                if (!currentReward) return;
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('reward_name', currentReward.name);
+                formData.append('points_required', currentReward.points);
+
+                // Make AJAX request
+                fetch('redeem_action.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    redeemModal.style.display = 'none';
+
+                    if (data.success) {
+                        // Update points display
+                        const pointsDisplay = document.querySelector('.points-display');
+                        if (pointsDisplay) {
+                            const starIcon = pointsDisplay.querySelector('i');
+                            const textNode = pointsDisplay.lastChild;
+                            textNode.textContent = ` ${data.new_total} pts`;
+                        }
+
+                        // Show success modal with appropriate message
+                        const successMessage = document.getElementById('success-message');
+                        if (deliveryType === 'pickup') {
+                            successMessage.textContent = 'Thank you! Your reward will be ready for pickup at our store within 24 hours.';
+                        } else {
+                            successMessage.textContent = 'Thank you! Your reward will be delivered to your registered address within 3-5 business days.';
+                        }
+                        successModal.style.display = 'block';
+                    } else {
+                        // Show error modal
+                        const errorMessage = document.getElementById('error-message');
+                        errorMessage.textContent = data.message || 'An error occurred while processing your request.';
+                        errorModal.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    redeemModal.style.display = 'none';
+                    const errorMessage = document.getElementById('error-message');
+                    errorMessage.textContent = 'Network error. Please try again.';
+                    errorModal.style.display = 'block';
+                });
+            }
+
+            // Pickup button handler
+            pickupBtn.addEventListener('click', function() {
+                handleRedemption('pickup');
+            });
+
+            // Deliver button handler
+            deliverBtn.addEventListener('click', function() {
+                handleRedemption('deliver');
+            });
+
+            // Success OK button handler
+            successOkBtn.addEventListener('click', function() {
+                successModal.style.display = 'none';
+                document.body.style.overflow = '';
+            });
+
+            // Error OK button handler
+            errorOkBtn.addEventListener('click', function() {
+                errorModal.style.display = 'none';
+                document.body.style.overflow = '';
             });
         });
 
