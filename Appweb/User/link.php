@@ -27,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['link_car'])) {
         // Link car functionality
         if ($conn) {
-            // Generate random car_index between 1-10
-            $newCarIndex = rand(1, 10);
+            // Generate random car_index between 0-8 to match vehicle specs
+            $newCarIndex = rand(0, 8);
             $stmt = $conn->prepare("UPDATE users SET car_index = :car_index WHERE username = :username");
             $stmt->bindParam(':car_index', $newCarIndex);
             $stmt->bindParam(':username', $username);
@@ -41,6 +41,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+}
+
+// Fetch battery level from database
+$db_battery_level = null;
+if ($conn && $username) {
+    $stmt_battery = $conn->prepare("SELECT battery_level FROM battery_levels WHERE username = :username ORDER BY last_updated DESC LIMIT 1");
+    $stmt_battery->bindParam(':username', $username);
+    $stmt_battery->execute();
+    $battery_row = $stmt_battery->fetch(PDO::FETCH_ASSOC);
+    $db_battery_level = $battery_row ? $battery_row['battery_level'] . '%' : null;
+}
+
+// Vehicle data based on car_index
+$vehicle_data = null;
+if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
+    // Real EV models
+    $models = [
+        0 => 'Audi q8 etron',
+        1 => 'Nissan leaf',
+        2 => 'Tesla x',
+        3 => 'Lotus Spectre',
+        4 => 'BYD Seagull',
+        5 => 'Hyundai',
+        6 => 'Porsche Taycan',
+        7 => 'BYD Tang',
+        8 => 'omada e5'
+    ];
+
+    // Car images
+    $car_images = [
+        0 => 'https://via.placeholder.com/400x200?text=Audi+Q8+Etron',
+        1 => 'https://via.placeholder.com/400x200?text=Nissan+Leaf',
+        2 => 'https://via.placeholder.com/400x200?text=Tesla+X',
+        3 => 'https://via.placeholder.com/400x200?text=Lotus+Spectre',
+        4 => 'https://via.placeholder.com/400x200?text=BYD+Seagull',
+        5 => 'https://via.placeholder.com/400x200?text=Hyundai',
+        6 => 'https://via.placeholder.com/400x200?text=Porsche+Taycan',
+        7 => 'https://via.placeholder.com/400x200?text=BYD+Tang',
+        8 => 'https://via.placeholder.com/400x200?text=Omada+E5'
+    ];
+
+    // Realistic vehicle specs based on model
+    $vehicle_specs = [
+        0 => ['range' => '450 km', 'time_to_full' => '6h 0m', 'battery_level' => '80%', 'hp' => 300], // Audi q8 etron
+        1 => ['range' => '220 km', 'time_to_full' => '8h 0m', 'battery_level' => '72%', 'hp' => 150], // Nissan leaf
+        2 => ['range' => '400 km', 'time_to_full' => '7h 0m', 'battery_level' => '85%', 'hp' => 450], // Tesla x
+        3 => ['range' => '500 km', 'time_to_full' => '5h 0m', 'battery_level' => '90%', 'hp' => 600], // Lotus Spectre
+        4 => ['range' => '300 km', 'time_to_full' => '5h 0m', 'battery_level' => '75%', 'hp' => 200], // BYD Seagull
+        5 => ['range' => '484 km', 'time_to_full' => '7h 20m', 'battery_level' => '95%', 'hp' => 400], // Hyundai
+        6 => ['range' => '400 km', 'time_to_full' => '6h 0m', 'battery_level' => '85%', 'hp' => 500], // Porsche Taycan
+        7 => ['range' => '400 km', 'time_to_full' => '7h 0m', 'battery_level' => '80%', 'hp' => 350], // BYD Tang
+        8 => ['range' => '350 km', 'time_to_full' => '6h 0m', 'battery_level' => '78%', 'hp' => 250] // omada e5
+    ];
+
+    $vehicle_data = [
+        'model' => $models[$carIndex],
+        'status' => 'Connected & Charging',
+        'range' => $vehicle_specs[$carIndex]['range'],
+        'time_to_full' => $vehicle_specs[$carIndex]['time_to_full'],
+        'battery_level' => $db_battery_level ?? $vehicle_specs[$carIndex]['battery_level'],
+        'image' => $car_images[$carIndex]
+    ];
+
+    // Calculate range and time_to_full based on battery level
+    $battery_level_str = $vehicle_data['battery_level'];
+    $battery_level_num = floatval(str_replace('%', '', $battery_level_str));
+
+    // Get max range from specs (assuming it's the max at 100%)
+    $max_range_km = intval(str_replace(' km', '', $vehicle_specs[$carIndex]['range']));
+
+    // Parse max charge time from specs
+    $time_str = $vehicle_specs[$carIndex]['time_to_full'];
+    preg_match('/(\d+)h\s*(\d+)m/', $time_str, $matches);
+    $max_charge_time_hours = 0;
+    if ($matches) {
+        $hours = intval($matches[1]);
+        $mins = intval($matches[2]);
+        $max_charge_time_hours = $hours + $mins / 60;
+    }
+
+    // Calculate current range
+    $current_range_km = round($max_range_km * ($battery_level_num / 100));
+    $vehicle_data['range'] = $current_range_km . ' km';
+
+    // Calculate time to full
+    $time_to_full_hours = $max_charge_time_hours * ((100 - $battery_level_num) / 100);
+    $hours_full = floor($time_to_full_hours);
+    $mins_full = round(($time_to_full_hours - $hours_full) * 60);
+    $vehicle_data['time_to_full'] = $hours_full . 'h ' . $mins_full . 'm';
 }
 ?>
 <!DOCTYPE HTML>
@@ -70,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="link-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); max-width: 600px; margin: 0 auto;">
-                    <?php if (is_null($carIndex) || $carIndex == 0): ?>
+                    <?php if (is_null($carIndex)): ?>
                         <!-- No Car Design -->
                         <h3 style="text-align: center; margin-bottom: 1rem; color: #1a202c;">Link Your Electric Vehicle</h3>
                         <p style="text-align: center; margin-bottom: 2rem; color: rgba(26, 32, 44, 0.7);">Connect your EV to start charging at Cephra stations</p>
@@ -90,31 +179,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php else: ?>
                         <!-- With Car Design -->
                         <h3 style="text-align: center; margin-bottom: 1rem; color: #1a202c;">Your Vehicle is Linked</h3>
-                        <p style="text-align: center; margin-bottom: 2rem; color: rgba(26, 32, 44, 0.7);">Porsche connected. You're ready to charge.</p>
-                        <img src="images/ads.png" alt="Porsche" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px; display: block; margin-left: auto; margin-right: auto;">
+                        <p style="text-align: center; margin-bottom: 2rem; color: rgba(26, 32, 44, 0.7);"><?php echo htmlspecialchars($vehicle_data['model']); ?> connected. You're ready to charge.</p>
+                        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px; display: block; margin-left: auto; margin-right: auto;">
                         <div class="car-details" style="margin-top: 2rem;">
                             <div class="detail-row" style="margin-bottom: 1rem;">
                                 <span class="detail-label">Car Model:</span>
-                                <span class="detail-value">Porsche <?php echo $carIndex; ?></span>
+                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['model']); ?></span>
                             </div>
                             <div class="detail-row" style="margin-bottom: 1rem;">
                                 <span class="detail-label">Performance:</span>
-                                <span class="detail-value"><?php echo rand(200, 400); ?> HP</span>
+                                <span class="detail-value"><?php echo $vehicle_specs[$carIndex]['hp']; ?> HP</span>
                             </div>
                             <div class="detail-row" style="margin-bottom: 1rem;">
                                 <span class="detail-label">Kms Remaining:</span>
-                                <span class="detail-value"><?php echo rand(50, 300); ?> km</span>
+                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['range']); ?></span>
                             </div>
                             <div class="detail-row" style="margin-bottom: 1rem;">
                                 <span class="detail-label">Time to Charge:</span>
-                                <span class="detail-value"><?php echo rand(20, 60); ?> minutes</span>
+                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['time_to_full']); ?></span>
                             </div>
                             <div class="detail-row" style="margin-bottom: 1rem;">
                                 <span class="detail-label">Battery Level:</span>
                                 <div class="progress-bar" style="width: 100%; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
-                                    <div class="progress-fill" style="height: 20px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); width: <?php echo rand(20, 100); ?>%; transition: width 0.3s ease;"></div>
+                                    <div class="progress-fill" style="height: 20px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); width: <?php echo $battery_level_num; ?>%; transition: width 0.3s ease;"></div>
                                 </div>
-                                <span class="progress-text" style="display: block; text-align: center; margin-top: 0.5rem;"><?php echo rand(20, 100); ?>%</span>
+                                <span class="progress-text" style="display: block; text-align: center; margin-top: 0.5rem;"><?php echo htmlspecialchars($vehicle_data['battery_level']); ?></span>
                             </div>
                         </div>
                         <div style="display:flex; gap:12px; justify-content:center; margin-top: 2rem;">
