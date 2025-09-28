@@ -50,30 +50,12 @@ public class Charge_Now extends javax.swing.JPanel {
 
     private void OKBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKBTNActionPerformed
         cephra.Phone.Utilities.CustomPopupManager.executeCallback();
-        // Fallback: if no popup is showing after callback, ensure ProceedBay appears with TBD bay
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    if (!cephra.Phone.Utilities.CustomPopupManager.isPopupShowing()) {
-                        String username = cephra.Database.CephraDB.getCurrentUsername();
-                        String ticket = (username == null || username.isEmpty())
-                                ? null
-                                : cephra.Database.CephraDB.getUserCurrentTicketId(username);
-                        if (ticket == null || ticket.trim().isEmpty()) {
-                            ticket = cephra.Phone.Utilities.QueueFlow.getCurrentTicketId();
-                        }
-                        String assignedBay = null;
-                        try { assignedBay = cephra.Admin.BayManagement.getBayNumberByTicket(ticket); } catch (Throwable ignore) {}
-                        if (username != null && !username.isEmpty()) {
-                            cephra.Phone.Utilities.CustomPopupManager.showProceedBayPopupInfo(ticket, (assignedBay != null ? assignedBay : "TBD"), username);
-                        }
-                    }
-                } catch (Throwable ignore) {}
-            }
-        });
+        // Note: The executeCallback method now handles the fallback internally to prevent looping
     }//GEN-LAST:event_OKBTNActionPerformed
 
     private void CANCELActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CANCELActionPerformed
+        // Clear callback and hide popup to prevent any further processing
+        cephra.Phone.Utilities.CustomPopupManager.cancelCurrentCallback();
         cephra.Phone.Utilities.CustomPopupManager.hideCustomPopup();
     }//GEN-LAST:event_CANCELActionPerformed
 
