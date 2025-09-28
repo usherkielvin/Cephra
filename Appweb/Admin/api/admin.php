@@ -70,13 +70,13 @@ try {
             $stmt = $db->query("SELECT COUNT(*) as count FROM charging_grid WHERE ticket_id IS NOT NULL");
             $stats['active_bays'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
             
-            // Overall revenue (all time)
-            $stmt = $db->query("SELECT SUM(amount) as revenue FROM payment_transactions");
+            // Overall revenue (all time) - using charging_history table to match Admin Java
+            $stmt = $db->query("SELECT SUM(total_amount) as revenue FROM charging_history");
             $revenue = $stmt->fetch(PDO::FETCH_ASSOC)['revenue'];
             $stats['revenue_today'] = $revenue ? (float)$revenue : 0;
             
-            // Today's revenue for comparison
-            $stmt = $db->query("SELECT SUM(amount) as revenue FROM payment_transactions WHERE DATE(processed_at) = CURDATE()");
+            // Today's revenue for comparison - using charging_history table to match Admin Java
+            $stmt = $db->query("SELECT SUM(total_amount) as revenue FROM charging_history WHERE DATE(completed_at) = CURDATE()");
             $today_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['revenue'];
             $stats['revenue_today_only'] = $today_revenue ? (float)$today_revenue : 0;
             
@@ -939,15 +939,15 @@ try {
                 default => 'INTERVAL 7 DAY'
             };
 
-            // Get revenue data
+            // Get revenue data - using charging_history table to match Admin Java
             $stmt = $db->query("
                 SELECT
-                    DATE(processed_at) as date,
-                    SUM(amount) as revenue
-                FROM payment_transactions
-                WHERE processed_at >= DATE_SUB(CURDATE(), $interval)
-                GROUP BY DATE(processed_at)
-                ORDER BY DATE(processed_at)
+                    DATE(completed_at) as date,
+                    SUM(total_amount) as revenue
+                FROM charging_history
+                WHERE completed_at >= DATE_SUB(CURDATE(), $interval)
+                GROUP BY DATE(completed_at)
+                ORDER BY DATE(completed_at)
             ");
             $revenue_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
