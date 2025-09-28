@@ -157,7 +157,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         add(loginbutton);
-        loginbutton.setBounds(220, 670, 90, 50);
+        loginbutton.setBounds(220, 668, 90, 50);
 
         UsernamePhone.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
         UsernamePhone.setBorder(null);
@@ -410,6 +410,13 @@ public class Register extends javax.swing.JPanel {
         } else if (passwordText.isEmpty()) {
             pass.requestFocusInWindow();
         }
+        return;
+    }
+
+    // Basic email format check
+    if (!emailText.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+        JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Email", JOptionPane.WARNING_MESSAGE);
+        email.requestFocusInWindow();
         return;
     }
 

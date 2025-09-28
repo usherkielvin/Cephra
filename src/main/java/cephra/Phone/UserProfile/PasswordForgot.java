@@ -51,7 +51,10 @@ public class PasswordForgot extends javax.swing.JPanel {
         add(Contact_Support_Button);
         Contact_Support_Button.setBounds(185, 663, 130, 30);
 
-        Back_Button.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        Back_Button.setBackground(new java.awt.Color(0, 0, 0));
+        Back_Button.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        Back_Button.setForeground(new java.awt.Color(0, 0, 0));
+        Back_Button.setText("Back to Sign in");
         Back_Button.setBorder(null);
         Back_Button.setBorderPainted(false);
         Back_Button.setContentAreaFilled(false);
