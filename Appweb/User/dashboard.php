@@ -1926,9 +1926,7 @@ if ($conn) {
 						<p class="feature-description">
 							<strong>Current Level:</strong> <?php echo htmlspecialchars($vehicle_data['battery_level']); ?><br>
 							<strong>Health Score:</strong> 92% (Excellent)<br>
-							<strong>Degradation:</strong> 8% over 2 years<br>
 							<strong>Temperature:</strong> Optimal (25°C)<br>
-							<strong>Cycles:</strong> 340/1000 remaining
 						</p>
 					</div>
 
@@ -1970,7 +1968,6 @@ if ($conn) {
 							<strong>System Status:</strong> All systems normal<br>
 							<strong>Last Check:</strong> 2 hours ago<br>
 							<strong>Alerts:</strong> None<br>
-							<strong>Maintenance:</strong> Due in 1,200 km
 						</p>
 					</div>
 					<?php endif; ?>
