@@ -352,7 +352,7 @@ $conn = $db->getConnection();
             <div class="leadership-grid">
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="" alt="Usher Kielvin Ponce" />
+                        <img src="images/default.png" alt="Usher Kielvin Ponce" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Usher Kielvin Ponce</h3>
@@ -362,14 +362,14 @@ $conn = $db->getConnection();
                     </div>
                     <div class="member-social">
                         <div class="social-links">
-                            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                            <a href="https://github.com/usherkielvin" class="social-link"><i class="fab fa-github"></i></a>
                         </div>
                     </div>
                 </div>
 
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="" alt="Mark Dwayne P. Dela Cruz" />
+                        <img src="images/delacruz.jpeg" alt="Mark Dwayne P. Dela Cruz" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Mark Dwayne P. Dela Cruz</h3>
@@ -380,14 +380,14 @@ $conn = $db->getConnection();
                     </div>
                     <div class="member-social">
                         <div class="social-links">
-                            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                            <a href="https://github.com/cwossant" class="social-link"><i class="fab fa-github"></i></a>
                         </div>
                     </div>
                 </div>
 
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="" alt="Dizon S. Dizon" />
+                        <img src="images/default.png" alt="Dizon S. Dizon" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Dizon S. Dizon</h3>
@@ -397,14 +397,14 @@ $conn = $db->getConnection();
                     </div>
                     <div class="member-social">
                         <div class="social-links">
-                            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                            <a href="https://github.com/Dizon-69" class="social-link"><i class="fab fa-github"></i></a>
                         </div>
                     </div>
                 </div>
 
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="" alt="Kenji A. Hizon" />
+                        <img src="images/kenji.jpeg" alt="Kenji A. Hizon" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Kenji A. Hizon</h3>
@@ -414,7 +414,7 @@ $conn = $db->getConnection();
                     </div>
                     <div class="member-social">
                         <div class="social-links">
-                            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                            <a href="https://github.com/froshitech" class="social-link"><i class="fab fa-github"></i></a>
                         </div>
                     </div>
                 </div>

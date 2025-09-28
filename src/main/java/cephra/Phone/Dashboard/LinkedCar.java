@@ -391,7 +391,7 @@ public class LinkedCar extends javax.swing.JPanel {
 
         plateNumber.setText("NBH3261");
         add(plateNumber);
-        plateNumber.setBounds(240, 230, 70, 30);
+        plateNumber.setBounds(62, 280, 100, 20);
 
         car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.png"))); // NOI18N
         car.setPreferredSize(new java.awt.Dimension(301, 226));

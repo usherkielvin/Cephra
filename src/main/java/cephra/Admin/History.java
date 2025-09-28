@@ -42,12 +42,13 @@ public class History extends javax.swing.JPanel {
         });
         
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
        
         // Set column widths
         JTableHeader header = jTable1.getTableHeader();
         header.setFont(new Font("Sogie UI", Font.BOLD, 16));
         
+
         // Set column widths
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(80);  // Ticket
         jTable1.getColumnModel().getColumn(1).setPreferredWidth(120); // Customer
@@ -70,7 +71,11 @@ public class History extends javax.swing.JPanel {
             ((DefaultTableModel) jTable1.getModel()).addColumn(model.getColumnName(i));
         }
         
-        cephra.Admin.Utilities.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());       
+        cephra.Admin.Utilities.HistoryBridge.registerModel((DefaultTableModel) jTable1.getModel());
+        
+        // Ensure table can scroll properly
+       
+        jTable1.setFillsViewportHeight(true);       
     }
  
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -112,7 +117,7 @@ public class History extends javax.swing.JPanel {
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Ticket", "Customer", "KWh", "Total", "Served By", "Date & Time", "Reference"
+                "Ticket", "Customer", "KWh", "Total", "Plate Number", "Date & Time", "Reference"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -124,10 +129,11 @@ public class History extends javax.swing.JPanel {
             }
         });
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        jTable1.setAutoscrolls(false);
+        jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
-        jTable1.setPreferredSize(new java.awt.Dimension(525, 139));
+        // Remove fixed size to allow proper scrolling
+        // jTable1.setPreferredSize(new java.awt.Dimension(525, 139));
         jTable1.setRequestFocusEnabled(false);
         jTable1.setShowHorizontalLines(true);
         jTable1.getTableHeader().setResizingAllowed(false);
@@ -374,29 +380,5 @@ public class History extends javax.swing.JPanel {
             System.err.println("Error formatting timestamp: " + e.getMessage());
         }
         return String.valueOf(timestamp);
-    }
-    
-    private String getStaffFirstNameFromDB() {
-        try {
-            // Get the logged-in username from the admin frame
-            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-            if (window instanceof cephra.Frame.Admin) {
-                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
-                usernameField.setAccessible(true);
-                String username = (String) usernameField.get(window);
-                
-                System.out.println("DEBUG History: Retrieved username from admin frame = '" + username + "'");
-                
-                if (username != null && !username.isEmpty()) {
-                    // Use the updated CephraDB method that queries staff_records.firstname
-                    String result = cephra.Database.CephraDB.getStaffFirstName(username);
-                    System.out.println("DEBUG History: CephraDB.getStaffFirstName returned = '" + result + "'");
-                    return result;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error getting staff first name: " + e.getMessage());
-        }
-        return "Admin"; // Fallback
     }
 }

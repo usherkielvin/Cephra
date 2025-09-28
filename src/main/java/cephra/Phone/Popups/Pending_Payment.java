@@ -387,6 +387,7 @@ public class Pending_Payment extends javax.swing.JPanel {
         payonline = new javax.swing.JButton();
         bg = new javax.swing.JLabel();
 
+        setOpaque(false);
         setLayout(null);
 
         TICKETNUMBER.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N

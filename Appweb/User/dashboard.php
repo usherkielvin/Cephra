@@ -19,7 +19,7 @@ $car_index = $user ? $user['car_index'] : null;
 // Vehicle data based on car_index
 $vehicle_data = null;
 if ($car_index && $car_index >= 1 && $car_index <= 10) {
-    // Placeholder models - will be updated with specific EV brands later
+    // Real EV models
     $models = [
         1 => 'EV Model 1',
         2 => 'EV Model 2',
@@ -33,19 +33,38 @@ if ($car_index && $car_index >= 1 && $car_index <= 10) {
         10 => 'EV Model 10'
     ];
 
+    // Realistic vehicle specs based on model
+    $vehicle_specs = [
+        1 => ['range' => '358 km', 'time_to_full' => '6h 30m', 'battery_level' => '85%'], // Tesla Model 3
+        2 => ['range' => '220 km', 'time_to_full' => '8h 0m', 'battery_level' => '72%'], // Nissan Leaf
+        3 => ['range' => '383 km', 'time_to_full' => '9h 15m', 'battery_level' => '90%'], // Chevrolet Bolt
+        4 => ['range' => '246 km', 'time_to_full' => '4h 45m', 'battery_level' => '68%'], // BMW i3
+        5 => ['range' => '484 km', 'time_to_full' => '7h 20m', 'battery_level' => '95%'], // Hyundai Kona Electric
+        6 => ['range' => '452 km', 'time_to_full' => '5h 10m', 'battery_level' => '78%'], // Kia Soul EV
+        7 => ['range' => '482 km', 'time_to_full' => '8h 5m', 'battery_level' => '82%'], // Volkswagen ID.4
+        8 => ['range' => '378 km', 'time_to_full' => '6h 50m', 'battery_level' => '88%'], // Ford Mustang Mach-E
+        9 => ['range' => '470 km', 'time_to_full' => '5h 30m', 'battery_level' => '76%'], // Polestar 2
+        10 => ['range' => '400 km', 'time_to_full' => '7h 40m', 'battery_level' => '91%'] // Audi e-tron
+    ];
+
     $vehicle_data = [
         'model' => $models[$car_index],
         'status' => 'Connected & Charging',
-        'range' => rand(30, 200) . ' km',
-        'time_to_full' => rand(1, 4) . 'h ' . rand(0, 59) . 'm',
-        'battery_level' => rand(20, 100) . '%'
+        'range' => $vehicle_specs[$car_index]['range'],
+        'time_to_full' => $vehicle_specs[$car_index]['time_to_full'],
+        'battery_level' => $vehicle_specs[$car_index]['battery_level']
     ];
 }
 
-echo "<!-- DEBUG: Session username: " . htmlspecialchars($_SESSION['username']) . " -->";
-echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
-echo "<!-- DEBUG: Fetched car_index: " . htmlspecialchars($car_index) . " -->";
-echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data)) . " -->";
+$latest_transaction = null;
+if ($conn) {
+    $stmt = $conn->prepare("SELECT pt.ticket_id, pt.amount, pt.payment_method, pt.transaction_status, pt.processed_at, ch.service_type FROM payment_transactions pt LEFT JOIN charging_history ch ON pt.ticket_id = ch.ticket_id WHERE pt.username = :username ORDER BY pt.processed_at DESC LIMIT 1");
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+    $latest_transaction = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+
 
 } else {
     $firstname = 'User';
@@ -1474,77 +1493,203 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 		<!-- Header -->
 		<header class="header">
 			<div class="container">
-            <div class="header-content" style="display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;">
+				<div class="header-content"
+					 style="display: flex;
+							align-items: center;
+							justify-content: space-between;
+							gap: 16px;
+							width: 100%;">
 					<!-- Logo -->
-                        <div class="logo" style="display:flex;align-items:center;gap:12px;margin-right:16px;">
-						<img src="images/logo.png" alt="Cephra" class="logo-img" />
-						<span class="logo-text">CEPHRA</span>
-					</div>
+            <a href="dashboard.php" class="logo"
+               style="display: flex;
+                      align-items: center;
+                      gap: 12px;
+                      margin-right: 16px;
+                      text-decoration: none;">
+                <img src="images/logo.png" alt="Cephra" class="logo-img" />
+                <span class="logo-text">CEPHRA</span>
+            </a>
 
 					<!-- Navigation -->
-                        <nav class="nav" style="flex:1;">
-                            <ul class="nav-list" style="display:flex;gap:1.25rem;align-items:center;">
+					<nav class="nav" style="flex: 1;">
+						<ul class="nav-list"
+							style="display: flex;
+								   gap: 1.25rem;
+								   align-items: center;">
 							<li><a href="#" onclick="openMonitorWeb(); return false;" class="nav-link">Monitor</a></li>
 							<li><a href="link.php" class="nav-link">Link</a></li>
 							<li><a href="history.php" class="nav-link">History</a></li>
-							<li><a href="wallet.php" class="nav-link">Wallet</a></li>
 							<li><a href="rewards.php" class="nav-link">Rewards</a></li>
 						</ul>
 					</nav>
 
 					<!-- Header Actions -->
-                        <div class="header-actions" style="display:flex;align-items:center;gap:12px;margin-left:auto;">
-                            <!-- Wallet button -->
-                            <a href="wallet.php" title="Wallet" style="display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;">
-                                <i class="fas fa-wallet" aria-hidden="true" style="font-size:18px;"></i>
-                            </a>
-                            <!-- Notification bell -->
-                            <div class="notifications" style="position:relative;">
-                                <button id="notifBtn" title="Notifications" style="display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;">
-                                    <i class="fas fa-bell" aria-hidden="true" style="font-size:18px;"></i>
-                                </button>
+					<div class="header-actions"
+						 style="display: flex;
+								align-items: center;
+								gap: 24px;
+								margin-left: auto;">
+						<!-- Wallet button -->
+						<a href="wallet.php"
+						   title="Wallet"
+						   style="display: inline-flex;
+								  align-items: center;
+								  justify-content: center;
+								  width: auto;
+								  height: auto;
+								  border: none;
+								  background: transparent;
+								  color: inherit;
+								  cursor: pointer;
+								  padding: 4px;">
+							<i class="fas fa-wallet" aria-hidden="true" style="font-size: 18px;"></i>
+						</a>
+                <!-- Notification bell -->
+                <div class="notifications" style="position: relative;">
+                    <button id="notifBtn"
+                            title="Notifications"
+                            style="display: inline-flex;
+                                   align-items: center;
+                                   justify-content: center;
+                                   width: auto;
+                                   height: auto;
+                                   border: none;
+                                   background: transparent;
+                                   color: inherit;
+                                   cursor: pointer;
+                                   padding: 4px;
+                                   position: relative;">
+                        <i class="fas fa-bell" aria-hidden="true" style="font-size: 18px;"></i>
+                        <span class="notification-badge" style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #ff4757; border-radius: 50%; display: block;"></span>
+                    </button>
+                    <div class="notification-dropdown" id="notificationDropdown"
+                         style="display: none;
+                                position: absolute;
+                                top: 100%;
+                                right: 0;
+                                background: white;
+                                border: 1px solid var(--border-color);
+                                border-radius: 8px;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                                min-width: 280px;
+                                max-width: 320px;
+                                z-index: 1001;
+                                max-height: 300px;
+                                overflow-y: auto;
+                                margin-top: 8px;">
+                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-info-circle" style="color: var(--primary-color); font-size: 16px; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Welcome to Cephra!</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your personalized dashboard is ready to use.</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Just now</div>
                             </div>
-                            <!-- Language selector (globe icon only) placed to the right of Download -->
-                            <div class="language-selector" style="position:relative;">
-                                <button class="language-btn" id="languageBtn" title="Language" style="display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;">
-                                    <i class="fas fa-globe" aria-hidden="true" style="font-size:18px;line-height:1;"></i>
-                                </button>
-                                <div class="language-dropdown" id="languageDropdown" style="position:absolute;top:28px;right:0;">
-                                    <div class="language-option" data-lang="en">English</div>
-                                    <div class="language-option" data-lang="fil">Filipino</div>
-                                    <div class="language-option" data-lang="ceb">Bisaya</div>
-                                    <div class="language-option" data-lang="zh">中文</div>
-                                </div>
-                            </div>
-                            <?php
-                            // Compute avatar source
-                            $pfpSrc = 'images/logo.png';
-                            if ($conn) {
-                                try {
-                                    $stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
-                                    $stmt2->bindParam(':u', $username);
-                                    $stmt2->execute();
-                                    $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
-                                    if ($row2 && !empty($row2['profile_picture'])) {
-                                        $pp = $row2['profile_picture'];
-                                        if (strpos($pp, 'data:image') === 0) {
-                                            $pfpSrc = $pp;
-                                        } elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
-                                            $pfpSrc = 'data:image/png;base64,' . $pp;
-                                        } elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
-                                            $path = 'uploads/profile_pictures/' . $pp;
-                                            if (file_exists(__DIR__ . '/' . $path)) {
-                                                $pfpSrc = $path;
-                                            }
-                                        }
-                                    }
-                                } catch (Exception $e) { /* ignore */ }
-                            }
-                            ?>
-                            <a href="profile.php" title="Profile" style="display:inline-flex;width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid rgba(0,0,0,0.08);">
-                                <img src="<?php echo htmlspecialchars($pfpSrc); ?>" alt="Profile" style="width:100%;height:100%;object-fit:cover;display:block;" />
-                            </a>
                         </div>
+                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-bolt" style="color: #28a745; font-size: 16px; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Charging Session Complete</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your EV has finished charging at Station A.</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-gift" style="color: #ff6b6b; font-size: 16px; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">New Rewards Available</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">You've earned 50 Green Points from your last charge.</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">1 day ago</div>
+                            </div>
+                        </div>
+                        <div class="notification-item" style="padding: 12px 16px; cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-tools" style="color: #ffa502; font-size: 16px; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">System Maintenance Scheduled</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Station B will be under maintenance tomorrow.</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+						<!-- Language selector (globe icon only) placed to the right of Download -->
+
+						<?php
+						// Compute avatar source
+						$pfpSrc = 'images/logo.png';
+						if ($conn) {
+							try {
+								$stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
+								$stmt2->bindParam(':u', $username);
+								$stmt2->execute();
+								$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+								if ($row2 && !empty($row2['profile_picture'])) {
+									$pp = $row2['profile_picture'];
+									if (strpos($pp, 'data:image') === 0) {
+										$pfpSrc = $pp;
+									} elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
+										$pfpSrc = 'data:image/png;base64,' . $pp;
+									} elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
+										$path = 'uploads/profile_pictures/' . $pp;
+										if (file_exists(__DIR__ . '/' . $path)) {
+											$pfpSrc = $path;
+										}
+									}
+								}
+							} catch (Exception $e) { /* ignore */ }
+						}
+						?>
+						<div class="profile-container" style="position: relative;">
+							<button class="profile-btn" id="profileBtn"
+								   title="Profile Menu"
+								   style="display: inline-flex;
+										  width: 38px;
+										  height: 38px;
+										  border-radius: 50%;
+										  overflow: hidden;
+										  border: 2px solid rgba(0, 0, 0, 0.08);
+										  background: transparent;
+										  cursor: pointer;
+										  padding: 0;">
+								<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
+									 alt="Profile"
+									 style="width: 100%;
+											height: 100%;
+											object-fit: cover;
+											display: block;" />
+							</button>
+							<ul class="profile-dropdown" id="profileDropdown"
+								style="position: absolute;
+									   top: 100%;
+									   right: 0;
+									   background: white;
+									   border: 1px solid rgba(0, 0, 0, 0.1);
+									   border-radius: 8px;
+									   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+									   min-width: 120px;
+									   list-style: none;
+									   padding: 0;
+									   margin: 0;
+									   z-index: 1001;
+									   display: none;">
+								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
+									<a href="profile.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Profile</a>
+								</li>
+								<li style="position: relative; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
+									<a href="#" id="languageMenuItem" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Language</a>
+                                    <ul class="language-sub-dropdown" id="languageSubDropdown" style="position: absolute; top: 0; right: 100%; left: auto; background: white; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); min-width: 120px; list-style: none; padding: 0; margin: 0; display: none;">
+										<li><a href="#" onclick="setLanguage('en'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">English</a></li>
+										<li><a href="#" onclick="setLanguage('fil'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Filipino</a></li>
+										<li><a href="#" onclick="setLanguage('ceb'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Bisaya</a></li>
+										<li><a href="#" onclick="setLanguage('zh'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">中文</a></li>
+									</ul>
+								</li>
+								<li>
+									<a href="profile_logout.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Logout</a>
+								</li>
+							</ul>
+						</div>
+					</div>
 
 					<!-- Mobile Menu Toggle -->
 					<button class="mobile-menu-toggle" id="mobileMenuToggle">
@@ -1562,7 +1707,6 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 						<li><a href="#" onclick="openMonitorWeb(); return false;" class="mobile-nav-link">Monitor</a></li>
 						<li><a href="link.php" class="mobile-nav-link">Link</a></li>
 						<li><a href="history.php" class="mobile-nav-link">History</a></li>
-						<li><a href="profile.php" class="mobile-nav-link">Profile</a></li>
 						<li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
 						<li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
 					</ul>
@@ -1786,7 +1930,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							Manage your payment methods, view transaction history,
 							and track your spending across all charging sessions.
 						</p>
-						<a href="profile.php" class="feature-link">Manage Wallet →</a>
+						<a href="wallet.php" class="feature-link">Manage Wallet →</a>
 					</div>
 				</div>
 			</div>
@@ -1801,6 +1945,18 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 				</div>
 
 				<div class="activity-list" id="recentActivity">
+					<?php if ($latest_transaction): ?>
+					<div class="activity-item">
+						<div class="activity-icon">
+							<i class="fas fa-credit-card"></i>
+						</div>
+						<div class="activity-content">
+							<h4 class="activity-title">₱<?php echo number_format($latest_transaction['amount'], 2); ?> Payment for <?php echo htmlspecialchars($latest_transaction['service_type'] ?? 'Charging'); ?></h4>
+							<p class="activity-description">Paid via <?php echo htmlspecialchars($latest_transaction['payment_method']); ?> - Status: <?php echo htmlspecialchars($latest_transaction['transaction_status']); ?></p>
+							<span class="activity-time"><?php echo date('M j, Y g:i A', strtotime($latest_transaction['processed_at'])); ?></span>
+						</div>
+					</div>
+					<?php else: ?>
 					<div class="activity-item">
 						<div class="activity-icon">
 							<i class="fas fa-info-circle"></i>
@@ -1811,6 +1967,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							<span class="activity-time">Just now</span>
 						</div>
 					</div>
+					<?php endif; ?>
 				</div>
 
 				<div class="activity-actions">
@@ -1827,6 +1984,130 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 			<button class="close-btn" onclick="closeGreenPointsPopup()">×</button>
 		</div>
 
+		<!-- Stations Modal -->
+		<div id="stationsModal" class="modal-overlay" style="display: none;">
+			<div class="modal-content large">
+				<div class="modal-header">
+					<h2 class="modal-title">Nearby Charging Stations</h2>
+					<button class="modal-close" onclick="closeStationsModal()">&times;</button>
+				</div>
+				<div class="modal-body">
+					<div class="stations-list">
+						<!-- Sample stations -->
+						<div class="station-item">
+							<div class="station-info">
+								<h4>Station A - Downtown</h4>
+								<p>123 Main St, City Center</p>
+								<div class="station-features">
+									<span class="feature-tag">Fast Charge</span>
+									<span class="feature-tag">24/7</span>
+								</div>
+							</div>
+							<div class="station-status">
+								<span class="status-available">Available</span>
+								<button class="station-btn" onclick="navigateToStation('Station A - Downtown')">Navigate</button>
+							</div>
+						</div>
+						<div class="station-item">
+							<div class="station-info">
+								<h4>Station B - Mall Area</h4>
+								<p>456 Shopping Blvd, Mall District</p>
+								<div class="station-features">
+									<span class="feature-tag">Normal Charge</span>
+									<span class="feature-tag">Covered</span>
+								</div>
+							</div>
+							<div class="station-status">
+								<span class="status-available">Available</span>
+								<button class="station-btn" onclick="navigateToStation('Station B - Mall Area')">Navigate</button>
+							</div>
+						</div>
+						<div class="station-item">
+							<div class="station-info">
+								<h4>Station C - Highway</h4>
+								<p>789 Highway Exit, Route 10</p>
+								<div class="station-features">
+									<span class="feature-tag">Fast Charge</span>
+									<span class="feature-tag">Rest Area</span>
+								</div>
+							</div>
+							<div class="station-status">
+								<span class="status-available">Available</span>
+								<button class="station-btn" onclick="navigateToStation('Station C - Highway')">Navigate</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Schedule Modal -->
+		<div id="scheduleModal" class="modal-overlay" style="display: none;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 class="modal-title">Schedule Charging</h2>
+					<button class="modal-close" onclick="closeScheduleModal()">&times;</button>
+				</div>
+				<div class="modal-body">
+					<form id="scheduleForm">
+						<div class="form-group">
+							<label for="scheduleDate">Date</label>
+							<input type="date" id="scheduleDate" name="date" required>
+						</div>
+						<div class="form-group">
+							<label for="scheduleTime">Time</label>
+							<input type="time" id="scheduleTime" name="time" required>
+						</div>
+						<div class="form-group">
+							<label for="chargingType">Charging Type</label>
+							<select id="chargingType" name="chargingType" required>
+								<option value="">Select Type</option>
+								<option value="Normal">Normal Charging</option>
+								<option value="Fast">Fast Charging</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="estimatedDuration">Estimated Duration (hours)</label>
+							<input type="number" id="estimatedDuration" name="duration" min="1" max="8" required>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button class="modal-btn secondary" onclick="closeScheduleModal()">Cancel</button>
+					<button class="modal-btn primary" onclick="submitSchedule()">Schedule</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Support Modal -->
+		<div id="supportModal" class="modal-overlay" style="display: none;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 class="modal-title">Support Center</h2>
+					<button class="modal-close" onclick="closeSupportModal()">&times;</button>
+				</div>
+				<div class="modal-body">
+					<div class="support-options">
+						<div class="support-option" onclick="showFAQ()">
+							<div class="support-icon"><i class="fas fa-question-circle"></i></div>
+							<h4>FAQ</h4>
+							<p>Frequently asked questions</p>
+						</div>
+						<div class="support-option" onclick="contactSupport()">
+							<div class="support-icon"><i class="fas fa-phone"></i></div>
+							<h4>Contact Support</h4>
+							<p>Get in touch with our team</p>
+						</div>
+						<div class="support-option" onclick="reportIssue()">
+							<div class="support-icon"><i class="fas fa-exclamation-triangle"></i></div>
+							<h4>Report Issue</h4>
+							<p>Report technical problems</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Scripts -->
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.dropotron.min.js"></script>
@@ -1834,53 +2115,99 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-    <script>
-        // Dashboard header: Language dropdown and Download QR like index.php
-        (function(){
-            const languageBtn = document.getElementById('languageBtn');
-            const languageDropdown = document.getElementById('languageDropdown');
-            if (languageBtn && languageDropdown) {
-                languageBtn.addEventListener('click', function(e){
+            <script>
+                // Profile dropdown functionality
+                (function() {
+                    const profileBtn = document.getElementById('profileBtn');
+                    const profileDropdown = document.getElementById('profileDropdown');
+                    const languageMenuItem = document.getElementById('languageMenuItem');
+                    const languageSubDropdown = document.getElementById('languageSubDropdown');
+
+                    if (profileBtn && profileDropdown) {
+                        profileBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const isVisible = profileDropdown.style.display === 'block';
+                            profileDropdown.style.display = isVisible ? 'none' : 'block';
+                        });
+
+                        // Close dropdown when clicking outside
+                        document.addEventListener('click', function(e) {
+                            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                                profileDropdown.style.display = 'none';
+                            }
+                        });
+
+            // Language sub-dropdown toggle
+            if (languageMenuItem && languageSubDropdown) {
+                languageMenuItem.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    languageDropdown.classList.toggle('show');
-                    languageBtn.classList.toggle('active');
+                    const isVisible = languageSubDropdown.style.display === 'block';
+                    languageSubDropdown.style.display = isVisible ? 'none' : 'block';
                 });
-                languageDropdown.querySelectorAll('.language-option').forEach(opt => {
-                    opt.addEventListener('click', function(){
-                        languageDropdown.classList.remove('show');
-                        languageBtn.classList.remove('active');
-                        // Persist choice (same as index)
-                        const lang = this.dataset.lang || 'en';
-                        localStorage.setItem('selectedLanguage', lang);
-                    });
-                });
-                document.addEventListener('click', function(e){
-                    if (!languageBtn.contains(e.target) && !languageDropdown.contains(e.target)) {
-                        languageDropdown.classList.remove('show');
-                        languageBtn.classList.remove('active');
+                // Close sub-dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!languageMenuItem.contains(e.target) && !languageSubDropdown.contains(e.target)) {
+                        languageSubDropdown.style.display = 'none';
                     }
                 });
             }
+        }
 
-            const downloadBtn = document.getElementById('downloadBtn');
-            const qrPopup = document.getElementById('qrPopup');
-            if (downloadBtn && qrPopup) {
-                downloadBtn.addEventListener('mouseenter', function(){
-                    qrPopup.classList.add('show');
-                });
-                downloadBtn.addEventListener('mouseleave', function(){
-                    setTimeout(()=>{
-                        if (!downloadBtn.matches(':hover') && !qrPopup.matches(':hover')) {
-                            qrPopup.classList.remove('show');
-                        }
-                    }, 100);
-                });
-                qrPopup.addEventListener('mouseleave', function(){
-                    qrPopup.classList.remove('show');
-                });
+
+
+// Notification dropdown functionality
+(function() {
+    const notifBtn = document.getElementById('notifBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+
+    if (notifBtn && notificationDropdown) {
+        notifBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isVisible = notificationDropdown.style.display === 'block';
+            notificationDropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notifBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.style.display = 'none';
             }
-        })();
-    </script>
+        });
+    }
+})();
+
+        // Set language function
+        window.setLanguage = function(lang) {
+            localStorage.setItem('selectedLanguage', lang);
+            if (typeof translateDashboard === 'function') {
+                translateDashboard();
+            }
+            // Close dropdowns
+            if (profileDropdown) profileDropdown.style.display = 'none';
+            if (languageSubDropdown) languageSubDropdown.style.display = 'none';
+            if (languageDropdown) languageDropdown.style.display = 'none';
+        };
+
+                    // Download QR hover (if exists)
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    const qrPopup = document.getElementById('qrPopup');
+                    if (downloadBtn && qrPopup) {
+                        downloadBtn.addEventListener('mouseenter', function(){
+                            qrPopup.classList.add('show');
+                        });
+                        downloadBtn.addEventListener('mouseleave', function(){
+                            setTimeout(()=>{
+                                if (!downloadBtn.matches(':hover') && !qrPopup.matches(':hover')) {
+                                    qrPopup.classList.remove('show');
+                                }
+                            }, 100);
+                        });
+                        qrPopup.addEventListener('mouseleave', function(){
+                            qrPopup.classList.remove('show');
+                        });
+                    }
+                })();
+            </script>
 
             <script>
                 function showDialog(title, message) {
@@ -2256,7 +2583,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 				(function() {
 					const dict = {
 						en: {
-							Monitor: 'Monitor', Link: 'Link', History: 'History', Profile: 'Profile', Logout: 'Logout',
+							Monitor: 'Monitor', Link: 'Link', History: 'History', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Logout',
 							LiveStatus: 'Live Status', LiveDesc: 'Real-time charging station information',
 							SystemStatus: 'System Status', AllOperational: 'All system operational',
 							CurrentQueue: 'Current Queue', VehiclesWaiting: 'vehicles waiting',
@@ -2268,7 +2595,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							RecentActivity: 'Recent Activity', RecentDesc: 'Your latest charging sessions and transactions'
 						},
 						fil: {
-							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Profile: 'Profile', Logout: 'Mag-logout',
+							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Mag-logout',
 							LiveStatus: 'Live Status', LiveDesc: 'Impormasyong real-time ng charging station',
 							SystemStatus: 'Katayuan ng Sistema', AllOperational: 'Maayos ang lahat ng sistema',
 							CurrentQueue: 'Kasalukuyang Pila', VehiclesWaiting: 'sasakyang naghihintay',
@@ -2280,7 +2607,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							RecentActivity: 'Kamakailang Aktibidad', RecentDesc: 'Pinakabagong charging sessions at transaksyon'
 						},
 						ceb: {
-							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Profile: 'Profile', Logout: 'Gawas',
+							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Gawas',
 							LiveStatus: 'Buhi nga Kahimtang', LiveDesc: 'Tinuod‑panahong impormasyon sa charging station',
 							SystemStatus: 'Kahimtang sa Sistema', AllOperational: 'Tanan sistema nagdagan',
 							CurrentQueue: 'Karon nga Linya', VehiclesWaiting: 'sakyanan naghulat',
@@ -2292,7 +2619,7 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 							RecentActivity: 'Bag-ong Kalihokan', RecentDesc: 'Pinakabag-ong mga sesyon ug transaksiyon'
 						},
 						zh: {
-							Monitor: '监控', Link: '连接', History: '历史', Profile: '资料', Logout: '登出',
+							Monitor: '监控', Link: '连接', History: '历史', Rewards: '奖励', Profile: '资料', Logout: '登出',
 							LiveStatus: '实时状态', LiveDesc: '充电站实时信息',
 							SystemStatus: '系统状态', AllOperational: '系统正常运行',
 							CurrentQueue: '当前排队', VehiclesWaiting: '辆等待中',
@@ -2312,8 +2639,8 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 						if (nav[0]) nav[0].textContent = t.Monitor;
 						if (nav[1]) nav[1].textContent = t.Link;
 						if (nav[2]) nav[2].textContent = t.History;
-						if (nav[3]) nav[3].textContent = t.Profile;
-						const logout = document.querySelector('.auth-link');
+						if (nav[3]) nav[3].textContent = t.Rewards;
+						const logout = document.querySelector('.mobile-auth-link');
 						if (logout) logout.textContent = t.Logout;
 						// Live status
 						const lsTitle = document.querySelector('.live-status .section-title');

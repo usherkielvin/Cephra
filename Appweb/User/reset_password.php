@@ -1,3 +1,14 @@
+<?php
+session_start();
+if (!isset($_SESSION['forgot_password_flow'])) {
+    header('Location: index.php');
+    exit;
+}
+// Prevent caching to avoid back button access
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -244,6 +255,9 @@
 
         <!-- Right Panel - Reset Password Form -->
         <div class="right-panel">
+            <button type="button" class="back-btn" onclick="window.location.href='index.php'">
+                <i class="fas fa-arrow-left"></i>
+            </button>
             <form class="form" id="resetPasswordForm">
                 <div class="form-header">
                     <h2 class="form-title">Reset Password</h2>

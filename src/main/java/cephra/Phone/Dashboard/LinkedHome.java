@@ -71,6 +71,10 @@ public class LinkedHome extends javax.swing.JPanel {
                 }
             }
         });
+         String username = cephra.Database.CephraDB.getCurrentUsername();
+           String userPlateNumber = cephra.Database.CephraDB.getUserPlateNumber(username);
+               plateNumber.setText(userPlateNumber);
+        
     }
     
     /**
@@ -254,6 +258,9 @@ public class LinkedHome extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         Status = new javax.swing.JLabel();
         LoggedName = new javax.swing.JLabel();
+        platenumholder = new javax.swing.JPanel();
+        plateNumber = new javax.swing.JLabel();
+        filler = new javax.swing.JLabel();
         CAR = new javax.swing.JLabel();
         Notifications = new javax.swing.JButton();
         charge = new javax.swing.JButton();
@@ -295,6 +302,17 @@ public class LinkedHome extends javax.swing.JPanel {
         LoggedName.setText("Welcome to Cephra, Dizon");
         add(LoggedName);
         LoggedName.setBounds(30, 100, 300, 50);
+
+        platenumholder.setBackground(new java.awt.Color(255, 255, 255));
+        platenumholder.setOpaque(false);
+        platenumholder.setLayout(new java.awt.GridLayout(1, 0, 10, 0));
+
+        plateNumber.setText("NBH3261");
+        platenumholder.add(plateNumber);
+        platenumholder.add(filler);
+
+        add(platenumholder);
+        platenumholder.setBounds(47, 230, 120, 20);
 
         CAR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.1.png"))); // NOI18N
         add(CAR);
@@ -546,12 +564,15 @@ public class LinkedHome extends javax.swing.JPanel {
     private javax.swing.JButton Notifications;
     private javax.swing.JLabel Status;
     private javax.swing.JButton charge;
+    private javax.swing.JLabel filler;
     private javax.swing.JButton historybutton;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JButton linkbutton;
     private javax.swing.JLabel pesobalance;
+    private javax.swing.JLabel plateNumber;
+    private javax.swing.JPanel platenumholder;
     private javax.swing.JButton profilebutton;
     private javax.swing.JLabel rewardbalance;
     private javax.swing.JButton rewards;

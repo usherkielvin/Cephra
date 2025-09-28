@@ -257,34 +257,9 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         
                         // Show waiting bay popup to user (bay number will be determined after assignment)
                         cephra.Phone.Utilities.CustomPopupManager.showWaitingBayPopup(ticket, customerName, () -> {
-                            // Hide the WaitingBayPOP first
-                            cephra.Phone.Utilities.CustomPopupManager.hideCustomPopup();
-                            
-                            // User confirmed, proceed with bay assignment
-                            boolean assigned = false;
-                            try { 
-                                assigned = tryAssignToAnyAvailableBay(ticket); 
-                            } catch (Throwable t) { 
-                                System.err.println("Queue: assign attempt failed: " + t.getMessage()); 
-                            }
-                            if (assigned) {
-                                setTableStatusToChargingByTicket(ticket);
-                                // Update database status to Charging
-                                try {
-                                    cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Charging");
-                                    
-                                    // Get the assigned bay number and show it to user
-                                    String assignedBayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticket);
-                                    if (assignedBayNumber != null) {
-                                        // Show the actual bay number to user (informational only)
-                                        cephra.Phone.Utilities.CustomPopupManager.showProceedBayPopupInfo(ticket, assignedBayNumber, customerName);
-                                    }
-                                } catch (Exception ex) {
-                                    System.err.println("Queue: Error updating database status to Charging: " + ex.getMessage());
-                                }
-                            } else {
-                                Queue.this.showBayUnavailableDialog(ticket);
-                            }
+                            // Bay assignment is now handled in executeCallback, this callback just updates the table
+                            System.out.println("Queue callback: Bay assignment already handled, updating table status");
+                            setTableStatusToChargingByTicket(ticket);
                         });
                         updateStatusCounters();
                         return;
@@ -785,7 +760,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     }
 
 
-    private void setTableStatusToChargingByTicket(String ticket) {
+    public void setTableStatusToChargingByTicket(String ticket) {
         int ticketCol = getColumnIndex("Ticket");
         int statusCol = getColumnIndex("Status");
         if (ticketCol < 0 || statusCol < 0) return;

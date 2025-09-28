@@ -1,6 +1,3 @@
-# Wallet Transaction Update Tasks
-
-- [x] Update wallet.php query to fetch from wallet_transactions table
-- [x] Modify transaction display to use new fields (description, reference_id, transaction_date)
-- [x] Add logic for positive/negative amount display based on transaction type
-- [x] Test wallet page to ensure transactions display correctly
+- [ ] Add PHP query in dashboard.php to fetch the latest transaction for the user
+- [ ] Modify the Recent Activity section to conditionally display transaction or welcome message
+- [ ] Test the changes to ensure correct display

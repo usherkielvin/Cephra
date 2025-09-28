@@ -163,6 +163,7 @@ if ($conn) {
             text-align: center;
             position: relative;
             overflow: hidden;
+            animation: fadeInUp 0.6s ease;
         }
 
         .wallet-hero::before {
@@ -173,6 +174,18 @@ if ($conn) {
             right: 0;
             bottom: 0;
             background: radial-gradient(circle at 20% 80%, rgba(0, 194, 206, 0.15) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .wallet-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 20%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 194, 206, 0.1);
+            border-radius: 50%;
             z-index: 1;
         }
 
@@ -200,8 +213,53 @@ if ($conn) {
             margin: 2rem auto;
             max-width: 500px;
             text-align: center;
-            box-shadow: 0 10px 30px var(--shadow-medium);
+            box-shadow: 0 10px 30px var(--shadow-medium), inset 0 0 20px rgba(255, 255, 255, 0.1);
             position: relative;
+            animation: fadeInUp 0.6s ease 0.2s both;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes modalScaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
         }
 
         .balance-text {
@@ -210,6 +268,7 @@ if ($conn) {
             color: white;
             margin-bottom: 1rem;
             transition: all 0.3s ease;
+            animation: pulse 2s infinite;
         }
 
         .eye-toggle {
@@ -249,6 +308,7 @@ if ($conn) {
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            text-align: center;
         }
 
         .wallet-btn:hover {
@@ -261,6 +321,7 @@ if ($conn) {
         .transactions-section {
             padding: 80px 0;
             background: var(--bg-secondary);
+            animation: fadeInUp 0.6s ease 0.4s both;
         }
 
         .section-header {
@@ -286,7 +347,7 @@ if ($conn) {
         }
 
         .trans-list {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -301,6 +362,10 @@ if ($conn) {
             border: 1px solid var(--border-color);
             box-shadow: 0 5px 15px var(--shadow-light);
             transition: all 0.3s ease;
+        }
+
+        .trans-item:nth-child(odd) {
+            background: var(--accent-color);
         }
 
         .trans-item:hover {
@@ -339,7 +404,7 @@ if ($conn) {
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 1rem;
         }
@@ -481,9 +546,39 @@ if ($conn) {
             transition: border-color 0.3s ease;
         }
 
-        .form-input:focus {
-            outline: none;
+        .quick-amounts {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        .quick-btn:hover,
+        .quick-btn.active {
+            background: var(--primary-color);
+            color: white;
             border-color: var(--primary-color);
+        }
+
+        .payment-methods {
+            margin: 1.5rem 0;
+        }
+
+        .form-input:focus {
+            outline: 2px solid var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 194, 206, 0.1);
         }
 
         /* Remove native number input spinners (arrows) */
@@ -660,7 +755,7 @@ if ($conn) {
                     <?php foreach ($transactions as $trans): ?>
                         <div class="trans-item">
                             <div>
-                                <div class="trans-desc"><?php echo htmlspecialchars($trans['description'] . ($trans['reference_id'] ? " (Ref: " . $trans['reference_id'] . ")" : "")); ?></div>
+                                <div class="trans-desc"><i class="fas fa-<?php echo $trans['amount'] >= 0 ? 'plus-circle' : 'minus-circle'; ?>"></i> <?php echo htmlspecialchars($trans['description'] . ($trans['reference_id'] ? " (Ref: " . $trans['reference_id'] . ")" : "")); ?></div>
                                 <div class="trans-date"><?php echo date('M d, Y h:i A', strtotime($trans['transaction_date'])); ?></div>
                             </div>
                             <div class="trans-amount <?php echo $trans['amount'] >= 0 ? 'positive' : 'negative'; ?>">
@@ -683,10 +778,30 @@ if ($conn) {
             <form id="topupForm">
                 <div class="form-group">
                     <label class="form-label" for="topupAmount">Amount (₱)</label>
-                    <input type="number" id="topupAmount" name="amount" class="form-input" min="1" step="0.01" required placeholder="Enter amount" style="width:100%;">
+                    <input type="number" id="topupAmount" name="amount" class="form-input" min="1" step="0.01" required placeholder="Enter amount">
+                    <div class="quick-amounts">
+                        <button type="button" class="quick-btn" data-amount="500">₱500</button>
+                        <button type="button" class="quick-btn" data-amount="1000">₱1000</button>
+                        <button type="button" class="quick-btn" data-amount="2000">₱2000</button>
+                        <button type="button" class="quick-btn" data-amount="5000">₱5000</button>
+                        <button type="button" class="quick-btn" data-amount="10000">₱10000</button>
+                    </div>
                 </div>
+
+                <div class="payment-methods">
+                    <label class="form-label" for="paymentMethod">Choose your payment method</label>
+                    <select id="paymentMethod" name="payment_method" class="form-input" required>
+                        <option value="" disabled selected>Select a payment method</option>
+                        <option value="gcash">GCash - XXXX XXXX 0921 (Expire 12/27)</option>
+                        <option value="paymaya">Paymaya - XXXX XXXX 5690 (Expire 9/26)</option>
+                        <option value="visa">Visa - XXXX XXXX 0921 (Expire 4/26)</option>
+                        <option value="tbabank">TBA Bank - XXXX XXXX 7777 (Expire 7/27)</option>
+                        <option value="dpwh">DPWH Funds - Default (Expire ∞)</option>
+                    </select>
+                </div>
+
                 <div class="modal-actions">
-                    <button type="submit" class="btn-primary">Topup</button>
+                    <button type="submit" class="btn-primary">Proceed</button>
                     <button type="button" class="btn-cancel" onclick="closeTopupModal()">Cancel</button>
                 </div>
             </form>
@@ -833,17 +948,30 @@ if ($conn) {
             document.body.style.overflow = '';
         }
 
-        // Topup Form Submit -> calls wallet-topup API
+        // Topup Form Submit -> calls wallet-topup API (extend for payment method if needed)
         document.getElementById('topupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const amountInput = document.getElementById('topupAmount');
             const amount = Number(amountInput.value);
-            if (!amount || amount <= 0) return;
+            const selectedMethod = document.getElementById('paymentMethod');
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            if (!selectedMethod.value) {
+                alert('Please select a payment method');
+                return;
+            }
             try {
                 const resp = await fetch('api/mobile.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ action: 'wallet-topup', username: '<?php echo htmlspecialchars($_SESSION['username']); ?>', amount: String(amount) })
+                    body: new URLSearchParams({
+                        action: 'wallet-topup',
+                        username: '<?php echo htmlspecialchars($_SESSION['username']); ?>',
+                        amount: String(amount),
+                        payment_method: selectedMethod.value
+                    })
                 });
                 const data = await resp.json();
                 if (data && data.success) {
@@ -870,9 +998,44 @@ if ($conn) {
             }
         });
 
+        // Ripple effect for buttons
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement("span");
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.classList.add("ripple");
+            const ripple = button.getElementsByClassName("ripple")[0];
+            if (ripple) {
+                ripple.remove();
+            }
+            button.appendChild(circle);
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initMobileMenu();
+
+            // Quick amount buttons
+            const quickBtns = document.querySelectorAll('.quick-btn');
+            const amountInput = document.getElementById('topupAmount');
+            quickBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const amount = this.dataset.amount;
+                    amountInput.value = amount;
+                    // Update active state
+                    quickBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            const buttons = document.querySelectorAll('.wallet-btn, .btn-primary, .btn-cancel, .quick-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', createRipple);
+            });
         });
     </script>
 </body>

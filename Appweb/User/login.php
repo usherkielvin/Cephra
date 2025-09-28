@@ -49,6 +49,9 @@
 
         <!-- Right Panel - Login Form -->
         <div class="right-panel">
+            <button type="button" class="back-btn" onclick="window.location.href='index.php'">
+                <i class="fas fa-arrow-left"></i>
+            </button>
             <form class="form" id="loginForm">
                 <div class="form-header">
                     <h2 class="form-title" data-i18n="loginTitle">Sign In</h2>
