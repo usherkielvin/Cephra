@@ -1,3 +1,3 @@
-- [ ] Add PHP query in dashboard.php to fetch the latest transaction for the user
-- [ ] Modify the Recent Activity section to conditionally display transaction or welcome message
-- [ ] Test the changes to ensure correct display
+- [x] Increase image sizes in rewards.php: Change desktop .reward-card img from 100px to 150px, and mobile from 60px to 100px.
+- [x] Remove background from images (change CSS background to transparent, remove padding)
+- [x] Center the images (change object-fit to contain, add object-position center)

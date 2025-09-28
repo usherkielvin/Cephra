@@ -267,13 +267,13 @@ if ($conn) {
         }
 
         .reward-card img {
-            width: 100px;
-            height: 100px;
+            width: 150px;
+            height: 150px;
             border-radius: 15px;
-            object-fit: cover;
+            object-fit: contain;
+            object-position: center;
             margin-bottom: 1rem;
-            background: var(--gradient-primary);
-            padding: 1rem;
+            background: transparent;
         }
 
         .reward-card h4 {
@@ -510,8 +510,11 @@ if ($conn) {
             }
 
             .reward-card img {
-                width: 60px;
-                height: 60px;
+                width: 100px;
+                height: 100px;
+                object-fit: contain;
+                object-position: center;
+                background: transparent;
             }
 
             .modal-content {
@@ -564,26 +567,26 @@ if ($conn) {
                 <h3>Exclusive Essentials</h3>
                 <div class="rewards-grid">
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Powerbank">
+                        <img src="images/powerbank.png" alt="Powerbank">
                         <h4>Powerbank</h4>
                         <p>50 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Umbrella">
+                        <img src="images/umbrella.png" alt="Umbrella">
                         <h4>Umbrella</h4>
                         <p>35 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Charger">
+                        <img src="images/charger.png" alt="Charger">
                         <h4>Charger</h4>
                         <p>40 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Case">
-                        <h4>Case</h4>
+                        <img src="images/case.png" alt="Case">
+                        <h4>Phone Case</h4>
                         <p>30 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
@@ -595,25 +598,25 @@ if ($conn) {
                 <h3>Exclusive Wearables</h3>
                 <div class="rewards-grid">
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="T-Shirt">
+                        <img src="images/tshirt.png" alt="T-Shirt">
                         <h4>T-Shirt</h4>
                         <p>70 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Hoodie">
+                        <img src="images/hoodie.png" alt="Hoodie">
                         <h4>Hoodie</h4>
                         <p>100 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Cap">
+                        <img src="images/cap.png" alt="Cap">
                         <h4>Cap</h4>
                         <p>50 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Socks">
+                        <img src="images/socks.jpeg" alt="Socks">
                         <h4>Socks</h4>
                         <p>25 pts</p>
                         <button class="redeem-btn">Redeem</button>
@@ -626,25 +629,25 @@ if ($conn) {
                 <h3>Refreshing Sips</h3>
                 <div class="rewards-grid">
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Coffee">
+                        <img src="images/coffee.png" alt="Coffee">
                         <h4>Coffee</h4>
                         <p>20 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Tea">
-                        <h4>Tea</h4>
+                        <img src="images/edrink.png" alt="Tea">
+                        <h4>Energy Drink</h4>
                         <p>15 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Juice">
+                        <img src="images/juice.png" alt="Juice">
                         <h4>Juice</h4>
                         <p>18 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Water">
+                        <img src="images/water.png" alt="Water">
                         <h4>Water</h4>
                         <p>10 pts</p>
                         <button class="redeem-btn">Redeem</button>
@@ -652,32 +655,32 @@ if ($conn) {
                 </div>
             </div>
 
-            <!-- Boost Category -->
+            <!-- Tools Category -->
             <div class="category">
-                <h3>Energy Boost</h3>
+                <h3>Tools</h3>
                 <div class="rewards-grid">
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Energy Drink">
-                        <h4>Energy Drink</h4>
-                        <p>50 pts</p>
-                        <button class="redeem-btn">Redeem</button>
-                    </div>
-                    <div class="reward-card">
-                        <img src="images/logo.png" alt="Vitamin">
-                        <h4>Vitamin</h4>
-                        <p>30 pts</p>
-                        <button class="redeem-btn">Redeem</button>
-                    </div>
-                    <div class="reward-card">
-                        <img src="images/logo.png" alt="Snack">
-                        <h4>Snack</h4>
+                        <img src="images/flashlight.png" alt="Flashlight">
+                        <h4>Flashlight</h4>
                         <p>25 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/logo.png" alt="Boost Pack">
-                        <h4>Boost Pack</h4>
-                        <p>80 pts</p>
+                        <img src="images/hammer.png" alt="Hammer">
+                        <h4>Hammer</h4>
+                        <p>25 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/ratchet.png" alt="Ratchet Set">
+                        <h4>Ratchet Set</h4>
+                        <p>60 pts</p>
+                        <button class="redeem-btn">Redeem</button>
+                    </div>
+                    <div class="reward-card">
+                        <img src="images/screwdriver.png" alt="Screwdriver">
+                        <h4>Screwdriver</h4>
+                        <p>25 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                 </div>
