@@ -304,6 +304,7 @@ public class LinkedHome extends javax.swing.JPanel {
         LoggedName.setBounds(30, 100, 300, 50);
 
         platenumholder.setBackground(new java.awt.Color(255, 255, 255));
+        platenumholder.setOpaque(false);
         platenumholder.setLayout(new java.awt.GridLayout(1, 0, 10, 0));
 
         plateNumber.setText("NBH3261");
