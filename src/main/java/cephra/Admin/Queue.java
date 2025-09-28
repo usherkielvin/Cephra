@@ -276,10 +276,23 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                             System.err.println("Queue: Error updating database status: " + ex.getMessage());
                         }
                         
+                        // Remove from waiting grid if it exists there
+                        try {
+                            cephra.Admin.BayManagement.removeTicketFromWaitingGrid(ticket);
+                        } catch (Exception ex) {
+                            System.err.println("Queue: Error removing ticket from waiting grid: " + ex.getMessage());
+                        }
+                        
                         try { 
                             ensurePaymentPending(ticket); 
                             if (paymentCol >= 0) {
                                 queTab.setValueAt("Pending", rowSnapshot, paymentCol);
+                            }
+                            
+                            // Also update the database to set payment status to Pending
+                            boolean paymentStatusUpdated = cephra.Database.CephraDB.updateQueueTicketPaymentStatus(ticket, "Pending");
+                            if (!paymentStatusUpdated) {
+                                System.err.println("Queue: Failed to update payment status to Pending in database for ticket " + ticket);
                             }
                         } catch (Exception ex) { 
                             System.err.println("Failed to set payment pending: " + ex.getMessage()); 

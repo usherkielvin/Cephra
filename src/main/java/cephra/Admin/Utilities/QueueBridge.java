@@ -396,12 +396,15 @@ public final class QueueBridge {
                     // - Active ticket clearing
                     // - History addition
                     
+                    System.out.println("QueueBridge: Payment processed successfully for ticket " + ticket);
                     
                     // Refresh history table to show the new completed ticket
                     try {
                         cephra.Admin.Utilities.HistoryBridge.refreshHistoryTable();
+                        System.out.println("QueueBridge: History table refreshed successfully");
                     } catch (Exception e) {
                         System.err.println("QueueBridge: Error refreshing history table: " + e.getMessage());
+                        // Don't fail the payment if history refresh fails
                     }
                     
                     // Don't close PayPop here - let PayPop handle its own navigation to receipt
@@ -412,12 +415,24 @@ public final class QueueBridge {
                         try {
                             // Remove ticket from queue (same as manual payment)
                             removeTicket(ticket);
+                            System.out.println("QueueBridge: Ticket removed from memory records");
                             
-                            // Trigger multiple refresh approaches to ensure UI updates
-                            triggerHardRefresh();
-                            triggerPanelSwitchRefresh();
+                            // Try to refresh admin UI if available, but don't fail if admin is not open
+                            try {
+                                triggerHardRefresh();
+                                System.out.println("QueueBridge: Admin UI refresh attempted");
+                            } catch (Exception e) {
+                                System.out.println("QueueBridge: Admin UI refresh failed (admin may not be open): " + e.getMessage());
+                            }
+                            
+                            try {
+                                triggerPanelSwitchRefresh();
+                                System.out.println("QueueBridge: Panel switch refresh attempted");
+                            } catch (Exception e) {
+                                System.out.println("QueueBridge: Panel switch refresh failed (admin may not be open): " + e.getMessage());
+                            }
                         } catch (Throwable t) {
-                            System.err.println("QueueBridge: Error removing ticket after online payment: " + t.getMessage());
+                            System.err.println("QueueBridge: Error in refresh timer: " + t.getMessage());
                         }
                     });
                     refreshTimer.setRepeats(false);
@@ -520,17 +535,40 @@ public final class QueueBridge {
                 );
                 
                 if (dbSuccess) {
+                    System.out.println("QueueBridge: Online payment processed successfully for ticket " + ticket);
+                    
+                    // Refresh history table to show the new completed ticket
+                    try {
+                        cephra.Admin.Utilities.HistoryBridge.refreshHistoryTable();
+                        System.out.println("QueueBridge: History table refreshed successfully");
+                    } catch (Exception e) {
+                        System.err.println("QueueBridge: Error refreshing history table: " + e.getMessage());
+                        // Don't fail the payment if history refresh fails
+                    }
+                    
                     // Add a longer delay to ensure database operations complete before UI updates
                     javax.swing.Timer refreshTimer = new javax.swing.Timer(200, _ -> {
                         try {
                             // Remove ticket from queue
                             removeTicket(ticket);
+                            System.out.println("QueueBridge: Ticket removed from memory records");
                             
-                            // Trigger multiple refresh approaches to ensure UI updates
-                            triggerHardRefresh();
-                            triggerPanelSwitchRefresh();
+                            // Try to refresh admin UI if available, but don't fail if admin is not open
+                            try {
+                                triggerHardRefresh();
+                                System.out.println("QueueBridge: Admin UI refresh attempted");
+                            } catch (Exception e) {
+                                System.out.println("QueueBridge: Admin UI refresh failed (admin may not be open): " + e.getMessage());
+                            }
+                            
+                            try {
+                                triggerPanelSwitchRefresh();
+                                System.out.println("QueueBridge: Panel switch refresh attempted");
+                            } catch (Exception e) {
+                                System.out.println("QueueBridge: Panel switch refresh failed (admin may not be open): " + e.getMessage());
+                            }
                         } catch (Throwable t) {
-                            System.err.println("QueueBridge: Error removing ticket after online payment: " + t.getMessage());
+                            System.err.println("QueueBridge: Error in refresh timer: " + t.getMessage());
                         }
                     });
                     refreshTimer.setRepeats(false);
@@ -578,8 +616,11 @@ public final class QueueBridge {
             try {
                 // Find the Queue panel in the current window
                 java.awt.Window[] windows = java.awt.Window.getWindows();
+                boolean adminFound = false;
+                
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Admin) {
+                        adminFound = true;
                         cephra.Frame.Admin adminFrame = (cephra.Frame.Admin) window;
                         
                         // Look for Queue panel in the admin frame
@@ -590,9 +631,16 @@ public final class QueueBridge {
                             
                             // Trigger hard refresh
                             queuePanel.hardRefreshTable();
+                            System.out.println("QueueBridge: Hard refresh completed successfully");
                             break;
+                        } else {
+                            System.out.println("QueueBridge: Admin frame found but Queue panel not found");
                         }
                     }
+                }
+                
+                if (!adminFound) {
+                    System.out.println("QueueBridge: No Admin frame found - hard refresh skipped");
                 }
             } catch (Exception e) {
                 System.err.println("QueueBridge: Error triggering hard refresh: " + e.getMessage());
@@ -608,8 +656,11 @@ public final class QueueBridge {
             try {
                 // Find the Admin frame
                 java.awt.Window[] windows = java.awt.Window.getWindows();
+                boolean adminFound = false;
+                
                 for (java.awt.Window window : windows) {
                     if (window instanceof cephra.Frame.Admin) {
+                        adminFound = true;
                         cephra.Frame.Admin adminFrame = (cephra.Frame.Admin) window;
                         
                         // Look for Queue panel in the admin frame
@@ -629,9 +680,16 @@ public final class QueueBridge {
                             // Force table refresh
                             queuePanel.hardRefreshTable();
                             
+                            System.out.println("QueueBridge: Panel switch refresh completed successfully");
                             break;
+                        } else {
+                            System.out.println("QueueBridge: Admin frame found but Queue panel not found for panel switch refresh");
                         }
                     }
+                }
+                
+                if (!adminFound) {
+                    System.out.println("QueueBridge: No Admin frame found - panel switch refresh skipped");
                 }
             } catch (Exception e) {
                 System.err.println("QueueBridge: Error triggering panel switch refresh: " + e.getMessage());
