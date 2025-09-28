@@ -386,6 +386,12 @@ try {
                 $stmt = $db->prepare("UPDATE password_reset_tokens SET used = 1 WHERE token = ?");
                 $stmt->execute([$temp_token]);
 
+                // Unset the session flag after successful password reset
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
+                unset($_SESSION['forgot_password_flow']);
+
                 echo json_encode([
                     "success" => true,
                     "message" => "Password reset successfully"

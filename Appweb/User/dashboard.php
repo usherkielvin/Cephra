@@ -1562,7 +1562,6 @@ echo "<!-- DEBUG: Vehicle data: " . htmlspecialchars(json_encode($vehicle_data))
 						<li><a href="#" onclick="openMonitorWeb(); return false;" class="mobile-nav-link">Monitor</a></li>
 						<li><a href="link.php" class="mobile-nav-link">Link</a></li>
 						<li><a href="history.php" class="mobile-nav-link">History</a></li>
-						<li><a href="profile.php" class="mobile-nav-link">Profile</a></li>
 						<li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
 						<li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
 					</ul>
