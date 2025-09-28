@@ -112,7 +112,7 @@ public class History extends javax.swing.JPanel {
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Ticket", "Customer", "KWh", "Total", "Served By", "Date & Time", "Reference"
+                "Ticket", "Customer", "KWh", "Total", "Plate Number", "Date & Time", "Reference"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -124,7 +124,6 @@ public class History extends javax.swing.JPanel {
             }
         });
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        jTable1.setAutoscrolls(false);
         jTable1.setFocusable(false);
         jTable1.setOpaque(false);
         jTable1.setPreferredSize(new java.awt.Dimension(525, 139));

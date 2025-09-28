@@ -561,4 +561,13 @@ public class CustomPopupManager {
         hideCustomPopup();
     }
     
+    /**
+     * Cancels the current callback (for Charge_Now cancel button)
+     * This prevents any further processing when user cancels
+     */
+    public static void cancelCurrentCallback() {
+        currentCallback = null;
+        userConfirmed = false;
+    }
+    
 }
