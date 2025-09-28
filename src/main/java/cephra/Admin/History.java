@@ -375,28 +375,4 @@ public class History extends javax.swing.JPanel {
         }
         return String.valueOf(timestamp);
     }
-    
-    private String getStaffFirstNameFromDB() {
-        try {
-            // Get the logged-in username from the admin frame
-            java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-            if (window instanceof cephra.Frame.Admin) {
-                java.lang.reflect.Field usernameField = window.getClass().getDeclaredField("loggedInUsername");
-                usernameField.setAccessible(true);
-                String username = (String) usernameField.get(window);
-                
-                System.out.println("DEBUG History: Retrieved username from admin frame = '" + username + "'");
-                
-                if (username != null && !username.isEmpty()) {
-                    // Use the updated CephraDB method that queries staff_records.firstname
-                    String result = cephra.Database.CephraDB.getStaffFirstName(username);
-                    System.out.println("DEBUG History: CephraDB.getStaffFirstName returned = '" + result + "'");
-                    return result;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error getting staff first name: " + e.getMessage());
-        }
-        return "Admin"; // Fallback
-    }
 }
