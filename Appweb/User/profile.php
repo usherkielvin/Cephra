@@ -139,55 +139,7 @@ if ($conn) {
     <link rel="stylesheet" href="assets/css/pages/profile.css" />
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-                <div class="header-content">
-						<!-- Logo -->
-						<div class="logo">
-							<img src="images/logo.png" alt="Cephra" class="logo-img">
-							<span class="logo-text">CEPHRA</span>
-						</div>
-
-						<!-- Navigation -->
-						<nav class="nav">
-							<ul class="nav-list">
-								<li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-								<li><a href="link.php" class="nav-link">Link</a></li>
-								<li><a href="history.php" class="nav-link">History</a></li>
-								<li class="current_page_item"><a href="profile.php" class="nav-link">Profile</a></li>
-								<li><a href="rewards.php" class="nav-link">Rewards</a></li>
-								<li><a href="wallet.php" class="nav-link">Wallet</a></li>
-							</ul>
-						</nav>
-
-						<!-- Header Actions (none on profile) -->
-						<div class="header-actions"></div>
-
-						<!-- Mobile Menu Toggle -->
-						<button class="mobile-menu-toggle" id="mobileMenuToggle">
-							<span></span>
-							<span></span>
-							<span></span>
-						</button>
-					</div>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div class="mobile-menu" id="mobileMenu">
-            <div class="mobile-menu-content">
-                <ul class="mobile-nav-list">
-                    <li><a href="dashboard.php" class="mobile-nav-link">Dashboard</a></li>
-                    <li><a href="link.php" class="mobile-nav-link">Link</a></li>
-                    <li><a href="history.php" class="mobile-nav-link">History</a></li>
-                    <li><a href="profile.php" class="mobile-nav-link">Profile</a></li>
-                    <li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
-                    <li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
-                </ul>
-				<div class="mobile-header-actions"></div>
-            </div>
-        </div>
-    </header>
+        <?php include __DIR__ . '/partials/header.php'; ?>
 
     <!-- Profile Section -->
     <section class="profile-section" style="padding: 100px 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
@@ -400,52 +352,8 @@ if ($conn) {
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <img src="images/logo.png" alt="Cephra" class="footer-logo-img" />
-                        <span class="footer-logo-text">CEPHRA</span>
-                    </div>
-                    <p class="footer-description">
-                        Your ultimate electric vehicle charging platform,
-                        powering the future of sustainable transportation.
-                    </p>
-                </div>
-
-                    <div class="footer-section">
-                        <h4 class="footer-title">Platform</h4>
-                        <ul class="footer-links">
-                            <li><a href="dashboard.php">Dashboard</a></li>
-                            <li><a href="ChargingPage.php">Charging</a></li>
-                            <li><a href="history.php">History</a></li>
-                        </ul>
-                    </div>
-
-                <div class="footer-section">
-                    <h4 class="footer-title">Support</h4>
-                    <ul class="footer-links">
-                        <li><a href="help_center.php">Help Center</a></li>
-                        <li><a href="contact_us.php">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h4 class="footer-title">Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="about_us.php">About Us</a></li>
-                        <li><a href="our_team.php">Our Team</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
-            </div>
-        </div>
-    </footer>
+		<!-- Footer -->
+		<?php include __DIR__ . '/partials/footer.php'; ?>
 
     <script>
         // Function to open Monitor Web in new tab
