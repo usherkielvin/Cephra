@@ -122,6 +122,15 @@ if ($conn) {
 	}
 
 	$profilePicture = $user['profile_picture'] ?? null;
+
+	// Fetch total charging time
+	$stmt = $conn->prepare("SELECT SUM(charging_time_minutes) as total_minutes FROM charging_history WHERE username = :username");
+	$stmt->bindParam(':username', $username);
+	$stmt->execute();
+	$charging_data = $stmt->fetch(PDO::FETCH_ASSOC);
+	$total_minutes = $charging_data['total_minutes'] ?? 0;
+	$total_hours = round($total_minutes / 60);
+	$co2_saved = round($total_hours * 5.43);
 }
 ?>
 <!DOCTYPE html>
@@ -241,11 +250,11 @@ if ($conn) {
                         <!-- Account Statistics -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                             <div style="text-align: center; padding: 1rem; background: rgba(76, 175, 80, 0.05); border-radius: 10px; border: 1px solid rgba(76, 175, 80, 0.2);">
-                                <div style="font-size: 1.5rem; font-weight: 700; color: #4CAF50; margin-bottom: 0.25rem;">156h</div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #4CAF50; margin-bottom: 0.25rem;"><?php echo $total_hours; ?>h</div>
                                 <div style="font-size: 0.8rem; color: rgba(26, 32, 44, 0.7);">Total Charging</div>
                             </div>
                             <div style="text-align: center; padding: 1rem; background: rgba(33, 150, 243, 0.05); border-radius: 10px; border: 1px solid rgba(33, 150, 243, 0.2);">
-                                <div style="font-size: 1.5rem; font-weight: 700; color: #2196F3; margin-bottom: 0.25rem;">847kg</div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #2196F3; margin-bottom: 0.25rem;"><?php echo $co2_saved; ?>kg</div>
                                 <div style="font-size: 0.8rem; color: rgba(26, 32, 44, 0.7);">CO₂ Saved</div>
                             </div>
                         </div>

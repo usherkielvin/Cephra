@@ -16,35 +16,63 @@ if ($conn) {
 $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
 
+// Fetch battery level from database
+$db_battery_level = null;
+$battery_history = [];
+if ($conn && $username) {
+    $stmt_battery = $conn->prepare("SELECT battery_level FROM battery_levels WHERE username = :username ORDER BY last_updated DESC LIMIT 1");
+    $stmt_battery->bindParam(':username', $username);
+    $stmt_battery->execute();
+    $battery_row = $stmt_battery->fetch(PDO::FETCH_ASSOC);
+    $db_battery_level = $battery_row ? $battery_row['battery_level'] . '%' : null;
+
+    // Fetch all battery history
+    $stmt_history = $conn->prepare("SELECT battery_level, initial_battery_level, battery_capacity_kwh, last_updated FROM battery_levels WHERE username = :username ORDER BY last_updated DESC");
+    $stmt_history->bindParam(':username', $username);
+    $stmt_history->execute();
+    $battery_history = $stmt_history->fetchAll(PDO::FETCH_ASSOC);
+}
+
 // Vehicle data based on car_index
 $vehicle_data = null;
-if ($car_index && $car_index >= 1 && $car_index <= 10) {
+if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
     // Real EV models
     $models = [
-        1 => 'EV Model 1',
-        2 => 'EV Model 2',
-        3 => 'EV Model 3',
-        4 => 'EV Model 4',
-        5 => 'EV Model 5',
-        6 => 'EV Model 6',
-        7 => 'EV Model 7',
-        8 => 'EV Model 8',
-        9 => 'EV Model 9',
-        10 => 'EV Model 10'
+        0 => 'Audi q8 etron',
+        1 => 'Nissan leaf',
+        2 => 'Tesla x',
+        3 => 'Lotus Spectre',
+        4 => 'BYD Seagull',
+        5 => 'Hyundai',
+        6 => 'Porsche Taycan',
+        7 => 'BYD Tang',
+        8 => 'omada e5'
+    ];
+
+    // Car images
+    $car_images = [
+        0 => 'https://via.placeholder.com/400x200?text=Audi+Q8+Etron',
+        1 => 'https://via.placeholder.com/400x200?text=Nissan+Leaf',
+        2 => 'https://via.placeholder.com/400x200?text=Tesla+X',
+        3 => 'https://via.placeholder.com/400x200?text=Lotus+Spectre',
+        4 => 'https://via.placeholder.com/400x200?text=BYD+Seagull',
+        5 => 'https://via.placeholder.com/400x200?text=Hyundai',
+        6 => 'https://via.placeholder.com/400x200?text=Porsche+Taycan',
+        7 => 'https://via.placeholder.com/400x200?text=BYD+Tang',
+        8 => 'https://via.placeholder.com/400x200?text=Omada+E5'
     ];
 
     // Realistic vehicle specs based on model
     $vehicle_specs = [
-        1 => ['range' => '358 km', 'time_to_full' => '6h 30m', 'battery_level' => '85%'], // Tesla Model 3
-        2 => ['range' => '220 km', 'time_to_full' => '8h 0m', 'battery_level' => '72%'], // Nissan Leaf
-        3 => ['range' => '383 km', 'time_to_full' => '9h 15m', 'battery_level' => '90%'], // Chevrolet Bolt
-        4 => ['range' => '246 km', 'time_to_full' => '4h 45m', 'battery_level' => '68%'], // BMW i3
-        5 => ['range' => '484 km', 'time_to_full' => '7h 20m', 'battery_level' => '95%'], // Hyundai Kona Electric
-        6 => ['range' => '452 km', 'time_to_full' => '5h 10m', 'battery_level' => '78%'], // Kia Soul EV
-        7 => ['range' => '482 km', 'time_to_full' => '8h 5m', 'battery_level' => '82%'], // Volkswagen ID.4
-        8 => ['range' => '378 km', 'time_to_full' => '6h 50m', 'battery_level' => '88%'], // Ford Mustang Mach-E
-        9 => ['range' => '470 km', 'time_to_full' => '5h 30m', 'battery_level' => '76%'], // Polestar 2
-        10 => ['range' => '400 km', 'time_to_full' => '7h 40m', 'battery_level' => '91%'] // Audi e-tron
+        0 => ['range' => '450 km', 'time_to_full' => '6h 0m', 'battery_level' => '80%'], // Audi q8 etron
+        1 => ['range' => '220 km', 'time_to_full' => '8h 0m', 'battery_level' => '72%'], // Nissan leaf
+        2 => ['range' => '400 km', 'time_to_full' => '7h 0m', 'battery_level' => '85%'], // Tesla x
+        3 => ['range' => '500 km', 'time_to_full' => '5h 0m', 'battery_level' => '90%'], // Lotus Spectre
+        4 => ['range' => '300 km', 'time_to_full' => '5h 0m', 'battery_level' => '75%'], // BYD Seagull
+        5 => ['range' => '484 km', 'time_to_full' => '7h 20m', 'battery_level' => '95%'], // Hyundai
+        6 => ['range' => '400 km', 'time_to_full' => '6h 0m', 'battery_level' => '85%'], // Porsche Taycan
+        7 => ['range' => '400 km', 'time_to_full' => '7h 0m', 'battery_level' => '80%'], // BYD Tang
+        8 => ['range' => '350 km', 'time_to_full' => '6h 0m', 'battery_level' => '78%'] // omada e5
     ];
 
     $vehicle_data = [
@@ -52,8 +80,53 @@ if ($car_index && $car_index >= 1 && $car_index <= 10) {
         'status' => 'Connected & Charging',
         'range' => $vehicle_specs[$car_index]['range'],
         'time_to_full' => $vehicle_specs[$car_index]['time_to_full'],
-        'battery_level' => $vehicle_specs[$car_index]['battery_level']
+        'battery_level' => $db_battery_level ?? $vehicle_specs[$car_index]['battery_level'],
+        'image' => $car_images[$car_index]
     ];
+
+    // Calculate range and time_to_full based on battery level
+    $battery_level_str = $vehicle_data['battery_level'];
+    $battery_level_num = floatval(str_replace('%', '', $battery_level_str));
+
+    // Get max range from specs (assuming it's the max at 100%)
+    $max_range_km = intval(str_replace(' km', '', $vehicle_specs[$car_index]['range']));
+
+    // Parse max charge time from specs
+    $time_str = $vehicle_specs[$car_index]['time_to_full'];
+    preg_match('/(\d+)h\s*(\d+)m/', $time_str, $matches);
+    $max_charge_time_hours = 0;
+    if ($matches) {
+        $hours = intval($matches[1]);
+        $mins = intval($matches[2]);
+        $max_charge_time_hours = $hours + $mins / 60;
+    }
+
+    // Calculate current range
+    $current_range_km = round($max_range_km * ($battery_level_num / 100));
+    $vehicle_data['range'] = $current_range_km . ' km';
+
+    // Calculate time to full
+    $time_to_full_hours = $max_charge_time_hours * ((100 - $battery_level_num) / 100);
+    $hours_full = floor($time_to_full_hours);
+    $mins_full = round(($time_to_full_hours - $hours_full) * 60);
+    $vehicle_data['time_to_full'] = $hours_full . 'h ' . $mins_full . 'm';
+
+    // Calculate additional metrics based on battery_level
+    $health_score = round($battery_level_num);
+    $degradation = round((100 - $battery_level_num) * 0.08);
+    $temperature = 25 + rand(-5, 5);
+    $cycles_remaining = round(($battery_level_num / 100) * 1000);
+    $highway_range = round($current_range_km * 0.8);
+    $city_range = round($current_range_km * 1.2);
+    $weather_impact = -round((100 - $battery_level_num) * 0.05);
+    $normal_charge = 45.00;
+    $fast_charge = 75.00;
+    $monthly_savings = round(($battery_level_num / 100) * 1250);
+    $green_points = round(($battery_level_num / 100) * 340);
+    $system_status = 'All systems normal';
+    $last_check = '2 hours ago';
+    $alerts = 'None';
+    $maintenance_due = round(($battery_level_num / 100) * 1200) . ' km';
 }
 
 $latest_transaction = null;
@@ -1840,19 +1913,19 @@ if ($conn) {
 						</div>
 						<h3 class="feature-title">Battery Health Monitor</h3>
 						<p class="feature-description">
+							<strong>Current Level:</strong> <?php echo htmlspecialchars($vehicle_data['battery_level']); ?><br>
 							<strong>Health Score:</strong> 92% (Excellent)<br>
 							<strong>Degradation:</strong> 8% over 2 years<br>
 							<strong>Temperature:</strong> Optimal (25°C)<br>
 							<strong>Cycles:</strong> 340/1000 remaining
 						</p>
-						<a href="#" onclick="showBatteryHealth(); return false;" class="feature-link">View Health →</a>
 					</div>
 
 					<!-- Range Calculator -->
 					<div class="feature-card">
 						<div class="feature-icon">
 							<i class="fas fa-route"></i>
-						</div>
+					</div>
 						<h3 class="feature-title">Range Calculator</h3>
 						<p class="feature-description">
 							<strong>Current Range:</strong> 45 km<br>
@@ -1860,7 +1933,6 @@ if ($conn) {
 							<strong>City Range:</strong> 52 km<br>
 							<strong>Weather Impact:</strong> -5 km (rain)
 						</p>
-						<a href="#" onclick="showRangeCalculator(); return false;" class="feature-link">Calculate Range →</a>
 					</div>
 
 					<!-- Estimated Cost -->
@@ -1875,7 +1947,6 @@ if ($conn) {
 							<strong>Monthly Savings:</strong> ₱1,250<br>
 							<strong>Green Points:</strong> 340 earned
 						</p>
-						<a href="#" onclick="showEstimatedCost(); return false;" class="feature-link">View Details →</a>
 					</div>
 
 					<!-- Vehicle Diagnostics -->
@@ -1884,16 +1955,14 @@ if ($conn) {
 							<i class="fas fa-stethoscope"></i>
 						</div>
 						<h3 class="feature-title">Vehicle Diagnostics</h3>
-						<p class="feature-description">
+						<p class="feature-description">	
 							<strong>System Status:</strong> All systems normal<br>
 							<strong>Last Check:</strong> 2 hours ago<br>
 							<strong>Alerts:</strong> None<br>
 							<strong>Maintenance:</strong> Due in 1,200 km
 						</p>
-						<a href="#" onclick="showDiagnostics(); return false;" class="feature-link">Run Diagnostics →</a>
 					</div>
 					<?php endif; ?>
-
 				</div>
 			</div>
 		</section>
