@@ -512,7 +512,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void nextNormalTicket() {
         String ticket = findNextTicketByType("NCH");
         if (ticket != null) {
-            boolean assigned = assignToNormalSlot(ticket);
+            boolean assigned = tryAssignToAnyAvailableBay(ticket);
             if (assigned) {
                 setTableStatusToChargingByTicket(ticket);
                 removeTicketFromGrid(ticket);
@@ -523,10 +523,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
                 }
             } else {
-                JOptionPane.showMessageDialog(this,
-                    "Normal Charge Bays 1-5 are full!\nTicket " + ticket + " remains in waiting queue.",
-                    "Normal Charge Bays Full",
-                    JOptionPane.INFORMATION_MESSAGE);
+                showBayUnavailableDialog(ticket);
             }
         }
         updateStatusCounters();
@@ -535,7 +532,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
     private void nextFastTicket() {
         String ticket = findNextTicketByType("FCH");
         if (ticket != null) {
-            boolean assigned = assignToFastSlot(ticket);
+            boolean assigned = tryAssignToAnyAvailableBay(ticket);
             if (assigned) {
                 setTableStatusToChargingByTicket(ticket);
                 removeTicketFromGrid(ticket);
@@ -546,10 +543,7 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                     triggerNotificationForCustomer(customerName, "MY_TURN", ticket, bayNumber);
                 }
             } else {
-                JOptionPane.showMessageDialog(this,
-                    "Fast Charge Bays 1-3 are full!\nTicket " + ticket + " remains in waiting queue.",
-                    "Fast Charge Bays Full",
-                    JOptionPane.INFORMATION_MESSAGE);
+                showBayUnavailableDialog(ticket);
             }
         }
         updateStatusCounters();
@@ -568,11 +562,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                       Ticket """ + ticket + " will remain in the waiting queue.\n" +
                      "Please wait for a fast charging bay to become available.";
             title = "Fast Charging Bays Unavailable";
-            /* message = "All Fast Charging Bays (1-3) are currently occupied or in maintenance!\n\n" +
-                     "Ticket " + ticket + " will remain in the waiting queue.\n" +
-                     "Please wait for a fast charging bay to become available.";
-            title = "Fast Charging Bays Unavailable";*/
-            
         } else {
             message = """
                       All Normal Charging Bays (4-8) are currently occupied or in maintenance!
@@ -580,11 +569,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                       Ticket """ + ticket + " will remain in the waiting queue.\n" +
                      "Please wait for a normal charging bay to become available.";
             title = "Normal Charging Bays Unavailable";
-            
-            /* message = "All Normal Charging Bays (4-8) are currently occupied or in maintenance!\n\n" +
-                     "Ticket " + ticket + " will remain in the waiting queue.\n" +
-                     "Please wait for a normal charging bay to become available.";
-            title = "Normal Charging Bays Unavailable";*/
         }
         
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
@@ -771,7 +755,6 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
             return assignToNormalSlot(ticket);
         }
     }
-
 
     public void setTableStatusToChargingByTicket(String ticket) {
         int ticketCol = getColumnIndex("Ticket");
