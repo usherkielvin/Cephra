@@ -37,7 +37,7 @@ if ($username && $conn) {
             <!-- Logo -->
             <div class="logo" style="display:flex;align-items:center;gap:12px;margin-right:16px;">
                 <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                <span class="logo-text">CEPHRA</span>
+                <span class="logo-text">CEP</span>
             </div>
             <!-- Navigation -->
             <nav class="nav" style="flex:1;">

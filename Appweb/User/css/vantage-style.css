@@ -66,6 +66,10 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+.header .container {
+    max-width: none;
+}
+
 
 /* Make header span full width and remove right padding so actions hit the edge */
 
