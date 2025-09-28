@@ -1,3 +1,3 @@
-- [x] Add HTML for notification dropdown in header after notifBtn
-- [x] Add CSS styles for notification dropdown
-- [x] Add JavaScript to toggle dropdown on click and close on outside click
+- [ ] Add PHP query in dashboard.php to fetch the latest transaction for the user
+- [ ] Modify the Recent Activity section to conditionally display transaction or welcome message
+- [ ] Test the changes to ensure correct display
