@@ -1,3 +1,4 @@
+<?php session_start(); $_SESSION['forgot_password_flow'] = true; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,6 +50,9 @@
 
         <!-- Right Panel - Forgot Password Form -->
         <div class="right-panel">
+            <button type="button" class="back-btn" onclick="window.location.href='index.php'">
+                <i class="fas fa-arrow-left"></i>
+            </button>
             <form class="form" id="forgotPasswordForm">
                 <div class="form-header">
                     <h2 class="form-title">Reset Password</h2>

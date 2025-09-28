@@ -208,7 +208,6 @@
                         AI-powered charging optimization that adapts to your vehicle's needs
                         and grid conditions for maximum efficiency.
                     </p>
-                    <a href="Register_Panel.php" class="feature-link">Experience Smart Charging →</a>
                 </div>
 
                 <!-- Feature 2: Real-time Monitoring -->
@@ -221,7 +220,6 @@
                         Track your charging sessions, energy consumption, and costs in real-time
                         with detailed analytics and insights.
                     </p>
-                    <a href="Register_Panel.php" class="feature-link">View Analytics →</a>
                 </div>
 
                 <!-- Feature 3: Rewards Program -->
@@ -234,7 +232,6 @@
                         Earn points on every charge and unlock exclusive benefits, discounts,
                         and premium features as you charge more.
                     </p>
-                    <a href="Register_Panel.php" class="feature-link">Join Rewards →</a>
                 </div>
             </div>
         </div>
@@ -264,7 +261,6 @@
                         <span class="spec-item">3-7 kW</span>
                         <span class="spec-item">2-3 hours</span>
                     </div>
-                    <a href="Register_Panel.php" class="charging-link">Start Normal Charging →</a>
                 </div>
 
                 <!-- Charging Type 2: Fast Charging -->
@@ -284,7 +280,6 @@
                         <span class="spec-item">50-150 kW</span>
                         <span class="spec-item">20-40 minutes</span>
                     </div>
-                    <a href="Register_Panel.php" class="charging-link">Start Fast Charging →</a>
                 </div>
 
                 <!-- Charging Type 3: Priority Charging -->
@@ -303,7 +298,6 @@
                         <span class="spec-item">Priority</span>
                         <span class="spec-item">10-30 minutes</span>
                     </div>
-                    <a href="Register_Panel.php" class="charging-link">Get Priority Access →</a>
                 </div>
             </div>
         </div>
