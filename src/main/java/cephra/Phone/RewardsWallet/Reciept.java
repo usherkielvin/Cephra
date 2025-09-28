@@ -287,10 +287,10 @@ public class Reciept extends javax.swing.JPanel {
         jLabel8.getAccessibleContext().setAccessibleName("");
 
         NumTicket.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        NumTicket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        NumTicket.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         NumTicket.setText("FCH008");
         add(NumTicket);
-        NumTicket.setBounds(140, 360, 100, 30);
+        NumTicket.setBounds(140, 360, 140, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Receipt.png"))); // NOI18N
         add(jLabel1);

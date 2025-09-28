@@ -19,6 +19,7 @@ public class CustomPopupManager {
     private static boolean userConfirmed = false;
     private static Runnable currentCallback = null;
     private static volatile boolean isExecutingCallback = false;
+    private static volatile boolean isShowingPopup = false; // Prevent multiple popup shows
     
     // Popup dimensions (centered in phone frame)
     private static final int POPUP_WIDTH = 320;
@@ -169,19 +170,33 @@ public class CustomPopupManager {
      * @param callback callback to execute when user responds
      */
     public static void showWaitingBayPopup(String ticketId, String username, Runnable callback) {
+        System.out.println("showWaitingBayPopup: Called with ticketId=" + ticketId + ", username=" + username);
+        
+        // Prevent multiple simultaneous popup shows
+        if (isShowingPopup) {
+            System.out.println("showWaitingBayPopup: Already showing a popup, ignoring duplicate call");
+            return;
+        }
+        
+        isShowingPopup = true; // Set flag to prevent duplicate calls
+        
         // Validate user is logged in
         if (!cephra.Database.CephraDB.isUserLoggedIn()) {
+            System.out.println("showWaitingBayPopup: User not logged in, returning");
+            isShowingPopup = false; // Reset flag on early return
             return;
         }
         
         // Get and validate current user
         String currentUser = cephra.Database.CephraDB.getCurrentUsername();
         if (currentUser == null || currentUser.trim().isEmpty()) {
+            isShowingPopup = false; // Reset flag on early return
             return;
         }
         
         // Validate user matches ticket owner
         if (!currentUser.trim().equals(username.trim())) {
+            isShowingPopup = false; // Reset flag on early return
             return;
         }
         
@@ -202,19 +217,28 @@ public class CustomPopupManager {
         }
         
         if (phoneFrame == null) {
+            isShowingPopup = false; // Reset flag on early return
             return;
         }
         
-        // Create Charge_Now panel
-        currentPopup = new Charge_Now();
-        setupWaitingBayPopupWithCallback((Charge_Now) currentPopup, ticketId, callback);
-        
-        // Show the popup
-        showCenteredPopup(phoneFrame, currentPopup);
-        
-        currentTicketId = ticketId;
-        isShowing = true;
-        userConfirmed = false;
+        try {
+            // Create Charge_Now panel
+            currentPopup = new Charge_Now();
+            setupWaitingBayPopupWithCallback((Charge_Now) currentPopup, ticketId, callback);
+            
+            // Show the popup
+            showCenteredPopup(phoneFrame, currentPopup);
+            
+            currentTicketId = ticketId;
+            isShowing = true;
+            userConfirmed = false;
+            System.out.println("showWaitingBayPopup: Charge_Now popup shown successfully for ticket: " + ticketId);
+        } catch (Exception e) {
+            System.err.println("showWaitingBayPopup: Error showing popup: " + e.getMessage());
+            e.printStackTrace();
+            isShowingPopup = false; // Reset flag on error
+            throw e; // Re-throw to let caller handle
+        }
     }
     
     /**
@@ -534,6 +558,7 @@ public class CustomPopupManager {
                 currentTicketId = null;
                 currentCallback = null;
                 isExecutingCallback = false;
+                isShowingPopup = false; // Reset flag when popup is hidden
             });
         }
     }
