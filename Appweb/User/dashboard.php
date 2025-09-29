@@ -52,15 +52,15 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
 
     // Car images
     $car_images = [
-        0 => 'images/audiq8etron.jpg',
-        1 => 'images/nissanleaf_.jpg',
-        2 => 'images/teslamodelx.jpeg',
-        3 => 'images/lotuseltre.png',
-        4 => 'images/bydseagull.jpg',
-        5 => 'images/default.png',
-        6 => 'images/porschetaycan.jpg',
-        7 => 'images/bydtang.jpg',
-        8 => 'images/omodae5.png'
+        0 => 'images/cars/audiq8etron.png',
+        1 => 'images/cars/nissanleaf_.png',
+        2 => 'images/cars/teslamodelx.png',
+        3 => 'images/cars/lotuseltre.png',
+        4 => 'images/cars/bydseagull.png',
+        5 => 'images/team pictures/default.png',
+        6 => 'images/cars/porschetaycan.png',
+        7 => 'images/cars/bydtang.png',
+        8 => 'images/cars/omodae5.png'
     ];
 
     // Realistic vehicle specs based on model
