@@ -1,24 +1,18 @@
-# TODO for Monitor Fullscreen Fixes
+# Delete Account Feature Implementation
 
-## Information Gathered
-- Fullscreen mode implemented with header containing theme and language controls
-- fullscreenThemeBtn calls themeBtn.click() but themeBtn is hidden in fullscreen, causing functionality issues
-- fullscreenLangBtn is a button that calls languageBtn.click(), which doesn't change language since languageBtn is a select
-- Need to convert fullscreenLangBtn to a select dropdown with same options as main languageBtn
-- Theme toggle logic needs to be directly implemented for fullscreenThemeBtn
+## Overview
+Implementing a confirmation modal for account deletion in profile.php, with a 3-second timer on the delete button, and backend logic to remove the user row from the 'users' table.
 
-## Plan
-- [x] Modify createFullscreenUI() to create fullscreenLangBtn as a select element with language options
-- [x] Update fullscreenLangBtn event handler to change language directly using same logic as main languageBtn
-- [x] Change fullscreenThemeBtn onclick to directly toggle theme using the same logic as themeBtn.onclick
-- [x] Ensure fullscreen controls update main UI state and localStorage
+## Steps
 
-## Dependent Files to Edit
-- Appweb/Monitor/index.php (JavaScript section)
+- [ ] Step 1: Create new file Appweb/User/delete_account.php with session validation, POST handling for deletion (DELETE from users WHERE username = :username, unlink profile picture if exists, session_destroy, redirect to index.php).
 
-## Followup Steps
-- [x] Test fullscreen mode activation
-- [x] Test theme toggle button in fullscreen
-- [x] Test language dropdown in fullscreen
-- [x] Verify theme and language changes sync between fullscreen and main UI
-- [x] Check localStorage persistence for both theme and language preferences
+- [ ] Step 2: Edit Appweb/User/profile.php to add HTML for delete confirmation modal (structure similar to existing photo modal: overlay, content with warning message, Cancel and Delete buttons at bottom).
+
+- [ ] Step 3: Edit Appweb/User/profile.php to add onclick="openDeleteModal()" to the existing delete button in form-actions.
+
+- [ ] Step 4: Edit Appweb/User/profile.php to add JavaScript functions in the <script> section: openDeleteModal() (show modal, start 3s countdown on delete button, disable until 0), closeDeleteModal(), handle delete click (AJAX POST to delete_account.php with username, on success: session clear via redirect, show success message).
+
+- [ ] Step 5: Test the feature (login, navigate to profile, click delete, verify modal/timer, confirm deletion in DB, check redirect).
+
+- [ ] Step 6: Mark all steps complete and remove this TODO if successful.

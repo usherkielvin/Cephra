@@ -567,25 +567,25 @@ if ($conn) {
                 <h3>Exclusive Essentials</h3>
                 <div class="rewards-grid">
                     <div class="reward-card">
-                        <img src="images/powerbank.png" alt="Powerbank">
+                        <img src="images/rewards/powerbank.png" alt="Powerbank">
                         <h4>Powerbank</h4>
                         <p>50 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/umbrella.png" alt="Umbrella">
+                        <img src="images/rewards/umbrella.png" alt="Umbrella">
                         <h4>Umbrella</h4>
                         <p>35 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/charger.png" alt="Charger">
+                        <img src="images/rewards/charger.png" alt="Charger">
                         <h4>Charger</h4>
                         <p>40 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/case.png" alt="Case">
+                        <img src="images/rewards/case.png" alt="Case">
                         <h4>Phone Case</h4>
                         <p>30 pts</p>
                         <button class="redeem-btn">Redeem</button>
@@ -598,25 +598,25 @@ if ($conn) {
                 <h3>Exclusive Wearables</h3>
                 <div class="rewards-grid">
                     <div class="reward-card">
-                        <img src="images/tshirt.png" alt="T-Shirt">
+                        <img src="images/rewards/tshirt.png" alt="T-Shirt">
                         <h4>T-Shirt</h4>
                         <p>70 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/hoodie.png" alt="Hoodie">
+                        <img src="images/rewards/hoodie.png" alt="Hoodie">
                         <h4>Hoodie</h4>
                         <p>100 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/cap.png" alt="Cap">
+                        <img src="images/rewards/cap.png" alt="Cap">
                         <h4>Cap</h4>
                         <p>50 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/socks.jpeg" alt="Socks">
+                        <img src="images/rewards/socks.jpeg" alt="Socks">
                         <h4>Socks</h4>
                         <p>25 pts</p>
                         <button class="redeem-btn">Redeem</button>
@@ -629,25 +629,25 @@ if ($conn) {
                 <h3>Refreshing Sips</h3>
                 <div class="rewards-grid">
                     <div class="reward-card">
-                        <img src="images/coffee.png" alt="Coffee">
+                        <img src="images/rewards/coffee.png" alt="Coffee">
                         <h4>Coffee</h4>
                         <p>20 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/edrink.png" alt="Tea">
+                        <img src="images/rewards/edrink.png" alt="Tea">
                         <h4>Energy Drink</h4>
                         <p>15 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/juice.png" alt="Juice">
+                        <img src="images/rewards/juice.png" alt="Juice">
                         <h4>Juice</h4>
                         <p>18 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/water.png" alt="Water">
+                        <img src="images/rewards/water.png" alt="Water">
                         <h4>Water</h4>
                         <p>10 pts</p>
                         <button class="redeem-btn">Redeem</button>
@@ -660,25 +660,25 @@ if ($conn) {
                 <h3>Tools</h3>
                 <div class="rewards-grid">
                     <div class="reward-card">
-                        <img src="images/flashlight.png" alt="Flashlight">
+                        <img src="images/rewards/flashlight.png" alt="Flashlight">
                         <h4>Flashlight</h4>
                         <p>25 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/hammer.png" alt="Hammer">
+                        <img src="images/rewards/hammer.png" alt="Hammer">
                         <h4>Hammer</h4>
                         <p>25 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/ratchet.png" alt="Ratchet Set">
+                        <img src="images/rewards/ratchet.png" alt="Ratchet Set">
                         <h4>Ratchet Set</h4>
                         <p>60 pts</p>
                         <button class="redeem-btn">Redeem</button>
                     </div>
                     <div class="reward-card">
-                        <img src="images/screwdriver.png" alt="Screwdriver">
+                        <img src="images/rewards/screwdriver.png" alt="Screwdriver">
                         <h4>Screwdriver</h4>
                         <p>25 pts</p>
                         <button class="redeem-btn">Redeem</button>
