@@ -78,7 +78,7 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
 
     $vehicle_data = [
         'model' => $models[$car_index],
-        'status' => 'Connected & Charging',
+        'status' => 'Connected',
         'range' => $vehicle_specs[$car_index]['range'],
         'time_to_full' => $vehicle_specs[$car_index]['time_to_full'],
         'battery_level' => $db_battery_level ?? $vehicle_specs[$car_index]['battery_level'],
