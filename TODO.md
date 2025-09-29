@@ -16,3 +16,4 @@ Implementing a confirmation modal for account deletion in profile.php, with a 3-
 - [ ] Step 5: Test the feature (login, navigate to profile, click delete, verify modal/timer, confirm deletion in DB, check redirect).
 
 - [ ] Step 6: Mark all steps complete and remove this TODO if successful.
+

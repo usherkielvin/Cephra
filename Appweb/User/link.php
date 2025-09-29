@@ -175,7 +175,7 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
 
     $vehicle_data = [
         'model' => $models[$carIndex],
-        'status' => 'Connected & Charging',
+        'status' => 'Connected',
         'range' => $vehicle_specs[$carIndex]['range'],
         'time_to_full' => $vehicle_specs[$carIndex]['time_to_full'],
         'battery_level' => $db_battery_level ?? $vehicle_specs[$carIndex]['battery_level'],
@@ -236,7 +236,7 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
                     <p class="section-description" style="font-size: 1.2rem; color: rgba(26, 32, 44, 0.8); max-width: 600px; margin: 0 auto;">Connect your electric vehicle to start charging at Cephra stations</p>
                 </div>
 
-                <div class="link-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); max-width: 600px; margin: 0 auto;">
+                <div class="link-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); max-width: 1500px; margin: 0 auto;">
                     <?php if (is_null($carIndex)): ?>
                         <!-- No Car Design -->
                         <h3 style="text-align: center; margin-bottom: 1rem; color: #1a202c;">Link Your Electric Vehicle</h3>
@@ -255,39 +255,35 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
                             </button>
                         </form>
                     <?php else: ?>
-                        <!-- With Car Design -->
-                        <h3 style="text-align: center; margin-bottom: 1rem; color: #1a202c;">Your Vehicle is Linked</h3>
-                        <p style="text-align: center; margin-bottom: 2rem; color: rgba(26, 32, 44, 0.7);"><?php echo htmlspecialchars($vehicle_data['model']); ?> connected. You're ready to charge.</p>
-                        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px; display: block; margin-left: auto; margin-right: auto;">
-                        <div class="car-details" style="margin-top: 2rem;">
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Car Model:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['model']); ?></span>
-                            </div>
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Performance:</span>
-                                <span class="detail-value"><?php echo $vehicle_specs[$carIndex]['hp']; ?> HP</span>
-                            </div>
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Kms Remaining:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['range']); ?></span>
-                            </div>
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Time to Charge:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['time_to_full']); ?></span>
-                            </div>
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Battery Level:</span>
-                                <div class="progress-bar" style="width: 100%; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
-                                    <div class="progress-fill" style="height: 20px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); width: <?php echo $battery_level_num; ?>%; transition: width 0.3s ease;"></div>
-                                </div>
-                                <span class="progress-text" style="display: block; text-align: center; margin-top: 0.5rem;"><?php echo htmlspecialchars($vehicle_data['battery_level']); ?></span>
-                            </div>
-                        </div>
-                        <div style="display:flex; gap:12px; justify-content:center; margin-top: 2rem;">
-                            <a href="dashboard.php" class="button">Go to Dashboard</a>
-                            <a href="ChargingPage.php" class="button alt">Start Charging</a>
-                        </div>
+<!-- With Car Design -->
+<div class="linked-car-layout modernized-layout">
+    <div class="modernized-details">
+            <div class="detail-row">
+                <span class="detail-label">Car Model</span>
+                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['model']); ?></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['status']); ?></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Kms Remaining</span>
+                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['range']); ?></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Time to Charge</span>
+                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['time_to_full']); ?></span>
+            </div>
+            <div class="detail-row battery-row">
+                <span class="detail-label">Battery Level</span>
+                <span class="progress-text" style="font-size: 2rem; font-weight: 700; color: #1a202c;"><?php echo htmlspecialchars($vehicle_data['battery_level']); ?></span>
+            </div>
+
+    </div>
+    <div class="modernized-car-image">
+        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" />
+    </div>
+</div>
                     <?php endif; ?>
                 </div>
             </div>
