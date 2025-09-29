@@ -251,7 +251,7 @@ public class Home extends javax.swing.JPanel {
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/curvedgif.gif"))); // NOI18N
         add(jLabel2);
-        jLabel2.setBounds(20, 400, 340, 196);
+        jLabel2.setBounds(30, 405, 330, 196);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         LoggedName.setForeground(new java.awt.Color(0, 204, 204));

@@ -368,6 +368,7 @@ public class LinkedCar extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel2 = new javax.swing.JLabel();
         plateNumber = new javax.swing.JLabel();
         car = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
@@ -389,9 +390,19 @@ public class LinkedCar extends javax.swing.JPanel {
 
         setLayout(null);
 
+        jLabel2.setBackground(new java.awt.Color(204, 204, 204));
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel2.setText("PLATE NUMBER:");
+        add(jLabel2);
+        jLabel2.setBounds(61, 280, 110, 20);
+
+        plateNumber.setBackground(new java.awt.Color(204, 204, 204));
+        plateNumber.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        plateNumber.setForeground(new java.awt.Color(102, 102, 102));
         plateNumber.setText("NBH3261");
         add(plateNumber);
-        plateNumber.setBounds(62, 280, 100, 20);
+        plateNumber.setBounds(170, 280, 70, 20);
 
         car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.png"))); // NOI18N
         car.setPreferredSize(new java.awt.Dimension(301, 226));
@@ -600,6 +611,7 @@ public class LinkedCar extends javax.swing.JPanel {
     private javax.swing.JButton historybutton;
     private javax.swing.JButton homebutton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel km;
     private javax.swing.JButton linkbutton;
