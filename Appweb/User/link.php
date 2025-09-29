@@ -10,6 +10,84 @@ require_once 'config/database.php';
 $db = new Database();
 $conn = $db->getConnection();
 
+// Function to process image and remove white background
+function process_image($image_path) {
+    $processed_dir = 'images/processed/';
+    if (!is_dir($processed_dir)) {
+        mkdir($processed_dir, 0755, true);
+    }
+
+    $processed_path = $processed_dir . basename($image_path, '.' . pathinfo($image_path, PATHINFO_EXTENSION)) . '.png';
+
+    if (file_exists($processed_path)) {
+        return $processed_path;
+    }
+
+    // Load the image
+    $image_info = getimagesize($image_path);
+    if (!$image_info) {
+        return $image_path; // Return original if can't load
+    }
+
+    $mime = $image_info['mime'];
+    switch ($mime) {
+        case 'image/jpeg':
+            $src_image = imagecreatefromjpeg($image_path);
+            break;
+        case 'image/png':
+            $src_image = imagecreatefrompng($image_path);
+            break;
+        case 'image/gif':
+            $src_image = imagecreatefromgif($image_path);
+            break;
+        default:
+            return $image_path;
+    }
+
+    if (!$src_image) {
+        return $image_path;
+    }
+
+    $width = imagesx($src_image);
+    $height = imagesy($src_image);
+
+    // Create new image with alpha channel
+    $new_image = imagecreatetruecolor($width, $height);
+    imagealphablending($new_image, false);
+    imagesavealpha($new_image, true);
+
+    // Define white color (adjust fuzziness if needed)
+    $white = imagecolorallocate($new_image, 255, 255, 255);
+
+    // Copy pixels, making white transparent
+    for ($x = 0; $x < $width; $x++) {
+        for ($y = 0; $y < $height; $y++) {
+            $rgb = imagecolorat($src_image, $x, $y);
+            $colors = imagecolorsforindex($src_image, $rgb);
+            $r = $colors['red'];
+            $g = $colors['green'];
+            $b = $colors['blue'];
+
+            // If color is close to white (within 10), make transparent
+            if ($r > 245 && $g > 245 && $b > 245) {
+                $alpha = 127; // Fully transparent
+            } else {
+                $alpha = 0; // Opaque
+            }
+
+            $color = imagecolorallocatealpha($new_image, $r, $g, $b, $alpha);
+            imagesetpixel($new_image, $x, $y, $color);
+        }
+    }
+
+    // Save as PNG
+    imagepng($new_image, $processed_path);
+    imagedestroy($src_image);
+    imagedestroy($new_image);
+
+    return $processed_path;
+}
+
 $username = $_SESSION['username'];
 
 // Check car_index from users table
@@ -71,15 +149,15 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
 
     // Car images
     $car_images = [
-        0 => 'https://via.placeholder.com/400x200?text=Audi+Q8+Etron',
-        1 => 'https://via.placeholder.com/400x200?text=Nissan+Leaf',
-        2 => 'https://via.placeholder.com/400x200?text=Tesla+X',
-        3 => 'https://via.placeholder.com/400x200?text=Lotus+Spectre',
-        4 => 'https://via.placeholder.com/400x200?text=BYD+Seagull',
-        5 => 'https://via.placeholder.com/400x200?text=Hyundai',
-        6 => 'https://via.placeholder.com/400x200?text=Porsche+Taycan',
-        7 => 'https://via.placeholder.com/400x200?text=BYD+Tang',
-        8 => 'https://via.placeholder.com/400x200?text=Omada+E5'
+        0 => 'images/cars/audiq8etron.png',
+        1 => 'images/cars/nissanleaf_.png',
+        2 => 'images/cars/teslamodelx.png',
+        3 => 'images/cars/lotuseltre.png',
+        4 => 'images/cars/bydseagull.png',
+        5 => 'images/team pictures/default.png',
+        6 => 'images/cars/porschetaycan.png',
+        7 => 'images/cars/bydtang.png',
+        8 => 'images/cars/omodae5.png'
     ];
 
     // Realistic vehicle specs based on model

@@ -18,36 +18,36 @@
     <meta name="theme-color" content="#0b1e29" />
     <style>
         :root {
-            /* Dark Mode - Default */
-            --bg: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
-            --panel: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-            --card: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            --text: #f7fafc;
-            --muted: #a0aec0;
-            --accent: #00d4aa;
-            --accent-hover: #00e6b8;
-            --avail: #48bb78;
-            --availText: #ffffff;
-            --occ: #f56565;
+            /* Dark Mode - Modern Scheme */
+            --bg: linear-gradient(135deg, #0a0a0a 0%, #1e1e1e 100%);
+            --panel: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+            --card: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+            --text: #ffffff;
+            --muted: #b0b0b0;
+            --accent: #0099aa;
+            --accent-hover: #0099aa;
+            --avail: #00b8cca5;
+            --availText: #000000;
+            --occ: #ff4444;
             --occText: #ffffff;
-            --maint: #ed8936;
-            --maintText: #ffffff;
-            --border: rgba(255,255,255,0.1);
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --maint: #ffaa00;
+            --maintText: #000000;
+            --border: rgba(255,255,255,0.15);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.5);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.7);
             --transition-fast: all 0.2s ease;
             --transition-normal: all 0.3s ease;
         }
-        .light { 
-            /* Light Mode */
+        .light {
+            /* Light Mode - Updated to match app color scheme */
             --bg: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
             --panel: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
-            --card: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+            --card: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
             --text: #2d3748;
             --muted: #718096;
-            --accent: #3182ce;
-            --accent-hover: #2c5aa0;
+            --accent: #00c2ce;
+            --accent-hover: #00e1ee;
             --avail: #38a169;
             --availText: #ffffff;
             --occ: #e53e3e;
@@ -66,8 +66,8 @@
             --card: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
             --text: #ffffff;
             --muted: #a0aec0;
-            --accent: #00d4aa;
-            --accent-hover: #00e6b8;
+            --accent: #00ffff;
+            --accent-hover: #00e6ff;
             --avail: #48bb78;
             --availText: #ffffff;
             --occ: #f56565;
@@ -271,21 +271,86 @@
         }
         .burger span::before { top:-6px; }
         .burger span::after  { top: 6px; }
-        .btn { 
-            background:transparent; 
-            color:var(--text); 
-            border:1px solid rgba(255,255,255,0.3); 
-            border-radius:10px; 
-            padding:8px 14px; 
-            cursor:pointer; 
-            font-size:13px; 
+        .btn {
+            background:transparent;
+            color:var(--text);
+            border:1px solid rgba(255,255,255,0.3);
+            border-radius:10px;
+            padding:8px 14px;
+            cursor:pointer;
+            font-size:13px;
             font-weight: 500;
             transition: var(--transition-fast);
+        }
+        .light .btn {
+            border-color: rgba(0,0,0,0.3);
         }
         .btn:hover {
             background: var(--accent);
             color: var(--bg);
             border-color: var(--accent);
+        }
+
+        /* Language select dropdown styling */
+        .language-select {
+            background: transparent !important;
+            color: #f7fafc !important;
+            border: 2px solid #4a5568 !important;
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            cursor: pointer !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            transition: var(--transition-fast) !important;
+            min-width: 60px !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f7fafc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 8px center !important;
+            background-size: 12px !important;
+            padding-right: 30px !important;
+        }
+
+        .light .language-select {
+            background: #ffffff !important;
+            color: #2d3748 !important;
+            border-color: #e2e8f0 !important;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232d3748' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 8px center !important;
+            background-size: 12px !important;
+            padding-right: 30px !important;
+        }
+
+        .language-select:hover {
+            border-color: var(--accent) !important;
+            background: #4a5568 !important;
+        }
+
+        .light .language-select:hover {
+            background: #f7fafc !important;
+            border-color: #00c2ce !important;
+        }
+
+        .language-select:focus {
+            outline: none !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.3) !important;
+        }
+
+        .light .language-select:focus {
+            box-shadow: 0 0 0 2px rgba(0, 194, 206, 0.3) !important;
+        }
+
+        .language-select option {
+            background: transparent !important;
+            color: #f7fafc !important;
+            padding: 8px !important;
+        }
+
+        .light .language-select option {
+            background: #ffffff !important;
+            color: #2d3748 !important;
         }
         .toolbar label { 
             display:flex; 
@@ -299,9 +364,90 @@
             padding: 4px 6px;
             border-radius: 8px;
         }
-        .toolbar label input[type="checkbox"] { 
-            margin:0 8px 0 0; 
+        .toolbar label input[type="checkbox"] {
+            margin:0 8px 0 0;
             accent-color: var(--accent);
+        }
+
+        /* Custom checkbox styling */
+        .toolbar label input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            background: var(--card);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition-fast);
+        }
+
+        .toolbar label input[type="checkbox"]:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .toolbar label input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--bg);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .toolbar label input[type="checkbox"]:hover {
+            border-color: var(--accent);
+        }
+
+        /* Custom range slider styling */
+        input[type="range"] {
+            appearance: none;
+            width: 60px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: var(--transition-fast);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: var(--transition-fast);
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        input[type="range"]:hover {
+            background: var(--muted);
         }
         .pager { 
             display:flex; 
@@ -513,6 +659,10 @@
             background: rgba(160, 174, 192, 0.1);
             padding: 4px 8px;
             border-radius: 4px;
+        }
+        .fullscreen-bay-type.fast-bay {
+            font-weight: bold;
+            color: var(--accent);
         }
         
         .fullscreen-bay-status {
@@ -735,7 +885,7 @@
 </head>
 <body>
     <h1>
-        <span class="logo"><img src="../Admin/images/MONU.png" alt="Cephra" /></span>
+        
         Cephra Live Monitor <span id="ts" class="ts"></span>
         <button class="burger" id="burgerBtn" aria-label="Menu"><span></span></button>
         <div class="toolbar" id="toolbarWrap">
@@ -747,8 +897,15 @@
                 Speed: <input type="range" id="speedSlider" min="50" max="200" value="90" style="width: 60px; margin: 0 5px;" />
             </label>
             <button class="btn" id="testTTSBtn">Test TTS</button>
+            <button class="btn" id="fullscreenBtn">Fullscreen</button>
             <button class="btn" id="themeBtn">Toggle Theme</button>
-            <button class="btn" id="languageBtn">EN</button>
+            <select class="btn language-select" id="languageBtn">
+                <option value="EN">EN</option>
+                <option value="ZH">ZH</option>
+                <option value="FIL">FIL</option>
+                <option value="CEB">CEB</option>
+                <option value="ES">ES</option>
+            </select>
         </div>
     </h1>
 
@@ -893,42 +1050,43 @@
         let isFirstLoad = true; // Flag to track first data load
 
         // Toolbar simplified to single Bay Announcer toggle
-        // Theme toggle
-        function setTheme(light) {
-            document.body.classList.toggle('light', !!light);
-        }
-        document.getElementById('themeBtn').onclick = () => setTheme(!document.body.classList.contains('light'));
-
         // Language toggle functionality
         const languageBtn = document.getElementById('languageBtn');
-        languageBtn.onclick = () => {
-            languageIndex = (languageIndex + 1) % languageKeys.length;
-            currentLanguage = languageKeys[languageIndex];
-            languageBtn.textContent = currentLanguage;
-            
+        languageBtn.onchange = (e) => {
+            currentLanguage = e.target.value;
+            languageIndex = languageKeys.indexOf(currentLanguage);
+
             // Visual feedback
             languageBtn.style.backgroundColor = '#4CAF50';
             setTimeout(() => {
                 languageBtn.style.backgroundColor = '';
             }, 500);
-            
+
             // Save language preference
             localStorage.setItem('monitor_language', currentLanguage);
-            
+
+            // Update fullscreen language select if in fullscreen mode
+            if (isFullscreen) {
+                const fullscreenLangSelect = document.getElementById('fullscreenLangBtn');
+                if (fullscreenLangSelect) {
+                    fullscreenLangSelect.value = currentLanguage;
+                }
+            }
+
             // Announce language change
             const langName = languages[currentLanguage].name;
             speak(`Language changed to ${langName}`);
-            
+
             console.log('Language changed to:', langName);
         };
-        
+
         // Load saved language preference
         const savedLang = localStorage.getItem('monitor_language') || 'EN';
         const savedIndex = languageKeys.indexOf(savedLang);
         if (savedIndex !== -1) {
             languageIndex = savedIndex;
             currentLanguage = savedLang;
-            languageBtn.textContent = currentLanguage;
+            languageBtn.value = currentLanguage;
         }
         
         // Initialize TTS controls
@@ -1004,21 +1162,45 @@
             document.body.classList.add('light');
             isDarkMode = false;
         }
-        
-        // Fullscreen temporarily disabled per request
-        
+
+        // Set initial button text
+        themeBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+
+        // Fullscreen button event listener
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', () => {
+                if (isFullscreen) {
+                    isFullscreen = false;
+                    document.body.classList.remove('fullscreen-mode');
+                    removeFullscreenUI();
+                    fullscreenBtn.textContent = 'Fullscreen';
+                } else {
+                    isFullscreen = true;
+                    document.body.classList.add('fullscreen-mode');
+                    createFullscreenUI();
+                    fullscreenBtn.textContent = 'Exit Fullscreen';
+                }
+            });
+        }
+
         function createFullscreenUI() {
             // Create fullscreen header
             const header = document.createElement('div');
             header.className = 'fullscreen-header';
             header.innerHTML = `
                 <div class="fullscreen-title">
-                    <div class="fullscreen-logo">C</div>
                     <span>Cephra Live Monitor</span>
                 </div>
                 <div class="fullscreen-controls">
-                    <button class="fullscreen-btn" id="fullscreenThemeBtn">${isDarkMode ? 'Light' : 'Dark'}</button>
-                    <button class="fullscreen-btn" id="fullscreenLangBtn">${currentLanguage}</button>
+                    <button class="fullscreen-btn" id="fullscreenThemeBtn">${isDarkMode ? 'Light Mode' : 'Dark Mode'}</button>
+                    <select class="fullscreen-btn language-select" id="fullscreenLangBtn">
+                        <option value="EN">EN</option>
+                        <option value="ZH">ZH</option>
+                        <option value="FIL">FIL</option>
+                        <option value="CEB">CEB</option>
+                        <option value="ES">ES</option>
+                    </select>
                     <button class="fullscreen-btn exit" id="fullscreenExitBtn">Exit</button>
                 </div>
             `;
@@ -1036,23 +1218,62 @@
                 isFullscreen = false;
                 document.body.classList.remove('fullscreen-mode');
                 removeFullscreenUI();
-                fsBtn.textContent = 'Fullscreen Bays';
+                const fullscreenBtn = document.getElementById('fullscreenBtn');
+                if (fullscreenBtn) fullscreenBtn.textContent = 'Fullscreen';
             };
             
             document.getElementById('fullscreenThemeBtn').onclick = () => {
                 isDarkMode = !isDarkMode;
+                const themeBtn = document.getElementById('themeBtn');
+                
+                if (isDarkMode) {
+                    document.body.classList.remove('light');
+                    document.body.classList.add('dark-theme');
+                    if (themeBtn) themeBtn.textContent = 'Light Mode';
+                    localStorage.setItem('monitor_theme', 'dark');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    document.body.classList.add('light');
+                    if (themeBtn) themeBtn.textContent = 'Dark Mode';
+                    localStorage.setItem('monitor_theme', 'light');
+                }
+                
                 document.getElementById('fullscreenThemeBtn').textContent = isDarkMode ? 'Light' : 'Dark';
-                // Update theme in main UI too
-                if (themeBtn) {
-                    themeBtn.click();
+                
+                // Update fullscreen theme classes
+                if (isDarkMode) {
+                    document.body.classList.add('dark-fullscreen');
+                    document.body.classList.remove('light');
+                } else {
+                    document.body.classList.remove('dark-fullscreen');
+                    document.body.classList.add('light');
                 }
             };
             
-            document.getElementById('fullscreenLangBtn').onclick = () => {
-                if (languageBtn) {
-                    languageBtn.click();
+            const fullscreenLangSelect = document.getElementById('fullscreenLangBtn');
+            fullscreenLangSelect.value = currentLanguage;
+            fullscreenLangSelect.onchange = (e) => {
+                currentLanguage = e.target.value;
+                languageIndex = languageKeys.indexOf(currentLanguage);
+
+                // Visual feedback
+                fullscreenLangSelect.style.backgroundColor = '#4CAF50';
+                setTimeout(() => {
+                    fullscreenLangSelect.style.backgroundColor = '';
+                }, 500);
+
+                // Save language preference
+                localStorage.setItem('monitor_language', currentLanguage);
+                // Update main language select
+                const mainLangSelect = document.getElementById('languageBtn');
+                if (mainLangSelect) {
+                    mainLangSelect.value = currentLanguage;
                 }
-                document.getElementById('fullscreenLangBtn').textContent = currentLanguage;
+                // Announce language change
+                const langName = languages[currentLanguage].name;
+                speak(`Language changed to ${langName}`);
+
+                console.log('Language changed to:', langName);
             };
             
             // Render bays in fullscreen
@@ -1073,7 +1294,7 @@
             grid.innerHTML = '';
             
             // Get current bay data
-            const bays = currentQueue.length > 0 ? 
+            const bays = currentQueue.length > 0 ?
                 Array.from({length: 8}, (_, i) => {
                     const bayNum = i + 1;
                     const bayData = lastBays[`Bay-${bayNum}`];
@@ -1082,14 +1303,16 @@
                         status: bayData?.status || 'available',
                         ticket_id: bayData?.ticket_id || '-',
                         username: bayData?.username || '-',
+                        plate_number: bayData?.plate_number || '-',
                         service_type: bayNum <= 3 ? 'Fast' : 'Normal'
                     };
-                }) : 
+                }) :
                 Array.from({length: 8}, (_, i) => ({
                     bay_number: i + 1,
                     status: 'available',
                     ticket_id: '-',
                     username: '-',
+                    plate_number: '-',
                     service_type: i < 3 ? 'Fast' : 'Normal'
                 }));
             
@@ -1099,7 +1322,7 @@
                 bayElement.innerHTML = `
                     <div class="fullscreen-bay-header">
                         <h3 class="fullscreen-bay-title">Bay-${bay.bay_number}</h3>
-                        <span class="fullscreen-bay-type">${bay.service_type}</span>
+                        <span class="fullscreen-bay-type ${bay.service_type === 'Fast' ? 'fast-bay' : ''}">${bay.service_type}</span>
                     </div>
                     <div class="fullscreen-bay-status">
                         <div class="fullscreen-status-badge ${bay.status}">
@@ -1114,6 +1337,10 @@
                         <div class="fullscreen-detail-item">
                             <span class="fullscreen-detail-label">User:</span>
                             <span class="fullscreen-detail-value">${bay.username}</span>
+                        </div>
+                        <div class="fullscreen-detail-item">
+                            <span class="fullscreen-detail-label">Plate:</span>
+                            <span class="fullscreen-detail-value">${bay.plate_number}</span>
                         </div>
                     </div>
                 `;
@@ -1148,11 +1375,8 @@
                         document.body.classList.add('light');
                     }
                 }
-            };
-            
-            // Set initial button text
-            themeBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
-        }
+    };
+}
         
         // WebSocket connection
         function connectWebSocket() {
@@ -1329,9 +1553,10 @@
             const bayIds = ['Bay-1','Bay-2','Bay-3','Bay-4','Bay-5','Bay-6','Bay-7','Bay-8'];
             wrap.innerHTML = bayIds.map(id => {
                 const fallbackType = (id === 'Bay-1' || id === 'Bay-2' || id === 'Bay-3') ? 'Fast' : 'Normal';
-                const b = bayMap[id] || { bay_number: id, bay_type: fallbackType, status: 'Available', current_ticket_id: '', current_username: '' };
+                const b = bayMap[id] || { bay_number: id, bay_type: fallbackType, status: 'Available', current_ticket_id: '', current_username: '', plate_number: '' };
                 const ticket = b.current_ticket_id || '';
                 const user = b.current_username || '';
+                const plate = b.plate_number || '';
                 const type = b.bay_type ? ` <small class=\"muted\">(${b.bay_type})</small>` : '';
                 return `
                 <div class="bay">
@@ -1339,6 +1564,7 @@
                     <div>${statusBadge(b.status)}</div>
                     <div class="bay-info">
                         <div class="info-row"><span class="info-label">Ticket:</span> <span class="info-value">${ticket || '-'}</span></div>
+                        <div class="info-row"><span class="info-label">Plate:</span> <span class="info-value">${plate || '-'}</span></div>
                         <div class="info-row"><span class="info-label">User:</span> <span class="info-value">${user || '-'}</span></div>
                     </div>
                 </div>`;

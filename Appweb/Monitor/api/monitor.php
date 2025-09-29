@@ -36,8 +36,10 @@ try {
             END AS status,
             cb.current_username,
             COALESCE(cb.current_ticket_id, (SELECT cg.ticket_id FROM charging_grid cg WHERE cg.bay_number = cb.bay_number LIMIT 1)) AS current_ticket_id,
-            cb.start_time
+            cb.start_time,
+            u.plate_number
         FROM charging_bays cb
+        LEFT JOIN users u ON cb.current_username = u.username
         ORDER BY cb.bay_number
     ");
     $bays = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -116,8 +116,16 @@ if ($conn) {
 		try {
 			$dt = new DateTime($user['created_at']);
 			$memberSinceFormatted = $dt->format('M d, Y h:i A');
+
+			// Calculate days since member since for streak
+			$now = new DateTime();
+			$interval = $now->diff($dt);
+			$streakDays = $interval->days;
+			$streakText = $streakDays == 1 ? 'Day Streak' : 'Days Streak';
 		} catch (Exception $e) {
 			$memberSinceFormatted = $user['created_at'];
+			$streakDays = 0;
+			$streakText = 'Day Streak';
 		}
 	}
 
@@ -263,7 +271,7 @@ if ($conn) {
                         <div style="margin-bottom: 1.5rem; text-align: center;">
                             <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 3rem; background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); color: white; border-radius: 20px; font-weight: 600;">
                                 <i class="fas fa-fire"></i>
-                                <span>7 Day Streak</span>
+                                <span><?php echo $streakDays . ' ' . $streakText; ?></span>
                             </div>
                         </div>
 
@@ -308,8 +316,8 @@ if ($conn) {
                             <button type="button" onclick="window.location.href='forgot_password.php'" class="btn-reset-password" style="background: transparent; color: #FF9800; border: 2px solid #FF9800; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
                                 <i class="fas fa-key"></i> Reset Password
                             </button>
-                            <button type="button" onclick="window.location.href='index.php'" class="btn-back" style="background: transparent; color: #00c2ce; border: 2px solid #00c2ce; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
-                                <i class="fas fa-arrow-left"></i> Logout
+                            <button type="button" class="btn-back" onclick="openDeleteModal()" style="background: transparent; color: #dc3545; border: 2px solid #dc3545; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                                <i class="fas fa-trash"></i> Delete account
                             </button>
                         </div>
                     </form>
@@ -358,6 +366,32 @@ if ($conn) {
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Delete Account Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-overlay" onclick="closeDeleteModal()"></div>
+        <div class="modal-content" style="max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="text-align: center; padding: 1.5rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1);">
+                <h3 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #dc3545;">Delete Account</h3>
+                <button class="modal-close" onclick="closeDeleteModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6c757d;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 2rem; text-align: center;">
+                <div style="margin-bottom: 2rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                    <p style="font-size: 1.1rem; color: #1a202c; line-height: 1.6; margin-bottom: 1rem;">Your account is going to be permanently deleted.</p>
+                    <p style="font-size: 0.95rem; color: #6c757d; line-height: 1.5;">This action cannot be undone. All your data, including charging history and rewards, will be lost forever.</p>
+                </div>
+                <div class="form-actions" style="display: flex; gap: 1rem; justify-content: center; width: 100%;">
+                    <button type="button" onclick="closeDeleteModal()" class="btn-cancel" style="background: transparent; color: #6c757d; border: 2px solid #6c757d; padding: 0.75rem 2rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; flex: 1; max-width: 200px;">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="button" id="confirmDeleteBtn" onclick="confirmDeleteAccount()" disabled style="background: #dc3545; color: white; border: none; padding: 0.75rem 2rem; border-radius: 25px; cursor: not-allowed; font-weight: 600; transition: all 0.3s ease; flex: 1; max-width: 200px; opacity: 0.6;">
+                        <i class="fas fa-trash"></i> Delete (00:03)
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -725,10 +759,91 @@ if ($conn) {
             isDragging = false;
         });
 
-        // Close modal on escape key
+        // Delete Account Modal Functions
+        function openDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            // Start 3-second timer
+            let timeLeft = 3;
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            const timer = setInterval(() => {
+                timeLeft--;
+                const seconds = timeLeft % 60;
+                const minutes = Math.floor(timeLeft / 60);
+                deleteBtn.innerHTML = `<i class="fas fa-trash"></i> Delete (${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')})`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    deleteBtn.disabled = false;
+                    deleteBtn.style.cursor = 'pointer';
+                    deleteBtn.style.opacity = '1';
+                    deleteBtn.innerHTML = `<i class="fas fa-trash"></i> Delete Account`;
+                }
+            }, 1000);
+            // Store timer to clear on close
+            modal.timer = timer;
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            if (!modal) return;
+            modal.style.display = 'none';
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+
+            // Clear timer if exists
+            if (modal.timer) {
+                clearInterval(modal.timer);
+                modal.timer = null;
+            }
+
+            // Reset button
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            deleteBtn.disabled = true;
+            deleteBtn.style.cursor = 'not-allowed';
+            deleteBtn.style.opacity = '0.6';
+            deleteBtn.innerHTML = `<i class="fas fa-trash"></i> Delete (00:03)`;
+        }
+
+        function confirmDeleteAccount() {
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            if (deleteBtn.disabled) return;
+
+            // Show loading
+            deleteBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Deleting...`;
+            deleteBtn.disabled = true;
+
+            // AJAX request
+            fetch('delete_account.php', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = 'index.php?message=Account deleted successfully';
+                } else {
+                    throw new Error('Deletion failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to delete account. Please try again.');
+                closeDeleteModal();
+            });
+        }
+
+        // Close modal on escape key for both modals
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeProfileUploadModal();
+                const photoModal = document.getElementById('profileUploadModal');
+                const deleteModal = document.getElementById('deleteModal');
+                if (photoModal && photoModal.style.display === 'flex') {
+                    closeProfileUploadModal();
+                } else if (deleteModal && deleteModal.style.display === 'flex') {
+                    closeDeleteModal();
+                }
             }
         });
 
@@ -757,16 +872,15 @@ if ($conn) {
 
             // Add click handlers for modal triggers
             document.addEventListener('click', function(e) {
-                // Close modal when clicking outside
+                // Close modal when clicking outside (handle both modals)
                 if (e.target.classList.contains('modal-overlay')) {
-                    closeProfileUploadModal();
-                }
-            });
-
-            // Add keyboard support for modal
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeProfileUploadModal();
+                    const photoModal = document.getElementById('profileUploadModal');
+                    const deleteModal = document.getElementById('deleteModal');
+                    if (photoModal.style.display === 'flex') {
+                        closeProfileUploadModal();
+                    } else if (deleteModal.style.display === 'flex') {
+                        closeDeleteModal();
+                    }
                 }
             });
         });

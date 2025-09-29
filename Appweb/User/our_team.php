@@ -283,36 +283,7 @@ $conn = $db->getConnection();
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                    <span class="logo-text">CEPHRA</span>
-                </div>
-
-                <nav class="nav">
-                    <ul class="nav-list">
-                        <li><a href="#" onclick="openMonitorWeb(); return false;" class="nav-link">Monitor</a></li>
-                        <li><a href="link.php" class="nav-link">Link</a></li>
-                        <li><a href="history.php" class="nav-link">History</a></li>
-                        <li><a href="profile.php" class="nav-link">Profile</a></li>
-                    </ul>
-                </nav>
-
-                <div class="header-actions">
-                    <div class="auth-buttons">
-                        <a href="dashboard.php" class="nav-link auth-link">Dashboard</a>
-                    </div>
-                </div>
-
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </div>
+        <?php include __DIR__ . '/partials/header.php'; ?>
 
         <div class="mobile-menu" id="mobileMenu">
             <div class="mobile-menu-content">
@@ -352,7 +323,7 @@ $conn = $db->getConnection();
             <div class="leadership-grid">
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="images/default.png" alt="Usher Kielvin Ponce" />
+                        <img src="images/team pictures/default.png" alt="Usher Kielvin Ponce" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Usher Kielvin Ponce</h3>
@@ -369,7 +340,7 @@ $conn = $db->getConnection();
 
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="images/delacruz.jpeg" alt="Mark Dwayne P. Dela Cruz" />
+                        <img src="images/team pictures/delacruz.jpeg" alt="Mark Dwayne P. Dela Cruz" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Mark Dwayne P. Dela Cruz</h3>
@@ -387,7 +358,7 @@ $conn = $db->getConnection();
 
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="images/default.png" alt="Dizon S. Dizon" />
+                        <img src="images/team pictures/default.png" alt="Dizon S. Dizon" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Dizon S. Dizon</h3>
@@ -404,7 +375,7 @@ $conn = $db->getConnection();
 
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="images/kenji.jpeg" alt="Kenji A. Hizon" />
+                        <img src="images/team pictures/kenji.jpeg" alt="Kenji A. Hizon" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Kenji A. Hizon</h3>

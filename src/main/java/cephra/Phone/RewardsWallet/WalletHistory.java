@@ -721,7 +721,7 @@ public class WalletHistory extends javax.swing.JPanel implements WalletHistoryUp
             }
         });
         add(closeButton);
-        closeButton.setBounds(10, 60, 0, 30);
+        closeButton.setBounds(10, 50, 40, 30);
 
         mainHistoryContainer.setBackground(new java.awt.Color(255, 255, 255));
         mainHistoryContainer.setOpaque(false);
