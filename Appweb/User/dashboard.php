@@ -2851,10 +2851,9 @@ if ($conn) {
 					</div>
 				</div>
 
-				<div class="footer-bottom">
-					<p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
-				</div>
-			</div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Cephra. All rights reserved. | <a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
+    </div>
 		</footer>
 
 		</body>
