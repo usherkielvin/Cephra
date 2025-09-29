@@ -316,6 +316,10 @@
             color: #2d3748 !important;
             border-color: #e2e8f0 !important;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232d3748' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 8px center !important;
+            background-size: 12px !important;
+            padding-right: 30px !important;
         }
 
         .language-select:hover {
