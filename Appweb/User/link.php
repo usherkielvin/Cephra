@@ -249,11 +249,11 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
         <section class="link-section" style="padding: 100px 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
             <div class="container">
                 <div class="section-header" style="text-align: center; margin-bottom: 60px;">
-                    <h2 class="section-title" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Link Your Car</h2>
-                    <p class="section-description" style="font-size: 1.2rem; color: rgba(26, 32, 44, 0.8); max-width: 600px; margin: 0 auto;">Connect your electric vehicle to start charging at Cephra stations</p>
+                    <h2 class="section-title" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><?php echo is_null($carIndex) ? 'Link Your Car' : 'Linked Car'; ?></h2>
+                    <p class="section-description" style="font-size: 1.2rem; color: rgba(26, 32, 44, 0.8); max-width: 600px; margin: 0 auto;"><?php echo is_null($carIndex) ? 'Connect your electric vehicle to start charging at Cephra stations' : 'Your electric vehicle is connected and ready for charging'; ?></p>
                 </div>
 
-                <div class="link-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); max-width: 1500px; margin: 0 auto;">
+                <div class="link-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); max-width: 1500px; margin: 0 auto; position: relative;">
                     <?php if (is_null($carIndex)): ?>
                         <!-- No Car Design -->
                         <div class="no-car-container" style="text-align: center; padding: 2rem;">
@@ -302,6 +302,7 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
         <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" />
     </div>
 </div>
+<button style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;" onclick="window.location.href='dashboard.php'">Start Charging</button>
                     <?php endif; ?>
                 </div>
             </div>

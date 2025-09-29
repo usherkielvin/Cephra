@@ -1,7 +1,4 @@
-# TODO: Redesign queuePopup in ChargingPage.php
-
-- [x] Create cancel_charge_action.php to handle ticket cancellation
-- [x] Update showQueueTicketProceedPopup in ChargingPage.php to display ticket ID, charging type, safety message, and two buttons
-- [x] Add cancelTicket JavaScript function in ChargingPage.php to call cancel endpoint and close popup
-- [x] Modernize popup design to match topupmodal from wallet.php
-- [x] Add enhanced designs and extra features (icons, gradients, animations, progress indicator, safety notice)
+- [x] Add "Start Charging" button inside link-container in link.php
+- [x] Position the button at the bottom middle of link-container
+- [x] Set button onclick to redirect to dashboard.php
+- [x] Test the button functionality
