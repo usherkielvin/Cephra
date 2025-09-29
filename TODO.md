@@ -1,42 +1,24 @@
-# Task: Copy battery_level logic from dashboard.php to link.php
+# TODO for Monitor Fullscreen Fixes
 
-## Breakdown of Steps
+## Information Gathered
+- Fullscreen mode implemented with header containing theme and language controls
+- fullscreenThemeBtn calls themeBtn.click() but themeBtn is hidden in fullscreen, causing functionality issues
+- fullscreenLangBtn is a button that calls languageBtn.click(), which doesn't change language since languageBtn is a select
+- Need to convert fullscreenLangBtn to a select dropdown with same options as main languageBtn
+- Theme toggle logic needs to be directly implemented for fullscreenThemeBtn
 
-1. **[x] Update link.php PHP logic:**
-   - Add database fetch for battery_level similar to dashboard.php.
-   - Include vehicle models, car_images, and vehicle_specs arrays from dashboard.php.
-   - Adjust car_index generation in form submission to rand(0,8) to match specs.
-   - Calculate current range and time_to_full based on battery_level, similar to dashboard.php.
+## Plan
+- [x] Modify createFullscreenUI() to create fullscreenLangBtn as a select element with language options
+- [x] Update fullscreenLangBtn event handler to change language directly using same logic as main languageBtn
+- [x] Change fullscreenThemeBtn onclick to directly toggle theme using the same logic as themeBtn.onclick
+- [x] Ensure fullscreen controls update main UI state and localStorage
 
-2. **[x] Update the "With Car" display section in link.php:**
-   - Replace hardcoded "Porsche" with dynamic model from $models[$car_index].
-   - Update "Kms Remaining" to show calculated range.
-   - Update "Time to Charge" to show calculated time_to_full.
-   - Update Battery Level progress bar and text to use $db_battery_level or specs value.
-   - Add Performance if possible (e.g., from specs or hardcoded).
+## Dependent Files to Edit
+- Appweb/Monitor/index.php (JavaScript section)
 
-3. **[x] Test and verify:**
-   - Ensure no errors in PHP.
-   - Check display updates correctly when car is linked.
-   - Update TODO.md after each step.
-
-Task completed successfully.
-
-# Task: Add plate number feature to main-vehicle-card in dashboard.php
-
-## Breakdown of Steps
-
-1. **[x] Modify PHP query to fetch plate_number from users table.**
-   - Update the SELECT statement to include plate_number.
-
-2. **[x] Add plate_number to vehicle_data array.**
-   - Assign the fetched plate_number to the vehicle_data.
-
-3. **[x] Add Plate Number stat-item in the HTML.**
-   - Insert a new div with stat-label "Plate Number" and stat-value displaying the plate_number or "Not Set".
-
-4. **[x] Test and verify the display.**
-   - Ensure the plate number shows correctly in the dashboard.
-   - Update TODO.md after each step.
-
-Task completed successfully.
+## Followup Steps
+- [x] Test fullscreen mode activation
+- [x] Test theme toggle button in fullscreen
+- [x] Test language dropdown in fullscreen
+- [x] Verify theme and language changes sync between fullscreen and main UI
+- [x] Check localStorage persistence for both theme and language preferences
