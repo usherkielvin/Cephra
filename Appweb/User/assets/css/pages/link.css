@@ -3,6 +3,139 @@
 .link-section {
     padding: 100px 0;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+}
+
+
+/* Modernized layout for linked car section */
+
+.linked-car-layout.modernized-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.modernized-details {
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.modernized-details .detail-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.modernized-details .detail-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: rgba(26, 32, 44, 0.5);
+    flex: 1 1 auto;
+}
+
+.modernized-details .detail-value {
+    font-weight: 700;
+    font-size: 2.7rem;
+    color: #1a202c;
+    flex: 1 1 auto;
+    text-align: left;
+}
+
+.modernized-details .battery-row .progress-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+.stat-large {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat-number {
+    font-size: 5rem;
+    font-weight: 700;
+    color: #1a202c;
+    line-height: 1;
+}
+
+.stat-label-small {
+    font-size: 1rem;
+    color: rgba(26, 32, 44, 0.7);
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+.modernized-button {
+    align-self: flex-start;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 2px solid #00c2ce;
+    background: transparent;
+    color: #00c2ce;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.modernized-button:hover {
+    background: #00c2ce;
+    color: white;
+}
+
+
+/* Car image styling */
+
+.modernized-car-image {
+    flex: 1 1 50%;
+    text-align: right;
+}
+
+.modernized-car-image img {
+    max-width: 100%;
+    height: auto;
+    border: none;
+    box-shadow: none;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.modernized-car-image img:hover {
+    transform: scale(1.05);
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 900px) {
+    .linked-car-layout.modernized-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+    .modernized-details,
+    .modernized-car-image {
+        flex: 1 1 100%;
+        text-align: center;
+    }
+    .modernized-car-image img {
+        max-width: 80%;
+    }
+    .stat-number {
+        font-size: 3rem;
+    }
+    .modernized-button {
+        align-self: center;
+    }
 }
 
 .link-container {
@@ -11,8 +144,90 @@
     padding: 2rem;
     border: 1px solid rgba(26, 32, 44, 0.1);
     box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1);
-    max-width: 600px;
+    width: 100%;
+    max-width: 1500px;
     margin: 0 auto;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+
+/* New layout for linked car section */
+
+.linked-car-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.linked-car-details {
+    flex: 1 1 45%;
+    min-width: 300px;
+}
+
+.linked-car-image {
+    flex: 1 1 50%;
+    min-width: 300px;
+    text-align: center;
+}
+
+.linked-car-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0;
+    box-shadow: none;
+    transition: transform 0.3s ease;
+}
+
+.linked-car-image img:hover {
+    transform: scale(1.05);
+}
+
+
+/* Adjust quick stats for left side */
+
+.quick-stats {
+    justify-content: flex-start;
+}
+
+
+/* Adjust status indicator */
+
+.status-indicator {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+}
+
+
+/* Adjust heading */
+
+.linked-car-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 900px) {
+    .linked-car-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+    .linked-car-details,
+    .linked-car-image {
+        flex: 1 1 100%;
+        min-width: auto;
+    }
+    .linked-car-heading {
+        justify-content: center;
+    }
 }
 
 .link-container h3 {
@@ -135,6 +350,133 @@
 }
 
 
+/* New Features Styles */
+
+
+/* Car Image Card */
+
+.car-image-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0, 194, 206, 0.15);
+    text-align: center;
+    animation: slideIn 0.8s ease-out;
+}
+
+.car-image-card img {
+    max-width: 80%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.car-image-card img:hover {
+    transform: scale(1.05);
+}
+
+
+/* Status Indicator */
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    animation: pulse 2s infinite;
+}
+
+
+/* Quick Stats */
+
+.quick-stats {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    justify-content: center;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 194, 206, 0.1);
+    text-align: center;
+    flex: 1;
+    max-width: 150px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 194, 206, 0.2);
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    color: #00c2ce;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: rgba(26, 32, 44, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+/* Animations */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    }
+    50% {
+        box-shadow: 0 2px 12px rgba(40, 167, 69, 0.5);
+    }
+    100% {
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    }
+}
+
+
 /* Mobile Responsiveness */
 
 @media (max-width: 600px) {
@@ -150,5 +492,13 @@
     }
     .link-container p {
         font-size: 1rem;
+    }
+    .quick-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+    .stat-card {
+        max-width: 100%;
+        width: 100%;
     }
 }

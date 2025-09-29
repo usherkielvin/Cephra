@@ -88,6 +88,20 @@ function process_image($image_path) {
     return $processed_path;
 }
 
+// Function to generate random plate number: 3 letters + 4 numbers
+function generatePlateNumber() {
+    $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $numbers = '0123456789';
+    $plate = '';
+    for ($i = 0; $i < 3; $i++) {
+        $plate .= $letters[rand(0, 25)];
+    }
+    for ($i = 0; $i < 4; $i++) {
+        $plate .= $numbers[rand(0, 9)];
+    }
+    return $plate;
+}
+
 $username = $_SESSION['username'];
 
 // Check car_index from users table
@@ -107,8 +121,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($conn) {
             // Generate random car_index between 0-8 to match vehicle specs
             $newCarIndex = rand(0, 8);
-            $stmt = $conn->prepare("UPDATE users SET car_index = :car_index WHERE username = :username");
+            // Generate random plate number: 3 letters + 4 numbers
+            $plateNumber = generatePlateNumber();
+            $stmt = $conn->prepare("UPDATE users SET car_index = :car_index, plate_number = :plate_number WHERE username = :username");
             $stmt->bindParam(':car_index', $newCarIndex);
+            $stmt->bindParam(':plate_number', $plateNumber);
             $stmt->bindParam(':username', $username);
             if ($stmt->execute()) {
                 $_SESSION['car_linked'] = true;
@@ -175,7 +192,7 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
 
     $vehicle_data = [
         'model' => $models[$carIndex],
-        'status' => 'Connected & Charging',
+        'status' => 'Connected',
         'range' => $vehicle_specs[$carIndex]['range'],
         'time_to_full' => $vehicle_specs[$carIndex]['time_to_full'],
         'battery_level' => $db_battery_level ?? $vehicle_specs[$carIndex]['battery_level'],
@@ -236,58 +253,55 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
                     <p class="section-description" style="font-size: 1.2rem; color: rgba(26, 32, 44, 0.8); max-width: 600px; margin: 0 auto;">Connect your electric vehicle to start charging at Cephra stations</p>
                 </div>
 
-                <div class="link-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); max-width: 600px; margin: 0 auto;">
+                <div class="link-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); max-width: 1500px; margin: 0 auto;">
                     <?php if (is_null($carIndex)): ?>
                         <!-- No Car Design -->
-                        <h3 style="text-align: center; margin-bottom: 1rem; color: #1a202c;">Link Your Electric Vehicle</h3>
-                        <p style="text-align: center; margin-bottom: 2rem; color: rgba(26, 32, 44, 0.7);">Connect your EV to start charging at Cephra stations</p>
-                        <img src="images/ConnectCar.gif" alt="Connect Car" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px; display: block; margin-left: auto; margin-right: auto;">
-                        <form method="post" id="linkForm">
-                            <div class="terms-checkbox" style="margin-bottom: 1rem;">
-                                <input type="checkbox" id="terms" name="terms" required>
-                                <label for="terms">By linking, I agree to the <a href="#" onclick="showTerms(); return false;">Terms & Conditions</a></label>
-                            </div>
-                            <?php if (isset($error)): ?>
-                                <div class="error-message" style="color: red; margin-bottom: 1rem;"><?php echo htmlspecialchars($error); ?></div>
-                            <?php endif; ?>
-                            <button type="submit" name="link_car" class="link-button" id="linkBtn" disabled style="width: 100%; padding: 0.75rem; background: #cccccc; color: white; border: none; border-radius: 8px; cursor: not-allowed; transition: all 0.3s ease;">
-                                Link My Car
-                            </button>
-                        </form>
-                    <?php else: ?>
-                        <!-- With Car Design -->
-                        <h3 style="text-align: center; margin-bottom: 1rem; color: #1a202c;">Your Vehicle is Linked</h3>
-                        <p style="text-align: center; margin-bottom: 2rem; color: rgba(26, 32, 44, 0.7);"><?php echo htmlspecialchars($vehicle_data['model']); ?> connected. You're ready to charge.</p>
-                        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" style="max-width: 100%; height: auto; margin: 20px 0; border-radius:8px; display: block; margin-left: auto; margin-right: auto;">
-                        <div class="car-details" style="margin-top: 2rem;">
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Car Model:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['model']); ?></span>
-                            </div>
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Performance:</span>
-                                <span class="detail-value"><?php echo $vehicle_specs[$carIndex]['hp']; ?> HP</span>
-                            </div>
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Kms Remaining:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['range']); ?></span>
-                            </div>
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Time to Charge:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['time_to_full']); ?></span>
-                            </div>
-                            <div class="detail-row" style="margin-bottom: 1rem;">
-                                <span class="detail-label">Battery Level:</span>
-                                <div class="progress-bar" style="width: 100%; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
-                                    <div class="progress-fill" style="height: 20px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); width: <?php echo $battery_level_num; ?>%; transition: width 0.3s ease;"></div>
+                        <div class="no-car-container" style="text-align: center; padding: 2rem;">
+                            <h3 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Link Your Electric Vehicle</h3>
+                            <p style="font-size: 1.1rem; color: rgba(26, 32, 44, 0.8); margin-bottom: 2rem;">Connect your EV to start charging at Cephra stations and enjoy seamless charging experiences.</p>
+                            <form method="post" id="linkForm" style="max-width: 400px; margin: 0 auto;">
+                                <div class="terms-checkbox" style="margin-bottom: 1.5rem; text-align: left;">
+                                    <input type="checkbox" id="terms" name="terms" required onclick="showTerms(); this.checked = false;" style="margin-right: 0.5rem;">
+                                    <label for="terms" style="font-size: 0.9rem;">By linking, I agree to the <a href="#" onclick="showTerms(); return false;" style="color: #00c2ce;">Terms & Conditions</a></label>
                                 </div>
-                                <span class="progress-text" style="display: block; text-align: center; margin-top: 0.5rem;"><?php echo htmlspecialchars($vehicle_data['battery_level']); ?></span>
-                            </div>
+                                <?php if (isset($error)): ?>
+                                    <div class="error-message" style="color: #e53e3e; margin-bottom: 1rem; font-size: 0.9rem;"><?php echo htmlspecialchars($error); ?></div>
+                                <?php endif; ?>
+                                <button type="submit" name="link_car" class="link-button" id="linkBtn" disabled style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #cccccc 0%, #b3b3b3 100%); color: white; border: none; border-radius: 12px; cursor: not-allowed; transition: all 0.3s ease; font-size: 1rem; font-weight: 600;">
+                                    Link My Car
+                                </button>
+                            </form>
                         </div>
-                        <div style="display:flex; gap:12px; justify-content:center; margin-top: 2rem;">
-                            <a href="dashboard.php" class="button">Go to Dashboard</a>
-                            <a href="ChargingPage.php" class="button alt">Start Charging</a>
-                        </div>
+                    <?php else: ?>
+<!-- With Car Design -->
+<div class="linked-car-layout modernized-layout">
+    <div class="modernized-details">
+            <div class="detail-row">
+                <span class="detail-label">Car Model</span>
+                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['model']); ?></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['status']); ?></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Kms Remaining</span>
+                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['range']); ?></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Time to Charge</span>
+                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['time_to_full']); ?></span>
+            </div>
+            <div class="detail-row battery-row">
+                <span class="detail-label">Battery Level</span>
+                <span class="progress-text" style="font-size: 2rem; font-weight: 700; color: #1a202c;"><?php echo htmlspecialchars($vehicle_data['battery_level']); ?></span>
+            </div>
+
+    </div>
+    <div class="modernized-car-image">
+        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" />
+    </div>
+</div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -318,11 +332,11 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
             const linkBtn = document.getElementById('linkBtn');
             if (this.checked) {
                 linkBtn.disabled = false;
-                linkBtn.style.background = '#4CAF50';
+                linkBtn.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
                 linkBtn.style.cursor = 'pointer';
             } else {
                 linkBtn.disabled = true;
-                linkBtn.style.background = '#cccccc';
+                linkBtn.style.background = 'linear-gradient(135deg, #cccccc 0%, #b3b3b3 100%)';
                 linkBtn.style.cursor = 'not-allowed';
             }
         });
@@ -368,7 +382,7 @@ These Terms are governed by the laws of Pasay City, Philippines.
 12. CONTACT
 Cephra Support — support@cephra.com | +63 2 8XXX XXXX
 
-By checking "I agree", you confirm you have read and accept these Terms.`;
+Please scroll to the bottom and click "I Agree" to accept these Terms.`;
 
             const modal = document.createElement('div');
             modal.style.cssText = `
@@ -393,16 +407,38 @@ By checking "I agree", you confirm you have read and accept these Terms.`;
                 max-height: 80vh;
                 overflow-y: auto;
                 position: relative;
+                display: flex;
+                flex-direction: column;
             `;
 
             modalContent.innerHTML = `
                 <h3>Terms and Conditions</h3>
-                <pre style="white-space: pre-wrap; font-family: inherit; font-size: 14px; line-height: 1.5;">${termsText}</pre>
-                <button onclick="this.closest('div').parentElement.remove(); document.getElementById('terms').checked = true;" style="margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">I Agree</button>
+                <pre id="termsText" style="white-space: pre-wrap; font-family: inherit; font-size: 14px; line-height: 1.5; flex-grow: 1; overflow-y: auto;">${termsText}</pre>
+                <button id="agreeBtn" disabled style="margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: not-allowed;">I Agree</button>
             `;
 
             modal.appendChild(modalContent);
             document.body.appendChild(modal);
+
+            const termsTextEl = document.getElementById('termsText');
+            const agreeBtn = document.getElementById('agreeBtn');
+
+            termsTextEl.addEventListener('scroll', () => {
+                if (termsTextEl.scrollTop + termsTextEl.clientHeight >= termsTextEl.scrollHeight - 5) {
+                    agreeBtn.disabled = false;
+                    agreeBtn.style.cursor = 'pointer';
+                    agreeBtn.style.pointerEvents = 'auto';
+                }
+            });
+
+            agreeBtn.addEventListener('click', () => {
+                document.getElementById('terms').checked = true;
+                modal.remove();
+                const linkBtn = document.getElementById('linkBtn');
+                linkBtn.disabled = false;
+                linkBtn.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+                linkBtn.style.cursor = 'pointer';
+            });
         }
     </script>
 </body>
