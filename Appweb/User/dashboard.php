@@ -1596,7 +1596,7 @@ if ($conn) {
 							style="display: flex;
 								   gap: 1.25rem;
 								   align-items: center;">
-							<li><a href="#" onclick="openMonitorWeb(); return false;" class="nav-link">Monitor</a></li>
+							<li><a href="dashboard.php" class="nav-link">Home</a></li>
 							<li><a href="link.php" class="nav-link">Link</a></li>
 							<li><a href="history.php" class="nav-link">History</a></li>
 							<li><a href="rewards.php" class="nav-link">Rewards</a></li>
@@ -1784,7 +1784,7 @@ if ($conn) {
 			<div class="mobile-menu" id="mobileMenu">
 				<div class="mobile-menu-content">
 					<ul class="mobile-nav-list">
-						<li><a href="#" onclick="openMonitorWeb(); return false;" class="mobile-nav-link">Monitor</a></li>
+						<li><a href="dashboard.php" class="nav-link">Home</a></li>
 						<li><a href="link.php" class="mobile-nav-link">Link</a></li>
 						<li><a href="history.php" class="mobile-nav-link">History</a></li>
 						<li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
@@ -2660,7 +2660,7 @@ if ($conn) {
 				(function() {
 					const dict = {
 						en: {
-							Monitor: 'Monitor', Link: 'Link', History: 'History', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Logout',
+							Monitor: 'Home', Link: 'Link', History: 'History', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Logout',
 							LiveStatus: 'Live Status', LiveDesc: 'Real-time charging station information',
 							SystemStatus: 'System Status', AllOperational: 'All system operational',
 							CurrentQueue: 'Current Queue', VehiclesWaiting: 'vehicles waiting',
@@ -2824,15 +2824,16 @@ if ($conn) {
 						</p>
 					</div>
 
-					<div class="footer-section">
-						<h4 class="footer-title">Platform</h4>
-						<ul class="footer-links">
-							<li><a href="dashboard.php">Dashboard</a></li>
-							<li><a href="ChargingPage.php">Charging</a></li>
-							<li><a href="history.php">History</a></li>
-						</ul>
-					</div>
-
+            <div class="footer-section">
+                <h4 class="footer-title">Platform</h4>
+                <ul class="footer-links">
+                    <li><a href="dashboard.php">Home</a></li>
+                    <li><a href=".../appweb/Monitor/index.php">Monitor</a></li>
+                    <li><a href="link.php">Link</a></li>
+                    <li><a href="history.php">History</a></li>
+                    <li><a href="rewards.php">Rewards</a></li>
+                </ul>
+            </div>
 					<div class="footer-section">
 						<h4 class="footer-title">Support</h4>
 						<ul class="footer-links">

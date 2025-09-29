@@ -20,9 +20,11 @@
             <div class="footer-section">
                 <h4 class="footer-title">Platform</h4>
                 <ul class="footer-links">
-                    <li><a href="dashboard.php">Dashboard</a></li>
-                    <li><a href="ChargingPage.php">Charging</a></li>
+                    <li><a href="dashboard.php">Home</a></li>
+                    <li><a href=".../appweb/Monitor/index.php">Monitor</a></li>
+                    <li><a href="link.php">Link</a></li>
                     <li><a href="history.php">History</a></li>
+                    <li><a href="rewards.php">Rewards</a></li>
                 </ul>
             </div>
 

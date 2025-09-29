@@ -339,7 +339,7 @@ if ($username && $conn) {
                     style="display: flex;
                            gap: 1.25rem;
                            align-items: center;">
-                    <li><a href="../Monitor/index.php" class="nav-link">Monitor</a></li>
+                    <li><a href="dashboard.php" class="nav-link">Home</a></li>
                     <li><a href="link.php" class="nav-link">Link</a></li>
                     <li><a href="history.php" class="nav-link">History</a></li>
                     <li><a href="rewards.php" class="nav-link">Rewards</a></li>
@@ -500,11 +500,10 @@ if ($username && $conn) {
     <div class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-content">
             <ul class="mobile-nav-list">
-                <li><a href="#" onclick="openMonitorWeb(); return false;" class="mobile-nav-link">Monitor</a></li>
+                <li><a href="dashboard.php" class="mobile-nav-link">Home</a></li>
                 <li><a href="link.php" class="mobile-nav-link">Link</a></li>
                 <li><a href="history.php" class="mobile-nav-link">History</a></li>
                 <li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
-                <li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
             </ul>
             <div class="mobile-header-actions">
                 <a href="profile_logout.php" class="mobile-auth-link">Logout</a>
