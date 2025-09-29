@@ -15,11 +15,36 @@ if ($conn) {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $firstname = $user ? $user['firstname'] : 'User';
 
-echo "<!-- DEBUG: Session username: " . htmlspecialchars($_SESSION['username']) . " -->";
-echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
+// Debug comments removed to prevent JSON parsing errors
 
 } else {
     $firstname = 'User';
+}
+
+// Handle ticket processing
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
+    header('Content-Type: application/json');
+
+    $ticketId = trim($_POST['ticketId']);
+    $username = $_SESSION['username'];
+
+    try {
+        // Update ticket status to 'processing'
+        $stmt = $conn->prepare("UPDATE charging_tickets SET status = 'processing', processed_at = NOW() WHERE ticket_id = :ticketId AND username = :username AND status = 'queued'");
+        $stmt->bindParam(':ticketId', $ticketId);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            echo json_encode(['success' => true, 'message' => 'Ticket processed successfully']);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Ticket not found or already processed']);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+    }
+
+    exit();
 }
 ?>
 <!DOCTYPE HTML>
@@ -183,12 +208,15 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                const href = this.getAttribute('href');
+                if (href && href !== '#') {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
                 }
             });
         });
@@ -302,28 +330,176 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
                 var serviceType = response.serviceType;
                 var batteryLevel = response.batteryLevel;
 
-                // Create popup HTML (QueueTicketProceed)
-                var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 320px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
-                popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Queue Ticket Proceed</h2>';
-                popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
-                popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
-                popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
-                popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
-                popupHtml += '<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">';
-                popupHtml += '<button onclick="closePopup()" style="padding: 10px 16px; background: #00a389; color: white; border: none; border-radius: 6px; cursor: pointer;">OK</button>';
-                popupHtml += '</div>';
-                popupHtml += '</div>';
+                // Determine charging icon based on service type
+                var chargingIcon = serviceType === 'Fast Charging' ? 'fas fa-bolt' : 'fas fa-battery-half';
+                var chargingColor = serviceType === 'Fast Charging' ? '#ff6b35' : '#00c2ce';
+
+                // Create modal HTML (QueueTicketProceed) with enhanced design
+                var modalHtml = '<div id="queueModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);">';
+                modalHtml += '<div class="modal-content" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 20px; padding: 0.5rem; max-width: 380px; width: 90%; box-shadow: 0 20px 40px rgba(0, 194, 206, 0.2); position: relative; font-size: 0.85rem;">';
+
+                modalHtml += '<div class="modal-header" style="text-align: center; margin-bottom: 1rem; position: relative; z-index: 2;">';
+                modalHtml += '<div class="success-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); border-radius: 50%; margin-bottom: 0.75rem; margin-top: 1rem; box-shadow: 0 8px 20px rgba(0, 194, 206, 0.3);">';
+                modalHtml += '<i class="fas fa-check" style="font-size: 1.25rem; color: white;"></i>';
+                modalHtml += '</div>';
+                modalHtml += '<h3 class="modal-title" style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.25rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Ticket Created Successfully!</h3>';
+                modalHtml += '<p class="modal-subtitle" style="color: rgba(26, 32, 44, 0.7); font-size: 0.85rem; margin: 0;">Your charging session has been queued</p>';
+                modalHtml += '</div>';
+
+                // Ticket details with enhanced styling
+                modalHtml += '<div class="ticket-details" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; padding: 0.75rem; margin-bottom: 0.75rem; border: 1px solid rgba(0, 194, 206, 0.1); position: relative; z-index: 2;">';
+
+                // Ticket ID section
+                modalHtml += '<div class="ticket-id-section" style="display: flex; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);">';
+                modalHtml += '<div class="section-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">';
+                modalHtml += '<i class="fas fa-ticket-alt" style="color: white; font-size: 1rem;"></i>';
+                modalHtml += '</div>';
+                modalHtml += '<div class="section-content">';
+                modalHtml += '<div class="section-label" style="font-size: 0.8rem; color: rgba(26, 32, 44, 0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Ticket ID</div>';
+                modalHtml += '<div class="section-value" style="font-size: 1.2rem; font-weight: 800; color: #1a202c; font-family: monospace;">' + ticketId + '</div>';
+                modalHtml += '</div>';
+                modalHtml += '</div>';
+
+                // Charging Type section
+                modalHtml += '<div class="charging-type-section" style="display: flex; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);">';
+                modalHtml += '<div class="section-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, ' + chargingColor + ' 0%, ' + (serviceType === 'Fast Charging' ? '#e74c3c' : '#0e3a49') + ' 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">';
+                modalHtml += '<i class="' + chargingIcon + '" style="color: white; font-size: 1rem;"></i>';
+                modalHtml += '</div>';
+                modalHtml += '<div class="section-content">';
+                modalHtml += '<div class="section-label" style="font-size: 0.8rem; color: rgba(26, 32, 44, 0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Charging Type</div>';
+                modalHtml += '<div class="section-value" style="font-size: 1.2rem; font-weight: 800; color: ' + chargingColor + ';">' + serviceType + '</div>';
+                modalHtml += '</div>';
+                modalHtml += '</div>';
+
+                // Battery status
+                modalHtml += '<div class="battery-status-section" style="display: flex; align-items: center; padding: 0.75rem; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);">';
+                modalHtml += '<div class="section-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">';
+                modalHtml += '<i class="fas fa-car-battery" style="color: white; font-size: 1rem;"></i>';
+                modalHtml += '</div>';
+                modalHtml += '<div class="section-content">';
+                modalHtml += '<div class="section-label" style="font-size: 0.8rem; color: rgba(26, 32, 44, 0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Current Battery</div>';
+                modalHtml += '<div class="section-value" style="font-size: 1.2rem; font-weight: 800; color: #27ae60;">' + batteryLevel + '%</div>';
+                modalHtml += '</div>';
+                modalHtml += '</div>';
+
+                modalHtml += '</div>';
+
+                // Safety message with icon
+                modalHtml += '<div class="safety-notice" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border: 1px solid #f39c12; border-radius: 10px; padding: 0.75rem; margin-bottom: 0.75rem; position: relative; z-index: 2;">';
+                modalHtml += '<div class="safety-content" style="display: flex; align-items: flex-start;">';
+                modalHtml += '<div class="safety-icon" style="width: 28px; height: 28px; background: #f39c12; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 0.5rem; flex-shrink: 0; margin-top: 0.125rem;">';
+                modalHtml += '<i class="fas fa-shield-alt" style="color: white; font-size: 0.7rem;"></i>';
+                modalHtml += '</div>';
+                modalHtml += '<div class="safety-text">';
+                modalHtml += '<div class="safety-title" style="font-weight: 700; color: #8b4513; margin-bottom: 0.125rem; font-size: 0.8rem;">Safety Priority Notice</div>';
+                modalHtml += '<div class="safety-description" style="color: #8b4513; line-height: 1.3; font-size: 0.75rem;">Under Cephra\'s 20% Rule, vehicles below 20% battery are prioritized for safety. Your session will be processed according to queue priority.</div>';
+                modalHtml += '</div>';
+                modalHtml += '</div>';
+                modalHtml += '</div>';
+
+                modalHtml += '<div class="modal-actions" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; margin-bottom: 1rem; position: relative; z-index: 2;">';
+                modalHtml += '<button onclick="processTicket()" class="btn-primary" style="background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 194, 206, 0.3); position: relative; overflow: hidden;">';
+                modalHtml += '<span style="position: relative; z-index: 2;">Process Ticket</span>';
+                modalHtml += '<div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: left 0.5s; z-index: 1;"></div>';
+                modalHtml += '</button>';
+                modalHtml += '<button onclick="cancelTicket(\'' + ticketId + '\')" class="btn-cancel" style="background: transparent; color: rgba(26, 32, 44, 0.6); border: 2px solid rgba(26, 32, 44, 0.3); padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease;">Cancel Ticket</button>';
+                modalHtml += '</div>';
+                modalHtml += '</div>';
+                modalHtml += '</div>';
+
+                // Add CSS animations
+                modalHtml += '<style>';
+                modalHtml += '@keyframes modalScaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }';
+                modalHtml += '.modal-content { animation: modalScaleIn 0.4s ease-out; }';
+                modalHtml += '.btn-primary:hover div { left: 100%; }';
+                modalHtml += '.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 194, 206, 0.4); }';
+                modalHtml += '.btn-cancel:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #ef4444; }';
+                modalHtml += '</style>';
 
                 // Append to body
-                document.body.insertAdjacentHTML('beforeend', popupHtml);
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                // Show modal with animation
+                setTimeout(function() {
+                    const modal = document.getElementById('queueModal');
+                    modal.style.display = 'flex';
+                    modal.style.alignItems = 'center';
+                    modal.style.justifyContent = 'center';
+                    document.body.style.overflow = 'hidden';
+                }, 10);
             }
         }
 
         // Function to close popup (defined globally)
         window.closePopup = function() {
-            const popup = document.getElementById('queuePopup');
-            if (popup) popup.remove();
+            const modal = document.getElementById('queueModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+                modal.remove();
+            }
         };
+
+        // Function to cancel ticket
+        function cancelTicket(ticketId) {
+            fetch('cancel_charge_action.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'ticketId=' + encodeURIComponent(ticketId)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closePopup();
+                } else if (data.error) {
+                    alert('Error cancelling ticket: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred while cancelling the ticket. Please try again.');
+                console.error('Error:', error);
+            });
+        }
+
+        // Function to process ticket
+        function processTicket() {
+            // Get the ticket ID from the modal
+            const modal = document.getElementById('queueModal');
+            if (!modal) return;
+
+            // Find the ticket ID in the modal content
+            const ticketIdElement = modal.querySelector('.section-value');
+            if (!ticketIdElement) return;
+
+            const ticketId = ticketIdElement.textContent.trim();
+
+            // Check if the Process Ticket button was pressed (this function is called only on button press)
+            // So no additional check needed here, but if you want to enforce, you can disable the button until clicked.
+
+            // Perform the fetch to the same page to process the ticket
+            fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'ticketId=' + encodeURIComponent(ticketId)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showDialog('Ticket Processing', 'Your Bay assignment will be announced in the dashboard, please wait for further notice.');
+                    closePopup();
+                } else if (data.error) {
+                    showDialog('Processing Error', data.error);
+                }
+            })
+            .catch(error => {
+                showDialog('Processing Error', 'An error occurred while processing the ticket. Please try again.');
+                console.error('Error:', error);
+            });
+        }
     </script>
 </body>
 </html>

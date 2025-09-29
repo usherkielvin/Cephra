@@ -646,7 +646,7 @@ function initMobileMenu() {
     });
 
     // Close menu when clicking outside on mobile
-    $(document).on('click', function(e) {
+    document.addEventListener('click', function(e) {
         if (window.innerWidth <= 768) {
             if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
                 if (mobileMenu.classList.contains('active')) {

@@ -67,14 +67,14 @@ if ($queuedCount > 0) {
     exit();
 }
 
-// Check if car is linked (assuming car linking is tracked in users table or separate table)
-// For now, we'll assume car is linked if user exists and has battery level data
-$stmt = $conn->prepare("SELECT COUNT(*) FROM battery_levels WHERE username = :username");
+// Check if car is linked by verifying car_index in users table
+$stmt = $conn->prepare("SELECT car_index FROM users WHERE username = :username");
 $stmt->bindParam(':username', $username);
 $stmt->execute();
-$hasBatteryData = $stmt->fetchColumn() > 0;
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+$carIndex = $result['car_index'] ?? null;
 
-if (!$hasBatteryData) {
+if ($carIndex === null || !is_numeric($carIndex) || $carIndex < 0 || $carIndex > 8) {
     echo json_encode(['error' => 'Please link your car first before charging.']);
     exit();
 }
