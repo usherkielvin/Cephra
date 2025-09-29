@@ -339,7 +339,7 @@ if ($username && $conn) {
                     style="display: flex;
                            gap: 1.25rem;
                            align-items: center;">
-                    <li><a href="#" onclick="openMonitorWeb(); return false;" class="nav-link">Monitor</a></li>
+                    <li><a href="../Monitor/index.php" class="nav-link">Monitor</a></li>
                     <li><a href="link.php" class="nav-link">Link</a></li>
                     <li><a href="history.php" class="nav-link">History</a></li>
                     <li><a href="rewards.php" class="nav-link">Rewards</a></li>

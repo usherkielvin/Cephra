@@ -41,41 +41,8 @@ echo "<!-- DEBUG: Fetched firstname: " . htmlspecialchars($firstname) . " -->";
 	<link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 	</head>
 	<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-                <div class="header-content">
-						<!-- Logo -->
-						<div class="logo">
-							<img src="images/logo.png" alt="Cephra" class="logo-img">
-							<span class="logo-text">CEPHRA</span>
-						</div>
-
-						<!-- Navigation -->
-						<nav class="nav">
-							<ul class="nav-list">
-								<li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-								<li><a href="link.php" class="nav-link">Link</a></li>
-								<li><a href="history.php" class="nav-link">History</a></li>
-								<li class="current_page_item"><a href="profile.php" class="nav-link">Profile</a></li>
-							</ul>
-						</nav>
-
-						<!-- Header Actions -->
-						<div class="header-actions">
-							<div class="auth-buttons">
-								<a href="dashboard.php" class="nav-link auth-link">Back</a>
-							</div>
-						</div>
-
-						<!-- Mobile Menu Toggle -->
-						<button class="mobile-menu-toggle" id="mobileMenuToggle">
-							<span></span>
-							<span></span>
-							<span></span>
-						</button>
-					</div>
-        </div>
+        
+<?php include __DIR__ . '/partials/header.php'; ?>
 
         <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobileMenu">
