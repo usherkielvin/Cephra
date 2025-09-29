@@ -1,6 +1,6 @@
 # 🔋 Cephra - EV Charging Queue Management System
 
-![Java](https://img.shields.io/badge/Java-21-orange)
+![Java](https://img.shields.io/badge/Java-24-orange)
 ![Maven](https://img.shields.io/badge/Maven-3.11.0-blue)
 ![Swing](https://img.shields.io/badge/Swing-GUI-green)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue)
@@ -10,6 +10,8 @@
 ## 🎯 Introduction
 
 **Cephra** is a comprehensive Electric Vehicle (EV) charging station queue management system that bridges the gap between traditional desktop applications and modern web interfaces. Built with Java Swing for robust desktop functionality and enhanced with a mobile-optimized web interface, Cephra provides a complete solution for managing EV charging stations, customer queues, and payment processing.
+
+> **📚 Academic Project**: This is a final project for the Data Structures & Algorithms course, demonstrating practical implementation of queue management algorithms, data structures, and modern software development practices.
 
 ### Why Cephra?
 - **Dual Interface**: Seamlessly combines Java desktop applications with modern web technology
@@ -54,55 +56,66 @@
 ```
 Cephra/
 ├── 📁 src/                          # Java Source Code (Primary System)
-│   ├── main/java/cephra/
-│   │   ├── Admin/                   # Admin panel components
-│   │   ├── Phone/                   # Customer mobile interface
-│   │   ├── Frame/                   # Main application frames
-│   │   ├── db/                      # Database connection classes
-│   │   └── CephraDB.java           # Core database operations
+│   └── main/java/cephra/
+│       ├── Admin/                   # Admin panel components (20 files)
+│       ├── Database/                # Database connection classes
+│       ├── Frame/                   # Main application frames (6 files)
+│       ├── Phone/                   # Customer mobile interface (96 files)
+│       └── Launcher.java           # Application entry point
 │   └── resources/
-│       ├── db/init.sql             # Database schema and initial data
-│       └── cephra/Photos/          # Application images and icons
+│       ├── db/                     # Database schema files (4 SQL files)
+│       └── cephra/Cephra Images/   # Application images and icons (131 files)
 ├── 📁 Appweb/                       # Web Interface Components
 │   ├── Admin/                      # Admin web interface
+│   │   ├── api/                    # Admin API endpoints
+│   │   ├── config/                 # Admin configuration
+│   │   ├── css/                    # Admin stylesheets
+│   │   ├── images/                 # Admin interface images
+│   │   ├── js/                     # Admin JavaScript files
+│   │   └── *.php                   # Admin PHP pages
 │   ├── Monitor/                    # Queue monitor web interface
-│   └── User/                       # Customer web interface
-│       ├── assets/                 # CSS, JS, and web assets
-│       ├── images/                 # Web interface images
-│       ├── api/                    # PHP API endpoints
-│       ├── config/                 # Database and configuration files
-│       ├── css/                    # Stylesheets
-│       ├── ChargingPage.php       # Main charging interface
-│       ├── dashboard.php          # User dashboard
-│       ├── link.php               # Vehicle linking interface
-│       └── *.php                  # Other PHP pages
+│   │   ├── api/                    # Monitor API endpoints
+│   │   ├── src/                    # Monitor source files
+│   │   └── *.php                   # Monitor PHP pages
+│   ├── User/                       # Customer web interface
+│   │   ├── api/                    # User API endpoints
+│   │   ├── assets/                 # CSS, JS, and web assets
+│   │   ├── config/                 # User configuration files
+│   │   ├── css/                    # User stylesheets
+│   │   ├── images/                 # User interface images
+│   │   ├── partials/               # Reusable PHP components
+│   │   ├── uploads/                # User uploads directory
+│   │   ├── vendor/                 # Composer dependencies
+│   │   └── *.php                   # User PHP pages
+│   └── Documentation.md            # Web interface documentation
 ├── 📁 config/                      # Configuration Files
-│   ├── database.php               # Database configuration
-│   └── nb-configuration.xml       # NetBeans project settings
-├── 📁 database/                    # Database Files
-│   ├── cephra-db.mv.db           # H2 database file
-│   └── cephra-db.trace.db        # H2 trace file
-├── 📁 scripts/                     # Setup and Management Scripts
-│   ├── init-database.bat         # Database initialization
-│   ├── run.bat                   # Application launcher
-│   ├── fix-database-schema.bat   # Database repair tools
-│   └── *.sql                     # SQL scripts
+│   └── database.php               # Database configuration
 ├── 📁 docs/                        # Documentation
 │   ├── SETUP.md                  # Setup instructions
 │   ├── MYSQL_SETUP.md            # MySQL configuration
 │   ├── XAMPP_SETUP.md            # Web server setup
 │   └── TESTING.md                # Testing guidelines
 ├── 📁 target/                      # Maven Build Output
-├── 📁 vscode/                      # VS Code Configuration
+│   └── classes/                   # Compiled Java classes
 ├── pom.xml                        # Maven project configuration
+├── nb-configuration.xml           # NetBeans project settings
+├── setup_database.php            # Database setup script
+├── setup_database_tables.php     # Database table creation
+├── setup_plate_numbers.sql       # Plate number setup
+├── add_missing_plate_columns.sql # Database migration script
+├── DATA_STRUCTURES_ALGORITHMS_Final_Project.txt # Project documentation
 ├── README.md                      # This file
-└── TODO.md                        # Project tasks and roadmap
+├── TODO.md                        # Project tasks and roadmap
+├── LICENSE                        # MIT License
+├── CODE_OF_CONDUCT.md            # Code of conduct
+├── CONTRIBUTING.md               # Contributing guidelines
+└── SECURITY.md                   # Security policy
 ```
 
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-- **Java 21** or higher
+- **Java 24** or higher
 - **Maven 3.11.0** or higher
 - **MySQL 8.0+** or **XAMPP** (for web interface)
 - **Windows 10/11** (batch scripts are Windows-specific)
@@ -141,7 +154,7 @@ Cephra/
 2. **Initialize Schema**
    ```bash
    # Run SQL initialization
-   scripts/init-database.bat
+   php setup_database.php
    ```
 
 #### Java Application
@@ -172,11 +185,12 @@ Cephra/
 ## 🛠️ Technologies Used
 
 ### Backend
-- **Java 21** - Core application logic
+- **Java 24** - Core application logic
 - **Java Swing** - Desktop GUI framework
 - **Maven** - Build and dependency management
 - **MySQL 8.0+** - Primary database
 - **H2 Database** - Embedded database for development
+- **HikariCP** - High-performance connection pooling
 
 ### Frontend
 - **PHP 8+** - Web interface backend
@@ -190,6 +204,7 @@ Cephra/
 - **VS Code** - Web development environment
 - **Git** - Version control
 - **XAMPP** - Local web server stack
+- **JUnit 5** - Unit testing framework
 
 ## 🎮 Usage
 
@@ -207,6 +222,13 @@ The application launches three synchronized interfaces:
 ### Key Workflows
 1. **Customer Registration** → **Queue Joining** → **Service Selection** → **Payment Processing**
 2. **Admin Monitoring** → **Queue Management** → **Payment Verification** → **History Tracking**
+
+### Recent Enhancements
+- **🔋 Enhanced Battery Management**: Real-time battery level tracking with dynamic range calculations
+- **🚗 Improved Vehicle Linking**: Dynamic vehicle model display with battery specifications
+- **📱 Dashboard Improvements**: Enhanced user dashboard with live status updates and responsive design
+- **🎨 UI/UX Updates**: Modern interface improvements across all platforms
+- **🔧 Database Optimizations**: Improved connection pooling with HikariCP integration
 
 ## 🔧 Configuration
 
@@ -273,6 +295,32 @@ We welcome contributions! Please see our contributing guidelines:
 - Specializes in Java Swing GUI
 - Focuses on building an intuitive and functional desktop interface
 
+## 📚 Academic Project Details
+
+### Data Structures & Algorithms Implementation
+
+This project demonstrates practical implementation of core computer science concepts:
+
+#### Key Data Structures Used
+- **ArrayList** - Dynamic queue management and ticket storage
+- **HashMap** - Battery information mapping and user data storage  
+- **Boolean Arrays** - Bay availability and occupation tracking
+- **PreparedStatement** - Secure database operations
+- **Swing Components** - GUI elements and user interface
+
+#### Key Algorithms Implemented
+- **Queue Management Algorithm** - FIFO (First In, First Out) with priority handling for low battery levels
+- **Bay Allocation Algorithm** - Checks availability and assigns appropriate charging bays
+- **Ticket Generation Algorithm** - Sequential numbering system (FCH001, NCH001, etc.)
+- **Battery Level Validation** - Prevents charging when battery is full
+- **Service Selection Algorithm** - Validates user eligibility and bay availability
+
+#### Project Scope
+- **Course**: Data Structures and Algorithms Final Project
+- **Institution**: NU MOA (National University - Mall of Asia)
+- **Objective**: Apply and implement learnings from the course in a real-world application
+- **Focus**: Queue Management System (QMS) for EV Charging Stations
+
 ## 🔄 API Documentation
 
 ### Core Endpoints
@@ -312,7 +360,7 @@ We welcome contributions! Please see our contributing guidelines:
    - Apache/Nginx web server
    - PHP 8.0+ with PDO extension
    - MySQL 8.0+ database
-   - Java 21 runtime for admin panel
+   - Java 24 runtime for admin panel
 
 2. **Security Configuration**
    - SSL certificate installation
