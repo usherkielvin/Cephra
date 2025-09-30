@@ -44,18 +44,20 @@ public class User_Login extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        cooldownLabel = new javax.swing.JLabel();
         See = new javax.swing.JButton();
         reghere = new javax.swing.JButton();
         forgotpass = new javax.swing.JButton();
         pass = new javax.swing.JPasswordField();
         username = new javax.swing.JTextField();
-        cooldownLabel = new javax.swing.JLabel();
         loginhome = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(370, 750));
         setPreferredSize(new java.awt.Dimension(370, 750));
         setLayout(null);
+        add(cooldownLabel);
+        cooldownLabel.setBounds(40, 430, 160, 20);
 
         See.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/EyeClose.png"))); // NOI18N
         See.setBorder(null);
@@ -118,8 +120,6 @@ public class User_Login extends javax.swing.JPanel {
         });
         add(username);
         username.setBounds(80, 320, 230, 35);
-        add(cooldownLabel);
-        cooldownLabel.setBounds(40, 400, 160, 20);
 
         loginhome.setBorder(null);
         loginhome.setBorderPainted(false);
