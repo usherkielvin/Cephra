@@ -323,13 +323,14 @@ public class LinkedHome extends javax.swing.JPanel {
         platenumholder.setOpaque(false);
         platenumholder.setLayout(new java.awt.GridLayout(1, 0, 10, 0));
 
+        plateNumber.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         plateNumber.setForeground(new java.awt.Color(102, 102, 102));
         plateNumber.setText("NBH3261");
         platenumholder.add(plateNumber);
         platenumholder.add(filler);
 
         add(platenumholder);
-        platenumholder.setBounds(40, 230, 120, 20);
+        platenumholder.setBounds(40, 230, 180, 20);
 
         CAR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.1.png"))); // NOI18N
         add(CAR);

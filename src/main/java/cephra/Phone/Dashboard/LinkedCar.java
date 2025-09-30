@@ -391,18 +391,18 @@ public class LinkedCar extends javax.swing.JPanel {
         setLayout(null);
 
         jLabel2.setBackground(new java.awt.Color(204, 204, 204));
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(102, 102, 102));
         jLabel2.setText("PLATE NUMBER:");
         add(jLabel2);
         jLabel2.setBounds(61, 280, 110, 20);
 
         plateNumber.setBackground(new java.awt.Color(204, 204, 204));
-        plateNumber.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        plateNumber.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         plateNumber.setForeground(new java.awt.Color(102, 102, 102));
         plateNumber.setText("NBH3261");
         add(plateNumber);
-        plateNumber.setBounds(170, 280, 70, 20);
+        plateNumber.setBounds(180, 280, 70, 20);
 
         car.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/c7.png"))); // NOI18N
         car.setPreferredSize(new java.awt.Dimension(301, 226));
