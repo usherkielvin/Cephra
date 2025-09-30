@@ -240,9 +240,9 @@ $conn = $db->getConnection();
         }
 
         .btn-secondary {
-            background: transparent;
+            background: var(--primary-color);
             color: white;
-            border: 2px solid white;
+            border: 2px solid var(--primary-color);
         }
 
         .btn-secondary:hover {
