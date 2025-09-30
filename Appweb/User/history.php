@@ -14,7 +14,7 @@ $username = $_SESSION['username'];
 
 $payments = [];
 if ($conn) {
-	$stmt = $conn->prepare("SELECT pt.ticket_id, pt.amount, pt.payment_method, pt.reference_number, pt.transaction_status, pt.processed_at, ch.service_type FROM payment_transactions pt LEFT JOIN charging_history ch ON pt.ticket_id = ch.ticket_id WHERE pt.username = :username ORDER BY pt.processed_at DESC LIMIT 20");
+	$stmt = $conn->prepare("SELECT pt.ticket_id, pt.amount, pt.payment_method, pt.reference_number, pt.transaction_status, pt.processed_at, pt.plate_number, ch.service_type FROM payment_transactions pt LEFT JOIN charging_history ch ON pt.ticket_id = ch.ticket_id WHERE pt.username = :username ORDER BY pt.processed_at DESC LIMIT 20");
 	$stmt->bindParam(':username', $username);
 	$stmt->execute();
 	$payments = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -122,6 +122,7 @@ if ($conn) {
                                         <th data-i18n="thStatus" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Status</th>
                                         <th data-i18n="thAmount" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Amount</th>
                                         <th data-i18n="thMethod" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Method</th>
+                                        <th data-i18n="thPlateNumber" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Plate Number</th>
                                         <th data-i18n="thReference" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Reference</th>
                                         <th data-i18n="thDate" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Date</th>
                                         <th data-i18n="thActions" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Actions</th>
@@ -138,6 +139,7 @@ if ($conn) {
 											</td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">₱<?php echo number_format($payment['amount'], 2); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars(ucfirst($payment['payment_method'])); ?></td>
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['plate_number'] ?: 'N/A'); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['reference_number'] ?: 'N/A'); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars(date('M d, Y H:i', strtotime($payment['processed_at']))); ?></td>
                                             <td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">
@@ -178,6 +180,127 @@ if ($conn) {
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
         <script src="assets/js/i18n.js"></script>
+		<style>
+			/* Modal Styles */
+			.modal {
+				display: none;
+				position: fixed;
+				z-index: 1000;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+			}
+
+			.modal.show {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.modal-content {
+				background: white;
+				border-radius: 15px;
+				padding: 0;
+				width: 90%;
+				max-width: 500px;
+				max-height: 80vh;
+				overflow-y: auto;
+			}
+
+			.modal-header {
+				background: #00c2ce;
+				color: white;
+				padding: 1rem 1.5rem;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.modal-header h3 {
+				margin: 0;
+				font-size: 1.25rem;
+			}
+
+			.modal-close {
+				background: none;
+				border: none;
+				color: white;
+				font-size: 1.5rem;
+				cursor: pointer;
+				padding: 0;
+			}
+
+			.modal-close:hover {
+				background: none;
+				border: none;
+			}
+
+			.modal-body {
+				padding: 1.5rem;
+			}
+
+			.transaction-details {
+				display: flex;
+				flex-direction: column;
+				gap: 0.75rem;
+			}
+
+			.detail-row {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0.5rem 0;
+				border-bottom: 1px solid #eee;
+			}
+
+			.detail-row:last-child {
+				border-bottom: none;
+			}
+
+			.detail-label {
+				font-weight: 600;
+				color: #333;
+				font-size: 0.9rem;
+			}
+
+			.detail-value {
+				color: #666;
+				text-align: right;
+			}
+
+			/* Mobile responsiveness for modal */
+			@media (max-width: 600px) {
+				.modal-content {
+					width: 95%;
+					max-height: 90vh;
+				}
+
+				.modal-header {
+					padding: 0.75rem 1rem;
+				}
+
+				.modal-header h3 {
+					font-size: 1.1rem;
+				}
+
+				.modal-body {
+					padding: 1rem;
+				}
+
+				.detail-row {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: 0.25rem;
+				}
+
+				.detail-value {
+					text-align: left;
+				}
+			}
+		</style>
+
 		<script>
 			// Mobile menu toggle
 			document.getElementById('mobileMenuToggle').addEventListener('click', function() {
@@ -273,8 +396,9 @@ if ($conn) {
 							status: row.cells[1].textContent,
 							amount: row.cells[2].textContent,
 							method: row.cells[3].textContent,
-							reference: row.cells[4].textContent,
-							date: row.cells[5].textContent
+							plate: row.cells[4].textContent,
+							reference: row.cells[5].textContent,
+							date: row.cells[6].textContent
 						};
 					}
 				});
@@ -300,6 +424,10 @@ if ($conn) {
                             <div class="detail-row">
                                 <span class="detail-label" data-i18n="modalMethod">${label('modalMethod','Payment Method:')}</span>
                                 <span class="detail-value">${transactionData.method}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" data-i18n="modalPlate">${label('modalPlate','Plate Number:')}</span>
+                                <span class="detail-value">${transactionData.plate}</span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label" data-i18n="modalReference">${label('modalReference','Reference Number:')}</span>

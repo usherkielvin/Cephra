@@ -1,7 +1,9 @@
-# TODO: Create Terms of Service and Privacy Policy Pages
+# Add Plate Number Column to History Table
 
 ## Tasks
-- [x] Create terms_of_service.php with header, footer, and TOS content
-- [x] Create privacy_policy.php with header, footer, and PP content
-- [x] Update footer.php to link to actual pages instead of #anchors
-- [x] Test the pages for proper display and navigation
+- [ ] Update SQL query in history.php to select pt.plate_number
+- [ ] Add "Plate Number" column header to the HTML table
+- [ ] Add plate_number cell to the table rows in the PHP loop
+- [ ] Update the showDetails JavaScript function to include plate_number in transactionData
+- [ ] Add plate_number display in the transaction details modal
+- [ ] Test the page to verify the column displays correctly
