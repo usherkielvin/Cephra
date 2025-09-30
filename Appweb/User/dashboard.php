@@ -17,6 +17,53 @@ $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
 
+// Fetch latest charging status from queue_tickets (current/pending sessions)
+$stmt_charging = $conn->prepare("SELECT status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_charging->bindParam(':username', $username);
+$stmt_charging->execute();
+$latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
+
+$charging_status = 'Connected';
+if ($latest_charging) {
+    if (strtolower($latest_charging['status']) === 'charging') {
+        $charging_status = 'charging';
+    } elseif (strtolower($latest_charging['payment_status']) === 'pending') {
+        $charging_status = 'pending_payment';
+    } elseif (strtolower($latest_charging['status']) === 'waiting') {
+        $charging_status = 'waiting';
+    }
+}
+
+// Set UI variables based on charging status and payment status
+if ($latest_charging) {
+    if (strtolower($latest_charging['status']) === 'waiting') {
+        $background_class = 'waiting-bg'; // static orange gradient
+        $status_text = 'Waiting';
+        $button_text = 'Check Monitor';
+        $button_href = '../Monitor/index.php';
+    } elseif (strtolower($latest_charging['status']) === 'charging') {
+        $background_class = 'charging-bg'; // yellow background with left-to-right shifting gradient animation
+        $status_text = 'charging';
+        $button_text = 'Check Monitor';
+        $button_href = '../Monitor/index.php';
+    } elseif (strtolower($latest_charging['status']) === 'complete') {
+        $background_class = 'pending-bg'; // static orange gradient
+        $status_text = 'Pending Payment';
+        $button_text = 'Pay Now';
+        $button_href = 'wallet.php';
+    } else {
+        $background_class = 'connected-bg';
+        $status_text = 'Connected';
+        $button_text = 'Charge Now';
+        $button_href = 'ChargingPage.php';
+    }
+} else {
+    $background_class = 'connected-bg';
+    $status_text = 'Connected';
+    $button_text = 'Charge Now';
+    $button_href = 'ChargingPage.php';
+}
+
 // Fetch battery level from database
 $db_battery_level = null;
 $battery_history = [];
@@ -41,10 +88,10 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
     $models = [
         0 => 'Audi q8 etron',
         1 => 'Nissan leaf',
-        2 => 'Tesla x',
+        2 => 'Tesla Model X',
         3 => 'Lotus Spectre',
         4 => 'BYD Seagull',
-        5 => 'Hyundai',
+        5 => 'Hyundai Ionic 5',
         6 => 'Porsche Taycan',
         7 => 'BYD Tang',
         8 => 'omada e5'
@@ -57,7 +104,7 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
         2 => 'images/cars/teslamodelx.png',
         3 => 'images/cars/lotuseltre.png',
         4 => 'images/cars/bydseagull.png',
-        5 => 'images/team pictures/default.png',
+        5 => 'images/cars/hyundai.png',
         6 => 'images/cars/porschetaycan.png',
         7 => 'images/cars/bydtang.png',
         8 => 'images/cars/omodae5.png'
@@ -78,7 +125,7 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
 
     $vehicle_data = [
         'model' => $models[$car_index],
-        'status' => 'Connected',
+        'status' => $status_text,
         'range' => $vehicle_specs[$car_index]['range'],
         'time_to_full' => $vehicle_specs[$car_index]['time_to_full'],
         'battery_level' => $db_battery_level ?? $vehicle_specs[$car_index]['battery_level'],
@@ -137,6 +184,15 @@ if ($conn) {
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $latest_transaction = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Fetch all queue tickets for the user
+$queue_tickets = [];
+if ($conn) {
+    $stmt_tickets = $conn->prepare("SELECT ticket_id, service_type, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC");
+    $stmt_tickets->bindParam(':username', $username);
+    $stmt_tickets->execute();
+    $queue_tickets = $stmt_tickets->fetchAll(PDO::FETCH_ASSOC);
 }
 
 
@@ -734,7 +790,6 @@ if ($conn) {
 			   ============================================ */
 
 			.main-vehicle-card {
-				background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%);
 				color: white;
 				position: relative;
 				overflow: hidden;
@@ -742,6 +797,29 @@ if ($conn) {
 				padding: 2.5rem;
 				box-shadow: 0 20px 40px rgba(0, 194, 206, 0.3);
 			}
+
+			/* Dynamic background classes */
+			.charging-bg {
+				background: linear-gradient(90deg, #2f855a 0%, #38a169 50%, #2f855a 100%);
+				animation: shift 2s linear infinite;
+			}
+
+			.pending-bg {
+				background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+			}
+
+			.waiting-bg {
+				background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+			}
+
+			.connected-bg {
+				background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%);
+			}
+
+@keyframes shift {
+	0% { background-position: 0% 0; }
+	100% { background-position: 200% 0; }
+}
 
 			.main-vehicle-content {
 				display: flex;
@@ -1867,7 +1945,7 @@ if ($conn) {
 				<div class="features-grid">
 					<!-- Car Status Feature -->
 					<?php if ($vehicle_data): ?>
-					<div class="feature-card main-vehicle-card" style="background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; position: relative; overflow: hidden;">
+					<div class="feature-card main-vehicle-card <?php echo $background_class; ?>" style="color: white; position: relative; overflow: hidden;">
 						<div class="main-vehicle-content">
 							<div class="vehicle-info">
 								<div class="feature-icon-large">
@@ -1899,9 +1977,9 @@ if ($conn) {
 									</div>
 								</div>
 							</div>
-							<div class="vehicle-actions">
-								<a class="quick-action-btn" href="ChargingPage.php">Charge Now</a>
-							</div>
+			<div class="vehicle-actions">
+				<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>"><?php echo htmlspecialchars($button_text); ?></a>
+			</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
 					</div>
@@ -2656,7 +2734,8 @@ if ($conn) {
                     });
                 }
 
-				// Simple i18n for dashboard (EN, Bisaya, 中文)
+				/*
+				// Simple i18n for dashboard (EN, Bisaya, 中文) - DISABLED
 				(function() {
 					const dict = {
 						en: {
@@ -2760,6 +2839,7 @@ if ($conn) {
 					}
 					window.translateDashboard = translateDashboard;
 				})();
+				*/
 
 				// Initialize dashboard features
                 $(document).ready(function() {
