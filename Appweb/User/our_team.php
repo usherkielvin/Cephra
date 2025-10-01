@@ -323,7 +323,7 @@ $conn = $db->getConnection();
             <div class="leadership-grid">
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="images/team pictures/default.png" alt="Usher Kielvin Ponce" />
+                        <img src="images/team pictures/aq.png" alt="Usher Kielvin Ponce" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Usher Kielvin Ponce</h3>
@@ -358,7 +358,7 @@ $conn = $db->getConnection();
 
                 <div class="team-member-card">
                     <div class="member-photo">
-                        <img src="images/team pictures/default.png" alt="Dizon S. Dizon" />
+                        <img src="images/team pictures/dizon.jpg" alt="Dizon S. Dizon" />
                     </div>
                     <div class="member-info">
                         <h3 class="member-name">Dizon S. Dizon</h3>
