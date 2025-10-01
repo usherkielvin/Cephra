@@ -240,9 +240,9 @@ $conn = $db->getConnection();
         }
 
         .btn-secondary {
-            background: transparent;
+            background: var(--primary-color);
             color: white;
-            border: 2px solid white;
+            border: 2px solid var(--primary-color);
         }
 
         .btn-secondary:hover {
@@ -380,7 +380,7 @@ $conn = $db->getConnection();
                     <div class="member-info">
                         <h3 class="member-name">Kenji A. Hizon</h3>
                         <div class="member-role">Desktop Application Interface Developer</div>
-                         <p class="member-bio">- Specializes in Java Swing GUI</p>
+                         <p class="member-bio">- Specializes in Java Swing GUI</p>  
                         <p class="member-bio">- Focuses on building an intuitive and functional desktop interface</p>
                     </div>
                     <div class="member-social">

@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set('UTC'); // Set PHP timezone explicitly
+date_default_timezone_set('Asia/Shanghai'); // Set PHP timezone explicitly
 
 // Updated Forgot Password API with PHPMailer email sending and OTP code logic
 
@@ -24,6 +24,9 @@ if (!$db) {
     exit();
 }
 
+// Set MySQL session timezone to match PHP timezone
+$db->exec("SET time_zone = '+08:00'");
+
 // Log PHP timezone
 error_log("PHP timezone: " . date_default_timezone_get());
 
@@ -34,23 +37,9 @@ error_log("MySQL global timezone: " . $timezones['@@global.time_zone'] . ", sess
 
 $method = $_SERVER["REQUEST_METHOD"];
 $action = $method === "POST" ? ($_POST["action"] ?? "") : ($_GET["action"] ?? "");
+$action = trim(strtolower($action));
 
-// Function to clean up expired OTP codes
-function cleanupExpiredOTPCodes($db) {
-    try {
-        $stmt = $db->prepare("DELETE FROM otp_codes WHERE expires_at < NOW() AND used = 0");
-        $deletedCount = $stmt->execute() ? $stmt->rowCount() : 0;
 
-        if ($deletedCount > 0) {
-            error_log("OTP Cleanup: Deleted $deletedCount expired OTP codes");
-        }
-
-        return $deletedCount;
-    } catch (Exception $e) {
-        error_log("OTP Cleanup Error: " . $e->getMessage());
-        return 0;
-    }
-}
 
 try {
     switch ($action) {
@@ -303,16 +292,8 @@ try {
                 break;
             }
 
-            // Mark code as used
-            $stmt = $db->prepare("UPDATE otp_codes SET used = 1 WHERE username = ?");
-            $stmt->execute([$username]);
-
-            // Generate temporary token for password reset
-            $temp_token = bin2hex(random_bytes(32));
-            $token_expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
-
-            $stmt = $db->prepare("INSERT INTO password_reset_tokens (username, token, expires_at, used) VALUES (?, ?, ?, 0)");
-            $stmt->execute([$username, $temp_token, $token_expires]);
+            // Mark the OTP code as verified (used=0 remains, but we can check it later)
+            // No temp token needed
 
             // Clean up expired codes after successful verification - TEMPORARILY DISABLED
             // $cleanedCount = cleanupExpiredOTPCodes($db);
@@ -322,8 +303,7 @@ try {
 
             echo json_encode([
                 "success" => true,
-                "message" => "Code verified successfully",
-                "temp_token" => $temp_token
+                "message" => "Code verified successfully"
             ]);
             break;
 
@@ -333,11 +313,11 @@ try {
                 break;
             }
 
-            $temp_token = $_POST["temp_token"] ?? "";
+            $email = $_POST["email"] ?? "";
             $new_password = $_POST["new_password"] ?? "";
 
-            if (!$temp_token) {
-                echo json_encode(["success" => false, "error" => "Invalid or missing token"]);
+            if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                echo json_encode(["success" => false, "error" => "Invalid email"]);
                 break;
             }
 
@@ -354,25 +334,36 @@ try {
                 break;
             }
 
-            // Verify the temporary token
-            $stmt = $db->prepare("SELECT username, expires_at FROM password_reset_tokens WHERE token = ? AND used = 0");
-            $stmt->execute([$temp_token]);
-            $tokenData = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Check if user exists and get username
+            $stmt = $db->prepare("SELECT username FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$user) {
+                echo json_encode([
+                    "success" => false,
+                    "error" => "Email not found"
+                ]);
+                break;
+            }
+            $username = $user['username'];
 
-            if (!$tokenData) {
-                echo json_encode(["success" => false, "error" => "Invalid or expired token"]);
+            // Verify there is a valid unused OTP code for this user
+            $stmt = $db->prepare("SELECT otp_code, expires_at FROM otp_codes WHERE username = ? AND used = 0");
+            $stmt->execute([$username]);
+            $otpData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$otpData) {
+                echo json_encode(["success" => false, "error" => "No valid reset code found. Please request a new password reset."]);
                 break;
             }
 
-            // Check if token has expired
-            $expiresAt = new DateTime($tokenData['expires_at']);
+            // Check if OTP has expired
+            $expiresAt = new DateTime($otpData['expires_at']);
             $now = new DateTime();
             if ($now > $expiresAt) {
-                echo json_encode(["success" => false, "error" => "Token has expired. Please request a new password reset."]);
+                echo json_encode(["success" => false, "error" => "Reset code has expired. Please request a new password reset."]);
                 break;
             }
-
-            $username = $tokenData['username'];
 
             // Store the new password (no hashing)
             $plain_password = $new_password;
@@ -382,9 +373,9 @@ try {
             $result = $stmt->execute([$plain_password, $username]);
 
             if ($result) {
-                // Mark the token as used
-                $stmt = $db->prepare("UPDATE password_reset_tokens SET used = 1 WHERE token = ?");
-                $stmt->execute([$temp_token]);
+                // Mark the OTP code as used
+                $stmt = $db->prepare("UPDATE otp_codes SET used = 1 WHERE username = ? AND otp_code = ?");
+                $stmt->execute([$username, $otpData['otp_code']]);
 
                 // Unset the session flag after successful password reset
                 if (session_status() == PHP_SESSION_NONE) {
@@ -412,9 +403,10 @@ try {
             break;
     }
 } catch (Exception $e) {
+    error_log("Exception: " . $e->getMessage());
     echo json_encode([
         "success" => false,
-        "error" => "Server error: " . $e->getMessage()
+        "error" => $e->getMessage()
     ]);
 }
 ?>

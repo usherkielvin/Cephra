@@ -17,6 +17,53 @@ $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
 
+// Fetch latest charging status from queue_tickets (current/pending sessions)
+$stmt_charging = $conn->prepare("SELECT status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_charging->bindParam(':username', $username);
+$stmt_charging->execute();
+$latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
+
+$charging_status = 'Connected';
+if ($latest_charging) {
+    if (strtolower($latest_charging['status']) === 'charging') {
+        $charging_status = 'charging';
+    } elseif (strtolower($latest_charging['payment_status']) === 'pending') {
+        $charging_status = 'pending_payment';
+    } elseif (strtolower($latest_charging['status']) === 'waiting') {
+        $charging_status = 'waiting';
+    }
+}
+
+// Set UI variables based on charging status and payment status
+if ($latest_charging) {
+    if (strtolower($latest_charging['status']) === 'waiting') {
+        $background_class = 'waiting-bg'; // static orange gradient
+        $status_text = 'Waiting';
+        $button_text = 'Check Monitor';
+        $button_href = '../Monitor/index.php';
+    } elseif (strtolower($latest_charging['status']) === 'charging') {
+        $background_class = 'charging-bg'; // yellow background with left-to-right shifting gradient animation
+        $status_text = 'charging';
+        $button_text = 'Check Monitor';
+        $button_href = '../Monitor/index.php';
+    } elseif (strtolower($latest_charging['status']) === 'complete') {
+        $background_class = 'pending-bg'; // static orange gradient
+        $status_text = 'Pending Payment';
+        $button_text = 'Pay Now';
+        $button_href = 'wallet.php';
+    } else {
+        $background_class = 'connected-bg';
+        $status_text = 'Connected';
+        $button_text = 'Charge Now';
+        $button_href = 'ChargingPage.php';
+    }
+} else {
+    $background_class = 'connected-bg';
+    $status_text = 'Connected';
+    $button_text = 'Charge Now';
+    $button_href = 'ChargingPage.php';
+}
+
 // Fetch battery level from database
 $db_battery_level = null;
 $battery_history = [];
@@ -41,10 +88,10 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
     $models = [
         0 => 'Audi q8 etron',
         1 => 'Nissan leaf',
-        2 => 'Tesla x',
+        2 => 'Tesla Model X',
         3 => 'Lotus Spectre',
         4 => 'BYD Seagull',
-        5 => 'Hyundai',
+        5 => 'Hyundai Ionic 5',
         6 => 'Porsche Taycan',
         7 => 'BYD Tang',
         8 => 'omada e5'
@@ -57,7 +104,7 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
         2 => 'images/cars/teslamodelx.png',
         3 => 'images/cars/lotuseltre.png',
         4 => 'images/cars/bydseagull.png',
-        5 => 'images/team pictures/default.png',
+        5 => 'images/cars/hyundai.png',
         6 => 'images/cars/porschetaycan.png',
         7 => 'images/cars/bydtang.png',
         8 => 'images/cars/omodae5.png'
@@ -78,7 +125,7 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
 
     $vehicle_data = [
         'model' => $models[$car_index],
-        'status' => 'Connected',
+        'status' => $status_text,
         'range' => $vehicle_specs[$car_index]['range'],
         'time_to_full' => $vehicle_specs[$car_index]['time_to_full'],
         'battery_level' => $db_battery_level ?? $vehicle_specs[$car_index]['battery_level'],
@@ -137,6 +184,15 @@ if ($conn) {
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $latest_transaction = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Fetch all queue tickets for the user
+$queue_tickets = [];
+if ($conn) {
+    $stmt_tickets = $conn->prepare("SELECT ticket_id, service_type, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC");
+    $stmt_tickets->bindParam(':username', $username);
+    $stmt_tickets->execute();
+    $queue_tickets = $stmt_tickets->fetchAll(PDO::FETCH_ASSOC);
 }
 
 
@@ -349,7 +405,7 @@ if ($conn) {
 			}
 
 			.mobile-menu-toggle {
-				display: none;
+				display: flex;
 				flex-direction: column;
 				background: none;
 				border: none;
@@ -387,14 +443,14 @@ if ($conn) {
 				background: rgba(255, 255, 255, 0.98);
 				backdrop-filter: blur(20px);
 				border-left: 1px solid var(--border-color);
-				z-index: 999;
+				z-index: 1001;
 				transition: right 0.3s ease;
 				box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
 			}
 
-			.mobile-menu.active {
-				right: 0;
-			}
+.mobile-menu.mobile-menu-open {
+    right: 0;
+}
 
 			.mobile-menu-content {
 				padding: 80px 2rem 2rem;
@@ -734,7 +790,6 @@ if ($conn) {
 			   ============================================ */
 
 			.main-vehicle-card {
-				background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%);
 				color: white;
 				position: relative;
 				overflow: hidden;
@@ -742,6 +797,29 @@ if ($conn) {
 				padding: 2.5rem;
 				box-shadow: 0 20px 40px rgba(0, 194, 206, 0.3);
 			}
+
+			/* Dynamic background classes */
+			.charging-bg {
+				background: linear-gradient(90deg, #2f855a 0%, #38a169 50%, #2f855a 100%);
+				animation: shift 2s linear infinite;
+			}
+
+			.pending-bg {
+				background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+			}
+
+			.waiting-bg {
+				background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+			}
+
+			.connected-bg {
+				background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%);
+			}
+
+@keyframes shift {
+	0% { background-position: 0% 0; }
+	100% { background-position: 200% 0; }
+}
 
 			.main-vehicle-content {
 				display: flex;
@@ -1553,20 +1631,24 @@ if ($conn) {
 					font-size: 1rem;
 				}
 
-				/* Optimize dashboard hero for small screens */
-				.dashboard-hero {
-					padding: 40px 0;
-				}
+    /* Optimize dashboard hero for small screens */
+    .dashboard-hero {
+        padding: 40px 0;
+    }
+    .dashboard-greeting {
+        font-size: 1.5rem;
+    }
+    .dashboard-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
 
-				.dashboard-greeting {
-					font-size: 1.5rem;
-				}
-
-				.dashboard-actions {
-					flex-direction: column;
-					gap: 1rem;
-				}
-			}
+@media (max-width: 400px) {
+    .wallet-link {
+        display: none !important;
+    }
+}
 		</style>
 	</head>
 	<body>
@@ -1610,7 +1692,7 @@ if ($conn) {
 								gap: 24px;
 								margin-left: auto;">
 						<!-- Wallet button -->
-						<a href="wallet.php"
+						<a href="wallet.php" class="wallet-link"
 						   title="Wallet"
 						   style="display: inline-flex;
 								  align-items: center;
@@ -1781,21 +1863,76 @@ if ($conn) {
 			</div>
 
 			<!-- Mobile Menu -->
-			<div class="mobile-menu" id="mobileMenu">
-				<div class="mobile-menu-content">
-					<ul class="mobile-nav-list">
-						<li><a href="dashboard.php" class="nav-link">Home</a></li>
-						<li><a href="link.php" class="mobile-nav-link">Link</a></li>
-						<li><a href="history.php" class="mobile-nav-link">History</a></li>
-						<li><a href="rewards.php" class="mobile-nav-link">Rewards</a></li>
-						<li><a href="wallet.php" class="mobile-nav-link">Wallet</a></li>
-					</ul>
-					<div class="mobile-header-actions">
-						<a href="profile_logout.php" class="mobile-auth-link">Logout</a>
-					</div>
-				</div>
-			</div>
+                <div class="mobile-menu" id="mobileMenu">
+                    <div class="mobile-menu-content">
+                        <!-- Mobile Navigation -->
+                        <div class="mobile-nav">
+                            <ul class="mobile-nav-list">
+                                <li class="mobile-nav-item">
+                                    <a href="dashboard.php" class="mobile-nav-link">Home</a>
+                                </li>
+                                <li class="mobile-nav-item">
+                                    <a href="link.php" class="mobile-nav-link">Link</a>
+                                </li>
+                                <li class="mobile-nav-item">
+                                    <a href="history.php" class="mobile-nav-link">History</a>
+                                </li>
+                                <li class="mobile-nav-item">
+                                    <a href="rewards.php" class="mobile-nav-link">Rewards</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Mobile Header Actions -->
+                        <div class="mobile-header-actions" style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
+                            <!-- Mobile Language Selector -->
+                            <div class="mobile-language-selector">
+                                <div class="language-selector">
+                                    <button class="language-btn" id="mobileLanguageBtn">
+                                        <span class="language-text">EN</span>
+                                        <i class="fas fa-chevron-down language-arrow"></i>
+                                    </button>
+                                    <div class="language-dropdown" id="mobileLanguageDropdown">
+                                        <div class="language-option" data-lang="en">English</div>
+                                        <div class="language-option" data-lang="fil">Filipino</div>
+                                        <div class="language-option" data-lang="ceb">Bisaya</div>
+                                        <div class="language-option" data-lang="zh">中文</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions row: Download + Logout in one row on small screens -->
+                        <div class="mobile-actions-row" style="display:flex;gap:16px;align-items:center;justify-content:center;margin-top:12px;">
+                            <!-- Mobile Download App -->
+                            <div class="mobile-download-app" style="display:flex;align-items:center;">
+                                <div class="download-app">
+                                    <button class="download-btn" id="mobileDownloadBtn">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <div class="qr-popup" id="mobileQrPopup">
+                                        <div class="qr-content">
+                                            <h4>Download Cephra App</h4>
+                                            <div class="qr-code">
+                                                <img src="images/qr.png" alt="QR Code - Download Cephra App" width="120" height="120" style="display: block; border-radius: 8px;" />
+                                            </div>
+                                            <p>Scan to download the Cephra mobile app</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Logout Button -->
+                            <div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;">
+                                <a href="profile_logout.php" class="nav-link auth-link">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 		</header>
+
+		<!-- Mobile Menu Overlay -->
+		<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
 		<!-- Dashboard Hero Section -->
 		<section class="dashboard-hero">
@@ -1867,7 +2004,7 @@ if ($conn) {
 				<div class="features-grid">
 					<!-- Car Status Feature -->
 					<?php if ($vehicle_data): ?>
-					<div class="feature-card main-vehicle-card" style="background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; position: relative; overflow: hidden;">
+					<div class="feature-card main-vehicle-card <?php echo $background_class; ?>" style="color: white; position: relative; overflow: hidden;">
 						<div class="main-vehicle-content">
 							<div class="vehicle-info">
 								<div class="feature-icon-large">
@@ -1899,9 +2036,9 @@ if ($conn) {
 									</div>
 								</div>
 							</div>
-							<div class="vehicle-actions">
-								<a class="quick-action-btn" href="ChargingPage.php">Charge Now</a>
-							</div>
+			<div class="vehicle-actions">
+				<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>"><?php echo htmlspecialchars($button_text); ?></a>
+			</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
 					</div>
@@ -2533,14 +2670,17 @@ if ($conn) {
                 function loadDashboardStats() {
                     // Simulate loading stats from API
                     setTimeout(() => {
-                        document.getElementById('totalSessions').textContent = '12';
-                        document.getElementById('energyConsumed').textContent = '45.2 kWh';
-                        document.getElementById('totalSavings').textContent = '₱1,250';
-                        document.getElementById('greenPoints').textContent = '340';
-                        document.getElementById('currentQueue').textContent = '3';
-                        document.getElementById('waitTime').textContent = '8 minutes';
-                        document.getElementById('activeSessions').textContent = '7';
-                        document.getElementById('avgDuration').textContent = '45 min';
+                        const currentQueueEl = document.getElementById('currentQueue');
+                        if (currentQueueEl) currentQueueEl.textContent = '3';
+
+                        const waitTimeEl = document.getElementById('waitTime');
+                        if (waitTimeEl) waitTimeEl.textContent = '8 minutes';
+
+                        const activeSessionsEl = document.getElementById('activeSessions');
+                        if (activeSessionsEl) activeSessionsEl.textContent = '7';
+
+                        const avgDurationEl = document.getElementById('avgDuration');
+                        if (avgDurationEl) avgDurationEl.textContent = '45 min';
                     }, 1000);
                 }
 
@@ -2584,79 +2724,16 @@ if ($conn) {
                     setInterval(fetchAndRenderLiveStatus, 3000);
                 }
 
-                // Mobile Menu Toggle Functionality
-                function initMobileMenu() {
-                    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-                    const mobileMenu = document.getElementById('mobileMenu');
-                    const mobileMenuOverlay = document.createElement('div');
-                    mobileMenuOverlay.className = 'mobile-menu-overlay';
-                    mobileMenuOverlay.id = 'mobileMenuOverlay';
-                    document.body.appendChild(mobileMenuOverlay);
+         // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('mobile-menu-open');
+            this.classList.toggle('active');
+        });
+                
 
-                    // Toggle mobile menu
-                    function toggleMobileMenu() {
-                        const isActive = mobileMenu.classList.contains('active');
-
-                        if (isActive) {
-                            closeMobileMenu();
-                        } else {
-                            openMobileMenu();
-                        }
-                    }
-
-                    // Open mobile menu
-                    function openMobileMenu() {
-                        mobileMenu.classList.add('active');
-                        mobileMenuToggle.classList.add('active');
-                        mobileMenuOverlay.classList.add('active');
-                        document.body.style.overflow = 'hidden';
-
-                        // Add click handlers
-                        mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-                        document.addEventListener('keydown', handleEscapeKey);
-                    }
-
-                    // Close mobile menu
-                    function closeMobileMenu() {
-                        mobileMenu.classList.remove('active');
-                        mobileMenuToggle.classList.remove('active');
-                        mobileMenuOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-
-                        // Remove event listeners
-                        mobileMenuOverlay.removeEventListener('click', closeMobileMenu);
-                        document.removeEventListener('keydown', handleEscapeKey);
-                    }
-
-                    // Handle escape key
-                    function handleEscapeKey(e) {
-                        if (e.key === 'Escape') {
-                            closeMobileMenu();
-                        }
-                    }
-
-                    // Add click handler to toggle button
-                    mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-
-                    // Add click handlers to mobile menu links
-                    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-                    mobileNavLinks.forEach(link => {
-                        link.addEventListener('click', closeMobileMenu);
-                    });
-
-                    // Close menu when clicking outside on mobile
-                    $(document).on('click', function(e) {
-                        if (window.innerWidth <= 768) {
-                            if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
-                                if (mobileMenu.classList.contains('active')) {
-                                    closeMobileMenu();
-                                }
-                            }
-                        }
-                    });
-                }
-
-				// Simple i18n for dashboard (EN, Bisaya, 中文)
+				/*
+				// Simple i18n for dashboard (EN, Bisaya, 中文) - DISABLED
 				(function() {
 					const dict = {
 						en: {
@@ -2760,6 +2837,7 @@ if ($conn) {
 					}
 					window.translateDashboard = translateDashboard;
 				})();
+				*/
 
 				// Initialize dashboard features
                 $(document).ready(function() {

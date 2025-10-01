@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
 
             if (result.success) {
-                sessionStorage.setItem('tempToken', result.temp_token);
                 showDialog('Success', 'Code verified. Please reset your password.');
                 setTimeout(() => {
                     window.location.href = 'reset_password.php';

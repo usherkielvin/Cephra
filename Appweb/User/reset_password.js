@@ -105,9 +105,9 @@ resetForm.addEventListener('submit', async function(e) {
 
     const newPassword = newPasswordInput.value;
     const confirmPassword = confirmPasswordInput.value;
-    const tempToken = sessionStorage.getItem('tempToken');
+    const email = sessionStorage.getItem('resetEmail');
 
-    if (!tempToken) {
+    if (!email) {
         showDialog('Error', 'Session expired. Please start the process again.');
         window.location.href = 'forgot_password.php';
         return;
@@ -127,7 +127,7 @@ resetForm.addEventListener('submit', async function(e) {
     try {
         const formData = new FormData();
         formData.append('action', 'reset-password');
-        formData.append('temp_token', tempToken);
+        formData.append('email', email);
         formData.append('new_password', newPassword);
 
         const response = await fetch('api/forgot_password_updated.php', {
@@ -143,7 +143,6 @@ resetForm.addEventListener('submit', async function(e) {
 
             // Clear session storage
             sessionStorage.removeItem('resetEmail');
-            sessionStorage.removeItem('tempToken');
 
             // Redirect to login page after a delay
             setTimeout(() => {
