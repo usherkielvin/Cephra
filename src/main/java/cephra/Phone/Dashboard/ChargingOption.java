@@ -67,7 +67,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(normalcharge);
-        normalcharge.setBounds(50, 380, 280, 120);
+        normalcharge.setBounds(50, 430, 270, 150);
 
         profilebutton.setBorder(null);
         profilebutton.setBorderPainted(false);
@@ -102,7 +102,7 @@ public class ChargingOption extends javax.swing.JPanel {
             }
         });
         add(fastcharge);
-        fastcharge.setBounds(50, 243, 280, 120);
+        fastcharge.setBounds(50, 260, 270, 150);
 
         linkbutton.setBorder(null);
         linkbutton.setBorderPainted(false);

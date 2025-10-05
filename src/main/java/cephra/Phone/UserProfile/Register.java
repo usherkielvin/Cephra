@@ -26,6 +26,49 @@ public class Register extends javax.swing.JPanel {
                 fname.requestFocusInWindow();
             }
         });
+
+        // Setup password validation
+        setupPasswordValidation(); // Add this line
+    }
+
+    private void setupPasswordValidation() {
+        // Set document filter to limit password to 25 characters
+        ((javax.swing.text.AbstractDocument) pass.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
+            @Override
+            public void insertString(javax.swing.text.DocumentFilter.FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
+                if ((fb.getDocument().getLength() + string.length()) <= 25) {
+                    super.insertString(fb, offset, string, attr);
+                } else {
+                    JOptionPane.showMessageDialog(pass, "Password is limited to 25 characters.", "Character Limit Exceeded", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+
+            @Override
+            public void replace(javax.swing.text.DocumentFilter.FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs) throws javax.swing.text.BadLocationException {
+                if ((fb.getDocument().getLength() - length + text.length()) <= 25) {
+                    super.replace(fb, offset, length, text, attrs);
+                } else {
+                    JOptionPane.showMessageDialog(pass, "Password is limited to 25 characters.", "Character Limit Exceeded", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
+        pass.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String password = new String(pass.getPassword());
+                boolean hasUpper = password.chars().anyMatch(Character::isUpperCase);
+                boolean hasLower = password.chars().anyMatch(Character::isLowerCase);
+                boolean hasDigit = password.chars().anyMatch(Character::isDigit);
+                boolean validLength = password.length() >= 8 && password.length() <= 25;
+
+                // Update JLabel colors based on validation
+                upper.setForeground(hasUpper ? Color.GREEN : Color.RED);
+                lower.setForeground(hasLower ? Color.GREEN : Color.RED);
+                number.setForeground(hasDigit ? Color.GREEN : Color.RED);
+                characters.setForeground(validLength ? Color.GREEN : Color.RED);
+            }
+        });
     }
 
     private void makeDraggable() {
@@ -69,6 +112,10 @@ public class Register extends javax.swing.JPanel {
         loginbutton = new javax.swing.JButton();
         UsernamePhone = new javax.swing.JTextField();
         lname = new javax.swing.JTextField();
+        upper = new javax.swing.JLabel();
+        lower = new javax.swing.JLabel();
+        number = new javax.swing.JLabel();
+        characters = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(370, 750));
@@ -108,7 +155,7 @@ public class Register extends javax.swing.JPanel {
         add(email);
         email.setBounds(50, 438, 280, 32);
 
-        fname.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        fname.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         fname.setBorder(null);
         fname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,7 +206,7 @@ public class Register extends javax.swing.JPanel {
         add(loginbutton);
         loginbutton.setBounds(220, 668, 90, 50);
 
-        UsernamePhone.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        UsernamePhone.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         UsernamePhone.setBorder(null);
         UsernamePhone.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -169,7 +216,7 @@ public class Register extends javax.swing.JPanel {
         add(UsernamePhone);
         UsernamePhone.setBounds(45, 360, 280, 32);
 
-        lname.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        lname.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         lname.setBorder(null);
         lname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -178,6 +225,22 @@ public class Register extends javax.swing.JPanel {
         });
         add(lname);
         lname.setBounds(200, 282, 120, 32);
+
+        upper.setText("At least one uppercase letter");
+        add(upper);
+        upper.setBounds(100, 550, 200, 16);
+
+        lower.setText("At least one lowercase letter");
+        add(lower);
+        lower.setBounds(100, 560, 200, 16);
+
+        number.setText("At least one number");
+        add(number);
+        number.setBounds(100, 570, 200, 16);
+
+        characters.setText("Minimum 8 characters");
+        add(characters);
+        characters.setBounds(100, 580, 150, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Register1.png"))); // NOI18N
         add(jLabel1);
@@ -388,7 +451,7 @@ public class Register extends javax.swing.JPanel {
     }//GEN-LAST:event_termsconditionActionPerformed
 
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
-          // Validate all fields are filled
+    // Validate all fields are filled
     String nameText = fname.getText().trim();
     String lastNameText = lname.getText().trim();
     String usernameText = UsernamePhone.getText().trim();
@@ -426,6 +489,18 @@ public class Register extends javax.swing.JPanel {
         return;
     }
 
+    // Password validation
+    boolean hasUpper = passwordText.chars().anyMatch(Character::isUpperCase);
+    boolean hasLower = passwordText.chars().anyMatch(Character::isLowerCase);
+    boolean hasDigit = passwordText.chars().anyMatch(Character::isDigit);
+    boolean validLength = passwordText.length() >= 8 && passwordText.length() <= 25;
+
+    if (!hasUpper || !hasLower || !hasDigit || !validLength) {
+        JOptionPane.showMessageDialog(this, "Password must contain at least one uppercase letter, one lowercase letter, one number, and be between 8 and 25 characters long.", "Invalid Password", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+
     // Call the database method to add the new user
     if (cephra.Database.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
         // Registration successful
@@ -447,7 +522,7 @@ public class Register extends javax.swing.JPanel {
         JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", JOptionPane.WARNING_MESSAGE);
         fname.requestFocusInWindow();
     }
-    }//GEN-LAST:event_registerActionPerformed
+}//GEN-LAST:event_registerActionPerformed
 
     private void fnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fnameActionPerformed
         lname.requestFocusInWindow(); // Move focus to lastname field
@@ -499,7 +574,8 @@ public class Register extends javax.swing.JPanel {
 
         javax.swing.JEditorPane editorPane = new javax.swing.JEditorPane("text/html", html);
         editorPane.setEditable(false);
-        editorPane.setOpaque(false);
+        editorPane.setOpaque(true);
+        editorPane.setBackground(java.awt.Color.WHITE);
         editorPane.setFocusable(false);
         editorPane.setHighlighter(null);
         editorPane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -521,6 +597,7 @@ public class Register extends javax.swing.JPanel {
         dialog.setDefaultCloseOperation(javax.swing.JDialog.DO_NOTHING_ON_CLOSE);
 
         javax.swing.JPanel content = new javax.swing.JPanel(new java.awt.BorderLayout());
+        content.setBackground(java.awt.Color.WHITE);
         content.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
         content.add(scrollPane, java.awt.BorderLayout.CENTER);
 
@@ -532,6 +609,7 @@ public class Register extends javax.swing.JPanel {
             }
         });
         javax.swing.JPanel buttons = new javax.swing.JPanel();
+        buttons.setBackground(java.awt.Color.WHITE);
         buttons.add(ok);
         content.add(buttons, java.awt.BorderLayout.SOUTH);
 
@@ -610,13 +688,17 @@ public class Register extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
     private javax.swing.JTextField UsernamePhone;
+    private javax.swing.JLabel characters;
     private javax.swing.JTextField email;
     private javax.swing.JTextField fname;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField lname;
     private javax.swing.JButton loginbutton;
+    private javax.swing.JLabel lower;
+    private javax.swing.JLabel number;
     private javax.swing.JPasswordField pass;
     private javax.swing.JButton register;
     private javax.swing.JCheckBox termscondition;
+    private javax.swing.JLabel upper;
     // End of variables declaration//GEN-END:variables
 }
