@@ -257,12 +257,33 @@ public class Pending_Payment extends javax.swing.JPanel {
         }
     }
 
+    // Intro animation fields
+    private Timer introTimer;
+    private ImageIcon mainImageIcon;
+    
     /**
      * Constructor for PayPop
      */
     public Pending_Payment() {
+        // Load intro gif and main image
+        // Initialize components but hide interactive content until GIF finishes
         initComponents();
+        hideContent();
+        loadImages();
         initializePayPop();
+        startIntroAnimation();
+    }
+    
+    /**
+     * Loads the intro gif and main image icons
+     */
+    private void loadImages() {
+        try {
+            mainImageIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/CASH.png"));
+        } catch (Exception e) {
+            System.err.println("Error loading images: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -278,6 +299,79 @@ public class Pending_Payment extends javax.swing.JPanel {
         SwingUtilities.invokeLater(this::updateTextWithAmount);
         
         // Set username if available (optional display label removed)
+    }
+    
+    /**
+     * Starts the intro animation sequence
+     */
+    private void startIntroAnimation() {
+        if (bg == null) {
+            // Fallback to main image if label not available
+            showMainImage();
+            return;
+        }
+        
+        // Create a fresh GIF instance to reset animation
+        ImageIcon freshGifIcon = null;
+        try {
+            freshGifIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/inpaypop.gif"));
+        } catch (Exception e) {
+            System.err.println("Error loading fresh intro gif: " + e.getMessage());
+            showMainImage();
+            return;
+        }
+        
+        bg.setIcon(freshGifIcon);
+
+        // Set up timer to forcibly cut GIF and switch to main image after 200ms (0.2 seconds)
+        introTimer = new Timer(200, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                // Force stop GIF by clearing icon first, then setting main image
+                bg.setIcon(null);
+                SwingUtilities.invokeLater(() -> {
+                    showMainImage();
+                    showContent();
+                });
+                introTimer.stop();
+            }
+        });
+        introTimer.setRepeats(false);
+        introTimer.start();
+    }
+    
+    /**
+     * Shows the main image and ends intro animation
+     */
+    private void showMainImage() {
+        if (bg != null && mainImageIcon != null) {
+            bg.setIcon(mainImageIcon);
+        }
+        if (introTimer != null) {
+            introTimer.stop();
+        }
+    }
+
+    private void hideContent() {
+        try {
+            if (TICKETNUMBER != null) TICKETNUMBER.setVisible(false);
+            if (TotalBill != null) TotalBill.setVisible(false);
+            if (ChargingDue != null) ChargingDue.setVisible(false);
+            if (kWh != null) kWh.setVisible(false);
+            if (Cash != null) Cash.setVisible(false);
+            if (payonline != null) payonline.setVisible(false);
+        } catch (Exception ignore) {}
+    }
+
+    private void showContent() {
+        try {
+            if (TICKETNUMBER != null) TICKETNUMBER.setVisible(true);
+            if (TotalBill != null) TotalBill.setVisible(true);
+            if (ChargingDue != null) ChargingDue.setVisible(true);
+            if (kWh != null) kWh.setVisible(true);
+            if (Cash != null) Cash.setVisible(true);
+            if (payonline != null) payonline.setVisible(true);
+        } catch (Exception ignore) {}
     }
 
     // NetBeans form manages background order by default
