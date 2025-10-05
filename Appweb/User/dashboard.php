@@ -2512,6 +2512,15 @@ if ($conn) {
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
             <script>
+                // Pass PHP variables to JavaScript
+                window.chargingStatus = '<?php echo $charging_status; ?>';
+                window.statusText = '<?php echo $status_text; ?>';
+                window.paymentStatus = '<?php echo $latest_charging ? $latest_charging['payment_status'] : ''; ?>';
+                window.ticketId = '<?php echo $latest_charging ? $latest_charging['ticket_id'] : ''; ?>';
+                window.serviceType = '<?php echo $latest_charging ? $latest_charging['service_type'] : ''; ?>';
+                window.batteryLevel = '<?php echo $db_battery_level ?: '0'; ?>';
+            </script>
+            <script>
                 // Profile dropdown functionality
                 (function() {
                     const profileBtn = document.getElementById('profileBtn');
@@ -2572,17 +2581,81 @@ if ($conn) {
     }
 })();
 
-        // Set language function
-        window.setLanguage = function(lang) {
-            localStorage.setItem('selectedLanguage', lang);
-            if (typeof translateDashboard === 'function') {
-                translateDashboard();
+// Set language function
+window.setLanguage = function(lang) {
+    localStorage.setItem('selectedLanguage', lang);
+    if (typeof translateDashboard === 'function') {
+        translateDashboard();
+    }
+    // Close dropdowns
+    if (profileDropdown) profileDropdown.style.display = 'none';
+    if (languageSubDropdown) languageSubDropdown.style.display = 'none';
+};
+
+// Initialize mobile menu
+window.initMobileMenu = function() {
+    // Mobile menu toggle
+    document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenu.classList.toggle('mobile-menu-open');
+        this.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking on mobile nav links
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            mobileMenu.classList.remove('mobile-menu-open');
+            mobileMenuToggle.classList.remove('active');
+        });
+    });
+
+    // Mobile Language Selector Functionality
+    const mobileLanguageBtn = document.getElementById('mobileLanguageBtn');
+    const mobileLanguageDropdown = document.getElementById('mobileLanguageDropdown');
+    const mobileLanguageOptions = mobileLanguageDropdown.querySelectorAll('.language-option');
+
+    // Toggle mobile language dropdown
+    mobileLanguageBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        mobileLanguageDropdown.classList.toggle('show');
+        mobileLanguageBtn.classList.toggle('active');
+    });
+
+    // Handle mobile language selection
+    mobileLanguageOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const selectedLang = this.dataset.lang;
+            mobileLanguageDropdown.classList.remove('show');
+            mobileLanguageBtn.classList.remove('active');
+            // Also update desktop language display
+            const desktopLanguageText = document.querySelector('#languageBtn .language-text');
+            if (desktopLanguageText) {
+                const langMap = { 'en': 'EN', 'fil': 'Fil', 'ceb': 'Bisaya', 'zh': '中文' };
+                desktopLanguageText.textContent = langMap[selectedLang] || 'EN';
             }
-            // Close dropdowns
-            if (profileDropdown) profileDropdown.style.display = 'none';
-            if (languageSubDropdown) languageSubDropdown.style.display = 'none';
-            if (languageDropdown) languageDropdown.style.display = 'none';
-        };
+            console.log('Language changed to:', selectedLang);
+        });
+    });
+
+    // Mobile QR Code Popup Functionality
+    const mobileDownloadBtn = document.getElementById('mobileDownloadBtn');
+    const mobileQrPopup = document.getElementById('mobileQrPopup');
+
+    // Show mobile QR popup on click
+    mobileDownloadBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        mobileQrPopup.classList.toggle('show');
+    });
+
+    // Hide mobile QR popup when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!mobileDownloadBtn.contains(e.target) && !mobileQrPopup.contains(e.target)) {
+            mobileQrPopup.classList.remove('show');
+        }
+    });
+};
 
                     // Download QR hover (if exists)
                     const downloadBtn = document.getElementById('downloadBtn');
@@ -2914,114 +2987,9 @@ if ($conn) {
         });
                 
 
-				/*
-				// Simple i18n for dashboard (EN, Bisaya, 中文) - DISABLED
-				(function() {
-					const dict = {
-						en: {
-							Monitor: 'Home', Link: 'Link', History: 'History', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Logout',
-							LiveStatus: 'Live Status', LiveDesc: 'Real-time charging station information',
-							SystemStatus: 'System Status', AllOperational: 'All system operational',
-							CurrentQueue: 'Current Queue', VehiclesWaiting: 'vehicles waiting',
-							ActiveSessions: 'Active Sessions', ChargingNow: 'charging now',
-							EstWait: 'Estimated wait time:', AvgSess: 'Average session duration:',
-							VehicleStatus: 'Vehicle Status', VehicleDesc: "Monitor your electric vehicle's charging status and performance",
-							BatteryHealthMonitor: 'Battery Health Monitor', RangeCalculator: 'Range Calculator', EstimatedCost: 'Estimated Cost', VehicleDiagnostics: 'Vehicle Diagnostics',
-							RewardsWallet: 'Rewards & Wallet', RewardsWalletDesc: 'Manage your rewards and wallet balance',
-							RecentActivity: 'Recent Activity', RecentDesc: 'Your latest charging sessions and transactions'
-						},
-						fil: {
-							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Mag-logout',
-							LiveStatus: 'Live Status', LiveDesc: 'Impormasyong real-time ng charging station',
-							SystemStatus: 'Katayuan ng Sistema', AllOperational: 'Maayos ang lahat ng sistema',
-							CurrentQueue: 'Kasalukuyang Pila', VehiclesWaiting: 'sasakyang naghihintay',
-							ActiveSessions: 'Aktibong Session', ChargingNow: 'kasalukuyang nagcha-charge',
-							EstWait: 'Tinatayang oras ng paghihintay:', AvgSess: 'Karaniwang tagal ng session:',
-							VehicleStatus: 'Katayuan ng Sasakyan', VehicleDesc: 'Subaybayan ang estado at performance ng iyong EV',
-							BatteryHealthMonitor: 'Kalusugan ng Baterya', RangeCalculator: 'Range Calculator', EstimatedCost: 'Tantyang Gastos', VehicleDiagnostics: 'Diagnostics ng Sasakyan',
-							RewardsWallet: 'Rewards at Wallet', RewardsWalletDesc: 'Pamahalaan ang iyong rewards at balanse',
-							RecentActivity: 'Kamakailang Aktibidad', RecentDesc: 'Pinakabagong charging sessions at transaksyon'
-						},
-						ceb: {
-							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Gawas',
-							LiveStatus: 'Buhi nga Kahimtang', LiveDesc: 'Tinuod‑panahong impormasyon sa charging station',
-							SystemStatus: 'Kahimtang sa Sistema', AllOperational: 'Tanan sistema nagdagan',
-							CurrentQueue: 'Karon nga Linya', VehiclesWaiting: 'sakyanan naghulat',
-							ActiveSessions: 'Aktibong mga Sesyon', ChargingNow: 'nag‑charge karon',
-							EstWait: 'Gibanabana nga paghulat:', AvgSess: 'Average nga gikatigayon sa sesyon:',
-							VehicleStatus: 'Kahimtang sa Salakyanan', VehicleDesc: 'Subaya ang kahimtang sa imong EV ug performance',
-							BatteryHealthMonitor: 'Kahimsog sa Baterya', RangeCalculator: 'Kalkulasyon sa Gilay-on', EstimatedCost: 'Gibanabana nga Gasto', VehicleDiagnostics: 'Diagnostics sa Salakyanan',
-							RewardsWallet: 'Ganti & Wallet', RewardsWalletDesc: 'Dumala ang imong ganti ug balanse sa wallet',
-							RecentActivity: 'Bag-ong Kalihokan', RecentDesc: 'Pinakabag-ong mga sesyon ug transaksiyon'
-						},
-						zh: {
-							Monitor: '监控', Link: '连接', History: '历史', Rewards: '奖励', Profile: '资料', Logout: '登出',
-							LiveStatus: '实时状态', LiveDesc: '充电站实时信息',
-							SystemStatus: '系统状态', AllOperational: '系统正常运行',
-							CurrentQueue: '当前排队', VehiclesWaiting: '辆等待中',
-							ActiveSessions: '进行中的会话', ChargingNow: '正在充电',
-							EstWait: '预计等待时间：', AvgSess: '平均会话时长：',
-							VehicleStatus: '车辆状态', VehicleDesc: '监控您的电动车充电状态与性能',
-							BatteryHealthMonitor: '电池健康监控', RangeCalculator: '续航计算器', EstimatedCost: '费用估算', VehicleDiagnostics: '车辆诊断',
-							RewardsWallet: '奖励与钱包', RewardsWalletDesc: '管理您的奖励与钱包余额',
-							RecentActivity: '近期活动', RecentDesc: '您最近的充电会话与交易'
-						}
-					};
-					function translateDashboard() {
-						const lang = localStorage.getItem('selectedLanguage') || 'en';
-						const t = dict[lang] || dict.en;
-						// Top navigation
-						const nav = document.querySelectorAll('.nav-list .nav-link');
-						if (nav[0]) nav[0].textContent = t.Monitor;
-						if (nav[1]) nav[1].textContent = t.Link;
-						if (nav[2]) nav[2].textContent = t.History;
-						if (nav[3]) nav[3].textContent = t.Rewards;
-						const logout = document.querySelector('.mobile-auth-link');
-						if (logout) logout.textContent = t.Logout;
-						// Live status
-						const lsTitle = document.querySelector('.live-status .section-title');
-						const lsDesc = document.querySelector('.live-status .section-description');
-						if (lsTitle) lsTitle.textContent = t.LiveStatus;
-						if (lsDesc) lsDesc.textContent = t.LiveDesc;
-						const cards = document.querySelectorAll('.status-card');
-						if (cards[0]) {
-							cards[0].querySelector('.status-title').textContent = t.SystemStatus;
-							const op = cards[0].querySelector('.status-text');
-							if (op) op.textContent = t.AllOperational;
-						}
-						if (cards[1]) {
-							cards[1].querySelector('.status-title').textContent = t.CurrentQueue;
-							const lbl = cards[1].querySelector('.queue-label');
-							if (lbl) lbl.textContent = t.VehiclesWaiting;
-							const est = cards[1].querySelector('.status-description');
-							if (est) est.firstChild.textContent = `${t.EstWait} `;
-						}
-						if (cards[2]) {
-							cards[2].querySelector('.status-title').textContent = t.ActiveSessions;
-							const lbl = cards[2].querySelector('.session-label');
-							if (lbl) lbl.textContent = t.ChargingNow;
-							const avg = cards[2].querySelector('.status-description');
-							if (avg) avg.firstChild.textContent = `${t.AvgSess} `;
-						}
-						// Section headers
-						const vsTitle = document.querySelector('.features .section-title');
-						const vsDesc = document.querySelector('.features .section-description');
-						if (vsTitle) vsTitle.textContent = t.VehicleStatus;
-						if (vsDesc) vsDesc.textContent = t.VehicleDesc;
-						const rwTitle = document.querySelector('.rewards-wallet .section-title');
-						const rwDesc = document.querySelector('.rewards-wallet .section-description');
-						if (rwTitle) rwTitle.textContent = t.RewardsWallet;
-						if (rwDesc) rwDesc.textContent = t.RewardsWalletDesc;
-						const raTitle = document.querySelector('.recent-activity .section-title');
-						const raDesc = document.querySelector('.recent-activity .section-description');
-						if (raTitle) raTitle.textContent = t.RecentActivity;
-						if (raDesc) raDesc.textContent = t.RecentDesc;
-					}
-					window.translateDashboard = translateDashboard;
-				})();
-				*/
 
-				// Initialize dashboard features
+
+                // Initialize dashboard features
                 $(document).ready(function() {
                     loadDashboardStats();
                     updateLiveStatus();
