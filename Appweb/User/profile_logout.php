@@ -13,18 +13,22 @@ $db = new Database();
 $conn = $db->getConnection();
 
 if ($conn) {
-	// Reset battery level to 10-50% on logout (like phonejava behavior)
+	// If battery level is 100, randomize to 15–50%; otherwise retain existing level
 	try {
-		$newLevel = 10 + rand(0, 40); // 10-50%
-		$reset = $conn->prepare("UPDATE battery_levels SET battery_level = :lvl, initial_battery_level = :lvl WHERE username = :username");
-		$reset->bindParam(':lvl', $newLevel);
-		$reset->bindParam(':username', $username);
-		$reset->execute();
-		
-		// Also update last_updated timestamp
-		$timestamp = $conn->prepare("UPDATE battery_levels SET last_updated = NOW() WHERE username = :username");
-		$timestamp->bindParam(':username', $username);
-		$timestamp->execute();
+		$stmt = $conn->prepare("SELECT battery_level FROM battery_levels WHERE username = :username LIMIT 1");
+		$stmt->bindParam(':username', $username);
+		$stmt->execute();
+		$row = $stmt->fetch(PDO::FETCH_ASSOC);
+		if ($row) {
+			$level = (int)($row['battery_level'] ?? 0);
+			if ($level >= 100) {
+				$newLevel = 15 + rand(0, 35); // 15–50
+				$reset = $conn->prepare("UPDATE battery_levels SET battery_level = :lvl, initial_battery_level = :lvl WHERE username = :username");
+				$reset->bindParam(':lvl', $newLevel);
+				$reset->bindParam(':username', $username);
+				$reset->execute();
+			}
+		}
 	} catch (Exception $e) {
 		// swallow DB errors to ensure logout completes
 	}

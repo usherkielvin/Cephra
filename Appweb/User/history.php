@@ -68,7 +68,7 @@ if ($conn) {
 					</div>
 
 					<!-- History Table -->
-					<div class="history-table-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); overflow-y: auto; overflow-x: auto; position: relative; max-height: 600px;">
+					<div class="history-table-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); overflow-y: auto; overflow-x: hidden; position: relative; max-height: 600px;">
 						<style>
 							.history-table-container::-webkit-scrollbar {
 								width: 8px;
@@ -84,30 +84,13 @@ if ($conn) {
 							.history-table-container::-webkit-scrollbar-thumb:hover {
 								background: #009cb4;
 							}
-							/* Natural table sizing with resizability */
+							/* Natural table sizing */
 							.history-table {
 								width: 100%;
-								min-width: 700px; /* Minimum width for proper display */
-								table-layout: fixed; /* Allow column resizing */
+								min-width: unset;
 							}
-							/* Column widths for better resizability */
-							.history-table th:nth-child(1),
-							.history-table td:nth-child(1) { width: 18%; } /* Transaction ID */
-							.history-table th:nth-child(2),
-							.history-table td:nth-child(2) { width: 12%; } /* Amount */
-							.history-table th:nth-child(3),
-							.history-table td:nth-child(3) { width: 12%; } /* Method */
-							.history-table th:nth-child(4),
-							.history-table td:nth-child(4) { width: 15%; } /* Plate Number */
-							.history-table th:nth-child(5),
-							.history-table td:nth-child(5) { width: 18%; } /* Reference */
-							.history-table th:nth-child(6),
-							.history-table td:nth-child(6) { width: 18%; } /* Date */
-							.history-table th:nth-child(7),
-							.history-table td:nth-child(7) { width: 17%; } /* Actions */
-							
 							/* Mobile responsiveness */
-							@media (max-width: 768px) {
+							@media (max-width: 600px) {
 								.history-table-container {
 									padding: 1rem;
 									border-radius: 15px;
@@ -115,24 +98,7 @@ if ($conn) {
 								}
 								.history-table {
 									font-size: 0.8rem;
-									min-width: 600px; /* Smaller minimum for mobile */
 								}
-								
-								/* Mobile column widths */
-								.history-table th:nth-child(1),
-								.history-table td:nth-child(1) { width: 20%; } /* Transaction ID */
-								.history-table th:nth-child(2),
-								.history-table td:nth-child(2) { width: 15%; } /* Amount */
-								.history-table th:nth-child(3),
-								.history-table td:nth-child(3) { width: 12%; } /* Method */
-								.history-table th:nth-child(4),
-								.history-table td:nth-child(4) { width: 15%; } /* Plate Number */
-								.history-table th:nth-child(5),
-								.history-table td:nth-child(5) { width: 20%; } /* Reference */
-								.history-table th:nth-child(6),
-								.history-table td:nth-child(6) { width: 20%; } /* Date */
-								.history-table th:nth-child(7),
-								.history-table td:nth-child(7) { width: 18%; } /* Actions */
 								.history-table th,
 								.history-table td {
 									padding: 0.75rem 0.5rem;
@@ -149,10 +115,11 @@ if ($conn) {
                                 <p data-i18n="noTransactionsHint" style="font-size: 1rem; margin: 0;">You haven't made any payments. Start by linking your account.</p>
                             </div>
 						<?php else: ?>
-							<table class="history-table" style="border-collapse: collapse; margin: 0; font-size: 0.9rem; background: transparent;">
+							<table class="history-table" style="width: 100%; border-collapse: collapse; margin: 0; font-size: 0.9rem; background: transparent; table-layout: auto;">
 								<thead>
 									<tr>
                                         <th data-i18n="thTransactionId" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Transaction ID</th>
+                                        <th data-i18n="thStatus" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Status</th>
                                         <th data-i18n="thAmount" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Amount</th>
                                         <th data-i18n="thMethod" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Method</th>
                                         <th data-i18n="thPlateNumber" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Plate Number</th>
@@ -165,6 +132,11 @@ if ($conn) {
 									<?php foreach ($payments as $payment): ?>
 										<tr data-status="<?php echo strtolower($payment['transaction_status']); ?>" data-method="<?php echo strtolower($payment['payment_method']); ?>" data-charge-type="<?php echo strtolower(explode(' ', $payment['service_type'])[0]); ?>">
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['ticket_id']); ?></td>
+											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">
+												<span class="status-badge status-<?php echo strtolower($payment['transaction_status']); ?>">
+													<?php echo htmlspecialchars(ucfirst($payment['transaction_status'])); ?>
+												</span>
+											</td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">₱<?php echo number_format($payment['amount'], 2); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars(ucfirst($payment['payment_method'])); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['plate_number'] ?: 'N/A'); ?></td>

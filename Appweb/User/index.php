@@ -108,7 +108,21 @@
 
                         <!-- Mobile Header Actions -->
                         <div class="mobile-header-actions" style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
-                            <!-- Language selector removed - available in profile dropdown -->
+                            <!-- Mobile Language Selector -->
+                            <div class="mobile-language-selector">
+                                <div class="language-selector">
+                                    <button class="language-btn" id="mobileLanguageBtn">
+                                        <span class="language-text">EN</span>
+                                        <i class="fas fa-chevron-down language-arrow"></i>
+                                    </button>
+                                    <div class="language-dropdown" id="mobileLanguageDropdown">
+                                        <div class="language-option" data-lang="en">English</div>
+                                        <div class="language-option" data-lang="fil">Filipino</div>
+                                        <div class="language-option" data-lang="ceb">Bisaya</div>
+                                        <div class="language-option" data-lang="zh">中文</div>
+                                    </div>
+                                </div>
+                            </div>
 
 						<!-- Actions row: Download + Auth in one row on small screens -->
 						<div class="mobile-actions-row" style="display:flex;gap:16px;align-items:center;justify-content:center;margin-top:12px;">
@@ -131,9 +145,9 @@
 							</div>
 
 							<!-- Mobile Auth Buttons -->
-							<div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;justify-content:center;width:100%;">
-								<a href="Register_Panel.php" class="nav-link auth-link" style="text-align:center;padding:0.75rem 1.5rem;background:var(--bg-secondary);color:var(--text-primary);border:1px solid var(--border-color);border-radius:25px;text-decoration:none;font-weight:600;transition:all 0.3s ease;min-width:120px;">Register</a>
-								<a href="login.php" class="nav-link auth-link" style="text-align:center;padding:0.75rem 1.5rem;background:var(--gradient-primary);color:white;border-radius:25px;text-decoration:none;font-weight:600;transition:all 0.3s ease;min-width:120px;">Login</a>
+							<div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;">
+								<a href="Register_Panel.php" class="nav-link auth-link">Register</a>
+								<a href="login.php" class="nav-link auth-link">Login</a>
 							</div>
 						</div>
                         </div>

@@ -39,7 +39,6 @@ if ($conn) {
 
     <link rel="stylesheet" href="css/vantage-style.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
-    <link rel="stylesheet" href="css/footer.css" />
     <style>
         :root {
             --primary-color: #00c2ce;
@@ -851,8 +850,7 @@ if ($conn) {
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2025 Cephra. All rights reserved.</p>
-                <p><a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
+                <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
             </div>
         </div>
     </footer>
