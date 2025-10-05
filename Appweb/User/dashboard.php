@@ -18,7 +18,7 @@ $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
 
 // Fetch latest charging status from queue_tickets (current/pending sessions)
-$stmt_charging = $conn->prepare("SELECT status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_charging = $conn->prepare("SELECT ticket_id, service_type, status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
 $stmt_charging->bindParam(':username', $username);
 $stmt_charging->execute();
 $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
@@ -214,6 +214,7 @@ if ($conn) {
     <meta name="theme-color" content="#1a1a2e" />
 
     <link rel="stylesheet" href="css/vantage-style.css" />
+    <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 		<style>
 			/* ============================================
@@ -2329,6 +2330,180 @@ if ($conn) {
 			</div>
 		</div>
 
+		<!-- Charging Status Modal -->
+		<div id="chargingModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon charging-icon">
+					<i class="fas fa-bolt"></i>
+				</div>
+				<h2 class="charging-modal-title">Your Car is Charging</h2>
+				<p class="charging-modal-description">Your vehicle is currently charging. Please wait while we power up your battery.</p>
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Current Battery:</span>
+						<span id="chargingCurrentBattery">45%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Target Battery:</span>
+						<span id="chargingTargetBattery">80%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Charging Speed:</span>
+						<span id="chargingSpeed">7.2 kW</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Time Remaining:</span>
+						<span id="chargingTimeRemaining">20 minutes</span>
+					</div>
+				</div>
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-primary" onclick="closeChargingModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Waiting Queue Modal -->
+		<div id="waitingModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon waiting-icon">
+					<i class="fas fa-clock"></i>
+				</div>
+				<h2 class="charging-modal-title">You're in the Queue</h2>
+				<p class="charging-modal-description">Your car is already in the charging queue. Please wait for your turn.</p>
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Queue Position:</span>
+						<span id="queuePosition">2nd</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Estimated Wait:</span>
+						<span id="estimatedWait">10 minutes</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Ticket ID:</span>
+						<span id="ticketId">#CH001</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Service Type:</span>
+						<span id="serviceType">Fast Charging</span>
+					</div>
+				</div>
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-secondary" onclick="cancelQueue()">Cancel</button>
+					<button class="charging-modal-btn btn-primary" onclick="closeWaitingModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Payment Completion Modal -->
+		<div id="paymentModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon completed-icon">
+					<i class="fas fa-check-circle"></i>
+				</div>
+				<h2 class="charging-modal-title">Charging Complete</h2>
+				<p class="charging-modal-description">Your charging session is complete. Please select your payment method.</p>
+				
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Session Duration:</span>
+						<span id="sessionDuration">45 minutes</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Energy Delivered:</span>
+						<span id="energyDelivered">12.5 kWh</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Final Battery:</span>
+						<span id="finalBattery">85%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Total Amount:</span>
+						<span id="totalAmount">₱75.00</span>
+					</div>
+				</div>
+
+				<div class="wallet-balance" id="walletBalanceDisplay" style="display: none;">
+					Current Wallet Balance: ₱<span id="currentWalletBalance">150.00</span>
+				</div>
+
+				<div class="error-message" id="errorMessage" style="display: none;">
+					Insufficient wallet balance. Please choose cash payment or add funds to your wallet.
+				</div>
+
+				<div class="payment-options">
+					<div class="payment-option" data-method="cash" onclick="selectPaymentMethod('cash')">
+						<div class="payment-icon">
+							<i class="fas fa-money-bill-wave"></i>
+						</div>
+						<div class="payment-label">Cash</div>
+					</div>
+					<div class="payment-option" data-method="ewallet" onclick="selectPaymentMethod('ewallet')">
+						<div class="payment-icon">
+							<i class="fas fa-wallet"></i>
+						</div>
+						<div class="payment-label">E-Wallet</div>
+					</div>
+				</div>
+
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-secondary" onclick="closePaymentModal()">Cancel</button>
+					<button class="charging-modal-btn btn-success" id="confirmPaymentBtn" onclick="confirmPayment()" disabled>Confirm Payment</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Payment Success Modal -->
+		<div id="paymentSuccessModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon charging-icon">
+					<i class="fas fa-check"></i>
+				</div>
+				<h2 class="charging-modal-title">Payment Successful</h2>
+				<p class="charging-modal-description">Thank you for your payment. Here's your receipt.</p>
+				
+				<div class="receipt-info">
+					<div class="receipt-header">PAYMENT RECEIPT</div>
+					<div class="receipt-item">
+						<span>Transaction ID:</span>
+						<span id="transactionId">#TXN12345</span>
+					</div>
+					<div class="receipt-item">
+						<span>Date & Time:</span>
+						<span id="receiptDateTime"></span>
+					</div>
+					<div class="receipt-item">
+						<span>Service:</span>
+						<span id="receiptService">Fast Charging</span>
+					</div>
+					<div class="receipt-item">
+						<span>Duration:</span>
+						<span id="receiptDuration">45 minutes</span>
+					</div>
+					<div class="receipt-item">
+						<span>Energy:</span>
+						<span id="receiptEnergy">12.5 kWh</span>
+					</div>
+					<div class="receipt-item">
+						<span>Payment Method:</span>
+						<span id="receiptPaymentMethod">E-Wallet</span>
+					</div>
+					<div class="receipt-item total">
+						<span>Total Paid:</span>
+						<span id="receiptTotal">₱75.00</span>
+					</div>
+					<div class="receipt-item" id="remainingBalanceItem" style="display: none;">
+						<span>Remaining Balance:</span>
+						<span id="receiptRemainingBalance">₱75.00</span>
+					</div>
+				</div>
+
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-primary" onclick="closePaymentSuccessModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
 		<!-- Scripts -->
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.dropotron.min.js"></script>
@@ -2336,6 +2511,15 @@ if ($conn) {
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+            <script>
+                // Pass PHP variables to JavaScript
+                window.chargingStatus = '<?php echo $charging_status; ?>';
+                window.statusText = '<?php echo $status_text; ?>';
+                window.paymentStatus = '<?php echo $latest_charging ? $latest_charging['payment_status'] : ''; ?>';
+                window.ticketId = '<?php echo $latest_charging ? $latest_charging['ticket_id'] : ''; ?>';
+                window.serviceType = '<?php echo $latest_charging ? $latest_charging['service_type'] : ''; ?>';
+                window.batteryLevel = '<?php echo $db_battery_level ?: '0'; ?>';
+            </script>
             <script>
                 // Profile dropdown functionality
                 (function() {
@@ -2397,17 +2581,81 @@ if ($conn) {
     }
 })();
 
-        // Set language function
-        window.setLanguage = function(lang) {
-            localStorage.setItem('selectedLanguage', lang);
-            if (typeof translateDashboard === 'function') {
-                translateDashboard();
+// Set language function
+window.setLanguage = function(lang) {
+    localStorage.setItem('selectedLanguage', lang);
+    if (typeof translateDashboard === 'function') {
+        translateDashboard();
+    }
+    // Close dropdowns
+    if (profileDropdown) profileDropdown.style.display = 'none';
+    if (languageSubDropdown) languageSubDropdown.style.display = 'none';
+};
+
+// Initialize mobile menu
+window.initMobileMenu = function() {
+    // Mobile menu toggle
+    document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenu.classList.toggle('mobile-menu-open');
+        this.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking on mobile nav links
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            mobileMenu.classList.remove('mobile-menu-open');
+            mobileMenuToggle.classList.remove('active');
+        });
+    });
+
+    // Mobile Language Selector Functionality
+    const mobileLanguageBtn = document.getElementById('mobileLanguageBtn');
+    const mobileLanguageDropdown = document.getElementById('mobileLanguageDropdown');
+    const mobileLanguageOptions = mobileLanguageDropdown.querySelectorAll('.language-option');
+
+    // Toggle mobile language dropdown
+    mobileLanguageBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        mobileLanguageDropdown.classList.toggle('show');
+        mobileLanguageBtn.classList.toggle('active');
+    });
+
+    // Handle mobile language selection
+    mobileLanguageOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const selectedLang = this.dataset.lang;
+            mobileLanguageDropdown.classList.remove('show');
+            mobileLanguageBtn.classList.remove('active');
+            // Also update desktop language display
+            const desktopLanguageText = document.querySelector('#languageBtn .language-text');
+            if (desktopLanguageText) {
+                const langMap = { 'en': 'EN', 'fil': 'Fil', 'ceb': 'Bisaya', 'zh': '中文' };
+                desktopLanguageText.textContent = langMap[selectedLang] || 'EN';
             }
-            // Close dropdowns
-            if (profileDropdown) profileDropdown.style.display = 'none';
-            if (languageSubDropdown) languageSubDropdown.style.display = 'none';
-            if (languageDropdown) languageDropdown.style.display = 'none';
-        };
+            console.log('Language changed to:', selectedLang);
+        });
+    });
+
+    // Mobile QR Code Popup Functionality
+    const mobileDownloadBtn = document.getElementById('mobileDownloadBtn');
+    const mobileQrPopup = document.getElementById('mobileQrPopup');
+
+    // Show mobile QR popup on click
+    mobileDownloadBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        mobileQrPopup.classList.toggle('show');
+    });
+
+    // Hide mobile QR popup when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!mobileDownloadBtn.contains(e.target) && !mobileQrPopup.contains(e.target)) {
+            mobileQrPopup.classList.remove('show');
+        }
+    });
+};
 
                     // Download QR hover (if exists)
                     const downloadBtn = document.getElementById('downloadBtn');
@@ -2739,114 +2987,9 @@ if ($conn) {
         });
                 
 
-				/*
-				// Simple i18n for dashboard (EN, Bisaya, 中文) - DISABLED
-				(function() {
-					const dict = {
-						en: {
-							Monitor: 'Home', Link: 'Link', History: 'History', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Logout',
-							LiveStatus: 'Live Status', LiveDesc: 'Real-time charging station information',
-							SystemStatus: 'System Status', AllOperational: 'All system operational',
-							CurrentQueue: 'Current Queue', VehiclesWaiting: 'vehicles waiting',
-							ActiveSessions: 'Active Sessions', ChargingNow: 'charging now',
-							EstWait: 'Estimated wait time:', AvgSess: 'Average session duration:',
-							VehicleStatus: 'Vehicle Status', VehicleDesc: "Monitor your electric vehicle's charging status and performance",
-							BatteryHealthMonitor: 'Battery Health Monitor', RangeCalculator: 'Range Calculator', EstimatedCost: 'Estimated Cost', VehicleDiagnostics: 'Vehicle Diagnostics',
-							RewardsWallet: 'Rewards & Wallet', RewardsWalletDesc: 'Manage your rewards and wallet balance',
-							RecentActivity: 'Recent Activity', RecentDesc: 'Your latest charging sessions and transactions'
-						},
-						fil: {
-							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Mag-logout',
-							LiveStatus: 'Live Status', LiveDesc: 'Impormasyong real-time ng charging station',
-							SystemStatus: 'Katayuan ng Sistema', AllOperational: 'Maayos ang lahat ng sistema',
-							CurrentQueue: 'Kasalukuyang Pila', VehiclesWaiting: 'sasakyang naghihintay',
-							ActiveSessions: 'Aktibong Session', ChargingNow: 'kasalukuyang nagcha-charge',
-							EstWait: 'Tinatayang oras ng paghihintay:', AvgSess: 'Karaniwang tagal ng session:',
-							VehicleStatus: 'Katayuan ng Sasakyan', VehicleDesc: 'Subaybayan ang estado at performance ng iyong EV',
-							BatteryHealthMonitor: 'Kalusugan ng Baterya', RangeCalculator: 'Range Calculator', EstimatedCost: 'Tantyang Gastos', VehicleDiagnostics: 'Diagnostics ng Sasakyan',
-							RewardsWallet: 'Rewards at Wallet', RewardsWalletDesc: 'Pamahalaan ang iyong rewards at balanse',
-							RecentActivity: 'Kamakailang Aktibidad', RecentDesc: 'Pinakabagong charging sessions at transaksyon'
-						},
-						ceb: {
-							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Gawas',
-							LiveStatus: 'Buhi nga Kahimtang', LiveDesc: 'Tinuod‑panahong impormasyon sa charging station',
-							SystemStatus: 'Kahimtang sa Sistema', AllOperational: 'Tanan sistema nagdagan',
-							CurrentQueue: 'Karon nga Linya', VehiclesWaiting: 'sakyanan naghulat',
-							ActiveSessions: 'Aktibong mga Sesyon', ChargingNow: 'nag‑charge karon',
-							EstWait: 'Gibanabana nga paghulat:', AvgSess: 'Average nga gikatigayon sa sesyon:',
-							VehicleStatus: 'Kahimtang sa Salakyanan', VehicleDesc: 'Subaya ang kahimtang sa imong EV ug performance',
-							BatteryHealthMonitor: 'Kahimsog sa Baterya', RangeCalculator: 'Kalkulasyon sa Gilay-on', EstimatedCost: 'Gibanabana nga Gasto', VehicleDiagnostics: 'Diagnostics sa Salakyanan',
-							RewardsWallet: 'Ganti & Wallet', RewardsWalletDesc: 'Dumala ang imong ganti ug balanse sa wallet',
-							RecentActivity: 'Bag-ong Kalihokan', RecentDesc: 'Pinakabag-ong mga sesyon ug transaksiyon'
-						},
-						zh: {
-							Monitor: '监控', Link: '连接', History: '历史', Rewards: '奖励', Profile: '资料', Logout: '登出',
-							LiveStatus: '实时状态', LiveDesc: '充电站实时信息',
-							SystemStatus: '系统状态', AllOperational: '系统正常运行',
-							CurrentQueue: '当前排队', VehiclesWaiting: '辆等待中',
-							ActiveSessions: '进行中的会话', ChargingNow: '正在充电',
-							EstWait: '预计等待时间：', AvgSess: '平均会话时长：',
-							VehicleStatus: '车辆状态', VehicleDesc: '监控您的电动车充电状态与性能',
-							BatteryHealthMonitor: '电池健康监控', RangeCalculator: '续航计算器', EstimatedCost: '费用估算', VehicleDiagnostics: '车辆诊断',
-							RewardsWallet: '奖励与钱包', RewardsWalletDesc: '管理您的奖励与钱包余额',
-							RecentActivity: '近期活动', RecentDesc: '您最近的充电会话与交易'
-						}
-					};
-					function translateDashboard() {
-						const lang = localStorage.getItem('selectedLanguage') || 'en';
-						const t = dict[lang] || dict.en;
-						// Top navigation
-						const nav = document.querySelectorAll('.nav-list .nav-link');
-						if (nav[0]) nav[0].textContent = t.Monitor;
-						if (nav[1]) nav[1].textContent = t.Link;
-						if (nav[2]) nav[2].textContent = t.History;
-						if (nav[3]) nav[3].textContent = t.Rewards;
-						const logout = document.querySelector('.mobile-auth-link');
-						if (logout) logout.textContent = t.Logout;
-						// Live status
-						const lsTitle = document.querySelector('.live-status .section-title');
-						const lsDesc = document.querySelector('.live-status .section-description');
-						if (lsTitle) lsTitle.textContent = t.LiveStatus;
-						if (lsDesc) lsDesc.textContent = t.LiveDesc;
-						const cards = document.querySelectorAll('.status-card');
-						if (cards[0]) {
-							cards[0].querySelector('.status-title').textContent = t.SystemStatus;
-							const op = cards[0].querySelector('.status-text');
-							if (op) op.textContent = t.AllOperational;
-						}
-						if (cards[1]) {
-							cards[1].querySelector('.status-title').textContent = t.CurrentQueue;
-							const lbl = cards[1].querySelector('.queue-label');
-							if (lbl) lbl.textContent = t.VehiclesWaiting;
-							const est = cards[1].querySelector('.status-description');
-							if (est) est.firstChild.textContent = `${t.EstWait} `;
-						}
-						if (cards[2]) {
-							cards[2].querySelector('.status-title').textContent = t.ActiveSessions;
-							const lbl = cards[2].querySelector('.session-label');
-							if (lbl) lbl.textContent = t.ChargingNow;
-							const avg = cards[2].querySelector('.status-description');
-							if (avg) avg.firstChild.textContent = `${t.AvgSess} `;
-						}
-						// Section headers
-						const vsTitle = document.querySelector('.features .section-title');
-						const vsDesc = document.querySelector('.features .section-description');
-						if (vsTitle) vsTitle.textContent = t.VehicleStatus;
-						if (vsDesc) vsDesc.textContent = t.VehicleDesc;
-						const rwTitle = document.querySelector('.rewards-wallet .section-title');
-						const rwDesc = document.querySelector('.rewards-wallet .section-description');
-						if (rwTitle) rwTitle.textContent = t.RewardsWallet;
-						if (rwDesc) rwDesc.textContent = t.RewardsWalletDesc;
-						const raTitle = document.querySelector('.recent-activity .section-title');
-						const raDesc = document.querySelector('.recent-activity .section-description');
-						if (raTitle) raTitle.textContent = t.RecentActivity;
-						if (raDesc) raDesc.textContent = t.RecentDesc;
-					}
-					window.translateDashboard = translateDashboard;
-				})();
-				*/
 
-				// Initialize dashboard features
+
+                // Initialize dashboard features
                 $(document).ready(function() {
                     loadDashboardStats();
                     updateLiveStatus();
@@ -2941,5 +3084,5 @@ if ($conn) {
     </div>
 		</footer>
 
-		</body>
-	</html>
+	</body>
+</html>

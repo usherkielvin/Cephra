@@ -177,18 +177,6 @@ if ($conn) {
             z-index: 1;
         }
 
-        .wallet-hero::after {
-            content: '';
-            position: absolute;
-            bottom: 20%;
-            right: 10%;
-            width: 80px;
-            height: 80px;
-            background: rgba(0, 194, 206, 0.1);
-            border-radius: 50%;
-            z-index: 1;
-        }
-
         .wallet-greeting {
             font-size: clamp(2.5rem, 6vw, 4rem);
             font-weight: 900;
