@@ -116,6 +116,9 @@ public class Queue_Ticket extends javax.swing.JPanel {
             
             currentInstance.setVisible(true);
             
+            // Start the intro animation after the popup is visible
+            currentInstance.startIntroAnimation();
+            
             phoneFrame.repaint();
         });
     }
@@ -154,16 +157,92 @@ public class Queue_Ticket extends javax.swing.JPanel {
         }
     }
     
+    // Timer for intro animation
+    private Timer introTimer;
+    private ImageIcon mainImageIcon;
+    
     public Queue_Ticket() {
         initComponents();
         setPreferredSize(new java.awt.Dimension(POPUP_WIDTH, POPUP_HEIGHT));
         setSize(POPUP_WIDTH, POPUP_HEIGHT);
         
+        // Initially hide interactive content until intro GIF finishes
+        hideContent();
+
+        // Load the main image
+        loadImages();
+
         // Setup close button functionality (ESC key)
         setupCloseButton();
-        
+
         // Setup action listeners for buttons
         setupActionListeners();
+    }
+    
+    /**
+     * Loads the main static image
+     */
+    private void loadImages() {
+        mainImageIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/ChargeQueProceed.png"));
+    }
+    
+    /**
+     * Starts the intro animation with GIF
+     */
+    private void startIntroAnimation() {
+        // Load the GIF animation
+        ImageIcon gifIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/inqueuetick.gif"));
+        Icon.setIcon(gifIcon);
+        
+        // Set up timer to switch to static image after 200ms (0.2 seconds)
+        if (introTimer != null && introTimer.isRunning()) {
+            introTimer.stop();
+        }
+        
+        introTimer = new Timer(200, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                // Switch to the static image and reveal content
+                showMainImage();
+                showContent();
+                introTimer.stop();
+            }
+        });
+        introTimer.setRepeats(false);
+        introTimer.start();
+    }
+    
+    /**
+     * Shows the main static image
+     */
+    private void showMainImage() {
+        Icon.setIcon(mainImageIcon);
+    }
+
+    /**
+     * Hide the interactive labels and buttons while the intro GIF plays.
+     */
+    private void hideContent() {
+        try {
+            tickectID.setVisible(false);
+            chargingService.setVisible(false);
+            batteryLevel.setVisible(false);
+            okBTN.setVisible(false);
+            cancelTixBTN.setVisible(false);
+        } catch (Exception ignore) {}
+    }
+
+    /**
+     * Show the interactive labels and buttons after the intro GIF finishes.
+     */
+    private void showContent() {
+        try {
+            tickectID.setVisible(true);
+            chargingService.setVisible(true);
+            batteryLevel.setVisible(true);
+            okBTN.setVisible(true);
+            cancelTixBTN.setVisible(true);
+        } catch (Exception ignore) {}
     }
 
 

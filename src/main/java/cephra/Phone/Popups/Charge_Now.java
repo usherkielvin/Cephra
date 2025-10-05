@@ -1,10 +1,100 @@
 package cephra.Phone.Popups;
 
-public class Charge_Now extends javax.swing.JPanel {
+import javax.swing.*;
 
+public class Charge_Now extends javax.swing.JPanel {
+    
+    // Intro animation fields
+    private Timer introTimer;
+    private ImageIcon mainImageIcon;
+    
     public Charge_Now() {
+        // Load intro gif and main image
+        // Initially hide interactive content until intro GIF finishes
         initComponents();
+        hideContent();
+        loadImages();
+        startIntroAnimation();
     } 
+    
+    /**
+     * Loads the intro gif and main image icons
+     */
+    private void loadImages() {
+        try {
+            mainImageIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/WaitingBayPOP.png"));
+        } catch (Exception e) {
+            System.err.println("Error loading images: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Starts the intro animation sequence
+     */
+    private void startIntroAnimation() {
+        if (ICON == null) {
+            // Fallback to main image if label not available
+            showMainImage();
+            return;
+        }
+        
+        // Create a fresh GIF instance to reset animation
+        ImageIcon freshGifIcon = null;
+        try {
+            freshGifIcon = new ImageIcon(getClass().getResource("/cephra/Cephra Images/inbaynumber.gif"));
+        } catch (Exception e) {
+            System.err.println("Error loading fresh intro gif: " + e.getMessage());
+            showMainImage();
+            return;
+        }
+        
+        ICON.setIcon(freshGifIcon);
+
+        // Set up timer to forcibly cut GIF and switch to main image after 200ms (0.2 seconds)
+        introTimer = new Timer(200, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                // Force stop GIF by clearing icon first, then setting main image
+                ICON.setIcon(null);
+                SwingUtilities.invokeLater(() -> {
+                    showMainImage();
+                    showContent();
+                });
+                introTimer.stop();
+            }
+        });
+        introTimer.setRepeats(false);
+        introTimer.start();
+    }
+    
+    /**
+     * Shows the main image and ends intro animation
+     */
+    private void showMainImage() {
+        if (ICON != null && mainImageIcon != null) {
+            ICON.setIcon(mainImageIcon);
+        }
+        if (introTimer != null) {
+            introTimer.stop();
+        }
+    }
+
+    private void hideContent() {
+        try {
+            TicketNumber.setVisible(false);
+            OKBTN.setVisible(false);
+            CANCEL.setVisible(false);
+        } catch (Exception ignore) {}
+    }
+
+    private void showContent() {
+        try {
+            TicketNumber.setVisible(true);
+            OKBTN.setVisible(true);
+            CANCEL.setVisible(true);
+        } catch (Exception ignore) {}
+    }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
