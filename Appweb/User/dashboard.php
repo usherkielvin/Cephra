@@ -284,7 +284,7 @@ if ($conn) {
 
 .close-btn {
 				position: absolute;
-				top: 26px;
+				top: 48px;
 				right: 32px;
 				background: none;
 				border: none;
@@ -1872,14 +1872,21 @@ if ($conn) {
                                     <a href="dashboard.php" class="mobile-nav-link">Home</a>
                                 </li>
                                 <li class="mobile-nav-item">
+                                    <a href="../Monitor/index.php" class="mobile-nav-link">Monitor</a>
+                                </li>
+                                <li class="mobile-nav-item">
                                     <a href="link.php" class="mobile-nav-link">Link</a>
                                 </li>
                                 <li class="mobile-nav-item">
+                                    <a href="wallet.php" class="mobile-nav-link">Wallet</a>
+                                </li>
+								<li class="mobile-nav-item">
                                     <a href="history.php" class="mobile-nav-link">History</a>
                                 </li>
-                                <li class="mobile-nav-item">
+								<li class="mobile-nav-item">
                                     <a href="rewards.php" class="mobile-nav-link">Rewards</a>
                                 </li>
+
                             </ul>
                         </div>
 

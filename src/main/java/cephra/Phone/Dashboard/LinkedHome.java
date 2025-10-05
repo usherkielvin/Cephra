@@ -159,7 +159,13 @@ public class LinkedHome extends javax.swing.JPanel {
                                 displayStatus = "Complete";
                                 break;
                             default:
-                                displayStatus = "Unavailable";
+                                // Get current user's battery level
+                                int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                                if (batteryLevel != -1) {
+                                    displayStatus = "Battery is " + batteryLevel + "%";
+                                } else {
+                                    displayStatus = "Battery is 100%";
+                                }
                                 break;
                         }
                         Status.setText(displayStatus);
@@ -181,8 +187,13 @@ public class LinkedHome extends javax.swing.JPanel {
                             PENDINGPAYMENT.setVisible(false);
                         }
                     } else {
-                        // No ticket found - show Unavailable
-                        Status.setText("Unavailable");
+                        // No ticket found - show current user's battery level
+                        int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                        if (batteryLevel != -1) {
+                            Status.setText("Battery is " + batteryLevel + "%");
+                        } else {
+                            Status.setText("Battery is 100%");
+                        }
                         PENDINGPAYMENT.setVisible(false);
                     }
                 } else {
@@ -306,10 +317,10 @@ public class LinkedHome extends javax.swing.JPanel {
 
         Status.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Status.setForeground(new java.awt.Color(255, 255, 255));
-        Status.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        Status.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Status.setText("Waiting");
         add(Status);
-        Status.setBounds(230, 337, 110, 40);
+        Status.setBounds(30, 337, 310, 40);
 
         LoggedName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         LoggedName.setForeground(new java.awt.Color(0, 204, 204));

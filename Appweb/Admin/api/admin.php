@@ -592,6 +592,13 @@ try {
                     throw new Exception('Ticket not found');
                 }
                 
+                // CRITICAL: Remove ticket from waiting grid if it exists there
+                $waiting_remove_stmt = $db->prepare("UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?");
+                $waiting_remove_result = $waiting_remove_stmt->execute([$ticket_id]);
+                if ($waiting_remove_result) {
+                    error_log("Admin API: Removed ticket {$ticket_id} from waiting grid");
+                }
+                
                 // Assign bay to ticket
                 $bay_stmt = $db->prepare("UPDATE charging_bays SET status = 'Occupied', current_ticket_id = ?, current_username = ?, start_time = NOW() WHERE bay_number = ?");
                 $bay_result = $bay_stmt->execute([$ticket_id, $ticket_data['username'], $bay_number]);
@@ -615,6 +622,9 @@ try {
                 $db->commit();
                 
                 error_log("Admin API: Successfully assigned ticket {$ticket_id} to bay {$bay_number}");
+                
+                // Trigger notification to user's phone to show Charge Now popup
+                triggerUserNotification($ticket_data['username'], $ticket_id, $bay_number);
                 
                 echo json_encode([
                     'success' => true, 
@@ -1488,5 +1498,54 @@ try {
     }
 } catch (Exception $e) {
     echo json_encode(['error' => 'Server error: ' . $e->getMessage()]);
+}
+
+/**
+ * Trigger notification to user's phone to show Charge Now popup
+ * This function creates a notification record that the user's phone can check
+ */
+function triggerUserNotification($username, $ticketId, $bayNumber) {
+    try {
+        global $db;
+        
+        // Create notification record in database
+        $stmt = $db->prepare("
+            INSERT INTO user_notifications (username, notification_type, ticket_id, bay_number, message, created_at, is_read) 
+            VALUES (?, 'CHARGE_NOW', ?, ?, ?, NOW(), 0)
+        ");
+        
+        $message = "It's your turn to charge! Please proceed to {$bayNumber} to begin your charging session.";
+        $result = $stmt->execute([$username, $ticketId, $bayNumber, $message]);
+        
+        if ($result) {
+            error_log("Admin API: Notification triggered for user {$username} - ticket {$ticketId} - bay {$bayNumber}");
+        } else {
+            error_log("Admin API: Failed to create notification for user {$username}");
+        }
+        
+        // Also try to send via WebSocket if available (for real-time updates)
+        sendWebSocketNotification($username, $ticketId, $bayNumber);
+        
+    } catch (Exception $e) {
+        error_log("Admin API: Error triggering user notification: " . $e->getMessage());
+    }
+}
+
+/**
+ * Send WebSocket notification for real-time updates
+ */
+function sendWebSocketNotification($username, $ticketId, $bayNumber) {
+    try {
+        // This would integrate with the WebSocket server if available
+        // For now, we'll log the attempt
+        error_log("Admin API: WebSocket notification for user {$username} - ticket {$ticketId} - bay {$bayNumber}");
+        
+        // TODO: Implement WebSocket integration when available
+        // This could send a message to the Monitor WebSocket server
+        // which could then broadcast to connected user clients
+        
+    } catch (Exception $e) {
+        error_log("Admin API: WebSocket notification error: " . $e->getMessage());
+    }
 }
 ?>
