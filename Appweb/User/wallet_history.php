@@ -38,6 +38,7 @@ if ($conn) {
         <meta name="theme-color" content="#062635" />
         <link rel="stylesheet" href="css/vantage-style.css" />
         <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+        <link rel="stylesheet" href="css/footer.css" />
     </head>
     <body class="homepage is-preload">
         <div id="page-wrapper">
@@ -100,6 +101,7 @@ if ($conn) {
                     </div>
                     <div class="footer-bottom">
                         <p>&copy; 2025 Cephra. All rights reserved.</p>
+                        <p><a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
                     </div>
                 </div>
             </footer>

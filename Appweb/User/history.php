@@ -87,26 +87,24 @@ if ($conn) {
 							/* Natural table sizing with resizability */
 							.history-table {
 								width: 100%;
-								min-width: 800px; /* Minimum width for proper display */
+								min-width: 700px; /* Minimum width for proper display */
 								table-layout: fixed; /* Allow column resizing */
 							}
 							/* Column widths for better resizability */
 							.history-table th:nth-child(1),
-							.history-table td:nth-child(1) { width: 15%; } /* Transaction ID */
+							.history-table td:nth-child(1) { width: 18%; } /* Transaction ID */
 							.history-table th:nth-child(2),
-							.history-table td:nth-child(2) { width: 10%; } /* Status */
+							.history-table td:nth-child(2) { width: 12%; } /* Amount */
 							.history-table th:nth-child(3),
-							.history-table td:nth-child(3) { width: 10%; } /* Amount */
+							.history-table td:nth-child(3) { width: 12%; } /* Method */
 							.history-table th:nth-child(4),
-							.history-table td:nth-child(4) { width: 10%; } /* Method */
+							.history-table td:nth-child(4) { width: 15%; } /* Plate Number */
 							.history-table th:nth-child(5),
-							.history-table td:nth-child(5) { width: 12%; } /* Plate Number */
+							.history-table td:nth-child(5) { width: 18%; } /* Reference */
 							.history-table th:nth-child(6),
-							.history-table td:nth-child(6) { width: 15%; } /* Reference */
+							.history-table td:nth-child(6) { width: 18%; } /* Date */
 							.history-table th:nth-child(7),
-							.history-table td:nth-child(7) { width: 15%; } /* Date */
-							.history-table th:nth-child(8),
-							.history-table td:nth-child(8) { width: 13%; } /* Actions */
+							.history-table td:nth-child(7) { width: 17%; } /* Actions */
 							
 							/* Mobile responsiveness */
 							@media (max-width: 768px) {
@@ -117,8 +115,24 @@ if ($conn) {
 								}
 								.history-table {
 									font-size: 0.8rem;
-									min-width: 700px; /* Smaller minimum for mobile */
+									min-width: 600px; /* Smaller minimum for mobile */
 								}
+								
+								/* Mobile column widths */
+								.history-table th:nth-child(1),
+								.history-table td:nth-child(1) { width: 20%; } /* Transaction ID */
+								.history-table th:nth-child(2),
+								.history-table td:nth-child(2) { width: 15%; } /* Amount */
+								.history-table th:nth-child(3),
+								.history-table td:nth-child(3) { width: 12%; } /* Method */
+								.history-table th:nth-child(4),
+								.history-table td:nth-child(4) { width: 15%; } /* Plate Number */
+								.history-table th:nth-child(5),
+								.history-table td:nth-child(5) { width: 20%; } /* Reference */
+								.history-table th:nth-child(6),
+								.history-table td:nth-child(6) { width: 20%; } /* Date */
+								.history-table th:nth-child(7),
+								.history-table td:nth-child(7) { width: 18%; } /* Actions */
 								.history-table th,
 								.history-table td {
 									padding: 0.75rem 0.5rem;
@@ -139,7 +153,6 @@ if ($conn) {
 								<thead>
 									<tr>
                                         <th data-i18n="thTransactionId" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Transaction ID</th>
-                                        <th data-i18n="thStatus" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Status</th>
                                         <th data-i18n="thAmount" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Amount</th>
                                         <th data-i18n="thMethod" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Method</th>
                                         <th data-i18n="thPlateNumber" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Plate Number</th>
@@ -152,11 +165,6 @@ if ($conn) {
 									<?php foreach ($payments as $payment): ?>
 										<tr data-status="<?php echo strtolower($payment['transaction_status']); ?>" data-method="<?php echo strtolower($payment['payment_method']); ?>" data-charge-type="<?php echo strtolower(explode(' ', $payment['service_type'])[0]); ?>">
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['ticket_id']); ?></td>
-											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">
-												<span class="status-badge status-<?php echo strtolower($payment['transaction_status']); ?>">
-													<?php echo htmlspecialchars(ucfirst($payment['transaction_status'])); ?>
-												</span>
-											</td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;">₱<?php echo number_format($payment['amount'], 2); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars(ucfirst($payment['payment_method'])); ?></td>
 											<td style="padding: 1rem 0.75rem; border-bottom: 1px solid rgba(26, 32, 44, 0.1); vertical-align: middle; background: transparent; transition: all 0.2s ease;"><?php echo htmlspecialchars($payment['plate_number'] ?: 'N/A'); ?></td>

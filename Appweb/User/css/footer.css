@@ -12,8 +12,9 @@
     font-size: 0.9rem;
 }
 
+/* Copyright text color - gray */
 .footer-bottom p:first-child {
-    color: white;
+    color: #888 !important;
 }
 
 .footer-bottom a {

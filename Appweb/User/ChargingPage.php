@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
 		<meta name="theme-color" content="#1a1a2e" />
 	<link rel="stylesheet" href="css/vantage-style.css" />
 	<link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+	<link rel="stylesheet" href="css/footer.css" />
 	</head>
 	<body>
         

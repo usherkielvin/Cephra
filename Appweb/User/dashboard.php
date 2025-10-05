@@ -213,6 +213,7 @@ if ($conn) {
 
     <link rel="stylesheet" href="css/vantage-style.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+    <link rel="stylesheet" href="css/footer.css" />
 		<style>
 			/* ============================================
 			   VANTAGE MARKETS INSPIRED WHITE THEME
