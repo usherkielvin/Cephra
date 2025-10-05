@@ -40,6 +40,7 @@ public class Ad_Rewards extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setOpaque(false);
         setLayout(null);
 
@@ -47,11 +48,11 @@ public class Ad_Rewards extends javax.swing.JPanel {
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
         add(jButton1);
-        jButton1.setBounds(260, 70, 30, 30);
+        jButton1.setBounds(300, 20, 30, 30);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/adsPhone.png"))); // NOI18N
         add(jLabel1);
-        jLabel1.setBounds(60, 70, 230, 300);
+        jLabel1.setBounds(27, 20, 310, 400);
     }// </editor-fold>//GEN-END:initComponents
 
     private void setupCloseAction() {
