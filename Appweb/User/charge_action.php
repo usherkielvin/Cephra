@@ -28,6 +28,9 @@ $username = $_SESSION['username'];
 
 $serviceType = $_POST['serviceType'] ?? '';
 
+// Add small delay to prevent rapid successive requests
+usleep(500000); // 0.5 second delay
+
 // Debug logging
 error_log("Charge action called - Username: $username, ServiceType: $serviceType");
 error_log("POST data: " . json_encode($_POST));

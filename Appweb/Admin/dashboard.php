@@ -358,6 +358,7 @@ if ($conn && isset($_SESSION['admin_username'])) {
                                 <tr>
                                     <th id="th-tx-ticket">Ticket</th>
                                     <th id="th-tx-user">User</th>
+                                    <th id="th-tx-plate">Plate Number</th>
                                     <th id="th-tx-kwh">kWh</th>
                                     <th id="th-tx-total">Total</th>
                                     <th id="th-tx-datetime">Date and Time</th>
@@ -366,7 +367,7 @@ if ($conn && isset($_SESSION['admin_username'])) {
                             </thead>
                             <tbody id="transactions-tbody">
                                 <tr>
-                                    <td colspan="6" class="loading">
+                                    <td colspan="7" class="loading">
                                         <i class="fas fa-spinner fa-spin"></i> Loading transaction data...
                                     </td>
                                 </tr>

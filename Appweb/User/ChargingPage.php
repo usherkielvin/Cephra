@@ -191,7 +191,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+                <p>&copy; 2025 Cephra. All rights reserved.</p>
+                <p><a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
             </div>
         </div>
     </footer>
@@ -286,6 +287,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
         }
 
         function processChargeRequest(serviceType) {
+            // Prevent multiple rapid clicks
+            if (window.chargingInProgress) {
+                return false;
+            }
+            window.chargingInProgress = true;
+
             // Force exact service type strings expected by backend
             let serviceTypeMapped = '';
             if (serviceType === 'Normal Charging' || serviceType === 'normal charging') {
@@ -296,8 +303,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 serviceTypeMapped = serviceType; // fallback
             }
 
-            // Disable links during processing
-            document.querySelectorAll('.charging-link').forEach(link => link.style.pointerEvents = 'none');
+            // Disable all charging buttons immediately
+            document.querySelectorAll('.charging-link').forEach(link => {
+                link.style.pointerEvents = 'none';
+                link.style.opacity = '0.6';
+                link.style.cursor = 'not-allowed';
+            });
 
             fetch('charge_action.php', {
                 method: 'POST',
@@ -319,8 +330,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 console.error('Error:', error);
             })
             .finally(() => {
-                // Re-enable links
-                document.querySelectorAll('.charging-link').forEach(link => link.style.pointerEvents = 'auto');
+                // Reset state and re-enable links
+                window.chargingInProgress = false;
+                document.querySelectorAll('.charging-link').forEach(link => {
+                    link.style.pointerEvents = 'auto';
+                    link.style.opacity = '1';
+                    link.style.cursor = 'pointer';
+                });
             });
         }
 

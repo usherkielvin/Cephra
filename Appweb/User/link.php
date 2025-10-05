@@ -302,7 +302,7 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
         <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" />
     </div>
 </div>
-<button style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;" onclick="window.location.href='dashboard.php'">Start Charging</button>
+<button style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;" onclick="window.location.href='ChargingPage.php'">Start Charging</button>
                     <?php endif; ?>
                 </div>
             </div>

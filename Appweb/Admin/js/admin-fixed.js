@@ -171,8 +171,8 @@ class AdminPanel {
                 <td><span class="status-badge ${s.status.toLowerCase()}">${s.status}</span></td>
                 <td>${this.formatDateTime(s.created_at)}</td>
                 <td>
-                    <button class="btn btn-secondary btn-sm" onclick="if (adminPanel) adminPanel.toggleStaffStatus('${s.username}', '${s.status === 'Active' ? 'Inactive' : 'Active'}')">
-                        <i class="fas fa-toggle-on"></i> ${s.status === 'Active' ? 'Deactivate' : 'Activate'}
+                    <button class="btn btn-warning btn-sm" onclick="if (adminPanel) adminPanel.resetStaffPassword('${s.username}')">
+                        <i class="fas fa-key"></i> Reset Password
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="if (adminPanel) adminPanel.deleteStaff('${s.username}')">
                         <i class="fas fa-trash"></i> Delete
@@ -221,23 +221,25 @@ class AdminPanel {
         }
     }
 
-    async toggleStaffStatus(username, status) {
+
+    async resetStaffPassword(username) {
+        if (!confirm(`Reset password for staff "${username}"? The new password will be sent to their email.`)) return;
         try {
             const res = await fetch('api/admin.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `action=toggle-staff-status&username=${encodeURIComponent(username)}&status=${encodeURIComponent(status)}`
+                body: `action=reset-staff-password&username=${encodeURIComponent(username)}`
             });
             const data = await res.json();
             if (data.success) {
-                this.showSuccess('Status updated');
+                this.showSuccess(data.message || 'Password reset successfully');
                 this.loadStaffData();
             } else {
-                this.showError(data.error || 'Failed to update');
+                this.showError(data.error || 'Failed to reset password');
             }
         } catch (e) {
-            console.error('Error toggling status:', e);
-            this.showError('Failed to update');
+            console.error('Error resetting password:', e);
+            this.showError('Failed to reset password');
         }
     }
 
@@ -1267,7 +1269,7 @@ class AdminPanel {
         if (transactions.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8" class="no-data">
+                    <td colspan="7" class="no-data">
                         <i class="fas fa-inbox"></i>
                         No transactions found
                     </td>
@@ -1321,6 +1323,7 @@ class AdminPanel {
                 <tr>
                     <td>${transaction.ticket_id || 'N/A'}</td>
                     <td>${transaction.username || 'N/A'}</td>
+                    <td>${transaction.plate_number || 'N/A'}</td>
                     <td>${energy} kWh</td>
                     <td>₱${amount}</td>
                     <td>${formattedDate}</td>
@@ -1373,7 +1376,7 @@ class AdminPanel {
         }
 
         // Create proper CSV format for Excel with shorter headers
-        let csv = 'Ticket,User,kWh,Amount,Date,Reference\n';
+        let csv = 'Ticket,User,Plate Number,kWh,Amount,Date,Reference\n';
         
         this.transactionData.forEach(transaction => {
             // Safely handle date parsing - use compact 12-hour format to prevent ####
@@ -1432,12 +1435,14 @@ class AdminPanel {
             // Clean text fields and escape quotes for CSV
             const ticketId = (transaction.ticket_id || 'N/A').toString().replace(/"/g, '""');
             const username = (transaction.username || 'N/A').toString().replace(/"/g, '""');
+            const plateNumber = (transaction.plate_number || 'N/A').toString().replace(/"/g, '""');
             const reference = (transaction.reference_number || 'N/A').toString().replace(/"/g, '""');
             
             // Create CSV row - format date as text to prevent Excel conversion
             const rowData = [
                 `"${ticketId}"`,
                 `"${username}"`,
+                `"${plateNumber}"`,
                 energy, // Don't quote numbers for Excel
                 amount, // Don't quote numbers for Excel
                 `"${formattedDate}"`, // Keep quoted to force text format

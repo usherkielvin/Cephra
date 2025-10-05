@@ -198,6 +198,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 				border-radius: 8px;
 				transition: all 0.3s ease;
 				display: block;
+				text-align: center;
 			}
 
 			.mobile-nav-link:hover {
@@ -222,6 +223,8 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 				text-align: center;
 				background: var(--gradient-primary);
 				color: white;
+				margin: 0 auto;
+				max-width: 200px;
 			}
 
 			.mobile-auth-link:hover {
@@ -294,82 +297,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
     }
 }
 
-/* Mobile Language Selector Styles */
-.mobile-language-selector {
-    width: 100%;
-    margin: 1rem 0;
-}
-
-.language-selector {
-    position: relative;
-    width: 100%;
-}
-
-.language-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 12px 16px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.language-btn:hover {
-    background: var(--bg-primary);
-    border-color: var(--primary-color);
-}
-
-.language-text {
-    font-weight: 500;
-}
-
-.language-arrow {
-    transition: transform 0.3s ease;
-}
-
-.language-btn.active .language-arrow {
-    transform: rotate(180deg);
-}
-
-.language-dropdown {
-    position: absolute;
-    top: auto;
-    bottom: 100%;
-    left: 0;
-    right: 0;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 2000;
-    display: none;
-    margin-bottom: 4px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.language-option {
-    padding: 12px 16px;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.language-option:last-child {
-    border-bottom: none;
-}
-
-.language-option:hover {
-    background: var(--bg-secondary);
-    color: var(--primary-color);
-}
+/* Mobile Language Selector removed - language selection available in profile dropdown */
 
 </style>
 
@@ -612,21 +540,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
                         <!-- Mobile Header Actions -->
                         <div class="mobile-header-actions" style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
-                            <!-- Mobile Language Selector -->
-                            <div class="mobile-language-selector">
-                                <div class="language-selector">
-                                    <button class="language-btn" id="mobileLanguageBtn">
-                                        <span class="language-text">EN</span>
-                                        <i class="fas fa-chevron-down language-arrow"></i>
-                                    </button>
-                                    <div class="language-dropdown" id="mobileLanguageDropdown">
-                                        <div class="language-option" data-lang="en">English</div>
-                                        <div class="language-option" data-lang="fil">Filipino</div>
-                                        <div class="language-option" data-lang="ceb">Bisaya</div>
-                                        <div class="language-option" data-lang="zh">中文</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Language selector removed - available in profile dropdown -->
                         </div>
 
                         <!-- Actions row: Download + Logout in one row on small screens -->
@@ -634,8 +548,8 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
 
                             <!-- Mobile Logout Button -->
-                            <div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;">
-                                <a href="profile_logout.php" class="nav-link auth-link">Logout</a>
+                            <div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;justify-content:center;width:100%;">
+                                <a href="profile_logout.php" class="nav-link auth-link" style="text-align:center;padding:0.75rem 1.5rem;background:var(--gradient-primary);color:white;border-radius:25px;text-decoration:none;font-weight:600;transition:all 0.3s ease;min-width:120px;">Logout</a>
                             </div>
                         </div>
                     </div>
@@ -829,19 +743,25 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                     document.getElementById('greenPointsPopup').style.display = 'flex';
                 }
 
-                // Function to close Green Points popup
+                // Function to close Green Points popup with state management
                 function closeGreenPointsPopup() {
+                    // Prevent multiple rapid clicks
+                    if (window.greenPointsPopupClosing) {
+                        return;
+                    }
+                    window.greenPointsPopupClosing = true;
+                    
                     document.getElementById('greenPointsPopup').style.display = 'none';
+                    
+                    // Reset state after a short delay
+                    setTimeout(function() {
+                        window.greenPointsPopupClosing = false;
+                    }, 500);
                 }
 
                 // Show popup after page loads (with delay)
                 $(document).ready(function() {
-                    // Show Green Points popup after 2 seconds
-                    if (document.getElementById('greenPointsPopup')) {
-                        setTimeout(function() {
-                            showGreenPointsPopup();
-                        }, 2000);
-                    }
+                    // Green Points popup removed - users can access rewards via navigation or View Rewards button
 
                     // Normal Charge Button Click Handler
                     $('#normalChargeBtn').click(function(e) {
@@ -916,9 +836,20 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                         }
                     }
 
-                    // Function to close popup (defined globally)
+                    // Function to close popup (defined globally) with state management
                     window.closePopup = function() {
+                        // Prevent multiple rapid clicks
+                        if (window.popupClosing) {
+                            return;
+                        }
+                        window.popupClosing = true;
+                        
                         $('#queuePopup').remove();
+                        
+                        // Reset state after a short delay
+                        setTimeout(function() {
+                            window.popupClosing = false;
+                        }, 500);
                     };
                 });
 
