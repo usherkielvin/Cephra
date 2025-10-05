@@ -2578,22 +2578,23 @@ if ($conn) {
                         }
                     }
 
-                    // Function to close popup (defined globally) with state management
+                    // Function to close popup (defined globally) - simple and clean
                     window.closePopup = function() {
                         try {
-                            // Try jQuery first
-                            if (typeof $ !== 'undefined' && $('#queuePopup').length) {
-                                $('#queuePopup').remove();
-                            } else {
-                                // Fallback to vanilla JS
-                                const popup = document.getElementById('queuePopup');
+                            // Remove all popups/modals
+                            const popups = document.querySelectorAll('#queuePopup, [data-dialog-overlay]');
+                            popups.forEach(popup => {
                                 if (popup && popup.parentNode) {
                                     popup.style.display = 'none';
-                                    popup.parentNode.removeChild(popup);
+                                    popup.remove();
                                 }
-                            }
+                            });
+                            document.body.style.overflow = '';
                         } catch (e) {
-                            // Element already removed or error occurred
+                            // Force cleanup
+                            document.body.style.overflow = '';
+                            const overlays = document.querySelectorAll('div[style*="position: fixed"][style*="background: rgba"]');
+                            overlays.forEach(overlay => overlay.remove());
                         }
                     };
                 });

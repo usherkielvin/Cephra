@@ -130,60 +130,26 @@ $bayNumber = null;
 // Determine initial status (mirror Java): priority -> Waiting, others -> Pending
 $initialStatus = ($priority == 1) ? 'Waiting' : 'Pending';
 
-// First, record the ticket in queue_tickets so it appears on Admin Queue
-$stmt = $conn->prepare("INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level, priority) VALUES (:ticket_id, :username, :service_type, :status, '', :battery_level, :priority)");
-$stmt->bindParam(':ticket_id', $ticketId);
-$stmt->bindParam(':username', $username);
-$stmt->bindParam(':service_type', $queueServiceType);
-$stmt->bindParam(':status', $initialStatus);
-$stmt->bindParam(':battery_level', $batteryLevel);
-$stmt->bindParam(':priority', $priority);
-if (!$stmt->execute()) {
-    $errorInfo = $stmt->errorInfo();
-    http_response_code(500);
-    echo json_encode(['error' => 'Failed to create queue record', 'db_error' => $errorInfo[2]]);
-    exit();
-}
+// DO NOT create the ticket yet - just return validation info for preview popup
+// Ticket will be created only when "Process Ticket" is clicked
 
-// If this is a priority ticket (Waiting status), add to waiting grid
-if ($priority == 1) {
-    try {
-        // Add ticket to waiting grid
-        $stmt = $conn->prepare("SELECT slot_number FROM waiting_grid WHERE ticket_id IS NULL ORDER BY slot_number LIMIT 1");
-        $stmt->execute();
-        $availableSlot = $stmt->fetchColumn();
-        
-        if ($availableSlot) {
-            // Add ticket to waiting grid
-            $stmt = $conn->prepare("UPDATE waiting_grid SET ticket_id = :ticket_id, username = :username, service_type = :service_type, initial_battery_level = :battery_level, position_in_queue = :slot WHERE slot_number = :slot");
-            $stmt->bindParam(':ticket_id', $ticketId);
-            $stmt->bindParam(':username', $username);
-            $stmt->bindParam(':service_type', $queueServiceType);
-            $stmt->bindParam(':battery_level', $batteryLevel);
-            $stmt->bindParam(':slot', $availableSlot);
-            $stmt->execute();
-            
-            error_log("Priority ticket $ticketId added to waiting grid slot $availableSlot");
-        } else {
-            error_log("No available waiting slots for priority ticket $ticketId");
-        }
-    } catch (Exception $e) {
-        error_log("Failed to add priority ticket $ticketId to waiting grid: " . $e->getMessage());
-    }
-}
+// Store ticket info in session for later creation
+$_SESSION['pendingTicket'] = [
+    'ticketId' => $ticketId,
+    'serviceType' => $serviceType,
+    'queueServiceType' => $queueServiceType,
+    'batteryLevel' => $batteryLevel,
+    'priority' => $priority,
+    'initialStatus' => $initialStatus
+];
 
-// Do not auto-create active_tickets here; Admin assignment handles bay routing (follows Java)
-
-// Set current service in session
-$_SESSION['currentService'] = $serviceType;
-$_SESSION['currentTicketId'] = $ticketId;
-
-// Respond success with ticket details
+// Respond success with ticket details for preview popup
 echo json_encode([
     'success' => true,
     'ticketId' => $ticketId,
     'serviceType' => $serviceType,
-    'batteryLevel' => $batteryLevel
+    'batteryLevel' => $batteryLevel,
+    'isPreview' => true  // Indicate this is just a preview
 ]);
 exit();
 ?>

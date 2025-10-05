@@ -261,9 +261,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             });
         });
 
-        // Charging functionality
+        // Charging functionality - clean dialog function
         function showDialog(title, message) {
+            // Remove any existing dialogs first
+            const existingDialogs = document.querySelectorAll('[data-dialog-overlay]');
+            existingDialogs.forEach(dialog => {
+                try {
+                    if (dialog.parentNode) {
+                        dialog.parentNode.removeChild(dialog);
+                    }
+                } catch (e) {
+                    // Element already removed
+                }
+            });
+            
             const overlay = document.createElement('div');
+            overlay.setAttribute('data-dialog-overlay', 'true');
             overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
             const dialog = document.createElement('div');
             dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
@@ -278,7 +291,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             const ok = document.createElement('button');
             ok.textContent = 'OK';
             ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
-            ok.onclick = () => document.body.removeChild(overlay);
+            ok.onclick = () => {
+                try {
+                    if (overlay && overlay.parentNode) {
+                        overlay.style.display = 'none';
+                        document.body.removeChild(overlay);
+                    }
+                } catch (e) {
+                    // Element already removed
+                }
+            };
             footer.appendChild(ok);
             dialog.appendChild(header);
             dialog.appendChild(body);
@@ -359,8 +381,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 modalHtml += '<div class="success-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); border-radius: 50%; margin-bottom: 0.75rem; margin-top: 1rem; box-shadow: 0 8px 20px rgba(0, 194, 206, 0.3);">';
                 modalHtml += '<i class="fas fa-check" style="font-size: 1.25rem; color: white;"></i>';
                 modalHtml += '</div>';
-                modalHtml += '<h3 class="modal-title" style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.25rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Ticket Created Successfully!</h3>';
-                modalHtml += '<p class="modal-subtitle" style="color: rgba(26, 32, 44, 0.7); font-size: 0.85rem; margin: 0;">Your charging session has been queued</p>';
+                modalHtml += '<h3 class="modal-title" style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.25rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Ready to Charge?</h3>';
+                modalHtml += '<p class="modal-subtitle" style="color: rgba(26, 32, 44, 0.7); font-size: 0.85rem; margin: 0;">Review your charging details below</p>';
                 modalHtml += '</div>';
 
                 // Ticket details with enhanced styling
@@ -447,40 +469,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             }
         }
 
-        // Function to close popup (defined globally)
-        window.closePopup = function() {
-            const modal = document.getElementById('queueModal');
-            if (modal) {
-                modal.style.display = 'none';
+        // Global cleanup function for all popups
+        window.cleanupAllPopups = function() {
+            try {
+                // Remove all types of modals/popups
+                const selectors = [
+                    '#queueModal', 
+                    '[data-dialog-overlay]',
+                    '.modal',
+                    'div[style*="position: fixed"][style*="background: rgba"]',
+                    'div[style*="position:fixed"][style*="background:rgba"]'
+                ];
+                
+                selectors.forEach(selector => {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(element => {
+                        if (element && element.parentNode) {
+                            element.style.display = 'none';
+                            element.remove();
+                        }
+                    });
+                });
+                
+                // Reset body overflow and remove any global styles
                 document.body.style.overflow = '';
-                modal.remove();
+                document.body.classList.remove('modal-open', 'popup-open');
+                
+            } catch (e) {
+                console.log('Cleanup completed');
             }
         };
 
-        // Function to cancel ticket
+        // Function to close popup (defined globally) - simple and clean
+        window.closePopup = function() {
+            window.cleanupAllPopups();
+            
+            // Clear any pending tickets from session
+            fetch('cancel_charge_action.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'cancelPending=true'
+            }).catch(() => {}); // Ignore errors
+        };
+
+        // Function to cancel ticket (just close popup since ticket isn't created yet)
         function cancelTicket(ticketId) {
+            // Since the ticket hasn't been created yet, just clear the pending ticket and close popup
             fetch('cancel_charge_action.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'ticketId=' + encodeURIComponent(ticketId)
+                body: 'cancelPending=true'
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    closePopup();
-                } else if (data.error) {
-                    alert('Error cancelling ticket: ' + data.error);
-                }
+                closePopup();
             })
             .catch(error => {
-                alert('An error occurred while cancelling the ticket. Please try again.');
+                // Even if there's an error, close the popup since it's just a preview
+                closePopup();
                 console.error('Error:', error);
             });
         }
 
-        // Function to process ticket
+        // Function to process ticket (actually create the ticket)
         function processTicket() {
             // Get the ticket ID from the modal
             const modal = document.getElementById('queueModal');
@@ -492,11 +545,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
 
             const ticketId = ticketIdElement.textContent.trim();
 
-            // Check if the Process Ticket button was pressed (this function is called only on button press)
-            // So no additional check needed here, but if you want to enforce, you can disable the button until clicked.
-
-            // Perform the fetch to the same page to process the ticket
-            fetch(window.location.href, {
+            // Call the new endpoint to actually create the ticket
+            fetch('process_ticket_action.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -506,15 +556,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showDialog('Ticket Processing', 'Your Bay assignment will be announced in the dashboard, please wait for further notice.');
+                    showDialog('Ticket Created Successfully!', 'Your charging session has been queued. Your Bay assignment will be announced in the dashboard, please wait for further notice.');
                     closePopup();
                 } else if (data.error) {
-                    showDialog('Processing Error', data.error);
+                    showDialog('Error', data.error);
+                    closePopup(); // Close the preview popup on error
                 }
             })
             .catch(error => {
-                showDialog('Processing Error', 'An error occurred while processing the ticket. Please try again.');
+                showDialog('Error', 'An error occurred while creating the ticket. Please try again.');
                 console.error('Error:', error);
+                closePopup(); // Close the preview popup on error
             });
         }
     </script>
