@@ -214,6 +214,7 @@ if ($conn) {
     <meta name="theme-color" content="#1a1a2e" />
 
     <link rel="stylesheet" href="css/vantage-style.css" />
+    <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
 		<style>
 			/* ============================================
@@ -2329,6 +2330,180 @@ if ($conn) {
 			</div>
 		</div>
 
+		<!-- Charging Status Modal -->
+		<div id="chargingModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon charging-icon">
+					<i class="fas fa-bolt"></i>
+				</div>
+				<h2 class="charging-modal-title">Your Car is Charging</h2>
+				<p class="charging-modal-description">Your vehicle is currently charging. Please wait while we power up your battery.</p>
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Current Battery:</span>
+						<span id="chargingCurrentBattery">45%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Target Battery:</span>
+						<span id="chargingTargetBattery">80%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Charging Speed:</span>
+						<span id="chargingSpeed">7.2 kW</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Time Remaining:</span>
+						<span id="chargingTimeRemaining">20 minutes</span>
+					</div>
+				</div>
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-primary" onclick="closeChargingModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Waiting Queue Modal -->
+		<div id="waitingModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon waiting-icon">
+					<i class="fas fa-clock"></i>
+				</div>
+				<h2 class="charging-modal-title">You're in the Queue</h2>
+				<p class="charging-modal-description">Your car is already in the charging queue. Please wait for your turn.</p>
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Queue Position:</span>
+						<span id="queuePosition">2nd</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Estimated Wait:</span>
+						<span id="estimatedWait">10 minutes</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Ticket ID:</span>
+						<span id="ticketId">#CH001</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Service Type:</span>
+						<span id="serviceType">Fast Charging</span>
+					</div>
+				</div>
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-secondary" onclick="cancelQueue()">Cancel</button>
+					<button class="charging-modal-btn btn-primary" onclick="closeWaitingModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Payment Completion Modal -->
+		<div id="paymentModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon completed-icon">
+					<i class="fas fa-check-circle"></i>
+				</div>
+				<h2 class="charging-modal-title">Charging Complete</h2>
+				<p class="charging-modal-description">Your charging session is complete. Please select your payment method.</p>
+				
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Session Duration:</span>
+						<span id="sessionDuration">45 minutes</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Energy Delivered:</span>
+						<span id="energyDelivered">12.5 kWh</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Final Battery:</span>
+						<span id="finalBattery">85%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Total Amount:</span>
+						<span id="totalAmount">₱75.00</span>
+					</div>
+				</div>
+
+				<div class="wallet-balance" id="walletBalanceDisplay" style="display: none;">
+					Current Wallet Balance: ₱<span id="currentWalletBalance">150.00</span>
+				</div>
+
+				<div class="error-message" id="errorMessage" style="display: none;">
+					Insufficient wallet balance. Please choose cash payment or add funds to your wallet.
+				</div>
+
+				<div class="payment-options">
+					<div class="payment-option" data-method="cash" onclick="selectPaymentMethod('cash')">
+						<div class="payment-icon">
+							<i class="fas fa-money-bill-wave"></i>
+						</div>
+						<div class="payment-label">Cash</div>
+					</div>
+					<div class="payment-option" data-method="ewallet" onclick="selectPaymentMethod('ewallet')">
+						<div class="payment-icon">
+							<i class="fas fa-wallet"></i>
+						</div>
+						<div class="payment-label">E-Wallet</div>
+					</div>
+				</div>
+
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-secondary" onclick="closePaymentModal()">Cancel</button>
+					<button class="charging-modal-btn btn-success" id="confirmPaymentBtn" onclick="confirmPayment()" disabled>Confirm Payment</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Payment Success Modal -->
+		<div id="paymentSuccessModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon charging-icon">
+					<i class="fas fa-check"></i>
+				</div>
+				<h2 class="charging-modal-title">Payment Successful</h2>
+				<p class="charging-modal-description">Thank you for your payment. Here's your receipt.</p>
+				
+				<div class="receipt-info">
+					<div class="receipt-header">PAYMENT RECEIPT</div>
+					<div class="receipt-item">
+						<span>Transaction ID:</span>
+						<span id="transactionId">#TXN12345</span>
+					</div>
+					<div class="receipt-item">
+						<span>Date & Time:</span>
+						<span id="receiptDateTime"></span>
+					</div>
+					<div class="receipt-item">
+						<span>Service:</span>
+						<span id="receiptService">Fast Charging</span>
+					</div>
+					<div class="receipt-item">
+						<span>Duration:</span>
+						<span id="receiptDuration">45 minutes</span>
+					</div>
+					<div class="receipt-item">
+						<span>Energy:</span>
+						<span id="receiptEnergy">12.5 kWh</span>
+					</div>
+					<div class="receipt-item">
+						<span>Payment Method:</span>
+						<span id="receiptPaymentMethod">E-Wallet</span>
+					</div>
+					<div class="receipt-item total">
+						<span>Total Paid:</span>
+						<span id="receiptTotal">₱75.00</span>
+					</div>
+					<div class="receipt-item" id="remainingBalanceItem" style="display: none;">
+						<span>Remaining Balance:</span>
+						<span id="receiptRemainingBalance">₱75.00</span>
+					</div>
+				</div>
+
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-primary" onclick="closePaymentSuccessModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
 		<!-- Scripts -->
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.dropotron.min.js"></script>
@@ -2941,5 +3116,5 @@ if ($conn) {
     </div>
 		</footer>
 
-		</body>
-	</html>
+	</body>
+</html>
