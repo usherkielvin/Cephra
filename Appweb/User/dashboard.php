@@ -18,7 +18,7 @@ $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
 
 // Fetch latest charging status from queue_tickets (current/pending sessions)
-$stmt_charging = $conn->prepare("SELECT status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_charging = $conn->prepare("SELECT ticket_id, service_type, status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
 $stmt_charging->bindParam(':username', $username);
 $stmt_charging->execute();
 $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
