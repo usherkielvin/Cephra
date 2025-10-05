@@ -714,7 +714,20 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
            <script>
                 function showDialog(title, message) {
+                    // Remove any existing dialogs first
+                    const existingDialogs = document.querySelectorAll('[data-dialog-overlay]');
+                    existingDialogs.forEach(dialog => {
+                        try {
+                            if (dialog.parentNode) {
+                                dialog.parentNode.removeChild(dialog);
+                            }
+                        } catch (e) {
+                            // Element already removed
+                        }
+                    });
+                    
                     const overlay = document.createElement('div');
+                    overlay.setAttribute('data-dialog-overlay', 'true');
                     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
                     const dialog = document.createElement('div');
                     dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
@@ -729,7 +742,16 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                     const ok = document.createElement('button');
                     ok.textContent = 'OK';
                     ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
-                    ok.onclick = () => document.body.removeChild(overlay);
+                    ok.onclick = () => {
+                        try {
+                            if (overlay && overlay.parentNode) {
+                                overlay.style.display = 'none';
+                                document.body.removeChild(overlay);
+                            }
+                        } catch (e) {
+                            // Element already removed
+                        }
+                    };
                     footer.appendChild(ok);
                     dialog.appendChild(header);
                     dialog.appendChild(body);
@@ -838,18 +860,21 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
                     // Function to close popup (defined globally) with state management
                     window.closePopup = function() {
-                        // Prevent multiple rapid clicks
-                        if (window.popupClosing) {
-                            return;
+                        try {
+                            // Try jQuery first
+                            if (typeof $ !== 'undefined' && $('#queuePopup').length) {
+                                $('#queuePopup').remove();
+                            } else {
+                                // Fallback to vanilla JS
+                                const popup = document.getElementById('queuePopup');
+                                if (popup && popup.parentNode) {
+                                    popup.style.display = 'none';
+                                    popup.parentNode.removeChild(popup);
+                                }
+                            }
+                        } catch (e) {
+                            // Element already removed or error occurred
                         }
-                        window.popupClosing = true;
-                        
-                        $('#queuePopup').remove();
-                        
-                        // Reset state after a short delay
-                        setTimeout(function() {
-                            window.popupClosing = false;
-                        }, 500);
                     };
                 });
 

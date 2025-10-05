@@ -3,7 +3,7 @@ session_start();
 
 // Check if already logged in
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header("Location: index.php");
+    header("Location: dashboard.php");
     exit();
 }
 

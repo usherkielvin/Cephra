@@ -1,5 +1,18 @@
 function showDialog(title, message) {
+    // Remove any existing dialogs first
+    const existingDialogs = document.querySelectorAll('[data-dialog-overlay]');
+    existingDialogs.forEach(dialog => {
+        try {
+            if (dialog.parentNode) {
+                dialog.parentNode.removeChild(dialog);
+            }
+        } catch (e) {
+            // Element already removed
+        }
+    });
+    
     const overlay = document.createElement('div');
+    overlay.setAttribute('data-dialog-overlay', 'true');
     overlay.style.cssText = `position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:10000; padding:16px;`;
 
     const dialog = document.createElement('div');
@@ -19,7 +32,16 @@ function showDialog(title, message) {
     const ok = document.createElement('button');
     ok.textContent = 'OK';
     ok.style.cssText = `background:#00c2ce; color:#fff; border:0; padding:8px 14px; border-radius:8px; cursor:pointer;`;
-    ok.onclick = () => document.body.removeChild(overlay);
+    ok.onclick = () => {
+        try {
+            if (overlay && overlay.parentNode) {
+                overlay.style.display = 'none';
+                document.body.removeChild(overlay);
+            }
+        } catch (e) {
+            // Element already removed
+        }
+    };
 
     footer.appendChild(ok);
     dialog.appendChild(header);

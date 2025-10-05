@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: login.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -21,14 +21,14 @@ if ($conn && isset($_SESSION['admin_username'])) {
         if (!$row || strcasecmp($row['status'] ?? '', 'Active') !== 0) {
             session_unset();
             session_destroy();
-            header("Location: login.php?deactivated=1");
+            header("Location: index.php?deactivated=1");
             exit();
         }
     } catch (Exception $e) {
         // On error, default to safe behavior: logout
         session_unset();
         session_destroy();
-        header("Location: login.php");
+        header("Location: index.php");
         exit();
     }
 }
