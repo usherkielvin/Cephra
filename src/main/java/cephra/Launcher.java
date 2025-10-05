@@ -1,7 +1,5 @@
 package cephra;
-
 import cephra.Database.CephraDB;
-
 public final class Launcher {
 
 	public static void main(String[] args) {
@@ -15,14 +13,12 @@ public final class Launcher {
 		}
 		javax.swing.SwingUtilities.invokeLater(() -> {
 			
-			// Launch Admin frame - positioned top-right
 			cephra.Frame.Admin admin = new cephra.Frame.Admin();
 			java.awt.Toolkit toolkit = java.awt.Toolkit.getDefaultToolkit();
 			java.awt.Dimension screenSize = toolkit.getScreenSize();
 			admin.setLocation(screenSize.width - admin.getWidth(), 0);
 			admin.setVisible(true);
-
-			// Launch Phone frame
+			
 			cephra.Frame.Phone phone = new cephra.Frame.Phone();
 			phone.setVisible(true);
 			phone.toFront();

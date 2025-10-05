@@ -1,36 +1,28 @@
 package cephra.Phone.Popups;
-
 import java.awt.event.*;
 import javax.swing.*;
-
 public class Notification extends javax.swing.JPanel {
-
     private Timer animationTimer;
     private Timer hideTimer;
-    private int yPosition = -70; // Start position (hidden above the screen)
-    private int targetY = 50; // Target position when fully shown (lower down for better visibility)
+    private int yPosition = -70;
+    private int targetY = 50;
     private boolean isShowing = false;
-    private static final int ANIMATION_SPEED = 5; // Pixels to move per step
-    private static final int ANIMATION_DELAY = 10; // Milliseconds between steps
-    private static final int DISPLAY_DURATION = 3000; // Display for 3 seconds
-    
-    // Notification types
+    private static final int ANIMATION_SPEED = 5;
+    private static final int ANIMATION_DELAY = 10;
+    private static final int DISPLAY_DURATION = 3000;
     public static final String TYPE_WAITING = "WAITING";
     public static final String TYPE_PENDING = "PENDING";
     public static final String TYPE_MY_TURN = "MY_TURN";
     public static final String TYPE_DONE = "DONE";
-    public static final String TYPE_OTP = "OTP";
-    
+    public static final String TYPE_OTP = "OTP"; 
     private String currentNotificationType = TYPE_WAITING;
     private String ticketId = "";
-    private String bayNumber = "";
-    
+    private String bayNumber = "";  
     public Notification() {
         initComponents();
         setOpaque(false);
-        setVisible(false); // Start hidden
-    }
-    
+        setVisible(false);
+    }  
     public void setNotificationType(String type, String ticketId, String bayNumber) {
         this.currentNotificationType = type;
         this.ticketId = ticketId != null ? ticketId : "";
@@ -39,9 +31,6 @@ public class Notification extends javax.swing.JPanel {
         updateNotificationDisplay();
     }
     
-    /**
-     * Updates the notification display based on the current type
-     */
     private void updateNotificationDisplay() {
         switch (currentNotificationType) {
             case TYPE_WAITING:
@@ -124,28 +113,19 @@ public class Notification extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    /**
-     * Force re-show the notification (useful for charging alerts)
-     */
+
     public void forceShowNotification() {
-        // Reset any existing state and show again
         isShowing = false;
         showNotification();
     }
-    
-    /**
-     * Update the current notification content and re-show it
-     */
+
     public void updateAndShowNotification(String type, String ticketId, String bayNumber) {
-        // Update the notification content
         setNotificationType(type, ticketId, bayNumber);
         
-        // If currently showing, restart the animation from the top
         if (isShowing) {
             yPosition = -70;
             setLocation(23, yPosition);
             
-            // Cancel existing timers
             if (animationTimer != null && animationTimer.isRunning()) {
                 animationTimer.stop();
             }
@@ -153,17 +133,12 @@ public class Notification extends javax.swing.JPanel {
                 hideTimer.stop();
             }
             
-            // Restart the show animation
             showNotificationAnimation();
         } else {
-            // If not showing, just show normally
             showNotification();
         }
-    }
-    
-    /**
-     * Internal method to start the show animation
-     */
+    } 
+
     private void showNotificationAnimation() {
         animationTimer = new Timer(ANIMATION_DELAY, new ActionListener() {
             @Override
@@ -172,7 +147,6 @@ public class Notification extends javax.swing.JPanel {
                     yPosition += ANIMATION_SPEED;
                     setLocation(23, yPosition);
                     
-                    // Ensure iPhone frame stays on top during animation
                     java.awt.Window[] windows = java.awt.Window.getWindows();
                     for (java.awt.Window window : windows) {
                         if (window instanceof cephra.Frame.Phone) {
@@ -181,10 +155,8 @@ public class Notification extends javax.swing.JPanel {
                         }
                     }
                 } else {
-                    // Animation completed
                     animationTimer.stop();
                     
-                    // Schedule hide after duration
                     hideTimer = new Timer(DISPLAY_DURATION, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -199,10 +171,8 @@ public class Notification extends javax.swing.JPanel {
         animationTimer.start();
     }
     
-    //Shows the notification with animation sliding down from the top
     public void showNotification() {
-        // Allow re-showing notifications (especially for charging alerts)
-        // Cancel any existing timers first
+       
         if (animationTimer != null && animationTimer.isRunning()) {
             animationTimer.stop();
         }
@@ -213,22 +183,17 @@ public class Notification extends javax.swing.JPanel {
         isShowing = true;
         setVisible(true);
         yPosition = -70;
-        setLocation(23, yPosition); // Start off-screen, centered horizontally
+        setLocation(23, yPosition);
         
-        // Start the show animation
         showNotificationAnimation();
     }
     
-    // Hides the notification with animation sliding up
     public void hideNotification() {
-        if (!isShowing) return; // Only hide if showing
+        if (!isShowing) return;
         
-        // Cancel existing animation if running
         if (animationTimer != null && animationTimer.isRunning()) {
             animationTimer.stop();
-        }
-        
-        // Create and start the hide animation
+        }  
         animationTimer = new Timer(ANIMATION_DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -236,7 +201,7 @@ public class Notification extends javax.swing.JPanel {
                     yPosition -= ANIMATION_SPEED;
                     setLocation(23, yPosition);
                 } else {
-                    // Animation completed
+                    
                     animationTimer.stop();
                     setVisible(false);
                     isShowing = false;
@@ -245,20 +210,13 @@ public class Notification extends javax.swing.JPanel {
         });
         animationTimer.start();
     }
-    
-    /**
-     * Add this notification to a parent JFrame
-     * @param frame The parent Phone frame
-     */
+ 
     public void addToFrame(cephra.Frame.Phone frame) {
         this.setBounds(23, -50, 330, 70); // Initial position off-screen, centered horizontally
         frame.getRootPane().getLayeredPane().add(this, JLayeredPane.POPUP_LAYER);
-        frame.getRootPane().getLayeredPane().moveToFront(this);
-        
-        // Ensure iPhone frame stays on top of the notification
+        frame.getRootPane().getLayeredPane().moveToFront(this);       
         frame.ensureIphoneFrameOnTop();
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel statusLabel;
