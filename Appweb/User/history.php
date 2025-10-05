@@ -68,7 +68,7 @@ if ($conn) {
 					</div>
 
 					<!-- History Table -->
-					<div class="history-table-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); overflow-y: auto; overflow-x: hidden; position: relative; max-height: 600px;">
+					<div class="history-table-container" style="background: white; border-radius: 20px; padding: 2rem; border: 1px solid rgba(26, 32, 44, 0.1); box-shadow: 0 5px 15px rgba(0, 194, 206, 0.1); overflow-y: auto; overflow-x: auto; position: relative; max-height: 600px;">
 						<style>
 							.history-table-container::-webkit-scrollbar {
 								width: 8px;
@@ -84,13 +84,32 @@ if ($conn) {
 							.history-table-container::-webkit-scrollbar-thumb:hover {
 								background: #009cb4;
 							}
-							/* Natural table sizing */
+							/* Natural table sizing with resizability */
 							.history-table {
 								width: 100%;
-								min-width: unset;
+								min-width: 800px; /* Minimum width for proper display */
+								table-layout: fixed; /* Allow column resizing */
 							}
+							/* Column widths for better resizability */
+							.history-table th:nth-child(1),
+							.history-table td:nth-child(1) { width: 15%; } /* Transaction ID */
+							.history-table th:nth-child(2),
+							.history-table td:nth-child(2) { width: 10%; } /* Status */
+							.history-table th:nth-child(3),
+							.history-table td:nth-child(3) { width: 10%; } /* Amount */
+							.history-table th:nth-child(4),
+							.history-table td:nth-child(4) { width: 10%; } /* Method */
+							.history-table th:nth-child(5),
+							.history-table td:nth-child(5) { width: 12%; } /* Plate Number */
+							.history-table th:nth-child(6),
+							.history-table td:nth-child(6) { width: 15%; } /* Reference */
+							.history-table th:nth-child(7),
+							.history-table td:nth-child(7) { width: 15%; } /* Date */
+							.history-table th:nth-child(8),
+							.history-table td:nth-child(8) { width: 13%; } /* Actions */
+							
 							/* Mobile responsiveness */
-							@media (max-width: 600px) {
+							@media (max-width: 768px) {
 								.history-table-container {
 									padding: 1rem;
 									border-radius: 15px;
@@ -98,6 +117,7 @@ if ($conn) {
 								}
 								.history-table {
 									font-size: 0.8rem;
+									min-width: 700px; /* Smaller minimum for mobile */
 								}
 								.history-table th,
 								.history-table td {
@@ -115,7 +135,7 @@ if ($conn) {
                                 <p data-i18n="noTransactionsHint" style="font-size: 1rem; margin: 0;">You haven't made any payments. Start by linking your account.</p>
                             </div>
 						<?php else: ?>
-							<table class="history-table" style="width: 100%; border-collapse: collapse; margin: 0; font-size: 0.9rem; background: transparent; table-layout: auto;">
+							<table class="history-table" style="border-collapse: collapse; margin: 0; font-size: 0.9rem; background: transparent;">
 								<thead>
 									<tr>
                                         <th data-i18n="thTransactionId" style="background: #00c2ce; color: white; padding: 1rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none; position: sticky; top: 0; z-index: 10;">Transaction ID</th>

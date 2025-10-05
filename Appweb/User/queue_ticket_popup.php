@@ -80,7 +80,18 @@ $estimatedMinutes = 5; // Placeholder, replace with actual logic
 
     <script>
         function closePopup() {
+            // Prevent multiple rapid clicks
+            if (window.popupClosing) {
+                return;
+            }
+            window.popupClosing = true;
+            
             document.getElementById('popupOverlay').style.display = 'none';
+            
+            // Reset state after a short delay
+            setTimeout(function() {
+                window.popupClosing = false;
+            }, 500);
         }
         
         // Close popup when clicking outside

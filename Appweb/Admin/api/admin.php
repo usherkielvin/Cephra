@@ -42,6 +42,76 @@ if (!$db) {
     exit();
 }
 
+// Function to ensure user has a plate number (like Java system)
+function ensureUserHasPlateNumber($db, $username) {
+    try {
+        // Check if user already has a plate number
+        $stmt = $db->prepare("SELECT plate_number FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user && $user['plate_number'] && !empty(trim($user['plate_number']))) {
+            return $user['plate_number'];
+        }
+        
+        // Generate a unique plate number if user doesn't have one
+        $plate_number = generateUniquePlateNumber($db);
+        
+        // Update user with the new plate number
+        $stmt = $db->prepare("UPDATE users SET plate_number = ? WHERE username = ?");
+        $stmt->execute([$plate_number, $username]);
+        
+        return $plate_number;
+    } catch (Exception $e) {
+        error_log("Failed to ensure plate number for user $username: " . $e->getMessage());
+        return null;
+    }
+}
+
+// Function to generate a unique plate number
+function generateUniquePlateNumber($db) {
+    // Generate plate number format: ABC-1234 (like Java system)
+    $letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+    $attempts = 0;
+    $max_attempts = 100;
+    
+    do {
+        $letter1 = $letters[array_rand($letters)];
+        $letter2 = $letters[array_rand($letters)];
+        $letter3 = $letters[array_rand($letters)];
+        $numbers = sprintf('%04d', rand(0, 9999));
+        
+        $plate_number = $letter1 . $letter2 . $letter3 . '-' . $numbers;
+        
+        // Check if plate number is unique
+        $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE plate_number = ?");
+        $stmt->execute([$plate_number]);
+        $count = $stmt->fetchColumn();
+        
+        if ($count == 0) {
+            return $plate_number;
+        }
+        
+        $attempts++;
+    } while ($attempts < $max_attempts);
+    
+    // Fallback: use timestamp-based plate number
+    return 'ADM-' . date('Ymd') . '-' . substr(uniqid(), -4);
+}
+
+// Function to generate a random password for staff
+function generateRandomPassword($length = 8) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*';
+    $password = '';
+    $characters_length = strlen($characters);
+    
+    for ($i = 0; $i < $length; $i++) {
+        $password .= $characters[rand(0, $characters_length - 1)];
+    }
+    
+    return $password;
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Get action from POST data or query string
@@ -192,15 +262,40 @@ try {
             echo json_encode($ok ? ['success' => true, 'message' => 'Staff added'] : ['error' => 'Failed to add staff']);
             break;
 
-        case 'toggle-staff-status':
+
+        case 'reset-staff-password':
             if ($method !== 'POST') { echo json_encode(['error' => 'Method not allowed']); break; }
             $username = $_POST['username'] ?? '';
-            $new_status = $_POST['status'] ?? '';
-            if (!$username || !in_array($new_status, ['Active','Inactive'])) { echo json_encode(['error' => 'Invalid input']); break; }
+            if (!$username) { echo json_encode(['error' => 'Username required']); break; }
             if (strtolower($username) === 'admin') { echo json_encode(['error' => 'Admin account cannot be modified']); break; }
-            $stmt = $db->prepare('UPDATE staff_records SET status = ? WHERE username = ?');
-            $ok = $stmt->execute([$new_status, $username]);
-            echo json_encode($ok ? ['success' => true] : ['error' => 'Failed to update status']);
+            
+            // Generate a new random password
+            $new_password = generateRandomPassword();
+            
+            // Update the password in the database
+            $stmt = $db->prepare('UPDATE staff_records SET password = ? WHERE username = ?');
+            $ok = $stmt->execute([$new_password, $username]);
+            
+            if ($ok) {
+                // Get staff email for notification
+                $email_stmt = $db->prepare('SELECT email, name FROM staff_records WHERE username = ?');
+                $email_stmt->execute([$username]);
+                $staff = $email_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($staff) {
+                    // Send email notification (optional - can be implemented later)
+                    // For now, just return success with the new password
+                    echo json_encode([
+                        'success' => true, 
+                        'message' => "Password reset successfully. New password: {$new_password}",
+                        'new_password' => $new_password
+                    ]);
+                } else {
+                    echo json_encode(['success' => true, 'message' => 'Password reset successfully']);
+                }
+            } else {
+                echo json_encode(['error' => 'Failed to reset password']);
+            }
             break;
 
         case 'delete-staff':
@@ -263,12 +358,53 @@ try {
                 break;
             }
             
-            // Update ticket status to Processing
+            // Get ticket details first
+            $stmt = $db->prepare("SELECT username, service_type, bay_number FROM queue_tickets WHERE ticket_id = ?");
+            $stmt->execute([$ticket_id]);
+            $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$ticket) {
+                echo json_encode(['error' => 'Ticket not found']);
+                break;
+            }
+            
+            $username = $ticket['username'];
+            $service_type = $ticket['service_type'];
+            $bay_number = $ticket['bay_number'] ?? 'TBD';
+            
+            // Update ticket status to Processing (this will trigger the user popup)
             $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Processing' WHERE ticket_id = ?");
             $result = $stmt->execute([$ticket_id]);
             
             if ($result) {
-                echo json_encode(['success' => true, 'message' => 'Ticket processed successfully']);
+                // Trigger notification to user's web dashboard
+                // Store notification data for the user to fetch
+                $notification_data = [
+                    'type' => 'charge_now_popup',
+                    'ticket_id' => $ticket_id,
+                    'bay_number' => $bay_number,
+                    'service_type' => $service_type,
+                    'timestamp' => time()
+                ];
+                
+                // Store in a simple file-based notification system
+                $notifications_file = '../../User/api/notifications.json';
+                $notifications = [];
+                
+                if (file_exists($notifications_file)) {
+                    $notifications = json_decode(file_get_contents($notifications_file), true) ?: [];
+                }
+                
+                $notifications[$username] = $notification_data;
+                file_put_contents($notifications_file, json_encode($notifications));
+                
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Ticket processed successfully. User notification sent.',
+                    'ticket_id' => $ticket_id,
+                    'username' => $username,
+                    'bay_number' => $bay_number
+                ]);
             } else {
                 echo json_encode(['error' => 'Failed to process ticket']);
             }
@@ -1151,16 +1287,18 @@ try {
                     $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
                 }
                 
-                // Get charging history ONLY from charging_history table - ONLY 6 COLUMNS
+                // Get charging history with plate numbers from users table
                 $sql = "
                     SELECT 
                         ch.ticket_id,
                         ch.username,
+                        COALESCE(u.plate_number, 'N/A') as plate_number,
                         ch.energy_used as energy_kwh,
                         ch.total_amount,
                         ch.reference_number,
                         ch.completed_at as transaction_date
                     FROM charging_history ch
+                    LEFT JOIN users u ON ch.username = u.username
                     $where_clause
                     ORDER BY ch.completed_at DESC
                     LIMIT 100
@@ -1370,22 +1508,43 @@ try {
                 
                 error_log("Payment Debug - User exists: " . $ticket['username']);
                 
-                // Insert payment transaction
+                // Ensure user has a plate number (like Java system)
+                $plate_number = ensureUserHasPlateNumber($db, $ticket['username']);
+                
+                // Insert payment transaction with plate number
                 error_log("Payment Debug - Creating payment transaction for amount: $amount");
-                $payment_stmt = $db->prepare("
-                    INSERT INTO payment_transactions (
-                        ticket_id, username, amount, payment_method, 
-                        reference_number, transaction_status, processed_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, NOW())
-                ");
-                $payment_result = $payment_stmt->execute([
-                    $ticket_id,
-                    $ticket['username'],
-                    $amount,
-                    $ticket['payment_method'] ?? 'Cash',
-                    $reference_number,
-                    'Completed'
-                ]);
+                if ($plate_number) {
+                    $payment_stmt = $db->prepare("
+                        INSERT INTO payment_transactions (
+                            ticket_id, username, amount, payment_method, 
+                            reference_number, transaction_status, plate_number, processed_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    $payment_result = $payment_stmt->execute([
+                        $ticket_id,
+                        $ticket['username'],
+                        $amount,
+                        $ticket['payment_method'] ?? 'Cash',
+                        $reference_number,
+                        'Completed',
+                        $plate_number
+                    ]);
+                } else {
+                    $payment_stmt = $db->prepare("
+                        INSERT INTO payment_transactions (
+                            ticket_id, username, amount, payment_method, 
+                            reference_number, transaction_status, processed_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    $payment_result = $payment_stmt->execute([
+                        $ticket_id,
+                        $ticket['username'],
+                        $amount,
+                        $ticket['payment_method'] ?? 'Cash',
+                        $reference_number,
+                        'Completed'
+                    ]);
+                }
                 
                 if (!$payment_result) {
                     $error_info = $payment_stmt->errorInfo();

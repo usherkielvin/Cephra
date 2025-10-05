@@ -46,6 +46,7 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2025 Cephra. All rights reserved. | <a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
+            <p>&copy; 2025 Cephra. All rights reserved.</p>
+            <p><a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
     </div>
 </footer>

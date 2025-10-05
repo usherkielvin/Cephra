@@ -15,36 +15,7 @@ document.querySelectorAll('.mobile-nav-link').forEach(link => {
     });
 });
 
-// Mobile Language Selector Functionality
-const mobileLanguageBtn = document.getElementById('mobileLanguageBtn');
-const mobileLanguageDropdown = document.getElementById('mobileLanguageDropdown');
-const mobileLanguageOptions = mobileLanguageDropdown.querySelectorAll('.language-option');
-
-// Toggle mobile language dropdown
-mobileLanguageBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    mobileLanguageDropdown.classList.toggle('show');
-    mobileLanguageBtn.classList.toggle('active');
-});
-
-// Handle mobile language selection
-mobileLanguageOptions.forEach(option => {
-    option.addEventListener('click', function() {
-        const selectedLang = this.dataset.lang;
-        updateLanguageDisplay(selectedLang);
-        mobileLanguageDropdown.classList.remove('show');
-        mobileLanguageBtn.classList.remove('active');
-
-        // Also update desktop language display
-        const desktopLanguageText = document.querySelector('#languageBtn .language-text');
-        if (desktopLanguageText) {
-            const langMap = { 'en': 'EN', 'fil': 'Fil', 'ceb': 'Bisaya', 'zh': '中文' };
-            desktopLanguageText.textContent = langMap[selectedLang] || 'EN';
-        }
-
-        console.log('Language changed to:', selectedLang);
-    });
-});
+// Mobile Language Selector removed - language selection available in profile dropdown
 
 // Mobile QR Code Popup Functionality
 const mobileDownloadBtn = document.getElementById('mobileDownloadBtn');
@@ -58,7 +29,7 @@ mobileDownloadBtn.addEventListener('click', function(e) {
 
 // Hide mobile QR popup when clicking outside
 document.addEventListener('click', function(e) {
-    if (!mobileDownloadBtn.contains(e.target) && !mobileQrPopup.contains(e.target)) {
+    if (mobileDownloadBtn && mobileQrPopup && !mobileDownloadBtn.contains(e.target) && !mobileQrPopup.contains(e.target)) {
         mobileQrPopup.classList.remove('show');
     }
 });
