@@ -1,4 +1,3 @@
-
 package cephra.Phone.Dashboard;
 
 import cephra.Phone.Utilities.BalanceManager;

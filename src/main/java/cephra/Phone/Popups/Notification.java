@@ -12,7 +12,7 @@ public class Notification extends javax.swing.JPanel {
     private boolean isShowing = false;
     private static final int ANIMATION_SPEED = 5; // Pixels to move per step
     private static final int ANIMATION_DELAY = 10; // Milliseconds between steps
-    private static final int DISPLAY_DURATION = 10000; // Display for 3 seconds
+    private static final int DISPLAY_DURATION = 3000; // Display for 3 seconds
     
     // Notification types
     public static final String TYPE_WAITING = "WAITING";
