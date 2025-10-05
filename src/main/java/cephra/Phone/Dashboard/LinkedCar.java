@@ -191,8 +191,10 @@ public class LinkedCar extends javax.swing.JPanel {
     // Method to update charging time and type based on queue ticket
     private void updateChargingTimeAndType(String username, int batteryLevel) {
         try {
-            // Check if user has an active queue ticket
+            // Check if user has an active ticket (from active_tickets table first, then queue_tickets)
+            String activeTicketId = cephra.Database.CephraDB.getActiveTicket(username);
             String queueTicketId = cephra.Database.CephraDB.getQueueTicketForUser(username);
+            String currentTicketId = (activeTicketId != null && !activeTicketId.isEmpty()) ? activeTicketId : queueTicketId;
             String ticketStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
             
             // Check if user has completed charging (battery at 100% or ticket completed)
@@ -207,11 +209,11 @@ public class LinkedCar extends javax.swing.JPanel {
                 
                 // System.out.println("LinkedCar: Charging completed - showing 'Not Charging' status for user " + username + 
                 //                  " (battery: " + batteryLevel + "%, status: " + ticketStatus + ")");
-            } else if (queueTicketId != null && ticketStatus != null && 
-                (ticketStatus.equals("Pending") || ticketStatus.equals("Waiting") || ticketStatus.equals("In Progress"))) {
+            } else if (currentTicketId != null && ticketStatus != null && 
+                (ticketStatus.equals("Pending") || ticketStatus.equals("Waiting") || ticketStatus.equals("In Progress") || ticketStatus.equals("Charging"))) {
                 
                 // Get ticket details from database
-                String serviceType = getTicketServiceType(queueTicketId);
+                String serviceType = getTicketServiceType(currentTicketId);
                 
                 if (serviceType != null) {
                     // Update charging type label when charging
@@ -229,7 +231,7 @@ public class LinkedCar extends javax.swing.JPanel {
                     chargingTimeLabel.setText(timeDisplay);
                     
                     // System.out.println("LinkedCar: Updated charging display - Type: " + serviceType + 
-                    //                  ", Time: " + timeDisplay + " for user " + username + " (battery: " + batteryLevel + "%)");
+                    //                  ", Time: " + timeDisplay + " for user " + username + " (battery: " + batteryLevel + "%, ticket: " + currentTicketId + ")");
                 } else {
                     // No ticket found, show not charging status
                     setNotChargingDisplay();
@@ -247,6 +249,19 @@ public class LinkedCar extends javax.swing.JPanel {
     // Method to get service type from ticket ID
     private String getTicketServiceType(String ticketId) {
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // First try to get from active_tickets table (for charging users)
+            try (java.sql.PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT service_type FROM active_tickets WHERE ticket_id = ?")) {
+                stmt.setString(1, ticketId);
+                
+                try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("service_type");
+                    }
+                }
+            }
+            
+            // If not found in active_tickets, try queue_tickets table
             try (java.sql.PreparedStatement stmt = conn.prepareStatement(
                     "SELECT service_type FROM queue_tickets WHERE ticket_id = ?")) {
                 stmt.setString(1, ticketId);

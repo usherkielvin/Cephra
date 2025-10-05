@@ -152,7 +152,18 @@ public class LinkedHome extends javax.swing.JPanel {
                                 displayStatus = "Waiting";
                                 break;
                             case "charging":
-                                displayStatus = "Charging";
+                                // Get the actual bay number for this ticket
+                                String ticketId = cephra.Database.CephraDB.getUserCurrentTicketId(username);
+                                if (ticketId != null && !ticketId.isEmpty()) {
+                                    String bayNumber = cephra.Admin.BayManagement.getBayNumberByTicket(ticketId);
+                                    if (bayNumber != null && !bayNumber.isEmpty()) {
+                                        displayStatus = "Charging at Bay " + bayNumber;
+                                    } else {
+                                        displayStatus = "Charging";
+                                    }
+                                } else {
+                                    displayStatus = "Charging";
+                                }
                                 break;
                             case "complete":
                             case "completed":
