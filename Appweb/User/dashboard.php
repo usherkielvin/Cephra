@@ -53,10 +53,18 @@ if ($active_ticket) {
 // Check queue_tickets for pending/waiting states
 elseif ($queue_ticket) {
     $current_ticket = $queue_ticket;
-    if (strtolower($queue_ticket['status']) === 'pending') {
+    // Check if payment is completed - if so, show as connected
+    if (strtolower($queue_ticket['payment_status']) === 'paid' ||
+        strtolower($queue_ticket['payment_status']) === 'completed' ||
+        strtolower($queue_ticket['payment_status']) === 'success') {
+        $status_text = 'Connected';
+        $background_class = 'connected-bg';
+        $button_text = 'Charge Now';
+        $button_href = 'ChargingPage.php';
+    } elseif (strtolower($queue_ticket['status']) === 'complete') {
         $background_class = 'queue-pending-bg';
-        $status_text = 'Queue Pending';
-        $button_text = 'Check Monitor';
+        $status_text = 'Pending Payment';
+        $button_text = 'Pay Now';
         $button_href = '../Monitor/index.php';
     } elseif (strtolower($queue_ticket['status']) === 'waiting') {
         $background_class = 'waiting-bg';
@@ -64,6 +72,14 @@ elseif ($queue_ticket) {
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
     }
+}
+
+// Determine if Start Charging button should be disabled
+$button_disabled = false;
+$disabled_status = '';
+if ($current_ticket && in_array(strtolower($current_ticket['status']), ['charging', 'completed'])) {
+    $button_disabled = true;
+    $disabled_status = ucfirst(strtolower($current_ticket['status']));
 }
 
 // Fetch battery level from database
@@ -821,6 +837,10 @@ if ($conn) {
 
 			.waiting-bg {
 				background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+			}
+
+			.queue-pending-bg {
+				background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
 			}
 
 			.connected-bg {
@@ -1967,7 +1987,7 @@ if ($conn) {
                     fast, and reliable charging solutions.
                 </p>
                 <div class="hero-actions">
-                    <a href="ChargingPage.php" class="btn btn-outline">Start Charging</a>
+                    <a href="ChargingPage.php" class="btn btn-outline" id="startChargingBtn">Start Charging</a>
                 </div>
             </div>
 		</section>
@@ -2055,7 +2075,11 @@ if ($conn) {
 								</div>
 							</div>
 			<div class="vehicle-actions">
-				<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>"><?php echo htmlspecialchars($button_text); ?></a>
+				<?php if ($button_disabled): ?>
+					<span class="quick-action-btn disabled" style="pointer-events: none; opacity: 0.5; cursor: not-allowed;"><?php echo htmlspecialchars($button_text); ?> (<?php echo htmlspecialchars($disabled_status); ?>)</span>
+				<?php else: ?>
+					<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>"><?php echo htmlspecialchars($button_text); ?></a>
+				<?php endif; ?>
 			</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
@@ -2521,171 +2545,83 @@ if ($conn) {
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-            <script>
+			<script>
                 // Pass PHP variables to JavaScript
                 window.chargingStatus = '<?php echo $charging_status; ?>';
                 window.statusText = '<?php echo $status_text; ?>';
+                window.currentStatus = '<?php echo $current_ticket ? strtolower($current_ticket['status']) : ''; ?>';
                 window.paymentStatus = '<?php echo $latest_charging ? $latest_charging['payment_status'] : ''; ?>';
                 window.ticketId = '<?php echo $latest_charging ? $latest_charging['ticket_id'] : ''; ?>';
                 window.serviceType = '<?php echo $latest_charging ? $latest_charging['service_type'] : ''; ?>';
                 window.batteryLevel = '<?php echo $db_battery_level ?: '0'; ?>';
-            </script>
-            <script>
-                // Profile dropdown functionality
-                (function() {
-                    const profileBtn = document.getElementById('profileBtn');
-                    const profileDropdown = document.getElementById('profileDropdown');
-                    const languageMenuItem = document.getElementById('languageMenuItem');
-                    const languageSubDropdown = document.getElementById('languageSubDropdown');
 
-                    if (profileBtn && profileDropdown) {
-                        profileBtn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            const isVisible = profileDropdown.style.display === 'block';
-                            profileDropdown.style.display = isVisible ? 'none' : 'block';
-                        });
+                // Function to show error popup
+                function showErrorPopup(message) {
+                    // Remove existing popup if any
+                    const existingPopup = document.querySelector('.popup-overlay.error-popup');
+                    if (existingPopup) {
+                        existingPopup.remove();
+                    }
 
-                        // Close dropdown when clicking outside
-                        document.addEventListener('click', function(e) {
-                            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                                profileDropdown.style.display = 'none';
+                    const overlay = document.createElement('div');
+                    overlay.className = 'popup-overlay error-popup';
+                    overlay.style.background = 'rgba(0, 0, 0, 0.6)';
+                    overlay.style.zIndex = '10001';
+
+                    const popup = document.createElement('div');
+                    popup.className = 'popup-content';
+                    popup.style.background = 'var(--bg-primary)';
+                    popup.style.color = 'var(--text-primary)';
+                    popup.style.border = '2px solid var(--primary-color)';
+                    popup.style.padding = '20px';
+                    popup.style.textAlign = 'center';
+                    popup.style.fontWeight = '600';
+                    popup.style.fontSize = '1.1rem';
+                    popup.style.borderRadius = '12px';
+                    popup.style.maxWidth = '320px';
+                    popup.style.boxShadow = '0 10px 30px rgba(0, 194, 206, 0.3)';
+                    popup.textContent = message;
+
+                    const btn = document.createElement('button');
+                    btn.textContent = 'OK';
+                    btn.style.marginTop = '16px';
+                    btn.style.padding = '8px 20px';
+                    btn.style.background = 'var(--primary-color)';
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                    btn.style.borderRadius = '8px';
+                    btn.style.cursor = 'pointer';
+                    btn.style.fontWeight = '700';
+                    btn.onclick = () => {
+                        if (overlay.parentNode) {
+                            overlay.parentNode.removeChild(overlay);
+                        }
+                    };
+
+                    popup.appendChild(document.createElement('br'));
+                    popup.appendChild(btn);
+                    overlay.appendChild(popup);
+                    document.body.appendChild(overlay);
+                }
+
+                // Add event listener to Start Charging button
+                document.addEventListener('DOMContentLoaded', function() {
+                    const startBtn = document.getElementById('startChargingBtn');
+                    if (startBtn) {
+                        startBtn.addEventListener('click', function(event) {
+                            // Check if current ticket status is waiting, charging, or completed
+                            const pendingStatuses = ['waiting', 'charging', 'completed'];
+                            const currentStatus = window.statusText ? window.statusText.toLowerCase() : '';
+
+                            if (pendingStatuses.includes(currentStatus)) {
+                                event.preventDefault();
+                                showErrorPopup('You already have a pending ticket');
                             }
-                        });
-
-            // Language sub-dropdown toggle
-            if (languageMenuItem && languageSubDropdown) {
-                languageMenuItem.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const isVisible = languageSubDropdown.style.display === 'block';
-                    languageSubDropdown.style.display = isVisible ? 'none' : 'block';
-                });
-                // Close sub-dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!languageMenuItem.contains(e.target) && !languageSubDropdown.contains(e.target)) {
-                        languageSubDropdown.style.display = 'none';
-                    }
-                });
-            }
-        }
-
-
-
-// Notification dropdown functionality
-(function() {
-    const notifBtn = document.getElementById('notifBtn');
-    const notificationDropdown = document.getElementById('notificationDropdown');
-
-    if (notifBtn && notificationDropdown) {
-        notifBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const isVisible = notificationDropdown.style.display === 'block';
-            notificationDropdown.style.display = isVisible ? 'none' : 'block';
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!notifBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
-                notificationDropdown.style.display = 'none';
-            }
-        });
-    }
-})();
-
-// Set language function
-window.setLanguage = function(lang) {
-    localStorage.setItem('selectedLanguage', lang);
-    if (typeof translateDashboard === 'function') {
-        translateDashboard();
-    }
-    // Close dropdowns
-    if (profileDropdown) profileDropdown.style.display = 'none';
-    if (languageSubDropdown) languageSubDropdown.style.display = 'none';
-};
-
-// Initialize mobile menu
-window.initMobileMenu = function() {
-    // Mobile menu toggle
-    document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-        const mobileMenu = document.getElementById('mobileMenu');
-        mobileMenu.classList.toggle('mobile-menu-open');
-        this.classList.toggle('active');
-    });
-
-    // Close mobile menu when clicking on mobile nav links
-    document.querySelectorAll('.mobile-nav-link').forEach(link => {
-        link.addEventListener('click', function() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-            mobileMenu.classList.remove('mobile-menu-open');
-            mobileMenuToggle.classList.remove('active');
-        });
-    });
-
-    // Mobile Language Selector Functionality
-    const mobileLanguageBtn = document.getElementById('mobileLanguageBtn');
-    const mobileLanguageDropdown = document.getElementById('mobileLanguageDropdown');
-    const mobileLanguageOptions = mobileLanguageDropdown.querySelectorAll('.language-option');
-
-    // Toggle mobile language dropdown
-    mobileLanguageBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        mobileLanguageDropdown.classList.toggle('show');
-        mobileLanguageBtn.classList.toggle('active');
-    });
-
-    // Handle mobile language selection
-    mobileLanguageOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            const selectedLang = this.dataset.lang;
-            mobileLanguageDropdown.classList.remove('show');
-            mobileLanguageBtn.classList.remove('active');
-            // Also update desktop language display
-            const desktopLanguageText = document.querySelector('#languageBtn .language-text');
-            if (desktopLanguageText) {
-                const langMap = { 'en': 'EN', 'fil': 'Fil', 'ceb': 'Bisaya', 'zh': '中文' };
-                desktopLanguageText.textContent = langMap[selectedLang] || 'EN';
-            }
-            console.log('Language changed to:', selectedLang);
-        });
-    });
-
-    // Mobile QR Code Popup Functionality
-    const mobileDownloadBtn = document.getElementById('mobileDownloadBtn');
-    const mobileQrPopup = document.getElementById('mobileQrPopup');
-
-    // Show mobile QR popup on click
-    mobileDownloadBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        mobileQrPopup.classList.toggle('show');
-    });
-
-    // Hide mobile QR popup when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!mobileDownloadBtn.contains(e.target) && !mobileQrPopup.contains(e.target)) {
-            mobileQrPopup.classList.remove('show');
-        }
-    });
-};
-
-                    // Download QR hover (if exists)
-                    const downloadBtn = document.getElementById('downloadBtn');
-                    const qrPopup = document.getElementById('qrPopup');
-                    if (downloadBtn && qrPopup) {
-                        downloadBtn.addEventListener('mouseenter', function(){
-                            qrPopup.classList.add('show');
-                        });
-                        downloadBtn.addEventListener('mouseleave', function(){
-                            setTimeout(()=>{
-                                if (!downloadBtn.matches(':hover') && !qrPopup.matches(':hover')) {
-                                    qrPopup.classList.remove('show');
-                                }
-                            }, 100);
-                        });
-                        qrPopup.addEventListener('mouseleave', function(){
-                            qrPopup.classList.remove('show');
+                            // else allow navigation normally
                         });
                     }
-                })();
+                });
+
             </script>
 
             <script>
@@ -3097,11 +3033,114 @@ window.initMobileMenu = function() {
                                 if (data.notification && data.notification.type === 'charge_now_popup') {
                                     showChargeNowPopup(data.notification);
                                 }
+
+                                // New modal logic for charging status
+                                if (data.status_text.toLowerCase().includes('charging')) {
+                                    // Show modal for charging status with bay number
+                                    showChargingBayModal(data.ticket_info ? data.ticket_info.ticket_id : '', data.status_text);
+                                }
+
+                                // New modal logic for pending payment
+                                if (data.status_text.toLowerCase().includes('pending payment') || data.status_text.toLowerCase().includes('queue pending')) {
+                                    showPaymentModal();
+                                }
                             }
                         })
                         .catch(error => {
                             console.log('Status update error:', error);
                         });
+                    }
+
+                    // Show modal for charging status with bay number and OK button
+                    function showChargingBayModal(ticketId, statusText) {
+                        // Check if modal already exists
+                        if (document.getElementById('chargingBayModal')) return;
+
+                        // Extract bay number from statusText
+                        const bayMatch = statusText.match(/Bay\s*#?(\w+)/i);
+                        const bayNumber = bayMatch ? bayMatch[1] : 'TBD';
+
+                        // Create modal overlay
+                        const overlay = document.createElement('div');
+                        overlay.id = 'chargingBayModal';
+                        overlay.className = 'modal-overlay';
+                        overlay.style.display = 'flex';
+
+                        // Create modal content
+                        const modalContent = document.createElement('div');
+                        modalContent.className = 'modal-content';
+                        modalContent.style.textAlign = 'center';
+                        modalContent.style.padding = '2rem';
+
+                        // Modal message
+                        const message = document.createElement('p');
+                        message.textContent = `Please Proceed to Bay #${bayNumber}`;
+                        message.style.fontSize = '1.25rem';
+                        message.style.marginBottom = '1.5rem';
+
+                        // OK button
+                        const okButton = document.createElement('button');
+                        okButton.textContent = 'OK';
+                        okButton.className = 'modal-btn primary';
+                        okButton.style.padding = '0.75rem 2rem';
+                        okButton.onclick = () => {
+                            document.body.removeChild(overlay);
+                        };
+
+                        modalContent.appendChild(message);
+                        modalContent.appendChild(okButton);
+                        overlay.appendChild(modalContent);
+                        document.body.appendChild(overlay);
+                    }
+
+                    // Show modal for payment with Pay Online and Pay Cash buttons
+                    function showPaymentModal() {
+                        // Check if modal already exists
+                        if (document.getElementById('paymentChoiceModal')) return;
+
+                        // Create modal overlay
+                        const overlay = document.createElement('div');
+                        overlay.id = 'paymentChoiceModal';
+                        overlay.className = 'modal-overlay';
+                        overlay.style.display = 'flex';
+
+                        // Create modal content
+                        const modalContent = document.createElement('div');
+                        modalContent.className = 'modal-content';
+                        modalContent.style.textAlign = 'center';
+                        modalContent.style.padding = '2rem';
+
+                        // Modal message
+                        const message = document.createElement('p');
+                        message.textContent = 'Your payment is pending. Please choose a payment method:';
+                        message.style.fontSize = '1.25rem';
+                        message.style.marginBottom = '1.5rem';
+
+                        // Pay Online button
+                        const payOnlineBtn = document.createElement('button');
+                        payOnlineBtn.textContent = 'Pay Online';
+                        payOnlineBtn.className = 'modal-btn primary';
+                        payOnlineBtn.style.marginRight = '1rem';
+                        payOnlineBtn.onclick = () => {
+                            // Redirect to online payment page or handle payment logic
+                            window.location.href = 'wallet.php';
+                        };
+
+                        // Pay Cash button
+                        const payCashBtn = document.createElement('button');
+                        payCashBtn.textContent = 'Pay Cash';
+                        payCashBtn.className = 'modal-btn secondary';
+                        payCashBtn.onclick = () => {
+                            // Close modal and possibly show instructions for cash payment
+                            document.body.removeChild(overlay);
+                            alert('Please proceed to pay cash at the charging station.');
+                        };
+
+                        modalContent.appendChild(message);
+                        modalContent.appendChild(payOnlineBtn);
+                        modalContent.appendChild(payCashBtn);
+                        overlay.appendChild(modalContent);
+                        document.body.appendChild(overlay);
                     }
 
                     // Show Charge Now popup (like Java MY_TURN notification)

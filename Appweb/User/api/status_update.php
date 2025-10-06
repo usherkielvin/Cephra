@@ -185,26 +185,34 @@ if ($action === 'get_status') {
     // Check queue_tickets for all states (including charging)
     if ($use_queue_ticket && $queue_ticket) {
         $queue_status = strtolower($queue_ticket['status']);
+        $payment_status = strtolower($queue_ticket['payment_status'] ?? '');
         $ticket_id = $queue_ticket['ticket_id'];
-        
-        error_log("Processing queue ticket for $username - Original status: {$queue_ticket['status']}, Lowercase: $queue_status, Ticket ID: $ticket_id");
-        
-        if ($queue_status === 'charging') {
+
+        error_log("Processing queue ticket for $username - Original status: {$queue_ticket['status']}, Payment status: {$queue_ticket['payment_status']}, Lowercase status: $queue_status, Ticket ID: $ticket_id");
+
+        // Check if payment is completed - if so, show as connected
+        if (in_array($payment_status, ['paid', 'completed', 'success'])) {
+            $status_text = 'Connected';
+            $background_class = 'connected-bg';
+            $button_text = 'Charge Now';
+            $button_href = 'ChargingPage.php';
+            error_log("Status updated to connected (payment completed) for $username: $status_text");
+        } elseif ($queue_status === 'charging') {
             $background_class = 'charging-bg';
-            
+
             // Try to get bay number from charging_grid first (most accurate)
             $stmt_charging_grid = $conn->prepare("SELECT bay_number FROM charging_grid WHERE username = :username AND ticket_id IS NOT NULL");
             $stmt_charging_grid->bindParam(':username', $username);
             $stmt_charging_grid->execute();
             $charging_grid_bay = $stmt_charging_grid->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($charging_grid_bay && $charging_grid_bay['bay_number']) {
                 $bay_number = str_replace('Bay-', 'Bay ', $charging_grid_bay['bay_number']);
             } else {
                 // Fallback to TBD if no bay found
                 $bay_number = 'TBD';
             }
-            
+
             $status_text = 'Charging at ' . $bay_number;
             $button_text = 'Check Monitor';
             $button_href = '../Monitor/index.php';
@@ -227,8 +235,14 @@ if ($action === 'get_status') {
             $button_text = 'Check Monitor';
             $button_href = '../Monitor/index.php';
             error_log("Status updated to in progress for $username: $status_text");
+        } elseif ($queue_status === 'complete') {
+            $background_class = 'queue-pending-bg';
+            $status_text = 'Pending Payment';
+            $button_text = 'Pay Now';
+            $button_href = '../Monitor/index.php';
+            error_log("Status updated to pending payment for $username: $status_text");
         }
-        
+
         // Add ticket information to the response for queue states
         $ticket_info = [
             'ticket_id' => $ticket_id,

@@ -465,7 +465,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                     if (processBtn) {
                         processBtn.addEventListener('click', function() {
                             console.log('Process Ticket button clicked');
-                            processTicket();
+                            // Get ticket ID and hide modal immediately
+                            const modal = document.getElementById('queueModal');
+                            if (modal) {
+                                const ticketIdSection = modal.querySelector('.ticket-id-section .section-value');
+                                if (ticketIdSection) {
+                                    const ticketId = ticketIdSection.textContent.trim();
+                                    modal.style.display = 'none';
+                                    processTicket(ticketId);
+                                }
+                            }
                         });
                     }
                     
@@ -607,29 +616,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
         };
 
         // Function to process ticket (actually create the ticket)
-        function processTicket() {
+        function processTicket(ticketId) {
             console.log('Processing ticket...');
-            
-            // Get the ticket ID from the modal
-            const modal = document.getElementById('queueModal');
-            if (!modal) {
-                console.error('Modal not found');
-                return;
-            }
-
-            // Find the ticket ID specifically in the ticket-id-section
-            const ticketIdSection = modal.querySelector('.ticket-id-section .section-value');
-            if (!ticketIdSection) {
-                console.error('Ticket ID element not found');
-                return;
-            }
-
-            const ticketId = ticketIdSection.textContent.trim();
             console.log('Found ticket ID:', ticketId);
+
+            // Close popup immediately after getting ticket ID
+            closePopup();
 
             // Call the new endpoint to actually create the ticket
             console.log('Sending request to process_ticket_action.php with ticketId:', ticketId);
-            
+
             fetch('process_ticket_action.php', {
                 method: 'POST',
                 headers: {
@@ -643,16 +639,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             })
             .then(data => {
                 console.log('Process ticket response:', data);
-                
+
                 if (data.success) {
-                    // Close popup first
-                    closePopup();
-                    
-                    // Show success dialog after a short delay to ensure popup is closed
+                    // Show success dialog after a short delay
                     setTimeout(() => {
                         showDialog('Ticket Created Successfully!', 'Your charging session has been queued. Your Bay assignment will be announced in the dashboard, please wait for further notice.');
                     }, 100);
-                    
+
                     // Trigger vehicle status update
                     if (typeof window.triggerVehicleStatusUpdate === 'function') {
                         window.triggerVehicleStatusUpdate();
@@ -663,16 +656,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                     }
                 } else if (data.error) {
                     console.error('Process ticket error:', data.error);
-                    // Close popup first
-                    closePopup();
                     // Show error dialog after a short delay
                     setTimeout(() => {
                         showDialog('Error', data.error);
                     }, 100);
                 } else {
                     console.error('Unexpected response:', data);
-                    // Close popup first
-                    closePopup();
                     // Show error dialog after a short delay
                     setTimeout(() => {
                         showDialog('Error', 'Unexpected response from server. Please try again.');
@@ -681,8 +670,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             })
             .catch(error => {
                 console.error('Process ticket fetch error:', error);
-                // Close popup first
-                closePopup();
                 // Show error dialog after a short delay
                 setTimeout(() => {
                     showDialog('Error', 'An error occurred while creating the ticket. Please try again.');

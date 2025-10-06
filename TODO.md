@@ -1,12 +1,9 @@
-# Mobile Menu Toggle Implementation
+# Fix Check Monitor Button Clickability When Waiting
 
 ## Tasks
-- [x] Verify HTML structure for mobile menu and toggle button
-- [x] Verify CSS styles for mobile menu and toggle
-- [x] Verify JavaScript for toggle functionality
-- [x] Fix JavaScript for mobile menu toggle
-- [x] Test mobile menu toggle on burger menu click
-- [x] Ensure mobile menu closes on link click or outside click
+- [ ] Edit dashboard.php to remove 'waiting' from the disabled status array
+- [ ] Verify the button is now clickable when status is 'waiting'
+- [ ] Test the monitor link functionality
 
-## Status
-Mobile menu toggle is now fully functional.
+## Details
+The issue is in Appweb/User/dashboard.php where the "Check Monitor" button is disabled when the ticket status is 'waiting'. By removing 'waiting' from the disabled statuses array, the button will remain enabled and allow users to check the monitor while waiting.
