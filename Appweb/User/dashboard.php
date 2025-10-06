@@ -23,6 +23,15 @@ $stmt_charging->bindParam(':username', $username);
 $stmt_charging->execute();
 $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
 
+// Fetch active ticket
+$stmt_active = $conn->prepare("SELECT ticket_id, status, bay_number FROM active_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_active->bindParam(':username', $username);
+$stmt_active->execute();
+$active_ticket = $stmt_active->fetch(PDO::FETCH_ASSOC);
+
+// Set queue_ticket to latest_charging
+$queue_ticket = $latest_charging;
+
 // Determine current status based on ticket states
 $current_ticket = null;
 $status_text = 'Connected';
@@ -3071,7 +3080,9 @@ window.initMobileMenu = function() {
                                 }
 
                                 // Update battery level if changed
-                                const batteryElement = document.querySelector('.feature-description strong:contains("Current Level:")');
+                                const batteryElement = $('.feature-description strong').filter(function() {
+                                    return $(this).text().includes('Current Level:');
+                                }).get(0);
                                 if (batteryElement && data.battery_level) {
                                     const batteryText = batteryElement.parentElement;
                                     if (batteryText) {
