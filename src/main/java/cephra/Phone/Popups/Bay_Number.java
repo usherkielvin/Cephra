@@ -91,7 +91,6 @@ public class Bay_Number extends javax.swing.JPanel {
     private javax.swing.JLabel TicketNumber;
     // End of variables declaration//GEN-END:variables
     public void startIntroAnimation() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'startIntroAnimation'");
     }
 }

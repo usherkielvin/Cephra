@@ -23,45 +23,38 @@ $stmt_charging->bindParam(':username', $username);
 $stmt_charging->execute();
 $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
 
-$charging_status = 'Connected';
-if ($latest_charging) {
-    if (strtolower($latest_charging['status']) === 'charging') {
-        $charging_status = 'charging';
-    } elseif (strtolower($latest_charging['payment_status']) === 'pending') {
-        $charging_status = 'pending_payment';
-    } elseif (strtolower($latest_charging['status']) === 'waiting') {
-        $charging_status = 'waiting';
+// Determine current status based on ticket states
+$current_ticket = null;
+$status_text = 'Connected';
+$background_class = 'connected-bg';
+$button_text = 'Charge Now';
+$button_href = 'ChargingPage.php';
+
+// Check active_tickets for charging states
+if ($active_ticket) {
+    $current_ticket = $active_ticket;
+    if (strtolower($active_ticket['status']) === 'charging') {
+        $background_class = 'charging-bg';
+        $bay_number = $active_ticket['bay_number'] ?? 'TBD';
+        $status_text = 'Charging at Bay ' . $bay_number;
+        $button_text = 'Check Monitor';
+        $button_href = '../Monitor/index.php';
     }
 }
-
-// Set UI variables based on charging status and payment status
-if ($latest_charging) {
-    if (strtolower($latest_charging['status']) === 'waiting') {
-        $background_class = 'waiting-bg'; // static orange gradient
+// Check queue_tickets for pending/waiting states
+elseif ($queue_ticket) {
+    $current_ticket = $queue_ticket;
+    if (strtolower($queue_ticket['status']) === 'pending') {
+        $background_class = 'queue-pending-bg';
+        $status_text = 'Queue Pending';
+        $button_text = 'Check Monitor';
+        $button_href = '../Monitor/index.php';
+    } elseif (strtolower($queue_ticket['status']) === 'waiting') {
+        $background_class = 'waiting-bg';
         $status_text = 'Waiting';
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
-    } elseif (strtolower($latest_charging['status']) === 'charging') {
-        $background_class = 'charging-bg'; // yellow background with left-to-right shifting gradient animation
-        $status_text = 'charging';
-        $button_text = 'Check Monitor';
-        $button_href = '../Monitor/index.php';
-    } elseif (strtolower($latest_charging['status']) === 'complete') {
-        $background_class = 'pending-bg'; // static orange gradient
-        $status_text = 'Pending Payment';
-        $button_text = 'Pay Now';
-        $button_href = 'wallet.php';
-    } else {
-        $background_class = 'connected-bg';
-        $status_text = 'Connected';
-        $button_text = 'Charge Now';
-        $button_href = 'ChargingPage.php';
     }
-} else {
-    $background_class = 'connected-bg';
-    $status_text = 'Connected';
-    $button_text = 'Charge Now';
-    $button_href = 'ChargingPage.php';
 }
 
 // Fetch battery level from database
@@ -152,7 +145,15 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
 
     // Calculate current range
     $current_range_km = round($max_range_km * ($battery_level_num / 100));
-    $vehicle_data['range'] = $current_range_km . ' km';
+    
+    // Check if we should show ticket instead of range (for ALL queue states including charging)
+    if ($current_ticket && in_array(strtolower($current_ticket['status']), ['pending', 'waiting', 'in progress', 'in_progress', 'charging'])) {
+        $vehicle_data['range_label'] = 'Ticket';
+        $vehicle_data['range'] = $current_ticket['ticket_id'];
+    } else {
+        $vehicle_data['range_label'] = 'Range';
+        $vehicle_data['range'] = $current_range_km . ' km';
+    }
 
     // Calculate time to full
     $time_to_full_hours = $max_charge_time_hours * ((100 - $battery_level_num) / 100);
@@ -2023,10 +2024,10 @@ if ($conn) {
 									<div class="vehicle-stats">
 										<div class="stat-item">
 											<span class="stat-label">Status</span>
-											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['status']); ?></span>
+											<span class="stat-value" data-status-value="true"><?php echo htmlspecialchars($vehicle_data['status']); ?></span>
 										</div>
 										<div class="stat-item">
-											<span class="stat-label">Range</span>
+											<span class="stat-label"><?php echo htmlspecialchars($vehicle_data['range_label']); ?></span>
 											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['range']); ?></span>
 										</div>
 										<div class="stat-item">
@@ -2680,7 +2681,20 @@ window.initMobileMenu = function() {
 
             <script>
                 function showDialog(title, message) {
+                    // Remove any existing dialogs first
+                    const existingDialogs = document.querySelectorAll('[data-dialog-overlay]');
+                    existingDialogs.forEach(dialog => {
+                        try {
+                            if (dialog.parentNode) {
+                                dialog.parentNode.removeChild(dialog);
+                            }
+                        } catch (e) {
+                            // Element already removed
+                        }
+                    });
+                    
                     const overlay = document.createElement('div');
+                    overlay.setAttribute('data-dialog-overlay', 'true');
                     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
                     const dialog = document.createElement('div');
                     dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
@@ -2695,7 +2709,16 @@ window.initMobileMenu = function() {
                     const ok = document.createElement('button');
                     ok.textContent = 'OK';
                     ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
-                    ok.onclick = () => document.body.removeChild(overlay);
+                    ok.onclick = () => {
+                        try {
+                            if (overlay && overlay.parentNode) {
+                                overlay.style.display = 'none';
+                                document.body.removeChild(overlay);
+                            }
+                        } catch (e) {
+                            // Element already removed
+                        }
+                    };
                     footer.appendChild(ok);
                     dialog.appendChild(header);
                     dialog.appendChild(body);
@@ -2755,7 +2778,7 @@ window.initMobileMenu = function() {
                             success: function(response) {
                                 if (response.success) {
                                     // Show QueueTicketProceed popup
-                                    showQueueTicketProceedPopup(response);
+                                    // Small popup removed - now handled by ChargingPage.php modal
                                 } else if (response.error) {
                                     showDialog('Charging', response.error);
                                 }
@@ -2771,32 +2794,22 @@ window.initMobileMenu = function() {
                         });
                     }
 
-                    function showQueueTicketProceedPopup(response) {
-                        if (response.success) {
-                            var ticketId = response.ticketId;
-                            var serviceType = response.serviceType;
-                            var batteryLevel = response.batteryLevel;
+                    // Removed showQueueTicketProceedPopup - now handled by ChargingPage.php modal
 
-                            // Create popup HTML (QueueTicketProceed)
-                            var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 320px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
-                            popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Queue Ticket Proceed</h2>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
-                            popupHtml += '<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">';
-                            popupHtml += '<button onclick="closePopup()" style="padding: 10px 16px; background: #00a389; color: white; border: none; border-radius: 6px; cursor: pointer;">OK</button>';
-                            popupHtml += '</div>';
-                            popupHtml += '</div>';
-
-                            // Append to body
-                            $('body').append(popupHtml);
-                        }
-                    }
-
-                    // Function to close popup (defined globally)
+                    // Function to close popup (defined globally) with state management
                     window.closePopup = function() {
+                        // Prevent multiple rapid clicks
+                        if (window.popupClosing) {
+                            return;
+                        }
+                        window.popupClosing = true;
+                        
                         $('#queuePopup').remove();
+                        
+                        // Reset state after a short delay
+                        setTimeout(function() {
+                            window.popupClosing = false;
+                        }, 500);
                     };
                 });
 
@@ -3014,6 +3027,194 @@ window.initMobileMenu = function() {
                     // Observe all feature cards and sections
                     document.querySelectorAll('.feature-card, .status-card, .stat-card, .promo-card, .charging-card').forEach(el => {
                         observer.observe(el);
+                    });
+
+                    // Real-time status updates
+                    function updateVehicleStatus() {
+                        fetch('api/status_update.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({action: 'get_status'})
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update status text
+                                const statusElement = document.querySelector('.stat-value');
+                                if (statusElement && data.status_text) {
+                                    statusElement.textContent = data.status_text;
+                                }
+
+                                // Update button text and href
+                                const buttonElement = document.querySelector('.quick-action-btn');
+                                if (buttonElement && data.button_text && data.button_href) {
+                                    buttonElement.textContent = data.button_text;
+                                    buttonElement.href = data.button_href;
+                                    
+                                    // Add target="_blank" for Monitor links
+                                    if (data.button_href.includes('Monitor')) {
+                                        buttonElement.setAttribute('target', '_blank');
+                                    } else {
+                                        buttonElement.removeAttribute('target');
+                                    }
+                                }
+
+                                // Update background class if status changed
+                                const vehicleCard = document.querySelector('.main-vehicle-card');
+                                if (vehicleCard && data.background_class) {
+                                    // Remove old background classes
+                                    vehicleCard.classList.remove('connected-bg', 'waiting-bg', 'charging-bg', 'pending-bg', 'queue-pending-bg');
+                                    // Add new background class
+                                    vehicleCard.classList.add(data.background_class);
+                                }
+
+                                // Update battery level if changed
+                                const batteryElement = document.querySelector('.feature-description strong:contains("Current Level:")');
+                                if (batteryElement && data.battery_level) {
+                                    const batteryText = batteryElement.parentElement;
+                                    if (batteryText) {
+                                        batteryText.innerHTML = batteryText.innerHTML.replace(
+                                            /<strong>Current Level:<\/strong>.*?<br>/,
+                                            `<strong>Current Level:</strong> ${data.battery_level}<br>`
+                                        );
+                                    }
+                                }
+
+                                // Handle notification popup (like Java MY_TURN notification)
+                                if (data.notification && data.notification.type === 'charge_now_popup') {
+                                    showChargeNowPopup(data.notification);
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Status update error:', error);
+                        });
+                    }
+
+                    // Show Charge Now popup (like Java MY_TURN notification)
+                    function showChargeNowPopup(notification) {
+                        // Create popup HTML similar to Java notification
+                        const popupHtml = `
+                            <div id="chargeNowPopup" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 2px solid #00c2ce; border-radius: 15px; padding: 30px; width: 400px; max-width: 90vw; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center;">
+                                <div style="margin-bottom: 20px;">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-bolt" style="color: white; font-size: 24px;"></i>
+                                    </div>
+                                    <h3 style="margin: 0; color: #0e3a49; font-size: 1.5rem;">Charge Now</h3>
+                                    <p style="margin: 10px 0; color: #666; font-size: 1rem;">Please go to your bay "${notification.bay_number}" now</p>
+                                    <p style="margin: 0; color: #888; font-size: 0.9rem;">Ticket ID: ${notification.ticket_id}</p>
+                                </div>
+                                <div style="display: flex; gap: 15px; justify-content: center;">
+                                    <button id="chargeNowCancel" style="padding: 12px 24px; background: #f0f0f0; color: #666; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
+                                    <button id="chargeNowOK" style="padding: 12px 24px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">OK</button>
+                                </div>
+                            </div>
+                            <div id="chargeNowOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;"></div>
+                        `;
+                        
+                        document.body.insertAdjacentHTML('beforeend', popupHtml);
+                        
+                        // Handle OK button click (like Java system)
+                        document.getElementById('chargeNowOK').addEventListener('click', function() {
+                            // Show bay number popup (like Java system)
+                            showBayNumberPopup(notification);
+                            closeChargeNowPopup();
+                        });
+                        
+                        // Handle Cancel button click
+                        document.getElementById('chargeNowCancel').addEventListener('click', function() {
+                            closeChargeNowPopup();
+                        });
+                        
+                        // Handle overlay click to close
+                        document.getElementById('chargeNowOverlay').addEventListener('click', function() {
+                            closeChargeNowPopup();
+                        });
+                    }
+                    
+                    // Show Bay Number popup (like Java system)
+                    function showBayNumberPopup(notification) {
+                        const bayPopupHtml = `
+                            <div id="bayNumberPopup" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 2px solid #00c2ce; border-radius: 15px; padding: 30px; width: 350px; max-width: 90vw; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center;">
+                                <div style="margin-bottom: 20px;">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-map-marker-alt" style="color: #333; font-size: 24px;"></i>
+                                    </div>
+                                    <h3 style="margin: 0; color: #0e3a49; font-size: 1.5rem;">Bay Assignment</h3>
+                                    <p style="margin: 15px 0; color: #666; font-size: 1.1rem;">Your assigned bay is:</p>
+                                    <div style="font-size: 2rem; font-weight: bold; color: #00c2ce; margin: 15px 0;">Bay ${notification.bay_number}</div>
+                                    <p style="margin: 10px 0; color: #888; font-size: 0.9rem;">Ticket ID: ${notification.ticket_id}</p>
+                                </div>
+                                <button id="bayNumberOK" style="padding: 12px 30px; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem;">OK</button>
+                            </div>
+                            <div id="bayNumberOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;"></div>
+                        `;
+                        
+                        document.body.insertAdjacentHTML('beforeend', bayPopupHtml);
+                        
+                        // Handle OK button click
+                        document.getElementById('bayNumberOK').addEventListener('click', function() {
+                            closeBayNumberPopup();
+                            // Update ticket status from waiting to charging (like Java system)
+                            updateTicketToCharging(notification.ticket_id);
+                        });
+                        
+                        // Handle overlay click to close
+                        document.getElementById('bayNumberOverlay').addEventListener('click', function() {
+                            closeBayNumberPopup();
+                        });
+                    }
+                    
+                    // Close Charge Now popup
+                    function closeChargeNowPopup() {
+                        const popup = document.getElementById('chargeNowPopup');
+                        const overlay = document.getElementById('chargeNowOverlay');
+                        if (popup) popup.remove();
+                        if (overlay) overlay.remove();
+                    }
+                    
+                    // Close Bay Number popup
+                    function closeBayNumberPopup() {
+                        const popup = document.getElementById('bayNumberPopup');
+                        const overlay = document.getElementById('bayNumberOverlay');
+                        if (popup) popup.remove();
+                        if (overlay) overlay.remove();
+                    }
+                    
+                    // Update ticket status from waiting to charging (like Java system)
+                    function updateTicketToCharging(ticketId) {
+                        fetch('api/status_update.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                action: 'confirm_charging',
+                                ticket_id: ticketId
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Refresh status to show charging state
+                                updateVehicleStatus();
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Error updating ticket status:', error);
+                        });
+                    }
+
+                    // Update status every 5 seconds
+                    setInterval(updateVehicleStatus, 5000);
+
+                    // Also update when page becomes visible (user switches back to tab)
+                    document.addEventListener('visibilitychange', function() {
+                        if (!document.hidden) {
+                            updateVehicleStatus();
+                        }
                     });
 
                     // Add click handlers for modal triggers

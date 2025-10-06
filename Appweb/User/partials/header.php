@@ -800,7 +800,20 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
            <script>
                 function showDialog(title, message) {
+                    // Remove any existing dialogs first
+                    const existingDialogs = document.querySelectorAll('[data-dialog-overlay]');
+                    existingDialogs.forEach(dialog => {
+                        try {
+                            if (dialog.parentNode) {
+                                dialog.parentNode.removeChild(dialog);
+                            }
+                        } catch (e) {
+                            // Element already removed
+                        }
+                    });
+                    
                     const overlay = document.createElement('div');
+                    overlay.setAttribute('data-dialog-overlay', 'true');
                     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
                     const dialog = document.createElement('div');
                     dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
@@ -815,7 +828,16 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                     const ok = document.createElement('button');
                     ok.textContent = 'OK';
                     ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
-                    ok.onclick = () => document.body.removeChild(overlay);
+                    ok.onclick = () => {
+                        try {
+                            if (overlay && overlay.parentNode) {
+                                overlay.style.display = 'none';
+                                document.body.removeChild(overlay);
+                            }
+                        } catch (e) {
+                            // Element already removed
+                        }
+                    };
                     footer.appendChild(ok);
                     dialog.appendChild(header);
                     dialog.appendChild(body);
@@ -877,7 +899,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                             success: function(response) {
                                 if (response.success) {
                                     // Show QueueTicketProceed popup
-                                    showQueueTicketProceedPopup(response);
+                                    // Small popup removed - now handled by ChargingPage.php modal
                                 } else if (response.error) {
                                     showDialog('Charging', response.error);
                                 }
@@ -893,32 +915,22 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                         });
                     }
 
-                    function showQueueTicketProceedPopup(response) {
-                        if (response.success) {
-                            var ticketId = response.ticketId;
-                            var serviceType = response.serviceType;
-                            var batteryLevel = response.batteryLevel;
+                    // Removed showQueueTicketProceedPopup - now handled by ChargingPage.php modal
 
-                            // Create popup HTML (QueueTicketProceed)
-                            var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 320px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
-                            popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Queue Ticket Proceed</h2>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
-                            popupHtml += '<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">';
-                            popupHtml += '<button onclick="closePopup()" style="padding: 10px 16px; background: #00a389; color: white; border: none; border-radius: 6px; cursor: pointer;">OK</button>';
-                            popupHtml += '</div>';
-                            popupHtml += '</div>';
-
-                            // Append to body
-                            $('body').append(popupHtml);
-                        }
-                    }
-
-                    // Function to close popup (defined globally)
+                    // Function to close popup (defined globally) with state management
                     window.closePopup = function() {
+                        // Prevent multiple rapid clicks
+                        if (window.popupClosing) {
+                            return;
+                        }
+                        window.popupClosing = true;
+                        
                         $('#queuePopup').remove();
+                        
+                        // Reset state after a short delay
+                        setTimeout(function() {
+                            window.popupClosing = false;
+                        }, 500);
                     };
                 });
 

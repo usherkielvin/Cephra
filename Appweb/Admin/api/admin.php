@@ -286,14 +286,58 @@ try {
                 break;
             }
             
-            // Update ticket status to Waiting
-            $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Waiting' WHERE ticket_id = ?");
-            $result = $stmt->execute([$ticket_id]);
-            
-            if ($result) {
-                echo json_encode(['success' => true, 'message' => 'Ticket moved to waiting status']);
-            } else {
-                echo json_encode(['error' => 'Failed to move ticket to waiting']);
+            try {
+                $db->beginTransaction();
+                
+                // Get ticket details first
+                $ticket_stmt = $db->prepare("SELECT username, service_type, initial_battery_level FROM queue_tickets WHERE ticket_id = ?");
+                $ticket_stmt->execute([$ticket_id]);
+                $ticket_data = $ticket_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$ticket_data) {
+                    throw new Exception('Ticket not found');
+                }
+                
+                // Update ticket status to Waiting
+                $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Waiting' WHERE ticket_id = ?");
+                $result = $stmt->execute([$ticket_id]);
+                
+                if (!$result) {
+                    throw new Exception('Failed to update ticket status');
+                }
+                
+                // Get next position in queue
+                $position_stmt = $db->query("SELECT COALESCE(MAX(position_in_queue), 0) + 1 as next_position FROM waiting_grid WHERE ticket_id IS NOT NULL");
+                $position_data = $position_stmt->fetch(PDO::FETCH_ASSOC);
+                $next_position = $position_data['next_position'];
+                
+                // Find an empty slot in waiting_grid or use the next position
+                $empty_slot_stmt = $db->query("SELECT id FROM waiting_grid WHERE ticket_id IS NULL LIMIT 1");
+                $empty_slot = $empty_slot_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($empty_slot) {
+                    // Use existing empty slot
+                    $insert_stmt = $db->prepare("
+                        UPDATE waiting_grid 
+                        SET ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, position_in_queue = ?
+                        WHERE id = ?
+                    ");
+                    $insert_stmt->execute([$ticket_id, $ticket_data['username'], $ticket_data['service_type'], $ticket_data['initial_battery_level'], $next_position, $empty_slot['id']]);
+                } else {
+                    // Insert new row (waiting_grid should have at least 8 slots)
+                    $insert_stmt = $db->prepare("
+                        INSERT INTO waiting_grid (ticket_id, username, service_type, initial_battery_level, position_in_queue) 
+                        VALUES (?, ?, ?, ?, ?)
+                    ");
+                    $insert_stmt->execute([$ticket_id, $ticket_data['username'], $ticket_data['service_type'], $ticket_data['initial_battery_level'], $next_position]);
+                }
+                
+                $db->commit();
+                echo json_encode(['success' => true, 'message' => 'Ticket moved to waiting status and added to waiting grid']);
+                
+            } catch (Exception $e) {
+                $db->rollback();
+                echo json_encode(['error' => 'Failed to move ticket to waiting: ' . $e->getMessage()]);
             }
             break;
 
@@ -607,6 +651,28 @@ try {
                     throw new Exception('Failed to assign bay');
                 }
                 
+                // CRITICAL: Also update charging_grid table for status display
+                $charging_grid_stmt = $db->prepare("INSERT INTO charging_grid (bay_number, ticket_id, username, service_type, initial_battery_level, start_time) VALUES (?, ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, start_time = NOW()");
+                
+                // Get ticket details for charging_grid
+                $ticket_details_stmt = $db->prepare("SELECT service_type, initial_battery_level FROM queue_tickets WHERE ticket_id = ?");
+                $ticket_details_stmt->execute([$ticket_id]);
+                $ticket_details = $ticket_details_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                $service_type = $ticket_details['service_type'] ?? '';
+                $initial_battery_level = $ticket_details['initial_battery_level'] ?? 0;
+                
+                $charging_grid_result = $charging_grid_stmt->execute([
+                    $bay_number, $ticket_id, $ticket_data['username'], $service_type, $initial_battery_level,
+                    $ticket_id, $ticket_data['username'], $service_type, $initial_battery_level
+                ]);
+                
+                if (!$charging_grid_result) {
+                    error_log("Admin API: Warning - Failed to update charging_grid for ticket {$ticket_id}");
+                } else {
+                    error_log("Admin API: Successfully updated charging_grid for ticket {$ticket_id} at bay {$bay_number}");
+                }
+                
                 // Verify the bay assignment was successful
                 $verify_stmt = $db->prepare("SELECT bay_number, status, current_ticket_id, current_username FROM charging_bays WHERE bay_number = ?");
                 $verify_stmt->execute([$bay_number]);
@@ -714,6 +780,16 @@ try {
                 
                 if (!$bay_result) {
                     throw new Exception('Failed to free bay');
+                }
+                
+                // CRITICAL: Also clear charging_grid table
+                $charging_grid_clear_stmt = $db->prepare("UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?");
+                $charging_grid_clear_result = $charging_grid_clear_stmt->execute([$ticket_id]);
+                
+                if (!$charging_grid_clear_result) {
+                    error_log("Admin API: Warning - Failed to clear charging_grid for ticket {$ticket_id}");
+                } else {
+                    error_log("Admin API: Successfully cleared charging_grid for ticket {$ticket_id}");
                 }
                 
                 // Add to charging history

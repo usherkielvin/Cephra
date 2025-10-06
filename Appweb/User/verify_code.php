@@ -216,7 +216,20 @@ header("Expires: 0");
         // Ensure custom UI dialog is available for feedback
         if (typeof window.showDialog === 'undefined') {
             window.showDialog = function(title, message, callback) {
+                // Remove any existing dialogs first
+                var existingDialogs = document.querySelectorAll('[data-dialog-overlay]');
+                existingDialogs.forEach(function(dialog) {
+                    try {
+                        if (dialog.parentNode) {
+                            dialog.parentNode.removeChild(dialog);
+                        }
+                    } catch (e) {
+                        // Element already removed
+                    }
+                });
+                
                 var overlay = document.createElement('div');
+                overlay.setAttribute('data-dialog-overlay', 'true');
                 overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;';
                 var dialog = document.createElement('div');
                 dialog.style.cssText = 'width:100%;max-width:360px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.25);overflow:hidden;';
@@ -232,7 +245,15 @@ header("Expires: 0");
                 ok.textContent = 'OK';
                 ok.style.cssText = 'background:#00c2ce;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;';
                 ok.onclick = function(){
-                    document.body.removeChild(overlay);
+                    try {
+                        if (overlay && overlay.parentNode) {
+                            overlay.style.display = 'none';
+                            document.body.removeChild(overlay);
+                        }
+                    } catch (e) {
+                        // Element already removed
+                    }
+                    
                     if (callback && typeof callback === 'function') {
                         callback();
                     }

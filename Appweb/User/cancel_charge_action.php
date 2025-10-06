@@ -27,9 +27,22 @@ if (!$conn) {
 $username = $_SESSION['username'];
 
 $ticketId = $_POST['ticketId'] ?? '';
+$cancelPending = $_POST['cancelPending'] ?? false;
 
 // Debug logging
-error_log("Cancel charge action called - Username: $username, TicketId: $ticketId");
+error_log("Cancel charge action called - Username: $username, TicketId: $ticketId, CancelPending: $cancelPending");
+
+// Handle pending ticket cancellation (when user cancels the preview popup)
+if ($cancelPending) {
+    if (isset($_SESSION['pendingTicket'])) {
+        unset($_SESSION['pendingTicket']);
+        echo json_encode(['success' => true, 'message' => 'Pending ticket cancelled']);
+        exit();
+    } else {
+        echo json_encode(['success' => true, 'message' => 'No pending ticket to cancel']);
+        exit();
+    }
+}
 
 // If no ticketId provided, return error
 if (empty($ticketId)) {
