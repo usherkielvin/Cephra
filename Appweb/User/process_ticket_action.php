@@ -26,8 +26,15 @@ if (!$conn) {
 
 $username = $_SESSION['username'];
 
+// Get ticketId from POST request
+$requestedTicketId = $_POST['ticketId'] ?? '';
+
+// Debug logging
+error_log("Process ticket action called - Username: $username, RequestedTicketId: $requestedTicketId");
+
 // Check if we have a pending ticket in session
 if (!isset($_SESSION['pendingTicket'])) {
+    error_log("No pending ticket found in session");
     echo json_encode(['error' => 'No pending ticket found. Please try again.']);
     exit();
 }
@@ -41,6 +48,14 @@ $queueServiceType = $pendingTicket['queueServiceType'];
 $batteryLevel = $pendingTicket['batteryLevel'];
 $priority = $pendingTicket['priority'];
 $initialStatus = $pendingTicket['initialStatus'];
+
+// Validate that the requested ticket ID matches the pending ticket ID
+if ($requestedTicketId !== $ticketId) {
+    error_log("Ticket ID mismatch - Requested: $requestedTicketId, Pending: $ticketId");
+    unset($_SESSION['pendingTicket']);
+    echo json_encode(['error' => 'Ticket ID mismatch. Please try again.']);
+    exit();
+}
 
 // Re-check if user still doesn't have an active ticket (double-check before creating)
 $stmt = $conn->prepare("SELECT COUNT(*) FROM active_tickets WHERE username = :username");
@@ -80,6 +95,8 @@ if ($currentBatteryLevel >= 100) {
 }
 
 // Now actually create the ticket in queue_tickets
+error_log("Creating ticket in queue_tickets - ID: $ticketId, User: $username, Service: $queueServiceType, Status: $initialStatus, Battery: $batteryLevel, Priority: $priority");
+
 $stmt = $conn->prepare("INSERT INTO queue_tickets (ticket_id, username, service_type, status, payment_status, initial_battery_level, priority) VALUES (:ticket_id, :username, :service_type, :status, '', :battery_level, :priority)");
 $stmt->bindParam(':ticket_id', $ticketId);
 $stmt->bindParam(':username', $username);
@@ -90,11 +107,14 @@ $stmt->bindParam(':priority', $priority);
 
 if (!$stmt->execute()) {
     $errorInfo = $stmt->errorInfo();
+    error_log("Failed to insert ticket into queue_tickets - Error: " . $errorInfo[2]);
     unset($_SESSION['pendingTicket']); // Clear pending ticket
     http_response_code(500);
     echo json_encode(['error' => 'Failed to create ticket', 'db_error' => $errorInfo[2]]);
     exit();
 }
+
+error_log("Successfully created ticket $ticketId in queue_tickets");
 
 // If this is a priority ticket (Waiting status), add to waiting grid
 if ($priority == 1) {

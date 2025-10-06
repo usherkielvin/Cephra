@@ -35,28 +35,87 @@ $background_class = 'connected-bg';
 $button_text = 'Charge Now';
 $button_href = 'ChargingPage.php';
 
+// Determine which ticket is more recent and prioritize it
+$use_queue_ticket = false;
+$use_active_ticket = false;
+
+if ($queue_ticket && $active_ticket) {
+    // Compare timestamps to see which is more recent
+    $queue_time = strtotime($queue_ticket['created_at']);
+    $active_time = strtotime($active_ticket['created_at']);
+    $use_queue_ticket = ($queue_time >= $active_time);
+    $use_active_ticket = !$use_queue_ticket;
+} elseif ($queue_ticket) {
+    $use_queue_ticket = true;
+} elseif ($active_ticket) {
+    $use_active_ticket = true;
+}
+
 // Check active_tickets for charging states
-if ($active_ticket) {
+if ($use_active_ticket && $active_ticket) {
     $current_ticket = $active_ticket;
-    if (strtolower($active_ticket['status']) === 'charging') {
+    $ticket_status = strtolower($active_ticket['status']);
+    if ($ticket_status === 'charging' || $ticket_status === 'active' || $ticket_status === 'processing') {
         $background_class = 'charging-bg';
-        $bay_number = $active_ticket['bay_number'] ?? 'TBD';
-        $status_text = 'Charging at Bay ' . $bay_number;
+        
+        // Try to get bay number from charging_grid first (most accurate)
+        $stmt_charging_grid = $conn->prepare("SELECT bay_number FROM charging_grid WHERE username = :username AND ticket_id IS NOT NULL");
+        $stmt_charging_grid->bindParam(':username', $username);
+        $stmt_charging_grid->execute();
+        $charging_grid_bay = $stmt_charging_grid->fetch(PDO::FETCH_ASSOC);
+        
+        if ($charging_grid_bay && $charging_grid_bay['bay_number']) {
+            $bay_number = str_replace('Bay-', 'Bay ', $charging_grid_bay['bay_number']);
+        } else {
+            // Fallback to active_tickets bay_number or TBD
+            $fallback_bay = $active_ticket['bay_number'] ?? 'TBD';
+            $bay_number = str_replace('Bay-', 'Bay ', $fallback_bay);
+        }
+        
+        $status_text = 'Charging at ' . $bay_number;
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
     }
 }
-// Check queue_tickets for pending/waiting states
-elseif ($queue_ticket) {
+
+// Check queue_tickets for all states (including charging)
+if ($use_queue_ticket && $queue_ticket) {
     $current_ticket = $queue_ticket;
-    if (strtolower($queue_ticket['status']) === 'pending') {
+    $queue_status = strtolower($queue_ticket['status']);
+    $ticket_id = $queue_ticket['ticket_id'];
+    
+    if ($queue_status === 'charging') {
+        $background_class = 'charging-bg';
+        
+        // Try to get bay number from charging_grid first (most accurate)
+        $stmt_charging_grid = $conn->prepare("SELECT bay_number FROM charging_grid WHERE username = :username AND ticket_id IS NOT NULL");
+        $stmt_charging_grid->bindParam(':username', $username);
+        $stmt_charging_grid->execute();
+        $charging_grid_bay = $stmt_charging_grid->fetch(PDO::FETCH_ASSOC);
+        
+        if ($charging_grid_bay && $charging_grid_bay['bay_number']) {
+            $bay_number = str_replace('Bay-', 'Bay ', $charging_grid_bay['bay_number']);
+        } else {
+            // Fallback to TBD if no bay found
+            $bay_number = 'TBD';
+        }
+        
+        $status_text = 'Charging at ' . $bay_number;
+        $button_text = 'Check Monitor';
+        $button_href = '../Monitor/index.php';
+    } elseif ($queue_status === 'pending') {
         $background_class = 'queue-pending-bg';
         $status_text = 'Queue Pending';
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
-    } elseif (strtolower($queue_ticket['status']) === 'waiting') {
+    } elseif ($queue_status === 'waiting') {
         $background_class = 'waiting-bg';
         $status_text = 'Waiting';
+        $button_text = 'Check Monitor';
+        $button_href = '../Monitor/index.php';
+    } elseif ($queue_status === 'in progress' || $queue_status === 'in_progress') {
+        $background_class = 'waiting-bg';
+        $status_text = 'In Progress';
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
     }
@@ -150,7 +209,15 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
 
     // Calculate current range
     $current_range_km = round($max_range_km * ($battery_level_num / 100));
-    $vehicle_data['range'] = $current_range_km . ' km';
+    
+    // Check if we should show ticket instead of range (for ALL queue states including charging)
+    if ($current_ticket && in_array(strtolower($current_ticket['status']), ['pending', 'waiting', 'in progress', 'in_progress', 'charging'])) {
+        $vehicle_data['range_label'] = 'Ticket';
+        $vehicle_data['range'] = $current_ticket['ticket_id'];
+    } else {
+        $vehicle_data['range_label'] = 'Range';
+        $vehicle_data['range'] = $current_range_km . ' km';
+    }
 
     // Calculate time to full
     $time_to_full_hours = $max_charge_time_hours * ((100 - $battery_level_num) / 100);
@@ -2011,10 +2078,10 @@ if ($conn) {
 									<div class="vehicle-stats">
 										<div class="stat-item">
 											<span class="stat-label">Status</span>
-											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['status']); ?></span>
+											<span class="stat-value" data-status-value="true"><?php echo htmlspecialchars($vehicle_data['status']); ?></span>
 										</div>
 										<div class="stat-item">
-											<span class="stat-label">Range</span>
+											<span class="stat-label"><?php echo htmlspecialchars($vehicle_data['range_label']); ?></span>
 											<span class="stat-value"><?php echo htmlspecialchars($vehicle_data['range']); ?></span>
 										</div>
 										<div class="stat-item">
@@ -2535,7 +2602,7 @@ if ($conn) {
                             success: function(response) {
                                 if (response.success) {
                                     // Show QueueTicketProceed popup
-                                    showQueueTicketProceedPopup(response);
+                                    // Small popup removed - now handled by ChargingPage.php modal
                                 } else if (response.error) {
                                     showDialog('Charging', response.error);
                                 }
@@ -2555,28 +2622,7 @@ if ($conn) {
                         });
                     }
 
-                    function showQueueTicketProceedPopup(response) {
-                        if (response.success) {
-                            var ticketId = response.ticketId;
-                            var serviceType = response.serviceType;
-                            var batteryLevel = response.batteryLevel;
-
-                            // Create popup HTML (QueueTicketProceed)
-                            var popupHtml = '<div id="queuePopup" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; border: 2px solid #007bff; border-radius: 10px; padding: 20px; width: 320px; z-index: 10000; box-shadow: 0 0 10px rgba(0,0,0,0.5);">';
-                            popupHtml += '<h2 style="margin-top: 0; color: #007bff; text-align: center;">Queue Ticket Proceed</h2>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Ticket ID:</strong> ' + ticketId + '</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Service:</strong> ' + serviceType + '</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Battery Level:</strong> ' + batteryLevel + '%</div>';
-                            popupHtml += '<div style="margin: 10px 0; font-size: 16px; text-align: center;"><strong>Estimated Wait Time:</strong> 5 minutes</div>';
-                            popupHtml += '<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">';
-                            popupHtml += '<button onclick="closePopup()" style="padding: 10px 16px; background: #00a389; color: white; border: none; border-radius: 6px; cursor: pointer;">OK</button>';
-                            popupHtml += '</div>';
-                            popupHtml += '</div>';
-
-                            // Append to body
-                            $('body').append(popupHtml);
-                        }
-                    }
+                    // Removed showQueueTicketProceedPopup - now handled by ChargingPage.php modal
 
                     // Function to close popup (defined globally) - simple and clean
                     window.closePopup = function() {
@@ -2920,8 +2966,10 @@ if ($conn) {
                         observer.observe(el);
                     });
 
-                    // Real-time status updates
+                    // Real-time status updates - improved version
                     function updateVehicleStatus() {
+                        console.log('updateVehicleStatus called at:', new Date().toLocaleTimeString());
+                        
                         fetch('api/status_update.php', {
                             method: 'POST',
                             headers: {
@@ -2929,54 +2977,187 @@ if ($conn) {
                             },
                             body: JSON.stringify({action: 'get_status'})
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            console.log('API response status:', response.status);
+                            return response.json();
+                        })
                         .then(data => {
                             if (data.success) {
-                                // Update status text
-                                const statusElement = document.querySelector('.stat-value');
-                                if (statusElement && data.status_text) {
-                                    statusElement.textContent = data.status_text;
+                                console.log('Vehicle status update received:', data); // Debug log
+                                console.log('Current status_text:', data.status_text);
+                                console.log('Previous status:', window.lastVehicleStatus);
+                                
+                                // Check if status actually changed
+                                if (window.lastVehicleStatus !== data.status_text) {
+                                    console.log('Status changed from:', window.lastVehicleStatus, 'to:', data.status_text);
                                 }
-
-                                // Update button text and href
-                                const buttonElement = document.querySelector('.quick-action-btn');
-                                if (buttonElement && data.button_text && data.button_href) {
-                                    buttonElement.textContent = data.button_text;
-                                    buttonElement.href = data.button_href;
-                                    
-                                    // Add target="_blank" for Monitor links
-                                    if (data.button_href.includes('Monitor')) {
-                                        buttonElement.setAttribute('target', '_blank');
-                                    } else {
-                                        buttonElement.removeAttribute('target');
+                                
+                                // Update status text - target the specific status element
+                                const statusSelectors = [
+                                    '.stat-item:first-child .stat-value', // First stat-item (Status)
+                                    '.vehicle-stats .stat-item:first-child .stat-value',
+                                    '.features .stat-item:first-child .stat-value',
+                                    '.stat-value[data-status-value]',
+                                    '[data-status-value]'
+                                ];
+                                
+                                let statusUpdated = false;
+                                for (const selector of statusSelectors) {
+                                    const statusElement = document.querySelector(selector);
+                                    if (statusElement && data.status_text) {
+                                        console.log('Updating status element with selector:', selector, 'to:', data.status_text);
+                                        statusElement.textContent = data.status_text;
+                                        // Add visual indicator that status was updated
+                                        statusElement.style.backgroundColor = '#00c2ce';
+                                        statusElement.style.color = 'white';
+                                        statusElement.style.padding = '2px 6px';
+                                        statusElement.style.borderRadius = '4px';
+                                        setTimeout(() => {
+                                            statusElement.style.backgroundColor = '';
+                                            statusElement.style.color = '';
+                                            statusElement.style.padding = '';
+                                            statusElement.style.borderRadius = '';
+                                        }, 1000);
+                                        statusUpdated = true;
+                                        break;
                                     }
                                 }
-
-                                // Update background class if status changed
-                                const vehicleCard = document.querySelector('.main-vehicle-card');
-                                if (vehicleCard && data.background_class) {
-                                    // Remove old background classes
-                                    vehicleCard.classList.remove('connected-bg', 'waiting-bg', 'charging-bg', 'pending-bg', 'queue-pending-bg');
-                                    // Add new background class
-                                    vehicleCard.classList.add(data.background_class);
+                                
+                                // Fallback: find status element by looking for "Status" label
+                                if (!statusUpdated) {
+                                    const statItems = document.querySelectorAll('.stat-item');
+                                    for (const item of statItems) {
+                                        const label = item.querySelector('.stat-label');
+                                        const value = item.querySelector('.stat-value');
+                                        if (label && value && label.textContent.trim() === 'Status') {
+                                            console.log('Found status element by label, updating to:', data.status_text);
+                                            value.textContent = data.status_text;
+                                            // Add visual indicator that status was updated
+                                            value.style.backgroundColor = '#00c2ce';
+                                            value.style.color = 'white';
+                                            value.style.padding = '2px 6px';
+                                            value.style.borderRadius = '4px';
+                                            setTimeout(() => {
+                                                value.style.backgroundColor = '';
+                                                value.style.color = '';
+                                                value.style.padding = '';
+                                                value.style.borderRadius = '';
+                                            }, 1000);
+                                            statusUpdated = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                if (!statusUpdated) {
+                                    console.log('No status element found to update');
                                 }
 
-                                // Update battery level if changed
-                                const batteryElement = document.querySelector('.feature-description strong:contains("Current Level:")');
-                                if (batteryElement && data.battery_level) {
-                                    const batteryText = batteryElement.parentElement;
-                                    if (batteryText) {
-                                        batteryText.innerHTML = batteryText.innerHTML.replace(
-                                            /<strong>Current Level:<\/strong>.*?<br>/,
-                                            `<strong>Current Level:</strong> ${data.battery_level}<br>`
-                                        );
+                                // Update button text and href - try multiple selectors
+                                const buttonSelectors = [
+                                    '.quick-action-btn',
+                                    '.charge-button',
+                                    '.action-button',
+                                    'a[href*="ChargingPage"]'
+                                ];
+                                
+                                let buttonUpdated = false;
+                                for (const selector of buttonSelectors) {
+                                    const buttonElement = document.querySelector(selector);
+                                    if (buttonElement && data.button_text && data.button_href) {
+                                        console.log('Updating button element with selector:', selector, 'to:', data.button_text, 'href:', data.button_href);
+                                        buttonElement.textContent = data.button_text;
+                                        buttonElement.href = data.button_href;
+                                        
+                                        // Add target="_blank" for Monitor links
+                                        if (data.button_href.includes('Monitor')) {
+                                            buttonElement.setAttribute('target', '_blank');
+                                        } else {
+                                            buttonElement.removeAttribute('target');
+                                        }
+                                        buttonUpdated = true;
+                                        break;
                                     }
+                                }
+                                if (!buttonUpdated) {
+                                    console.log('No button element found to update');
+                                }
+
+                                // Update background class - try multiple selectors
+                                const cardSelectors = [
+                                    '.main-vehicle-card',
+                                    '.vehicle-card',
+                                    '.features-card',
+                                    '.status-card'
+                                ];
+                                
+                                let backgroundUpdated = false;
+                                for (const selector of cardSelectors) {
+                                    const vehicleCard = document.querySelector(selector);
+                                    if (vehicleCard && data.background_class) {
+                                        console.log('Updating background class with selector:', selector, 'to:', data.background_class);
+                                        // Remove old background classes
+                                        vehicleCard.classList.remove('connected-bg', 'waiting-bg', 'charging-bg', 'pending-bg', 'queue-pending-bg');
+                                        // Add new background class
+                                        vehicleCard.classList.add(data.background_class);
+                                        backgroundUpdated = true;
+                                        break;
+                                    }
+                                }
+                                if (!backgroundUpdated) {
+                                    console.log('No background element found to update');
+                                }
+
+                                // Update battery level - improved selector
+                                const batteryElements = document.querySelectorAll('.feature-description, .battery-info, [data-battery]');
+                                batteryElements.forEach(element => {
+                                    if (element && data.battery_level) {
+                                        const html = element.innerHTML;
+                                        if (html.includes('Current Level:') || html.includes('Battery:')) {
+                                            element.innerHTML = html.replace(
+                                                /(Current Level:|Battery:)\s*\d+%/g,
+                                                '$1 ' + data.battery_level
+                                            );
+                                        }
+                                    }
+                                });
+
+                                // Update range/ticket display based on queue status (including charging)
+                                if (data.ticket_info && data.ticket_info.ticket_id) {
+                                    // Replace "Range" with "Ticket" and show ticket ID for ALL queue states including charging
+                                    const rangeElements = document.querySelectorAll('.stat-item');
+                                    rangeElements.forEach(element => {
+                                        const label = element.querySelector('.stat-label');
+                                        const value = element.querySelector('.stat-value');
+                                        if (label && value && label.textContent.trim() === 'Range') {
+                                            console.log('Updating range to ticket display:', data.ticket_info.ticket_id);
+                                            label.textContent = 'Ticket';
+                                            value.textContent = data.ticket_info.ticket_id;
+                                        }
+                                    });
+                                } else {
+                                    // Restore range display when not in queue (only for connected status)
+                                    const rangeElements = document.querySelectorAll('.stat-item');
+                                    rangeElements.forEach(element => {
+                                        const label = element.querySelector('.stat-label');
+                                        const value = element.querySelector('.stat-value');
+                                        if (label && value && label.textContent.trim() === 'Ticket') {
+                                            console.log('Restoring range display');
+                                            label.textContent = 'Range';
+                                            // Get original range from PHP data (calculate from battery level)
+                                            const originalRange = '<?php echo htmlspecialchars($current_range_km . ' km'); ?>';
+                                            value.textContent = originalRange;
+                                        }
+                                    });
                                 }
 
                                 // Handle notification popup (like Java MY_TURN notification)
                                 if (data.notification && data.notification.type === 'charge_now_popup') {
                                     showChargeNowPopup(data.notification);
                                 }
+                                
+                                // Store current status for comparison
+                                window.lastVehicleStatus = data.status_text;
                             }
                         })
                         .catch(error => {
@@ -3098,12 +3279,79 @@ if ($conn) {
                         });
                     }
 
-                    // Update status every 5 seconds
-                    setInterval(updateVehicleStatus, 5000);
+                    // Global function to trigger status update (for debugging)
+                    window.triggerVehicleStatusUpdate = function() {
+                        console.log('Manual status update triggered');
+                        updateVehicleStatus();
+                    };
+                    
+                    // Update status every 1 second for more real-time updates (increased frequency for testing)
+                    setInterval(updateVehicleStatus, 1000);
+                    
+                    // Also update immediately when page loads
+                    updateVehicleStatus();
 
                     // Also update when page becomes visible (user switches back to tab)
                     document.addEventListener('visibilitychange', function() {
                         if (!document.hidden) {
+                            updateVehicleStatus();
+                        }
+                    });
+                    
+                    // Add function to manually trigger status update (for use by other functions)
+                    window.triggerVehicleStatusUpdate = function() {
+                        console.log('Manual status update triggered');
+                        updateVehicleStatus();
+                    };
+                    
+                    // Add manual refresh button for testing (remove in production)
+                    function addManualRefreshButton() {
+                        const refreshBtn = document.createElement('button');
+                        refreshBtn.innerHTML = '🔄 Refresh Status';
+                        refreshBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #00c2ce; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;';
+                        refreshBtn.onclick = function() {
+                            console.log('Manual refresh button clicked');
+                            updateVehicleStatus();
+                        };
+                        document.body.appendChild(refreshBtn);
+                        
+                        // Add test API button
+                        const testBtn = document.createElement('button');
+                        testBtn.innerHTML = '🧪 Test API';
+                        testBtn.style.cssText = 'position: fixed; top: 50px; right: 10px; z-index: 9999; background: #ff6b35; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;';
+                        testBtn.onclick = function() {
+                            console.log('Test API button clicked');
+                            testStatusAPI();
+                        };
+                        document.body.appendChild(testBtn);
+                    }
+                    
+                    // Test the status API directly
+                    function testStatusAPI() {
+                        console.log('Testing status API...');
+                        
+                        fetch('api/status_update.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({action: 'test_status'})
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Test API response:', data);
+                        })
+                        .catch(error => {
+                            console.error('Test API error:', error);
+                        });
+                    }
+                    
+                    // Add the manual refresh button after page loads
+                    setTimeout(addManualRefreshButton, 1000);
+                    
+                    // Listen for storage events (for cross-tab communication)
+                    window.addEventListener('storage', function(e) {
+                        if (e.key === 'vehicle_status_update') {
                             updateVehicleStatus();
                         }
                     });

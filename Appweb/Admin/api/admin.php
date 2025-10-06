@@ -422,14 +422,58 @@ try {
                 break;
             }
             
-            // Update ticket status to Waiting
-            $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Waiting' WHERE ticket_id = ?");
-            $result = $stmt->execute([$ticket_id]);
-            
-            if ($result) {
-                echo json_encode(['success' => true, 'message' => 'Ticket moved to waiting status']);
-            } else {
-                echo json_encode(['error' => 'Failed to move ticket to waiting']);
+            try {
+                $db->beginTransaction();
+                
+                // Get ticket details first
+                $ticket_stmt = $db->prepare("SELECT username, service_type, initial_battery_level FROM queue_tickets WHERE ticket_id = ?");
+                $ticket_stmt->execute([$ticket_id]);
+                $ticket_data = $ticket_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$ticket_data) {
+                    throw new Exception('Ticket not found');
+                }
+                
+                // Update ticket status to Waiting
+                $stmt = $db->prepare("UPDATE queue_tickets SET status = 'Waiting' WHERE ticket_id = ?");
+                $result = $stmt->execute([$ticket_id]);
+                
+                if (!$result) {
+                    throw new Exception('Failed to update ticket status');
+                }
+                
+                // Get next position in queue
+                $position_stmt = $db->query("SELECT COALESCE(MAX(position_in_queue), 0) + 1 as next_position FROM waiting_grid WHERE ticket_id IS NOT NULL");
+                $position_data = $position_stmt->fetch(PDO::FETCH_ASSOC);
+                $next_position = $position_data['next_position'];
+                
+                // Find an empty slot in waiting_grid or use the next position
+                $empty_slot_stmt = $db->query("SELECT id FROM waiting_grid WHERE ticket_id IS NULL LIMIT 1");
+                $empty_slot = $empty_slot_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($empty_slot) {
+                    // Use existing empty slot
+                    $insert_stmt = $db->prepare("
+                        UPDATE waiting_grid 
+                        SET ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, position_in_queue = ?
+                        WHERE id = ?
+                    ");
+                    $insert_stmt->execute([$ticket_id, $ticket_data['username'], $ticket_data['service_type'], $ticket_data['initial_battery_level'], $next_position, $empty_slot['id']]);
+                } else {
+                    // Insert new row (waiting_grid should have at least 8 slots)
+                    $insert_stmt = $db->prepare("
+                        INSERT INTO waiting_grid (ticket_id, username, service_type, initial_battery_level, position_in_queue) 
+                        VALUES (?, ?, ?, ?, ?)
+                    ");
+                    $insert_stmt->execute([$ticket_id, $ticket_data['username'], $ticket_data['service_type'], $ticket_data['initial_battery_level'], $next_position]);
+                }
+                
+                $db->commit();
+                echo json_encode(['success' => true, 'message' => 'Ticket moved to waiting status and added to waiting grid']);
+                
+            } catch (Exception $e) {
+                $db->rollback();
+                echo json_encode(['error' => 'Failed to move ticket to waiting: ' . $e->getMessage()]);
             }
             break;
 

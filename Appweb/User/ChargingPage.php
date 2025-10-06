@@ -411,13 +411,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 modalHtml += '</div>';
 
                 // Battery status
-                modalHtml += '<div class="battery-status-section" style="display: flex; align-items: center; padding: 0.75rem; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);">';
+                modalHtml += '<div class="battery-status-section" style="display: flex; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);">';
                 modalHtml += '<div class="section-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">';
                 modalHtml += '<i class="fas fa-car-battery" style="color: white; font-size: 1rem;"></i>';
                 modalHtml += '</div>';
                 modalHtml += '<div class="section-content">';
                 modalHtml += '<div class="section-label" style="font-size: 0.8rem; color: rgba(26, 32, 44, 0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Current Battery</div>';
                 modalHtml += '<div class="section-value" style="font-size: 1.2rem; font-weight: 800; color: #27ae60;">' + batteryLevel + '%</div>';
+                modalHtml += '</div>';
+                modalHtml += '</div>';
+
+                // Estimated Wait Time section
+                modalHtml += '<div class="wait-time-section" style="display: flex; align-items: center; padding: 0.75rem; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);">';
+                modalHtml += '<div class="section-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">';
+                modalHtml += '<i class="fas fa-clock" style="color: white; font-size: 1rem;"></i>';
+                modalHtml += '</div>';
+                modalHtml += '<div class="section-content">';
+                modalHtml += '<div class="section-label" style="font-size: 0.8rem; color: rgba(26, 32, 44, 0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Estimated Wait Time</div>';
+                modalHtml += '<div class="section-value" style="font-size: 1.2rem; font-weight: 800; color: #f39c12;">5 minutes</div>';
                 modalHtml += '</div>';
                 modalHtml += '</div>';
 
@@ -437,11 +448,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 modalHtml += '</div>';
 
                 modalHtml += '<div class="modal-actions" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; margin-bottom: 1rem; position: relative; z-index: 2;">';
-                modalHtml += '<button onclick="processTicket()" class="btn-primary" style="background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 194, 206, 0.3); position: relative; overflow: hidden;">';
+                modalHtml += '<button id="processTicketBtn" class="btn-primary" style="background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 194, 206, 0.3); position: relative; overflow: hidden;">';
                 modalHtml += '<span style="position: relative; z-index: 2;">Process Ticket</span>';
                 modalHtml += '<div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: left 0.5s; z-index: 1;"></div>';
                 modalHtml += '</button>';
-                modalHtml += '<button onclick="cancelTicket(\'' + ticketId + '\')" class="btn-cancel" style="background: transparent; color: rgba(26, 32, 44, 0.6); border: 2px solid rgba(26, 32, 44, 0.3); padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease;">Cancel Ticket</button>';
+                modalHtml += '<button id="cancelTicketBtn" data-ticket-id="' + ticketId + '" class="btn-cancel" style="background: transparent; color: rgba(26, 32, 44, 0.6); border: 2px solid rgba(26, 32, 44, 0.3); padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease;">Cancel Ticket</button>';
                 modalHtml += '</div>';
                 modalHtml += '</div>';
                 modalHtml += '</div>';
@@ -465,12 +476,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                     modal.style.alignItems = 'center';
                     modal.style.justifyContent = 'center';
                     document.body.style.overflow = 'hidden';
+                    
+                    // Add event listener for process ticket button
+                    const processBtn = document.getElementById('processTicketBtn');
+                    if (processBtn) {
+                        processBtn.addEventListener('click', function() {
+                            console.log('Process Ticket button clicked');
+                            processTicket();
+                        });
+                    }
+                    
+                    // Add event listener for cancel button
+                    const cancelBtn = document.getElementById('cancelTicketBtn');
+                    if (cancelBtn) {
+                        cancelBtn.addEventListener('click', function() {
+                            const ticketId = this.getAttribute('data-ticket-id');
+                            console.log('Cancel button clicked for ticket:', ticketId);
+                            cancelTicket(ticketId);
+                        });
+                    }
                 }, 10);
             }
         }
 
         // Global cleanup function for all popups
         window.cleanupAllPopups = function() {
+            console.log('Starting popup cleanup...');
             try {
                 // Remove all types of modals/popups
                 const selectors = [
@@ -481,12 +512,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                     'div[style*="position:fixed"][style*="background:rgba"]'
                 ];
                 
+                let removedCount = 0;
                 selectors.forEach(selector => {
                     const elements = document.querySelectorAll(selector);
                     elements.forEach(element => {
                         if (element && element.parentNode) {
+                            console.log('Removing element:', selector, element);
                             element.style.display = 'none';
                             element.remove();
+                            removedCount++;
                         }
                     });
                 });
@@ -495,14 +529,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 document.body.style.overflow = '';
                 document.body.classList.remove('modal-open', 'popup-open');
                 
+                console.log('Cleanup completed. Removed', removedCount, 'elements');
+                
             } catch (e) {
-                console.log('Cleanup completed');
+                console.error('Cleanup error:', e);
+                console.log('Cleanup completed with errors');
             }
         };
 
         // Function to close popup (defined globally) - simple and clean
         window.closePopup = function() {
+            console.log('closePopup called');
+            
+            // Specifically target and remove the queueModal
+            const queueModal = document.getElementById('queueModal');
+            if (queueModal) {
+                console.log('Found queueModal, removing...');
+                queueModal.style.display = 'none';
+                queueModal.remove();
+            } else {
+                console.log('queueModal not found');
+            }
+            
+            // Force cleanup of all popups
             window.cleanupAllPopups();
+            
+            // Restore body scroll
+            document.body.style.overflow = '';
             
             // Clear any pending tickets from session
             fetch('cancel_charge_action.php', {
@@ -510,10 +563,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'cancelPending=true'
             }).catch(() => {}); // Ignore errors
+            
+            console.log('closePopup completed');
         };
 
         // Function to cancel ticket (just close popup since ticket isn't created yet)
         function cancelTicket(ticketId) {
+            console.log('Cancelling ticket:', ticketId);
+            
             // Since the ticket hasn't been created yet, just clear the pending ticket and close popup
             fetch('cancel_charge_action.php', {
                 method: 'POST',
@@ -524,28 +581,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             })
             .then(response => response.json())
             .then(data => {
-                closePopup();
+                console.log('Cancel response:', data);
+                
+                // Close popup first
+                window.cleanupAllPopups();
+                
+                // Trigger vehicle status update after cancelling
+                if (typeof window.triggerVehicleStatusUpdate === 'function') {
+                    window.triggerVehicleStatusUpdate();
+                } else {
+                    // Fallback: trigger storage event for cross-tab communication
+                    localStorage.setItem('vehicle_status_update', Date.now());
+                    localStorage.removeItem('vehicle_status_update');
+                }
+                
+                // Show success message
+                if (data.success) {
+                    console.log('Ticket cancelled successfully');
+                }
             })
             .catch(error => {
+                console.error('Cancel ticket error:', error);
+                
                 // Even if there's an error, close the popup since it's just a preview
-                closePopup();
-                console.error('Error:', error);
+                window.cleanupAllPopups();
+                
+                // Show error message
+                showDialog('Error', 'Failed to cancel ticket. Please try again.');
             });
         }
 
+        // Global function to trigger vehicle status updates
+        window.triggerVehicleStatusUpdate = function() {
+            // Try to call the dashboard update function if available
+            if (typeof window.updateVehicleStatus === 'function') {
+                window.updateVehicleStatus();
+            }
+            
+            // Also trigger storage event for cross-tab communication
+            localStorage.setItem('vehicle_status_update', Date.now());
+            localStorage.removeItem('vehicle_status_update');
+        };
+
         // Function to process ticket (actually create the ticket)
         function processTicket() {
+            console.log('Processing ticket...');
+            
             // Get the ticket ID from the modal
             const modal = document.getElementById('queueModal');
-            if (!modal) return;
+            if (!modal) {
+                console.error('Modal not found');
+                return;
+            }
 
-            // Find the ticket ID in the modal content
-            const ticketIdElement = modal.querySelector('.section-value');
-            if (!ticketIdElement) return;
+            // Find the ticket ID specifically in the ticket-id-section
+            const ticketIdSection = modal.querySelector('.ticket-id-section .section-value');
+            if (!ticketIdSection) {
+                console.error('Ticket ID element not found');
+                return;
+            }
 
-            const ticketId = ticketIdElement.textContent.trim();
+            const ticketId = ticketIdSection.textContent.trim();
+            console.log('Found ticket ID:', ticketId);
 
             // Call the new endpoint to actually create the ticket
+            console.log('Sending request to process_ticket_action.php with ticketId:', ticketId);
+            
             fetch('process_ticket_action.php', {
                 method: 'POST',
                 headers: {
@@ -553,20 +654,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 },
                 body: 'ticketId=' + encodeURIComponent(ticketId)
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log('Process ticket response:', data);
+                
                 if (data.success) {
-                    showDialog('Ticket Created Successfully!', 'Your charging session has been queued. Your Bay assignment will be announced in the dashboard, please wait for further notice.');
+                    // Close popup first
                     closePopup();
+                    
+                    // Show success dialog after a short delay to ensure popup is closed
+                    setTimeout(() => {
+                        showDialog('Ticket Created Successfully!', 'Your charging session has been queued. Your Bay assignment will be announced in the dashboard, please wait for further notice.');
+                    }, 100);
+                    
+                    // Trigger vehicle status update
+                    if (typeof window.triggerVehicleStatusUpdate === 'function') {
+                        window.triggerVehicleStatusUpdate();
+                    } else {
+                        // Fallback: trigger storage event for cross-tab communication
+                        localStorage.setItem('vehicle_status_update', Date.now());
+                        localStorage.removeItem('vehicle_status_update');
+                    }
                 } else if (data.error) {
-                    showDialog('Error', data.error);
-                    closePopup(); // Close the preview popup on error
+                    console.error('Process ticket error:', data.error);
+                    // Close popup first
+                    closePopup();
+                    // Show error dialog after a short delay
+                    setTimeout(() => {
+                        showDialog('Error', data.error);
+                    }, 100);
+                } else {
+                    console.error('Unexpected response:', data);
+                    // Close popup first
+                    closePopup();
+                    // Show error dialog after a short delay
+                    setTimeout(() => {
+                        showDialog('Error', 'Unexpected response from server. Please try again.');
+                    }, 100);
                 }
             })
             .catch(error => {
-                showDialog('Error', 'An error occurred while creating the ticket. Please try again.');
-                console.error('Error:', error);
-                closePopup(); // Close the preview popup on error
+                console.error('Process ticket fetch error:', error);
+                // Close popup first
+                closePopup();
+                // Show error dialog after a short delay
+                setTimeout(() => {
+                    showDialog('Error', 'An error occurred while creating the ticket. Please try again.');
+                }, 100);
             });
         }
     </script>

@@ -1954,35 +1954,26 @@
             // Only announce for bays 1-8
             if (bayNumber < 1 || bayNumber > 8) return;
             
-            const statusMap = {
-                'available': 'available',
-                'occupied': 'occupied',
-                'maintenance': 'under maintenance'
-            };
-            
-            let message = '';
             if (oldStatus && newStatus && oldStatus !== newStatus) {
-                const newStatusText = statusMap[newStatus.toLowerCase()] || newStatus;
+                // Debug log to help troubleshoot
+                console.log('Bay announcement:', {bayNumber, oldStatus, newStatus, ticketId, username});
                 
-                // Create clear announcements for each status change
+                // Use proper messageType approach to avoid "Bay Bay" duplication
                 if (newStatus.toLowerCase() === 'available') {
-                    message = ` ${bayNumber} is now available`;
+                    speak('', 'available', { bayNumber });
                 } else if (newStatus.toLowerCase() === 'occupied') {
-                    message = ` ${bayNumber} is now occupied`;
+                    // For occupied status, create a custom message since we have additional info
+                    let message = `Bay ${bayNumber} is now occupied`;
                     if (username) {
                         message += ` by ${username}`;
                     }
                     if (ticketId) {
                         message += ` with ticket ${ticketId}`;
                     }
+                    speak(message);
                 } else if (newStatus.toLowerCase() === 'maintenance') {
-                    message = ` ${bayNumber} is now under maintenance`;
+                    speak('', 'maintenance', { bayNumber });
                 }
-                
-                // Debug log to help troubleshoot
-                console.log('Bay announcement:', message, {bayNumber, oldStatus, newStatus, ticketId, username});
-                
-                speak(message);
             }
         }
         

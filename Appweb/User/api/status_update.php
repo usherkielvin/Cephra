@@ -79,6 +79,34 @@ $username = $_SESSION['username'];
 $input = json_decode(file_get_contents('php://input'), true);
 $action = $input['action'] ?? '';
 
+// Debug logging
+error_log("Status update API called - Username: $username, Action: $action");
+
+if ($action === 'test_status') {
+    // Test endpoint to check current status for debugging
+    $test_username = $_POST['username'] ?? $username;
+    
+    $stmt_queue = $conn->prepare("SELECT ticket_id, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_queue->bindParam(':username', $test_username);
+    $stmt_queue->execute();
+    $queue_ticket = $stmt_queue->fetch(PDO::FETCH_ASSOC);
+    
+    $stmt_active = $conn->prepare("SELECT ticket_id, status, bay_number, created_at FROM active_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_active->bindParam(':username', $test_username);
+    $stmt_active->execute();
+    $active_ticket = $stmt_active->fetch(PDO::FETCH_ASSOC);
+    
+    echo json_encode([
+        'success' => true,
+        'test_username' => $test_username,
+        'session_username' => $username,
+        'queue_ticket' => $queue_ticket,
+        'active_ticket' => $active_ticket,
+        'charging_grid' => $conn->query("SELECT bay_number, ticket_id FROM charging_grid WHERE username = '$test_username'")->fetchAll(PDO::FETCH_ASSOC)
+    ]);
+    exit();
+}
+
 if ($action === 'get_status') {
     // Fetch latest charging status from both queue_tickets and active_tickets
     $stmt_queue = $conn->prepare("SELECT ticket_id, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
@@ -96,30 +124,116 @@ if ($action === 'get_status') {
     $background_class = 'connected-bg';
     $button_text = 'Charge Now';
     $button_href = 'ChargingPage.php';
+    
+    // Debug logging
+    error_log("Initial status for $username: $status_text");
+
+    // Determine which ticket is more recent and prioritize it
+    $use_queue_ticket = false;
+    $use_active_ticket = false;
+    
+    if ($queue_ticket && $active_ticket) {
+        // Compare timestamps to see which is more recent
+        $queue_time = strtotime($queue_ticket['created_at']);
+        $active_time = strtotime($active_ticket['created_at']);
+        $use_queue_ticket = ($queue_time >= $active_time);
+        $use_active_ticket = !$use_queue_ticket;
+        
+        error_log("Both tickets found for $username - Queue: {$queue_ticket['created_at']}, Active: {$active_ticket['created_at']}, Using: " . ($use_queue_ticket ? 'queue' : 'active'));
+    } elseif ($queue_ticket) {
+        $use_queue_ticket = true;
+        error_log("Only queue ticket found for $username");
+    } elseif ($active_ticket) {
+        $use_active_ticket = true;
+        error_log("Only active ticket found for $username");
+    }
 
     // Check active_tickets for charging states
-    if ($active_ticket) {
-        if (strtolower($active_ticket['status']) === 'charging') {
+    if ($use_active_ticket && $active_ticket) {
+        $ticket_status = strtolower($active_ticket['status']);
+        if ($ticket_status === 'charging' || $ticket_status === 'active' || $ticket_status === 'processing') {
             $background_class = 'charging-bg';
-            $bay_number = $active_ticket['bay_number'] ?? 'TBD';
-            $status_text = 'Charging at Bay ' . $bay_number;
+            
+            // Try to get bay number from charging_grid first (most accurate)
+            $stmt_charging_grid = $conn->prepare("SELECT bay_number FROM charging_grid WHERE username = :username AND ticket_id IS NOT NULL");
+            $stmt_charging_grid->bindParam(':username', $username);
+            $stmt_charging_grid->execute();
+            $charging_grid_bay = $stmt_charging_grid->fetch(PDO::FETCH_ASSOC);
+            
+            if ($charging_grid_bay && $charging_grid_bay['bay_number']) {
+                $bay_number = str_replace('Bay-', 'Bay ', $charging_grid_bay['bay_number']);
+            } else {
+                // Fallback to active_tickets bay_number or TBD
+                $fallback_bay = $active_ticket['bay_number'] ?? 'TBD';
+                $bay_number = str_replace('Bay-', 'Bay ', $fallback_bay);
+            }
+            
+            $status_text = 'Charging at ' . $bay_number;
             $button_text = 'Check Monitor';
             $button_href = '../Monitor/index.php';
+            
+            // Debug logging
+            error_log("Status updated to charging (from active_tickets) for $username: $status_text");
+            
+            // Add ticket information for active_tickets charging status
+            $ticket_info = [
+                'ticket_id' => $active_ticket['ticket_id'],
+                'status' => $active_ticket['status']
+            ];
         }
     }
-    // Check queue_tickets for pending/waiting states
-    elseif ($queue_ticket) {
-        if (strtolower($queue_ticket['status']) === 'pending') {
+    // Check queue_tickets for all states (including charging)
+    if ($use_queue_ticket && $queue_ticket) {
+        $queue_status = strtolower($queue_ticket['status']);
+        $ticket_id = $queue_ticket['ticket_id'];
+        
+        error_log("Processing queue ticket for $username - Original status: {$queue_ticket['status']}, Lowercase: $queue_status, Ticket ID: $ticket_id");
+        
+        if ($queue_status === 'charging') {
+            $background_class = 'charging-bg';
+            
+            // Try to get bay number from charging_grid first (most accurate)
+            $stmt_charging_grid = $conn->prepare("SELECT bay_number FROM charging_grid WHERE username = :username AND ticket_id IS NOT NULL");
+            $stmt_charging_grid->bindParam(':username', $username);
+            $stmt_charging_grid->execute();
+            $charging_grid_bay = $stmt_charging_grid->fetch(PDO::FETCH_ASSOC);
+            
+            if ($charging_grid_bay && $charging_grid_bay['bay_number']) {
+                $bay_number = str_replace('Bay-', 'Bay ', $charging_grid_bay['bay_number']);
+            } else {
+                // Fallback to TBD if no bay found
+                $bay_number = 'TBD';
+            }
+            
+            $status_text = 'Charging at ' . $bay_number;
+            $button_text = 'Check Monitor';
+            $button_href = '../Monitor/index.php';
+            error_log("Status updated to charging (from queue_tickets) for $username: $status_text");
+        } elseif ($queue_status === 'pending') {
             $background_class = 'queue-pending-bg';
             $status_text = 'Queue Pending';
             $button_text = 'Check Monitor';
             $button_href = '../Monitor/index.php';
-        } elseif (strtolower($queue_ticket['status']) === 'waiting') {
+            error_log("Status updated to queue pending for $username: $status_text");
+        } elseif ($queue_status === 'waiting') {
             $background_class = 'waiting-bg';
             $status_text = 'Waiting';
             $button_text = 'Check Monitor';
             $button_href = '../Monitor/index.php';
+            error_log("Status updated to waiting for $username: $status_text");
+        } elseif ($queue_status === 'in progress' || $queue_status === 'in_progress') {
+            $background_class = 'waiting-bg';
+            $status_text = 'In Progress';
+            $button_text = 'Check Monitor';
+            $button_href = '../Monitor/index.php';
+            error_log("Status updated to in progress for $username: $status_text");
         }
+        
+        // Add ticket information to the response for queue states
+        $ticket_info = [
+            'ticket_id' => $ticket_id,
+            'status' => $queue_ticket['status']
+        ];
     }
 
     // Get current battery level
@@ -142,6 +256,9 @@ if ($action === 'get_status') {
         }
     }
 
+    // Final debug logging
+    error_log("Final status for $username: $status_text, Background: $background_class, Button: $button_text");
+    
     echo json_encode([
         'success' => true,
         'status_text' => $status_text,
@@ -150,6 +267,7 @@ if ($action === 'get_status') {
         'button_href' => $button_href,
         'battery_level' => $battery_level,
         'notification' => $notification,
+        'ticket_info' => $ticket_info ?? null,
         'timestamp' => time()
     ]);
 } elseif ($action === 'confirm_charging') {
