@@ -502,3 +502,52 @@
         width: 100%;
     }
 }
+
+@media (max-width: 370px) {
+    .link-section {
+        padding: 30px 0;
+    }
+    .link-container {
+        padding: 0.5rem;
+        border-radius: 10px;
+        margin: 0 0.5rem;
+    }
+    .link-container h3 {
+        font-size: 1.2rem;
+    }
+    .link-container p {
+        font-size: 0.9rem;
+    }
+    .modernized-details .detail-value {
+        font-size: 1.5rem;
+    }
+    .modernized-details .battery-row .progress-text {
+        font-size: 1.2rem;
+    }
+    .stat-number {
+        font-size: 2rem;
+    }
+    .modernized-car-image img {
+        max-width: 70%;
+    }
+    .modernized-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    .quick-stats {
+        gap: 0.5rem;
+    }
+    .stat-card {
+        padding: 0.75rem;
+        max-width: 120px;
+    }
+    .stat-icon {
+        font-size: 1rem;
+    }
+    .stat-value {
+        font-size: 0.9rem;
+    }
+    .stat-label {
+        font-size: 0.7rem;
+    }
+}

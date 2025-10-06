@@ -492,8 +492,11 @@ if ($conn) {
                 position: static;
                 transform: none;
                 right: auto;
-                margin-left: auto;
+                margin: 0 auto;
                 order: 3;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .header-content {
@@ -529,6 +532,35 @@ if ($conn) {
 
             .modal-btn {
                 width: 100%;
+            }
+        }
+
+        @media (max-width: 370px) {
+            .rewards-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            .reward-card {
+                padding: 0.75rem;
+            }
+            .reward-card h4 {
+                font-size: 0.9rem;
+            }
+            .reward-card p {
+                font-size: 0.75rem;
+            }
+            .redeem-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+            .rewards-section {
+                padding: 50px 0;
+            }
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            .section-header p {
+                font-size: 1rem;
             }
         }
     </style>
@@ -737,6 +769,7 @@ if ($conn) {
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script>
+        
         // Mobile Menu Toggle
         function initMobileMenu() {
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');

@@ -1691,294 +1691,9 @@ if ($conn) {
 		</style>
 	</head>
 	<body>
-		<!-- Header -->
-		<header class="header">
-			<div class="container">
-				<div class="header-content"
-					 style="display: flex;
-							align-items: center;
-							justify-content: space-between;
-							gap: 16px;
-							width: 100%;">
-					<!-- Logo -->
-            <a href="dashboard.php" class="logo"
-               style="display: flex;
-                      align-items: center;
-                      gap: 12px;
-                      margin-right: 16px;
-                      text-decoration: none;">
-                <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                <span class="logo-text">CEPHRA</span>
-            </a>
+			<?php include __DIR__ . '/partials/header.php'; ?>
 
-					<!-- Navigation -->
-					<nav class="nav" style="flex: 1;">
-						<ul class="nav-list"
-							style="display: flex;
-								   gap: 1.25rem;
-								   align-items: center;">
-							<li><a href="dashboard.php" class="nav-link">Home</a></li>
-							<li><a href="link.php" class="nav-link">Link</a></li>
-							<li><a href="history.php" class="nav-link">History</a></li>
-							<li><a href="rewards.php" class="nav-link">Rewards</a></li>
-						</ul>
-					</nav>
 
-					<!-- Header Actions -->
-					<div class="header-actions"
-						 style="display: flex;
-								align-items: center;
-								gap: 24px;
-								margin-left: auto;">
-						<!-- Wallet button -->
-						<a href="wallet.php" class="wallet-link"
-						   title="Wallet"
-						   style="display: inline-flex;
-								  align-items: center;
-								  justify-content: center;
-								  width: auto;
-								  height: auto;
-								  border: none;
-								  background: transparent;
-								  color: inherit;
-								  cursor: pointer;
-								  padding: 4px;">
-							<i class="fas fa-wallet" aria-hidden="true" style="font-size: 18px;"></i>
-						</a>
-                <!-- Notification bell -->
-                <div class="notifications" style="position: relative;">
-                    <button id="notifBtn"
-                            title="Notifications"
-                            style="display: inline-flex;
-                                   align-items: center;
-                                   justify-content: center;
-                                   width: auto;
-                                   height: auto;
-                                   border: none;
-                                   background: transparent;
-                                   color: inherit;
-                                   cursor: pointer;
-                                   padding: 4px;
-                                   position: relative;">
-                        <i class="fas fa-bell" aria-hidden="true" style="font-size: 18px;"></i>
-                        <span class="notification-badge" style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #ff4757; border-radius: 50%; display: block;"></span>
-                    </button>
-                    <div class="notification-dropdown" id="notificationDropdown"
-                         style="display: none;
-                                position: absolute;
-                                top: 100%;
-                                right: 0;
-                                background: white;
-                                border: 1px solid var(--border-color);
-                                border-radius: 8px;
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                                min-width: 280px;
-                                max-width: 320px;
-                                z-index: 1001;
-                                max-height: 300px;
-                                overflow-y: auto;
-                                margin-top: 8px;">
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-info-circle" style="color: var(--primary-color); font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Welcome to Cephra!</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your personalized dashboard is ready to use.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Just now</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-bolt" style="color: #28a745; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Charging Session Complete</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your EV has finished charging at Station A.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 hours ago</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-gift" style="color: #ff6b6b; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">New Rewards Available</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">You've earned 50 Green Points from your last charge.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">1 day ago</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-tools" style="color: #ffa502; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">System Maintenance Scheduled</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Station B will be under maintenance tomorrow.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 days ago</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-						<!-- Language selector (globe icon only) placed to the right of Download -->
-
-						<?php
-						// Compute avatar source
-						$pfpSrc = 'images/logo.png';
-						if ($conn) {
-							try {
-								$stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
-								$stmt2->bindParam(':u', $username);
-								$stmt2->execute();
-								$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
-								if ($row2 && !empty($row2['profile_picture'])) {
-									$pp = $row2['profile_picture'];
-									if (strpos($pp, 'data:image') === 0) {
-										$pfpSrc = $pp;
-									} elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
-										$pfpSrc = 'data:image/png;base64,' . $pp;
-									} elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
-										$path = 'uploads/profile_pictures/' . $pp;
-										if (file_exists(__DIR__ . '/' . $path)) {
-											$pfpSrc = $path;
-										}
-									}
-								}
-							} catch (Exception $e) { /* ignore */ }
-						}
-						?>
-						<div class="profile-container" style="position: relative;">
-							<button class="profile-btn" id="profileBtn"
-								   title="Profile Menu"
-								   style="display: inline-flex;
-										  width: 38px;
-										  height: 38px;
-										  border-radius: 50%;
-										  overflow: hidden;
-										  border: 2px solid rgba(0, 0, 0, 0.08);
-										  background: transparent;
-										  cursor: pointer;
-										  padding: 0;">
-								<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
-									 alt="Profile"
-									 style="width: 100%;
-											height: 100%;
-											object-fit: cover;
-											display: block;" />
-							</button>
-							<ul class="profile-dropdown" id="profileDropdown"
-								style="position: absolute;
-									   top: 100%;
-									   right: 0;
-									   background: white;
-									   border: 1px solid rgba(0, 0, 0, 0.1);
-									   border-radius: 8px;
-									   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-									   min-width: 120px;
-									   list-style: none;
-									   padding: 0;
-									   margin: 0;
-									   z-index: 1001;
-									   display: none;">
-								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
-									<a href="profile.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Profile</a>
-								</li>
-								<li style="position: relative; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
-									<a href="#" id="languageMenuItem" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Language</a>
-                                    <ul class="language-sub-dropdown" id="languageSubDropdown" style="position: absolute; top: 0; right: 100%; left: auto; background: white; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); min-width: 120px; list-style: none; padding: 0; margin: 0; display: none;">
-										<li><a href="#" onclick="setLanguage('en'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">English</a></li>
-										<li><a href="#" onclick="setLanguage('fil'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Filipino</a></li>
-										<li><a href="#" onclick="setLanguage('ceb'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Bisaya</a></li>
-										<li><a href="#" onclick="setLanguage('zh'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">中文</a></li>
-									</ul>
-								</li>
-								<li>
-									<a href="profile_logout.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Logout</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-
-					<!-- Mobile Menu Toggle -->
-					<button class="mobile-menu-toggle" id="mobileMenuToggle">
-						<span></span>
-						<span></span>
-						<span></span>
-					</button>
-				</div>
-			</div>
-
-			<!-- Mobile Menu -->
-                <div class="mobile-menu" id="mobileMenu">
-                    <div class="mobile-menu-content">
-                        <!-- Mobile Navigation -->
-                        <div class="mobile-nav">
-                            <ul class="mobile-nav-list">
-                                <li class="mobile-nav-item">
-                                    <a href="dashboard.php" class="mobile-nav-link">Home</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="../Monitor/index.php" class="mobile-nav-link">Monitor</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="link.php" class="mobile-nav-link">Link</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="wallet.php" class="mobile-nav-link">Wallet</a>
-                                </li>
-								<li class="mobile-nav-item">
-                                    <a href="history.php" class="mobile-nav-link">History</a>
-                                </li>
-								<li class="mobile-nav-item">
-                                    <a href="rewards.php" class="mobile-nav-link">Rewards</a>
-                                </li>
-
-                            </ul>
-                        </div>
-
-                        <!-- Mobile Header Actions -->
-                        <div class="mobile-header-actions" style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
-                            <!-- Mobile Language Selector -->
-                            <div class="mobile-language-selector">
-                                <div class="language-selector">
-                                    <button class="language-btn" id="mobileLanguageBtn">
-                                        <span class="language-text">EN</span>
-                                        <i class="fas fa-chevron-down language-arrow"></i>
-                                    </button>
-                                    <div class="language-dropdown" id="mobileLanguageDropdown">
-                                        <div class="language-option" data-lang="en">English</div>
-                                        <div class="language-option" data-lang="fil">Filipino</div>
-                                        <div class="language-option" data-lang="ceb">Bisaya</div>
-                                        <div class="language-option" data-lang="zh">中文</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Actions row: Download + Logout in one row on small screens -->
-                        <div class="mobile-actions-row" style="display:flex;gap:16px;align-items:center;justify-content:center;margin-top:12px;">
-                            <!-- Mobile Download App -->
-                            <div class="mobile-download-app" style="display:flex;align-items:center;">
-                                <div class="download-app">
-                                    <button class="download-btn" id="mobileDownloadBtn">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                    <div class="qr-popup" id="mobileQrPopup">
-                                        <div class="qr-content">
-                                            <h4>Download Cephra App</h4>
-                                            <div class="qr-code">
-                                                <img src="images/qr.png" alt="QR Code - Download Cephra App" width="120" height="120" style="display: block; border-radius: 8px;" />
-                                            </div>
-                                            <p>Scan to download the Cephra mobile app</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mobile Logout Button -->
-                            <div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;">
-                                <a href="profile_logout.php" class="nav-link auth-link">Logout</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-		</header>
-
-		<!-- Mobile Menu Overlay -->
-		<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
 		<!-- Dashboard Hero Section -->
 		<section class="dashboard-hero">
@@ -2554,6 +2269,62 @@ if ($conn) {
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
 			<script>
+				 // Mobile Menu Toggle
+        function initMobileMenu() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.createElement('div');
+            mobileMenuOverlay.className = 'mobile-menu-overlay';
+            mobileMenuOverlay.id = 'mobileMenuOverlay';
+            document.body.appendChild(mobileMenuOverlay);
+
+            function toggleMobileMenu() {
+                const isActive = mobileMenu.classList.contains('active');
+                if (isActive) {
+                    closeMobileMenu();
+                } else {
+                    openMobileMenu();
+                }
+            }
+
+            function openMobileMenu() {
+                mobileMenu.classList.add('active');
+                mobileMenuToggle.classList.add('active');
+                mobileMenuOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+                document.addEventListener('keydown', handleEscapeKey);
+            }
+
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                mobileMenuOverlay.removeEventListener('click', closeMobileMenu);
+                document.removeEventListener('keydown', handleEscapeKey);
+            }
+
+            function handleEscapeKey(e) {
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+            }
+
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileNavLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                        if (mobileMenu.classList.contains('active')) {
+                            closeMobileMenu();
+                        }
+                    }
+                }
+            });
+        }
                 // Pass PHP variables to JavaScript
                 window.chargingStatus = '<?php echo $charging_status; ?>';
                 window.statusText = '<?php echo $status_text; ?>';
@@ -2629,6 +2400,27 @@ if ($conn) {
                         });
                     }
                 });
+
+				// Notification dropdown functionality
+(function() {
+    const notifBtn = document.getElementById('notifBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+
+    if (notifBtn && notificationDropdown) {
+        notifBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isVisible = notificationDropdown.style.display === 'block';
+            notificationDropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notifBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.style.display = 'none';
+            }
+        });
+    }
+})();
 
             </script>
 
@@ -2945,12 +2737,21 @@ if ($conn) {
                     setInterval(fetchAndRenderLiveStatus, 3000);
                 }
 
-         // Mobile menu toggle
-        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('mobile-menu-open');
-            this.classList.toggle('active');
-        });
+                // Fix for passive event listeners in jQuery
+                if (typeof jQuery !== 'undefined') {
+                    jQuery.event.special.touchstart = {
+                        setup: function(_, ns, handle) {
+                            this.addEventListener('touchstart', handle, { passive: true });
+                        }
+                    };
+                    jQuery.event.special.touchmove = {
+                        setup: function(_, ns, handle) {
+                            this.addEventListener('touchmove', handle, { passive: true });
+                        }
+                    };
+                }
+
+
                 
 
 

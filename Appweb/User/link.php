@@ -321,12 +321,62 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
     <script src="assets/js/main.js"></script>
 
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-            const nav = document.querySelector('.nav');
-            nav.classList.toggle('mobile-menu-open');
-            this.classList.toggle('active');
-        });
+        // Mobile Menu Toggle
+        function initMobileMenu() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.createElement('div');
+            mobileMenuOverlay.className = 'mobile-menu-overlay';
+            mobileMenuOverlay.id = 'mobileMenuOverlay';
+            document.body.appendChild(mobileMenuOverlay);
+
+            function toggleMobileMenu() {
+                const isActive = mobileMenu.classList.contains('active');
+                if (isActive) {
+                    closeMobileMenu();
+                } else {
+                    openMobileMenu();
+                }
+            }
+
+            function openMobileMenu() {
+                mobileMenu.classList.add('active');
+                mobileMenuToggle.classList.add('active');
+                mobileMenuOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+                document.addEventListener('keydown', handleEscapeKey);
+            }
+
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                mobileMenuOverlay.removeEventListener('click', closeMobileMenu);
+                document.removeEventListener('keydown', handleEscapeKey);
+            }
+
+            function handleEscapeKey(e) {
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+            }
+
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileNavLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                        if (mobileMenu.classList.contains('active')) {
+                            closeMobileMenu();
+                        }
+                    }
+                }
+            });
+        }
 
         // Enable/disable button based on terms checkbox
         document.getElementById('terms').addEventListener('change', function() {
