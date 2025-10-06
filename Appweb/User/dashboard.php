@@ -74,12 +74,20 @@ elseif ($queue_ticket) {
     }
 }
 
+// Determine if vehicle action button (quick-action-btn) should be disabled
+$vehicle_button_disabled = false;
+$vehicle_disabled_status = '';
+if ($current_ticket && in_array(strtolower($current_ticket['status']), ['charging', 'completed', 'pending'])) {
+    $vehicle_button_disabled = true;
+    $vehicle_disabled_status = ucfirst(strtolower($current_ticket['status']));
+}
+
 // Determine if Start Charging button should be disabled
-$button_disabled = false;
-$disabled_status = '';
-if ($current_ticket && in_array(strtolower($current_ticket['status']), ['charging', 'completed'])) {
-    $button_disabled = true;
-    $disabled_status = ucfirst(strtolower($current_ticket['status']));
+$start_charging_disabled = false;
+$start_charging_disabled_status = '';
+if ($current_ticket && in_array(strtolower($current_ticket['status']), ['waiting', 'charging', 'completed'])) {
+    $start_charging_disabled = true;
+    $start_charging_disabled_status = ucfirst(strtolower($current_ticket['status']));
 }
 
 // Fetch battery level from database
@@ -1987,7 +1995,11 @@ if ($conn) {
                     fast, and reliable charging solutions.
                 </p>
                 <div class="hero-actions">
+                    <?php if ($start_charging_disabled): ?>
+                    <span class="btn btn-outline disabled" style="pointer-events: none; opacity: 0.5; cursor: not-allowed;" id="startChargingBtn">Start Charging (<?php echo htmlspecialchars($start_charging_disabled_status); ?>)</span>
+                    <?php else: ?>
                     <a href="ChargingPage.php" class="btn btn-outline" id="startChargingBtn">Start Charging</a>
+                    <?php endif; ?>
                 </div>
             </div>
 		</section>
@@ -2075,11 +2087,7 @@ if ($conn) {
 								</div>
 							</div>
 			<div class="vehicle-actions">
-				<?php if ($button_disabled): ?>
-					<span class="quick-action-btn disabled" style="pointer-events: none; opacity: 0.5; cursor: not-allowed;"><?php echo htmlspecialchars($button_text); ?> (<?php echo htmlspecialchars($disabled_status); ?>)</span>
-				<?php else: ?>
-					<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>"><?php echo htmlspecialchars($button_text); ?></a>
-				<?php endif; ?>
+				<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>"><?php echo htmlspecialchars($button_text); ?></a>
 			</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
@@ -2609,9 +2617,9 @@ if ($conn) {
                     const startBtn = document.getElementById('startChargingBtn');
                     if (startBtn) {
                         startBtn.addEventListener('click', function(event) {
-                            // Check if current ticket status is waiting, charging, or completed
-                            const pendingStatuses = ['waiting', 'charging', 'completed'];
-                            const currentStatus = window.statusText ? window.statusText.toLowerCase() : '';
+                            // Check if current ticket status is charging or completed
+                            const pendingStatuses = ['charging', 'completed'];
+                            const currentStatus = window.currentStatus || '';
 
                             if (pendingStatuses.includes(currentStatus)) {
                                 event.preventDefault();
@@ -2951,7 +2959,6 @@ if ($conn) {
                 $(document).ready(function() {
                     loadDashboardStats();
                     updateLiveStatus();
-                    initMobileMenu(); // Initialize mobile menu functionality
 					// Apply saved language translations
 					setTimeout(() => { try { window.translateDashboard(); } catch(e){} }, 0);
 
@@ -3053,6 +3060,12 @@ if ($conn) {
 
                     // Show modal for charging status with bay number and OK button
                     function showChargingBayModal(ticketId, statusText) {
+                        // Check if modal already shown for this ticket
+                        const modalKey = 'bayModalShown_' + ticketId;
+                        if (localStorage.getItem(modalKey) === 'true') {
+                            return;
+                        }
+
                         // Check if modal already exists
                         if (document.getElementById('chargingBayModal')) return;
 
@@ -3091,6 +3104,9 @@ if ($conn) {
                         modalContent.appendChild(okButton);
                         overlay.appendChild(modalContent);
                         document.body.appendChild(overlay);
+
+                        // Mark modal as shown for this ticket
+                        localStorage.setItem(modalKey, 'true');
                     }
 
                     // Show modal for payment with Pay Online and Pay Cash buttons
