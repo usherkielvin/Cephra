@@ -535,7 +535,7 @@
                 TryNow: 'Subukan Ngayon',
                 ContestTitle: 'EV Champion 2025',
                 ContestDesc: 'Sumali sa aming taunang charging contest. Manalo ng premium subscription, eksklusibong merchandise, at charging credits.',
-                JoinContest: 'Sumali sa Paligsahan',
+                JoinContest: 'Sumali',
                 RegistrationOpen: 'Bukas ang Rehistrasyon',
                 ValidUntil: 'Bisa hanggang',
                 Platform: 'Plataporma',
