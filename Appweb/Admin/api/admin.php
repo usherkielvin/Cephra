@@ -787,6 +787,28 @@ try {
                     throw new Exception('Failed to assign bay');
                 }
                 
+                // CRITICAL: Also update charging_grid table for status display
+                $charging_grid_stmt = $db->prepare("INSERT INTO charging_grid (bay_number, ticket_id, username, service_type, initial_battery_level, start_time) VALUES (?, ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE ticket_id = ?, username = ?, service_type = ?, initial_battery_level = ?, start_time = NOW()");
+                
+                // Get ticket details for charging_grid
+                $ticket_details_stmt = $db->prepare("SELECT service_type, initial_battery_level FROM queue_tickets WHERE ticket_id = ?");
+                $ticket_details_stmt->execute([$ticket_id]);
+                $ticket_details = $ticket_details_stmt->fetch(PDO::FETCH_ASSOC);
+                
+                $service_type = $ticket_details['service_type'] ?? '';
+                $initial_battery_level = $ticket_details['initial_battery_level'] ?? 0;
+                
+                $charging_grid_result = $charging_grid_stmt->execute([
+                    $bay_number, $ticket_id, $ticket_data['username'], $service_type, $initial_battery_level,
+                    $ticket_id, $ticket_data['username'], $service_type, $initial_battery_level
+                ]);
+                
+                if (!$charging_grid_result) {
+                    error_log("Admin API: Warning - Failed to update charging_grid for ticket {$ticket_id}");
+                } else {
+                    error_log("Admin API: Successfully updated charging_grid for ticket {$ticket_id} at bay {$bay_number}");
+                }
+                
                 // Verify the bay assignment was successful
                 $verify_stmt = $db->prepare("SELECT bay_number, status, current_ticket_id, current_username FROM charging_bays WHERE bay_number = ?");
                 $verify_stmt->execute([$bay_number]);
@@ -894,6 +916,16 @@ try {
                 
                 if (!$bay_result) {
                     throw new Exception('Failed to free bay');
+                }
+                
+                // CRITICAL: Also clear charging_grid table
+                $charging_grid_clear_stmt = $db->prepare("UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?");
+                $charging_grid_clear_result = $charging_grid_clear_stmt->execute([$ticket_id]);
+                
+                if (!$charging_grid_clear_result) {
+                    error_log("Admin API: Warning - Failed to clear charging_grid for ticket {$ticket_id}");
+                } else {
+                    error_log("Admin API: Successfully cleared charging_grid for ticket {$ticket_id}");
                 }
                 
                 // Add to charging history
