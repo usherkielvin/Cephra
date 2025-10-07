@@ -7,6 +7,74 @@ if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 $showClose = isset($_SESSION['username']) && !empty($_SESSION['username']);
+
+// Attempt to load live data from the database to populate the monitor
+// Default to empty arrays so the client can use its own simulated data if desired
+$baysJson = '[]';
+$waitingsJson = '[]';
+try {
+  // Use __DIR__ so includes are robust regardless of cwd
+  require_once __DIR__ . '/../Admin/config/database.php';
+  $db = new Database();
+  $conn = $db->getConnection();
+  if ($conn) {
+    // Fetch bays (same logic as api/monitor.php but normalize fields for the frontend)
+    $stmt = $conn->query("SELECT
+            cb.bay_number,
+            cb.bay_type,
+            CASE
+                WHEN cb.status = 'Available'
+                     AND EXISTS (SELECT 1 FROM charging_grid cg
+                                 WHERE cg.bay_number = cb.bay_number
+                                   AND cg.ticket_id IS NOT NULL)
+                THEN 'Occupied'
+                ELSE cb.status
+            END AS status,
+            cb.current_username,
+            COALESCE(cb.current_ticket_id, (SELECT cg.ticket_id FROM charging_grid cg WHERE cg.bay_number = cb.bay_number LIMIT 1)) AS current_ticket_id,
+            cb.start_time,
+            u.plate_number
+        FROM charging_bays cb
+        LEFT JOIN users u ON cb.current_username = u.username
+        ORDER BY cb.bay_number");
+    $bays = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Map DB rows into a simple structure but do not fabricate any fields.
+    $jsBays = array_map(function($b){
+      // keep bay_number as-is; frontend will interpret it
+      return [
+        'bay' => $b['bay_number'],
+        'type' => $b['bay_type'] ?? 'Normal',
+        'status' => $b['status'] ?? 'Available',
+        'ticket' => $b['current_ticket_id'] ?? '',
+        'user' => $b['current_username'] ?? '',
+        'plate' => $b['plate_number'] ?? '',
+        'last_updated' => $b['start_time'] ?? ''
+      ];
+    }, $bays ?: []);
+
+    // Fetch waiting queue with plate if available
+    $stmt = $conn->query("SELECT q.ticket_id, q.username, q.service_type, q.created_at, u.plate_number FROM queue_tickets q LEFT JOIN users u ON q.username = u.username WHERE q.status = 'Waiting' ORDER BY q.created_at ASC");
+    $queue = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Do not synthesize any missing fields; pass DB values (or empty strings) to JS
+    $jsWaitings = array_map(function($q){
+      return [
+        'ticket' => $q['ticket_id'] ?? '',
+        'plate' => $q['plate_number'] ?? '',
+        'user' => $q['username'] ?? '',
+        'service' => $q['service_type'] ?? '',
+        'time' => $q['created_at'] ?? ''
+      ];
+    }, $queue ?: []);
+
+    $baysJson = json_encode($jsBays, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $waitingsJson = json_encode($jsWaitings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  }
+} catch (Exception $e) {
+  // On error keep arrays empty so client-side retains control over simulated values
+  $baysJson = '[]';
+  $waitingsJson = '[]';
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -398,29 +466,28 @@ $showClose = isset($_SESSION['username']) && !empty($_SESSION['username']);
 
   <script>
     // Lightweight frontend logic for visualization and basic interaction
-    const sampleBays = Array.from({length:8},(_,i)=>({
-      bay: i+1,
-      type: (i<3)?'Fast':'Normal',
-      status: (i%3===0)?'Available':(i%3===1)?'Occupied':'Maintenance',
-      ticket: (i%3===1)?`T-${100+i}`:'-',
-      user: (i%3===1)?`User ${i+1}`:'-',
-      plate: (i%3===1)? randomPlate() : '-',
-      last_updated: new Date(Date.now() - (i*60000)).toISOString()
-    }));
+    // If server-side provided live JSON is available, use it. Otherwise fall back to simulated sample data.
+    const __serverBays = <?php echo $baysJson; ?>;
+    // Do not fabricate client-side data. If server provides bays use them, otherwise use an empty list
+    const sampleBays = (__serverBays && Array.isArray(__serverBays) && __serverBays.length>0) ? __serverBays.map(b=>({
+      bay: b.bay || '',
+      type: b.type || '',
+      status: b.status || '',
+      ticket: b.ticket || '',
+      user: b.user || '',
+      plate: b.plate || '',
+      last_updated: b.last_updated || ''
+    })) : [];
 
-    // helper to create randomized plate numbers (3 letters + 4 digits)
-    function randomPlate(){
-      const letters = Array.from({length:3}, ()=> String.fromCharCode(65 + Math.floor(Math.random()*26))).join('');
-      const numbers = String(Math.floor(1000 + Math.random()*9000));
-      return letters + numbers;
-    }
-
-    const sampleWaitings = [
-      {ticket:'T-200',plate:randomPlate(),user:'Alice',service:'Normal',time: new Date(Date.now()-1000*60*2)},
-      {ticket:'T-201',plate:randomPlate(),user:'Bob',service:'Fast',time: new Date(Date.now()-1000*60*4)},
-      {ticket:'T-202',plate:randomPlate(),user:'Carlos',service:'Normal',time: new Date(Date.now()-1000*60*5)},
-      {ticket:'T-203',plate:randomPlate(),user:'Diana',service:'Normal',time: new Date(Date.now()-1000*60*10)}
-    ];
+    const __serverWaitings = <?php echo $waitingsJson; ?>;
+    // Use server waitings if present, otherwise no client-side fabricated waitings
+    const sampleWaitings = (__serverWaitings && Array.isArray(__serverWaitings) && __serverWaitings.length>0) ? __serverWaitings.map(w=>({
+      ticket: w.ticket || '',
+      plate: w.plate || '',
+      user: w.user || '',
+      service: w.service || '',
+      time: w.time ? new Date(w.time) : null
+    })) : [];
 
     // Render helpers
     function renderGrid(){
@@ -628,29 +695,7 @@ $showClose = isset($_SESSION['username']) && !empty($_SESSION['username']);
       if(waitingsPage < total){ waitingsPage++; renderWaitings(); }
     });
 
-    // Periodically update sample data to simulate live changes (for visualization only)
-    setInterval(()=>{
-      // rotate statuses
-      sampleBays.forEach((b,i)=>{
-        if(Math.random()<0.07){
-          const r = Math.random();
-          const newStatus = r<0.5?'Available':(r<0.8?'Occupied':'Maintenance');
-          if(newStatus !== b.status){
-            b.status = newStatus;
-            b.last_updated = new Date().toISOString();
-            b.ticket = b.status==='Occupied'? `T-${200+i}` : '-';
-            b.user = b.status==='Occupied'? `User ${i+1}` : '-';
-          }
-        }
-      });
-      // add a new waiting occasionally
-      if(Math.random()<0.1){
-        const id = 'T-'+(300+Math.floor(Math.random()*100));
-        sampleWaitings.unshift({ticket:id,plate:randomPlate(),user:'Guest',service:(Math.random()<0.4?'Fast':'Normal'),time:new Date()});
-        if(sampleWaitings.length>12) sampleWaitings.pop();
-      }
-      renderGrid(); renderWaitings();
-    },2500);
+    // No client-side simulation: live updates should come from server/WebSocket or API.
 
       // Center controls which do not have a label (fullscreen/dark toggles)
       (function centerLabelessControls(){
