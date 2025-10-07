@@ -17,16 +17,20 @@ $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
 
-// Fetch latest charging status from both queue_tickets and active_tickets
-$stmt_queue = $conn->prepare("SELECT ticket_id, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
-$stmt_queue->bindParam(':username', $username);
-$stmt_queue->execute();
-$queue_ticket = $stmt_queue->fetch(PDO::FETCH_ASSOC);
+// Fetch latest charging status from queue_tickets (current/pending sessions)
+$stmt_charging = $conn->prepare("SELECT ticket_id, service_type, status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_charging->bindParam(':username', $username);
+$stmt_charging->execute();
+$latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
 
-$stmt_active = $conn->prepare("SELECT ticket_id, status, bay_number, created_at FROM active_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+// Fetch active ticket
+$stmt_active = $conn->prepare("SELECT ticket_id, status, bay_number FROM active_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
 $stmt_active->bindParam(':username', $username);
 $stmt_active->execute();
 $active_ticket = $stmt_active->fetch(PDO::FETCH_ASSOC);
+
+// Set queue_ticket to latest_charging
+$queue_ticket = $latest_charging;
 
 // Determine current status based on ticket states
 $current_ticket = null;
@@ -35,90 +39,55 @@ $background_class = 'connected-bg';
 $button_text = 'Charge Now';
 $button_href = 'ChargingPage.php';
 
-// Determine which ticket is more recent and prioritize it
-$use_queue_ticket = false;
-$use_active_ticket = false;
-
-if ($queue_ticket && $active_ticket) {
-    // Compare timestamps to see which is more recent
-    $queue_time = strtotime($queue_ticket['created_at']);
-    $active_time = strtotime($active_ticket['created_at']);
-    $use_queue_ticket = ($queue_time >= $active_time);
-    $use_active_ticket = !$use_queue_ticket;
-} elseif ($queue_ticket) {
-    $use_queue_ticket = true;
-} elseif ($active_ticket) {
-    $use_active_ticket = true;
-}
-
 // Check active_tickets for charging states
-if ($use_active_ticket && $active_ticket) {
+if ($active_ticket) {
     $current_ticket = $active_ticket;
-    $ticket_status = strtolower($active_ticket['status']);
-    if ($ticket_status === 'charging' || $ticket_status === 'active' || $ticket_status === 'processing') {
+    if (strtolower($active_ticket['status']) === 'charging') {
         $background_class = 'charging-bg';
-        
-        // Try to get bay number from charging_grid first (most accurate)
-        $stmt_charging_grid = $conn->prepare("SELECT bay_number FROM charging_grid WHERE username = :username AND ticket_id IS NOT NULL");
-        $stmt_charging_grid->bindParam(':username', $username);
-        $stmt_charging_grid->execute();
-        $charging_grid_bay = $stmt_charging_grid->fetch(PDO::FETCH_ASSOC);
-        
-        if ($charging_grid_bay && $charging_grid_bay['bay_number']) {
-            $bay_number = str_replace('Bay-', 'Bay ', $charging_grid_bay['bay_number']);
-        } else {
-            // Fallback to active_tickets bay_number or TBD
-            $fallback_bay = $active_ticket['bay_number'] ?? 'TBD';
-            $bay_number = str_replace('Bay-', 'Bay ', $fallback_bay);
-        }
-        
-        $status_text = 'Charging at ' . $bay_number;
+        $bay_number = $active_ticket['bay_number'] ?? 'TBD';
+        $status_text = 'Charging at Bay ' . $bay_number;
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
     }
 }
-
-// Check queue_tickets for all states (including charging)
-if ($use_queue_ticket && $queue_ticket) {
+// Check queue_tickets for pending/waiting states
+elseif ($queue_ticket) {
     $current_ticket = $queue_ticket;
-    $queue_status = strtolower($queue_ticket['status']);
-    $ticket_id = $queue_ticket['ticket_id'];
-    
-    if ($queue_status === 'charging') {
-        $background_class = 'charging-bg';
-        
-        // Try to get bay number from charging_grid first (most accurate)
-        $stmt_charging_grid = $conn->prepare("SELECT bay_number FROM charging_grid WHERE username = :username AND ticket_id IS NOT NULL");
-        $stmt_charging_grid->bindParam(':username', $username);
-        $stmt_charging_grid->execute();
-        $charging_grid_bay = $stmt_charging_grid->fetch(PDO::FETCH_ASSOC);
-        
-        if ($charging_grid_bay && $charging_grid_bay['bay_number']) {
-            $bay_number = str_replace('Bay-', 'Bay ', $charging_grid_bay['bay_number']);
-        } else {
-            // Fallback to TBD if no bay found
-            $bay_number = 'TBD';
-        }
-        
-        $status_text = 'Charging at ' . $bay_number;
-        $button_text = 'Check Monitor';
-        $button_href = '../Monitor/index.php';
-    } elseif ($queue_status === 'pending') {
+    // Check if payment is completed - if so, show as connected
+    if (strtolower($queue_ticket['payment_status']) === 'paid' ||
+        strtolower($queue_ticket['payment_status']) === 'completed' ||
+        strtolower($queue_ticket['payment_status']) === 'success') {
+        $status_text = 'Connected';
+        $background_class = 'connected-bg';
+        $button_text = 'Charge Now';
+        $button_href = 'ChargingPage.php';
+    } elseif (strtolower($queue_ticket['status']) === 'complete') {
         $background_class = 'queue-pending-bg';
-        $status_text = 'Queue Pending';
-        $button_text = 'Check Monitor';
+        $status_text = 'Pending Payment';
+        $button_text = 'Pay Now';
         $button_href = '../Monitor/index.php';
-    } elseif ($queue_status === 'waiting') {
+    } elseif (strtolower($queue_ticket['status']) === 'waiting') {
         $background_class = 'waiting-bg';
         $status_text = 'Waiting';
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
-    } elseif ($queue_status === 'in progress' || $queue_status === 'in_progress') {
-        $background_class = 'waiting-bg';
-        $status_text = 'In Progress';
-        $button_text = 'Check Monitor';
-        $button_href = '../Monitor/index.php';
     }
+}
+
+// Determine if vehicle action button (quick-action-btn) should be disabled
+$vehicle_button_disabled = false;
+$vehicle_disabled_status = '';
+if ($current_ticket && in_array(strtolower($current_ticket['status']), ['charging', 'completed', 'pending'])) {
+    $vehicle_button_disabled = true;
+    $vehicle_disabled_status = ucfirst(strtolower($current_ticket['status']));
+}
+
+// Determine if Start Charging button should be disabled
+$start_charging_disabled = false;
+$start_charging_disabled_status = '';
+if ($current_ticket && in_array(strtolower($current_ticket['status']), ['waiting', 'charging', 'completed'])) {
+    $start_charging_disabled = true;
+    $start_charging_disabled_status = ucfirst(strtolower($current_ticket['status']));
 }
 
 // Fetch battery level from database
@@ -279,8 +248,8 @@ if ($conn) {
     <meta name="theme-color" content="#1a1a2e" />
 
     <link rel="stylesheet" href="css/vantage-style.css" />
+    <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
-    <link rel="stylesheet" href="css/footer.css" />
 		<style>
 			/* ============================================
 			   VANTAGE MARKETS INSPIRED WHITE THEME
@@ -879,7 +848,7 @@ if ($conn) {
 			}
 
 			.queue-pending-bg {
-				background: linear-gradient(135deg, #ff9500 0%, #ffad33 100%);
+				background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
 			}
 
 			.connected-bg {
@@ -1722,280 +1691,9 @@ if ($conn) {
 		</style>
 	</head>
 	<body>
-		<!-- Header -->
-		<header class="header">
-			<div class="container">
-				<div class="header-content"
-					 style="display: flex;
-							align-items: center;
-							justify-content: space-between;
-							gap: 16px;
-							width: 100%;">
-					<!-- Logo -->
-            <a href="dashboard.php" class="logo"
-               style="display: flex;
-                      align-items: center;
-                      gap: 12px;
-                      margin-right: 16px;
-                      text-decoration: none;">
-                <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                <span class="logo-text">CEPHRA</span>
-            </a>
+			<?php include __DIR__ . '/partials/header.php'; ?>
 
-					<!-- Navigation -->
-					<nav class="nav" style="flex: 1;">
-						<ul class="nav-list"
-							style="display: flex;
-								   gap: 1.25rem;
-								   align-items: center;">
-							<li><a href="dashboard.php" class="nav-link">Home</a></li>
-							<li><a href="link.php" class="nav-link">Link</a></li>
-							<li><a href="history.php" class="nav-link">History</a></li>
-							<li><a href="rewards.php" class="nav-link">Rewards</a></li>
-						</ul>
-					</nav>
 
-					<!-- Header Actions -->
-					<div class="header-actions"
-						 style="display: flex;
-								align-items: center;
-								gap: 24px;
-								margin-left: auto;">
-						<!-- Wallet button -->
-						<a href="wallet.php" class="wallet-link"
-						   title="Wallet"
-						   style="display: inline-flex;
-								  align-items: center;
-								  justify-content: center;
-								  width: auto;
-								  height: auto;
-								  border: none;
-								  background: transparent;
-								  color: inherit;
-								  cursor: pointer;
-								  padding: 4px;">
-							<i class="fas fa-wallet" aria-hidden="true" style="font-size: 18px;"></i>
-						</a>
-                <!-- Notification bell -->
-                <div class="notifications" style="position: relative;">
-                    <button id="notifBtn"
-                            title="Notifications"
-                            style="display: inline-flex;
-                                   align-items: center;
-                                   justify-content: center;
-                                   width: auto;
-                                   height: auto;
-                                   border: none;
-                                   background: transparent;
-                                   color: inherit;
-                                   cursor: pointer;
-                                   padding: 4px;
-                                   position: relative;">
-                        <i class="fas fa-bell" aria-hidden="true" style="font-size: 18px;"></i>
-                        <span class="notification-badge" style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #ff4757; border-radius: 50%; display: block;"></span>
-                    </button>
-                    <div class="notification-dropdown" id="notificationDropdown"
-                         style="display: none;
-                                position: absolute;
-                                top: 100%;
-                                right: 0;
-                                background: white;
-                                border: 1px solid var(--border-color);
-                                border-radius: 8px;
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                                min-width: 280px;
-                                max-width: 320px;
-                                z-index: 1001;
-                                max-height: 300px;
-                                overflow-y: auto;
-                                margin-top: 8px;">
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-info-circle" style="color: var(--primary-color); font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Welcome to Cephra!</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your personalized dashboard is ready to use.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Just now</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-bolt" style="color: #28a745; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Charging Session Complete</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your EV has finished charging at Station A.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 hours ago</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-gift" style="color: #ff6b6b; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">New Rewards Available</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">You've earned 50 Green Points from your last charge.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">1 day ago</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-tools" style="color: #ffa502; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">System Maintenance Scheduled</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Station B will be under maintenance tomorrow.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 days ago</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-						<!-- Language selector (globe icon only) placed to the right of Download -->
-
-						<?php
-						// Compute avatar source
-						$pfpSrc = 'images/logo.png';
-						if ($conn) {
-							try {
-								$stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
-								$stmt2->bindParam(':u', $username);
-								$stmt2->execute();
-								$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
-								if ($row2 && !empty($row2['profile_picture'])) {
-									$pp = $row2['profile_picture'];
-									if (strpos($pp, 'data:image') === 0) {
-										$pfpSrc = $pp;
-									} elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
-										$pfpSrc = 'data:image/png;base64,' . $pp;
-									} elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
-										$path = 'uploads/profile_pictures/' . $pp;
-										if (file_exists(__DIR__ . '/' . $path)) {
-											$pfpSrc = $path;
-										}
-									}
-								}
-							} catch (Exception $e) { /* ignore */ }
-						}
-						?>
-						<div class="profile-container" style="position: relative;">
-							<button class="profile-btn" id="profileBtn"
-								   title="Profile Menu"
-								   style="display: inline-flex;
-										  width: 38px;
-										  height: 38px;
-										  border-radius: 50%;
-										  overflow: hidden;
-										  border: 2px solid rgba(0, 0, 0, 0.08);
-										  background: transparent;
-										  cursor: pointer;
-										  padding: 0;">
-								<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
-									 alt="Profile"
-									 style="width: 100%;
-											height: 100%;
-											object-fit: cover;
-											display: block;" />
-							</button>
-							<ul class="profile-dropdown" id="profileDropdown"
-								style="position: absolute;
-									   top: 100%;
-									   right: 0;
-									   background: white;
-									   border: 1px solid rgba(0, 0, 0, 0.1);
-									   border-radius: 8px;
-									   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-									   min-width: 120px;
-									   list-style: none;
-									   padding: 0;
-									   margin: 0;
-									   z-index: 1001;
-									   display: none;">
-								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
-									<a href="profile.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Profile</a>
-								</li>
-								<li style="position: relative; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
-									<a href="#" id="languageMenuItem" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Language</a>
-                                    <ul class="language-sub-dropdown" id="languageSubDropdown" style="position: absolute; top: 0; right: 100%; left: auto; background: white; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); min-width: 120px; list-style: none; padding: 0; margin: 0; display: none;">
-										<li><a href="#" onclick="setLanguage('en'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">English</a></li>
-										<li><a href="#" onclick="setLanguage('fil'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Filipino</a></li>
-										<li><a href="#" onclick="setLanguage('ceb'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Bisaya</a></li>
-										<li><a href="#" onclick="setLanguage('zh'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">中文</a></li>
-									</ul>
-								</li>
-								<li>
-									<a href="profile_logout.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Logout</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-
-					<!-- Mobile Menu Toggle -->
-					<button class="mobile-menu-toggle" id="mobileMenuToggle">
-						<span></span>
-						<span></span>
-						<span></span>
-					</button>
-				</div>
-			</div>
-
-			<!-- Mobile Menu -->
-                <div class="mobile-menu" id="mobileMenu">
-                    <div class="mobile-menu-content">
-                        <!-- Mobile Navigation -->
-                        <div class="mobile-nav">
-                            <ul class="mobile-nav-list">
-                                <li class="mobile-nav-item">
-                                    <a href="dashboard.php" class="mobile-nav-link">Home</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="../Monitor/index.php" class="mobile-nav-link">Monitor</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="link.php" class="mobile-nav-link">Link</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="wallet.php" class="mobile-nav-link">Wallet</a>
-                                </li>
-								<li class="mobile-nav-item">
-                                    <a href="history.php" class="mobile-nav-link">History</a>
-                                </li>
-								<li class="mobile-nav-item">
-                                    <a href="rewards.php" class="mobile-nav-link">Rewards</a>
-                                </li>
-
-                            </ul>
-                        </div>
-
-                        <!-- Mobile Header Actions -->
-                        <div class="mobile-header-actions" style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
-                            <!-- Language selector removed - available in profile dropdown -->
-                        </div>
-
-                        <!-- Actions row: Download + Logout in one row on small screens -->
-                        <div class="mobile-actions-row" style="display:flex;gap:16px;align-items:center;justify-content:center;margin-top:12px;">
-                            <!-- Mobile Download App -->
-                            <div class="mobile-download-app" style="display:flex;align-items:center;">
-                                <div class="download-app">
-                                    <button class="download-btn" id="mobileDownloadBtn">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                    <div class="qr-popup" id="mobileQrPopup">
-                                        <div class="qr-content">
-                                            <h4>Download Cephra App</h4>
-                                            <div class="qr-code">
-                                                <img src="images/qr.png" alt="QR Code - Download Cephra App" width="120" height="120" style="display: block; border-radius: 8px;" />
-                                            </div>
-                                            <p>Scan to download the Cephra mobile app</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mobile Logout Button -->
-                            <div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;justify-content:center;width:100%;">
-                                <a href="profile_logout.php" class="nav-link auth-link" style="text-align:center;padding:0.75rem 1.5rem;background:var(--gradient-primary);color:white;border-radius:25px;text-decoration:none;font-weight:600;transition:all 0.3s ease;min-width:120px;">Logout</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-		</header>
-
-		<!-- Mobile Menu Overlay -->
-		<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
 		<!-- Dashboard Hero Section -->
 		<section class="dashboard-hero">
@@ -2012,7 +1710,11 @@ if ($conn) {
                     fast, and reliable charging solutions.
                 </p>
                 <div class="hero-actions">
-                    <a href="ChargingPage.php" class="btn btn-outline">Start Charging</a>
+                    <?php if ($start_charging_disabled): ?>
+                    <span class="btn btn-outline disabled" style="pointer-events: none; opacity: 0.5; cursor: not-allowed;" id="startChargingBtn">Start Charging (<?php echo htmlspecialchars($start_charging_disabled_status); ?>)</span>
+                    <?php else: ?>
+                    <a href="ChargingPage.php" class="btn btn-outline" id="startChargingBtn">Start Charging</a>
+                    <?php endif; ?>
                 </div>
             </div>
 		</section>
@@ -2057,17 +1759,17 @@ if ($conn) {
 		</section>
 
 		<!-- Features Section -->
-		<section class="features" style="padding: 80px 0; display: block !important;">
+		<section class="features" style="padding: 80px 0;">
 			<div class="container">
 				<div class="section-header">
 					<h2 class="section-title">Vehicle Status</h2>
 					<p class="section-description">Monitor your electric vehicle's charging status and performance</p>
 				</div>
 
-				<div class="features-grid" style="display: grid !important;">
+				<div class="features-grid">
 					<!-- Car Status Feature -->
 					<?php if ($vehicle_data): ?>
-					<div class="feature-card main-vehicle-card animate-in <?php echo $background_class; ?>" style="color: white; position: relative; overflow: hidden; opacity: 1 !important; transform: none !important;">
+					<div class="feature-card main-vehicle-card <?php echo $background_class; ?>" style="color: white; position: relative; overflow: hidden;">
 						<div class="main-vehicle-content">
 							<div class="vehicle-info">
 								<div class="feature-icon-large">
@@ -2100,13 +1802,13 @@ if ($conn) {
 								</div>
 							</div>
 			<div class="vehicle-actions">
-				<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>" <?php echo (strpos($button_href, 'Monitor') !== false) ? 'target="_blank"' : ''; ?>><?php echo htmlspecialchars($button_text); ?></a>
+				<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>"><?php echo htmlspecialchars($button_text); ?></a>
 			</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
 					</div>
 					<?php else: ?>
-					<div class="feature-card main-vehicle-card animate-in" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); color: white; position: relative; overflow: hidden; text-align: center; padding: 4rem 2rem; opacity: 1 !important; transform: none !important;">
+					<div class="feature-card main-vehicle-card" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); color: white; position: relative; overflow: hidden; text-align: center; padding: 4rem 2rem;">
 						<div class="feature-icon-large" style="margin: 0 auto 1rem; background: rgba(255, 255, 255, 0.2);">
 							<i class="fas fa-car" style="font-size: 32px;"></i>
 						</div>
@@ -2118,7 +1820,7 @@ if ($conn) {
 
 					<?php if ($vehicle_data): ?>
 					<!-- Battery Health Monitor -->
-					<div class="feature-card animate-in" style="opacity: 1 !important; transform: none !important;">
+					<div class="feature-card">
 						<div class="feature-icon">
 							<i class="fas fa-battery-three-quarters"></i>
 						</div>
@@ -2131,7 +1833,7 @@ if ($conn) {
 					</div>
 
 					<!-- Range Calculator -->
-					<div class="feature-card animate-in" style="opacity: 1 !important; transform: none !important;">
+					<div class="feature-card">
 						<div class="feature-icon">
 							<i class="fas fa-route"></i>
 					</div>
@@ -2145,7 +1847,7 @@ if ($conn) {
 					</div>
 
 					<!-- Estimated Cost -->
-					<div class="feature-card animate-in" style="opacity: 1 !important; transform: none !important;">
+					<div class="feature-card">
 						<div class="feature-icon">
 							<i class="fas fa-dollar-sign"></i>
 						</div>
@@ -2159,7 +1861,7 @@ if ($conn) {
 					</div>
 
 					<!-- Vehicle Diagnostics -->
-					<div class="feature-card animate-in" style="opacity: 1 !important; transform: none !important;">
+					<div class="feature-card">
 						<div class="feature-icon">
 							<i class="fas fa-stethoscope"></i>
 						</div>
@@ -2176,16 +1878,16 @@ if ($conn) {
 		</section>
 
 		<!-- Rewards and Wallet Section -->
-		<section class="rewards-wallet" style="padding: 80px 0; background: #f8f9fa; display: block !important;">
+		<section class="rewards-wallet" style="padding: 80px 0; background: #f8f9fa;">
 			<div class="container">
 				<div class="section-header">
 					<h2 class="section-title">Rewards & Wallet</h2>
 					<p class="section-description">Manage your rewards and wallet balance</p>
 				</div>
 
-				<div class="features-grid" style="display: grid !important;">
+				<div class="features-grid">
 					<!-- Rewards Feature -->
-					<div class="feature-card animate-in" style="grid-column: span 2; display: block !important; opacity: 1 !important; transform: none !important;">
+					<div class="feature-card" style="grid-column: span 2;">
 						<div class="feature-icon">
 							<i class="fas fa-gift"></i>
 						</div>
@@ -2194,11 +1896,11 @@ if ($conn) {
 							Earn points on every charge and unlock exclusive benefits,
 							discounts, and premium features as you charge more.
 						</p>
-						<a href="rewards.php" class="feature-link">View Rewards →</a>
+						<a href="#" onclick="showGreenPointsPopup(); return false;" class="feature-link">View Rewards →</a>
 					</div>
 
 					<!-- Wallet Feature -->
-					<div class="feature-card animate-in" style="grid-column: span 2; display: block !important; opacity: 1 !important; transform: none !important;">
+					<div class="feature-card" style="grid-column: span 2;">
 						<div class="feature-icon">
 							<i class="fas fa-wallet"></i>
 						</div>
@@ -2385,6 +2087,180 @@ if ($conn) {
 			</div>
 		</div>
 
+		<!-- Charging Status Modal -->
+		<div id="chargingModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon charging-icon">
+					<i class="fas fa-bolt"></i>
+				</div>
+				<h2 class="charging-modal-title">Your Car is Charging</h2>
+				<p class="charging-modal-description">Your vehicle is currently charging. Please wait while we power up your battery.</p>
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Current Battery:</span>
+						<span id="chargingCurrentBattery">45%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Target Battery:</span>
+						<span id="chargingTargetBattery">80%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Charging Speed:</span>
+						<span id="chargingSpeed">7.2 kW</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Time Remaining:</span>
+						<span id="chargingTimeRemaining">20 minutes</span>
+					</div>
+				</div>
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-primary" onclick="closeChargingModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Waiting Queue Modal -->
+		<div id="waitingModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon waiting-icon">
+					<i class="fas fa-clock"></i>
+				</div>
+				<h2 class="charging-modal-title">You're in the Queue</h2>
+				<p class="charging-modal-description">Your car is already in the charging queue. Please wait for your turn.</p>
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Queue Position:</span>
+						<span id="queuePosition">2nd</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Estimated Wait:</span>
+						<span id="estimatedWait">10 minutes</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Ticket ID:</span>
+						<span id="ticketId">#CH001</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Service Type:</span>
+						<span id="serviceType">Fast Charging</span>
+					</div>
+				</div>
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-secondary" onclick="cancelQueue()">Cancel</button>
+					<button class="charging-modal-btn btn-primary" onclick="closeWaitingModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Payment Completion Modal -->
+		<div id="paymentModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon completed-icon">
+					<i class="fas fa-check-circle"></i>
+				</div>
+				<h2 class="charging-modal-title">Charging Complete</h2>
+				<p class="charging-modal-description">Your charging session is complete. Please select your payment method.</p>
+				
+				<div class="charging-modal-info">
+					<div class="charging-info-item">
+						<span>Session Duration:</span>
+						<span id="sessionDuration">45 minutes</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Energy Delivered:</span>
+						<span id="energyDelivered">12.5 kWh</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Final Battery:</span>
+						<span id="finalBattery">85%</span>
+					</div>
+					<div class="charging-info-item">
+						<span>Total Amount:</span>
+						<span id="totalAmount">₱75.00</span>
+					</div>
+				</div>
+
+				<div class="wallet-balance" id="walletBalanceDisplay" style="display: none;">
+					Current Wallet Balance: ₱<span id="currentWalletBalance">150.00</span>
+				</div>
+
+				<div class="error-message" id="errorMessage" style="display: none;">
+					Insufficient wallet balance. Please choose cash payment or add funds to your wallet.
+				</div>
+
+				<div class="payment-options">
+					<div class="payment-option" data-method="cash" onclick="selectPaymentMethod('cash')">
+						<div class="payment-icon">
+							<i class="fas fa-money-bill-wave"></i>
+						</div>
+						<div class="payment-label">Cash</div>
+					</div>
+					<div class="payment-option" data-method="ewallet" onclick="selectPaymentMethod('ewallet')">
+						<div class="payment-icon">
+							<i class="fas fa-wallet"></i>
+						</div>
+						<div class="payment-label">E-Wallet</div>
+					</div>
+				</div>
+
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-secondary" onclick="closePaymentModal()">Cancel</button>
+					<button class="charging-modal-btn btn-success" id="confirmPaymentBtn" onclick="confirmPayment()" disabled>Confirm Payment</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Payment Success Modal -->
+		<div id="paymentSuccessModal" class="charging-modal-overlay" style="display: none;">
+			<div class="charging-modal-content">
+				<div class="charging-modal-icon charging-icon">
+					<i class="fas fa-check"></i>
+				</div>
+				<h2 class="charging-modal-title">Payment Successful</h2>
+				<p class="charging-modal-description">Thank you for your payment. Here's your receipt.</p>
+				
+				<div class="receipt-info">
+					<div class="receipt-header">PAYMENT RECEIPT</div>
+					<div class="receipt-item">
+						<span>Transaction ID:</span>
+						<span id="transactionId">#TXN12345</span>
+					</div>
+					<div class="receipt-item">
+						<span>Date & Time:</span>
+						<span id="receiptDateTime"></span>
+					</div>
+					<div class="receipt-item">
+						<span>Service:</span>
+						<span id="receiptService">Fast Charging</span>
+					</div>
+					<div class="receipt-item">
+						<span>Duration:</span>
+						<span id="receiptDuration">45 minutes</span>
+					</div>
+					<div class="receipt-item">
+						<span>Energy:</span>
+						<span id="receiptEnergy">12.5 kWh</span>
+					</div>
+					<div class="receipt-item">
+						<span>Payment Method:</span>
+						<span id="receiptPaymentMethod">E-Wallet</span>
+					</div>
+					<div class="receipt-item total">
+						<span>Total Paid:</span>
+						<span id="receiptTotal">₱75.00</span>
+					</div>
+					<div class="receipt-item" id="remainingBalanceItem" style="display: none;">
+						<span>Remaining Balance:</span>
+						<span id="receiptRemainingBalance">₱75.00</span>
+					</div>
+				</div>
+
+				<div class="charging-modal-buttons">
+					<button class="charging-modal-btn btn-primary" onclick="closePaymentSuccessModal()">OK</button>
+				</div>
+			</div>
+		</div>
+
 		<!-- Scripts -->
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.dropotron.min.js"></script>
@@ -2392,47 +2268,140 @@ if ($conn) {
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-            <script>
-                // Profile dropdown functionality
-                (function() {
-                    const profileBtn = document.getElementById('profileBtn');
-                    const profileDropdown = document.getElementById('profileDropdown');
-                    const languageMenuItem = document.getElementById('languageMenuItem');
-                    const languageSubDropdown = document.getElementById('languageSubDropdown');
+			<script>
+				 // Mobile Menu Toggle
+        function initMobileMenu() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.createElement('div');
+            mobileMenuOverlay.className = 'mobile-menu-overlay';
+            mobileMenuOverlay.id = 'mobileMenuOverlay';
+            document.body.appendChild(mobileMenuOverlay);
 
-                    if (profileBtn && profileDropdown) {
-                        profileBtn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            const isVisible = profileDropdown.style.display === 'block';
-                            profileDropdown.style.display = isVisible ? 'none' : 'block';
-                        });
+            function toggleMobileMenu() {
+                const isActive = mobileMenu.classList.contains('active');
+                if (isActive) {
+                    closeMobileMenu();
+                } else {
+                    openMobileMenu();
+                }
+            }
 
-                        // Close dropdown when clicking outside
-                        document.addEventListener('click', function(e) {
-                            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                                profileDropdown.style.display = 'none';
+            function openMobileMenu() {
+                mobileMenu.classList.add('active');
+                mobileMenuToggle.classList.add('active');
+                mobileMenuOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+                document.addEventListener('keydown', handleEscapeKey);
+            }
+
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                mobileMenuOverlay.removeEventListener('click', closeMobileMenu);
+                document.removeEventListener('keydown', handleEscapeKey);
+            }
+
+            function handleEscapeKey(e) {
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+            }
+
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileNavLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                        if (mobileMenu.classList.contains('active')) {
+                            closeMobileMenu();
+                        }
+                    }
+                }
+            });
+        }
+                // Pass PHP variables to JavaScript
+                window.chargingStatus = '<?php echo $charging_status; ?>';
+                window.statusText = '<?php echo $status_text; ?>';
+                window.currentStatus = '<?php echo $current_ticket ? strtolower($current_ticket['status']) : ''; ?>';
+                window.paymentStatus = '<?php echo $latest_charging ? $latest_charging['payment_status'] : ''; ?>';
+                window.ticketId = '<?php echo $latest_charging ? $latest_charging['ticket_id'] : ''; ?>';
+                window.serviceType = '<?php echo $latest_charging ? $latest_charging['service_type'] : ''; ?>';
+                window.batteryLevel = '<?php echo $db_battery_level ?: '0'; ?>';
+
+                // Function to show error popup
+                function showErrorPopup(message) {
+                    // Remove existing popup if any
+                    const existingPopup = document.querySelector('.popup-overlay.error-popup');
+                    if (existingPopup) {
+                        existingPopup.remove();
+                    }
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'popup-overlay error-popup';
+                    overlay.style.background = 'rgba(0, 0, 0, 0.6)';
+                    overlay.style.zIndex = '10001';
+
+                    const popup = document.createElement('div');
+                    popup.className = 'popup-content';
+                    popup.style.background = 'var(--bg-primary)';
+                    popup.style.color = 'var(--text-primary)';
+                    popup.style.border = '2px solid var(--primary-color)';
+                    popup.style.padding = '20px';
+                    popup.style.textAlign = 'center';
+                    popup.style.fontWeight = '600';
+                    popup.style.fontSize = '1.1rem';
+                    popup.style.borderRadius = '12px';
+                    popup.style.maxWidth = '320px';
+                    popup.style.boxShadow = '0 10px 30px rgba(0, 194, 206, 0.3)';
+                    popup.textContent = message;
+
+                    const btn = document.createElement('button');
+                    btn.textContent = 'OK';
+                    btn.style.marginTop = '16px';
+                    btn.style.padding = '8px 20px';
+                    btn.style.background = 'var(--primary-color)';
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                    btn.style.borderRadius = '8px';
+                    btn.style.cursor = 'pointer';
+                    btn.style.fontWeight = '700';
+                    btn.onclick = () => {
+                        if (overlay.parentNode) {
+                            overlay.parentNode.removeChild(overlay);
+                        }
+                    };
+
+                    popup.appendChild(document.createElement('br'));
+                    popup.appendChild(btn);
+                    overlay.appendChild(popup);
+                    document.body.appendChild(overlay);
+                }
+
+                // Add event listener to Start Charging button
+                document.addEventListener('DOMContentLoaded', function() {
+                    const startBtn = document.getElementById('startChargingBtn');
+                    if (startBtn) {
+                        startBtn.addEventListener('click', function(event) {
+                            // Check if current ticket status is charging or completed
+                            const pendingStatuses = ['charging', 'completed'];
+                            const currentStatus = window.currentStatus || '';
+
+                            if (pendingStatuses.includes(currentStatus)) {
+                                event.preventDefault();
+                                showErrorPopup('You already have a pending ticket');
                             }
+                            // else allow navigation normally
                         });
-
-            // Language sub-dropdown toggle
-            if (languageMenuItem && languageSubDropdown) {
-                languageMenuItem.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const isVisible = languageSubDropdown.style.display === 'block';
-                    languageSubDropdown.style.display = isVisible ? 'none' : 'block';
-                });
-                // Close sub-dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!languageMenuItem.contains(e.target) && !languageSubDropdown.contains(e.target)) {
-                        languageSubDropdown.style.display = 'none';
                     }
                 });
-            }
-        }
 
-
-
-// Notification dropdown functionality
+				// Notification dropdown functionality
 (function() {
     const notifBtn = document.getElementById('notifBtn');
     const notificationDropdown = document.getElementById('notificationDropdown');
@@ -2453,37 +2422,6 @@ if ($conn) {
     }
 })();
 
-        // Set language function
-        window.setLanguage = function(lang) {
-            localStorage.setItem('selectedLanguage', lang);
-            if (typeof translateDashboard === 'function') {
-                translateDashboard();
-            }
-            // Close dropdowns
-            if (profileDropdown) profileDropdown.style.display = 'none';
-            if (languageSubDropdown) languageSubDropdown.style.display = 'none';
-            if (languageDropdown) languageDropdown.style.display = 'none';
-        };
-
-                    // Download QR hover (if exists)
-                    const downloadBtn = document.getElementById('downloadBtn');
-                    const qrPopup = document.getElementById('qrPopup');
-                    if (downloadBtn && qrPopup) {
-                        downloadBtn.addEventListener('mouseenter', function(){
-                            qrPopup.classList.add('show');
-                        });
-                        downloadBtn.addEventListener('mouseleave', function(){
-                            setTimeout(()=>{
-                                if (!downloadBtn.matches(':hover') && !qrPopup.matches(':hover')) {
-                                    qrPopup.classList.remove('show');
-                                }
-                            }, 100);
-                        });
-                        qrPopup.addEventListener('mouseleave', function(){
-                            qrPopup.classList.remove('show');
-                        });
-                    }
-                })();
             </script>
 
             <script>
@@ -2539,25 +2477,17 @@ if ($conn) {
                     document.getElementById('greenPointsPopup').style.display = 'flex';
                 }
 
-                // Function to close Green Points popup with state management
+                // Function to close Green Points popup
                 function closeGreenPointsPopup() {
-                    // Prevent multiple rapid clicks
-                    if (window.greenPointsPopupClosing) {
-                        return;
-                    }
-                    window.greenPointsPopupClosing = true;
-                    
                     document.getElementById('greenPointsPopup').style.display = 'none';
-                    
-                    // Reset state after a short delay
-                    setTimeout(function() {
-                        window.greenPointsPopupClosing = false;
-                    }, 500);
                 }
 
                 // Show popup after page loads (with delay)
                 $(document).ready(function() {
-                    // Green Points popup removed - users can access rewards via navigation or View Rewards button
+                    // Show Green Points popup after 2 seconds
+                    setTimeout(function() {
+                        showGreenPointsPopup();
+                    }, 2000);
 
                     // Normal Charge Button Click Handler
                     $('#normalChargeBtn').click(function(e) {
@@ -2572,12 +2502,6 @@ if ($conn) {
                     });
 
                     function processChargeRequest(serviceType) {
-                        // Prevent multiple rapid clicks
-                        if (window.chargingInProgress) {
-                            return false;
-                        }
-                        window.chargingInProgress = true;
-
                         // Force exact service type strings expected by backend
                         let serviceTypeMapped = '';
                         if (serviceType === 'Normal Charging' || serviceType === 'normal charging') {
@@ -2588,11 +2512,8 @@ if ($conn) {
                             serviceTypeMapped = serviceType; // fallback
                         }
 
-                        // Disable buttons during processing with visual feedback
-                        $('#normalChargeBtn, #fastChargeBtn').prop('disabled', true).css({
-                            'opacity': '0.6',
-                            'cursor': 'not-allowed'
-                        });
+                        // Disable buttons during processing
+                        $('#normalChargeBtn, #fastChargeBtn').prop('disabled', true);
 
                         $.ajax({
                             url: 'charge_action.php',
@@ -2612,36 +2533,28 @@ if ($conn) {
                                 console.error('AJAX Error:', error);
                             },
                             complete: function() {
-                                // Reset state and re-enable buttons
-                                window.chargingInProgress = false;
-                                $('#normalChargeBtn, #fastChargeBtn').prop('disabled', false).css({
-                                    'opacity': '1',
-                                    'cursor': 'pointer'
-                                });
+                                // Re-enable buttons
+                                $('#normalChargeBtn, #fastChargeBtn').prop('disabled', false);
                             }
                         });
                     }
 
                     // Removed showQueueTicketProceedPopup - now handled by ChargingPage.php modal
 
-                    // Function to close popup (defined globally) - simple and clean
+                    // Function to close popup (defined globally) with state management
                     window.closePopup = function() {
-                        try {
-                            // Remove all popups/modals
-                            const popups = document.querySelectorAll('#queuePopup, [data-dialog-overlay]');
-                            popups.forEach(popup => {
-                                if (popup && popup.parentNode) {
-                                    popup.style.display = 'none';
-                                    popup.remove();
-                                }
-                            });
-                            document.body.style.overflow = '';
-                        } catch (e) {
-                            // Force cleanup
-                            document.body.style.overflow = '';
-                            const overlays = document.querySelectorAll('div[style*="position: fixed"][style*="background: rgba"]');
-                            overlays.forEach(overlay => overlay.remove());
+                        // Prevent multiple rapid clicks
+                        if (window.popupClosing) {
+                            return;
                         }
+                        window.popupClosing = true;
+                        
+                        $('#queuePopup').remove();
+                        
+                        // Reset state after a short delay
+                        setTimeout(function() {
+                            window.popupClosing = false;
+                        }, 500);
                     };
                 });
 
@@ -2824,126 +2737,29 @@ if ($conn) {
                     setInterval(fetchAndRenderLiveStatus, 3000);
                 }
 
-         // Mobile menu toggle
-        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('mobile-menu-open');
-            this.classList.toggle('active');
-        });
+                // Fix for passive event listeners in jQuery
+                if (typeof jQuery !== 'undefined') {
+                    jQuery.event.special.touchstart = {
+                        setup: function(_, ns, handle) {
+                            this.addEventListener('touchstart', handle, { passive: true });
+                        }
+                    };
+                    jQuery.event.special.touchmove = {
+                        setup: function(_, ns, handle) {
+                            this.addEventListener('touchmove', handle, { passive: true });
+                        }
+                    };
+                }
+
+
                 
 
-				/*
-				// Simple i18n for dashboard (EN, Bisaya, 中文) - DISABLED
-				(function() {
-					const dict = {
-						en: {
-							Monitor: 'Home', Link: 'Link', History: 'History', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Logout',
-							LiveStatus: 'Live Status', LiveDesc: 'Real-time charging station information',
-							SystemStatus: 'System Status', AllOperational: 'All system operational',
-							CurrentQueue: 'Current Queue', VehiclesWaiting: 'vehicles waiting',
-							ActiveSessions: 'Active Sessions', ChargingNow: 'charging now',
-							EstWait: 'Estimated wait time:', AvgSess: 'Average session duration:',
-							VehicleStatus: 'Vehicle Status', VehicleDesc: "Monitor your electric vehicle's charging status and performance",
-							BatteryHealthMonitor: 'Battery Health Monitor', RangeCalculator: 'Range Calculator', EstimatedCost: 'Estimated Cost', VehicleDiagnostics: 'Vehicle Diagnostics',
-							RewardsWallet: 'Rewards & Wallet', RewardsWalletDesc: 'Manage your rewards and wallet balance',
-							RecentActivity: 'Recent Activity', RecentDesc: 'Your latest charging sessions and transactions'
-						},
-						fil: {
-							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Mag-logout',
-							LiveStatus: 'Live Status', LiveDesc: 'Impormasyong real-time ng charging station',
-							SystemStatus: 'Katayuan ng Sistema', AllOperational: 'Maayos ang lahat ng sistema',
-							CurrentQueue: 'Kasalukuyang Pila', VehiclesWaiting: 'sasakyang naghihintay',
-							ActiveSessions: 'Aktibong Session', ChargingNow: 'kasalukuyang nagcha-charge',
-							EstWait: 'Tinatayang oras ng paghihintay:', AvgSess: 'Karaniwang tagal ng session:',
-							VehicleStatus: 'Katayuan ng Sasakyan', VehicleDesc: 'Subaybayan ang estado at performance ng iyong EV',
-							BatteryHealthMonitor: 'Kalusugan ng Baterya', RangeCalculator: 'Range Calculator', EstimatedCost: 'Tantyang Gastos', VehicleDiagnostics: 'Diagnostics ng Sasakyan',
-							RewardsWallet: 'Rewards at Wallet', RewardsWalletDesc: 'Pamahalaan ang iyong rewards at balanse',
-							RecentActivity: 'Kamakailang Aktibidad', RecentDesc: 'Pinakabagong charging sessions at transaksyon'
-						},
-						ceb: {
-							Monitor: 'Monitor', Link: 'Link', History: 'Kasaysayan', Rewards: 'Rewards', Profile: 'Profile', Logout: 'Gawas',
-							LiveStatus: 'Buhi nga Kahimtang', LiveDesc: 'Tinuod‑panahong impormasyon sa charging station',
-							SystemStatus: 'Kahimtang sa Sistema', AllOperational: 'Tanan sistema nagdagan',
-							CurrentQueue: 'Karon nga Linya', VehiclesWaiting: 'sakyanan naghulat',
-							ActiveSessions: 'Aktibong mga Sesyon', ChargingNow: 'nag‑charge karon',
-							EstWait: 'Gibanabana nga paghulat:', AvgSess: 'Average nga gikatigayon sa sesyon:',
-							VehicleStatus: 'Kahimtang sa Salakyanan', VehicleDesc: 'Subaya ang kahimtang sa imong EV ug performance',
-							BatteryHealthMonitor: 'Kahimsog sa Baterya', RangeCalculator: 'Kalkulasyon sa Gilay-on', EstimatedCost: 'Gibanabana nga Gasto', VehicleDiagnostics: 'Diagnostics sa Salakyanan',
-							RewardsWallet: 'Ganti & Wallet', RewardsWalletDesc: 'Dumala ang imong ganti ug balanse sa wallet',
-							RecentActivity: 'Bag-ong Kalihokan', RecentDesc: 'Pinakabag-ong mga sesyon ug transaksiyon'
-						},
-						zh: {
-							Monitor: '监控', Link: '连接', History: '历史', Rewards: '奖励', Profile: '资料', Logout: '登出',
-							LiveStatus: '实时状态', LiveDesc: '充电站实时信息',
-							SystemStatus: '系统状态', AllOperational: '系统正常运行',
-							CurrentQueue: '当前排队', VehiclesWaiting: '辆等待中',
-							ActiveSessions: '进行中的会话', ChargingNow: '正在充电',
-							EstWait: '预计等待时间：', AvgSess: '平均会话时长：',
-							VehicleStatus: '车辆状态', VehicleDesc: '监控您的电动车充电状态与性能',
-							BatteryHealthMonitor: '电池健康监控', RangeCalculator: '续航计算器', EstimatedCost: '费用估算', VehicleDiagnostics: '车辆诊断',
-							RewardsWallet: '奖励与钱包', RewardsWalletDesc: '管理您的奖励与钱包余额',
-							RecentActivity: '近期活动', RecentDesc: '您最近的充电会话与交易'
-						}
-					};
-					function translateDashboard() {
-						const lang = localStorage.getItem('selectedLanguage') || 'en';
-						const t = dict[lang] || dict.en;
-						// Top navigation
-						const nav = document.querySelectorAll('.nav-list .nav-link');
-						if (nav[0]) nav[0].textContent = t.Monitor;
-						if (nav[1]) nav[1].textContent = t.Link;
-						if (nav[2]) nav[2].textContent = t.History;
-						if (nav[3]) nav[3].textContent = t.Rewards;
-						const logout = document.querySelector('.mobile-auth-link');
-						if (logout) logout.textContent = t.Logout;
-						// Live status
-						const lsTitle = document.querySelector('.live-status .section-title');
-						const lsDesc = document.querySelector('.live-status .section-description');
-						if (lsTitle) lsTitle.textContent = t.LiveStatus;
-						if (lsDesc) lsDesc.textContent = t.LiveDesc;
-						const cards = document.querySelectorAll('.status-card');
-						if (cards[0]) {
-							cards[0].querySelector('.status-title').textContent = t.SystemStatus;
-							const op = cards[0].querySelector('.status-text');
-							if (op) op.textContent = t.AllOperational;
-						}
-						if (cards[1]) {
-							cards[1].querySelector('.status-title').textContent = t.CurrentQueue;
-							const lbl = cards[1].querySelector('.queue-label');
-							if (lbl) lbl.textContent = t.VehiclesWaiting;
-							const est = cards[1].querySelector('.status-description');
-							if (est) est.firstChild.textContent = `${t.EstWait} `;
-						}
-						if (cards[2]) {
-							cards[2].querySelector('.status-title').textContent = t.ActiveSessions;
-							const lbl = cards[2].querySelector('.session-label');
-							if (lbl) lbl.textContent = t.ChargingNow;
-							const avg = cards[2].querySelector('.status-description');
-							if (avg) avg.firstChild.textContent = `${t.AvgSess} `;
-						}
-						// Section headers
-						const vsTitle = document.querySelector('.features .section-title');
-						const vsDesc = document.querySelector('.features .section-description');
-						if (vsTitle) vsTitle.textContent = t.VehicleStatus;
-						if (vsDesc) vsDesc.textContent = t.VehicleDesc;
-						const rwTitle = document.querySelector('.rewards-wallet .section-title');
-						const rwDesc = document.querySelector('.rewards-wallet .section-description');
-						if (rwTitle) rwTitle.textContent = t.RewardsWallet;
-						if (rwDesc) rwDesc.textContent = t.RewardsWalletDesc;
-						const raTitle = document.querySelector('.recent-activity .section-title');
-						const raDesc = document.querySelector('.recent-activity .section-description');
-						if (raTitle) raTitle.textContent = t.RecentActivity;
-						if (raDesc) raDesc.textContent = t.RecentDesc;
-					}
-					window.translateDashboard = translateDashboard;
-				})();
-				*/
 
-				// Initialize dashboard features
+
+                // Initialize dashboard features
                 $(document).ready(function() {
                     loadDashboardStats();
                     updateLiveStatus();
-                    initMobileMenu(); // Initialize mobile menu functionality
 					// Apply saved language translations
 					setTimeout(() => { try { window.translateDashboard(); } catch(e){} }, 0);
 
@@ -2966,10 +2782,8 @@ if ($conn) {
                         observer.observe(el);
                     });
 
-                    // Real-time status updates - improved version
+                    // Real-time status updates
                     function updateVehicleStatus() {
-                        console.log('updateVehicleStatus called at:', new Date().toLocaleTimeString());
-                        
                         fetch('api/status_update.php', {
                             method: 'POST',
                             headers: {
@@ -2977,192 +2791,173 @@ if ($conn) {
                             },
                             body: JSON.stringify({action: 'get_status'})
                         })
-                        .then(response => {
-                            console.log('API response status:', response.status);
-                            return response.json();
-                        })
+                        .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                console.log('Vehicle status update received:', data); // Debug log
-                                console.log('Current status_text:', data.status_text);
-                                console.log('Previous status:', window.lastVehicleStatus);
-                                
-                                // Check if status actually changed
-                                if (window.lastVehicleStatus !== data.status_text) {
-                                    console.log('Status changed from:', window.lastVehicleStatus, 'to:', data.status_text);
-                                }
-                                
-                                // Update status text - target the specific status element
-                                const statusSelectors = [
-                                    '.stat-item:first-child .stat-value', // First stat-item (Status)
-                                    '.vehicle-stats .stat-item:first-child .stat-value',
-                                    '.features .stat-item:first-child .stat-value',
-                                    '.stat-value[data-status-value]',
-                                    '[data-status-value]'
-                                ];
-                                
-                                let statusUpdated = false;
-                                for (const selector of statusSelectors) {
-                                    const statusElement = document.querySelector(selector);
-                                    if (statusElement && data.status_text) {
-                                        console.log('Updating status element with selector:', selector, 'to:', data.status_text);
-                                        statusElement.textContent = data.status_text;
-                                        // Add visual indicator that status was updated
-                                        statusElement.style.backgroundColor = '#00c2ce';
-                                        statusElement.style.color = 'white';
-                                        statusElement.style.padding = '2px 6px';
-                                        statusElement.style.borderRadius = '4px';
-                                        setTimeout(() => {
-                                            statusElement.style.backgroundColor = '';
-                                            statusElement.style.color = '';
-                                            statusElement.style.padding = '';
-                                            statusElement.style.borderRadius = '';
-                                        }, 1000);
-                                        statusUpdated = true;
-                                        break;
-                                    }
-                                }
-                                
-                                // Fallback: find status element by looking for "Status" label
-                                if (!statusUpdated) {
-                                    const statItems = document.querySelectorAll('.stat-item');
-                                    for (const item of statItems) {
-                                        const label = item.querySelector('.stat-label');
-                                        const value = item.querySelector('.stat-value');
-                                        if (label && value && label.textContent.trim() === 'Status') {
-                                            console.log('Found status element by label, updating to:', data.status_text);
-                                            value.textContent = data.status_text;
-                                            // Add visual indicator that status was updated
-                                            value.style.backgroundColor = '#00c2ce';
-                                            value.style.color = 'white';
-                                            value.style.padding = '2px 6px';
-                                            value.style.borderRadius = '4px';
-                                            setTimeout(() => {
-                                                value.style.backgroundColor = '';
-                                                value.style.color = '';
-                                                value.style.padding = '';
-                                                value.style.borderRadius = '';
-                                            }, 1000);
-                                            statusUpdated = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                                if (!statusUpdated) {
-                                    console.log('No status element found to update');
+                                // Update status text
+                                const statusElement = document.querySelector('.stat-value');
+                                if (statusElement && data.status_text) {
+                                    statusElement.textContent = data.status_text;
                                 }
 
-                                // Update button text and href - try multiple selectors
-                                const buttonSelectors = [
-                                    '.quick-action-btn',
-                                    '.charge-button',
-                                    '.action-button',
-                                    'a[href*="ChargingPage"]'
-                                ];
-                                
-                                let buttonUpdated = false;
-                                for (const selector of buttonSelectors) {
-                                    const buttonElement = document.querySelector(selector);
-                                    if (buttonElement && data.button_text && data.button_href) {
-                                        console.log('Updating button element with selector:', selector, 'to:', data.button_text, 'href:', data.button_href);
-                                        buttonElement.textContent = data.button_text;
-                                        buttonElement.href = data.button_href;
-                                        
-                                        // Add target="_blank" for Monitor links
-                                        if (data.button_href.includes('Monitor')) {
-                                            buttonElement.setAttribute('target', '_blank');
-                                        } else {
-                                            buttonElement.removeAttribute('target');
-                                        }
-                                        buttonUpdated = true;
-                                        break;
+                                // Update button text and href
+                                const buttonElement = document.querySelector('.quick-action-btn');
+                                if (buttonElement && data.button_text && data.button_href) {
+                                    buttonElement.textContent = data.button_text;
+                                    buttonElement.href = data.button_href;
+                                    
+                                    // Add target="_blank" for Monitor links
+                                    if (data.button_href.includes('Monitor')) {
+                                        buttonElement.setAttribute('target', '_blank');
+                                    } else {
+                                        buttonElement.removeAttribute('target');
                                     }
                                 }
-                                if (!buttonUpdated) {
-                                    console.log('No button element found to update');
+
+                                // Update background class if status changed
+                                const vehicleCard = document.querySelector('.main-vehicle-card');
+                                if (vehicleCard && data.background_class) {
+                                    // Remove old background classes
+                                    vehicleCard.classList.remove('connected-bg', 'waiting-bg', 'charging-bg', 'pending-bg', 'queue-pending-bg');
+                                    // Add new background class
+                                    vehicleCard.classList.add(data.background_class);
                                 }
 
-                                // Update background class - try multiple selectors
-                                const cardSelectors = [
-                                    '.main-vehicle-card',
-                                    '.vehicle-card',
-                                    '.features-card',
-                                    '.status-card'
-                                ];
-                                
-                                let backgroundUpdated = false;
-                                for (const selector of cardSelectors) {
-                                    const vehicleCard = document.querySelector(selector);
-                                    if (vehicleCard && data.background_class) {
-                                        console.log('Updating background class with selector:', selector, 'to:', data.background_class);
-                                        // Remove old background classes
-                                        vehicleCard.classList.remove('connected-bg', 'waiting-bg', 'charging-bg', 'pending-bg', 'queue-pending-bg');
-                                        // Add new background class
-                                        vehicleCard.classList.add(data.background_class);
-                                        backgroundUpdated = true;
-                                        break;
+                                // Update battery level if changed
+                                const batteryElement = $('.feature-description strong').filter(function() {
+                                    return $(this).text().includes('Current Level:');
+                                }).get(0);
+                                if (batteryElement && data.battery_level) {
+                                    const batteryText = batteryElement.parentElement;
+                                    if (batteryText) {
+                                        batteryText.innerHTML = batteryText.innerHTML.replace(
+                                            /<strong>Current Level:<\/strong>.*?<br>/,
+                                            `<strong>Current Level:</strong> ${data.battery_level}<br>`
+                                        );
                                     }
-                                }
-                                if (!backgroundUpdated) {
-                                    console.log('No background element found to update');
-                                }
-
-                                // Update battery level - improved selector
-                                const batteryElements = document.querySelectorAll('.feature-description, .battery-info, [data-battery]');
-                                batteryElements.forEach(element => {
-                                    if (element && data.battery_level) {
-                                        const html = element.innerHTML;
-                                        if (html.includes('Current Level:') || html.includes('Battery:')) {
-                                            element.innerHTML = html.replace(
-                                                /(Current Level:|Battery:)\s*\d+%/g,
-                                                '$1 ' + data.battery_level
-                                            );
-                                        }
-                                    }
-                                });
-
-                                // Update range/ticket display based on queue status (including charging)
-                                if (data.ticket_info && data.ticket_info.ticket_id) {
-                                    // Replace "Range" with "Ticket" and show ticket ID for ALL queue states including charging
-                                    const rangeElements = document.querySelectorAll('.stat-item');
-                                    rangeElements.forEach(element => {
-                                        const label = element.querySelector('.stat-label');
-                                        const value = element.querySelector('.stat-value');
-                                        if (label && value && label.textContent.trim() === 'Range') {
-                                            console.log('Updating range to ticket display:', data.ticket_info.ticket_id);
-                                            label.textContent = 'Ticket';
-                                            value.textContent = data.ticket_info.ticket_id;
-                                        }
-                                    });
-                                } else {
-                                    // Restore range display when not in queue (only for connected status)
-                                    const rangeElements = document.querySelectorAll('.stat-item');
-                                    rangeElements.forEach(element => {
-                                        const label = element.querySelector('.stat-label');
-                                        const value = element.querySelector('.stat-value');
-                                        if (label && value && label.textContent.trim() === 'Ticket') {
-                                            console.log('Restoring range display');
-                                            label.textContent = 'Range';
-                                            // Get original range from PHP data (calculate from battery level)
-                                            const originalRange = '<?php echo htmlspecialchars($current_range_km . ' km'); ?>';
-                                            value.textContent = originalRange;
-                                        }
-                                    });
                                 }
 
                                 // Handle notification popup (like Java MY_TURN notification)
                                 if (data.notification && data.notification.type === 'charge_now_popup') {
                                     showChargeNowPopup(data.notification);
                                 }
-                                
-                                // Store current status for comparison
-                                window.lastVehicleStatus = data.status_text;
+
+                                // New modal logic for charging status
+                                if (data.status_text.toLowerCase().includes('charging')) {
+                                    // Show modal for charging status with bay number
+                                    showChargingBayModal(data.ticket_info ? data.ticket_info.ticket_id : '', data.status_text);
+                                }
+
+                                // New modal logic for pending payment
+                                if (data.status_text.toLowerCase().includes('pending payment') || data.status_text.toLowerCase().includes('queue pending')) {
+                                    showPaymentModal();
+                                }
                             }
                         })
                         .catch(error => {
                             console.log('Status update error:', error);
                         });
+                    }
+
+                    // Show modal for charging status with bay number and OK button
+                    function showChargingBayModal(ticketId, statusText) {
+                        // Check if modal already shown for this ticket
+                        const modalKey = 'bayModalShown_' + ticketId;
+                        if (localStorage.getItem(modalKey) === 'true') {
+                            return;
+                        }
+
+                        // Check if modal already exists
+                        if (document.getElementById('chargingBayModal')) return;
+
+                        // Extract bay number from statusText
+                        const bayMatch = statusText.match(/Bay\s*#?(\w+)/i);
+                        const bayNumber = bayMatch ? bayMatch[1] : 'TBD';
+
+                        // Create modal overlay
+                        const overlay = document.createElement('div');
+                        overlay.id = 'chargingBayModal';
+                        overlay.className = 'modal-overlay';
+                        overlay.style.display = 'flex';
+
+                        // Create modal content
+                        const modalContent = document.createElement('div');
+                        modalContent.className = 'modal-content';
+                        modalContent.style.textAlign = 'center';
+                        modalContent.style.padding = '2rem';
+
+                        // Modal message
+                        const message = document.createElement('p');
+                        message.textContent = `Please Proceed to Bay #${bayNumber}`;
+                        message.style.fontSize = '1.25rem';
+                        message.style.marginBottom = '1.5rem';
+
+                        // OK button
+                        const okButton = document.createElement('button');
+                        okButton.textContent = 'OK';
+                        okButton.className = 'modal-btn primary';
+                        okButton.style.padding = '0.75rem 2rem';
+                        okButton.onclick = () => {
+                            document.body.removeChild(overlay);
+                        };
+
+                        modalContent.appendChild(message);
+                        modalContent.appendChild(okButton);
+                        overlay.appendChild(modalContent);
+                        document.body.appendChild(overlay);
+
+                        // Mark modal as shown for this ticket
+                        localStorage.setItem(modalKey, 'true');
+                    }
+
+                    // Show modal for payment with Pay Online and Pay Cash buttons
+                    function showPaymentModal() {
+                        // Check if modal already exists
+                        if (document.getElementById('paymentChoiceModal')) return;
+
+                        // Create modal overlay
+                        const overlay = document.createElement('div');
+                        overlay.id = 'paymentChoiceModal';
+                        overlay.className = 'modal-overlay';
+                        overlay.style.display = 'flex';
+
+                        // Create modal content
+                        const modalContent = document.createElement('div');
+                        modalContent.className = 'modal-content';
+                        modalContent.style.textAlign = 'center';
+                        modalContent.style.padding = '2rem';
+
+                        // Modal message
+                        const message = document.createElement('p');
+                        message.textContent = 'Your payment is pending. Please choose a payment method:';
+                        message.style.fontSize = '1.25rem';
+                        message.style.marginBottom = '1.5rem';
+
+                        // Pay Online button
+                        const payOnlineBtn = document.createElement('button');
+                        payOnlineBtn.textContent = 'Pay Online';
+                        payOnlineBtn.className = 'modal-btn primary';
+                        payOnlineBtn.style.marginRight = '1rem';
+                        payOnlineBtn.onclick = () => {
+                            // Redirect to online payment page or handle payment logic
+                            window.location.href = 'wallet.php';
+                        };
+
+                        // Pay Cash button
+                        const payCashBtn = document.createElement('button');
+                        payCashBtn.textContent = 'Pay Cash';
+                        payCashBtn.className = 'modal-btn secondary';
+                        payCashBtn.onclick = () => {
+                            // Close modal and possibly show instructions for cash payment
+                            document.body.removeChild(overlay);
+                            alert('Please proceed to pay cash at the charging station.');
+                        };
+
+                        modalContent.appendChild(message);
+                        modalContent.appendChild(payOnlineBtn);
+                        modalContent.appendChild(payCashBtn);
+                        overlay.appendChild(modalContent);
+                        document.body.appendChild(overlay);
                     }
 
                     // Show Charge Now popup (like Java MY_TURN notification)
@@ -3279,79 +3074,12 @@ if ($conn) {
                         });
                     }
 
-                    // Global function to trigger status update (for debugging)
-                    window.triggerVehicleStatusUpdate = function() {
-                        console.log('Manual status update triggered');
-                        updateVehicleStatus();
-                    };
-                    
-                    // Update status every 1 second for more real-time updates (increased frequency for testing)
-                    setInterval(updateVehicleStatus, 1000);
-                    
-                    // Also update immediately when page loads
-                    updateVehicleStatus();
+                    // Update status every 5 seconds
+                    setInterval(updateVehicleStatus, 5000);
 
                     // Also update when page becomes visible (user switches back to tab)
                     document.addEventListener('visibilitychange', function() {
                         if (!document.hidden) {
-                            updateVehicleStatus();
-                        }
-                    });
-                    
-                    // Add function to manually trigger status update (for use by other functions)
-                    window.triggerVehicleStatusUpdate = function() {
-                        console.log('Manual status update triggered');
-                        updateVehicleStatus();
-                    };
-                    
-                    // Add manual refresh button for testing (remove in production)
-                    function addManualRefreshButton() {
-                        const refreshBtn = document.createElement('button');
-                        refreshBtn.innerHTML = '🔄 Refresh Status';
-                        refreshBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #00c2ce; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;';
-                        refreshBtn.onclick = function() {
-                            console.log('Manual refresh button clicked');
-                            updateVehicleStatus();
-                        };
-                        document.body.appendChild(refreshBtn);
-                        
-                        // Add test API button
-                        const testBtn = document.createElement('button');
-                        testBtn.innerHTML = '🧪 Test API';
-                        testBtn.style.cssText = 'position: fixed; top: 50px; right: 10px; z-index: 9999; background: #ff6b35; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;';
-                        testBtn.onclick = function() {
-                            console.log('Test API button clicked');
-                            testStatusAPI();
-                        };
-                        document.body.appendChild(testBtn);
-                    }
-                    
-                    // Test the status API directly
-                    function testStatusAPI() {
-                        console.log('Testing status API...');
-                        
-                        fetch('api/status_update.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({action: 'test_status'})
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Test API response:', data);
-                        })
-                        .catch(error => {
-                            console.error('Test API error:', error);
-                        });
-                    }
-                    
-                    // Add the manual refresh button after page loads
-                    setTimeout(addManualRefreshButton, 1000);
-                    
-                    // Listen for storage events (for cross-tab communication)
-                    window.addEventListener('storage', function(e) {
-                        if (e.key === 'vehicle_status_update') {
                             updateVehicleStatus();
                         }
                     });
@@ -3420,10 +3148,9 @@ if ($conn) {
 				</div>
 
         <div class="footer-bottom">
-            <p>&copy; 2025 Cephra. All rights reserved.</p>
-            <p><a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
+            <p>&copy; 2025 Cephra. All rights reserved. | <a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
     </div>
 		</footer>
 
-		</body>
-	</html>
+	</body>
+</html>

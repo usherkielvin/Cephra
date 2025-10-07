@@ -378,15 +378,6 @@ try {
                 $_SESSION['lastname'] = $user['lastname'];
                 $_SESSION['email'] = $user['email'];
                 
-                // Reset battery level to 10-50% on login (like phonejava behavior)
-                try {
-                    $newLevel = 10 + rand(0, 40); // 10-50%
-                    $reset = $db->prepare("UPDATE battery_levels SET battery_level = ?, initial_battery_level = ?, last_updated = NOW() WHERE username = ?");
-                    $reset->execute([$newLevel, $newLevel, $user['username']]);
-                } catch (Exception $e) {
-                    // Continue login even if battery reset fails
-                }
-                
                 echo json_encode([
                     "success" => true,
                     "message" => "Login successful",

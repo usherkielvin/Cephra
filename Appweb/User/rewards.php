@@ -383,46 +383,6 @@ if ($conn) {
             text-decoration: none;
         }
 
-        /* Responsive Greenpoints Centering */
-        @media (max-width: 768px) {
-            .rewards-hero .container {
-                padding: 0 1rem;
-            }
-            
-            .points-display {
-                min-width: 100px !important;
-                padding: 0.75rem 1.25rem !important;
-                font-size: 0.9rem !important;
-                margin: 0 auto !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-            
-            /* Force center the points container */
-            .rewards-hero div[style*="margin-top:4rem"] {
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                width: 100% !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .points-display {
-                min-width: 90px !important;
-                padding: 0.5rem 1rem !important;
-                font-size: 0.85rem !important;
-            }
-            
-            .rewards-hero div[style*="margin-top:4rem"] {
-                padding: 0 !important;
-                margin: 2rem auto 0 auto !important;
-            }
-        }
-
         /* Modal Styles */
         .modal {
             display: none;
@@ -438,7 +398,7 @@ if ($conn) {
 
         .modal-content {
             background-color: var(--bg-card);
-            margin: 0;
+            margin: 15% auto;
             padding: 2rem;
             border: 1px solid var(--border-color);
             border-radius: 20px;
@@ -446,13 +406,7 @@ if ($conn) {
             max-width: 500px;
             box-shadow: 0 10px 30px var(--shadow-medium);
             text-align: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            position: relative;
         }
 
         .close-modal {
@@ -487,8 +441,6 @@ if ($conn) {
             gap: 1rem;
             justify-content: center;
             margin-top: 2rem;
-            width: 100%;
-            max-width: 400px;
         }
 
         .modal-btn {
@@ -499,9 +451,7 @@ if ($conn) {
             font-weight: 600;
             transition: all 0.3s ease;
             flex: 1;
-            max-width: 180px;
-            min-width: 120px;
-            text-align: center;
+            max-width: 200px;
         }
 
         .pickup {
@@ -542,8 +492,11 @@ if ($conn) {
                 position: static;
                 transform: none;
                 right: auto;
-                margin-left: auto;
+                margin: 0 auto;
                 order: 3;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .header-content {
@@ -568,57 +521,54 @@ if ($conn) {
             }
 
             .modal-content {
-                margin: 0;
+                margin: 20% auto;
                 padding: 1.5rem;
-                width: 95%;
-                max-width: 350px;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
             }
 
+            /* Ensure modal buttons are centered and touch-friendly on small screens */
             .modal-buttons {
                 flex-direction: column;
                 gap: 0.75rem;
-                width: 100%;
-                max-width: 280px;
-                margin-top: 1.5rem;
+                align-items: center; /* center horizontally */
+                justify-content: center; /* center vertically within modal-buttons */
+                padding: 0 1rem; /* add some horizontal padding so buttons don't touch edges */
             }
 
             .modal-btn {
-                width: 100%;
-                max-width: none;
-                min-width: auto;
-                padding: 0.875rem 1rem;
-                font-size: 0.9rem;
+                width: 100%; /* full width within padded container */
+                max-width: 360px; /* limit extreme width on larger small screens */
+                box-sizing: border-box; /* include padding in width */
+                margin: 0 auto; /* center if max-width applies */
+                padding: 0.75rem 1rem;
             }
         }
-        
-        @media (max-width: 480px) {
-            .modal-content {
-                width: 98%;
-                max-width: 320px;
-                padding: 1.25rem;
+
+        @media (max-width: 370px) {
+            .rewards-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
             }
-            
-            .modal h2 {
-                font-size: 1.25rem;
-                margin-bottom: 0.75rem;
+            .reward-card {
+                padding: 0.75rem;
             }
-            
-            .modal p {
+            .reward-card h4 {
                 font-size: 0.9rem;
-                margin-bottom: 0.75rem;
             }
-            
-            .modal-buttons {
-                gap: 0.5rem;
-                max-width: 260px;
+            .reward-card p {
+                font-size: 0.75rem;
             }
-            
-            .modal-btn {
-                padding: 0.75rem 0.875rem;
-                font-size: 0.85rem;
+            .redeem-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+            .rewards-section {
+                padding: 50px 0;
+            }
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            .section-header p {
+                font-size: 1rem;
             }
         }
     </style>
@@ -635,8 +585,8 @@ if ($conn) {
             <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; position: relative; z-index: 2;">
                 Earn and redeem points for exclusive perks as you charge with Cephra.
             </p>
-            <div style="margin-top:4rem;display:flex;justify-content:center;align-items:center;width:100%;">
-                <div class="points-display" style="position:static;background: var(--gradient-primary);color:#fff;padding:1rem 1.75rem;border-radius:25px;font-weight:600;box-shadow:0 5px 15px var(--shadow-medium);display:inline-flex;align-items:center;justify-content:center;min-width:120px;text-align:center;">
+            <div style="margin-top:4rem;display:flex;justify-content:center;">
+                <div class="points-display" style="position:static;background: var(--gradient-primary);color:#fff;padding:1rem 1.75rem;border-radius:25px;font-weight:600;box-shadow:0 5px 15px var(--shadow-medium);">
                     <i class="fas fa-star" style="margin-right:12px;font-size:1.1rem;"></i>
                     <?php echo $total_points; ?> pts
                 </div>
@@ -827,6 +777,7 @@ if ($conn) {
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script>
+        
         // Mobile Menu Toggle
         function initMobileMenu() {
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');

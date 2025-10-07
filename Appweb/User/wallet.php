@@ -39,7 +39,6 @@ if ($conn) {
 
     <link rel="stylesheet" href="css/vantage-style.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
-    <link rel="stylesheet" href="css/footer.css" />
     <style>
         :root {
             --primary-color: #00c2ce;
@@ -175,18 +174,6 @@ if ($conn) {
             right: 0;
             bottom: 0;
             background: radial-gradient(circle at 20% 80%, rgba(0, 194, 206, 0.15) 0%, transparent 50%);
-            z-index: 1;
-        }
-
-        .wallet-hero::after {
-            content: '';
-            position: absolute;
-            bottom: 20%;
-            right: 10%;
-            width: 80px;
-            height: 80px;
-            background: rgba(0, 194, 206, 0.1);
-            border-radius: 50%;
             z-index: 1;
         }
 
@@ -851,8 +838,7 @@ if ($conn) {
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2025 Cephra. All rights reserved.</p>
-                <p><a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
+                <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
             </div>
         </div>
     </footer>

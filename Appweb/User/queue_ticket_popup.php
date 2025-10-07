@@ -80,19 +80,18 @@ $estimatedMinutes = 5; // Placeholder, replace with actual logic
 
     <script>
         function closePopup() {
-            try {
-                const overlay = document.getElementById('popupOverlay');
-                if (overlay) {
-                    overlay.style.display = 'none';
-                    overlay.remove();
-                }
-                document.body.style.overflow = '';
-            } catch (e) {
-                // Force remove any remaining overlays
-                document.body.style.overflow = '';
-                const overlays = document.querySelectorAll('div[style*="position: fixed"][style*="background: rgba"]');
-                overlays.forEach(overlay => overlay.remove());
+            // Prevent multiple rapid clicks
+            if (window.popupClosing) {
+                return;
             }
+            window.popupClosing = true;
+            
+            document.getElementById('popupOverlay').style.display = 'none';
+            
+            // Reset state after a short delay
+            setTimeout(function() {
+                window.popupClosing = false;
+            }, 500);
         }
         
         // Close popup when clicking outside

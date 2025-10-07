@@ -64,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
 		<meta name="theme-color" content="#1a1a2e" />
 	<link rel="stylesheet" href="css/vantage-style.css" />
 	<link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
-	<link rel="stylesheet" href="css/footer.css" />
 	</head>
 	<body>
         
@@ -192,8 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2025 Cephra. All rights reserved.</p>
-                <p><a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
+                <p>&copy; 2025 Cephra. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
             </div>
         </div>
     </footer>
@@ -310,12 +308,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
         }
 
         function processChargeRequest(serviceType) {
-            // Prevent multiple rapid clicks
-            if (window.chargingInProgress) {
-                return false;
-            }
-            window.chargingInProgress = true;
-
             // Force exact service type strings expected by backend
             let serviceTypeMapped = '';
             if (serviceType === 'Normal Charging' || serviceType === 'normal charging') {
@@ -326,12 +318,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 serviceTypeMapped = serviceType; // fallback
             }
 
-            // Disable all charging buttons immediately
-            document.querySelectorAll('.charging-link').forEach(link => {
-                link.style.pointerEvents = 'none';
-                link.style.opacity = '0.6';
-                link.style.cursor = 'not-allowed';
-            });
+            // Disable links during processing
+            document.querySelectorAll('.charging-link').forEach(link => link.style.pointerEvents = 'none');
 
             fetch('charge_action.php', {
                 method: 'POST',
@@ -353,13 +341,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                 console.error('Error:', error);
             })
             .finally(() => {
-                // Reset state and re-enable links
-                window.chargingInProgress = false;
-                document.querySelectorAll('.charging-link').forEach(link => {
-                    link.style.pointerEvents = 'auto';
-                    link.style.opacity = '1';
-                    link.style.cursor = 'pointer';
-                });
+                // Re-enable links
+                document.querySelectorAll('.charging-link').forEach(link => link.style.pointerEvents = 'auto');
             });
         }
 
@@ -482,7 +465,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                     if (processBtn) {
                         processBtn.addEventListener('click', function() {
                             console.log('Process Ticket button clicked');
-                            processTicket();
+                            // Get ticket ID and hide modal immediately
+                            const modal = document.getElementById('queueModal');
+                            if (modal) {
+                                const ticketIdSection = modal.querySelector('.ticket-id-section .section-value');
+                                if (ticketIdSection) {
+                                    const ticketId = ticketIdSection.textContent.trim();
+                                    modal.style.display = 'none';
+                                    processTicket(ticketId);
+                                }
+                            }
                         });
                     }
                     
@@ -624,29 +616,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
         };
 
         // Function to process ticket (actually create the ticket)
-        function processTicket() {
+        function processTicket(ticketId) {
             console.log('Processing ticket...');
-            
-            // Get the ticket ID from the modal
-            const modal = document.getElementById('queueModal');
-            if (!modal) {
-                console.error('Modal not found');
-                return;
-            }
-
-            // Find the ticket ID specifically in the ticket-id-section
-            const ticketIdSection = modal.querySelector('.ticket-id-section .section-value');
-            if (!ticketIdSection) {
-                console.error('Ticket ID element not found');
-                return;
-            }
-
-            const ticketId = ticketIdSection.textContent.trim();
             console.log('Found ticket ID:', ticketId);
+
+            // Close popup immediately after getting ticket ID
+            closePopup();
 
             // Call the new endpoint to actually create the ticket
             console.log('Sending request to process_ticket_action.php with ticketId:', ticketId);
-            
+
             fetch('process_ticket_action.php', {
                 method: 'POST',
                 headers: {
@@ -660,16 +639,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             })
             .then(data => {
                 console.log('Process ticket response:', data);
-                
+
                 if (data.success) {
-                    // Close popup first
-                    closePopup();
-                    
-                    // Show success dialog after a short delay to ensure popup is closed
+                    // Show success dialog after a short delay
                     setTimeout(() => {
                         showDialog('Ticket Created Successfully!', 'Your charging session has been queued. Your Bay assignment will be announced in the dashboard, please wait for further notice.');
                     }, 100);
-                    
+
                     // Trigger vehicle status update
                     if (typeof window.triggerVehicleStatusUpdate === 'function') {
                         window.triggerVehicleStatusUpdate();
@@ -680,16 +656,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
                     }
                 } else if (data.error) {
                     console.error('Process ticket error:', data.error);
-                    // Close popup first
-                    closePopup();
                     // Show error dialog after a short delay
                     setTimeout(() => {
                         showDialog('Error', data.error);
                     }, 100);
                 } else {
                     console.error('Unexpected response:', data);
-                    // Close popup first
-                    closePopup();
                     // Show error dialog after a short delay
                     setTimeout(() => {
                         showDialog('Error', 'Unexpected response from server. Please try again.');
@@ -698,8 +670,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ticketId'])) {
             })
             .catch(error => {
                 console.error('Process ticket fetch error:', error);
-                // Close popup first
-                closePopup();
                 // Show error dialog after a short delay
                 setTimeout(() => {
                     showDialog('Error', 'An error occurred while creating the ticket. Please try again.');
