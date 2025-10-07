@@ -505,7 +505,7 @@ try {
         card.innerHTML = `
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <h3>Bay ${b.bay} <span style='font-size:12px;color:var(--muted)'>(${b.type})</span></h3>
+              <h3>${b.bay} <span style='font-size:12px;color:var(--muted)'>(${b.type})</span></h3>
               <span class="badge ${pillClass}">${b.status}</span>
             </div>
             <div style="margin-top:8px" class="meta">
