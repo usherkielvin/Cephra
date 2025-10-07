@@ -3247,8 +3247,10 @@ if ($conn) {
                         });
                     }
 
-                    // Update status every 5 seconds
-                    setInterval(updateVehicleStatus, 5000);
+					// Update status every 5 seconds
+					// Call once immediately so the UI reflects the latest state on page load
+					try { updateVehicleStatus(); } catch (e) { console.error('initial updateVehicleStatus call failed', e); }
+					setInterval(updateVehicleStatus, 5000);
 
                     // Also update when page becomes visible (user switches back to tab)
                     document.addEventListener('visibilitychange', function() {

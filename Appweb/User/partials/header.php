@@ -1210,12 +1210,11 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 					window.translateDashboard = translateDashboard;
 				})();
 
-				// Initialize dashboard features
+                // Initialize header features (do not auto-start live/dashboard fetches here)
                 $(document).ready(function() {
-                    loadDashboardStats();
-                    updateLiveStatus();
-					// Apply saved language translations
-					setTimeout(() => { try { window.translateDashboard(); } catch(e){} }, 0);
+                    // Defer starting dashboard/live fetches to page-specific scripts to avoid unnecessary network load
+                    // Apply saved language translations
+                    setTimeout(() => { try { window.translateDashboard(); } catch(e){} }, 0);
 
                     // Intersection Observer for animations
                     const observerOptions = {
