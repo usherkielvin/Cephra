@@ -171,7 +171,7 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
         2 => 'images/cars/teslamodelx.png',
         3 => 'images/cars/lotuseltre.png',
         4 => 'images/cars/bydseagull.png',
-        5 => 'images/team pictures/default.png',
+        5 => 'images/cars/hyundai.png',
         6 => 'images/cars/porschetaycan.png',
         7 => 'images/cars/bydtang.png',
         8 => 'images/cars/omodae5.png'
