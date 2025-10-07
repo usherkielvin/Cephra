@@ -171,8 +171,8 @@ class AdminPanel {
                 <td><span class="status-badge ${s.status.toLowerCase()}">${s.status}</span></td>
                 <td>${this.formatDateTime(s.created_at)}</td>
                 <td>
-                    <button class="btn btn-secondary btn-sm" onclick="if (adminPanel) adminPanel.toggleStaffStatus('${s.username}', '${s.status === 'Active' ? 'Inactive' : 'Active'}')">
-                        <i class="fas fa-toggle-on"></i> ${s.status === 'Active' ? 'Deactivate' : 'Activate'}
+                    <button class="btn btn-warning btn-sm" onclick="if (adminPanel) adminPanel.resetStaffPassword('${s.username}')">
+                        <i class="fas fa-key"></i> Reset Password
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="if (adminPanel) adminPanel.deleteStaff('${s.username}')">
                         <i class="fas fa-trash"></i> Delete
@@ -180,6 +180,38 @@ class AdminPanel {
                 </td>
             </tr>
         `).join('');
+    }
+
+    async resetStaffPassword(username) {
+        if (!username) return;
+        
+        // Show confirmation dialog
+        const confirmed = confirm(`Reset password for staff member: ${username}\n\nA new 6-digit password will be generated.\n\nProceed with password reset?`);
+        
+        if (!confirmed) return;
+        
+        try {
+            const response = await fetch('api/admin.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=reset-staff-password&username=${encodeURIComponent(username)}`
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert(`Password reset successful!\n\nNew password: ${result.new_password}\n\nPlease inform the staff member of their new password.`);
+                // Refresh the staff table
+                this.loadStaffData();
+            } else {
+                this.showError(result.error || 'Failed to reset password');
+            }
+        } catch (error) {
+            console.error('Error resetting password:', error);
+            this.showError('Failed to reset password');
+        }
     }
 
     // staff activity removed
@@ -221,25 +253,6 @@ class AdminPanel {
         }
     }
 
-    async toggleStaffStatus(username, status) {
-        try {
-            const res = await fetch('api/admin.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `action=toggle-staff-status&username=${encodeURIComponent(username)}&status=${encodeURIComponent(status)}`
-            });
-            const data = await res.json();
-            if (data.success) {
-                this.showSuccess('Status updated');
-                this.loadStaffData();
-            } else {
-                this.showError(data.error || 'Failed to update');
-            }
-        } catch (e) {
-            console.error('Error toggling status:', e);
-            this.showError('Failed to update');
-        }
-    }
 
     async deleteStaff(username) {
         if (!confirm(`Delete staff "${username}"?`)) return;
