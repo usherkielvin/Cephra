@@ -6,11 +6,96 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 session_start();
 
+// Ensure PHP does not emit HTML error pages. Instead convert errors/exceptions/fatals to JSON
+ini_set('display_errors', '0');
+error_reporting(E_ALL);
+
+set_error_handler(function ($severity, $message, $file, $line) {
+    // Convert PHP warnings/notices/errors to JSON response without using HTTP status codes
+    send_response([
+        'success' => false,
+        'code' => 500,
+        'message' => $message,
+        'type' => 'php_error',
+        'file' => $file,
+        'line' => $line,
+        'severity' => $severity
+    ]);
+});
+
+set_exception_handler(function ($e) {
+    send_response([
+        'success' => false,
+        'code' => 500,
+        'message' => $e->getMessage(),
+        'type' => 'exception'
+    ]);
+});
+
+register_shutdown_function(function () {
+    $err = error_get_last();
+    if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR])) {
+        send_response([
+            'success' => false,
+            'code' => 500,
+            'message' => $err['message'],
+            'type' => 'shutdown',
+            'file' => $err['file'],
+            'line' => $err['line']
+        ]);
+    }
+});
+
+/**
+ * Standardized JSON response helper
+ * Always returns a JSON object with the shape:
+ * {
+ *   success: bool,
+ *   code: int,        // application-level code (not HTTP status)
+ *   message: string,  // human-readable message or ''
+ *   data: object|null  // payload (any keys besides success/code/message are moved here)
+ * }
+ */
+function send_response(array $payload)
+{
+    // Ensure Content-Type header
+    header('Content-Type: application/json');
+
+    $success = isset($payload['success']) ? (bool)$payload['success'] : false;
+    $code = isset($payload['code']) ? intval($payload['code']) : 0;
+    $message = '';
+    if (isset($payload['message'])) {
+        $message = $payload['message'];
+    } elseif (isset($payload['error'])) {
+        $message = $payload['error'];
+    }
+
+    // Move remaining keys to data
+    $data = null;
+    $reserved = ['success', 'code', 'message', 'error'];
+    $other = array_diff_key($payload, array_flip($reserved));
+    if (!empty($other)) {
+        $data = $other;
+    }
+
+    $response = [
+        'success' => $success,
+        'code' => $code,
+        'message' => $message,
+        'data' => $data
+    ];
+
+    echo json_encode($response);
+    exit();
+}
+
 // Check if admin is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized access']);
-    exit();
+    send_response([
+        'success' => false,
+        'code' => 401,
+        'message' => 'Unauthorized access'
+    ]);
 }
 
 // Enforce deactivated staff cannot use API
@@ -24,16 +109,20 @@ try {
         if (!$row || strcasecmp($row['status'] ?? '', 'Active') !== 0) {
             session_unset();
             session_destroy();
-            http_response_code(401);
-            echo json_encode(['error' => 'Account deactivated']);
-            exit();
+            send_response([
+                'success' => false,
+                'code' => 401,
+                'message' => 'Account deactivated'
+            ]);
         }
     }
 } catch (Exception $e) {
     // If validation fails unexpectedly, block access
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit();
+    send_response([
+        'success' => false,
+        'code' => 401,
+        'message' => 'Unauthorized'
+    ]);
 }
 
 $db = (new Database())->getConnection();

@@ -47,6 +47,20 @@ if (window._originalFetch) {
         }
     };
 }
+
+// Helper: safely parse JSON response and log raw response on failure.
+async function safeParseResponse(response, context = '') {
+    const raw = await response.text().catch(() => '');
+    try {
+        return JSON.parse(raw);
+    } catch (err) {
+        console.error(`Failed to parse JSON response${context ? ' (' + context + ')' : ''}:`, err);
+        const preview = raw && raw.length > 800 ? raw.slice(0,800) + '... [truncated]' : raw;
+        console.error('Server response preview:', preview);
+        // Return an error-shaped object to keep callers safe
+        return { success: false, error: 'Invalid server response (not JSON)', _raw: preview };
+    }
+}
 class AdminPanel {
     constructor() {
         this.currentPanel = 'dashboard';
@@ -247,7 +261,7 @@ class AdminPanel {
                 body: `action=reset-staff-password&username=${encodeURIComponent(username)}`
             });
 
-            const result = await response.json();
+            const result = await safeParseResponse(response, 'resetStaffPassword');
 
             if (result.success) {
                 alert(`Password reset successful!\n\nNew password: ${result.new_password}\n\nPlease inform the staff member of their new password.`);
@@ -272,10 +286,10 @@ class AdminPanel {
 
     async addStaff() {
         const payload = {
-            name: (document.getElementById('staff-name') ? .value) || '',
-            username: (document.getElementById('staff-username') ? .value) || '',
-            email: (document.getElementById('staff-email') ? .value) || '',
-            password: (document.getElementById('staff-password') ? .value) || ''
+            name: (document.getElementById('staff-name')?.value) || '',
+            username: (document.getElementById('staff-username')?.value) || '',
+            email: (document.getElementById('staff-email')?.value) || '',
+            password: (document.getElementById('staff-password')?.value) || ''
         };
         if (!payload.name || !payload.username || !payload.email || !payload.password) {
             this.showError('Please fill in all fields');
@@ -287,7 +301,7 @@ class AdminPanel {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `action=add-staff&${new URLSearchParams(payload).toString()}`
             });
-            const data = await res.json();
+            const data = await safeParseResponse(res, 'addStaff');
             if (data.success) {
                 this.showSuccess('Staff added');
                 this.closeModal('add-staff-modal');
@@ -310,7 +324,7 @@ class AdminPanel {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `action=delete-staff&username=${encodeURIComponent(username)}`
             });
-            const data = await res.json();
+            const data = await safeParseResponse(res, 'deleteStaff');
             if (data.success) {
                 this.showSuccess('Staff deleted');
                 const row = document.getElementById(`staff-row-${username}`);
@@ -327,7 +341,7 @@ class AdminPanel {
     async loadDashboardData() {
         try {
             const response = await fetch('api/admin.php?action=dashboard');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadDashboardData');
 
             if (data.success) {
                 this.updateDashboardStats(data.stats);
@@ -367,7 +381,7 @@ class AdminPanel {
     async loadQueueData() {
         try {
             const response = await fetch('api/admin.php?action=queue');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadQueueData');
 
             if (data.success) {
                 this.updateQueueTable(data.queue);
@@ -431,7 +445,7 @@ class AdminPanel {
     async loadBaysData() {
         try {
             const response = await fetch('api/admin.php?action=bays');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadBaysData');
 
             if (data.success) {
                 this.updateBaysGrid(data.bays);
@@ -493,7 +507,7 @@ class AdminPanel {
     async loadUsersData() {
         try {
             const response = await fetch('api/admin.php?action=users');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadUsersData');
 
             if (data.success) {
                 this.updateUsersTable(data.users);
@@ -542,7 +556,7 @@ class AdminPanel {
                 },
                 body: `action=delete-user&username=${username}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(res, 'deleteUser');
 
             if (data.success) {
                 this.showSuccess('User deleted successfully');
@@ -584,7 +598,7 @@ class AdminPanel {
         try {
             console.log('Loading analytics data for range:', this.analyticsRange);
             const response = await fetch(`api/admin.php?action=analytics&range=${this.analyticsRange}`);
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'processPayment');
 
             console.log('Analytics API response:', data);
 
@@ -900,7 +914,7 @@ class AdminPanel {
     async loadBusinessData() {
         try {
             const response = await fetch('api/admin.php?action=business-settings');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'markAsPaid');
 
             if (data.success) {
                 document.getElementById('min-fee').value = data.settings.min_fee || 0;
@@ -914,7 +928,7 @@ class AdminPanel {
     async viewTicket(ticketId) {
         try {
             const response = await fetch(`api/admin.php?action=ticket-details&ticket_id=${ticketId}`);
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'setBayMaintenance');
 
             if (data.success) {
                 this.showTicketModal(data.ticket);
@@ -970,7 +984,7 @@ class AdminPanel {
                 },
                 body: `action=process-ticket&ticket_id=${ticketId}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'setBayAvailable');
 
             if (data.success) {
                 this.showSuccess('Ticket processed successfully');
@@ -993,7 +1007,7 @@ class AdminPanel {
                 },
                 body: `action=mark-payment-paid&ticket_id=${ticketId}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadBusinessData');
 
             if (data.success) {
                 this.showSuccess('Payment processed successfully');
@@ -1016,7 +1030,7 @@ class AdminPanel {
                 },
                 body: `action=mark-payment-paid&ticket_id=${ticketId}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'viewTicket');
 
             if (data.success) {
                 this.showSuccess('Ticket marked as paid successfully');
@@ -1192,7 +1206,7 @@ class AdminPanel {
                 },
                 body: `action=set-bay-maintenance&bay_number=${bayNumber}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'addUser');
 
             if (data.success) {
                 this.showSuccess('Bay set to maintenance mode');
@@ -1219,7 +1233,7 @@ class AdminPanel {
                 },
                 body: `action=set-bay-available&bay_number=${bayNumber}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'saveBusinessSettings');
 
             if (data.success) {
                 this.showSuccess('Bay set to available');
@@ -1260,7 +1274,7 @@ class AdminPanel {
                 },
                 body: `action=add-user&${new URLSearchParams(userData).toString()}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadTransactions');
 
             if (data.success) {
                 this.showSuccess('User added successfully');
@@ -1292,7 +1306,7 @@ class AdminPanel {
                 },
                 body: `action=save-business-settings&min_fee=${minFee}&kwh_per_peso=${kwhPerPeso}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'filterTransactions');
 
             if (data.success) {
                 this.showSuccess('Business settings updated successfully');
@@ -1341,7 +1355,7 @@ class AdminPanel {
     async loadTransactions() {
         try {
             const response = await fetch('api/admin.php?action=transactions');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadTransactions');
             
             if (data.success) {
                 // Store transaction data for export
@@ -1453,7 +1467,7 @@ class AdminPanel {
             }
 
             const response = await fetch(url);
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'filterTransactions');
             
             if (data.success) {
                 // Store filtered transaction data for export
@@ -1909,7 +1923,10 @@ function autoAssignWaitingTickets() {
             'Content-Type': 'application/x-www-form-urlencoded',
         }
     })
-        .then(response => response.json())
+        .then(async (response) => {
+            const data = await safeParseResponse(response, 'autoAssignWaitingTickets');
+            return data;
+        })
         .then(data => {
             hideLoadingSpinner(overlay);
             if (data.success) {
