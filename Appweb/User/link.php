@@ -240,6 +240,56 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
     <link rel="stylesheet" href="css/vantage-style.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
     <link rel="stylesheet" href="assets/css/pages/link.css" />
+    <style>
+        /* Modernized linked car layout tweaks */
+        .modernized-layout {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .modernized-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .modernized-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modernized-details .detail-label { color: #4a5568; font-weight:600; }
+        .modernized-details .detail-value { color: #1a202c; }
+
+        @media (max-width: 768px) {
+            .modernized-layout {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .modernized-details {
+                align-items: center;
+                max-width: 100%;
+                padding: 0 1rem;
+            }
+            .modernized-details .detail-row {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+            }
+            .modernized-details .detail-row .detail-value {
+                text-align: center;
+            }
+            .modernized-car-image { width: 100%; display:flex; justify-content:center; }
+        }
+    </style>
 </head>
 <body class="homepage is-preload">
     <div id="page-wrapper">
@@ -298,8 +348,8 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
             </div>
 
     </div>
-    <div class="modernized-car-image">
-        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" />
+    <div class="modernized-car-image" style="display:flex;align-items:center;justify-content:center;padding:1.25rem 0;">
+        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" style="max-width:100%;height:auto;display:block;" />
     </div>
 </div>
 <button style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;" onclick="window.location.href='dashboard.php'">Start Charging</button>
