@@ -180,7 +180,7 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
     $current_range_km = round($max_range_km * ($battery_level_num / 100));
     
     // Check if we should show ticket instead of range (for ALL queue states including charging)
-    if ($current_ticket && in_array(strtolower($current_ticket['status']), ['pending', 'waiting', 'in progress', 'in_progress', 'charging'])) {
+    if ($current_ticket && in_array(strtolower($current_ticket['status']), [ 'waiting', 'in progress', 'in_progress', 'charging'])) {
         $vehicle_data['range_label'] = 'Ticket';
         $vehicle_data['range'] = $current_ticket['ticket_id'];
     } else {
@@ -3120,16 +3120,16 @@ if ($conn) {
 						</p>
 					</div>
 
-            <div class="footer-section">
-                <h4 class="footer-title">Platform</h4>
-                <ul class="footer-links">
-                    <li><a href="dashboard.php">Home</a></li>
-                    <li><a href=".../appweb/Monitor/index.php">Monitor</a></li>
-                    <li><a href="link.php">Link</a></li>
-                    <li><a href="history.php">History</a></li>
-                    <li><a href="rewards.php">Rewards</a></li>
-                </ul>
-            </div>
+					<div class="footer-section">
+				<h4 class="footer-title">Platform</h4>
+				<ul class="footer-links">
+					<li><a href="dashboard.php">Home</a></li>
+					<li><a href="../Monitor/monitor.php">Monitor</a></li>
+					<li><a href="link.php">Link</a></li>
+					<li><a href="history.php">History</a></li>
+					<li><a href="rewards.php">Rewards</a></li>
+				</ul>
+			</div>
 					<div class="footer-section">
 						<h4 class="footer-title">Support</h4>
 						<ul class="footer-links">

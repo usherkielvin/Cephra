@@ -2,6 +2,11 @@
 // New Queue Monitor UI for Cephra
 // File: Appweb/Monitor/monitor.php
 // This is a new visual design and lightweight frontend logic for previewing the queue monitor.
+// Start session if not already started and detect logged-in user
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+$showClose = isset($_SESSION['username']) && !empty($_SESSION['username']);
 ?>
 <!doctype html>
 <html lang="en">
@@ -297,6 +302,9 @@
     <div class="brand">
       <h1>Cephra Live Monitor</h1>
     </div>
+    <?php if (!empty($showClose)): ?>
+      <a href="../User/dashboard.php" title="Back to dashboard" class="close-btn" style="margin-left:auto;text-decoration:none;color:var(--text);font-size:22px;font-weight:700;background:transparent;border:0;padding:6px 10px;border-radius:8px;">&times;</a>
+    <?php endif; ?>
   </header>
 
   <main>
