@@ -34,8 +34,10 @@ if (window._originalFetch) {
             const res = await window._originalFetch(...args);
             if (res && res.status === 401) {
                 // Try to parse message for debugging but don't rely on it
-                try { const txt = await res.clone().text();
-                    console.warn('API returned 401:', txt); } catch (_) {}
+                try {
+                    const txt = await res.clone().text();
+                    console.warn('API returned 401:', txt);
+                } catch (_) {}
                 handleUnauthorizedGlobal();
             }
             return res;
@@ -270,10 +272,10 @@ class AdminPanel {
 
     async addStaff() {
         const payload = {
-            name: document.getElementById('staff-name') ? .value || '',
-            username: document.getElementById('staff-username') ? .value || '',
-            email: document.getElementById('staff-email') ? .value || '',
-            password: document.getElementById('staff-password') ? .value || ''
+            name: (document.getElementById('staff-name')?.value) || '',
+            username: (document.getElementById('staff-username')?.value) || '',
+            email: (document.getElementById('staff-email')?.value) || '',
+            password: (document.getElementById('staff-password')?.value) || ''
         };
         if (!payload.name || !payload.username || !payload.email || !payload.password) {
             this.showError('Please fill in all fields');
@@ -1061,10 +1063,26 @@ class AdminPanel {
             });
             
             if (!response.ok) {
+                const text = await response.text().catch(() => '');
+                console.error(`HTTP ${response.status}: ${response.statusText}`, text);
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
-            const data = await response.json();
+
+            // Some server errors return HTML (PHP warnings/notices) which cause
+            // response.json() to throw a SyntaxError. Read text and try to parse
+            // JSON manually so we can log the raw response when parsing fails.
+            const raw = await response.text();
+            let data;
+            try {
+                data = JSON.parse(raw);
+            } catch (parseErr) {
+                console.error('Invalid JSON response while progressing ticket:', parseErr);
+                // Log a truncated preview of the server response for debugging
+                const preview = raw.length > 800 ? raw.slice(0, 800) + '... [truncated]' : raw;
+                console.error('Server response preview:', preview);
+                this.showError('Server returned an unexpected response while progressing the ticket. Check console for details.');
+                return;
+            }
 
             if (data.success) {
                 this.showSuccess(`Ticket ${ticketId} progressed successfully`);
@@ -1089,11 +1107,37 @@ class AdminPanel {
             const rows = tbody.querySelectorAll('tr');
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length >= 5) {
-                    const paymentStatus = cells[4].textContent.trim().toLowerCase();
+                // Payment column is the 6th column (index 5) in the table layout
+                if (cells.length >= 6) {
+                    const paymentStatus = cells[5].textContent.trim().toLowerCase();
                     if (paymentStatus === 'paid') {
-                        console.log('Auto-removing paid ticket row');
-                        row.remove();
+                        // Attempt server-side delete to permanently remove the ticket
+                        const ticketId = (cells[0].textContent || '').trim();
+                        if (!ticketId) { row.remove(); return; }
+
+                        fetch('api/admin.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `action=delete-ticket&ticket_id=${encodeURIComponent(ticketId)}`
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data && data.success) {
+                                console.log(`Deleted ticket ${ticketId} from server`);
+                                row.remove();
+                                this.updateQueueCounters();
+                            } else {
+                                console.warn('Failed to delete ticket on server, removing from UI anyway', data);
+                                row.remove();
+                                this.updateQueueCounters();
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Network error deleting ticket:', err);
+                            // Remove from UI to keep consistent, but log error
+                            row.remove();
+                            this.updateQueueCounters();
+                        });
                     }
                 }
             });

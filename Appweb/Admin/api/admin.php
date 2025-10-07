@@ -1567,6 +1567,38 @@ try {
             }
             break;
 
+        case 'delete-ticket':
+            if ($method !== 'POST') { echo json_encode(['error' => 'Method not allowed']); break; }
+            $ticket_id = $_POST['ticket_id'] ?? '';
+            if (!$ticket_id) { echo json_encode(['error' => 'Ticket ID required']); break; }
+
+            try {
+                $db->beginTransaction();
+
+                // Remove from waiting_grid if present
+                $wg = $db->prepare("UPDATE waiting_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, position_in_queue = NULL WHERE ticket_id = ?");
+                $wg->execute([$ticket_id]);
+
+                // Free the bay if assigned to this ticket
+                $freeBay = $db->prepare("UPDATE charging_bays SET current_ticket_id = NULL, current_username = NULL, status = 'Available', start_time = NULL WHERE current_ticket_id = ?");
+                $freeBay->execute([$ticket_id]);
+
+                // Clear charging_grid entries
+                $clearGrid = $db->prepare("UPDATE charging_grid SET ticket_id = NULL, username = NULL, service_type = NULL, initial_battery_level = NULL, start_time = NULL WHERE ticket_id = ?");
+                $clearGrid->execute([$ticket_id]);
+
+                // Delete from queue_tickets
+                $del = $db->prepare('DELETE FROM queue_tickets WHERE ticket_id = ?');
+                $del->execute([$ticket_id]);
+
+                $db->commit();
+                echo json_encode(['success' => true, 'message' => 'Ticket deleted']);
+            } catch (Exception $e) {
+                $db->rollback();
+                echo json_encode(['error' => 'Failed to delete ticket: ' . $e->getMessage()]);
+            }
+            break;
+
 
         default:
             echo json_encode([

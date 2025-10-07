@@ -705,5 +705,47 @@ if ($conn && isset($_SESSION['admin_username'])) {
             applyStatusFilter();
         })();
     </script>
+    <script>
+        // Remove rows where Payment column equals "Paid"
+        (function(){
+            const tbody = document.getElementById('queue-tbody');
+            if (!tbody) return;
+
+            function isPaidRow(tr){
+                // Payment column is the 6th column (0-based index 5) per table header
+                const paymentCell = tr.children[5];
+                if (!paymentCell) return false;
+                const txt = (paymentCell.textContent || '').trim().toLowerCase();
+                return txt === 'paid' || txt === 'paid.'; // tolerate trailing dot
+            }
+
+            function removePaidQueueRows(){
+                Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                    if (tr.classList.contains('loading')) return;
+                    try {
+                        if (isPaidRow(tr)) {
+                            // Remove the row from DOM to avoid it appearing in filters/search
+                            tr.remove();
+                        }
+                    } catch(e){
+                        // ignore individual row errors
+                    }
+                });
+            }
+
+            // Observe table body for new rows and remove paid ones automatically
+            const obs = new MutationObserver((mutations)=>{
+                // small debounce to batch multiple mutations
+                removePaidQueueRows();
+            });
+            obs.observe(tbody, { childList: true, subtree: false });
+
+            // Run once on initial load
+            removePaidQueueRows();
+
+            // Expose for manual triggering (e.g., from console)
+            try{ window.removePaidQueueRows = removePaidQueueRows; } catch(_){}
+        })();
+    </script>
 </body>
 </html>

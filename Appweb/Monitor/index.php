@@ -578,22 +578,81 @@ try {
     const darkToggle = document.getElementById('darkToggle');
     const langSelect = document.getElementById('lang');
 
+    // Simple queued TTS player so announcements don't cut each other off
+    const TTS = (function(){
+      const queue = [];
+      let speaking = false;
+      let selectedVoice = null;
+
+      function getLangTag(code){
+        return code==='en'? 'en-US' : (code==='es'? 'es-ES' : (code==='fil'? 'en-PH' : 'zh-CN'));
+      }
+
+      function loadPreferredVoice(){
+        const preferredLang = langSelect.value || 'en';
+        const voices = window.speechSynthesis.getVoices() || [];
+        // Try to pick a voice matching the language tag then a generic default
+        const tag = getLangTag(preferredLang).split('-')[0];
+        selectedVoice = voices.find(v=>v.lang && v.lang.toLowerCase().startsWith(tag)) || voices[0] || null;
+      }
+
+      // voices may load asynchronously
+      if('speechSynthesis' in window){
+        window.speechSynthesis.onvoiceschanged = loadPreferredVoice;
+        // attempt initial load
+        setTimeout(loadPreferredVoice, 250);
+      }
+
+      function speakNow(text){
+        if(!('speechSynthesis' in window)){
+          console.log('TTS not supported:', text);
+          return Promise.resolve();
+        }
+        return new Promise((resolve)=>{
+          try{
+            const u = new SpeechSynthesisUtterance(text);
+            u.volume = (volumeEl.value/100);
+            u.rate = Math.max(0.1, (speedEl.value/100));
+            u.lang = getLangTag(langSelect.value || 'en');
+            if(selectedVoice) u.voice = selectedVoice;
+            u.onend = ()=>{ speaking = false; resolve(); };
+            u.onerror = (e)=>{ speaking = false; console.warn('TTS error', e); resolve(); };
+            speaking = true;
+            window.speechSynthesis.speak(u);
+            console.log('TTS:', text);
+          }catch(err){ speaking = false; console.warn('TTS failed', err); resolve(); }
+        });
+      }
+
+      async function runQueue(){
+        if(speaking) return;
+        while(queue.length){
+          const item = queue.shift();
+          // respect announcer toggle
+          if(!announcerEl.classList.contains('active')) return queue.splice(0);
+          await speakNow(item);
+        }
+      }
+
+      return {
+        enqueue(text){
+          if(!text) return;
+          queue.push(String(text));
+          // update voice selection each enqueue in case language changed
+          if('speechSynthesis' in window) loadPreferredVoice();
+          runQueue().catch(e=>console.warn(e));
+        },
+        cancel(){ if('speechSynthesis' in window){ window.speechSynthesis.cancel(); queue.length=0; speaking=false;} }
+      };
+    })();
+
     function speak(text){
       if(!announcerEl.classList.contains('active')) return;
       if(!('speechSynthesis' in window)){
-        alert('TTS not supported in this browser');
+        console.log('TTS not supported in this browser');
         return;
       }
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.volume = (volumeEl.value/100);
-      u.rate = (speedEl.value/100);
-      // basic language mapping
-      const lang = langSelect.value;
-      u.lang = lang==='en'? 'en-US' : (lang==='es'? 'es-ES' : (lang==='fil'? 'en-PH':'zh-CN'));
-      window.speechSynthesis.speak(u);
-      // also show a small visual cue (console + title)
-      console.log('TTS:', text);
+      TTS.enqueue(text);
     }
 
     testTtsBtn.addEventListener('click', ()=>{
@@ -742,18 +801,57 @@ try {
         return { bays, waitings };
       }
 
-      // announce newly occupied bays (simple delta detection by ticket ID)
+      // announce changes between two snapshots for bays and waitings
       function announceDiff(oldBays, newBays){
         try{
           const oldMap = (oldBays||[]).reduce((m,b)=>{ m[b.bay]=b; return m; },{});
           (newBays||[]).forEach(nb=>{
-            const ob = oldMap[nb.bay];
-            // if previously no ticket and now has a ticket -> new occupation
-            if((!ob || !ob.ticket) && nb.ticket){
-              speak(`Bay ${nb.bay} is now occupied by ticket ${nb.ticket}`);
+            const ob = oldMap[nb.bay] || {ticket:'', status: ''};
+            const oldTicket = ob.ticket || '';
+            const newTicket = nb.ticket || '';
+            const oldStatus = (ob.status||'').toLowerCase();
+            const newStatus = (nb.status||'').toLowerCase();
+
+            // ticket added
+            if(!oldTicket && newTicket){
+              const plate = nb.plate ? ` plate ${nb.plate}` : '';
+              TTS.enqueue(`Bay ${nb.bay} is now occupied by ticket ${newTicket}${plate}`);
+            }
+            // ticket removed
+            else if(oldTicket && !newTicket){
+              TTS.enqueue(`Bay ${nb.bay} is now available`);
+            }
+            // status changed (maintenance, occupied, available, etc.)
+            else if(oldStatus !== newStatus){
+              TTS.enqueue(`Bay ${nb.bay} status changed to ${nb.status}`);
             }
           });
         }catch(e){console.warn('announceDiff failed',e)}
+      }
+
+      function announceWaitingsDiff(oldWaitings, newWaitings){
+        try{
+          const oldMap = (oldWaitings||[]).reduce((m,w)=>{ if(w && w.ticket) m[w.ticket]=w; return m; },{});
+          const newMap = (newWaitings||[]).reduce((m,w)=>{ if(w && w.ticket) m[w.ticket]=w; return m; },{});
+
+          // new tickets
+          (newWaitings||[]).forEach(w=>{
+            if(!w || !w.ticket) return;
+            if(!oldMap[w.ticket]){
+              const plate = w.plate ? ` plate ${w.plate}` : '';
+              const svc = w.service ? ` for ${w.service}` : '';
+              TTS.enqueue(`New waiting ticket ${w.ticket}${plate}${svc}`);
+            }
+          });
+
+          // removed tickets (served)
+          (oldWaitings||[]).forEach(w=>{
+            if(!w || !w.ticket) return;
+            if(!newMap[w.ticket]){
+              TTS.enqueue(`Waiting ticket ${w.ticket} has been served`);
+            }
+          });
+        }catch(e){console.warn('announceWaitingsDiff failed',e)}
       }
 
       async function pollOnce(){
@@ -767,11 +865,11 @@ try {
           // create lightweight snapshot string for change detection
           const snap = JSON.stringify({b: normalized.bays.map(x=>({bay:x.bay,ticket:x.ticket,status:x.status})), w: normalized.waitings.map(x=>({ticket:x.ticket,plate:x.plate}))});
           if(snap !== lastSnapshot){
-            // update announcer first (announce any new occupancies)
+            // announce diffs: bays and waitings
             try{ announceDiff(window.sampleBays || [], normalized.bays); }catch(e){}
+            try{ announceWaitingsDiff(window.sampleWaitings || [], normalized.waitings); }catch(e){}
 
             // replace sample arrays and local references so render functions use updated data
-            // keep them as plain arrays (no proxies) to avoid serialization surprises
             window.sampleBays = sampleBays = normalized.bays;
             window.sampleWaitings = sampleWaitings = normalized.waitings;
             // re-render UI
