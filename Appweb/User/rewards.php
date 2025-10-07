@@ -525,13 +525,21 @@ if ($conn) {
                 padding: 1.5rem;
             }
 
+            /* Ensure modal buttons are centered and touch-friendly on small screens */
             .modal-buttons {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 0.75rem;
+                align-items: center; /* center horizontally */
+                justify-content: center; /* center vertically within modal-buttons */
+                padding: 0 1rem; /* add some horizontal padding so buttons don't touch edges */
             }
 
             .modal-btn {
-                width: 100%;
+                width: 100%; /* full width within padded container */
+                max-width: 360px; /* limit extreme width on larger small screens */
+                box-sizing: border-box; /* include padding in width */
+                margin: 0 auto; /* center if max-width applies */
+                padding: 0.75rem 1rem;
             }
         }
 
