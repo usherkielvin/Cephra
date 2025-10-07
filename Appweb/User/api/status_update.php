@@ -1,4 +1,8 @@
 <?php
+// Disable error display to prevent breaking JSON
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 session_start();
 if (!isset($_SESSION['username'])) {
     http_response_code(401);
@@ -258,7 +262,7 @@ if ($action === 'get_status') {
             $background_class = 'queue-pending-bg';
             $status_text = 'Pending Payment';
             $button_text = 'Pay Now';
-            $button_href = '../Monitor/index.php';
+            $button_href = 'javascript:void(0)'; // Change to trigger payment popup
             
             // Add payment modal trigger
             $payment_modal = [

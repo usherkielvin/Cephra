@@ -1,4 +1,8 @@
 <?php
+// Disable error display to prevent breaking JSON
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 session_start();
 if (!isset($_SESSION['username'])) {
     http_response_code(401);
@@ -87,7 +91,13 @@ try {
     
     // Update battery level to 100% when charging is complete and paid
     $stmt = $conn->prepare("UPDATE battery_levels SET battery_level = 100, last_updated = NOW() WHERE username = ?");
-    $stmt->execute([$username]);
+    $result = $stmt->execute([$username]);
+    
+    if ($result) {
+        error_log("Payment: Successfully set battery to 100% for user $username");
+    } else {
+        error_log("Payment: Failed to set battery to 100% for user $username");
+    }
     
     // Save to charging_history
     $stmt = $conn->prepare("INSERT INTO charging_history (ticket_id, username, service_type, status, payment_status, amount, payment_method, initial_battery_level, final_battery_level, start_time, end_time, created_at) VALUES (?, ?, ?, 'completed', 'paid', ?, ?, ?, ?, NOW(), NOW(), NOW())");
