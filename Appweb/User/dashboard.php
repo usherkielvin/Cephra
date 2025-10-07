@@ -37,8 +37,7 @@ $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
 
-// Fetch latest charging status from queue_tickets (current/pending sessions)
-$stmt_charging = $conn->prepare("SELECT ticket_id, service_type, status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_charging = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
 $stmt_charging->bindParam(':username', $username);
 $stmt_charging->execute();
 $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
@@ -105,9 +104,15 @@ if ($current_ticket && in_array(strtolower($current_ticket['status']), ['chargin
 // Determine if Start Charging button should be disabled
 $start_charging_disabled = false;
 $start_charging_disabled_status = '';
-if ($current_ticket && in_array(strtolower($current_ticket['status']), ['waiting', 'charging', 'completed'])) {
-    $start_charging_disabled = true;
-    $start_charging_disabled_status = ucfirst(strtolower($current_ticket['status']));
+// Disable when status is one of: waiting, charging, completed, pending (case-insensitive)
+if ($current_ticket) {
+	$st = strtolower($current_ticket['status']);
+	// normalize some common variants
+	if ($st === 'complete') $st = 'completed';
+	if (in_array($st, ['waiting', 'charging', 'completed', 'pending'])) {
+		$start_charging_disabled = true;
+		$start_charging_disabled_status = ucfirst($st);
+	}
 }
 
 // Fetch battery level from database
@@ -347,15 +352,7 @@ if ($conn) {
 				font-size: 1.1rem;
 			}
 
-			#confirmPaymentBtn:disabled {
-				background-color: #ccc;
-				cursor: not-allowed;
-			}
 
-			#confirmPaymentBtn:not(:disabled) {
-				background-color: #00c2ce;
-				cursor: pointer;
-			}
 
 			.wallet-balance {
 				background-color: #f0f9ff;
@@ -668,6 +665,14 @@ if ($conn) {
 			.mobile-menu-overlay.active {
 				opacity: 1;
 				visibility: visible;
+			}
+
+			/* Hide Start Charging button when disabled for clearer UX */
+			#startChargingBtn.disabled,
+			#startChargingBtn[aria-disabled="true"] {
+				display: none !important;
+				visibility: hidden !important;
+				pointer-events: none !important;
 			}
 
 			/* Dashboard Hero Section */
@@ -2269,30 +2274,34 @@ if ($conn) {
 		</div>
 
 		<!-- Payment Completion Modal -->
-		<div id="paymentModal" class="charging-modal-overlay" style="display: none;">
-			<div class="charging-modal-content">
-				<div class="charging-modal-icon completed-icon">
-					<i class="fas fa-check-circle"></i>
+		<div id="paymentModal" class="charging-modal-overlay" style="display: none; align-items: center; justify-content: center;">
+			<div class="charging-modal-content modern-modal-card" role="dialog" aria-labelledby="paymentModalTitle" aria-modal="true">
+				<div class="charging-modal-header">
+					<div class="charging-modal-icon completed-icon modern-icon">
+						<i class="fas fa-check-circle"></i>
+					</div>
+					<div class="charging-modal-headline">
+						<h2 id="paymentModalTitle" class="charging-modal-title">Charging Complete</h2>
+						<p class="charging-modal-description">Your charging session is complete. Please select your payment method.</p>
+					</div>
 				</div>
-				<h2 class="charging-modal-title">Charging Complete</h2>
-				<p class="charging-modal-description">Your charging session is complete. Please select your payment method.</p>
-				
-				<div class="charging-modal-info">
+
+				<div class="charging-modal-info modern-info">
 					<div class="charging-info-item">
-						<span>Session Duration:</span>
-						<span id="sessionDuration">45 minutes</span>
+						<div class="label">Session Duration</div>
+						<div class="value" id="sessionDuration">45 minutes</div>
 					</div>
 					<div class="charging-info-item">
-						<span>Energy Delivered:</span>
-						<span id="energyDelivered">12.5 kWh</span>
+						<div class="label">Energy Delivered</div>
+						<div class="value" id="energyDelivered">12.5 kWh</div>
 					</div>
 					<div class="charging-info-item">
-						<span>Final Battery:</span>
-						<span id="finalBattery">85%</span>
+						<div class="label">Final Battery</div>
+						<div class="value" id="finalBattery">85%</div>
 					</div>
 					<div class="charging-info-item">
-						<span>Total Amount:</span>
-						<span id="totalAmount">₱75.00</span>
+						<div class="label">Total Amount</div>
+						<div class="value total-amount" id="totalAmount">₱75.00</div>
 					</div>
 				</div>
 
@@ -2300,28 +2309,29 @@ if ($conn) {
 					Current Wallet Balance: ₱<span id="currentWalletBalance">150.00</span>
 				</div>
 
-				<div class="error-message" id="errorMessage" style="display: none;">
+				<div class="error-message" id="errorMessage" style="display: none; color: #b00020; font-weight: 600; text-align: center; margin-top: 8px;">
 					Insufficient wallet balance. Please choose cash payment or add funds to your wallet.
 				</div>
 
-				<div class="payment-options">
-					<div class="payment-option" data-method="cash" id="cashPaymentOption" onclick="selectPaymentMethod('cash')">
-						<div class="payment-icon">
-							<i class="fas fa-money-bill-wave"></i>
-						</div>
-						<div class="payment-label">Cash</div>
-					</div>
-					<div class="payment-option" data-method="ewallet" id="ewalletPaymentOption" onclick="selectPaymentMethod('ewallet')">
-						<div class="payment-icon">
-							<i class="fas fa-wallet"></i>
-						</div>
-						<div class="payment-label">E-Wallet</div>
+				<!-- payment option cards removed; action buttons below now carry the same design -->
+
+				<!-- Action buttons - side by side -->
+				<div class="charging-modal-buttons modern-button-row" style="margin-top:18px; display:flex; gap:12px;">
+					<button type="button" id="payWithCashBtn" class="charging-modal-btn btn-secondary modern-btn payment-option" data-method="cash" style="flex:1;">Pay with Cash</button>
+					<button type="button" id="payWithEwalletBtn" class="charging-modal-btn btn-primary modern-btn payment-option" data-method="ewallet" style="flex:1;">Pay with E-Wallet</button>
+				</div>
+
+				<!-- E-Wallet confirmation step (hidden by default) -->
+				<div id="ewalletConfirm" style="display:none; margin-top:14px; text-align:center;">
+					<p style="margin:0 0 10px 0; font-weight:600;">Your wallet has sufficient balance. Confirm payment?</p>
+					<div class="modern-button-row" style="display:flex; gap:12px; justify-content:center; margin-top:8px;">
+						<button id="ewalletProceedBtn" class="charging-modal-btn btn-primary modern-btn" type="button" style="flex:1;">Proceed</button>
+						<button id="ewalletCancelBtn" class="charging-modal-btn btn-secondary modern-btn" type="button" style="flex:1;">Cancel</button>
 					</div>
 				</div>
 
-				<div class="charging-modal-buttons">
-					<button class="charging-modal-btn btn-secondary" id="cancelPaymentBtn" onclick="closePaymentModal()">Cancel</button>
-					<button class="charging-modal-btn btn-success" id="confirmPaymentBtn" onclick="confirmPayment()" disabled>Confirm Payment</button>
+				<div style="margin-top:10px; text-align:center;">
+					<button class="charging-modal-btn" onclick="closePaymentModal()" style="background:transparent;border:0;color:#666;">Close</button>
 				</div>
 			</div>
 		</div>
@@ -2503,17 +2513,18 @@ if ($conn) {
                 document.addEventListener('DOMContentLoaded', function() {
                     const startBtn = document.getElementById('startChargingBtn');
                     if (startBtn) {
-                        startBtn.addEventListener('click', function(event) {
-                            // Check if current ticket status is charging or completed
-                            const pendingStatuses = ['charging', 'completed'];
-                            const currentStatus = window.currentStatus || '';
+							startBtn.addEventListener('click', function(event) {
+								// Check if current ticket status is one that should block starting a new charge
+								const blockedStatuses = ['charging', 'completed', 'complete', 'pending', 'waiting'];
+								const currentStatus = (window.currentStatus || '').toLowerCase();
 
-                            if (pendingStatuses.includes(currentStatus)) {
-                                event.preventDefault();
-                                showErrorPopup('You already have a pending ticket');
-                            }
-                            // else allow navigation normally
-                        });
+								if (blockedStatuses.includes(currentStatus)) {
+									event.preventDefault();
+									showErrorPopup('You already have a pending ticket or session in progress');
+									return;
+								}
+								// else allow navigation normally
+							});
                     }
                 });
 
@@ -2960,8 +2971,8 @@ if ($conn) {
                                                 receiptServiceEl.textContent = data.payment_modal ? data.payment_modal.service_type : 'Charging';
                                             }
                                             
-                                            // Show the payment completion modal
-                                            showPaymentCompletionModal();
+											// Show the payment completion modal (user-initiated, force it)
+											showPaymentCompletionModal(true);
                                         };
                                     } else {
                                         // Handle other button actions (redirect to href)
@@ -2986,6 +2997,48 @@ if ($conn) {
                                     // Add new background class
                                     vehicleCard.classList.add(data.background_class);
                                 }
+
+								// Disable or enable the Start Charging button when status is 'complete'
+								try {
+									const startBtn = document.getElementById('startChargingBtn');
+									const normalizedStatus = (data.status_text || '').toLowerCase();
+									if (startBtn) {
+										// disable for several known blocking status keywords
+										const shouldDisable = ['complete','completed','pending','waiting','charging'].some(k => normalizedStatus.includes(k) || normalizedStatus === k);
+										if (shouldDisable) {
+											// Mark as disabled for both <a> and <button> variants
+											startBtn.classList.add('disabled');
+											startBtn.setAttribute('aria-disabled', 'true');
+											// Anchor handling: remove href and prevent interaction
+											if (startBtn.tagName && startBtn.tagName.toLowerCase() === 'a') {
+												// stash href so we can restore it later
+												if (!startBtn.dataset._hrefBackup) startBtn.dataset._hrefBackup = startBtn.getAttribute('href') || '';
+												startBtn.removeAttribute('href');
+												startBtn.style.pointerEvents = 'none';
+												startBtn.tabIndex = -1;
+											} else {
+												// For buttons/spans, set disabled if supported
+												try { startBtn.disabled = true; } catch(e){}
+											}
+										} else {
+											// Re-enable
+											startBtn.classList.remove('disabled');
+											startBtn.removeAttribute('aria-disabled');
+											if (startBtn.tagName && startBtn.tagName.toLowerCase() === 'a') {
+												if (startBtn.dataset._hrefBackup) {
+													startBtn.setAttribute('href', startBtn.dataset._hrefBackup);
+													delete startBtn.dataset._hrefBackup;
+												}
+												startBtn.style.pointerEvents = '';
+												startBtn.tabIndex = 0;
+											} else {
+												try { startBtn.disabled = false; } catch(e){}
+											}
+										}
+									}
+								} catch (e) {
+									console.warn('startChargingBtn toggle failed', e);
+								}
 
                                 // Update battery level if changed
                                 const batteryElement = $('.feature-description strong').filter(function() {
@@ -3022,8 +3075,8 @@ if ($conn) {
                                     document.getElementById('totalAmount').textContent = '₱' + totalAmount.toFixed(2);
                                     document.getElementById('receiptService').textContent = data.payment_modal.service_type || 'Charging';
                                     
-                                    // Show the payment completion modal
-                                    showPaymentCompletionModal();
+									// Show the payment completion modal (automated status update - do not force)
+												showPaymentCompletionModal();
                                 }
                             }
                         })
@@ -3259,103 +3312,101 @@ if ($conn) {
                         }
                     });
 
-                    // Handle initial Pay Now button click on page load
-                    document.addEventListener('DOMContentLoaded', function() {
-                        console.log('DOMContentLoaded - setting up payment modal');
-                        
-                        // Set up payment option click handlers
-                        const cashOption = document.getElementById('cashPaymentOption');
-                        const ewalletOption = document.getElementById('ewalletPaymentOption');
-                        
-                        if (cashOption) {
-                            cashOption.addEventListener('click', function() {
-                                console.log('Cash option clicked');
-                                selectPaymentMethod('cash');
-                            });
-                        }
-                        
-                        if (ewalletOption) {
-                            ewalletOption.addEventListener('click', function() {
-                                console.log('E-wallet option clicked');
-                                selectPaymentMethod('ewallet');
-                            });
-                        }
-                        
-                        console.log('Payment option handlers set up');
-                        
-                        // Set up cancel and confirm button handlers
-                        const cancelBtn = document.getElementById('cancelPaymentBtn');
-                        const confirmBtn = document.getElementById('confirmPaymentBtn');
-                        
-                        if (cancelBtn) {
-                            cancelBtn.addEventListener('click', function() {
-                                console.log('Cancel button clicked');
-                                closePaymentModal();
-                            });
-                        }
-                        
-                        if (confirmBtn) {
-                            confirmBtn.addEventListener('click', function() {
-                                console.log('Confirm button clicked');
-                                confirmPayment();
-                            });
-                        }
-                        
-                        console.log('Button handlers set up');
-                        
-                        const initialButton = document.getElementById('vehicleActionBtn');
-                        console.log('Initial button found:', initialButton);
-                        console.log('Button text:', initialButton ? initialButton.textContent : 'none');
-                        
-                        if (initialButton && initialButton.textContent === 'Pay Now') {
-                            console.log('Setting up initial Pay Now button click handler');
-                            initialButton.onclick = function(e) {
-                                e.preventDefault();
-                                console.log('Initial Pay Now button clicked');
-                                
-                                // Get payment data from PHP variables
-                                const ticketId = '<?php echo $queue_ticket ? $queue_ticket['ticket_id'] : ''; ?>';
-                                const serviceType = '<?php echo $queue_ticket ? $queue_ticket['service_type'] : ''; ?>';
-                                const amount = <?php echo $queue_ticket ? calculateChargingAmount($queue_ticket['service_type']) : 0; ?>;
-                                
-                                console.log('PHP data:', { ticketId, serviceType, amount });
-                                
-                                if (ticketId) {
-                                    currentTicketId = ticketId;
-                                    totalAmount = amount;
-                                    
-                                    // Update modal with actual data
-                                    const totalAmountEl = document.getElementById('totalAmount');
-                                    const receiptServiceEl = document.getElementById('receiptService');
-                                    
-                                    if (totalAmountEl) {
-                                        totalAmountEl.textContent = '₱' + totalAmount.toFixed(2);
-                                    }
-                                    if (receiptServiceEl) {
-                                        receiptServiceEl.textContent = serviceType || 'Charging';
-                                    }
-                                    
-                                    // Show the payment completion modal
-                                    showPaymentCompletionModal();
-                                } else {
-                                    console.log('No ticket ID found');
-                                }
-                            };
-                        } else if (initialButton && initialButton.textContent !== 'Pay Now') {
-                            // Handle other button actions on page load
-                            const buttonHref = '<?php echo $button_href; ?>';
-                            if (buttonHref) {
-                                initialButton.onclick = function(e) {
-                                    e.preventDefault();
-                                    if (buttonHref.includes('Monitor')) {
-                                        window.open(buttonHref, '_blank');
-                                    } else {
-                                        window.location.href = buttonHref;
-                                    }
-                                };
-                            }
-                        }
-                    });
+					// Handle initial Pay Now button click on page load
+					console.log('setting up payment modal handlers (immediate)');
+
+					// Attach handlers to any element with .payment-option (buttons now)
+					document.querySelectorAll('.payment-option').forEach(el => {
+						el.addEventListener('click', function(e) {
+							// If this is one of the dedicated pay buttons, skip the generic handler
+							if (el.id === 'payWithCashBtn' || el.id === 'payWithEwalletBtn') {
+								// Let the button-specific listeners handle the click
+								return;
+							}
+							const method = el.getAttribute('data-method');
+							console.log('payment-option clicked, method=', method);
+							if (!method) return;
+							selectPaymentMethod(method);
+							try { payNow(method); } catch(e){ console.error('payNow failed', e); }
+						});
+					});
+
+					console.log('Payment option handlers set up (buttons)');
+
+					// Set up direct-pay button handlers (replaces confirm/cancel flow)
+					const payCashBtn = document.getElementById('payWithCashBtn');
+					const payEwalletBtn = document.getElementById('payWithEwalletBtn');
+
+					if (payCashBtn) {
+						payCashBtn.addEventListener('click', function() {
+							console.log('Pay with Cash clicked');
+							payNow('cash');
+						});
+					}
+
+					if (payEwalletBtn) {
+						// Open a confirmation step for e-wallet payments when clicked
+						payEwalletBtn.addEventListener('click', function() {
+							console.log('Pay with E-Wallet clicked');
+							// Start the e-wallet payment flow which checks balance and shows a Proceed/Cancel confirmation
+							try { initiateEwalletPayment(); } catch (e) { console.error('initiateEwalletPayment failed', e); }
+						});
+					}
+
+					console.log('Direct pay button handlers set up');
+
+					const initialButton = document.getElementById('vehicleActionBtn');
+					console.log('Initial button found:', initialButton);
+					console.log('Button text:', initialButton ? initialButton.textContent : 'none');
+
+					if (initialButton && initialButton.textContent === 'Pay Now') {
+						console.log('Setting up initial Pay Now button click handler');
+						initialButton.onclick = function(e) {
+							e.preventDefault();
+							console.log('Initial Pay Now button clicked');
+
+							// Get payment data from PHP variables
+							const ticketId = '<?php echo $queue_ticket ? $queue_ticket['ticket_id'] : ''; ?>';
+							const serviceType = '<?php echo $queue_ticket ? $queue_ticket['service_type'] : ''; ?>';
+							const amount = <?php echo $queue_ticket ? calculateChargingAmount($queue_ticket['service_type']) : 0; ?>;
+
+							console.log('PHP data:', { ticketId, serviceType, amount });
+
+							if (ticketId) {
+								currentTicketId = ticketId;
+								totalAmount = amount;
+
+								// Update modal with actual data
+								const totalAmountEl = document.getElementById('totalAmount');
+								const receiptServiceEl = document.getElementById('receiptService');
+
+								if (totalAmountEl) {
+									totalAmountEl.textContent = '₱' + totalAmount.toFixed(2);
+								}
+								if (receiptServiceEl) {
+									receiptServiceEl.textContent = serviceType || 'Charging';
+								}
+
+								// Show the payment completion modal
+								showPaymentCompletionModal();
+							} else {
+								console.log('No ticket ID found');
+							}
+						};
+					} else if (initialButton && initialButton.textContent !== 'Pay Now') {
+						// Handle other button actions on page load
+						const buttonHref = '<?php echo $button_href; ?>';
+						if (buttonHref) {
+							initialButton.onclick = function(e) {
+								e.preventDefault();
+								if (buttonHref.includes('Monitor')) {
+									window.open(buttonHref, '_blank');
+								} else {
+									window.location.href = buttonHref;
+								}
+							};
+						}
+					}
 
                     // Add click handlers for modal triggers
                     $(document).on('click', function(e) {
@@ -3405,12 +3456,11 @@ if ($conn) {
                             return;
                         }
                         
-                        // Enable confirm button
-                        const confirmBtn = document.getElementById('confirmPaymentBtn');
-                        if (confirmBtn) {
-                            confirmBtn.disabled = false;
-                            confirmBtn.textContent = 'Confirm Payment';
-                        }
+						// Enable pay buttons (direct pay flow)
+						const payCashBtnEl = document.getElementById('payWithCashBtn');
+						const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+						if (payCashBtnEl) payCashBtnEl.disabled = false;
+						if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
                         
                         // Show wallet balance if e-wallet is selected
                         if (method === 'ewallet') {
@@ -3423,212 +3473,264 @@ if ($conn) {
                         }
                     }
 
-                    // Fetch current wallet balance
-                    window.fetchWalletBalance = async function() {
-                        console.log('Fetching wallet balance for amount:', totalAmount);
-                        try {
-                            const response = await fetch('api/mobile.php?action=wallet-balance&username=<?php echo htmlspecialchars($_SESSION['username']); ?>');
-                            
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            
-                            const text = await response.text();
-                            let data;
-                            try {
-                                data = JSON.parse(text);
-                            } catch (e) {
-                                console.error('Wallet balance JSON parse error:', e);
-                                console.error('Response text:', text);
-                                throw new Error('Invalid JSON response from wallet API');
-                            }
-                            
-                            console.log('Wallet balance response:', data);
-                            
-                            if (data.success) {
-                                const balance = data.balance || 0;
-                                console.log('Current wallet balance:', balance);
-                                document.getElementById('currentWalletBalance').textContent = balance.toFixed(2);
-                                document.getElementById('walletBalanceDisplay').style.display = 'block';
-                                
-                                // Check if balance is sufficient
-                                if (balance < totalAmount) {
-                                    console.log('Insufficient balance:', balance, '<', totalAmount);
-                                    document.getElementById('errorMessage').style.display = 'block';
-                                    document.getElementById('confirmPaymentBtn').disabled = true;
-                                } else {
-                                    console.log('Sufficient balance:', balance, '>=', totalAmount);
-                                    document.getElementById('errorMessage').style.display = 'none';
-                                    document.getElementById('confirmPaymentBtn').disabled = false;
-                                }
-                            } else {
-                                console.error('Wallet balance API error:', data.error);
-                            }
-                        } catch (error) {
-                            console.error('Error fetching wallet balance:', error);
-                            // Show error message to user
-                            document.getElementById('errorMessage').textContent = 'Unable to check wallet balance. Please try again.';
-                            document.getElementById('errorMessage').style.display = 'block';
-                        }
-                    }
+					// Fetch current wallet balance - returns numeric balance or throws
+					window.fetchWalletBalance = async function() {
+						console.log('Fetching wallet balance for amount:', totalAmount);
+						const resp = await fetch('api/mobile.php?action=wallet-balance&username=<?php echo htmlspecialchars($_SESSION['username']); ?>');
+						if (!resp.ok) throw new Error('Network response was not ok');
+						const text = await resp.text();
+						let data;
+						try {
+							data = JSON.parse(text);
+						} catch (e) {
+							console.error('Wallet balance JSON parse error:', e);
+							console.error('Response text:', text);
+							throw new Error('Invalid JSON response from wallet API');
+						}
+						if (!data.success) throw new Error(data.error || 'Wallet API error');
+						const balance = Number(data.balance || 0);
+						document.getElementById('currentWalletBalance').textContent = balance.toFixed(2);
+						document.getElementById('walletBalanceDisplay').style.display = 'block';
+						return balance;
+					}
 
-                    // Confirm payment - Updated function
-                    window.confirmPayment = async function() {
-                        console.log('confirmPayment called with method:', selectedPaymentMethod);
-                        console.log('Payment data:', { currentTicketId, totalAmount, selectedPaymentMethod });
-                        
-                        // Validate payment method
-                        if (!selectedPaymentMethod) {
-                            alert('Please select a payment method (Cash or E-Wallet)');
-                            return;
-                        }
-                        
-                        if (selectedPaymentMethod !== 'cash' && selectedPaymentMethod !== 'ewallet') {
-                            alert('Invalid payment method selected. Please try again.');
-                            return;
-                        }
-                        
-                        // Validate ticket ID
-                        if (!currentTicketId || currentTicketId.trim() === '') {
-                            alert('No ticket ID found. Please refresh the page and try again.');
-                            return;
-                        }
-                        
-                        // Validate amount
-                        if (!totalAmount || totalAmount <= 0 || isNaN(totalAmount)) {
-                            alert('Invalid payment amount. Please refresh the page and try again.');
-                            return;
-                        }
-                        
-                        // Additional validation for e-wallet
-                        if (selectedPaymentMethod === 'ewallet') {
-                            const errorMsg = document.getElementById('errorMessage');
-                            if (errorMsg && errorMsg.style.display !== 'none') {
-                                alert('Insufficient wallet balance. Please add funds to your wallet or choose cash payment.');
-                                return;
-                            }
-                        }
-                        
-                        // Show loading state
-                        const confirmBtn = document.getElementById('confirmPaymentBtn');
-                        const originalText = confirmBtn.textContent;
-                        confirmBtn.textContent = 'Processing...';
-                        confirmBtn.disabled = true;
-                        
-                        try {
-                            const response = await fetch('api/process_payment.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    ticket_id: currentTicketId,
-                                    payment_method: selectedPaymentMethod,
-                                    amount: totalAmount
-                                })
-                            });
-                            
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            
-                            const text = await response.text();
-                            let data;
-                            try {
-                                data = JSON.parse(text);
-                            } catch (e) {
-                                console.error('Payment JSON parse error:', e);
-                                console.error('Payment response text:', text);
-                                throw new Error('Invalid JSON response from payment API');
-                            }
-                            
-                            console.log('Payment processing response:', data);
-                            
-                            if (data.success) {
-                                console.log('Payment successful!');
-                                
-                                // Show success message with more details
-                                if (selectedPaymentMethod === 'cash') {
-                                    alert('Cash payment recorded successfully!');
-                                } else {
-                                    const remainingBalance = data.remaining_balance;
-                                    if (remainingBalance !== null) {
-                                        alert(`E-wallet payment processed successfully!\nRemaining balance: ₱${remainingBalance.toFixed(2)}`);
-                                    } else {
-                                        alert('E-wallet payment processed successfully!');
-                                    }
-                                }
-                                
-                                // Close the payment modal
-                                closePaymentModal();
-                                
-                                // Refresh the page to update status
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 1000);
-                                
-                            } else {
-                                console.error('Payment failed:', data.error);
-                                alert('Payment failed: ' + (data.error || 'Unknown error'));
-                                // Reset button
-                                confirmBtn.textContent = originalText;
-                                confirmBtn.disabled = false;
-                            }
-                        } catch (error) {
-                            console.error('Payment error:', error);
-                            alert('Payment failed. Please try again.');
-                            // Reset button
-                            confirmBtn.textContent = originalText;
-                            confirmBtn.disabled = false;
-                        }
-                    }
+					// Confirm payment - now callable directly by payNow
+					window.confirmPayment = async function(method) {
+						console.log('confirmPayment called with method:', method);
+						selectedPaymentMethod = method;
 
-                    // Close payment modal
-                    window.closePaymentModal = function() {
-                        console.log('closePaymentModal called');
-                        
-                        const paymentModal = document.getElementById('paymentModal');
-                        if (paymentModal) {
-                            paymentModal.style.display = 'none';
-                        }
-                        
-                        // Reset payment selection
-                        selectedPaymentMethod = null;
-                        
-                        const confirmBtn = document.getElementById('confirmPaymentBtn');
-                        if (confirmBtn) {
-                            confirmBtn.disabled = true;
-                            confirmBtn.textContent = 'Confirm Payment';
-                        }
-                        
-                        // Clear any selections
-                        document.querySelectorAll('.payment-option').forEach(option => {
-                            option.classList.remove('selected');
-                        });
-                        
-                        // Hide wallet balance and error messages
-                        const walletDisplay = document.getElementById('walletBalanceDisplay');
-                        const errorDisplay = document.getElementById('errorMessage');
-                        if (walletDisplay) walletDisplay.style.display = 'none';
-                        if (errorDisplay) errorDisplay.style.display = 'none';
-                        
-                        console.log('Payment modal closed and reset');
-                    }
+						// Validate payment method
+						if (!selectedPaymentMethod || (selectedPaymentMethod !== 'cash' && selectedPaymentMethod !== 'ewallet')) {
+							alert('Invalid payment method.');
+							return;
+						}
 
-                    // Show payment completion modal
-                    window.showPaymentCompletionModal = function() {
+
+
+						// Validate ticket ID and amount
+						if (!currentTicketId || currentTicketId.trim() === '') {
+							alert('No ticket ID found. Please refresh the page and try again.');
+							return;
+						}
+						if (!totalAmount || totalAmount <= 0 || isNaN(totalAmount)) {
+							alert('Invalid payment amount. Please refresh the page and try again.');
+							return;
+						}
+
+						// For e-wallet, check balance first
+						if (selectedPaymentMethod === 'ewallet') {
+							try {
+								const balance = await fetchWalletBalance();
+								if (balance < totalAmount) {
+									document.getElementById('errorMessage').style.display = 'block';
+									alert('Insufficient wallet balance. Please add funds or choose cash.');
+									return;
+								}
+							} catch (err) {
+								console.error('Wallet balance check failed:', err);
+								alert('Unable to verify wallet balance. Please try again later.');
+								return;
+							}
+						}
+
+						// Show loading state on the pay buttons
+						const payCashBtnEl = document.getElementById('payWithCashBtn');
+						const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+						if (payCashBtnEl) payCashBtnEl.disabled = true;
+						if (payEwalletBtnEl) payEwalletBtnEl.disabled = true;
+
+						try {
+							const response = await fetch('api/process_payment.php', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ ticket_id: currentTicketId, payment_method: selectedPaymentMethod, amount: totalAmount })
+							});
+							if (!response.ok) throw new Error('Network error');
+							const text = await response.text();
+							let data;
+							try { data = JSON.parse(text); } catch (e) { throw new Error('Invalid JSON from payment API'); }
+
+							if (data.success) {
+								if (selectedPaymentMethod === 'cash') {
+									alert('Cash payment recorded successfully!');
+								} else {
+									const remaining = data.remaining_balance != null ? Number(data.remaining_balance) : null;
+									if (remaining != null) alert(`E-wallet payment processed. Remaining balance: ₱${remaining.toFixed(2)}`);
+									else alert('E-wallet payment processed successfully!');
+								}
+
+								closePaymentModal();
+								setTimeout(() => window.location.reload(), 900);
+							} else {
+								throw new Error(data.error || 'Payment failed');
+							}
+						} catch (err) {
+							console.error('Payment error', err);
+							alert('Payment failed: ' + (err.message || 'Unknown error'));
+						} finally {
+							if (payCashBtnEl) payCashBtnEl.disabled = false;
+							if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
+						}
+					}
+
+					// Pay Now helper - immediately attempts payment with the chosen method
+					window.payNow = function(method) {
+						// Ensure modal ticket data present
+						console.log('payNow triggered for:', method, 'ticket:', currentTicketId, 'amount:', totalAmount);
+						if (!method) return;
+						// Short-circuit client-side UX messages to avoid server errors during development
+						if (method === 'cash') {
+							// Show a friendly instruction to the user
+							showDialog('Cash Payment', 'Please go to the counter to pay.');
+							// Close the payment modal after a short delay
+							setTimeout(() => {
+								closePaymentModal();
+							}, 900);
+							return;
+						}
+
+						if (method === 'ewallet') {
+							// Attempt to fetch balance and provide user-friendly message, but do NOT call server payment API
+							fetchWalletBalance().then(balance => {
+								if (balance >= totalAmount) {
+									showDialog('E-Wallet Payment', 'Your e-wallet has sufficient balance. Please confirm payment from the app.');
+								} else {
+									document.getElementById('errorMessage').style.display = 'block';
+									showDialog('E-Wallet Payment', 'Insufficient wallet balance. Please add funds or choose cash.');
+								}
+							}).catch(err => {
+								console.error('Wallet balance check failed:', err);
+								showDialog('E-Wallet Payment', 'Unable to verify wallet balance. Please try again later.');
+							});
+							return;
+						}
+
+						// Fallback: if other methods are passed, call the original confirm flow
+						confirmPayment(method);
+					}
+
+						// Close payment modal
+						window.closePaymentModal = function() {
+							console.log('closePaymentModal called');
+                        
+							const paymentModal = document.getElementById('paymentModal');
+							if (paymentModal) {
+								paymentModal.style.display = 'none';
+							}
+
+							// Reset payment selection and enable pay buttons
+							selectedPaymentMethod = null;
+							const payCashBtnEl = document.getElementById('payWithCashBtn');
+							const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+							if (payCashBtnEl) payCashBtnEl.disabled = false;
+							if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
+
+							// Clear any selections
+							document.querySelectorAll('.payment-option').forEach(option => {
+								option.classList.remove('selected');
+							});
+
+							// Hide wallet balance and error messages
+							const walletDisplay = document.getElementById('walletBalanceDisplay');
+							const errorDisplay = document.getElementById('errorMessage');
+							if (walletDisplay) walletDisplay.style.display = 'none';
+							if (errorDisplay) errorDisplay.style.display = 'none';
+                        
+							console.log('Payment modal closed and reset');
+						}
+
+						// Global e-wallet confirmation helpers (separate from confirmPayment)
+						window.initiateEwalletPayment = async function() {
+							console.log('initiateEwalletPayment (global) called');
+							if (!currentTicketId || !totalAmount) {
+								alert('Payment data missing. Please refresh and try again.');
+								return;
+							}
+							try {
+								const balance = await fetchWalletBalance();
+								console.log('Wallet balance:', balance, 'Total amount:', totalAmount);
+								if (balance >= totalAmount) {
+									showEwalletConfirmUI(balance);
+								} else {
+									document.getElementById('errorMessage').style.display = 'block';
+									alert('Insufficient wallet balance. Please add funds or choose cash.');
+								}
+							} catch (err) {
+								console.error('Error checking wallet balance for ewallet payment', err);
+								alert('Unable to verify wallet balance. Please try again later.');
+							}
+						}
+
+						window.showEwalletConfirmUI = function(balance) {
+							const confirmEl = document.getElementById('ewalletConfirm');
+							const walletBalanceDisplay = document.getElementById('walletBalanceDisplay');
+							if (walletBalanceDisplay) walletBalanceDisplay.style.display = 'block';
+							if (confirmEl) confirmEl.style.display = 'block';
+							const payCashBtnEl = document.getElementById('payWithCashBtn');
+							const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+							if (payCashBtnEl) payCashBtnEl.disabled = true;
+							if (payEwalletBtnEl) payEwalletBtnEl.disabled = true;
+						}
+
+						window.hideEwalletConfirmUI = function() {
+							const confirmEl = document.getElementById('ewalletConfirm');
+							if (confirmEl) confirmEl.style.display = 'none';
+							const payCashBtnEl = document.getElementById('payWithCashBtn');
+							const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+							if (payCashBtnEl) payCashBtnEl.disabled = false;
+							if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
+						}
+
+						// Proceed / Cancel wiring for the confirm UI
+						document.addEventListener('click', function(e) {
+							if (e.target && e.target.id === 'ewalletProceedBtn') {
+								// Proceed: call the main confirmPayment flow which performs the deduction
+								confirmPayment('ewallet');
+							}
+							if (e.target && e.target.id === 'ewalletCancelBtn') {
+								// Cancel: hide confirm UI and return to modal
+								hideEwalletConfirmUI();
+							}
+						});
+
+					// Show payment completion modal
+					// optional parameter force=true bypasses the per-ticket spam guard (useful for explicit user actions)
+					window.showPaymentCompletionModal = function(force) {
                         console.log('showPaymentCompletionModal called');
                         console.log('currentTicketId:', currentTicketId);
                         console.log('totalAmount:', totalAmount);
                         
-                        // Always show the modal - remove localStorage check
-                        // Reset payment selection
-                        selectedPaymentMethod = null;
-                        const confirmBtn = document.getElementById('confirmPaymentBtn');
-                        if (confirmBtn) {
-                            confirmBtn.disabled = true;
-                            confirmBtn.textContent = 'Confirm Payment';
-                        }
+					// Prevent spamming: show once per ticket using localStorage, and guard against duplicate calls in this session
+						if (!force) {
+							try {
+								const ticketKey = currentTicketId ? ('paymentModalShown_' + currentTicketId) : 'paymentModalShown_global';
+								if (localStorage.getItem(ticketKey) === 'true') {
+									console.log('Payment modal already shown for', ticketKey, '- skipping');
+									return;
+								}
+								// mark as shown
+								localStorage.setItem(ticketKey, 'true');
+							} catch (e) {
+								// localStorage could be unavailable in some privacy modes; fall back to in-memory guard
+								console.warn('localStorage unavailable, using in-memory guard');
+							}
+
+							// in-memory guard to prevent duplicate shows in same page session
+							if (window._paymentModalShowing) {
+								console.log('Payment modal already showing in this session, skipping');
+								return;
+							}
+							window._paymentModalShowing = true;
+						} else {
+							console.log('force=true: bypassing spam guard and showing modal');
+						}
+
+					// Reset payment selection and enable pay buttons
+						selectedPaymentMethod = null;
+						const payCashBtnEl = document.getElementById('payWithCashBtn');
+						const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+						if (payCashBtnEl) payCashBtnEl.disabled = false;
+						if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
                         
                         // Remove any existing selection
                         document.querySelectorAll('.payment-option').forEach(option => {
@@ -3646,6 +3748,14 @@ if ($conn) {
                         if (paymentModal) {
                             paymentModal.style.display = 'flex';
                             console.log('Payment modal shown');
+							// When modal is closed, reset the in-memory guard so it can be shown again in the same session if needed
+							const observer = new MutationObserver(() => {
+								if (paymentModal.style.display === 'none') {
+									window._paymentModalShowing = false;
+									observer.disconnect();
+								}
+							});
+							observer.observe(paymentModal, { attributes: true, attributeFilter: ['style'] });
                         } else {
                             console.error('Payment modal element not found');
                         }
@@ -3695,17 +3805,15 @@ if ($conn) {
                         const modal = document.getElementById('paymentModal');
                         console.log('1. Payment modal exists:', !!modal);
                         
-                        // Test 2: Check if payment options exist
-                        const cashOption = document.getElementById('cashPaymentOption');
-                        const ewalletOption = document.getElementById('ewalletPaymentOption');
-                        console.log('2. Cash option exists:', !!cashOption);
-                        console.log('3. E-wallet option exists:', !!ewalletOption);
+						// Test 2: Check if payment option buttons exist
+						const paymentOptions = document.querySelectorAll('.payment-option');
+						console.log('2. Payment option buttons count:', paymentOptions.length);
                         
                         // Test 3: Check if buttons exist
-                        const confirmBtn = document.getElementById('confirmPaymentBtn');
-                        const cancelBtn = document.getElementById('cancelPaymentBtn');
-                        console.log('4. Confirm button exists:', !!confirmBtn);
-                        console.log('5. Cancel button exists:', !!cancelBtn);
+						const payCashBtn = document.getElementById('payWithCashBtn');
+						const payEwalletBtn = document.getElementById('payWithEwalletBtn');
+						console.log('4. Pay with Cash button exists:', !!payCashBtn);
+						console.log('5. Pay with E-Wallet button exists:', !!payEwalletBtn);
                         
                         // Test 4: Check if functions are global
                         console.log('6. selectPaymentMethod function exists:', typeof window.selectPaymentMethod);
@@ -3748,6 +3856,47 @@ if ($conn) {
             </script>
 
 		<!-- Footer -->
+
+		<style>
+		/* Modern payment modal styles */
+		.modern-modal-card{
+			width:100%;
+			max-width:480px;
+			background:var(--bg-card, #fff);
+			border-radius:14px;
+			box-shadow:0 20px 40px rgba(14,58,73,0.12);
+			padding:18px 18px 16px 18px;
+			display:flex;
+			flex-direction:column;
+			gap:8px;
+			border:1px solid rgba(14,58,73,0.06);
+		}
+
+		.charging-modal-header{display:flex;gap:12px;align-items:center}
+		.modern-icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00c2ce 0%, #0e3a49 100%);color:#fff;font-size:20px}
+		.charging-modal-title{margin:0;font-size:1.25rem;color:#0e3a49}
+		.charging-modal-description{margin:0;color:#666;font-size:0.95rem}
+
+		.modern-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+		.charging-info-item{background:rgba(14,58,73,0.02);padding:10px;border-radius:10px;display:flex;flex-direction:column}
+		.charging-info-item .label{font-size:0.85rem;color:#667;}
+		.charging-info-item .value{font-weight:700;color:#0e3a49;margin-top:4px}
+		.total-amount{color:#00aab0}
+
+		/* Apply payment-option card styles to buttons inside the modern button row */
+		.modern-button-row .payment-option{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px;border-radius:10px;border:1px solid rgba(14,58,73,0.06);cursor:pointer;background:#fff;justify-content:center}
+		.payment-option{ /* keep generic class for other uses */ display:inline-flex }
+		.payment-option.selected{border-color:rgba(0,194,206,0.9);box-shadow:0 6px 18px rgba(0,194,206,0.08)}
+		.payment-icon{font-size:20px;color:#0e3a49}
+		.payment-label{font-weight:600;color:#0e3a49}
+
+		.modern-button-row .modern-btn{padding:12px 14px;border-radius:10px;font-weight:700;border:0;cursor:pointer}
+		.modern-button-row .btn-primary{background:linear-gradient(135deg,#00c2ce 0%, #0e3a49 100%);color:#fff}
+		.modern-button-row .btn-secondary{background:#f3f6f7;color:#0e3a49}
+
+		/* Ensure modal overlay centers content when displayed as flex */
+		.charging-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:10000;padding:16px}
+		</style>
 		<footer class="footer">
 			<div class="container">
 				<div class="footer-content">

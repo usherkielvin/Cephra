@@ -710,7 +710,82 @@ try {
     // Integration notes (not active):
     // - To fetch live snapshot: GET 'api/monitor.php' (JSON) — similar to existing monitor/index.php
     // - To use websocket: connect to ws://<host>:8080/ and parse messages similar to the other monitor implementation
+    // Polling logic: fetch live snapshot every 3 seconds and update UI only when data changed
+    (function enablePolling(){
+      const POLL_URL = './api/monitor.php';
+      const POLL_INTERVAL = 3000; // ms
+      let lastSnapshot = null; // stringified snapshot for simple change detection
 
+      // Helper to normalize API response into structures used by renderers
+      function normalizeApiData(data){
+        const bays = Array.isArray(data.bays) ? data.bays.map(b => ({
+          bay: b.bay_number || b.bay || '',
+          type: b.bay_type || b.type || 'Normal',
+          status: b.status || 'Available',
+          ticket: b.current_ticket_id || b.ticket || '',
+          user: b.current_username || b.user || '',
+          plate: b.plate_number || b.plate || '',
+          last_updated: b.start_time || b.last_updated || ''
+        })) : [];
+
+        // map queue into waiting items shape used by renderWaitings
+        const waitings = Array.isArray(data.queue) ? data.queue.map(w => ({
+          ticket: w.ticket_id || w.ticket || '',
+          plate: w.plate_number || w.plate || '',
+          user: w.username || w.user || '',
+          service: w.service_type || w.service || '',
+          time: w.created_at ? new Date(w.created_at) : (w.time ? new Date(w.time) : null)
+        })) : [];
+
+        return { bays, waitings };
+      }
+
+      // announce newly occupied bays (simple delta detection by ticket ID)
+      function announceDiff(oldBays, newBays){
+        try{
+          const oldMap = (oldBays||[]).reduce((m,b)=>{ m[b.bay]=b; return m; },{});
+          (newBays||[]).forEach(nb=>{
+            const ob = oldMap[nb.bay];
+            // if previously no ticket and now has a ticket -> new occupation
+            if((!ob || !ob.ticket) && nb.ticket){
+              speak(`Bay ${nb.bay} is now occupied by ticket ${nb.ticket}`);
+            }
+          });
+        }catch(e){console.warn('announceDiff failed',e)}
+      }
+
+      async function pollOnce(){
+        try{
+          const res = await fetch(POLL_URL, { cache: 'no-store' });
+          if(!res.ok) return; // silent fail
+          const json = await res.json();
+          if(!json || json.success !== true) return;
+
+          const normalized = normalizeApiData(json);
+          // create lightweight snapshot string for change detection
+          const snap = JSON.stringify({b: normalized.bays.map(x=>({bay:x.bay,ticket:x.ticket,status:x.status})), w: normalized.waitings.map(x=>({ticket:x.ticket,plate:x.plate}))});
+          if(snap !== lastSnapshot){
+            // update announcer first (announce any new occupancies)
+            try{ announceDiff(window.sampleBays || [], normalized.bays); }catch(e){}
+
+            // replace sample arrays in-place so render functions use updated data
+            window.sampleBays = normalized.bays;
+            window.sampleWaitings = normalized.waitings;
+            // re-render UI
+            renderGrid();
+            renderWaitings();
+            lastSnapshot = snap;
+          }
+        }catch(err){
+          // network or parse errors - keep existing UI
+          console.warn('monitor poll error', err);
+        }
+      }
+
+      // Start immediate poll then interval
+      pollOnce();
+      setInterval(pollOnce, POLL_INTERVAL);
+    })();
   </script>
 </body>
 </html>

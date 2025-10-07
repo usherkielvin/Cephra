@@ -109,7 +109,7 @@ if ($action === 'test_status') {
     // Test endpoint to check current status for debugging
     $test_username = $_POST['username'] ?? $username;
     
-    $stmt_queue = $conn->prepare("SELECT ticket_id, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_queue = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
     $stmt_queue->bindParam(':username', $test_username);
     $stmt_queue->execute();
     $queue_ticket = $stmt_queue->fetch(PDO::FETCH_ASSOC);
@@ -132,7 +132,7 @@ if ($action === 'test_status') {
 
 if ($action === 'get_status') {
     // Fetch latest charging status from both queue_tickets and active_tickets
-    $stmt_queue = $conn->prepare("SELECT ticket_id, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_queue = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
     $stmt_queue->bindParam(':username', $username);
     $stmt_queue->execute();
     $queue_ticket = $stmt_queue->fetch(PDO::FETCH_ASSOC);
