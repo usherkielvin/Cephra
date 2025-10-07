@@ -267,6 +267,94 @@ if ($conn) {
 				--bg-primary: #ffffff;
 				--bg-secondary: #f8fafc;
 				--bg-card: #ffffff;
+
+			/* Payment Modal Styles */
+			.charging-modal-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.7);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 10000;
+			}
+
+			.charging-modal-content {
+				background: white;
+				border-radius: 15px;
+				padding: 2rem;
+				max-width: 500px;
+				width: 90%;
+				max-height: 90vh;
+				overflow-y: auto;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+			}
+
+			.payment-option {
+				cursor: pointer;
+				transition: all 0.3s ease;
+				border: 2px solid #e0e0e0;
+				border-radius: 10px;
+				padding: 1rem;
+				margin: 0.5rem 0;
+				display: flex;
+				align-items: center;
+			}
+
+			.payment-option:hover {
+				border-color: #00c2ce;
+				background-color: #f0f9ff;
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(0, 194, 206, 0.2);
+			}
+
+			.payment-option.selected {
+				border-color: #00c2ce;
+				background-color: #e6f7ff;
+			}
+
+			.payment-icon {
+				margin-right: 1rem;
+				font-size: 1.5rem;
+				color: #00c2ce;
+			}
+
+			.payment-label {
+				font-weight: 600;
+				font-size: 1.1rem;
+			}
+
+			#confirmPaymentBtn:disabled {
+				background-color: #ccc;
+				cursor: not-allowed;
+			}
+
+			#confirmPaymentBtn:not(:disabled) {
+				background-color: #00c2ce;
+				cursor: pointer;
+			}
+
+			.wallet-balance {
+				background-color: #f0f9ff;
+				border: 1px solid #00c2ce;
+				border-radius: 8px;
+				padding: 1rem;
+				margin: 1rem 0;
+				text-align: center;
+			}
+
+			.error-message {
+				background-color: #fee;
+				border: 1px solid #fcc;
+				border-radius: 8px;
+				padding: 1rem;
+				margin: 1rem 0;
+				color: #c33;
+				text-align: center;
+			}
 				--border-color: rgba(26, 32, 44, 0.1);
 				--shadow-light: rgba(0, 194, 206, 0.1);
 				--shadow-medium: rgba(0, 194, 206, 0.2);
@@ -2849,8 +2937,17 @@ if ($conn) {
                                 }
 
                                 // New modal logic for pending payment
-                                if (data.status_text.toLowerCase().includes('pending payment') || data.status_text.toLowerCase().includes('queue pending')) {
-                                    showPaymentModal();
+                                if (data.payment_modal && data.payment_modal.show) {
+                                    // Set payment data
+                                    currentTicketId = data.payment_modal.ticket_id;
+                                    totalAmount = data.payment_modal.amount;
+                                    
+                                    // Update modal with actual data
+                                    document.getElementById('totalAmount').textContent = '₱' + totalAmount.toFixed(2);
+                                    document.getElementById('receiptService').textContent = data.payment_modal.service_type || 'Charging';
+                                    
+                                    // Show the payment completion modal
+                                    showPaymentCompletionModal();
                                 }
                             }
                         })
@@ -3102,6 +3199,160 @@ if ($conn) {
                             closeSupportModal();
                         }
                     });
+
+                    // Payment method selection
+                    let selectedPaymentMethod = null;
+                    let currentTicketId = null;
+                    let totalAmount = 0;
+
+                    function selectPaymentMethod(method) {
+                        selectedPaymentMethod = method;
+                        
+                        // Update UI to show selected method
+                        document.querySelectorAll('.payment-option').forEach(option => {
+                            option.classList.remove('selected');
+                        });
+                        document.querySelector(`[data-method="${method}"]`).classList.add('selected');
+                        
+                        // Enable confirm button
+                        document.getElementById('confirmPaymentBtn').disabled = false;
+                        
+                        // Show wallet balance if e-wallet is selected
+                        if (method === 'ewallet') {
+                            fetchWalletBalance();
+                        } else {
+                            document.getElementById('walletBalanceDisplay').style.display = 'none';
+                            document.getElementById('errorMessage').style.display = 'none';
+                        }
+                    }
+
+                    // Fetch current wallet balance
+                    async function fetchWalletBalance() {
+                        try {
+                            const response = await fetch('api/mobile.php?action=wallet-balance&username=<?php echo htmlspecialchars($_SESSION['username']); ?>');
+                            const data = await response.json();
+                            
+                            if (data.success) {
+                                const balance = data.balance || 0;
+                                document.getElementById('currentWalletBalance').textContent = balance.toFixed(2);
+                                document.getElementById('walletBalanceDisplay').style.display = 'block';
+                                
+                                // Check if balance is sufficient
+                                if (balance < totalAmount) {
+                                    document.getElementById('errorMessage').style.display = 'block';
+                                    document.getElementById('confirmPaymentBtn').disabled = true;
+                                } else {
+                                    document.getElementById('errorMessage').style.display = 'none';
+                                    document.getElementById('confirmPaymentBtn').disabled = false;
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Error fetching wallet balance:', error);
+                        }
+                    }
+
+                    // Confirm payment - Updated function
+                    async function confirmPayment() {
+                        if (!selectedPaymentMethod) {
+                            alert('Please select a payment method');
+                            return;
+                        }
+                        
+                        // Show loading state
+                        const confirmBtn = document.getElementById('confirmPaymentBtn');
+                        const originalText = confirmBtn.textContent;
+                        confirmBtn.textContent = 'Processing...';
+                        confirmBtn.disabled = true;
+                        
+                        try {
+                            const response = await fetch('api/process_payment.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    ticket_id: currentTicketId,
+                                    payment_method: selectedPaymentMethod,
+                                    amount: totalAmount
+                                })
+                            });
+                            
+                            const data = await response.json();
+                            
+                            if (data.success) {
+                                // Show success message
+                                if (selectedPaymentMethod === 'cash') {
+                                    alert('Cash payment recorded successfully!');
+                                } else {
+                                    alert('E-wallet payment processed successfully!');
+                                }
+                                
+                                // Close the payment modal
+                                closePaymentModal();
+                                
+                                // Refresh the page to update status
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000);
+                                
+                            } else {
+                                alert('Payment failed: ' + (data.error || 'Unknown error'));
+                                // Reset button
+                                confirmBtn.textContent = originalText;
+                                confirmBtn.disabled = false;
+                            }
+                        } catch (error) {
+                            console.error('Payment error:', error);
+                            alert('Payment failed. Please try again.');
+                            // Reset button
+                            confirmBtn.textContent = originalText;
+                            confirmBtn.disabled = false;
+                        }
+                    }
+
+                    // Close payment modal
+                    function closePaymentModal() {
+                        document.getElementById('paymentModal').style.display = 'none';
+                        selectedPaymentMethod = null;
+                        document.getElementById('confirmPaymentBtn').disabled = true;
+                        
+                        // Clear any selections
+                        document.querySelectorAll('.payment-option').forEach(option => {
+                            option.classList.remove('selected');
+                        });
+                        
+                        // Hide wallet balance and error messages
+                        document.getElementById('walletBalanceDisplay').style.display = 'none';
+                        document.getElementById('errorMessage').style.display = 'none';
+                    }
+
+                    // Show payment completion modal
+                    function showPaymentCompletionModal() {
+                        // Check if modal already shown for this ticket
+                        const modalKey = 'paymentModalShown_' + currentTicketId;
+                        if (localStorage.getItem(modalKey) === 'true') {
+                            return;
+                        }
+                        
+                        // Reset payment selection
+                        selectedPaymentMethod = null;
+                        document.getElementById('confirmPaymentBtn').disabled = true;
+                        
+                        // Remove any existing selection
+                        document.querySelectorAll('.payment-option').forEach(option => {
+                            option.classList.remove('selected');
+                        });
+                        
+                        // Hide wallet balance and error messages initially
+                        document.getElementById('walletBalanceDisplay').style.display = 'none';
+                        document.getElementById('errorMessage').style.display = 'none';
+                        
+                        // Show the payment modal
+                        document.getElementById('paymentModal').style.display = 'flex';
+                        
+                        // Mark modal as shown for this ticket
+                        localStorage.setItem(modalKey, 'true');
+                    }
                 });
             </script>
 

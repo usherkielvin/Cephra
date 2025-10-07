@@ -18,6 +18,25 @@ if (!$conn) {
     exit();
 }
 
+// Function to calculate charging amount based on service type
+function calculateChargingAmount($serviceType) {
+    // Define pricing based on service type
+    $pricing = [
+        'Fast Charging' => 75.00,
+        'Normal Charging' => 45.00,
+        'Fast' => 75.00,
+        'Normal' => 45.00
+    ];
+    
+    foreach ($pricing as $type => $amount) {
+        if (stripos($serviceType, $type) !== false) {
+            return $amount;
+        }
+    }
+    
+    return 75.00; // Default amount
+}
+
 // Function to ensure user has a plate number (like Java system)
 function ensureUserHasPlateNumber($conn, $username) {
     try {
@@ -240,6 +259,15 @@ if ($action === 'get_status') {
             $status_text = 'Pending Payment';
             $button_text = 'Pay Now';
             $button_href = '../Monitor/index.php';
+            
+            // Add payment modal trigger
+            $payment_modal = [
+                'show' => true,
+                'ticket_id' => $ticket_id,
+                'service_type' => $queue_ticket['service_type'],
+                'amount' => calculateChargingAmount($queue_ticket['service_type'])
+            ];
+            
             error_log("Status updated to pending payment for $username: $status_text");
         }
 
@@ -282,6 +310,7 @@ if ($action === 'get_status') {
         'battery_level' => $battery_level,
         'notification' => $notification,
         'ticket_info' => $ticket_info ?? null,
+        'payment_modal' => $payment_modal ?? null,
         'timestamp' => time()
     ]);
 } elseif ($action === 'confirm_charging') {
