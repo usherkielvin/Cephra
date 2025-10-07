@@ -468,26 +468,28 @@ try {
     // Lightweight frontend logic for visualization and basic interaction
     // If server-side provided live JSON is available, use it. Otherwise fall back to simulated sample data.
     const __serverBays = <?php echo $baysJson; ?>;
-    // Do not fabricate client-side data. If server provides bays use them, otherwise use an empty list
-    const sampleBays = (__serverBays && Array.isArray(__serverBays) && __serverBays.length>0) ? __serverBays.map(b=>({
-      bay: b.bay || '',
-      type: b.type || '',
-      status: b.status || '',
-      ticket: b.ticket || '',
-      user: b.user || '',
-      plate: b.plate || '',
-      last_updated: b.last_updated || ''
-    })) : [];
+      // Do not fabricate client-side data. If server provides bays use them, otherwise use an empty list
+      // expose arrays on window so polling can replace them and renders will pick up changes
+      let sampleBays = window.sampleBays = (__serverBays && Array.isArray(__serverBays) && __serverBays.length>0) ? __serverBays.map(b=>({
+        bay: b.bay || '',
+        type: b.type || '',
+        status: b.status || '',
+        ticket: b.ticket || '',
+        user: b.user || '',
+        plate: b.plate || '',
+        last_updated: b.last_updated || ''
+      })) : [];
 
     const __serverWaitings = <?php echo $waitingsJson; ?>;
-    // Use server waitings if present, otherwise no client-side fabricated waitings
-    const sampleWaitings = (__serverWaitings && Array.isArray(__serverWaitings) && __serverWaitings.length>0) ? __serverWaitings.map(w=>({
-      ticket: w.ticket || '',
-      plate: w.plate || '',
-      user: w.user || '',
-      service: w.service || '',
-      time: w.time ? new Date(w.time) : null
-    })) : [];
+      // Use server waitings if present, otherwise no client-side fabricated waitings
+      // expose on window and keep local reference so renders use updated data when polling replaces them
+      let sampleWaitings = window.sampleWaitings = (__serverWaitings && Array.isArray(__serverWaitings) && __serverWaitings.length>0) ? __serverWaitings.map(w=>({
+        ticket: w.ticket || '',
+        plate: w.plate || '',
+        user: w.user || '',
+        service: w.service || '',
+        time: w.time ? new Date(w.time) : null
+      })) : [];
 
     // Render helpers
     function renderGrid(){
@@ -712,8 +714,8 @@ try {
     // - To use websocket: connect to ws://<host>:8080/ and parse messages similar to the other monitor implementation
     // Polling logic: fetch live snapshot every 3 seconds and update UI only when data changed
     (function enablePolling(){
-      const POLL_URL = './api/monitor.php';
-      const POLL_INTERVAL = 3000; // ms
+  const POLL_URL = './api/monitor.php';
+  const POLL_INTERVAL = 2000; // ms (refresh every 2 seconds)
       let lastSnapshot = null; // stringified snapshot for simple change detection
 
       // Helper to normalize API response into structures used by renderers
@@ -768,9 +770,10 @@ try {
             // update announcer first (announce any new occupancies)
             try{ announceDiff(window.sampleBays || [], normalized.bays); }catch(e){}
 
-            // replace sample arrays in-place so render functions use updated data
-            window.sampleBays = normalized.bays;
-            window.sampleWaitings = normalized.waitings;
+            // replace sample arrays and local references so render functions use updated data
+            // keep them as plain arrays (no proxies) to avoid serialization surprises
+            window.sampleBays = sampleBays = normalized.bays;
+            window.sampleWaitings = sampleWaitings = normalized.waitings;
             // re-render UI
             renderGrid();
             renderWaitings();

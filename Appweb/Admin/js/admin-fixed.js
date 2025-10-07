@@ -1,4 +1,50 @@
 // Fixed Admin Panel JavaScript with Proper API Connections
+
+// Global unauthorized handler: intercept 401 responses and stop auto-refresh
+// This prevents the UI from repeatedly showing "Unauthorized access" notifications
+// when the session expires. It shows a single message and redirects to login.
+window._originalFetch = window.fetch ? window.fetch.bind(window) : null;
+window.__unauthorizedHandled = false;
+
+function handleUnauthorizedGlobal() {
+    if (window.__unauthorizedHandled) return;
+    window.__unauthorizedHandled = true;
+    try {
+        if (window.adminPanel && window.adminPanel.refreshInterval) {
+            clearInterval(window.adminPanel.refreshInterval);
+            window.adminPanel.refreshInterval = null;
+        }
+        if (window.adminPanel && typeof window.adminPanel.showError === 'function') {
+            window.adminPanel.showError('Session expired. Redirecting to login...');
+        } else {
+            // Fallback if adminPanel not initialized yet
+            try { alert('Session expired. Redirecting to login...'); } catch (_) {}
+        }
+    } catch (e) {
+        console.error('Error handling unauthorized state:', e);
+    }
+    // Redirect to login after a short delay so the user can see the message
+    setTimeout(() => { window.location.href = 'index.php'; }, 2200);
+}
+
+// Override global fetch to detect 401 responses. Keep original behavior otherwise.
+if (window._originalFetch) {
+    window.fetch = async function(...args) {
+        try {
+            const res = await window._originalFetch(...args);
+            if (res && res.status === 401) {
+                // Try to parse message for debugging but don't rely on it
+                try { const txt = await res.clone().text();
+                    console.warn('API returned 401:', txt); } catch (_) {}
+                handleUnauthorizedGlobal();
+            }
+            return res;
+        } catch (err) {
+            // Network or other fetch error - just rethrow
+            throw err;
+        }
+    };
+}
 class AdminPanel {
     constructor() {
         this.currentPanel = 'dashboard';
@@ -184,12 +230,12 @@ class AdminPanel {
 
     async resetStaffPassword(username) {
         if (!username) return;
-        
+
         // Show confirmation dialog
         const confirmed = confirm(`Reset password for staff member: ${username}\n\nA new 6-digit password will be generated.\n\nProceed with password reset?`);
-        
+
         if (!confirmed) return;
-        
+
         try {
             const response = await fetch('api/admin.php', {
                 method: 'POST',
@@ -198,9 +244,9 @@ class AdminPanel {
                 },
                 body: `action=reset-staff-password&username=${encodeURIComponent(username)}`
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 alert(`Password reset successful!\n\nNew password: ${result.new_password}\n\nPlease inform the staff member of their new password.`);
                 // Refresh the staff table
@@ -224,10 +270,10 @@ class AdminPanel {
 
     async addStaff() {
         const payload = {
-            name: document.getElementById('staff-name')?.value || '',
-            username: document.getElementById('staff-username')?.value || '',
-            email: document.getElementById('staff-email')?.value || '',
-            password: document.getElementById('staff-password')?.value || ''
+            name: document.getElementById('staff-name') ? .value || '',
+            username: document.getElementById('staff-username') ? .value || '',
+            email: document.getElementById('staff-email') ? .value || '',
+            password: document.getElementById('staff-password') ? .value || ''
         };
         if (!payload.name || !payload.username || !payload.email || !payload.password) {
             this.showError('Please fill in all fields');
