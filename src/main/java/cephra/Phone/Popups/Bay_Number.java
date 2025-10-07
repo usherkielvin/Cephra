@@ -1,18 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package cephra.Phone.Popups;
-
-/**
- *
- * @author Kenji
- */
 public class Bay_Number extends javax.swing.JPanel {
-
-    /**
-     * Creates new form ProceedBayPOP
-     */
     public Bay_Number() {
         initComponents();
     }

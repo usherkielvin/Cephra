@@ -192,15 +192,23 @@ try {
             echo json_encode($ok ? ['success' => true, 'message' => 'Staff added'] : ['error' => 'Failed to add staff']);
             break;
 
-        case 'toggle-staff-status':
+        case 'reset-staff-password':
             if ($method !== 'POST') { echo json_encode(['error' => 'Method not allowed']); break; }
             $username = $_POST['username'] ?? '';
-            $new_status = $_POST['status'] ?? '';
-            if (!$username || !in_array($new_status, ['Active','Inactive'])) { echo json_encode(['error' => 'Invalid input']); break; }
-            if (strtolower($username) === 'admin') { echo json_encode(['error' => 'Admin account cannot be modified']); break; }
-            $stmt = $db->prepare('UPDATE staff_records SET status = ? WHERE username = ?');
-            $ok = $stmt->execute([$new_status, $username]);
-            echo json_encode($ok ? ['success' => true] : ['error' => 'Failed to update status']);
+            if (!$username) { echo json_encode(['error' => 'Username required']); break; }
+            if (strtolower($username) === 'admin') { echo json_encode(['error' => 'Admin account password cannot be reset']); break; }
+            
+            // Generate random 6-digit password
+            $new_password = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            
+            $stmt = $db->prepare('UPDATE staff_records SET password = ? WHERE username = ?');
+            $ok = $stmt->execute([$new_password, $username]);
+            
+            if ($ok) {
+                echo json_encode(['success' => true, 'new_password' => $new_password, 'message' => 'Password reset successfully']);
+            } else {
+                echo json_encode(['error' => 'Failed to reset password']);
+            }
             break;
 
         case 'delete-staff':
@@ -1564,7 +1572,7 @@ try {
             echo json_encode([
                 'error' => 'Invalid action',
                 'available_actions' => [
-                    'dashboard', 'queue', 'bays', 'users', 'staff', 'staff-activity', 'add-staff', 'toggle-staff-status', 'delete-staff', 'ticket-details',
+                    'dashboard', 'queue', 'bays', 'users', 'staff', 'staff-activity', 'add-staff', 'reset-staff-password', 'delete-staff', 'ticket-details',
                     'process-ticket', 'progress-to-waiting', 'progress-to-charging', 'progress-to-complete', 'auto-assign-waiting-tickets',
                     'mark-payment-paid', 'set-bay-maintenance', 'set-bay-available',
                     'add-user', 'delete-user', 'settings', 'save-settings', 'analytics', 'transactions', 'progress-next-ticket'
