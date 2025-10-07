@@ -119,13 +119,14 @@
         .grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            grid-template-rows: repeat(auto-fit, minmax(200px, auto)); 
-            gap: 20px; 
+            grid-auto-rows: 1fr; /* keep cards consistent height */
+            gap: 18px; 
+            align-items: start;
         }
         .bay { 
             background: var(--card);
-            border-radius: 16px; 
-            padding: 18px; 
+            border-radius: 12px; 
+        padding: 18px 14px; /* extra top space for header/pill */
             border: 1px solid var(--border);
             min-width: 0; 
             height: 200px; 
@@ -133,14 +134,14 @@
             flex-direction: column; 
             justify-content: space-between; 
             box-shadow: var(--shadow-md); 
-            transition: var(--transition-normal);
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
             position: relative;
             overflow: hidden;
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
         }
         .bay:hover { 
             transform: translateY(-5px); 
-            box-shadow: var(--shadow-lg);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
         }
         .bay::after {
             content: '';
@@ -150,58 +151,86 @@
             width: 100%;
             height: 4px;
             background: var(--accent);
-            opacity: 0.7;
+            opacity: 0.85;
+            transform-origin: left center;
         }
-        .bay h3 { 
-            margin: 0 0 12px; 
-            font-size: 20px; 
-            color:var(--accent); 
-            word-break: break-word; 
+        .bay-header {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:8px;
+        }
+        .bay-type {
+            font-size:12px;
+            color:var(--muted);
+            background:transparent;
+            padding:4px 8px;
+            border-radius:8px;
+            border:1px solid rgba(0,0,0,0.04);
+        }
+    .bay-status { position:absolute; right:12px; top:10px; z-index:6; }
+
+        .bay h3 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--accent);
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
-        .bay-info {
-            margin-top: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+
+        .bay-center-status {
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:28px;
+            font-weight:700;
+            color:var(--text);
+        margin: 18px 0 8px; /* push down so it doesn't collide with the top-right pill */
+        padding-top: 4px;
+            text-transform: capitalize;
         }
+
         .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
+            display:flex;
+            flex-direction:column;
+            gap:4px;
+            font-size:13px;
+            align-items:flex-end;
         }
-        .info-label {
-            color: var(--muted);
-            font-weight: 500;
-        }
-        .info-value {
-            font-weight: 500;
-        }
-        .badge { 
-            display:inline-block; 
-            padding:8px 14px; 
-            border-radius: 999px; 
-            font-size: 14px; 
-            font-weight: 500;
+
+        .badge {
+            display:inline-block;
+            padding:6px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
             box-shadow: var(--shadow-sm);
-            transition: var(--transition-fast);
+            transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
         }
-        .available { 
-            background:var(--avail); 
-            color:var(--availText); 
-            font-size: 16px; 
-            font-weight: bold; 
-            padding: 10px 16px; 
+
+        .bay.available { box-shadow: 0 6px 20px rgba(56,161,105,0.08); }
+        .bay.occupied { box-shadow: 0 6px 20px rgba(229,62,62,0.08); }
+        .bay.maintenance { box-shadow: 0 6px 20px rgba(221,107,32,0.08); }
+
+        .bay::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+            opacity: 0.85;
+            transform-origin: left center;
         }
-        .occupied { 
-            background:var(--occ); 
-            color:var(--occText); 
-        }
-        .maintenance { 
-            background:var(--maint); 
-            color:var(--maintText); 
+        .bay.available::after { background: var(--avail); }
+        .bay.occupied::after { background: var(--occ); }
+        .bay.maintenance::after { background: var(--maint); }
+
+        .maintenance {
+            background:var(--maint);
+            color:var(--maintText);
         }
         .row { 
             margin-top: 20px; 
@@ -595,15 +624,15 @@
             gap: 20px;
             padding: 20px;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-        }
-        
-        /* Fullscreen Bay Cards - Completely Different Design */
-        .fullscreen-bay {
-            background: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
+            .badge {
+                display:inline-block;
+                padding:4px 10px; /* slightly smaller pill to avoid collisions */
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 600;
+                box-shadow: var(--shadow-sm);
+                transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+            }
             justify-content: space-between;
             border: 2px solid transparent;
             transition: all 0.3s ease;
@@ -630,20 +659,20 @@
         
         .fullscreen-bay.available::before {
             background: #48bb78;
-            transform: scaleX(1);
-        }
-        
-        .fullscreen-bay:hover {
-            transform: translateY(-5px);
-            border-color: #00d4aa;
-            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.3);
-        }
-        
-        .fullscreen-bay-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            .bay-info {
+                margin-top: 8px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px 12px;
+                align-items: start;
+                /* ensure details are visually lower-right */
+                position: absolute;
+                right: 12px;
+                bottom: 12px;
+                width: 42%; /* slightly narrower to avoid overlapping center status */
+                background: transparent;
+                text-align: right;
+            }
         }
         
         .fullscreen-bay-title {
@@ -883,7 +912,7 @@
         }
     </style>
 </head>
-<body>
+<body class="light">
     <h1>
         
         Cephra Live Monitor <span id="ts" class="ts"></span>
@@ -1148,17 +1177,19 @@
             });
         }
 
-        // Theme / display state
-        let isFullscreen = false; // kept for possible future re-enable
-        let isDarkMode = true; // Default to dark mode
+    // Theme / display state
+    let isFullscreen = false; // kept for possible future re-enable
+    let isDarkMode = false; // Default to light mode
         const themeBtn = document.getElementById('themeBtn');
         
-        // Load saved theme preference
-        const savedTheme = localStorage.getItem('monitor_theme') || 'dark';
+        // Load saved theme preference (default to light)
+        const savedTheme = localStorage.getItem('monitor_theme') || 'light';
         if (savedTheme === 'dark') {
+            document.body.classList.remove('light');
             document.body.classList.add('dark-theme');
             isDarkMode = true;
         } else {
+            document.body.classList.remove('dark-theme');
             document.body.classList.add('light');
             isDarkMode = false;
         }
@@ -1558,16 +1589,21 @@
                 const user = b.current_username || '';
                 const plate = b.plate_number || '';
                 const type = b.bay_type ? ` <small class=\"muted\">(${b.bay_type})</small>` : '';
+                const statusClass = (b.status || '').toLowerCase();
                 return `
-                <div class="bay">
-                    <h3>${b.bay_number}${type}</h3>
-                    <div>${statusBadge(b.status)}</div>
-                    <div class="bay-info">
-                        <div class="info-row"><span class="info-label">Ticket:</span> <span class="info-value">${ticket || '-'}</span></div>
-                        <div class="info-row"><span class="info-label">Plate:</span> <span class="info-value">${plate || '-'}</span></div>
-                        <div class="info-row"><span class="info-label">User:</span> <span class="info-value">${user || '-'}</span></div>
-                    </div>
-                </div>`;
+                    <div class="bay ${statusClass}">
+                        <div class="bay-header">
+                            <h3>${b.bay_number}${type}</h3>
+                            <div class="bay-type">${b.bay_type || 'Normal'}</div>
+                        </div>
+                        <div class="bay-center-status">${(b.status || 'Available')}</div>
+                        <div class="bay-status">${statusBadge(b.status)}</div>
+                        <div class="bay-info">
+                            <div class="info-row"><span class="info-label">Ticket:</span> <span class="info-value">${ticket || '-'}</span></div>
+                            <div class="info-row"><span class="info-label">Plate:</span> <span class="info-value">${plate || '-'}</span></div>
+                            <div class="info-row"><span class="info-label">User:</span> <span class="info-value">${user || '-'}</span></div>
+                        </div>
+                    </div>`;
             }).join('');
         }
 
