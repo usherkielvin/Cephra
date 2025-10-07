@@ -339,6 +339,8 @@ try {
     justify-content:center; /* center the main area on the screen */
     background:var(--bg);
   }
+  /* Make usernames more prominent in TV mode */
+  body.tv .tv-user{font-weight:800;color:var(--text);}
   body.tv h1{font-size:36px}
   /* Layout: two-column split - queue on the left, waitings on the right */
   body.tv main{display:grid;grid-template-columns:2.4fr 1fr;grid-template-rows:1fr;gap:28px;height:95vh;width:95vw;max-width:1900px;transform:scale(1.06);transform-origin:center;}
@@ -516,7 +518,7 @@ try {
             </div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-            <div class="muted">User: ${b.user}</div>
+            <div class="muted">User: <span class="tv-user">${b.user}</span></div>
             <div class="muted"><span class="ts">Updated: ${last.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span></div>
           </div>
         `;
@@ -553,7 +555,7 @@ try {
           return `<tr>
             <td>${w.ticket}</td>
             <td><span class="waitings-plate">${w.plate}</span></td>
-            <td>${w.user}</td>
+            <td><span class="tv-user">${w.user}</span></td>
             <td><div class="service-badge ${serviceClass}">${w.service}</div></td>
           </tr>`;
         }).join('');
