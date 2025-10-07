@@ -1,2179 +1,716 @@
 <?php
-// Simple live monitor page for Cephra
-?>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cephra Monitor</title>
-    <link rel="manifest" href="monitor.webmanifest" />
-    <link rel="icon" type="image/png" href="../Admin/images/MONU.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="../Admin/images/MONU.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="../Admin/images/MONU.png" />
-    <link rel="apple-touch-icon" sizes="167x167" href="../Admin/images/MONU.png" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Monitor" />
-    <meta name="theme-color" content="#0b1e29" />
-    <style>
-        :root {
-            /* Dark Mode - Modern Scheme */
-            --bg: linear-gradient(135deg, #0a0a0a 0%, #1e1e1e 100%);
-            --panel: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            --card: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
-            --text: #ffffff;
-            --muted: #b0b0b0;
-            --accent: #0099aa;
-            --accent-hover: #0099aa;
-            --avail: #00b8cca5;
-            --availText: #000000;
-            --occ: #ff4444;
-            --occText: #ffffff;
-            --maint: #ffaa00;
-            --maintText: #000000;
-            --border: rgba(255,255,255,0.15);
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.5);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.7);
-            --transition-fast: all 0.2s ease;
-            --transition-normal: all 0.3s ease;
-        }
-        .light {
-            /* Light Mode - Updated to match app color scheme */
-            --bg: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-            --panel: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
-            --card: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
-            --text: #2d3748;
-            --muted: #718096;
-            --accent: #00c2ce;
-            --accent-hover: #00e1ee;
-            --avail: #38a169;
-            --availText: #ffffff;
-            --occ: #e53e3e;
-            --occText: #ffffff;
-            --maint: #dd6b20;
-            --maintText: #ffffff;
-            --border: rgba(0,0,0,0.1);
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
-        }
-        .dark-fullscreen {
-            /* Enhanced Dark Mode for Fullscreen */
-            --bg: linear-gradient(135deg, #0a0e13 0%, #1a202c 100%);
-            --panel: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-            --card: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            --text: #ffffff;
-            --muted: #a0aec0;
-            --accent: #00ffff;
-            --accent-hover: #00e6ff;
-            --avail: #48bb78;
-            --availText: #ffffff;
-            --occ: #f56565;
-            --occText: #ffffff;
-            --maint: #ed8936;
-            --maintText: #ffffff;
-            --border: rgba(255,255,255,0.15);
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
-        }
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            margin: 0; 
-            padding: 15px; 
-            background:var(--bg); 
-            color:var(--text); 
-            transition: var(--transition-normal); 
-            line-height: 1.5;
-        }
-        h1 { 
-            margin: 0 0 15px; 
-            font-size: 24px; 
-            display:flex; 
-            align-items:center; 
-            gap:10px; 
-            flex-wrap: wrap; 
-            font-weight: 600;
-        }
-        .logo { 
-            width:36px; 
-            height:36px; 
-            border-radius:6px; 
-            overflow:hidden; 
-            display:inline-block; 
-            background:transparent; 
-            box-shadow: var(--shadow-sm);
-        }
-        .logo img { 
-            width:100%; 
-            height:100%; 
-            object-fit:contain; 
-            object-position:center; 
-            display:block; 
-            background:transparent; 
-            transition: var(--transition-fast);
-        }
-        .logo:hover img { transform: scale(1.05); }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            grid-auto-rows: 1fr; /* keep cards consistent height */
-            gap: 18px; 
-            align-items: start;
-        }
-        .bay { 
-            background: var(--card);
-            border-radius: 12px; 
-        padding: 18px 14px; /* extra top space for header/pill */
-            border: 1px solid var(--border);
-            min-width: 0; 
-            height: 200px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            box-shadow: var(--shadow-md); 
-            transition: transform 0.22s ease, box-shadow 0.22s ease;
-            position: relative;
-            overflow: hidden;
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
-        }
-        .bay:hover { 
-            transform: translateY(-5px); 
-            transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
-        }
-        .bay::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--accent);
-            opacity: 0.85;
-            transform-origin: left center;
-        }
-        .bay-header {
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:12px;
-            margin-bottom:8px;
-        }
-        .bay-type {
-            font-size:12px;
-            color:var(--muted);
-            background:transparent;
-            padding:4px 8px;
-            border-radius:8px;
-            border:1px solid rgba(0,0,0,0.04);
-        }
-    .bay-status { position:absolute; right:12px; top:10px; z-index:6; }
-
-        .bay h3 {
-            margin: 0;
-            font-size: 18px;
-            color: var(--accent);
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        .bay-center-status {
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:28px;
-            font-weight:700;
-            color:var(--text);
-        margin: 18px 0 8px; /* push down so it doesn't collide with the top-right pill */
-        padding-top: 4px;
-            text-transform: capitalize;
-        }
-
-        .info-row {
-            display:flex;
-            flex-direction:column;
-            gap:4px;
-            font-size:13px;
-            align-items:flex-end;
-        }
-
-        .badge {
-            display:inline-block;
-            padding:6px 12px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
-        }
-
-        .bay.available { box-shadow: 0 6px 20px rgba(56,161,105,0.08); }
-        .bay.occupied { box-shadow: 0 6px 20px rgba(229,62,62,0.08); }
-        .bay.maintenance { box-shadow: 0 6px 20px rgba(221,107,32,0.08); }
-
-        .bay::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--accent);
-            opacity: 0.85;
-            transform-origin: left center;
-        }
-        .bay.available::after { background: var(--avail); }
-        .bay.occupied::after { background: var(--occ); }
-        .bay.maintenance::after { background: var(--maint); }
-
-        .maintenance {
-            background:var(--maint);
-            color:var(--maintText);
-        }
-        .row { 
-            margin-top: 20px; 
-            display:flex; 
-            gap:20px; 
-            align-items:flex-start; 
-            flex-wrap: wrap; 
-        }
-        .panel { 
-            background: var(--panel);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 20px;
-            flex: 1 1 320px;
-            min-width: 0; 
-            box-shadow: var(--shadow-md);
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-        }
-        table { 
-            width:100%; 
-            border-collapse: collapse; 
-        }
-        th, td { 
-            text-align:left; 
-            padding:10px; 
-            border-bottom:1px solid rgba(255,255,255,0.08); 
-            font-size: 14px; 
-        }
-        th { 
-            color:var(--accent); 
-            font-weight: 600;
-        }
-        .muted { 
-            color:var(--muted); 
-            font-size: 13px; 
-        }
-        .ts { 
-            font-size: 13px; 
-            color:var(--muted); 
-            margin-left:10px; 
-            font-weight: normal;
-        }
-        .toolbar { 
-            margin-left:auto; 
-            display:flex; 
-            gap:12px; 
-            align-items:center; 
-            flex-wrap: wrap;
-        }
-        /* Burger button (hidden by default, visible on small screens) */
-        .burger {
-            display:none;
-            margin-left:auto;
-            width:36px; height:28px;
-            border:1px solid rgba(255,255,255,0.3);
-            border-radius:8px;
-            background:transparent;
-            align-items:center; justify-content:center;
-            cursor:pointer;
-        }
-        .burger span {
-            display:block; width:18px; height:2px; background:var(--text);
-            position:relative;
-        }
-        .burger span::before, .burger span::after {
-            content:""; position:absolute; left:0; width:18px; height:2px; background:var(--text);
-        }
-        .burger span::before { top:-6px; }
-        .burger span::after  { top: 6px; }
-        .btn {
-            background:transparent;
-            color:var(--text);
-            border:1px solid rgba(255,255,255,0.3);
-            border-radius:10px;
-            padding:8px 14px;
-            cursor:pointer;
-            font-size:13px;
-            font-weight: 500;
-            transition: var(--transition-fast);
-        }
-        .light .btn {
-            border-color: rgba(0,0,0,0.3);
-        }
-        .btn:hover {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
-        }
-
-        /* Language select dropdown styling */
-        .language-select {
-            background: transparent !important;
-            color: #f7fafc !important;
-            border: 2px solid #4a5568 !important;
-            border-radius: 8px !important;
-            padding: 8px 12px !important;
-            cursor: pointer !important;
-            font-size: 13px !important;
-            font-weight: 500 !important;
-            transition: var(--transition-fast) !important;
-            min-width: 60px !important;
-            appearance: none !important;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f7fafc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 8px center !important;
-            background-size: 12px !important;
-            padding-right: 30px !important;
-        }
-
-        .light .language-select {
-            background: #ffffff !important;
-            color: #2d3748 !important;
-            border-color: #e2e8f0 !important;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232d3748' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 8px center !important;
-            background-size: 12px !important;
-            padding-right: 30px !important;
-        }
-
-        .language-select:hover {
-            border-color: var(--accent) !important;
-            background: #4a5568 !important;
-        }
-
-        .light .language-select:hover {
-            background: #f7fafc !important;
-            border-color: #00c2ce !important;
-        }
-
-        .language-select:focus {
-            outline: none !important;
-            border-color: var(--accent) !important;
-            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.3) !important;
-        }
-
-        .light .language-select:focus {
-            box-shadow: 0 0 0 2px rgba(0, 194, 206, 0.3) !important;
-        }
-
-        .language-select option {
-            background: transparent !important;
-            color: #f7fafc !important;
-            padding: 8px !important;
-        }
-
-        .light .language-select option {
-            background: #ffffff !important;
-            color: #2d3748 !important;
-        }
-        .toolbar label { 
-            display:flex; 
-            align-items:center; 
-            gap:8px; 
-            cursor:pointer; 
-            font-size:13px; 
-            max-width: 100%;
-            white-space: nowrap;
-            overflow: visible;
-            padding: 4px 6px;
-            border-radius: 8px;
-        }
-        .toolbar label input[type="checkbox"] {
-            margin:0 8px 0 0;
-            accent-color: var(--accent);
-        }
-
-        /* Custom checkbox styling */
-        .toolbar label input[type="checkbox"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border);
-            border-radius: 4px;
-            background: var(--card);
-            cursor: pointer;
-            position: relative;
-            transition: var(--transition-fast);
-        }
-
-        .toolbar label input[type="checkbox"]:checked {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .toolbar label input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--bg);
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .toolbar label input[type="checkbox"]:hover {
-            border-color: var(--accent);
-        }
-
-        /* Custom range slider styling */
-        input[type="range"] {
-            appearance: none;
-            width: 60px;
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            outline: none;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: var(--transition-fast);
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            background: var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: var(--transition-fast);
-        }
-
-        input[type="range"]::-moz-range-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        input[type="range"]:hover {
-            background: var(--muted);
-        }
-        .pager { 
-            display:flex; 
-            gap:8px; 
-            align-items:center; 
-            margin-top:12px; 
-            flex-wrap: wrap; 
-            justify-content: center;
-        }
-        
-        /* Announcement toast styling */
-        .announcement-toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--accent);
-            color: var(--bg);
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            box-shadow: var(--shadow-lg);
-            z-index: 1000;
-            opacity: 0;
-            transition: transform 0.4s ease, opacity 0.4s ease;
-            text-align: center;
-            max-width: 95%;
-            border: 2px solid var(--bg);
-            white-space: normal;
-            word-break: break-word;
-            overflow-wrap: anywhere;
-        }
-        
-        .announcement-toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        .pager .btn { padding:4px 8px; }
-        
-        /* Fullscreen Mode - Completely Different UI */
-        .fullscreen-mode { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100vh; 
-            z-index: 1000; 
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-            box-sizing: border-box;
-            color: #ffffff;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-        
-        /* Hide default elements in fullscreen */
-        .fullscreen-mode h1,
-        .fullscreen-mode .toolbar,
-        .fullscreen-mode .row {
-            display: none !important;
-        }
-        
-        /* Fullscreen Header */
-        .fullscreen-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 100%);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            border-bottom: 2px solid #00d4aa;
-            z-index: 10;
-        }
-        
-        .fullscreen-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: 600;
-        }
-        
-        .fullscreen-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: #00d4aa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .fullscreen-controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .fullscreen-btn {
-            background: #00d4aa;
-            color: #000;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .fullscreen-btn:hover {
-            background: #00e6b8;
-            transform: translateY(-1px);
-        }
-        
-        .fullscreen-btn.exit {
-            background: #ff6b6b;
-            color: #fff;
-        }
-        
-        .fullscreen-btn.exit:hover {
-            background: #ff5252;
-        }
-        
-        /* Fullscreen Grid - Different Layout */
-        .fullscreen-grid {
-            position: absolute;
-            top: 60px;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); 
-            grid-template-rows: repeat(2, 1fr); 
-            gap: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            .badge {
-                display:inline-block;
-                padding:4px 10px; /* slightly smaller pill to avoid collisions */
-                border-radius: 999px;
-                font-size: 12px;
-                font-weight: 600;
-                box-shadow: var(--shadow-sm);
-                transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
-            }
-            justify-content: space-between;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .fullscreen-bay::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #00d4aa;
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .fullscreen-bay.occupied::before {
-            background: #ff6b6b;
-            transform: scaleX(1);
-        }
-        
-        .fullscreen-bay.available::before {
-            background: #48bb78;
-            .bay-info {
-                margin-top: 8px;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 8px 12px;
-                align-items: start;
-                /* ensure details are visually lower-right */
-                position: absolute;
-                right: 12px;
-                bottom: 12px;
-                width: 42%; /* slightly narrower to avoid overlapping center status */
-                background: transparent;
-                text-align: right;
-            }
-        }
-        
-        .fullscreen-bay-title {
-            color: #ffffff;
-            font-size: 18px; 
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .fullscreen-bay-type {
-            color: #a0aec0;
-            font-size: 12px;
-            background: rgba(160, 174, 192, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        .fullscreen-bay-type.fast-bay {
-            font-weight: bold;
-            color: var(--accent);
-        }
-        
-        .fullscreen-bay-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 15px 0;
-        }
-        
-        .fullscreen-status-badge {
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-size: 14px; 
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .fullscreen-status-badge.available {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
-        }
-        
-        .fullscreen-status-badge.occupied {
-            background: linear-gradient(135deg, #ff6b6b 0%, #e53e3e 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-        }
-        
-        .fullscreen-bay-details {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .fullscreen-detail-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .fullscreen-detail-item:last-child {
-            border-bottom: none;
-        }
-        
-        .fullscreen-detail-label {
-            color: #a0aec0;
-            font-size: 12px; 
-            font-weight: 500;
-        }
-        
-        .fullscreen-detail-value {
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        
-        /* Fullscreen Responsive */
-        @media (max-width: 1200px) {
-            .fullscreen-grid {
-                grid-template-columns: repeat(3, 1fr);
-                grid-template-rows: repeat(3, 1fr);
-            }
-        }
-        
-        @media (max-width: 900px) {
-            .fullscreen-grid {
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(4, 1fr);
-            }
-        }
-        
-        @media (max-width: 600px) {
-            .fullscreen-grid {
-                grid-template-columns: 1fr;
-                grid-template-rows: repeat(8, 1fr);
-            }
-        }
-        
-        /* Fullscreen responsive styles */
-        @media (max-width: 480px) {
-            .fullscreen-mode { padding: 10px; }
-            .fullscreen-mode h1 { font-size: 16px; margin-bottom: 8px; }
-            .fullscreen-mode .toolbar .btn { padding: 3px 6px; font-size: 10px; }
-            .fullscreen-mode .toolbar label { 
-                display: none;
-            }
-            .fullscreen-mode .grid { 
-                grid-template-columns: repeat(2, 1fr); 
-                grid-template-rows: repeat(4, 1fr);
-                gap: 20px; 
-                padding: 20px;
-                height: calc(100vh - 60px);
-            }
-            .fullscreen-mode .bay { 
-                padding: 15px; 
-                font-size: 14px;
-                margin: 0;
-                border-radius: 12px;
-            }
-            .fullscreen-mode .bay h3 { font-size: 16px; margin-bottom: 8px; }
-            .fullscreen-mode .badge { padding: 8px 12px; font-size: 12px; }
-            .fullscreen-mode .available { font-size: 14px; padding: 10px 14px; }
-            .fullscreen-mode .muted { font-size: 10px; margin-top: 8px; }
-        }
-        
-        @media (min-width: 481px) and (max-width: 768px) {
-            .fullscreen-mode .grid { 
-                grid-template-columns: repeat(3, 1fr); 
-                grid-template-rows: repeat(3, 1fr);
-                gap: 25px;
-                padding: 22px;
-                height: calc(100vh - 70px);
-            }
-            .fullscreen-mode .bay { 
-                font-size: 15px;
-                padding: 18px;
-                margin: 0;
-                border-radius: 14px;
-            }
-        }
-        
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .fullscreen-mode .grid { 
-                grid-template-columns: repeat(4, 1fr); 
-                grid-template-rows: repeat(2, 1fr);
-                gap: 28px;
-                padding: 24px;
-                height: calc(100vh - 75px);
-            }
-            .fullscreen-mode .bay { 
-                font-size: 16px;
-                padding: 20px;
-                margin: 0;
-                border-radius: 15px;
-            }
-        }
-        
-        @media (min-width: 1025px) {
-            .fullscreen-mode .grid { 
-                grid-template-columns: repeat(4, 1fr); 
-                grid-template-rows: repeat(2, 1fr);
-                gap: 30px;
-                padding: 25px;
-                height: calc(100vh - 80px);
-            }
-            .fullscreen-mode .bay { 
-                font-size: 16px;
-                padding: 20px;
-                margin: 0;
-                border-radius: 15px;
-            }
-        }
-        
-        /* Large screens - full expansion */
-        @media (min-width: 1400px) {
-            .fullscreen-mode .grid { 
-                grid-template-columns: repeat(4, 1fr); 
-                grid-template-rows: repeat(2, 1fr);
-                gap: 35px;
-                padding: 30px;
-                height: calc(100vh - 80px);
-            }
-            .fullscreen-mode .bay { 
-                font-size: 18px;
-                padding: 25px;
-                margin: 0;
-                border-radius: 18px;
-            }
-            .fullscreen-mode .bay h3 { font-size: 22px; margin-bottom: 12px; }
-            .fullscreen-mode .badge { padding: 12px 18px; font-size: 16px; }
-            .fullscreen-mode .available { font-size: 20px; padding: 14px 20px; }
-        }
-        
-        /* Improved responsive design for different screen sizes */
-        @media (max-width: 640px) {
-            body { padding: 8px; }
-            h1 { font-size: 18px; margin-bottom: 10px; }
-            .burger { display:flex; }
-            .toolbar { display:none; width:100%; margin-top:8px; }
-            .toolbar.show { display:flex; flex-direction: column; align-items: stretch; }
-            .toolbar .btn, .toolbar label { width: 100%; }
-            .grid { gap: 12px; grid-template-columns: 1fr; grid-template-rows: repeat(auto-fit, minmax(170px, auto)); }
-            .bay { padding: 12px; height: 170px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s; }
-            .bay:active { transform: scale(0.98); }
-            .bay h3 { font-size: 16px; margin-bottom: 10px; }
-            .available { font-size: 14px; font-weight: bold; padding: 6px 10px; }
-            .panel { padding: 10px; }
-            th, td { font-size: 12px; padding: 6px; }
-            .pager { justify-content: center; }
-        }
-        @media (min-width: 421px) and (max-width: 640px) {
-            body { padding: 10px; }
-            h1 { font-size: 20px; }
-            .toolbar { flex-wrap: wrap; }
-            .grid { gap: 15px; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(auto-fit, minmax(180px, auto)); }
-            .bay { padding: 15px; height: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s; }
-            .bay:hover { transform: translateY(-3px); }
-            .available { font-size: 15px; font-weight: bold; padding: 7px 11px; }
-            .panel { padding: 12px; }
-        }
-        @media (min-width: 641px) and (max-width: 1024px) {
-            body { padding: 12px; }
-            .grid { gap: 18px; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
-            .bay { padding: 16px; height: 200px; box-shadow: 0 3px 8px rgba(0,0,0,0.12); transition: transform 0.2s, box-shadow 0.2s; }
-            .bay:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
-            .available { font-size: 16px; font-weight: bold; padding: 8px 12px; }
-        }
-        @media (min-width: 1025px) {
-            body { padding: 15px; }
-            .grid { gap: 20px; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(auto-fit, minmax(200px, auto)); }
-            .bay { padding: 18px; height: 200px; box-shadow: 0 3px 10px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; }
-            .bay:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
-            .available { font-size: 16px; font-weight: bold; padding: 8px 12px; }
-        }
-    </style>
-</head>
-<body class="light">
-    <h1>
-        
-        Cephra Live Monitor <span id="ts" class="ts"></span>
-        <button class="burger" id="burgerBtn" aria-label="Menu"><span></span></button>
-        <div class="toolbar" id="toolbarWrap">
-            <label class="muted" style="white-space:nowrap;"><input type="checkbox" id="announcerChk" checked /> Bay Announcer</label>
-            <label class="muted" style="white-space:nowrap; margin-left: 10px;">
-                Volume: <input type="range" id="volumeSlider" min="0" max="100" value="80" style="width: 60px; margin: 0 5px;" />
-            </label>
-            <label class="muted" style="white-space:nowrap;">
-                Speed: <input type="range" id="speedSlider" min="50" max="200" value="90" style="width: 60px; margin: 0 5px;" />
-            </label>
-            <button class="btn" id="testTTSBtn">Test TTS</button>
-            <button class="btn" id="fullscreenBtn">Fullscreen</button>
-            <button class="btn" id="themeBtn">Toggle Theme</button>
-            <select class="btn language-select" id="languageBtn">
-                <option value="EN">EN</option>
-                <option value="ZH">ZH</option>
-                <option value="FIL">FIL</option>
-                <option value="CEB">CEB</option>
-                <option value="ES">ES</option>
-            </select>
-        </div>
-    </h1>
-
-    <div class="grid" id="bays"></div>
-
-    <div class="row">
-        <div class="panel">
-            <h3 style="margin:0 0 8px;color:var(--accent);">Waiting Queue</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ticket</th>
-                        <th>User</th>
-                        <th>Service</th>
-                        <th>Since</th>
-                    </tr>
-                </thead>
-                <tbody id="queue"></tbody>
-            </table>
-            <div class="pager">
-                <button class="btn" id="prevPage">Prev</button>
-                <span class="muted" id="pageInfo">Page 1</span>
-                <button class="btn" id="nextPage">Next</button>
-                <span class="muted">Page size: 10</span>
-            </div>
-            
-        </div>
-    </div>
-
-
-    <script>
-        // Simplified header: only Bay Announcer toggle retained
-        
-        // Language support
-        const languages = {
-            'EN': { name: 'English', code: 'en' },
-            'ZH': { name: '中文 (Chinese)', code: 'zh' },
-            'FIL': { name: 'Filipino', code: 'fil' },
-            'CEB': { name: 'Bisaya', code: 'ceb' },
-            'ES': { name: 'Español', code: 'es' }
-        };
-        
-        let currentLanguage = 'EN';
-        let languageIndex = 0;
-        const languageKeys = Object.keys(languages);
-        
-        // Enhanced TTS messages for different languages
-        const ttsMessages = {
-            'EN': {
-                waiting: 'Ticket {ticketId} is now waiting in queue',
-                done: 'Ticket {ticketId} charging completed at Bay {bayNumber}. Please disconnect your vehicle',
-                assigned: 'Ticket {ticketId} assigned to Bay {bayNumber}. Please proceed to your charging bay',
-                available: 'Bay {bayNumber} is now available for charging',
-                maintenance: 'Bay {bayNumber} is under maintenance. Please use another bay',
-                charging_started: 'Charging started for ticket {ticketId} at Bay {bayNumber}',
-                queue_position: 'You are position {position} in the queue',
-                welcome: 'Welcome to Cephra charging station',
-                thank_you: 'Thank you for using Cephra charging station',
-                payment_success: 'Payment successful. Please proceed to Bay {bayNumber}',
-                payment_failed: 'Payment failed. Please try again',
-                emergency: 'Emergency stop activated at Bay {bayNumber}',
-                system_error: 'System error detected. Please contact support'
-            },
-            'ZH': {
-                waiting: '票据 {ticketId} 现在正在队列中等待',
-                done: '票据 {ticketId} 在 {bayNumber} 号充电桩充电完成。请断开您的车辆',
-                assigned: '票据 {ticketId} 已分配到 {bayNumber} 号充电桩。请前往您的充电桩',
-                available: '{bayNumber} 号充电桩现在可用于充电',
-                maintenance: '{bayNumber} 号充电桩正在维护中。请使用其他充电桩',
-                charging_started: '票据 {ticketId} 在 {bayNumber} 号充电桩开始充电',
-                queue_position: '您在队列中的位置是第 {position} 位',
-                welcome: '欢迎使用Cephra充电站',
-                thank_you: '感谢您使用Cephra充电站',
-                payment_success: '支付成功。请前往 {bayNumber} 号充电桩',
-                payment_failed: '支付失败。请重试',
-                emergency: '{bayNumber} 号充电桩紧急停止已激活',
-                system_error: '检测到系统错误。请联系技术支持'
-            },
-            'FIL': {
-                waiting: 'Tiket {ticketId} ay naghihintay na sa pila',
-                done: 'Tapos na ang pagkarga ng Tiket {ticketId} sa Bay {bayNumber}. Pakidisconnect ang inyong sasakyan',
-                assigned: 'Nakatalaga na ang Tiket {ticketId} sa Bay {bayNumber}. Pumunta sa inyong charging bay',
-                available: 'Available na ang Bay {bayNumber} para sa pagkarga',
-                maintenance: 'Under maintenance ang Bay {bayNumber}. Gumamit ng ibang bay',
-                charging_started: 'Nagsimula na ang pagkarga ng Tiket {ticketId} sa Bay {bayNumber}',
-                queue_position: 'Ikaw ay nasa position {position} sa pila',
-                welcome: 'Maligayang pagdating sa Cephra charging station',
-                thank_you: 'Salamat sa paggamit ng Cephra charging station',
-                payment_success: 'Successful ang bayad. Pumunta sa Bay {bayNumber}',
-                payment_failed: 'Failed ang bayad. Subukan ulit',
-                emergency: 'Emergency stop na-activate sa Bay {bayNumber}',
-                system_error: 'May system error. Tawagan ang support'
-            },
-            'CEB': {
-                waiting: 'Tiket {ticketId} naghulat na sa pila',
-                done: 'Nahuman na ang pag-charge sa Tiket {ticketId} sa Bay {bayNumber}. Pakidisconnect ang inyong sakyanan',
-                assigned: 'Nakatalaga na ang Tiket {ticketId} sa Bay {bayNumber}. Adto sa inyong charging bay',
-                available: 'Available na ang Bay {bayNumber} para sa pag-charge',
-                maintenance: 'Under maintenance ang Bay {bayNumber}. Gamit ang lain nga bay',
-                charging_started: 'Nagsugod na ang pag-charge sa Tiket {ticketId} sa Bay {bayNumber}',
-                queue_position: 'Ikaw naa sa position {position} sa pila',
-                welcome: 'Maayong pag-abot sa Cephra charging station',
-                thank_you: 'Salamat sa pag-gamit sa Cephra charging station',
-                payment_success: 'Successful ang bayad. Adto sa Bay {bayNumber}',
-                payment_failed: 'Failed ang bayad. Sulayi usab',
-                emergency: 'Emergency stop na-activate sa Bay {bayNumber}',
-                system_error: 'Naay system error. Tawagi ang support'
-            },
-            'ES': {
-                waiting: 'Boleto {ticketId} está ahora esperando en la cola',
-                done: 'Boleto {ticketId} terminó de cargar en la Bahía {bayNumber}. Por favor desconecte su vehículo',
-                assigned: 'Boleto {ticketId} ahora está asignado a la Bahía {bayNumber}. Por favor diríjase a su bahía',
-                available: 'La Bahía {bayNumber} está ahora disponible para cargar',
-                maintenance: 'La Bahía {bayNumber} está en mantenimiento. Por favor use otra bahía',
-                charging_started: 'La carga comenzó para el boleto {ticketId} en la Bahía {bayNumber}',
-                queue_position: 'Usted está en la posición {position} en la cola',
-                welcome: 'Bienvenido a la estación de carga Cephra',
-                thank_you: 'Gracias por usar la estación de carga Cephra',
-                payment_success: 'Pago exitoso. Por favor proceda a la Bahía {bayNumber}',
-                payment_failed: 'Pago fallido. Por favor intente de nuevo',
-                emergency: 'Parada de emergencia activada en la Bahía {bayNumber}',
-                system_error: 'Error del sistema detectado. Por favor contacte soporte'
-            }
-        };
-        
-        // TTS Settings
-        let ttsVolume = 0.8;
-        let ttsRate = 0.9;
-        let ttsPitch = 1.1;
-        
-        let currentQueue = [];
-        let lastBays = {};
-        let lastQueueTickets = new Set(); // Track tickets that were already announced
-        let page = 1;
-        const pageSize = 10;
-        let socket = null;
-        let isConnected = false;
-        let reconnectAttempts = 0;
-        let reconnectInterval = null;
-        const maxReconnectAttempts = 5;
-        const reconnectDelay = 3000; // 3 seconds
-        let isFirstLoad = true; // Flag to track first data load
-
-        // Toolbar simplified to single Bay Announcer toggle
-        // Language toggle functionality
-        const languageBtn = document.getElementById('languageBtn');
-        languageBtn.onchange = (e) => {
-            currentLanguage = e.target.value;
-            languageIndex = languageKeys.indexOf(currentLanguage);
-
-            // Visual feedback
-            languageBtn.style.backgroundColor = '#4CAF50';
-            setTimeout(() => {
-                languageBtn.style.backgroundColor = '';
-            }, 500);
-
-            // Save language preference
-            localStorage.setItem('monitor_language', currentLanguage);
-
-            // Update fullscreen language select if in fullscreen mode
-            if (isFullscreen) {
-                const fullscreenLangSelect = document.getElementById('fullscreenLangBtn');
-                if (fullscreenLangSelect) {
-                    fullscreenLangSelect.value = currentLanguage;
-                }
-            }
-
-            // Announce language change
-            const langName = languages[currentLanguage].name;
-            speak(`Language changed to ${langName}`);
-
-            console.log('Language changed to:', langName);
-        };
-
-        // Load saved language preference
-        const savedLang = localStorage.getItem('monitor_language') || 'EN';
-        const savedIndex = languageKeys.indexOf(savedLang);
-        if (savedIndex !== -1) {
-            languageIndex = savedIndex;
-            currentLanguage = savedLang;
-            languageBtn.value = currentLanguage;
-        }
-        
-        // Initialize TTS controls
-        const volumeSlider = document.getElementById('volumeSlider');
-        const speedSlider = document.getElementById('speedSlider');
-        
-        // Load saved TTS settings
-        const savedVolume = localStorage.getItem('monitor_tts_volume');
-        const savedSpeed = localStorage.getItem('monitor_tts_speed');
-        
-        if (savedVolume) {
-            ttsVolume = parseFloat(savedVolume);
-            volumeSlider.value = Math.round(ttsVolume * 100);
-        }
-        
-        if (savedSpeed) {
-            ttsRate = parseFloat(savedSpeed);
-            speedSlider.value = Math.round(ttsRate * 100);
-        }
-        
-        // Volume control
-        volumeSlider.addEventListener('input', (e) => {
-            ttsVolume = e.target.value / 100;
-            localStorage.setItem('monitor_tts_volume', ttsVolume.toString());
-        });
-        
-        // Speed control
-        speedSlider.addEventListener('input', (e) => {
-            ttsRate = e.target.value / 100;
-            localStorage.setItem('monitor_tts_speed', ttsRate.toString());
-        });
-        
-        // Test TTS button
-        const testTTSBtn = document.getElementById('testTTSBtn');
-        if (testTTSBtn) {
-            testTTSBtn.addEventListener('click', () => {
-                // Test different announcement types
-                const testMessages = [
-                    () => announceWelcome(),
-                    () => announceQueuePosition(1),
-                    () => announceChargingStarted('TEST001', 1),
-                    () => announceTicketDone('TEST001', 1),
-                    () => announceBayAvailable(1),
-                    () => announcePaymentSuccess(1)
-                ];
-                
-                // Cycle through test messages
-                const randomIndex = Math.floor(Math.random() * testMessages.length);
-                testMessages[randomIndex]();
-            });
-        }
-
-        // Responsive burger toggle
-        const burgerBtn = document.getElementById('burgerBtn');
-        const toolbarWrap = document.getElementById('toolbarWrap');
-        if (burgerBtn && toolbarWrap) {
-            burgerBtn.addEventListener('click', () => {
-                toolbarWrap.classList.toggle('show');
-            });
-        }
-
-    // Theme / display state
-    let isFullscreen = false; // kept for possible future re-enable
-    let isDarkMode = false; // Default to light mode
-        const themeBtn = document.getElementById('themeBtn');
-        
-        // Load saved theme preference (default to light)
-        const savedTheme = localStorage.getItem('monitor_theme') || 'light';
-        if (savedTheme === 'dark') {
-            document.body.classList.remove('light');
-            document.body.classList.add('dark-theme');
-            isDarkMode = true;
-        } else {
-            document.body.classList.remove('dark-theme');
-            document.body.classList.add('light');
-            isDarkMode = false;
-        }
-
-        // Set initial button text
-        themeBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
-
-        // Fullscreen button event listener
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        if (fullscreenBtn) {
-            fullscreenBtn.addEventListener('click', () => {
-                if (isFullscreen) {
-                    isFullscreen = false;
-                    document.body.classList.remove('fullscreen-mode');
-                    removeFullscreenUI();
-                    fullscreenBtn.textContent = 'Fullscreen';
-                } else {
-                    isFullscreen = true;
-                    document.body.classList.add('fullscreen-mode');
-                    createFullscreenUI();
-                    fullscreenBtn.textContent = 'Exit Fullscreen';
-                }
-            });
-        }
-
-        function createFullscreenUI() {
-            // Create fullscreen header
-            const header = document.createElement('div');
-            header.className = 'fullscreen-header';
-            header.innerHTML = `
-                <div class="fullscreen-title">
-                    <span>Cephra Live Monitor</span>
-                </div>
-                <div class="fullscreen-controls">
-                    <button class="fullscreen-btn" id="fullscreenThemeBtn">${isDarkMode ? 'Light Mode' : 'Dark Mode'}</button>
-                    <select class="fullscreen-btn language-select" id="fullscreenLangBtn">
-                        <option value="EN">EN</option>
-                        <option value="ZH">ZH</option>
-                        <option value="FIL">FIL</option>
-                        <option value="CEB">CEB</option>
-                        <option value="ES">ES</option>
-                    </select>
-                    <button class="fullscreen-btn exit" id="fullscreenExitBtn">Exit</button>
-                </div>
-            `;
-            
-            // Create fullscreen grid
-            const grid = document.createElement('div');
-            grid.className = 'fullscreen-grid';
-            grid.id = 'fullscreen-grid';
-            
-            document.body.appendChild(header);
-            document.body.appendChild(grid);
-            
-            // Add event listeners for fullscreen controls
-            document.getElementById('fullscreenExitBtn').onclick = () => {
-                isFullscreen = false;
-                document.body.classList.remove('fullscreen-mode');
-                removeFullscreenUI();
-                const fullscreenBtn = document.getElementById('fullscreenBtn');
-                if (fullscreenBtn) fullscreenBtn.textContent = 'Fullscreen';
-            };
-            
-            document.getElementById('fullscreenThemeBtn').onclick = () => {
-                isDarkMode = !isDarkMode;
-                const themeBtn = document.getElementById('themeBtn');
-                
-                if (isDarkMode) {
-                    document.body.classList.remove('light');
-                    document.body.classList.add('dark-theme');
-                    if (themeBtn) themeBtn.textContent = 'Light Mode';
-                    localStorage.setItem('monitor_theme', 'dark');
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    document.body.classList.add('light');
-                    if (themeBtn) themeBtn.textContent = 'Dark Mode';
-                    localStorage.setItem('monitor_theme', 'light');
-                }
-                
-                document.getElementById('fullscreenThemeBtn').textContent = isDarkMode ? 'Light' : 'Dark';
-                
-                // Update fullscreen theme classes
-                if (isDarkMode) {
-                    document.body.classList.add('dark-fullscreen');
-                    document.body.classList.remove('light');
-                } else {
-                    document.body.classList.remove('dark-fullscreen');
-                    document.body.classList.add('light');
-                }
-            };
-            
-            const fullscreenLangSelect = document.getElementById('fullscreenLangBtn');
-            fullscreenLangSelect.value = currentLanguage;
-            fullscreenLangSelect.onchange = (e) => {
-                currentLanguage = e.target.value;
-                languageIndex = languageKeys.indexOf(currentLanguage);
-
-                // Visual feedback
-                fullscreenLangSelect.style.backgroundColor = '#4CAF50';
-                setTimeout(() => {
-                    fullscreenLangSelect.style.backgroundColor = '';
-                }, 500);
-
-                // Save language preference
-                localStorage.setItem('monitor_language', currentLanguage);
-                // Update main language select
-                const mainLangSelect = document.getElementById('languageBtn');
-                if (mainLangSelect) {
-                    mainLangSelect.value = currentLanguage;
-                }
-                // Announce language change
-                const langName = languages[currentLanguage].name;
-                speak(`Language changed to ${langName}`);
-
-                console.log('Language changed to:', langName);
-            };
-            
-            // Render bays in fullscreen
-            renderFullscreenBays();
-        }
-        
-        function removeFullscreenUI() {
-            const header = document.querySelector('.fullscreen-header');
-            const grid = document.querySelector('.fullscreen-grid');
-            if (header) header.remove();
-            if (grid) grid.remove();
-        }
-        
-        function renderFullscreenBays() {
-            const grid = document.getElementById('fullscreen-grid');
-            if (!grid) return;
-            
-            grid.innerHTML = '';
-            
-            // Get current bay data
-            const bays = currentQueue.length > 0 ?
-                Array.from({length: 8}, (_, i) => {
-                    const bayNum = i + 1;
-                    const bayData = lastBays[`Bay-${bayNum}`];
-                    return {
-                        bay_number: bayNum,
-                        status: bayData?.status || 'available',
-                        ticket_id: bayData?.ticket_id || '-',
-                        username: bayData?.username || '-',
-                        plate_number: bayData?.plate_number || '-',
-                        service_type: bayNum <= 3 ? 'Fast' : 'Normal'
-                    };
-                }) :
-                Array.from({length: 8}, (_, i) => ({
-                    bay_number: i + 1,
-                    status: 'available',
-                    ticket_id: '-',
-                    username: '-',
-                    plate_number: '-',
-                    service_type: i < 3 ? 'Fast' : 'Normal'
-                }));
-            
-            bays.forEach(bay => {
-                const bayElement = document.createElement('div');
-                bayElement.className = `fullscreen-bay ${bay.status}`;
-                bayElement.innerHTML = `
-                    <div class="fullscreen-bay-header">
-                        <h3 class="fullscreen-bay-title">Bay-${bay.bay_number}</h3>
-                        <span class="fullscreen-bay-type ${bay.service_type === 'Fast' ? 'fast-bay' : ''}">${bay.service_type}</span>
-                    </div>
-                    <div class="fullscreen-bay-status">
-                        <div class="fullscreen-status-badge ${bay.status}">
-                            ${bay.status === 'available' ? 'Available' : 'Occupied'}
-                        </div>
-                    </div>
-                    <div class="fullscreen-bay-details">
-                        <div class="fullscreen-detail-item">
-                            <span class="fullscreen-detail-label">Ticket:</span>
-                            <span class="fullscreen-detail-value">${bay.ticket_id}</span>
-                        </div>
-                        <div class="fullscreen-detail-item">
-                            <span class="fullscreen-detail-label">User:</span>
-                            <span class="fullscreen-detail-value">${bay.username}</span>
-                        </div>
-                        <div class="fullscreen-detail-item">
-                            <span class="fullscreen-detail-label">Plate:</span>
-                            <span class="fullscreen-detail-value">${bay.plate_number}</span>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(bayElement);
-            });
-        }
-        
-        // Enhanced theme toggle
-        if (themeBtn) {
-            themeBtn.onclick = () => {
-                isDarkMode = !isDarkMode;
-                
-                if (isDarkMode) {
-                    document.body.classList.remove('light');
-                    document.body.classList.add('dark-theme');
-                    themeBtn.textContent = 'Light Mode';
-                    localStorage.setItem('monitor_theme', 'dark');
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    document.body.classList.add('light');
-                    themeBtn.textContent = 'Dark Mode';
-                    localStorage.setItem('monitor_theme', 'light');
-                }
-                
-                // Update fullscreen theme if in fullscreen
-                if (isFullscreen) {
-                    if (isDarkMode) {
-                        document.body.classList.add('dark-fullscreen');
-                        document.body.classList.remove('light');
-                    } else {
-                        document.body.classList.remove('dark-fullscreen');
-                        document.body.classList.add('light');
-                    }
-                }
-    };
+// New Queue Monitor UI for Cephra
+// File: Appweb/Monitor/monitor.php
+// This is a new visual design and lightweight frontend logic for previewing the queue monitor.
+// Start session if not already started and detect logged-in user
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
 }
-        
-        // WebSocket connection
-        function connectWebSocket() {
-            // Get the current hostname and use it to build the WebSocket URL
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const host = window.location.hostname;
-            const wsUrl = `${protocol}//${host}:8080`;
-            
-            // Create WebSocket connection
-            socket = new WebSocket(wsUrl);
-            
-            // Connection opened
-            socket.addEventListener('open', (event) => {
-                console.log('WebSocket connected');
-                isConnected = true;
-                // connected
-                clearInterval(reconnectInterval);
-                reconnectInterval = null;
-                // updateConnectionStatus(true); // Removed
-            });
-            
-            // Listen for messages
-            socket.addEventListener('message', (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    if (data && !data.error) {
-                        // Initialize lastQueueTickets with current queue tickets on first load
-                        if (lastQueueTickets.size === 0 && data.queue && data.queue.length > 0) {
-                            // Add all current tickets to the set to prevent re-announcing
-                            data.queue.forEach(ticket => {
-                                if (ticket.ticket_id) {
-                                    lastQueueTickets.add(ticket.ticket_id);
-                                    // Only announce if this is not the first load
-                                    if (!isFirstLoad) {
-                                        announceWaitingTicket(ticket.ticket_id);
-                                    }
-                                }
-                            });
-                        }
-                        
-                        // After first load, set flag to false
-                        isFirstLoad = false;
-                        
-                        handleAlerts(data);
-                        renderBays(data.bays || []);
-                        currentQueue = data.queue || [];
-                        renderQueuePage();
-                        document.getElementById('ts').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        
-                        // Update fullscreen UI if active
-                        if (isFullscreen) {
-                            renderFullscreenBays();
-                        }
-                    } else {
-                        console.error('Monitor error', data.error);
-                    }
-                } catch (e) {
-                    console.error('Error processing WebSocket message', e);
-                }
-            });
-            
-            // Connection closed
-            socket.addEventListener('close', (event) => {
-                console.log('WebSocket disconnected');
-                isConnected = false;
-                // updateConnectionStatus(false); // Removed
-                socket = null;
-                
-                // Attempt to reconnect if not already trying
-                if (!reconnectInterval && reconnectAttempts < maxReconnectAttempts) {
-                    reconnectInterval = setInterval(attemptReconnect, reconnectDelay);
-                } else if (reconnectAttempts >= maxReconnectAttempts) {
-                    // Fall back to polling if max reconnect attempts reached
-                    console.log('Max reconnect attempts reached, falling back to polling');
-                    startPolling();
-                }
-            });
-            
-            // Connection error
-            socket.addEventListener('error', (event) => {
-                console.error('WebSocket error', event);
-                isConnected = false;
-                // updateConnectionStatus(false); // Removed
-            });
-        }
-        
-        function attemptReconnect() {
-            if (reconnectAttempts < maxReconnectAttempts) {
-                reconnectAttempts++;
-                console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
-                connectWebSocket();
-            } else {
-                clearInterval(reconnectInterval);
-                reconnectInterval = null;
-                console.log('Max reconnect attempts reached, falling back to polling');
-                startPolling();
-            }
-        }
-        
-        // Connection status indicator removed
-        
-        let pollingInterval = null;
-        
-        function startPolling() {
-            if (!pollingInterval) {
-                console.log('Starting polling fallback');
-                // Fetch immediately
-                fetchSnapshot();
-                // Then set up interval
-                pollingInterval = setInterval(fetchSnapshot, 3000);
-            }
-        }
-        
-        function stopPolling() {
-            if (pollingInterval) {
-                console.log('Stopping polling');
-                clearInterval(pollingInterval);
-                pollingInterval = null;
-            }
-        }
-        
-        async function fetchSnapshot() {
-            try {
-                const res = await fetch('api/monitor.php', { cache: 'no-store' });
-                const data = await res.json();
-                if (data && !data.error) {
-                    // Initialize lastQueueTickets with current queue tickets on first load
-                    if (lastQueueTickets.size === 0 && data.queue && data.queue.length > 0) {
-                        // Add all current tickets to the set to prevent re-announcing
-                        data.queue.forEach(ticket => {
-                            if (ticket.ticket_id) {
-                                lastQueueTickets.add(ticket.ticket_id);
-                                // Only announce if this is not the first load
-                                if (!isFirstLoad) {
-                                    announceWaitingTicket(ticket.ticket_id);
-                                }
-                            }
-                        });
-                    }
-                    
-                    // After first load, set flag to false
-                    isFirstLoad = false;
-                    
-                    handleAlerts(data);
-                    renderBays(data.bays || []);
-                    currentQueue = data.queue || [];
-                    renderQueuePage();
-                    document.getElementById('ts').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    
-                    // Update fullscreen UI if active
-                    if (isFullscreen) {
-                        renderFullscreenBays();
-                    }
-                } else {
-                    console.error('Monitor error', data.error);
-                }
-            } catch (e) {
-                console.error('Monitor fetch failed', e);
-            }
-        }
+$showClose = isset($_SESSION['username']) && !empty($_SESSION['username']);
 
-        function statusBadge(status) {
-            const s = (status || '').toLowerCase();
-            if (s === 'available') return '<span class="badge available">Available</span>';
-            if (s === 'occupied') return '<span class="badge occupied">Occupied</span>';
-            return '<span class="badge maintenance">Maintenance</span>';
-        }
+// Attempt to load live data from the database to populate the monitor
+// Default to empty arrays so the client can use its own simulated data if desired
+$baysJson = '[]';
+$waitingsJson = '[]';
+try {
+  // Use __DIR__ so includes are robust regardless of cwd
+  require_once __DIR__ . '/../Admin/config/database.php';
+  $db = new Database();
+  $conn = $db->getConnection();
+  if ($conn) {
+    // Fetch bays (same logic as api/monitor.php but normalize fields for the frontend)
+    $stmt = $conn->query("SELECT
+            cb.bay_number,
+            cb.bay_type,
+            CASE
+                WHEN cb.status = 'Available'
+                     AND EXISTS (SELECT 1 FROM charging_grid cg
+                                 WHERE cg.bay_number = cb.bay_number
+                                   AND cg.ticket_id IS NOT NULL)
+                THEN 'Occupied'
+                ELSE cb.status
+            END AS status,
+            cb.current_username,
+            COALESCE(cb.current_ticket_id, (SELECT cg.ticket_id FROM charging_grid cg WHERE cg.bay_number = cb.bay_number LIMIT 1)) AS current_ticket_id,
+            cb.start_time,
+            u.plate_number
+        FROM charging_bays cb
+        LEFT JOIN users u ON cb.current_username = u.username
+        ORDER BY cb.bay_number");
+    $bays = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        function renderBays(bays) {
-            const wrap = document.getElementById('bays');
-            const bayMap = {};
-            (bays || []).forEach(b => { bayMap[b.bay_number] = b; });
+    // Map DB rows into a simple structure but do not fabricate any fields.
+    $jsBays = array_map(function($b){
+      // keep bay_number as-is; frontend will interpret it
+      return [
+        'bay' => $b['bay_number'],
+        'type' => $b['bay_type'] ?? 'Normal',
+        'status' => $b['status'] ?? 'Available',
+        'ticket' => $b['current_ticket_id'] ?? '',
+        'user' => $b['current_username'] ?? '',
+        'plate' => $b['plate_number'] ?? '',
+        'last_updated' => $b['start_time'] ?? ''
+      ];
+    }, $bays ?: []);
 
-            const bayIds = ['Bay-1','Bay-2','Bay-3','Bay-4','Bay-5','Bay-6','Bay-7','Bay-8'];
-            wrap.innerHTML = bayIds.map(id => {
-                const fallbackType = (id === 'Bay-1' || id === 'Bay-2' || id === 'Bay-3') ? 'Fast' : 'Normal';
-                const b = bayMap[id] || { bay_number: id, bay_type: fallbackType, status: 'Available', current_ticket_id: '', current_username: '', plate_number: '' };
-                const ticket = b.current_ticket_id || '';
-                const user = b.current_username || '';
-                const plate = b.plate_number || '';
-                const type = b.bay_type ? ` <small class=\"muted\">(${b.bay_type})</small>` : '';
-                const statusClass = (b.status || '').toLowerCase();
-                return `
-                    <div class="bay ${statusClass}">
-                        <div class="bay-header">
-                            <h3>${b.bay_number}${type}</h3>
-                            <div class="bay-type">${b.bay_type || 'Normal'}</div>
-                        </div>
-                        <div class="bay-center-status">${(b.status || 'Available')}</div>
-                        <div class="bay-status">${statusBadge(b.status)}</div>
-                        <div class="bay-info">
-                            <div class="info-row"><span class="info-label">Ticket:</span> <span class="info-value">${ticket || '-'}</span></div>
-                            <div class="info-row"><span class="info-label">Plate:</span> <span class="info-value">${plate || '-'}</span></div>
-                            <div class="info-row"><span class="info-label">User:</span> <span class="info-value">${user || '-'}</span></div>
-                        </div>
-                    </div>`;
-            }).join('');
-        }
+    // Fetch waiting queue with plate if available
+    $stmt = $conn->query("SELECT q.ticket_id, q.username, q.service_type, q.created_at, u.plate_number FROM queue_tickets q LEFT JOIN users u ON q.username = u.username WHERE q.status = 'Waiting' ORDER BY q.created_at ASC");
+    $queue = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Do not synthesize any missing fields; pass DB values (or empty strings) to JS
+    $jsWaitings = array_map(function($q){
+      return [
+        'ticket' => $q['ticket_id'] ?? '',
+        'plate' => $q['plate_number'] ?? '',
+        'user' => $q['username'] ?? '',
+        'service' => $q['service_type'] ?? '',
+        'time' => $q['created_at'] ?? ''
+      ];
+    }, $queue ?: []);
 
-        function renderQueuePage() {
-            const tbody = document.getElementById('queue');
-            // Clamp page to valid range BEFORE slicing
-            let totalPages = Math.max(1, Math.ceil(currentQueue.length / pageSize));
-            if (page > totalPages) page = totalPages;
-            if (page < 1) page = 1;
-            const start = (page - 1) * pageSize;
-            const rows = currentQueue.slice(start, start + pageSize);
-            tbody.innerHTML = (rows.length ? rows : [{ticket_id:'', username:'', service_type:'', created_at:''}]).map((r, idx) => {
-                if (rows.length === 0 && idx === 0) {
-                    return `<tr><td colspan="4" class="muted">No waiting tickets</td></tr>`;
-                }
-                const since = r.created_at ? new Date(r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
-                return `<tr>
-                    <td>${r.ticket_id || ''}</td>
-                    <td>${r.username || ''}</td>
-                    <td>${r.service_type || ''}</td>
-                    <td>${since}</td>
-                </tr>`;
-            }).join('');
-            document.getElementById('pageInfo').textContent = `Page ${page} / ${totalPages}`;
-        }
+    $baysJson = json_encode($jsBays, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $waitingsJson = json_encode($jsWaitings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  }
+} catch (Exception $e) {
+  // On error keep arrays empty so client-side retains control over simulated values
+  $baysJson = '[]';
+  $waitingsJson = '[]';
+}
+?>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cephra — Queue Monitor (Preview)</title>
+  <link rel="icon" href="../Admin/images/MONU.png">
+  <style>
+    /* Refreshed light-blue theme and improved dark mode */
+    :root{
+      --bg: #eef9ff;               /* light subtle blue */
+      --surface: #ffffff;
+      --muted: #4b5563;
+      --accent: #0ea5ff;           /* bright sky blue */
+      --accent-2: #0284c7;         /* deeper blue */
+      --accent-3: #7dd3fc;         /* soft highlight */
+      --danger: #ef4444;
+      --glass: rgba(255,255,255,0.7);
+      --shadow: 0 12px 30px rgba(2,6,23,0.06);
+      --panel-border: rgba(2,6,23,0.06);
+      --card-border: rgba(2,6,23,0.08);
+      --grid-bg: linear-gradient(180deg, rgba(14,165,255,0.02), rgba(255,255,255,0));
+      --table-row: rgba(2,6,23,0.02);
+      --radius:14px;
+      --text: #02263b;             /* dark slate for good contrast */
+    }
 
-        document.getElementById('prevPage').onclick = () => { if (page > 1) { page--; renderQueuePage(); } };
-        document.getElementById('nextPage').onclick = () => { const total = Math.max(1, Math.ceil(currentQueue.length / pageSize)); if (page < total) { page++; renderQueuePage(); } };
+    /* Dark mode variables: used when body has 'dark' class */
+    body.dark{
+      --bg: linear-gradient(180deg,#031022,#042035);
+      --surface: #071226;
+      --muted: #9fb3c8;
+      --accent: #38bdf8;
+      --accent-2: #0ea5ff;
+      --accent-3: rgba(255,255,255,0.04);
+      --glass: rgba(255,255,255,0.03);
+      --shadow: 0 18px 40px rgba(2,6,23,0.6);
+      --panel-border: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.06);
+      --grid-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      --table-row: rgba(255,255,255,0.02);
+      --text: #e6f6ff;
+    }
 
-        // Track tickets that were previously in bays
-        let ticketsInBays = new Map(); // Map of ticketId -> bayNumber
-        
-        function handleAlerts(data) {
-            const bays = data.bays || [];
-            const currentQueue = data.queue || [];
-            
-            // Check for bay status changes and announce them
-            bays.forEach(b => {
-                const key = b.bay_number;
-                const prev = lastBays[key];
-                const now = (b.status || '') + '|' + (b.current_ticket_id || '') + '|' + (b.current_username || '');
-                
-                if (prev !== now) {
-                    // Parse previous state for TTS announcement
-                    let prevStatus = '';
-                    let prevTicketId = '';
-                    let newStatus = b.status || '';
-                    let newTicketId = b.current_ticket_id || '';
-                    let newUsername = b.current_username || '';
-                    
-                    if (prev) {
-                        const prevParts = prev.split('|');
-                        prevStatus = prevParts[0] || '';
-                        prevTicketId = prevParts[1] || '';
-                    }
-                    
-                    // Track tickets in bays
-                    if (prevTicketId && !newTicketId && prevStatus === 'occupied' && newStatus === 'available') {
-                        // Ticket is done charging
-                        announceTicketDone(prevTicketId, b.bay_number);
-                    }
-                    
-                    // Update ticket tracking
-                    if (prevTicketId) {
-                        ticketsInBays.delete(prevTicketId);
-                    }
-                    if (newTicketId) {
-                        ticketsInBays.set(newTicketId, b.bay_number);
-                    }
-                    
-                    // Only announce if we have a previous state and status actually changed
-                    if (prev && prevStatus !== newStatus) {
-                        announceBayChange(b.bay_number, prevStatus, newStatus, newTicketId, newUsername);
-                    }
-                }
-                lastBays[key] = now;
-             });
-            
-            
-            // Check for new waiting tickets
-            currentQueue.forEach(ticket => {
-                const ticketId = ticket.ticket_id;
-                if (ticketId && !lastQueueTickets.has(ticketId)) {
-                    // New ticket in waiting queue
-                    announceWaitingTicket(ticketId);
-                    lastQueueTickets.add(ticketId);
-                    // Ensure the announcement is visible even if the user hasn't charged yet
-                    console.log('New waiting ticket detected:', ticketId);
-                }
-            });
-            
-            // Check for tickets that moved from waiting to a bay
-            const currentTicketIds = new Set(currentQueue.map(t => t.ticket_id).filter(id => id));
-            for (let ticketId of lastQueueTickets) {
-                if (!currentTicketIds.has(ticketId)) {
-                    // Ticket is no longer in waiting queue
-                    // Check if it's now in a bay
-                    const bayNumber = ticketsInBays.get(ticketId);
-                    if (bayNumber) {
-                        // Ticket moved from waiting to a bay
-                        announceTicketAssigned(ticketId, bayNumber);
-                    }
-                    lastQueueTickets.delete(ticketId);
-                }
-            }
-        }
+  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  /* make sizing predictable */
+  *, *::before, *::after { box-sizing: border-box; }
+    body{padding:20px;box-sizing:border-box;transition:background .25s,color .25s}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+    .brand{display:flex;flex-direction:column}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
 
-        // Improved text-to-speech functionality with better voice selection and audio feedback
-        // Function to show a visual toast notification
-        function showToast(text) {
-            // Create visual feedback for announcement
-            const announcementElement = document.createElement('div');
-            announcementElement.className = 'announcement-toast';
-            announcementElement.textContent = text;
-            document.body.appendChild(announcementElement);
-            
-            // Animate in
-            setTimeout(() => {
-                announcementElement.classList.add('show');
-            }, 10);
-            
-            // Remove after animation completes
-            setTimeout(() => {
-                announcementElement.classList.remove('show');
-                setTimeout(() => {
-                    document.body.removeChild(announcementElement);
-                }, 500);
-            }, 4000);
-        }
-        
-        function speak(text, messageType = null, variables = {}) {
-            // Always show the toast notification
-            showToast(text);
-            
-            // Only speak if announcer is enabled
-            if (document.getElementById('announcerChk').checked && 'speechSynthesis' in window) {
-                // Stop any current speech
-                speechSynthesis.cancel();
-                
-                // Use localized message if messageType is provided
-                let messageToSpeak = text;
-                if (messageType && ttsMessages[currentLanguage] && ttsMessages[currentLanguage][messageType]) {
-                    messageToSpeak = ttsMessages[currentLanguage][messageType];
-                    // Replace variables in the message
-                    for (const [key, value] of Object.entries(variables)) {
-                        messageToSpeak = messageToSpeak.replace(`{${key}}`, value);
-                    }
-                }
-                
-                const utterance = new SpeechSynthesisUtterance(messageToSpeak);
-                utterance.rate = ttsRate;  // Use user-controlled rate
-                utterance.pitch = ttsPitch; // Use user-controlled pitch
-                utterance.volume = ttsVolume; // Use user-controlled volume
-                
-                // Get all available voices
-                let voices = [];
-                
-                // Handle the case where voices might not be loaded yet
-                const loadVoices = () => {
-                    voices = speechSynthesis.getVoices();
-                    
-                    // Enhanced voice selection based on current language
-                    const currentLang = languages[currentLanguage].code;
-                    let preferredVoices = [];
-                    
-                    // Language-specific voice preferences with better matching
-                    switch (currentLang) {
-                        case 'zh':
-                            preferredVoices = [
-                                'Microsoft Huihui - Chinese (Simplified, PRC)',
-                                'Microsoft Yaoyao - Chinese (Simplified, PRC)',
-                                'Chinese (Simplified)',
-                                'Chinese (Mandarin)',
-                                'Mandarin Chinese',
-                                'Chinese',
-                                'Huihui',
-                                'Yaoyao'
-                            ];
-                            break;
-                        case 'fil':
-                            preferredVoices = [
-                                'Filipino',
-                                'Tagalog',
-                                'Microsoft Maria - Filipino (Philippines)',
-                                'Microsoft Rosa - Filipino (Philippines)',
-                                'Google Filipino',
-                                'Google Tagalog',
-                                'Filipino (Philippines)',
-                                'Tagalog (Philippines)',
-                                'Filipino Female',
-                                'Tagalog Female',
-                                'Filipino Male',
-                                'Tagalog Male',
-                                'English (Philippines)',
-                                'English (US)',
-                                'English'
-                            ];
-                            break;
-                        case 'ceb':
-                            preferredVoices = [
-                                'Cebuano',
-                                'Bisaya',
-                                'Microsoft Cebuano - Cebuano (Philippines)',
-                                'Google Cebuano',
-                                'Google Bisaya',
-                                'Cebuano (Philippines)',
-                                'Bisaya (Philippines)',
-                                'Cebuano Female',
-                                'Bisaya Female',
-                                'Cebuano Male',
-                                'Bisaya Male',
-                                'Filipino',
-                                'Tagalog',
-                                'English (Philippines)',
-                                'English (US)',
-                                'English'
-                            ];
-                            break;
-                        case 'es':
-                            preferredVoices = [
-                                'Microsoft Helena - Spanish (Spain)',
-                                'Microsoft Sabina - Spanish (Mexico)',
-                                'Microsoft Laura - Spanish (Spain)',
-                                'Spanish (Spain)',
-                                'Spanish (Mexico)',
-                                'Spanish (Latin America)',
-                                'Español',
-                                'Spanish',
-                                'Helena',
-                                'Sabina',
-                                'Laura'
-                            ];
-                            break;
-                        default: // English
-                            preferredVoices = [
-                                'Microsoft Zira - English (United States)',
-                                'Microsoft Hazel - English (Great Britain)',
-                                'Microsoft Susan - English (United States)',
-                        'Google UK English Female',
-                                'Google US English Female',
-                        'Samantha',
-                        'Karen',
-                        'Susan',
-                                'Zira',
-                                'Hazel',
-                                'English (US)',
-                                'English (UK)',
-                        'Female',
-                        'female'
-                    ];
-                    }
-                    
-                    // Enhanced voice selection with multiple matching strategies
-                    let selectedVoice = null;
-                    
-                    // Strategy 1: Exact name match with localService
-                    for (const preferred of preferredVoices) {
-                        const found = voices.find(voice => 
-                            voice.name === preferred && voice.localService
-                        );
-                        if (found) {
-                            selectedVoice = found;
-                            break;
-                        }
-                    }
-                    
-                    // Strategy 2: Contains match with localService
-                    if (!selectedVoice) {
-                        for (const preferred of preferredVoices) {
-                            const found = voices.find(voice => 
-                                voice.name.toLowerCase().includes(preferred.toLowerCase()) && voice.localService
-                            );
-                            if (found) {
-                                selectedVoice = found;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Strategy 2.5: Special Filipino/Bisaya native language matching
-                    if (!selectedVoice && (currentLang === 'fil' || currentLang === 'ceb')) {
-                        const nativeKeywords = currentLang === 'fil' 
-                            ? ['filipino', 'tagalog', 'philippines']
-                            : ['cebuano', 'bisaya', 'filipino', 'tagalog', 'philippines'];
-                        
-                        for (const keyword of nativeKeywords) {
-                            const found = voices.find(voice => 
-                                voice.name.toLowerCase().includes(keyword) && voice.localService
-                            );
-                            if (found) {
-                                selectedVoice = found;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Strategy 3: Language code match
-                    if (!selectedVoice) {
-                        const found = voices.find(voice => 
-                            voice.lang.startsWith(currentLang) && voice.localService
-                        );
-                        if (found) {
-                            selectedVoice = found;
-                        }
-                    }
-                    
-                    // Strategy 4: Exact name match without localService restriction
-                    if (!selectedVoice) {
-                        for (const preferred of preferredVoices) {
-                            const found = voices.find(voice => 
-                                voice.name === preferred
-                            );
-                            if (found) {
-                                selectedVoice = found;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Strategy 5: Contains match without localService restriction
-                    if (!selectedVoice) {
-                        for (const preferred of preferredVoices) {
-                            const found = voices.find(voice => 
-                                voice.name.toLowerCase().includes(preferred.toLowerCase())
-                            );
-                            if (found) {
-                                selectedVoice = found;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Strategy 6: Language code match without localService restriction
-                    if (!selectedVoice) {
-                        const found = voices.find(voice => 
-                            voice.lang.startsWith(currentLang)
-                        );
-                        if (found) {
-                            selectedVoice = found;
-                        }
-                    }
-                    
-                    // Strategy 7: Special Filipino/Bisaya native language fallback (without localService restriction)
-                    if (!selectedVoice && (currentLang === 'fil' || currentLang === 'ceb')) {
-                        const nativeKeywords = currentLang === 'fil' 
-                            ? ['filipino', 'tagalog', 'philippines']
-                            : ['cebuano', 'bisaya', 'filipino', 'tagalog', 'philippines'];
-                        
-                        for (const keyword of nativeKeywords) {
-                            const found = voices.find(voice => 
-                                voice.name.toLowerCase().includes(keyword)
-                            );
-                            if (found) {
-                                selectedVoice = found;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // If still no voice, use the first available
-                    if (!selectedVoice && voices.length > 0) {
-                        selectedVoice = voices[0];
-                    }
-                    
-                    if (selectedVoice) {
-                        utterance.voice = selectedVoice;
-                    }
-                    
-                    // Speak the text
-                    speechSynthesis.speak(utterance);
-                };
-                
-                // If voices are already loaded, use them
-                if (speechSynthesis.getVoices().length > 0) {
-                    loadVoices();
-                } else {
-                    // Otherwise wait for them to load
-                    speechSynthesis.onvoiceschanged = loadVoices;
-                }
-            }
-        }
-        
-        function announceBayChange(bayNumber, oldStatus, newStatus, ticketId, username) {
-            // Only announce for bays 1-8
-            if (bayNumber < 1 || bayNumber > 8) return;
-            
-            if (oldStatus && newStatus && oldStatus !== newStatus) {
-                // Debug log to help troubleshoot
-                console.log('Bay announcement:', {bayNumber, oldStatus, newStatus, ticketId, username});
-                
-                // Use proper messageType approach to avoid "Bay Bay" duplication
-                if (newStatus.toLowerCase() === 'available') {
-                    speak('', 'available', { bayNumber });
-                } else if (newStatus.toLowerCase() === 'occupied') {
-                    // For occupied status, create a custom message since we have additional info
-                    let message = `Bay ${bayNumber} is now occupied`;
-                    if (username) {
-                        message += ` by ${username}`;
-                    }
-                    if (ticketId) {
-                        message += ` with ticket ${ticketId}`;
-                    }
-                    speak(message);
-                } else if (newStatus.toLowerCase() === 'maintenance') {
-                    speak('', 'maintenance', { bayNumber });
-                }
-            }
-        }
-        
-        function announceWaitingTicket(ticketId) {
-            // Simple announcement: just the ticket number
-            const message = `Ticket ${ticketId} is now waiting`;
-            
-            // Debug log to help troubleshoot
-            console.log('Waiting ticket announcement:', message, {ticketId});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'waiting', { ticketId });
-            }
-        }
-        
-        function announceChargingStarted(ticketId, bayNumber) {
-            const message = `Charging started for ticket ${ticketId} at Bay ${bayNumber}`;
-            console.log('Charging started announcement:', message, {ticketId, bayNumber});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'charging_started', { ticketId, bayNumber });
-            }
-        }
-        
-        function announceQueuePosition(position) {
-            const message = `You are position ${position} in the queue`;
-            console.log('Queue position announcement:', message, {position});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'queue_position', { position });
-            }
-        }
-        
-        function announceWelcome() {
-            const message = 'Welcome to Cephra charging station';
-            console.log('Welcome announcement:', message);
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'welcome', {});
-            }
-        }
-        
-        function announceThankYou() {
-            const message = 'Thank you for using Cephra charging station';
-            console.log('Thank you announcement:', message);
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'thank_you', {});
-            }
-        }
-        
-        function announcePaymentSuccess(bayNumber) {
-            const message = `Payment successful. Please proceed to Bay ${bayNumber}`;
-            console.log('Payment success announcement:', message, {bayNumber});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'payment_success', { bayNumber });
-            }
-        }
-        
-        function announcePaymentFailed() {
-            const message = 'Payment failed. Please try again';
-            console.log('Payment failed announcement:', message);
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'payment_failed', {});
-            }
-        }
-        
-        function announceEmergencyStop(bayNumber) {
-            const message = `Emergency stop activated at Bay ${bayNumber}`;
-            console.log('Emergency stop announcement:', message, {bayNumber});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'emergency', { bayNumber });
-            }
-        }
-        
-        function announceSystemError() {
-            const message = 'System error detected. Please contact support';
-            console.log('System error announcement:', message);
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'system_error', {});
-            }
-        }
-        
-        function announceBayAvailable(bayNumber) {
-            const message = `Bay ${bayNumber} is now available for charging`;
-            console.log('Bay available announcement:', message, {bayNumber});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'available', { bayNumber });
-            }
-        }
-        
-        function announceBayMaintenance(bayNumber) {
-            const message = `Bay ${bayNumber} is under maintenance. Please use another bay`;
-            console.log('Bay maintenance announcement:', message, {bayNumber});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'maintenance', { bayNumber });
-            }
-        }
-        
-        function announceTicketDone(ticketId, bayNumber) {
-            // Announcement for when a ticket is done charging
-            const message = `Ticket ${ticketId} is done charging at Bay ${bayNumber}`;
-            
-            // Debug log to help troubleshoot
-            console.log('Ticket done announcement:', message, {ticketId, bayNumber});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'done', { ticketId, bayNumber });
-            }
-        }
-        
-        function announceTicketAssigned(ticketId, bayNumber) {
-            // Announcement for when a ticket is assigned to a bay
-            const message = `Ticket ${ticketId} is now assigned to Bay ${bayNumber}`;
-            
-            // Debug log to help troubleshoot
-            console.log('Ticket assigned announcement:', message, {ticketId, bayNumber});
-            
-            if (document.getElementById('announcerChk').checked) {
-                speak(message, 'assigned', { ticketId, bayNumber });
-            }
-        }
-        
+    main{display:flex;flex-direction:column;gap:18px}
 
-        // Removed connection status indicator
-        
-        // Render placeholders immediately and fetch a snapshot for faster first paint
-        renderBays([]);
-        fetchSnapshot();
-        
-        // Welcome announcement on page load (with delay to allow voices to load)
-        setTimeout(() => {
-            announceWelcome();
-        }, 2000);
-        
-        // Initialize connection
-        if ('WebSocket' in window) {
-            // WebSockets are supported, try to connect
-            connectWebSocket();
-        } else {
-            // WebSockets are not supported, fall back to polling
-            console.log('WebSockets not supported, using polling');
-            startPolling();
-        }
-        
-        // Handle page visibility changes
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                // Page is now visible, reconnect if needed
-                if (!socket && !pollingInterval) {
-                    if ('WebSocket' in window) {
-                        connectWebSocket();
-                    } else {
-                        startPolling();
-                    }
-                }
-            }
+    /* Panel base */
+  .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;border:1px solid var(--panel-border)}
+
+    /* Controls redesigned: force a single horizontal row with horizontal scrolling on small screens */
+    #controls{
+      display:flex;
+      flex-direction:row;
+      gap:8px;
+      width:100%;
+      max-width:100%;
+      margin:0 auto;
+      align-items:center;
+      justify-content:flex-start;
+      padding:4px 6px;
+      overflow-x:auto; /* allow horizontal scroll only if absolutely necessary */
+      -webkit-overflow-scrolling:touch;
+      flex-wrap:nowrap; /* ensure single row */
+      position:relative;
+    }
+
+    /* each control card remains compact and inline */
+    .ctrl{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 8px;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+      border:1px solid var(--panel-border);
+      box-shadow: 0 6px 16px rgba(2,6,23,0.04);
+      min-height:42px;
+      justify-content:space-between; /* label left, control right */
+      flex:1 1 0; /* allow controls to share available width and shrink if needed */
+      min-width:0; /* allow full shrink to prevent page overflow */
+      max-width:none;
+      white-space:nowrap; /* keep label + inline elements on one line */
+      overflow:hidden;text-overflow:ellipsis
+    }
+    .ctrl > label{font-size:13px;color:var(--muted);flex:0 0 auto;min-width:36px;max-width:30%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ctrl .control-body{display:flex;flex:1 1 auto;align-items:center;gap:8px;justify-content:flex-end;min-width:0}
+
+  /* Announcer control should not shrink; keep label visible */
+  .ctrl-announcer{flex:0 0 auto}
+  .ctrl-announcer > label{min-width:110px;max-width:160px}
+
+  /* If a control has no label (control-body is the only child), center its content */
+  .ctrl > .control-body:only-child{margin-left:auto;margin-right:auto;justify-content:center}
+
+    /* make sliders and controls scale correctly but keep them compact */
+  /* sliders should use the available space inside the control body */
+  .control-body input[type="range"]{width:100%;max-width:160px;min-width:48px}
+  .control-body select{min-width:56px}
+
+  /* reduce button padding so buttons don't force overflow */
+  button.action{padding:8px 10px;font-size:13px}
+  button.ghost{padding:6px 8px;font-size:13px}
+
+    /* small fade to indicate horizontal scroll when overflowing */
+    #controls::after{
+      content:'';position:absolute;right:8px;top:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,var(--bg));pointer-events:none;border-radius:0 12px 12px 0;display:block
+    }
+
+    /* CSS fallback to center controls without a label (for browsers without :has support) */
+    .ctrl.centered > .control-body{margin-left:auto;margin-right:auto;justify-content:center}
+
+    /* Slightly darker card for dark mode */
+    body.dark .ctrl{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 8px 20px rgba(2,6,23,0.3);
+    }
+
+    /* Toggle switch for Bay announcer: default neutral surface and strong active state */
+    .ctrl .control-body .toggle-switch,
+    .toggle-switch{
+      width:46px;
+      height:26px;
+      border-radius:999px;
+      background:var(--surface);
+      border:1px solid var(--panel-border);
+      position:relative;
+      cursor:pointer;
+      display:inline-block;
+      vertical-align:middle;
+      transition:all .18s ease;
+      box-shadow: 0 6px 14px rgba(2,6,23,0.04);
+      padding:3px;
+    }
+    .toggle-switch .knob{
+      position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 6px 16px rgba(2,6,23,0.08);transition:all .18s ease}
+    /* Active state: bright gradient, no border, subtle glow */
+    .ctrl .control-body .toggle-switch.active,
+    .toggle-switch.active{
+      background:linear-gradient(90deg,var(--accent-2),var(--accent));
+      border-color:transparent;
+      box-shadow: 0 10px 30px rgba(14,165,255,0.18), 0 3px 8px rgba(2,6,23,0.06) inset;
+    }
+    .toggle-switch.active .knob{transform:translateX(20px)}
+
+  /* Compact icon labels - reserve space so toggles don't overlap labels */
+  .label-icon{display:inline-flex;align-items:center;gap:8px;min-width:84px;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .label-icon svg{opacity:0.9;flex:0 0 18px}
+  /* ensure toggle switches don't visually intrude into the label area */
+  .ctrl .toggle-switch{margin-left:6px}
+
+    /* Range (sliders) modern look */
+    input[type=range]{-webkit-appearance:none;height:8px;border-radius:8px;background:linear-gradient(90deg,var(--accent-3),transparent);outline:none}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 4px 10px rgba(14,165,255,0.25);border:2px solid white}
+
+    /* Buttons */
+  button.action{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:white;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:600;box-shadow:0 10px 22px rgba(2,6,23,0.08);display:inline-flex;align-items:center;gap:8px}
+  button.ghost{background:transparent;border:1px solid var(--panel-border);padding:9px 12px;border-radius:12px;cursor:pointer;color:var(--text);display:inline-flex;align-items:center;gap:8px}
+
+    select{background:var(--surface);border:1px solid rgba(2,6,23,0.06);padding:8px 10px;border-radius:8px;color:var(--text)}
+
+    /* Queue grid - bigger, more prominent */
+  #queueGrid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,240px);gap:18px;padding:12px;border-radius:12px;background:var(--grid-bg);border:1px solid var(--panel-border)}
+  .card{border-radius:14px;padding:16px;background:linear-gradient(180deg,var(--surface),rgba(255,255,255,0.02));display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--card-border);box-shadow:0 8px 22px rgba(2,6,23,0.05);transition:transform .18s ease,box-shadow .18s ease}
+  .card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 18px 40px rgba(2,6,23,0.09)}
+    .card h3{margin:0;font-size:18px;color:var(--accent-2)}
+    .status{font-weight:800;font-size:20px}
+    .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px}
+
+  /* Make ticket and plate values more prominent on the cards */
+  .card .meta strong{font-size:16px;color:var(--text);font-weight:800}
+  /* place ticket and plate on separate lines for clarity */
+  .card .meta{display:flex;flex-direction:column;gap:6px}
+  .card .meta .line{display:flex;align-items:center;gap:6px}
+  .card .meta .plate{font-size:15px;color:var(--accent-2);letter-spacing:0.6px}
+  body.tv .card .meta strong{font-size:26px}
+  body.tv .card .meta .plate{font-size:22px}
+
+    /* Status badges */
+  .badge{display:inline-block;padding:8px 12px;border-radius:999px;color:white;font-weight:700;font-size:13px;transition:all .18s ease;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+  .badge.occupied{background:linear-gradient(90deg,#ff8a65,#ff5252);box-shadow:0 8px 24px rgba(255,82,82,0.12)}
+  .badge.available{background:linear-gradient(90deg,#34d399,#10b981);box-shadow:0 8px 24px rgba(16,185,129,0.12)}
+  /* smaller maintenance badge to avoid header wrapping */
+  .badge.maintenance{background:linear-gradient(90deg,#f59e0b,#f97316);box-shadow:0 8px 24px rgba(249,115,22,0.10);padding:6px 10px;font-size:12px}
+  /* neutral state */
+  .badge.unknown{background:linear-gradient(90deg,#94a3b8,#64748b);box-shadow:0 8px 24px rgba(100,116,139,0.06)}
+
+    /* Waitings table */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:12px;border-bottom:1px solid var(--panel-border);text-align:left}
+    th{background:transparent;color:var(--muted);font-weight:700}
+  tbody tr:nth-child(even){background:var(--table-row)}
+
+    /* Responsive behaviour */
+    @media (max-width:1000px){#queueGrid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,220px)}}
+    @media (max-width:820px){
+      /* Keep single-row behavior but make controls more compact on narrower screens */
+      #controls{gap:6px;padding:4px 6px;}
+      .ctrl{padding:5px 6px;min-width:48px;flex:1 1 0}
+      .ctrl > label{min-width:30px;max-width:32%}
+      .ctrl .control-body{justify-content:flex-end}
+      .control-body input[type="range"]{min-width:28px;max-width:120px}
+    }
+
+    @media (max-width:420px){
+      /* tiny screens: slightly reduce font-sizes and icon gaps */
+      .ctrl > label{font-size:12px}
+      button.action, button.ghost{font-size:12px;padding:6px 8px}
+      .label-icon svg{display:none}
+    }
+    @media (max-width:600px){#queueGrid{grid-template-columns:1fr;grid-template-rows:repeat(8,160px)} .panel{padding:12px}}
+
+    /* small helper styles */
+    .muted{color:var(--muted)}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--accent-2);color:white;font-size:12px;font-weight:600}
+
+    /* Enhanced waitings table visuals */
+    .waitings-table{width:100%;border-collapse:separate;border-spacing:0 10px}
+    .waitings-table thead{position:sticky;top:0;background:transparent}
+    .waitings-table tbody tr{background:transparent}
+    .waitings-row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--surface);border:1px solid var(--panel-border);box-shadow:0 6px 18px rgba(2,6,23,0.03)}
+    .waitings-cell{padding:0;margin:0;flex:1;min-width:0}
+    .waitings-ticket{font-weight:800;font-size:15px;color:var(--text);min-width:100px}
+    .waitings-plate{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--accent-2)}
+    .waitings-user{display:flex;align-items:center;gap:8px;color:var(--muted);min-width:160px}
+    .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(90deg,var(--accent-3),transparent);display:inline-flex;align-items:center;justify-content:center;color:var(--accent-2);font-weight:700}
+    .service-badge{padding:6px 10px;border-radius:999px;font-weight:700;color:white;font-size:12px}
+  /* Fast: red, Normal: blue */
+  .service-badge.Fast{background:linear-gradient(90deg,#ef4444,#dc2626)}
+  .service-badge.Normal{background:linear-gradient(90deg,#3b82f6,#2563eb)}
+    .service-badge.Other{background:linear-gradient(90deg,#94a3b8,#64748b)}
+  /* center the Service column */
+  thead th:nth-child(4), tbody td:nth-child(4){text-align:center}
+    .empty-waitings{padding:28px;text-align:center;color:var(--muted);border-radius:12px;border:1px dashed var(--panel-border);background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+
+    /* Fullscreen helper */
+    .fullscreen{position:fixed;inset:0;z-index:9999;background:var(--bg);padding:22px;overflow:auto}
+
+  /* Center pager under tables */
+  #waitingsPager{justify-content:center}
+  #waitingsPager .muted{min-width:110px;text-align:center}
+
+  /* TV / fullscreen presentation tweaks - applied when body has .tv */
+  body.tv{
+    font-size:1.5rem;
+    overflow:hidden; /* prevent page vertical scroll in TV mode */
+    padding:0; /* remove extra padding so content fits exactly */
+    margin:0;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center; /* center the main area on the screen */
+    background:var(--bg);
+  }
+  body.tv h1{font-size:36px}
+  /* Layout: two-column split - queue on the left, waitings on the right */
+  body.tv main{display:grid;grid-template-columns:2.4fr 1fr;grid-template-rows:1fr;gap:28px;height:95vh;width:95vw;max-width:1900px;transform:scale(1.06);transform-origin:center;}
+  body.tv .panel{padding:24px;height:100%;overflow:hidden;box-sizing:border-box}
+  body.tv #queueGrid{grid-template-rows:repeat(2,1fr);gap:24px;height:100%;overflow:auto}
+  body.tv .card{padding:26px;border-radius:20px}
+  body.tv .card h3{font-size:30px}
+  body.tv .status{font-size:32px}
+  body.tv .badge{padding:14px 18px;font-size:18px}
+  body.tv .badge.maintenance{padding:10px 14px;font-size:16px}
+  body.tv table{font-size:22px}
+  body.tv th, body.tv td{padding:20px}
+  body.tv #controls{display:none !important} /* hide controls in tv mode */
+
+    /* Waitings table wrapper sizing: fill its panel and scroll internally (no page scroll) */
+  .table-wrap{max-height:320px;overflow:auto;margin-top:14px}
+  body.tv .table-wrap{max-height:100%;height:100%;overflow:auto}
+  /* Ensure panels fill their column without causing body scroll */
+  body.tv #queuePanel, body.tv #waitingsPanel{height:100%;overflow:hidden}
+  /* hide timestamps in TV mode */
+  body.tv .ts{display:none !important}
+  /* Hide the pager in TV/fullscreen for a cleaner view */
+  body.tv #waitingsPager{display:none !important}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>Cephra Live Monitor</h1>
+    </div>
+    <?php if (!empty($showClose)): ?>
+      <a href="../User/dashboard.php" title="Back to dashboard" class="close-btn" style="margin-left:auto;text-decoration:none;color:var(--text);font-size:22px;font-weight:700;background:transparent;border:0;padding:6px 10px;border-radius:8px;">&times;</a>
+    <?php endif; ?>
+  </header>
+
+  <main>
+    <!-- Controls panel -->
+    <section class="panel" id="controlsPanel">
+
+      <div id="controls">
+        <div class="ctrl ctrl-announcer">
+          <label for="announcer" class="label-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v18" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Bay announcer</label>
+          <div class="control-body"><div id="announcer" class="toggle-switch active"><div class="knob"></div></div></div>
+        </div>
+
+        <div class="ctrl">
+          <label for="volume" class="label-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Volume</label>
+          <div class="control-body"><input id="volume" type="range" min="0" max="100" value="80"></div>
+        </div>
+
+        <div class="ctrl">
+          <label for="speed" class="label-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12h3M12 3v3M21 12h-3M12 21v-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Speed</label>
+          <div class="control-body"><input id="speed" type="range" min="50" max="200" value="90"></div>
+        </div>
+
+        <div class="ctrl">
+          <div class="control-body"><button class="action" id="testTts"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4v16h4l6 3V1L8 4H4z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Test TTS</button></div>
+        </div>
+
+        <div class="ctrl">
+          <div class="control-body"><button class="ghost" id="fullscreenToggle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7v-4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 17v4h-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 3h-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21H3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Enter fullscreen</button></div>
+        </div>
+
+        <div class="ctrl">
+          <div class="control-body"><button class="ghost" id="darkToggle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Dark mode</button></div>
+        </div>
+
+        <div class="ctrl">
+          <label for="lang">Language</label>
+          <div class="control-body">
+            <select id="lang">
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+              <option value="fil">FIL</option>
+              <option value="zh">ZH</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Queue panel -->
+    <section class="panel" id="queuePanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      </div>
+
+      <div id="queueGrid">
+        <!-- Cards injected by JS for visualization -->
+      </div>
+    </section>
+
+    <!-- Waitings panel -->
+    <section class="panel" id="waitingsPanel">
+      <div id="waitingsTop" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--panel-border);padding-bottom:18px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <strong>Waiting Queue</strong>
+          <div id="waitingsCount" class="muted">&nbsp;</div>
+        </div>
+      </div>
+
+  <div class="table-wrap" style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Ticket</th>
+              <th>Plate Number</th>
+              <th>Name</th>
+              <th>Service</th>
+            </tr>
+          </thead>
+          <tbody id="waitingsBody">
+            <!-- injected -->
+          </tbody>
+        </table>
+  <div style="display:flex;align-items:center;gap:10px;margin-top:10px" id="waitingsPager">
+          <button class="ghost" id="prevWaitings">Prev</button>
+          <div class="muted" id="waitingsPageInfo">Page 1 / 1</div>
+          <button class="ghost" id="nextWaitings">Next</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Lightweight frontend logic for visualization and basic interaction
+    // If server-side provided live JSON is available, use it. Otherwise fall back to simulated sample data.
+    const __serverBays = <?php echo $baysJson; ?>;
+    // Do not fabricate client-side data. If server provides bays use them, otherwise use an empty list
+    const sampleBays = (__serverBays && Array.isArray(__serverBays) && __serverBays.length>0) ? __serverBays.map(b=>({
+      bay: b.bay || '',
+      type: b.type || '',
+      status: b.status || '',
+      ticket: b.ticket || '',
+      user: b.user || '',
+      plate: b.plate || '',
+      last_updated: b.last_updated || ''
+    })) : [];
+
+    const __serverWaitings = <?php echo $waitingsJson; ?>;
+    // Use server waitings if present, otherwise no client-side fabricated waitings
+    const sampleWaitings = (__serverWaitings && Array.isArray(__serverWaitings) && __serverWaitings.length>0) ? __serverWaitings.map(w=>({
+      ticket: w.ticket || '',
+      plate: w.plate || '',
+      user: w.user || '',
+      service: w.service || '',
+      time: w.time ? new Date(w.time) : null
+    })) : [];
+
+    // Render helpers
+    function renderGrid(){
+      const wrap = document.getElementById('queueGrid');
+      wrap.innerHTML = '';
+      // fill exactly 8 cells
+      for(let i=0;i<8;i++){
+        const b = sampleBays[i] || {bay:i+1,type:'Normal',status:'Available',ticket:'-',user:'-'};
+        const card = document.createElement('div');
+        card.className='card';
+        // compute status normalized
+        const status = (b.status||'').toLowerCase();
+        const pillClass = status === 'available' ? 'available' : (status === 'occupied' ? 'occupied' : (status === 'maintenance' ? 'maintenance' : 'unknown'));
+        const last = b.last_updated ? new Date(b.last_updated) : new Date();
+        card.innerHTML = `
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h3>${b.bay} <span style='font-size:12px;color:var(--muted)'>(${b.type})</span></h3>
+              <span class="badge ${pillClass}">${b.status}</span>
+            </div>
+            <div style="margin-top:8px" class="meta">
+              <div class="line">Ticket: <strong>${b.ticket}</strong></div>
+              <div class="line">Plate: <strong class="plate">${b.plate||'-'}</strong></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div class="muted">User: ${b.user}</div>
+            <div class="muted"><span class="ts">Updated: ${last.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span></div>
+          </div>
+        `;
+        wrap.appendChild(card);
+      }
+    }
+
+  // Pagination state for waitings
+  let waitingsPage = 1;
+  const waitingsPageSize = 5; // default page size
+
+    function renderWaitings(){
+      const tbody = document.getElementById('waitingsBody');
+      const totalItems = sampleWaitings.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / waitingsPageSize));
+      if(waitingsPage > totalPages) waitingsPage = totalPages;
+      if(waitingsPage < 1) waitingsPage = 1;
+      const start = (waitingsPage - 1) * waitingsPageSize;
+      const pageItems = sampleWaitings.slice(start, start + waitingsPageSize);
+      // update count
+      document.getElementById('waitingsCount').textContent = `${totalItems} waiting` + (totalItems!==1? 's':'');
+      if(pageItems.length === 0){
+        tbody.innerHTML = `
+          <tr><td colspan="4">
+            <div class="empty-waitings">
+              <div style="font-size:20px;font-weight:800;margin-bottom:6px">No waiting tickets</div>
+              <div class="muted">There are currently no customers in the waiting queue.</div>
+            </div>
+          </td></tr>`;
+      } else {
+        // Render simple table rows: Ticket | Plate (copy) | Name | Service
+        tbody.innerHTML = pageItems.map(w=>{
+          const serviceClass = (w.service||'Other');
+          return `<tr>
+            <td>${w.ticket}</td>
+            <td><span class="waitings-plate">${w.plate}</span></td>
+            <td>${w.user}</td>
+            <td><div class="service-badge ${serviceClass}">${w.service}</div></td>
+          </tr>`;
+        }).join('');
+      }
+      document.getElementById('waitingsPageInfo').textContent = `Page ${waitingsPage} / ${totalPages}`;
+    }
+    // No search/filter controls at top anymore; default paging used
+
+    function timeAgo(d){
+      const s = Math.floor((Date.now()-d.getTime())/1000);
+      if(s<60) return s+'s';
+      if(s<3600) return Math.floor(s/60)+'m';
+      return Math.floor(s/3600)+'h';
+    }
+
+    // Controls
+  const volumeEl = document.getElementById('volume');
+  const speedEl = document.getElementById('speed');
+  const announcerEl = document.getElementById('announcer');
+    const testTtsBtn = document.getElementById('testTts');
+    const fullscreenToggle = document.getElementById('fullscreenToggle');
+    const darkToggle = document.getElementById('darkToggle');
+    const langSelect = document.getElementById('lang');
+
+    function speak(text){
+      if(!announcerEl.classList.contains('active')) return;
+      if(!('speechSynthesis' in window)){
+        alert('TTS not supported in this browser');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.volume = (volumeEl.value/100);
+      u.rate = (speedEl.value/100);
+      // basic language mapping
+      const lang = langSelect.value;
+      u.lang = lang==='en'? 'en-US' : (lang==='es'? 'es-ES' : (lang==='fil'? 'en-PH':'zh-CN'));
+      window.speechSynthesis.speak(u);
+      // also show a small visual cue (console + title)
+      console.log('TTS:', text);
+    }
+
+    testTtsBtn.addEventListener('click', ()=>{
+      speak('This is a test announcement from Cephra monitor');
+    });
+
+    // announcer toggle behavior + persist preference
+    const savedAnnouncer = localStorage.getItem('monitor_announcer');
+    if(savedAnnouncer === null || savedAnnouncer === 'true'){
+      announcerEl.classList.add('active');
+    } else {
+      announcerEl.classList.remove('active');
+    }
+
+    announcerEl.addEventListener('click', ()=>{
+      const active = announcerEl.classList.toggle('active');
+      localStorage.setItem('monitor_announcer', active ? 'true' : 'false');
+    });
+
+    fullscreenToggle.addEventListener('click', ()=>{
+      console.log('fullscreenToggle clicked');
+      // If we're already fullscreen, try to exit. If we're in simulated mode, disable it.
+      if(document.fullscreenElement){
+        document.exitFullscreen().catch(()=>{});
+        return;
+      }
+
+      // Try native Fullscreen API first (must be initiated by user gesture)
+      const el = document.documentElement;
+      if(el.requestFullscreen){
+        el.requestFullscreen().then(()=>{
+          // on success, fullscreenchange listener will call setTvMode(true)
+        }).catch(()=>{
+          // Fullscreen API failed (e.g., blocked by browser). Fall back to simulated TV mode.
+          window._tvSimulated = true;
+          setTvMode(true);
         });
-    </script>
+      } else {
+        // No Fullscreen API available - simulate TV mode
+        window._tvSimulated = true;
+        setTvMode(true);
+      }
+    });
+
+    darkToggle.addEventListener('click', ()=>{
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      darkToggle.textContent = isDark ? 'Light mode' : 'Dark mode';
+      // small visual feedback for theme change
+      if(isDark){
+        document.documentElement.style.transition = 'background .3s, color .3s';
+      } else {
+        document.documentElement.style.transition = 'background .3s, color .3s';
+      }
+    });
+
+    // Simple clock
+    function tick(){
+      const t = new Date();
+      const clockEl = document.getElementById('clock');
+      if(clockEl) clockEl.textContent = t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }
+
+    // Initial render
+    renderGrid();
+    renderWaitings();
+    tick();
+    setInterval(tick,1000);
+
+    // Fullscreen behaviour: when fullscreen, hide header and controls and apply TV-friendly styles
+    function setTvMode(enabled){
+      if(enabled){
+        document.body.classList.add('tv');
+        const header = document.querySelector('header'); if(header) header.style.display='none';
+        const controlsPanel = document.getElementById('controlsPanel'); if(controlsPanel) controlsPanel.style.display='none';
+        fullscreenToggle.textContent = 'Exit fullscreen';
+        const pager = document.getElementById('waitingsPager'); if(pager) pager.setAttribute('aria-hidden','true');
+      } else {
+        document.body.classList.remove('tv');
+        const header = document.querySelector('header'); if(header) header.style.display='flex';
+        const controlsPanel = document.getElementById('controlsPanel'); if(controlsPanel) controlsPanel.style.display='block';
+        fullscreenToggle.textContent = 'Enter fullscreen';
+        const pager = document.getElementById('waitingsPager'); if(pager) pager.removeAttribute('aria-hidden');
+      }
+    }
+
+    // sync on fullscreenchange (supports escape key and external toggles)
+    document.addEventListener('fullscreenchange', ()=>{
+      const enabled = !!document.fullscreenElement;
+      // if we left fullscreen natively but had previously simulated, clear simulated flag
+      if(!enabled && window._tvSimulated){ window._tvSimulated = false; }
+      setTvMode(enabled || !!window._tvSimulated);
+    });
+
+    // Pager handlers
+    document.getElementById('prevWaitings').addEventListener('click', ()=>{
+      if(waitingsPage > 1){ waitingsPage--; renderWaitings(); }
+    });
+    document.getElementById('nextWaitings').addEventListener('click', ()=>{
+      const total = Math.max(1, Math.ceil(sampleWaitings.length / waitingsPageSize));
+      if(waitingsPage < total){ waitingsPage++; renderWaitings(); }
+    });
+
+    // No client-side simulation: live updates should come from server/WebSocket or API.
+
+      // Center controls which do not have a label (fullscreen/dark toggles)
+      (function centerLabelessControls(){
+        try{
+          const ctrlEls = document.querySelectorAll('#controls .ctrl');
+          ctrlEls.forEach(c=>{
+            if(!c.querySelector('label')) c.classList.add('centered');
+          });
+        }catch(e){/* noop */}
+      })();
+
+    // Integration notes (not active):
+    // - To fetch live snapshot: GET 'api/monitor.php' (JSON) — similar to existing monitor/index.php
+    // - To use websocket: connect to ws://<host>:8080/ and parse messages similar to the other monitor implementation
+
+  </script>
 </body>
 </html>
