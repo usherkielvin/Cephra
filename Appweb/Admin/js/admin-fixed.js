@@ -272,10 +272,10 @@ class AdminPanel {
 
     async addStaff() {
         const payload = {
-            name: (document.getElementById('staff-name')?.value) || '',
-            username: (document.getElementById('staff-username')?.value) || '',
-            email: (document.getElementById('staff-email')?.value) || '',
-            password: (document.getElementById('staff-password')?.value) || ''
+            name: (document.getElementById('staff-name') ? .value) || '',
+            username: (document.getElementById('staff-username') ? .value) || '',
+            email: (document.getElementById('staff-email') ? .value) || '',
+            password: (document.getElementById('staff-password') ? .value) || ''
         };
         if (!payload.name || !payload.username || !payload.email || !payload.password) {
             this.showError('Please fill in all fields');
