@@ -498,7 +498,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 						<!-- Language selector (globe icon only) placed to the right of Download -->
 
 						<?php
-						// Simple profile picture logic
+						// Always process profile picture fresh for each page load
 						$pfpSrc = 'images/logo.png'; // Default fallback
 						
 						if (isset($username) && isset($conn) && $conn && !empty($username)) {
@@ -511,17 +511,23 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 									$pp = $row['profile_picture'];
 									
 									if (strpos($pp, 'data:image') === 0) {
+										// Data URI format (already complete)
 										$pfpSrc = $pp;
 									} elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
+										// Raw Base64 format from Java app - convert to data URI
 										$pfpSrc = 'data:image/png;base64,' . $pp;
 									} elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
+										// File upload format
 										$path = 'uploads/profile_pictures/' . $pp;
 										if (file_exists(__DIR__ . '/../' . $path)) {
 											$pfpSrc = $path;
 										}
+									} else {
+										// Any other format - try to display as image
+										$pfpSrc = $pp;
 									}
 								} else {
-									// Use user initial
+									// No profile picture - use user initial
 									$pfpSrc = 'data:image/svg+xml;base64,' . base64_encode('
 										<svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
 											<circle cx="19" cy="19" r="19" fill="#00c2ce"/>
@@ -553,12 +559,14 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 									</div>
 								<?php else: ?>
 									<!-- All other profile pictures (data URI, Base64, uploaded files, default logo) -->
-									<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
+									<img src="<?php echo htmlspecialchars($pfpSrc); ?>?v=<?php echo time(); ?>&t=<?php echo uniqid(); ?>"
 										 alt="Profile - <?php echo htmlspecialchars($username); ?>"
 										 style="width: 100%;
 												height: 100%;
 												object-fit: cover;
-												display: block;" />
+												display: block;" 
+										 onload="console.log('Profile loaded:', this.src);"
+										 onerror="console.log('Profile failed:', this.src);" />
 								<?php endif; ?>
 							</button>
 							<ul class="profile-dropdown" id="profileDropdown"
