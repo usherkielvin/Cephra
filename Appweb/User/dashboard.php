@@ -2030,7 +2030,7 @@ if ($conn) {
 							Earn points on every charge and unlock exclusive benefits,
 							discounts, and premium features as you charge more.
 						</p>
-						<a href="#" onclick="showGreenPointsPopup(); return false;" class="feature-link">View Rewards →</a>
+						<a href="rewards.php" class="feature-link">View Rewards →</a>
 					</div>
 
 					<!-- Wallet Feature -->

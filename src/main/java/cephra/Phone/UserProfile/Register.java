@@ -62,11 +62,19 @@ public class Register extends javax.swing.JPanel {
                 boolean hasDigit = password.chars().anyMatch(Character::isDigit);
                 boolean validLength = password.length() >= 8 && password.length() <= 25;
 
-                // Update JLabel colors based on validation
-                upper.setForeground(hasUpper ? Color.GREEN : Color.RED);
-                lower.setForeground(hasLower ? Color.GREEN : Color.RED);
-                number.setForeground(hasDigit ? Color.GREEN : Color.RED);
-                characters.setForeground(validLength ? Color.GREEN : Color.RED);
+                // Update JLabel colors based on validation (with null checks)
+                if (upper != null) {
+                    upper.setForeground(hasUpper ? Color.GREEN : Color.RED);
+                }
+                if (lower != null) {
+                    lower.setForeground(hasLower ? Color.GREEN : Color.RED);
+                }
+                if (number != null) {
+                    number.setForeground(hasDigit ? Color.GREEN : Color.RED);
+                }
+                if (characters != null) {
+                    characters.setForeground(validLength ? Color.GREEN : Color.RED);
+                }
             }
         });
     }
@@ -221,6 +229,26 @@ public class Register extends javax.swing.JPanel {
         });
         add(lname);
         lname.setBounds(200, 282, 120, 32);
+
+        upper = new javax.swing.JLabel();
+        upper.setText("At least one uppercase letter");
+        add(upper);
+        upper.setBounds(100, 550, 200, 16);
+
+        lower = new javax.swing.JLabel();
+        lower.setText("At least one lowercase letter");
+        add(lower);
+        lower.setBounds(100, 560, 200, 16);
+
+        number = new javax.swing.JLabel();
+        number.setText("At least one number");
+        add(number);
+        number.setBounds(100, 570, 200, 16);
+
+        characters = new javax.swing.JLabel();
+        characters.setText("Minimum 8 characters");
+        add(characters);
+        characters.setBounds(100, 580, 150, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Register1.png"))); // NOI18N
         add(jLabel1);
@@ -409,28 +437,25 @@ public class Register extends javax.swing.JPanel {
     String emailText = email.getText().trim();
     String passwordText = new String(pass.getPassword()).trim();
 
-    if (nameText.isEmpty() || lastNameText.isEmpty() || usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", JOptionPane.WARNING_MESSAGE);
-        
-        // Focus on the first empty field
-        if (nameText.isEmpty()) {
-            fname.requestFocusInWindow();
-        } else if (lastNameText.isEmpty()) {
-            lname.requestFocusInWindow();
-        } else if (usernameText.isEmpty()) {
-            UsernamePhone.requestFocusInWindow();
-        } else if (emailText.isEmpty()) {
-            email.requestFocusInWindow();
-        } else if (passwordText.isEmpty()) {
-            pass.requestFocusInWindow();
-        }
+    // Check each field individually and show one popup at a time
+    
+    // Check first name
+    if (nameText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter your first name.", "First Name Required", JOptionPane.WARNING_MESSAGE);
+        fname.requestFocusInWindow();
         return;
     }
-
-    // Name validation
+    
     if (nameText.length() < 2) {
         JOptionPane.showMessageDialog(this, "First name must be at least 2 characters long.", "Invalid First Name", JOptionPane.WARNING_MESSAGE);
         fname.requestFocusInWindow();
+        return;
+    }
+    
+    // Check last name
+    if (lastNameText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter your last name.", "Last Name Required", JOptionPane.WARNING_MESSAGE);
+        lname.requestFocusInWindow();
         return;
     }
     
@@ -440,7 +465,13 @@ public class Register extends javax.swing.JPanel {
         return;
     }
 
-    // Username format validation
+    // Check username
+    if (usernameText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter a username.", "Username Required", JOptionPane.WARNING_MESSAGE);
+        UsernamePhone.requestFocusInWindow();
+        return;
+    }
+    
     if (usernameText.length() < 3) {
         JOptionPane.showMessageDialog(this, "Username must be at least 3 characters long.", "Invalid Username", JOptionPane.WARNING_MESSAGE);
         UsernamePhone.requestFocusInWindow();
@@ -453,28 +484,63 @@ public class Register extends javax.swing.JPanel {
         return;
     }
 
-    // Basic email format check
+    // Check email
+    if (emailText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter your email address.", "Email Required", JOptionPane.WARNING_MESSAGE);
+        email.requestFocusInWindow();
+        return;
+    }
+    
     if (!emailText.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
         JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Email", JOptionPane.WARNING_MESSAGE);
         email.requestFocusInWindow();
         return;
     }
 
-    // Check if terms and conditions are agreed to
-    if (!termscondition.isSelected()) {
-        JOptionPane.showMessageDialog(this, "Please agree to the Terms and Conditions before registering!", "Terms and Conditions Required", JOptionPane.WARNING_MESSAGE);
+    // Check password
+    if (passwordText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter a password.", "Password Required", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    // Password validation - check each requirement individually
+    if (passwordText.length() < 8) {
+        JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long.", "Password Too Short", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    if (passwordText.length() > 25) {
+        JOptionPane.showMessageDialog(this, "Password must be no more than 25 characters long.", "Password Too Long", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    boolean hasUpper = passwordText.chars().anyMatch(Character::isUpperCase);
+    if (!hasUpper) {
+        JOptionPane.showMessageDialog(this, "Password must contain at least one uppercase letter.", "Password Missing Uppercase", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    boolean hasLower = passwordText.chars().anyMatch(Character::isLowerCase);
+    if (!hasLower) {
+        JOptionPane.showMessageDialog(this, "Password must contain at least one lowercase letter.", "Password Missing Lowercase", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    boolean hasDigit = passwordText.chars().anyMatch(Character::isDigit);
+    if (!hasDigit) {
+        JOptionPane.showMessageDialog(this, "Password must contain at least one number.", "Password Missing Number", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
         return;
     }
 
-    // Password validation
-    boolean hasUpper = passwordText.chars().anyMatch(Character::isUpperCase);
-    boolean hasLower = passwordText.chars().anyMatch(Character::isLowerCase);
-    boolean hasDigit = passwordText.chars().anyMatch(Character::isDigit);
-    boolean validLength = passwordText.length() >= 8 && passwordText.length() <= 25;
-
-    if (!hasUpper || !hasLower || !hasDigit || !validLength) {
-        JOptionPane.showMessageDialog(this, "Password must contain at least one uppercase letter, one lowercase letter, one number, and be between 8 and 25 characters long.", "Invalid Password", JOptionPane.WARNING_MESSAGE);
-        pass.requestFocusInWindow();
+    // Check terms and conditions
+    if (!termscondition.isSelected()) {
+        JOptionPane.showMessageDialog(this, "Please agree to the Terms and Conditions before registering!", "Terms and Conditions Required", JOptionPane.WARNING_MESSAGE);
         return;
     }
 
