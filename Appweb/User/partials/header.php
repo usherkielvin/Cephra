@@ -559,7 +559,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 									</div>
 								<?php else: ?>
 									<!-- All other profile pictures (data URI, Base64, uploaded files, default logo) -->
-									<img src="<?php echo htmlspecialchars($pfpSrc); ?>?v=<?php echo time(); ?>&t=<?php echo uniqid(); ?>"
+									<img src="<?php echo htmlspecialchars($pfpSrc); ?>?v=<?php echo time(); ?>&t=<?php echo uniqid(); ?>&r=<?php echo rand(1000,9999); ?>"
 										 alt="Profile - <?php echo htmlspecialchars($username); ?>"
 										 style="width: 100%;
 												height: 100%;
@@ -581,7 +581,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 									   list-style: none;
 									   padding: 0;
 									   margin: 0;
-									   z-index: 1001;
+									   z-index: 10001;
 									   display: none;">
 								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05); padding: 8px 16px; background: #f8f9fa; font-weight: bold; color: #333;">
 									<?php echo htmlspecialchars($username); ?>
@@ -664,6 +664,34 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
             <script>
+                // Force refresh profile picture when switching tabs
+                function forceRefreshProfilePicture() {
+                    const profileImg = document.querySelector('#profileBtn img');
+                    if (profileImg) {
+                        // Get the base source without cache parameters
+                        let baseSrc = profileImg.src.split('?')[0];
+                        
+                        // Add fresh cache-busting parameters
+                        const newSrc = baseSrc + '?v=' + Date.now() + '&t=' + Math.random() + '&r=' + Math.floor(Math.random() * 10000);
+                        
+                        // Force reload the image
+                        profileImg.src = newSrc;
+                        console.log('Profile picture force refreshed:', newSrc);
+                    }
+                }
+                
+                // Refresh on tab switch
+                document.addEventListener('visibilitychange', function() {
+                    if (!document.hidden) {
+                        setTimeout(forceRefreshProfilePicture, 50);
+                    }
+                });
+                
+                // Refresh on window focus
+                window.addEventListener('focus', function() {
+                    setTimeout(forceRefreshProfilePicture, 50);
+                });
+                
                 // Profile dropdown functionality
                 (function() {
                     const profileBtn = document.getElementById('profileBtn');
