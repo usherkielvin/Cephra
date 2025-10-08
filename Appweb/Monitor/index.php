@@ -1248,15 +1248,15 @@ try {
             // ticket added
             if(!oldTicket && newTicket){
               const plate = nb.plate ? ` plate ${nb.plate}` : '';
-              TTS.enqueue(`Bay ${nb.bay} is now occupied by ticket ${newTicket}${plate}`);
+              TTS.enqueue(` ${nb.bay} is now occupied by ticket ${newTicket}${plate}`);
             }
             // ticket removed
             else if(oldTicket && !newTicket){
-              TTS.enqueue(`Bay ${nb.bay} is now available`);
+              TTS.enqueue(` ${nb.bay} is now available`);
             }
             // status changed (maintenance, occupied, available, etc.)
             else if(oldStatus !== newStatus){
-              TTS.enqueue(`Bay ${nb.bay} status changed to ${nb.status}`);
+              TTS.enqueue(` ${nb.bay} status changed to ${nb.status}`);
             }
           });
         }catch(e){console.warn('announceDiff failed',e)}
