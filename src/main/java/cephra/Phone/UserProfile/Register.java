@@ -27,57 +27,8 @@ public class Register extends javax.swing.JPanel {
             }
         });
 
-        // Setup password validation
-        setupPasswordValidation(); // Add this line
     }
 
-    private void setupPasswordValidation() {
-        // Set document filter to limit password to 25 characters
-        ((javax.swing.text.AbstractDocument) pass.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
-            @Override
-            public void insertString(javax.swing.text.DocumentFilter.FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
-                if ((fb.getDocument().getLength() + string.length()) <= 25) {
-                    super.insertString(fb, offset, string, attr);
-                } else {
-                    JOptionPane.showMessageDialog(pass, "Password is limited to 25 characters.", "Character Limit Exceeded", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-
-            @Override
-            public void replace(javax.swing.text.DocumentFilter.FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs) throws javax.swing.text.BadLocationException {
-                if ((fb.getDocument().getLength() - length + text.length()) <= 25) {
-                    super.replace(fb, offset, length, text, attrs);
-                } else {
-                    JOptionPane.showMessageDialog(pass, "Password is limited to 25 characters.", "Character Limit Exceeded", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        });
-
-        pass.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String password = new String(pass.getPassword());
-                boolean hasUpper = password.chars().anyMatch(Character::isUpperCase);
-                boolean hasLower = password.chars().anyMatch(Character::isLowerCase);
-                boolean hasDigit = password.chars().anyMatch(Character::isDigit);
-                boolean validLength = password.length() >= 8 && password.length() <= 25;
-
-                // Update JLabel colors based on validation (with null checks)
-                if (upper != null) {
-                    upper.setForeground(hasUpper ? Color.GREEN : Color.RED);
-                }
-                if (lower != null) {
-                    lower.setForeground(hasLower ? Color.GREEN : Color.RED);
-                }
-                if (number != null) {
-                    number.setForeground(hasDigit ? Color.GREEN : Color.RED);
-                }
-                if (characters != null) {
-                    characters.setForeground(validLength ? Color.GREEN : Color.RED);
-                }
-            }
-        });
-    }
 
     private void makeDraggable() {
         final Point[] dragPoint = {null};
@@ -230,25 +181,6 @@ public class Register extends javax.swing.JPanel {
         add(lname);
         lname.setBounds(200, 282, 120, 32);
 
-        upper = new javax.swing.JLabel();
-        upper.setText("At least one uppercase letter");
-        add(upper);
-        upper.setBounds(100, 550, 200, 16);
-
-        lower = new javax.swing.JLabel();
-        lower.setText("At least one lowercase letter");
-        add(lower);
-        lower.setBounds(100, 560, 200, 16);
-
-        number = new javax.swing.JLabel();
-        number.setText("At least one number");
-        add(number);
-        number.setBounds(100, 570, 200, 16);
-
-        characters = new javax.swing.JLabel();
-        characters.setText("Minimum 8 characters");
-        add(characters);
-        characters.setBounds(100, 580, 150, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Register1.png"))); // NOI18N
         add(jLabel1);
@@ -738,17 +670,13 @@ public class Register extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
     private javax.swing.JTextField UsernamePhone;
-    private javax.swing.JLabel characters;
     private javax.swing.JTextField email;
     private javax.swing.JTextField fname;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField lname;
     private javax.swing.JButton loginbutton;
-    private javax.swing.JLabel lower;
-    private javax.swing.JLabel number;
     private javax.swing.JPasswordField pass;
     private javax.swing.JButton register;
     private javax.swing.JCheckBox termscondition;
-    private javax.swing.JLabel upper;
     // End of variables declaration//GEN-END:variables
 }
