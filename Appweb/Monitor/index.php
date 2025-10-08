@@ -225,8 +225,8 @@ try {
     .ctrl .control-body .toggle-switch,
     .toggle-switch{
       width:46px;
-      height:26px;
-      border-radius:999px;
+      height:15px;
+      border-radius:px;
       background:var(--surface);
       border:1px solid var(--panel-border);
       position:relative;
@@ -237,7 +237,7 @@ try {
       box-shadow: 0 6px 14px rgba(2,6,23,0.04);
       padding:3px;
       touch-action:manipulation;
-      min-height:44px;
+      min-height:28px;
       min-width:44px;
     }
     .toggle-switch .knob{
