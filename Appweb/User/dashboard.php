@@ -29,13 +29,43 @@ function calculateChargingAmount($serviceType) {
 
 if ($conn) {
     $username = $_SESSION['username'];
-    $stmt = $conn->prepare("SELECT firstname, car_index, plate_number FROM users WHERE username = :username");
+    $stmt = $conn->prepare("SELECT firstname, car_index, plate_number, profile_picture FROM users WHERE username = :username");
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
+$user_profile_picture = $user ? $user['profile_picture'] : null;
+
+// Process profile picture for dashboard
+$dashboard_pfp_src = 'images/logo.png'; // Default fallback
+if ($user_profile_picture) {
+    if (strpos($user_profile_picture, 'data:image') === 0) {
+        // Data URI format (already complete)
+        $dashboard_pfp_src = $user_profile_picture;
+    } elseif (strpos($user_profile_picture, 'iVBORw0KGgo') === 0) {
+        // Raw Base64 format - convert to data URI
+        $dashboard_pfp_src = 'data:image/png;base64,' . $user_profile_picture;
+    } elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $user_profile_picture)) {
+        // File upload format
+        $path = 'uploads/profile_pictures/' . $user_profile_picture;
+        if (file_exists($path)) {
+            $dashboard_pfp_src = $path;
+        }
+    } else {
+        // Any other format - try to display as image
+        $dashboard_pfp_src = $user_profile_picture;
+    }
+} else {
+    // No profile picture - use user initial
+    $dashboard_pfp_src = 'data:image/svg+xml;base64,' . base64_encode('
+        <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="19" cy="19" r="19" fill="#00c2ce"/>
+            <text x="19" y="25" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">' . strtoupper(substr($username, 0, 1)) . '</text>
+        </svg>
+    ');
+}
 
 $stmt_charging = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
 $stmt_charging->bindParam(':username', $username);

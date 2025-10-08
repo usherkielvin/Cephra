@@ -498,59 +498,30 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 						<!-- Language selector (globe icon only) placed to the right of Download -->
 
 						<?php
-						// Compute avatar source
-						$pfpSrc = 'images/logo.png';
+						// Simple profile picture logic
+						$pfpSrc = 'images/logo.png'; // Default fallback
 						
-						// Debug: Check if username is set
-						if (empty($username)) {
-							error_log("Header: Username is empty in session");
-						}
-						
-						// Debug: Log what we're doing
-						error_log("Header: Processing profile picture for user: " . ($username ?? 'null'));
-						
-						if ($conn && !empty($username)) {
+						if (isset($username) && isset($conn) && $conn && !empty($username)) {
 							try {
-								$stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
-								$stmt2->bindParam(':u', $username);
-								$stmt2->execute();
-								$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+								$stmt = $conn->prepare("SELECT profile_picture FROM users WHERE username = ? LIMIT 1");
+								$stmt->execute([$username]);
+								$row = $stmt->fetch(PDO::FETCH_ASSOC);
 								
-								if ($row2 && !empty($row2['profile_picture'])) {
-									$pp = $row2['profile_picture'];
-									error_log("Header: Found profile picture, type: " . substr($pp, 0, 50) . "...");
+								if ($row && !empty($row['profile_picture'])) {
+									$pp = $row['profile_picture'];
 									
 									if (strpos($pp, 'data:image') === 0) {
-										// Data URI format (already complete) - show regardless of size
 										$pfpSrc = $pp;
-										error_log("Header: Using data URI format");
 									} elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
-										// Raw Base64 format - convert to data URI and show regardless of size
 										$pfpSrc = 'data:image/png;base64,' . $pp;
-										error_log("Header: Using Base64 format, length: " . strlen($pp));
 									} elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
-										// File upload format - show regardless of filename length
 										$path = 'uploads/profile_pictures/' . $pp;
 										if (file_exists(__DIR__ . '/../' . $path)) {
 											$pfpSrc = $path;
-											error_log("Header: Using uploaded file: " . $path);
-										} else {
-											error_log("Header: Uploaded file not found: " . $path . ", using initial");
-											$pfpSrc = 'data:image/svg+xml;base64,' . base64_encode('
-												<svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
-													<circle cx="19" cy="19" r="19" fill="#00c2ce"/>
-													<text x="19" y="25" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">' . strtoupper(substr($username, 0, 1)) . '</text>
-												</svg>
-											');
 										}
-									} else {
-										// Any other format - try to display as image
-										$pfpSrc = $pp;
-										error_log("Header: Using unknown format as-is: " . substr($pp, 0, 50));
 									}
 								} else {
-									// If no profile picture found, use a default avatar with user's initial
-									error_log("Header: No profile picture found, using initial");
+									// Use user initial
 									$pfpSrc = 'data:image/svg+xml;base64,' . base64_encode('
 										<svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
 											<circle cx="19" cy="19" r="19" fill="#00c2ce"/>
@@ -559,11 +530,8 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 									');
 								}
 							} catch (Exception $e) { 
-								error_log("Header: Error fetching profile picture: " . $e->getMessage());
+								// Silent fail - use default
 							}
-						} else {
-							// If no connection or username, use default logo
-							error_log("Header: No database connection or username for profile picture");
 						}
 						?>
 						<div class="profile-container" style="position: relative;">
