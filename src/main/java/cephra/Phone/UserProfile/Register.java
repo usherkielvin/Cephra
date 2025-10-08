@@ -112,10 +112,6 @@ public class Register extends javax.swing.JPanel {
         loginbutton = new javax.swing.JButton();
         UsernamePhone = new javax.swing.JTextField();
         lname = new javax.swing.JTextField();
-        upper = new javax.swing.JLabel();
-        lower = new javax.swing.JLabel();
-        number = new javax.swing.JLabel();
-        characters = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(370, 750));
@@ -225,22 +221,6 @@ public class Register extends javax.swing.JPanel {
         });
         add(lname);
         lname.setBounds(200, 282, 120, 32);
-
-        upper.setText("At least one uppercase letter");
-        add(upper);
-        upper.setBounds(100, 550, 200, 16);
-
-        lower.setText("At least one lowercase letter");
-        add(lower);
-        lower.setBounds(100, 560, 200, 16);
-
-        number.setText("At least one number");
-        add(number);
-        number.setBounds(100, 570, 200, 16);
-
-        characters.setText("Minimum 8 characters");
-        add(characters);
-        characters.setBounds(100, 580, 150, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Register1.png"))); // NOI18N
         add(jLabel1);
@@ -659,17 +639,13 @@ public class Register extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
     private javax.swing.JTextField UsernamePhone;
-    private javax.swing.JLabel characters;
     private javax.swing.JTextField email;
     private javax.swing.JTextField fname;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField lname;
     private javax.swing.JButton loginbutton;
-    private javax.swing.JLabel lower;
-    private javax.swing.JLabel number;
     private javax.swing.JPasswordField pass;
     private javax.swing.JButton register;
     private javax.swing.JCheckBox termscondition;
-    private javax.swing.JLabel upper;
     // End of variables declaration//GEN-END:variables
 }

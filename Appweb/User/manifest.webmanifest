@@ -2,21 +2,24 @@
     "name": "Cephra EV Charging Platform",
     "short_name": "Cephra",
     "description": "Your ultimate electric vehicle charging platform",
-    "start_url": "dashboard.php",
+    "start_url": "./dashboard.php",
+    "scope": "./",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#00c2ce",
     "orientation": "portrait-primary",
     "icons": [
         {
-            "src": "images/logo.png",
+            "src": "./images/logo.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
-            "src": "images/logo.png",
+            "src": "./images/logo.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }
