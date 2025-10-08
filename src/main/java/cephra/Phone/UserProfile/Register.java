@@ -427,6 +427,32 @@ public class Register extends javax.swing.JPanel {
         return;
     }
 
+    // Name validation
+    if (nameText.length() < 2) {
+        JOptionPane.showMessageDialog(this, "First name must be at least 2 characters long.", "Invalid First Name", JOptionPane.WARNING_MESSAGE);
+        fname.requestFocusInWindow();
+        return;
+    }
+    
+    if (lastNameText.length() < 2) {
+        JOptionPane.showMessageDialog(this, "Last name must be at least 2 characters long.", "Invalid Last Name", JOptionPane.WARNING_MESSAGE);
+        lname.requestFocusInWindow();
+        return;
+    }
+
+    // Username format validation
+    if (usernameText.length() < 3) {
+        JOptionPane.showMessageDialog(this, "Username must be at least 3 characters long.", "Invalid Username", JOptionPane.WARNING_MESSAGE);
+        UsernamePhone.requestFocusInWindow();
+        return;
+    }
+    
+    if (!usernameText.matches("^[a-zA-Z0-9_]+$")) {
+        JOptionPane.showMessageDialog(this, "Username can only contain letters, numbers, and underscores.", "Invalid Username", JOptionPane.WARNING_MESSAGE);
+        UsernamePhone.requestFocusInWindow();
+        return;
+    }
+
     // Basic email format check
     if (!emailText.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
         JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Email", JOptionPane.WARNING_MESSAGE);
@@ -453,25 +479,32 @@ public class Register extends javax.swing.JPanel {
     }
 
     // Call the database method to add the new user
-    if (cephra.Database.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
-        // Registration successful
-        JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+    try {
+        if (cephra.Database.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
+            // Registration successful
+            JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
-        // Navigate to User_Login after OK is clicked
-        SwingUtilities.invokeLater(() -> {
-            Window[] windows = Window.getWindows();
-            for (Window window : windows) {
-                if (window instanceof cephra.Frame.Phone) {
-                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
-                    break;
+            // Navigate to User_Login after OK is clicked
+            SwingUtilities.invokeLater(() -> {
+                Window[] windows = Window.getWindows();
+                for (Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
+                        break;
+                    }
                 }
-            }
-        });
-    } else {
-        // Username or email already exists
-        JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", JOptionPane.WARNING_MESSAGE);
-        fname.requestFocusInWindow();
+            });
+        } else {
+            // Username or email already exists
+            JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", JOptionPane.WARNING_MESSAGE);
+            fname.requestFocusInWindow();
+        }
+    } catch (Exception e) {
+        // Handle any unexpected database errors
+        JOptionPane.showMessageDialog(this, "Registration failed due to a system error. Please try again.", "System Error", JOptionPane.ERROR_MESSAGE);
+        System.err.println("Registration error: " + e.getMessage());
+        e.printStackTrace();
     }
 }//GEN-LAST:event_registerActionPerformed
 
@@ -639,13 +672,17 @@ public class Register extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
     private javax.swing.JTextField UsernamePhone;
+    private javax.swing.JLabel characters;
     private javax.swing.JTextField email;
     private javax.swing.JTextField fname;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField lname;
     private javax.swing.JButton loginbutton;
+    private javax.swing.JLabel lower;
+    private javax.swing.JLabel number;
     private javax.swing.JPasswordField pass;
     private javax.swing.JButton register;
     private javax.swing.JCheckBox termscondition;
+    private javax.swing.JLabel upper;
     // End of variables declaration//GEN-END:variables
 }
