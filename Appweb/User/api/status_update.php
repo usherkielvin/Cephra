@@ -109,7 +109,7 @@ if ($action === 'test_status') {
     // Test endpoint to check current status for debugging
     $test_username = $_POST['username'] ?? $username;
     
-    $stmt_queue = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_queue = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
     $stmt_queue->bindParam(':username', $test_username);
     $stmt_queue->execute();
     $queue_ticket = $stmt_queue->fetch(PDO::FETCH_ASSOC);
@@ -132,7 +132,7 @@ if ($action === 'test_status') {
 
 if ($action === 'get_status') {
     // Fetch latest charging status from both queue_tickets and active_tickets
-    $stmt_queue = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_queue = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
     $stmt_queue->bindParam(':username', $username);
     $stmt_queue->execute();
     $queue_ticket = $stmt_queue->fetch(PDO::FETCH_ASSOC);
@@ -241,11 +241,11 @@ if ($action === 'get_status') {
             $button_href = '../Monitor/index.php';
             error_log("Status updated to charging (from queue_tickets) for $username: $status_text");
         } elseif ($queue_status === 'pending') {
-            $background_class = 'queue-pending-bg';
-            $status_text = 'Queue Pending';
-            $button_text = 'Check Monitor';
-            $button_href = '../Monitor/index.php';
-            error_log("Status updated to queue pending for $username: $status_text");
+            $background_class = 'connected-bg';
+            $status_text = 'Connected';
+            $button_text = 'Charge Now';
+            $button_href = 'ChargingPage.php';
+            error_log("Status updated to connected (pending ticket ready) for $username: $status_text");
         } elseif ($queue_status === 'waiting') {
             $background_class = 'waiting-bg';
             $status_text = 'Waiting';

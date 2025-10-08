@@ -80,7 +80,7 @@ try {
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>Cephra — Queue Monitor (Preview)</title>
   <link rel="icon" href="../Admin/images/MONU.png">
   <style>
@@ -120,10 +120,28 @@ try {
       --text: #e6f6ff;
     }
 
-  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
   /* make sizing predictable */
   *, *::before, *::after { box-sizing: border-box; }
-    body{padding:20px;box-sizing:border-box;transition:background .25s,color .25s}
+    body{padding:20px;box-sizing:border-box;transition:background .25s,color .25s;overflow-x:hidden}
+    
+    /* Improve scrolling on mobile */
+    *{-webkit-overflow-scrolling:touch}
+    
+    /* Better touch targets for mobile */
+    input, select, button, .toggle-switch{min-height:44px;touch-action:manipulation}
+    
+    /* Force responsive behavior */
+    *{max-width:100%;box-sizing:border-box}
+    html{overflow-x:hidden}
+    body{width:100%;max-width:100vw;overflow-x:hidden}
+    main{width:100%;max-width:100%}
+    .panel{width:100%;max-width:100%}
+    
+    /* Ensure no horizontal overflow */
+    #controls{max-width:100%;overflow-x:auto}
+    #queueGrid{max-width:100%}
+    .table-wrap{max-width:100%;overflow-x:auto}
     header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
     .brand{display:flex;flex-direction:column}
     h1{font-size:20px;margin:0}
@@ -218,6 +236,9 @@ try {
       transition:all .18s ease;
       box-shadow: 0 6px 14px rgba(2,6,23,0.04);
       padding:3px;
+      touch-action:manipulation;
+      min-height:44px;
+      min-width:44px;
     }
     .toggle-switch .knob{
       position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 6px 16px rgba(2,6,23,0.08);transition:all .18s ease}
@@ -241,13 +262,19 @@ try {
     input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 4px 10px rgba(14,165,255,0.25);border:2px solid white}
 
     /* Buttons */
-  button.action{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:white;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:600;box-shadow:0 10px 22px rgba(2,6,23,0.08);display:inline-flex;align-items:center;gap:8px}
-  button.ghost{background:transparent;border:1px solid var(--panel-border);padding:9px 12px;border-radius:12px;cursor:pointer;color:var(--text);display:inline-flex;align-items:center;gap:8px}
+  button.action{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:white;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:600;box-shadow:0 10px 22px rgba(2,6,23,0.08);display:inline-flex;align-items:center;gap:8px;transition:all 0.2s ease;min-height:44px;touch-action:manipulation}
+  button.ghost{background:transparent;border:1px solid var(--panel-border);padding:9px 12px;border-radius:12px;cursor:pointer;color:var(--text);display:inline-flex;align-items:center;gap:8px;transition:all 0.2s ease;min-height:44px;touch-action:manipulation}
+  
+  /* Button hover and active states for better mobile interaction */
+  button.action:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(2,6,23,0.12)}
+  button.action:active{transform:translateY(0);box-shadow:0 6px 16px rgba(2,6,23,0.08)}
+  button.ghost:hover{background:var(--accent-3);border-color:var(--accent)}
+  button.ghost:active{background:var(--accent-3);transform:scale(0.98)}
 
     select{background:var(--surface);border:1px solid rgba(2,6,23,0.06);padding:8px 10px;border-radius:8px;color:var(--text)}
 
     /* Queue grid - bigger, more prominent */
-  #queueGrid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,240px);gap:18px;padding:12px;border-radius:12px;background:var(--grid-bg);border:1px solid var(--panel-border)}
+  #queueGrid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,240px);gap:18px;padding:12px;border-radius:12px;background:var(--grid-bg);border:1px solid var(--panel-border);overflow:hidden;box-sizing:border-box}
   .card{border-radius:14px;padding:16px;background:linear-gradient(180deg,var(--surface),rgba(255,255,255,0.02));display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--card-border);box-shadow:0 8px 22px rgba(2,6,23,0.05);transition:transform .18s ease,box-shadow .18s ease}
   .card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 18px 40px rgba(2,6,23,0.09)}
     .card h3{margin:0;font-size:18px;color:var(--accent-2)}
@@ -263,13 +290,24 @@ try {
   body.tv .card .meta strong{font-size:26px}
   body.tv .card .meta .plate{font-size:22px}
 
-    /* Status badges */
-  .badge{display:inline-block;padding:8px 12px;border-radius:999px;color:white;font-weight:700;font-size:13px;transition:all .18s ease;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+    /* Status badges - Consistent sizing */
+  .badge{
+    display:inline-block;
+    padding:8px 12px;
+    border-radius:999px;
+    color:white;
+    font-weight:700;
+    font-size:13px;
+    transition:all .18s ease;
+    box-shadow:0 6px 18px rgba(2,6,23,0.06);
+    min-width:100px;
+    text-align:center;
+    white-space:nowrap;
+    box-sizing:border-box;
+  }
   .badge.occupied{background:linear-gradient(90deg,#ff8a65,#ff5252);box-shadow:0 8px 24px rgba(255,82,82,0.12)}
   .badge.available{background:linear-gradient(90deg,#34d399,#10b981);box-shadow:0 8px 24px rgba(16,185,129,0.12)}
-  /* smaller maintenance badge to avoid header wrapping */
-  .badge.maintenance{background:linear-gradient(90deg,#f59e0b,#f97316);box-shadow:0 8px 24px rgba(249,115,22,0.10);padding:6px 10px;font-size:12px}
-  /* neutral state */
+  .badge.maintenance{background:linear-gradient(90deg,#f59e0b,#f97316);box-shadow:0 8px 24px rgba(249,115,22,0.10)}
   .badge.unknown{background:linear-gradient(90deg,#94a3b8,#64748b);box-shadow:0 8px 24px rgba(100,116,139,0.06)}
 
     /* Waitings table */
@@ -278,8 +316,11 @@ try {
     th{background:transparent;color:var(--muted);font-weight:700}
   tbody tr:nth-child(even){background:var(--table-row)}
 
-    /* Responsive behaviour */
-    @media (max-width:1000px){#queueGrid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,220px)}}
+    /* Responsive behaviour - More aggressive mobile fixes */
+    @media (max-width:1000px){
+      #queueGrid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,220px)}
+    }
+    
     @media (max-width:820px){
       /* Keep single-row behavior but make controls more compact on narrower screens */
       #controls{gap:6px;padding:4px 6px;}
@@ -289,13 +330,105 @@ try {
       .control-body input[type="range"]{min-width:28px;max-width:120px}
     }
 
-    @media (max-width:420px){
-      /* tiny screens: slightly reduce font-sizes and icon gaps */
-      .ctrl > label{font-size:12px}
-      button.action, button.ghost{font-size:12px;padding:6px 8px}
-      .label-icon svg{display:none}
+    @media (max-width:768px){
+      /* Mobile landscape and smaller tablets */
+      body{padding:8px !important;margin:0 !important;}
+      .panel{padding:8px !important;margin:0 0 12px 0 !important;}
+      #queueGrid{grid-template-columns:repeat(2,1fr) !important;grid-template-rows:repeat(4,160px) !important;gap:8px !important;padding:8px !important;}
+      .card{padding:8px !important;}
+      .card h3{font-size:14px !important;margin:0 0 4px 0 !important;}
+      .status{font-size:16px !important;}
+      .badge{padding:4px 8px !important;font-size:11px !important;min-width:80px !important;}
+      
+      /* Make controls more mobile-friendly */
+      #controls{flex-wrap:wrap !important;gap:6px !important;padding:6px !important;}
+      .ctrl{min-width:100px !important;flex:1 1 calc(50% - 3px) !important;padding:4px 6px !important;}
+      .ctrl-announcer{flex:1 1 100% !important;}
+      .ctrl-announcer > label{min-width:auto !important;max-width:none !important;}
+      
+      /* Header adjustments */
+      header{margin-bottom:12px !important;padding:0 !important;}
+      h1{font-size:18px !important;}
+      
+      /* Table adjustments */
+      .table-wrap{max-height:200px !important;}
+      .waitings-table{font-size:11px !important;}
+      .waitings-table th, .waitings-table td{padding:6px 3px !important;}
     }
-    @media (max-width:600px){#queueGrid{grid-template-columns:1fr;grid-template-rows:repeat(8,160px)} .panel{padding:12px}}
+
+    @media (max-width:600px){
+      /* Mobile portrait - More aggressive fixes */
+      body{padding:4px !important;margin:0 !important;overflow-x:hidden !important;}
+      .panel{padding:6px !important;margin:0 0 8px 0 !important;}
+      #queueGrid{grid-template-columns:1fr !important;grid-template-rows:repeat(8,120px) !important;gap:6px !important;padding:6px !important;}
+      .card{padding:6px !important;}
+      .card h3{font-size:12px !important;margin:0 0 2px 0 !important;}
+      .status{font-size:14px !important;}
+      .badge{padding:3px 6px !important;font-size:10px !important;min-width:70px !important;}
+      
+      /* Stack controls vertically on very small screens */
+      #controls{flex-direction:column !important;gap:6px !important;padding:4px !important;}
+      .ctrl{flex:1 1 auto !important;min-width:auto !important;width:100% !important;padding:4px 6px !important;}
+      .ctrl > label{min-width:auto !important;max-width:none !important;flex:0 0 auto !important;font-size:11px !important;}
+      .ctrl .control-body{justify-content:flex-start !important;}
+      
+      /* Header adjustments */
+      header{margin-bottom:8px !important;flex-direction:column !important;align-items:flex-start !important;gap:4px !important;}
+      h1{font-size:16px !important;}
+      
+      /* Make table more mobile-friendly */
+      .table-wrap{max-height:150px !important;overflow-x:auto !important;}
+      .waitings-table{font-size:10px !important;min-width:100% !important;}
+      .waitings-table th, .waitings-table td{padding:4px 2px !important;white-space:nowrap !important;}
+      .waitings-ticket{font-size:11px !important;min-width:60px !important;}
+      .waitings-plate{font-size:10px !important;}
+      .waitings-user{min-width:80px !important;font-size:10px !important;}
+      .service-badge{padding:2px 4px !important;font-size:9px !important;}
+      
+      /* Adjust card content for mobile */
+      .card .meta{font-size:10px !important;}
+      .card .meta strong{font-size:11px !important;}
+      .card .meta .plate{font-size:10px !important;}
+      .card .muted{font-size:9px !important;}
+      
+      /* Button adjustments */
+      button.action, button.ghost{font-size:10px !important;padding:4px 6px !important;min-height:36px !important;}
+    }
+
+    @media (max-width:420px){
+      /* Very small screens - Maximum compression */
+      body{padding:2px !important;margin:0 !important;}
+      .panel{padding:4px !important;margin:0 0 6px 0 !important;}
+      #queueGrid{grid-template-rows:repeat(8,100px) !important;gap:4px !important;padding:4px !important;}
+      .card{padding:4px !important;}
+      .card h3{font-size:11px !important;margin:0 0 1px 0 !important;}
+      .status{font-size:12px !important;}
+      .badge{padding:2px 4px !important;font-size:9px !important;min-width:60px !important;}
+      
+      /* Controls */
+      .ctrl > label{font-size:10px !important;}
+      button.action, button.ghost{font-size:9px !important;padding:3px 4px !important;min-height:32px !important;}
+      .label-icon svg{display:none !important;}
+      
+      /* Header */
+      header{margin-bottom:4px !important;}
+      h1{font-size:14px !important;}
+      
+      /* Table */
+      .table-wrap{max-height:120px !important;}
+      .waitings-table{font-size:9px !important;}
+      .waitings-table th, .waitings-table td{padding:3px 1px !important;}
+      .waitings-ticket{font-size:10px !important;min-width:50px !important;}
+      .waitings-plate{font-size:9px !important;}
+      .waitings-user{min-width:60px !important;font-size:9px !important;}
+      .service-badge{padding:1px 3px !important;font-size:8px !important;}
+      
+      /* Card content */
+      .card .meta{font-size:9px !important;}
+      .card .meta strong{font-size:10px !important;}
+      .card .meta .plate{font-size:9px !important;}
+      .card .muted{font-size:8px !important;}
+    }
 
     /* small helper styles */
     .muted{color:var(--muted)}
@@ -343,21 +476,208 @@ try {
   body.tv .tv-user{font-weight:800;color:var(--text);}
   body.tv h1{font-size:36px}
   /* Layout: two-column split - queue on the left, waitings on the right */
-  body.tv main{display:grid;grid-template-columns:2.4fr 1fr;grid-template-rows:1fr;gap:28px;height:95vh;width:95vw;max-width:1900px;transform:scale(1.06);transform-origin:center;}
-  body.tv .panel{padding:24px;height:100%;overflow:hidden;box-sizing:border-box}
-  body.tv #queueGrid{grid-template-rows:repeat(2,1fr);gap:24px;height:100%;overflow:auto}
-  body.tv .card{padding:26px;border-radius:20px}
-  body.tv .card h3{font-size:30px}
-  body.tv .status{font-size:32px}
-  body.tv .badge{padding:14px 18px;font-size:18px}
-  body.tv .badge.maintenance{padding:10px 14px;font-size:16px}
+  body.tv main{display:grid;grid-template-columns:2.2fr 1fr;grid-template-rows:1fr;gap:20px;height:95vh;width:95vw;max-width:1900px;transform:scale(1.0);transform-origin:center;overflow:hidden;padding:10px;box-sizing:border-box}
+  body.tv .panel{padding:16px;height:100%;overflow:hidden;box-sizing:border-box}
+  body.tv #queueGrid{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,1fr);gap:16px;height:100%;overflow:auto;padding:8px;box-sizing:border-box;max-width:100%;width:100%}
+  body.tv #queueGrid .card{width:100%;max-width:100%;box-sizing:border-box;overflow:hidden;min-width:0}
+  body.tv .card{padding:20px;border-radius:16px;min-width:0;overflow:hidden}
+  body.tv .card h3{font-size:24px;margin:0 0 8px 0}
+  body.tv .status{font-size:26px}
+  body.tv .badge{padding:10px 14px;font-size:16px;min-width:120px}
+  body.tv .badge.maintenance{padding:10px 14px;font-size:16px;min-width:120px}
   body.tv table{font-size:22px}
   body.tv th, body.tv td{padding:20px}
   body.tv #controls{display:none !important} /* hide controls in tv mode */
+  
+  /* Mobile fullscreen mode - responsive TV mode */
+  @media (max-width:768px) {
+    body.tv{
+      font-size:1rem;
+      padding:8px;
+      align-items:flex-start;
+      justify-content:flex-start;
+    }
+    body.tv main{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      height:calc(100vh - 16px);
+      width:calc(100vw - 16px);
+      max-width:none;
+      transform:none;
+      overflow-y:auto;
+      overflow-x:hidden;
+      box-sizing:border-box;
+    }
+    body.tv .panel{
+      padding:12px;
+      height:auto;
+      flex:1;
+      min-height:0;
+    }
+    body.tv #queuePanel{
+      flex:2;
+    }
+    body.tv #waitingsPanel{
+      flex:1;
+      min-height:200px;
+    }
+    body.tv #queueGrid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-rows:repeat(4,1fr);
+      gap:12px;
+      height:100%;
+      padding:8px;
+      box-sizing:border-box;
+      overflow:hidden;
+      width:100%;
+      max-width:100%;
+    }
+    body.tv #queueGrid .card{
+      width:100%;
+      max-width:100%;
+      box-sizing:border-box;
+      overflow:hidden;
+      min-width:0;
+    }
+    body.tv .card{
+      padding:12px;
+      border-radius:12px;
+    }
+    body.tv .card h3{font-size:16px}
+    body.tv .status{font-size:18px}
+    body.tv .badge{padding:6px 10px;font-size:12px;min-width:90px}
+    body.tv .badge.maintenance{padding:6px 10px;font-size:12px;min-width:90px}
+    body.tv table{font-size:14px}
+    body.tv th, body.tv td{padding:8px}
+    body.tv h1{font-size:20px}
+  }
+  
+  @media (max-width:600px) {
+    body.tv{
+      padding:4px;
+    }
+    body.tv main{
+      height:calc(100vh - 8px);
+      width:calc(100vw - 8px);
+      gap:8px;
+      overflow-x:hidden;
+      box-sizing:border-box;
+    }
+    body.tv .panel{
+      padding:8px;
+    }
+    body.tv #queueGrid{
+      grid-template-columns:minmax(0,1fr);
+      grid-template-rows:repeat(8,1fr);
+      gap:8px;
+      padding:4px;
+      box-sizing:border-box;
+      overflow:hidden;
+      width:100%;
+      max-width:100%;
+    }
+    body.tv #queueGrid .card{
+      width:100%;
+      max-width:100%;
+      box-sizing:border-box;
+      overflow:hidden;
+      min-width:0;
+    }
+    body.tv .card{
+      padding:8px;
+    }
+    body.tv .card h3{font-size:14px}
+    body.tv .status{font-size:16px}
+    body.tv .badge{padding:4px 8px;font-size:11px;min-width:80px}
+    body.tv table{font-size:12px}
+    body.tv th, body.tv td{padding:6px}
+    body.tv h1{font-size:18px}
+  }
+  
+  @media (max-width:420px) {
+    body.tv{
+      padding:2px;
+    }
+    body.tv main{
+      height:calc(100vh - 4px);
+      width:calc(100vw - 4px);
+      gap:4px;
+      overflow-x:hidden;
+      box-sizing:border-box;
+    }
+    body.tv .panel{
+      padding:4px;
+    }
+    body.tv #queueGrid{
+      grid-template-columns:minmax(0,1fr);
+      gap:4px;
+      padding:2px;
+      box-sizing:border-box;
+      overflow:hidden;
+      width:100%;
+      max-width:100%;
+    }
+    body.tv #queueGrid .card{
+      width:100%;
+      max-width:100%;
+      box-sizing:border-box;
+      overflow:hidden;
+      min-width:0;
+    }
+    body.tv .card{
+      padding:4px;
+    }
+    body.tv .card h3{font-size:12px}
+    body.tv .status{font-size:14px}
+    body.tv .badge{padding:3px 6px;font-size:10px;min-width:70px}
+    body.tv table{font-size:11px}
+    body.tv th, body.tv td{padding:4px}
+    body.tv h1{font-size:16px}
+  }
+  
+  /* iOS standalone mode support */
+  body.ios-standalone{
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+    padding-left:env(safe-area-inset-left);
+    padding-right:env(safe-area-inset-right);
+  }
+  
+  /* Mobile fullscreen button improvements */
+  @media (max-width:768px) {
+    #fullscreenToggle{
+      min-height:44px;
+      font-size:14px;
+      padding:8px 12px;
+    }
+    #fullscreenToggle svg{
+      width:18px;
+      height:18px;
+    }
+  }
+  
+  @media (max-width:420px) {
+    #fullscreenToggle{
+      font-size:12px;
+      padding:6px 8px;
+    }
+    #fullscreenToggle svg{
+      width:16px;
+      height:16px;
+    }
+  }
 
     /* Waitings table wrapper sizing: fill its panel and scroll internally (no page scroll) */
-  .table-wrap{max-height:320px;overflow:auto;margin-top:14px}
+  .table-wrap{max-height:320px;overflow:auto;margin-top:14px;-webkit-overflow-scrolling:touch}
   body.tv .table-wrap{max-height:100%;height:100%;overflow:auto}
+  
+  /* Mobile table improvements */
+  @media (max-width:600px){
+    .table-wrap{max-height:280px;overflow-x:auto;overflow-y:auto}
+    .waitings-table{min-width:100%;white-space:nowrap}
+    .waitings-table th, .waitings-table td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  }
   /* Ensure panels fill their column without causing body scroll */
   body.tv #queuePanel, body.tv #waitingsPanel{height:100%;overflow:hidden}
   /* hide timestamps in TV mode */
@@ -677,23 +997,59 @@ try {
     fullscreenToggle.addEventListener('click', ()=>{
       console.log('fullscreenToggle clicked');
       // If we're already fullscreen, try to exit. If we're in simulated mode, disable it.
-      if(document.fullscreenElement){
-        document.exitFullscreen().catch(()=>{});
+      if(document.fullscreenElement || window._tvSimulated){
+        if(document.fullscreenElement){
+          document.exitFullscreen().catch(()=>{});
+        } else {
+          window._tvSimulated = false;
+          setTvMode(false);
+        }
         return;
       }
 
       // Try native Fullscreen API first (must be initiated by user gesture)
       const el = document.documentElement;
+      
+      // Check for mobile-specific fullscreen methods
       if(el.requestFullscreen){
         el.requestFullscreen().then(()=>{
           // on success, fullscreenchange listener will call setTvMode(true)
-        }).catch(()=>{
+        }).catch((err)=>{
+          console.log('Fullscreen API failed:', err);
           // Fullscreen API failed (e.g., blocked by browser). Fall back to simulated TV mode.
+          window._tvSimulated = true;
+          setTvMode(true);
+        });
+      } else if(el.webkitRequestFullscreen) {
+        // Safari iOS fullscreen
+        el.webkitRequestFullscreen().then(()=>{
+          setTvMode(true);
+        }).catch((err)=>{
+          console.log('Webkit fullscreen failed:', err);
+          window._tvSimulated = true;
+          setTvMode(true);
+        });
+      } else if(el.mozRequestFullScreen) {
+        // Firefox fullscreen
+        el.mozRequestFullScreen().then(()=>{
+          setTvMode(true);
+        }).catch((err)=>{
+          console.log('Moz fullscreen failed:', err);
+          window._tvSimulated = true;
+          setTvMode(true);
+        });
+      } else if(el.msRequestFullscreen) {
+        // IE/Edge fullscreen
+        el.msRequestFullscreen().then(()=>{
+          setTvMode(true);
+        }).catch((err)=>{
+          console.log('MS fullscreen failed:', err);
           window._tvSimulated = true;
           setTvMode(true);
         });
       } else {
         // No Fullscreen API available - simulate TV mode
+        console.log('No fullscreen API available, using simulated mode');
         window._tvSimulated = true;
         setTvMode(true);
       }
@@ -723,6 +1079,36 @@ try {
     renderWaitings();
     tick();
     setInterval(tick,1000);
+    
+    // Mobile responsiveness handler
+    function handleMobileResize() {
+      const width = window.innerWidth;
+      const body = document.body;
+      
+      // Remove any existing mobile classes
+      body.classList.remove('mobile-landscape', 'mobile-portrait', 'mobile-small');
+      
+      // Add appropriate mobile class based on screen size
+      if (width <= 420) {
+        body.classList.add('mobile-small');
+      } else if (width <= 600) {
+        body.classList.add('mobile-portrait');
+      } else if (width <= 768) {
+        body.classList.add('mobile-landscape');
+      }
+      
+      // Force reflow to ensure CSS changes take effect
+      body.style.display = 'none';
+      body.offsetHeight; // Trigger reflow
+      body.style.display = '';
+    }
+    
+    // Handle initial load and resize events
+    handleMobileResize();
+    window.addEventListener('resize', handleMobileResize);
+    window.addEventListener('orientationchange', function() {
+      setTimeout(handleMobileResize, 100); // Delay to ensure orientation change is complete
+    });
 
     // Fullscreen behaviour: when fullscreen, hide header and controls and apply TV-friendly styles
     function setTvMode(enabled){
@@ -732,19 +1118,64 @@ try {
         const controlsPanel = document.getElementById('controlsPanel'); if(controlsPanel) controlsPanel.style.display='none';
         fullscreenToggle.textContent = 'Exit fullscreen';
         const pager = document.getElementById('waitingsPager'); if(pager) pager.setAttribute('aria-hidden','true');
+        
+        // Mobile-specific fullscreen optimizations
+        if(window.innerWidth <= 768) {
+          // Prevent zoom on mobile fullscreen
+          document.body.style.zoom = '1';
+          // Ensure proper viewport handling
+          const viewport = document.querySelector('meta[name="viewport"]');
+          if(viewport) {
+            viewport.setAttribute('content', 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover');
+          }
+          // Hide mobile browser UI elements
+          if('standalone' in window.navigator && window.navigator.standalone) {
+            document.body.classList.add('ios-standalone');
+          }
+        }
       } else {
         document.body.classList.remove('tv');
         const header = document.querySelector('header'); if(header) header.style.display='flex';
         const controlsPanel = document.getElementById('controlsPanel'); if(controlsPanel) controlsPanel.style.display='block';
         fullscreenToggle.textContent = 'Enter fullscreen';
         const pager = document.getElementById('waitingsPager'); if(pager) pager.removeAttribute('aria-hidden');
+        
+        // Reset mobile-specific fullscreen optimizations
+        document.body.style.zoom = '';
+        document.body.classList.remove('ios-standalone');
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if(viewport) {
+          viewport.setAttribute('content', 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no');
+        }
       }
+      
+      // Force reflow to ensure changes take effect
+      document.body.offsetHeight;
     }
 
     // sync on fullscreenchange (supports escape key and external toggles)
     document.addEventListener('fullscreenchange', ()=>{
       const enabled = !!document.fullscreenElement;
       // if we left fullscreen natively but had previously simulated, clear simulated flag
+      if(!enabled && window._tvSimulated){ window._tvSimulated = false; }
+      setTvMode(enabled || !!window._tvSimulated);
+    });
+    
+    // Handle mobile-specific fullscreen events
+    document.addEventListener('webkitfullscreenchange', ()=>{
+      const enabled = !!document.webkitFullscreenElement;
+      if(!enabled && window._tvSimulated){ window._tvSimulated = false; }
+      setTvMode(enabled || !!window._tvSimulated);
+    });
+    
+    document.addEventListener('mozfullscreenchange', ()=>{
+      const enabled = !!document.mozFullScreenElement;
+      if(!enabled && window._tvSimulated){ window._tvSimulated = false; }
+      setTvMode(enabled || !!window._tvSimulated);
+    });
+    
+    document.addEventListener('MSFullscreenChange', ()=>{
+      const enabled = !!document.msFullscreenElement;
       if(!enabled && window._tvSimulated){ window._tvSimulated = false; }
       setTvMode(enabled || !!window._tvSimulated);
     });

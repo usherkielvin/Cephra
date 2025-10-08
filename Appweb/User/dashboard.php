@@ -37,7 +37,7 @@ $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
 
-$stmt_charging = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_charging = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
 $stmt_charging->bindParam(':username', $username);
 $stmt_charging->execute();
 $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
@@ -90,6 +90,11 @@ elseif ($queue_ticket) {
         $status_text = 'Waiting';
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
+    } elseif (strtolower($queue_ticket['status']) === 'pending') {
+        $background_class = 'connected-bg';
+        $status_text = 'Connected';
+        $button_text = 'Charge Now';
+        $button_href = 'ChargingPage.php';
     }
 }
 

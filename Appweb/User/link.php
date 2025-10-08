@@ -236,7 +236,7 @@ $start_charging_disabled = false;
 $start_charging_disabled_status = '';
 if ($conn) {
     // Fetch latest charging status from queue_tickets (current/pending sessions)
-    $stmt_charging = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_charging = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
     $stmt_charging->bindParam(':username', $username);
     $stmt_charging->execute();
     $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);

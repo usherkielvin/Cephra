@@ -500,12 +500,19 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 						<?php
 						// Compute avatar source
 						$pfpSrc = 'images/logo.png';
-						if ($conn) {
+						
+						// Debug: Check if username is set
+						if (empty($username)) {
+							error_log("Header: Username is empty in session");
+						}
+						
+						if ($conn && !empty($username)) {
 							try {
 								$stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
 								$stmt2->bindParam(':u', $username);
 								$stmt2->execute();
 								$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+								
 								if ($row2 && !empty($row2['profile_picture'])) {
 									$pp = $row2['profile_picture'];
 									if (strpos($pp, 'data:image') === 0) {
@@ -518,13 +525,26 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 											$pfpSrc = $path;
 										}
 									}
+								} else {
+									// If no profile picture found, use a default avatar with user's initial
+									$pfpSrc = 'data:image/svg+xml;base64,' . base64_encode('
+										<svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
+											<circle cx="19" cy="19" r="19" fill="#00c2ce"/>
+											<text x="19" y="25" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">' . strtoupper(substr($username, 0, 1)) . '</text>
+										</svg>
+									');
 								}
-							} catch (Exception $e) { /* ignore */ }
+							} catch (Exception $e) { 
+								error_log("Header: Error fetching profile picture: " . $e->getMessage());
+							}
+						} else {
+							// If no connection or username, use default logo
+							error_log("Header: No database connection or username for profile picture");
 						}
 						?>
 						<div class="profile-container" style="position: relative;">
 							<button class="profile-btn" id="profileBtn"
-								   title="Profile Menu"
+								   title="Profile Menu - <?php echo htmlspecialchars($username); ?>"
 								   style="display: inline-flex;
 										  width: 38px;
 										  height: 38px;
@@ -534,12 +554,20 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 										  background: transparent;
 										  cursor: pointer;
 										  padding: 0;">
-								<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
-									 alt="Profile"
-									 style="width: 100%;
-											height: 100%;
-											object-fit: cover;
-											display: block;" />
+								<?php if (strpos($pfpSrc, 'data:image/svg+xml') === 0): ?>
+									<!-- SVG Avatar with user initial -->
+									<div style="width: 100%; height: 100%; background: #00c2ce; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">
+										<?php echo strtoupper(substr($username, 0, 1)); ?>
+									</div>
+								<?php else: ?>
+									<!-- Regular image -->
+									<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
+										 alt="Profile - <?php echo htmlspecialchars($username); ?>"
+										 style="width: 100%;
+												height: 100%;
+												object-fit: cover;
+												display: block;" />
+								<?php endif; ?>
 							</button>
 							<ul class="profile-dropdown" id="profileDropdown"
 								style="position: absolute;
@@ -549,12 +577,15 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 									   border: 1px solid rgba(0, 0, 0, 0.1);
 									   border-radius: 8px;
 									   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-									   min-width: 120px;
+									   min-width: 150px;
 									   list-style: none;
 									   padding: 0;
 									   margin: 0;
 									   z-index: 1001;
 									   display: none;">
+								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05); padding: 8px 16px; background: #f8f9fa; font-weight: bold; color: #333;">
+									<?php echo htmlspecialchars($username); ?>
+								</li>
 								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
 									<a href="profile.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Profile</a>
 								</li>

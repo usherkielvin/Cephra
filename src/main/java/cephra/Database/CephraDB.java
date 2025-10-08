@@ -279,24 +279,25 @@ public class CephraDB {
     }
     
     // Method to update user profile information
-    public static boolean updateUserProfile(String username, String firstName, String lastName, String email) {
+    public static boolean updateUserProfile(String currentUsername, String newUsername, String firstName, String lastName, String email) {
         try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "UPDATE users SET firstname = ?, lastname = ?, email = ? WHERE username = ?")) {
+                     "UPDATE users SET username = ?, firstname = ?, lastname = ?, email = ? WHERE username = ?")) {
             
-            stmt.setString(1, firstName);
-            stmt.setString(2, lastName);
-            stmt.setString(3, email);
-            stmt.setString(4, username);
+            stmt.setString(1, newUsername);
+            stmt.setString(2, firstName);
+            stmt.setString(3, lastName);
+            stmt.setString(4, email);
+            stmt.setString(5, currentUsername);
             
             int rowsAffected = stmt.executeUpdate();
             boolean success = rowsAffected > 0;
             
             if (success) {
-                System.out.println("CephraDB: Updated profile for user " + username + 
-                    " - Name: " + firstName + " " + lastName + ", Email: " + email);
+                System.out.println("CephraDB: Updated profile for user " + currentUsername + 
+                    " - New Username: " + newUsername + ", Name: " + firstName + " " + lastName + ", Email: " + email);
             } else {
-                System.err.println("CephraDB: No rows affected when updating profile for user " + username);
+                System.err.println("CephraDB: No rows affected when updating profile for user " + currentUsername);
             }
             
             return success;
@@ -306,6 +307,24 @@ public class CephraDB {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    // Method to check if username is available
+    public static boolean isUsernameAvailable(String username) {
+        try (Connection conn = cephra.Database.DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT COUNT(*) FROM users WHERE username = ?")) {
+            
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) == 0; // Returns true if username is available
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking username availability: " + e.getMessage());
+        }
+        return false;
     }
     
     // Method to get a user's current password by email
