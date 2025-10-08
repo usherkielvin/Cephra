@@ -97,8 +97,7 @@ public class Edit_Profile extends javax.swing.JPanel {
         setupAutoCapitalization(fname);
         setupAutoCapitalization(lname);
         
-        // Add backspace focus navigation
-        setupBackspaceNavigation();
+        // Backspace navigation removed as requested
     }
      // Setup auto-capitalization for text fields
     private void setupAutoCapitalization(JTextField textField) {
@@ -145,34 +144,6 @@ public class Edit_Profile extends javax.swing.JPanel {
                 }
             }
         });
-    }
-     // Setup backspace navigation to move focus to previous field
-    private void setupBackspaceNavigation() {
-        // Define the field order for navigation
-        JTextField[] fields = {fname, lname, UsernamePhone, email};
-        
-        for (int i = 0; i < fields.length; i++) {
-            final int currentIndex = i;
-            final JTextField currentField = fields[i];
-            
-            currentField.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    // Only handle backspace key when field is empty
-                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && currentField.getText().isEmpty()) {
-                        // Prevent default backspace behavior and move to previous field
-                        e.consume();
-                        if (currentIndex > 0) {
-                            fields[currentIndex - 1].requestFocusInWindow();
-                            // Move cursor to end of previous field
-                            SwingUtilities.invokeLater(() -> {
-                                fields[currentIndex - 1].setCaretPosition(fields[currentIndex - 1].getText().length());
-                            });
-                        }
-                    }
-                }
-            });
-        }
     }
 
     
@@ -544,9 +515,10 @@ public class Edit_Profile extends javax.swing.JPanel {
             String newFirstName = fname.getText().trim();
             String newLastName = lname.getText().trim();
             String newEmail = email.getText().trim();
+            String newUsername = UsernamePhone.getText().trim();
 
             // Validate required fields
-            if (newFirstName.isEmpty() || newLastName.isEmpty() || newEmail.isEmpty()) {
+            if (newFirstName.isEmpty() || newLastName.isEmpty() || newEmail.isEmpty() || newUsername.isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this,
                     "Please fill in all required fields.",
                     "Validation Error", javax.swing.JOptionPane.WARNING_MESSAGE);
@@ -561,8 +533,16 @@ public class Edit_Profile extends javax.swing.JPanel {
                 return;
             }
 
+            // Check username availability if username is being changed
+            if (!newUsername.equals(currentUsername) && !cephra.Database.CephraDB.isUsernameAvailable(newUsername)) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Username is already taken. Please choose a different username.",
+                    "Validation Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             // Update user data in database
-            boolean success = updateUserProfile(currentUsername, newFirstName, newLastName, newEmail);
+            boolean success = updateUserProfile(currentUsername, newUsername, newFirstName, newLastName, newEmail);
             
             if (success) {
                 javax.swing.JOptionPane.showMessageDialog(this,
@@ -581,10 +561,10 @@ public class Edit_Profile extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_savechangesActionPerformed
 
-    private boolean updateUserProfile(String username, String firstName, String lastName, String email) {
+    private boolean updateUserProfile(String currentUsername, String newUsername, String firstName, String lastName, String email) {
         try {
             // Update user profile in database
-            return cephra.Database.CephraDB.updateUserProfile(username, firstName, lastName, email);
+            return cephra.Database.CephraDB.updateUserProfile(currentUsername, newUsername, firstName, lastName, email);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

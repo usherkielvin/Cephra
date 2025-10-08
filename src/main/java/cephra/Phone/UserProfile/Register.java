@@ -296,8 +296,7 @@ public class Register extends javax.swing.JPanel {
         setupAutoFillUsername();
         setupEmailDomainCompletion();
         
-        // Add backspace focus navigation
-        setupBackspaceNavigation();
+        // Backspace navigation removed as requested
     }
     
     // Setup auto-capitalization for text fields
@@ -387,34 +386,6 @@ public class Register extends javax.swing.JPanel {
         });
     }
     
-    // Setup backspace navigation to move focus to previous field
-    private void setupBackspaceNavigation() {
-        // Define the field order for navigation
-        JTextField[] fields = {fname, lname, UsernamePhone, email, pass};
-        
-        for (int i = 0; i < fields.length; i++) {
-            final int currentIndex = i;
-            final JTextField currentField = fields[i];
-            
-            currentField.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    // Only handle backspace key when field is empty
-                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && currentField.getText().isEmpty()) {
-                        // Prevent default backspace behavior and move to previous field
-                        e.consume();
-                        if (currentIndex > 0) {
-                            fields[currentIndex - 1].requestFocusInWindow();
-                            // Move cursor to end of previous field
-                            SwingUtilities.invokeLater(() -> {
-                                fields[currentIndex - 1].setCaretPosition(fields[currentIndex - 1].getText().length());
-                            });
-                        }
-                    }
-                }
-            });
-        }
-    }
 
     
     // Ensure the background label (PNG) stays positioned correctly
