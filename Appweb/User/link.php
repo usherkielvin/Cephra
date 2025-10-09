@@ -171,7 +171,7 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
         2 => 'images/cars/teslamodelx.png',
         3 => 'images/cars/lotuseltre.png',
         4 => 'images/cars/bydseagull.png',
-        5 => 'images/team pictures/default.png',
+        5 => 'images/cars/hyundai.png',
         6 => 'images/cars/porschetaycan.png',
         7 => 'images/cars/bydtang.png',
         8 => 'images/cars/omodae5.png'
@@ -226,6 +226,56 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
     $mins_full = round(($time_to_full_hours - $hours_full) * 60);
     $vehicle_data['time_to_full'] = $hours_full . 'h ' . $mins_full . 'm';
 }
+
+// === Start: Status & Start Charging integration (copied/adapted from dashboard) ===
+$latest_charging = null;
+$active_ticket = null;
+$current_ticket = null;
+$status_text = 'Connected';
+$start_charging_disabled = false;
+$start_charging_disabled_status = '';
+if ($conn) {
+    // Fetch latest charging status from queue_tickets (current/pending sessions)
+    $stmt_charging = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
+    $stmt_charging->bindParam(':username', $username);
+    $stmt_charging->execute();
+    $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
+
+    // Fetch active ticket
+    $stmt_active = $conn->prepare("SELECT ticket_id, status, bay_number FROM active_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_active->bindParam(':username', $username);
+    $stmt_active->execute();
+    $active_ticket = $stmt_active->fetch(PDO::FETCH_ASSOC);
+
+    // Prefer active ticket for current status
+    if ($active_ticket) {
+        $current_ticket = $active_ticket;
+        if (strtolower($active_ticket['status']) === 'charging') {
+            $status_text = 'Charging at Bay ' . ($active_ticket['bay_number'] ?? 'TBD');
+        } else {
+            $status_text = $active_ticket['status'];
+        }
+    } elseif ($latest_charging) {
+        $current_ticket = $latest_charging;
+        // If payment shows paid, treat as connected
+        if (in_array(strtolower($latest_charging['payment_status']), ['paid','completed','success'])) {
+            $status_text = 'Connected';
+        } else {
+            $status_text = $latest_charging['status'] ?: 'Connected';
+        }
+    }
+
+    // Normalize and determine disabling statuses
+    if ($current_ticket) {
+        $st = strtolower($current_ticket['status']);
+        if ($st === 'complete') $st = 'completed';
+        if (in_array($st, ['waiting','charging','completed','pending'])) {
+            $start_charging_disabled = true;
+            $start_charging_disabled_status = ucfirst($st);
+        }
+    }
+}
+// === End: Status integration ===
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -240,6 +290,56 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
     <link rel="stylesheet" href="css/vantage-style.css" />
     <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
     <link rel="stylesheet" href="assets/css/pages/link.css" />
+    <style>
+        /* Modernized linked car layout tweaks */
+        .modernized-layout {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .modernized-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .modernized-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modernized-details .detail-label { color: #4a5568; font-weight:600; }
+        .modernized-details .detail-value { color: #1a202c; }
+
+        @media (max-width: 768px) {
+            .modernized-layout {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .modernized-details {
+                align-items: center;
+                max-width: 100%;
+                padding: 0 1rem;
+            }
+            .modernized-details .detail-row {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+            }
+            .modernized-details .detail-row .detail-value {
+                text-align: center;
+            }
+            .modernized-car-image { width: 100%; display:flex; justify-content:center; }
+        }
+    </style>
 </head>
 <body class="homepage is-preload">
     <div id="page-wrapper">
@@ -282,7 +382,7 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
             </div>
             <div class="detail-row">
                 <span class="detail-label">Status</span>
-                <span class="detail-value"><?php echo htmlspecialchars($vehicle_data['status']); ?></span>
+                <span class="detail-value" id="linkVehicleStatus"><?php echo htmlspecialchars($status_text ?? $vehicle_data['status']); ?></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Kms Remaining</span>
@@ -298,11 +398,15 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
             </div>
 
     </div>
-    <div class="modernized-car-image">
-        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" />
+    <div class="modernized-car-image" style="display:flex;align-items:center;justify-content:center;padding:1.25rem 0;">
+        <img src="<?php echo htmlspecialchars($vehicle_data['image']); ?>" alt="<?php echo htmlspecialchars($vehicle_data['model']); ?>" style="max-width:100%;height:auto;display:block;" />
     </div>
 </div>
-<button style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;" onclick="window.location.href='dashboard.php'">Start Charging</button>
+<?php if ($start_charging_disabled): ?>
+    <button id="startChargingBtn" class="btn btn-outline disabled" aria-disabled="true" style="display:none; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: not-allowed;">Start Charging (<?php echo htmlspecialchars($start_charging_disabled_status); ?>)</button>
+<?php else: ?>
+    <button id="startChargingBtn" class="btn btn-outline" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; background: linear-gradient(135deg, #00c2ce 0%, #0e3a49 100%); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;" onclick="window.location.href='ChargingPage.php'">Start Charging</button>
+<?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -321,12 +425,149 @@ if ($carIndex !== null && $carIndex >= 0 && $carIndex <= 8) {
     <script src="assets/js/main.js"></script>
 
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-            const nav = document.querySelector('.nav');
-            nav.classList.toggle('mobile-menu-open');
-            this.classList.toggle('active');
+        /* Hide Start Charging when aria-disabled or class 'disabled' is present */
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #startChargingBtn.disabled,
+            #startChargingBtn[aria-disabled="true"] { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+        `;
+        document.head.appendChild(style);
+
+        // Expose currentStatus for inline checks (initialized from PHP)
+        window.currentStatus = '<?php echo isset($current_ticket) ? strtolower($current_ticket['status']) : ''; ?>';
+
+        // Prevent navigation if button is disabled regardless of onclick attribute
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('startChargingBtn');
+            if (!btn) return;
+            btn.addEventListener('click', function(e) {
+                const blocked = btn.classList.contains('disabled') || btn.getAttribute('aria-disabled') === 'true' || ['charging','completed','complete','pending','waiting'].includes((window.currentStatus||'').toLowerCase());
+                if (blocked) {
+                    e.preventDefault();
+                    // show small inline notice
+                    alert('You already have an active or pending session: ' + (window.currentStatus || '')); 
+                }
+            });
         });
+
+        // Poll status_update API every 3s to refresh the status and button state
+        (function startPolling() {
+            async function fetchStatus() {
+                try {
+                    const res = await fetch('api/status_update.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'get_status' })
+                    });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    if (!data || !data.success) return;
+
+                    // Update status text
+                    const statusEl = document.getElementById('linkVehicleStatus');
+                    if (statusEl && data.status_text) statusEl.textContent = data.status_text;
+
+                    // Update window.currentStatus for local checks
+                    window.currentStatus = (data.status_text || '').toLowerCase();
+
+                    // Update start button state
+                    const startBtn = document.getElementById('startChargingBtn');
+                    if (startBtn) {
+                        const normalized = (data.status_text || '').toLowerCase();
+                        const shouldDisable = ['complete','completed','pending','waiting','charging'].some(k => normalized.includes(k) || normalized === k);
+                        if (shouldDisable) {
+                            startBtn.classList.add('disabled');
+                            startBtn.setAttribute('aria-disabled', 'true');
+                            if (startBtn.tagName && startBtn.tagName.toLowerCase() === 'a') {
+                                if (!startBtn.dataset._hrefBackup) startBtn.dataset._hrefBackup = startBtn.getAttribute('href') || '';
+                                startBtn.removeAttribute('href');
+                                startBtn.style.pointerEvents = 'none';
+                                startBtn.tabIndex = -1;
+                            } else {
+                                try { startBtn.disabled = true; } catch(e){}
+                            }
+                        } else {
+                            startBtn.classList.remove('disabled');
+                            startBtn.removeAttribute('aria-disabled');
+                            if (startBtn.tagName && startBtn.tagName.toLowerCase() === 'a') {
+                                if (startBtn.dataset._hrefBackup) {
+                                    startBtn.setAttribute('href', startBtn.dataset._hrefBackup);
+                                    delete startBtn.dataset._hrefBackup;
+                                }
+                                startBtn.style.pointerEvents = '';
+                                startBtn.tabIndex = 0;
+                            } else {
+                                try { startBtn.disabled = false; } catch(e){}
+                            }
+                        }
+                    }
+
+                } catch (e) {
+                    // ignore network errors silently
+                    console.warn('Status poll failed', e);
+                }
+            }
+
+            // Initial fetch and interval
+            fetchStatus();
+            setInterval(fetchStatus, 3000);
+        })();
+        // Mobile Menu Toggle
+        function initMobileMenu() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.createElement('div');
+            mobileMenuOverlay.className = 'mobile-menu-overlay';
+            mobileMenuOverlay.id = 'mobileMenuOverlay';
+            document.body.appendChild(mobileMenuOverlay);
+
+            function toggleMobileMenu() {
+                const isActive = mobileMenu.classList.contains('active');
+                if (isActive) {
+                    closeMobileMenu();
+                } else {
+                    openMobileMenu();
+                }
+            }
+
+            function openMobileMenu() {
+                mobileMenu.classList.add('active');
+                mobileMenuToggle.classList.add('active');
+                mobileMenuOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+                document.addEventListener('keydown', handleEscapeKey);
+            }
+
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                mobileMenuOverlay.removeEventListener('click', closeMobileMenu);
+                document.removeEventListener('keydown', handleEscapeKey);
+            }
+
+            function handleEscapeKey(e) {
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+            }
+
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileNavLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                        if (mobileMenu.classList.contains('active')) {
+                            closeMobileMenu();
+                        }
+                    }
+                }
+            });
+        }
 
         // Enable/disable button based on terms checkbox
         document.getElementById('terms').addEventListener('change', function() {

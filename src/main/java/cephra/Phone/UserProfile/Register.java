@@ -27,49 +27,8 @@ public class Register extends javax.swing.JPanel {
             }
         });
 
-        // Setup password validation
-        setupPasswordValidation(); // Add this line
     }
 
-    private void setupPasswordValidation() {
-        // Set document filter to limit password to 25 characters
-        ((javax.swing.text.AbstractDocument) pass.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
-            @Override
-            public void insertString(javax.swing.text.DocumentFilter.FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
-                if ((fb.getDocument().getLength() + string.length()) <= 25) {
-                    super.insertString(fb, offset, string, attr);
-                } else {
-                    JOptionPane.showMessageDialog(pass, "Password is limited to 25 characters.", "Character Limit Exceeded", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-
-            @Override
-            public void replace(javax.swing.text.DocumentFilter.FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs) throws javax.swing.text.BadLocationException {
-                if ((fb.getDocument().getLength() - length + text.length()) <= 25) {
-                    super.replace(fb, offset, length, text, attrs);
-                } else {
-                    JOptionPane.showMessageDialog(pass, "Password is limited to 25 characters.", "Character Limit Exceeded", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        });
-
-        pass.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String password = new String(pass.getPassword());
-                boolean hasUpper = password.chars().anyMatch(Character::isUpperCase);
-                boolean hasLower = password.chars().anyMatch(Character::isLowerCase);
-                boolean hasDigit = password.chars().anyMatch(Character::isDigit);
-                boolean validLength = password.length() >= 8 && password.length() <= 25;
-
-                // Update JLabel colors based on validation
-                upper.setForeground(hasUpper ? Color.GREEN : Color.RED);
-                lower.setForeground(hasLower ? Color.GREEN : Color.RED);
-                number.setForeground(hasDigit ? Color.GREEN : Color.RED);
-                characters.setForeground(validLength ? Color.GREEN : Color.RED);
-            }
-        });
-    }
 
     private void makeDraggable() {
         final Point[] dragPoint = {null};
@@ -112,10 +71,6 @@ public class Register extends javax.swing.JPanel {
         loginbutton = new javax.swing.JButton();
         UsernamePhone = new javax.swing.JTextField();
         lname = new javax.swing.JTextField();
-        upper = new javax.swing.JLabel();
-        lower = new javax.swing.JLabel();
-        number = new javax.swing.JLabel();
-        characters = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(370, 750));
@@ -226,21 +181,6 @@ public class Register extends javax.swing.JPanel {
         add(lname);
         lname.setBounds(200, 282, 120, 32);
 
-        upper.setText("At least one uppercase letter");
-        add(upper);
-        upper.setBounds(100, 550, 200, 16);
-
-        lower.setText("At least one lowercase letter");
-        add(lower);
-        lower.setBounds(100, 560, 200, 16);
-
-        number.setText("At least one number");
-        add(number);
-        number.setBounds(100, 570, 200, 16);
-
-        characters.setText("Minimum 8 characters");
-        add(characters);
-        characters.setBounds(100, 580, 150, 16);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Register1.png"))); // NOI18N
         add(jLabel1);
@@ -296,8 +236,7 @@ public class Register extends javax.swing.JPanel {
         setupAutoFillUsername();
         setupEmailDomainCompletion();
         
-        // Add backspace focus navigation
-        setupBackspaceNavigation();
+        // Backspace navigation removed as requested
     }
     
     // Setup auto-capitalization for text fields
@@ -387,34 +326,6 @@ public class Register extends javax.swing.JPanel {
         });
     }
     
-    // Setup backspace navigation to move focus to previous field
-    private void setupBackspaceNavigation() {
-        // Define the field order for navigation
-        JTextField[] fields = {fname, lname, UsernamePhone, email, pass};
-        
-        for (int i = 0; i < fields.length; i++) {
-            final int currentIndex = i;
-            final JTextField currentField = fields[i];
-            
-            currentField.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    // Only handle backspace key when field is empty
-                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && currentField.getText().isEmpty()) {
-                        // Prevent default backspace behavior and move to previous field
-                        e.consume();
-                        if (currentIndex > 0) {
-                            fields[currentIndex - 1].requestFocusInWindow();
-                            // Move cursor to end of previous field
-                            SwingUtilities.invokeLater(() -> {
-                                fields[currentIndex - 1].setCaretPosition(fields[currentIndex - 1].getText().length());
-                            });
-                        }
-                    }
-                }
-            });
-        }
-    }
 
     
     // Ensure the background label (PNG) stays positioned correctly
@@ -458,69 +369,140 @@ public class Register extends javax.swing.JPanel {
     String emailText = email.getText().trim();
     String passwordText = new String(pass.getPassword()).trim();
 
-    if (nameText.isEmpty() || lastNameText.isEmpty() || usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Incomplete Form", JOptionPane.WARNING_MESSAGE);
-        
-        // Focus on the first empty field
-        if (nameText.isEmpty()) {
-            fname.requestFocusInWindow();
-        } else if (lastNameText.isEmpty()) {
-            lname.requestFocusInWindow();
-        } else if (usernameText.isEmpty()) {
-            UsernamePhone.requestFocusInWindow();
-        } else if (emailText.isEmpty()) {
-            email.requestFocusInWindow();
-        } else if (passwordText.isEmpty()) {
-            pass.requestFocusInWindow();
-        }
+    // Check each field individually and show one popup at a time
+    
+    // Check first name
+    if (nameText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter your first name.", "First Name Required", JOptionPane.WARNING_MESSAGE);
+        fname.requestFocusInWindow();
+        return;
+    }
+    
+    if (nameText.length() < 2) {
+        JOptionPane.showMessageDialog(this, "First name must be at least 2 characters long.", "Invalid First Name", JOptionPane.WARNING_MESSAGE);
+        fname.requestFocusInWindow();
+        return;
+    }
+    
+    // Check last name
+    if (lastNameText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter your last name.", "Last Name Required", JOptionPane.WARNING_MESSAGE);
+        lname.requestFocusInWindow();
+        return;
+    }
+    
+    if (lastNameText.length() < 2) {
+        JOptionPane.showMessageDialog(this, "Last name must be at least 2 characters long.", "Invalid Last Name", JOptionPane.WARNING_MESSAGE);
+        lname.requestFocusInWindow();
         return;
     }
 
-    // Basic email format check
+    // Check username
+    if (usernameText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter a username.", "Username Required", JOptionPane.WARNING_MESSAGE);
+        UsernamePhone.requestFocusInWindow();
+        return;
+    }
+    
+    if (usernameText.length() < 3) {
+        JOptionPane.showMessageDialog(this, "Username must be at least 3 characters long.", "Invalid Username", JOptionPane.WARNING_MESSAGE);
+        UsernamePhone.requestFocusInWindow();
+        return;
+    }
+    
+    if (!usernameText.matches("^[a-zA-Z0-9_]+$")) {
+        JOptionPane.showMessageDialog(this, "Username can only contain letters, numbers, and underscores.", "Invalid Username", JOptionPane.WARNING_MESSAGE);
+        UsernamePhone.requestFocusInWindow();
+        return;
+    }
+
+    // Check email
+    if (emailText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter your email address.", "Email Required", JOptionPane.WARNING_MESSAGE);
+        email.requestFocusInWindow();
+        return;
+    }
+    
     if (!emailText.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
         JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Email", JOptionPane.WARNING_MESSAGE);
         email.requestFocusInWindow();
         return;
     }
 
-    // Check if terms and conditions are agreed to
+    // Check password
+    if (passwordText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter a password.", "Password Required", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    // Password validation - check each requirement individually
+    if (passwordText.length() < 8) {
+        JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long.", "Password Too Short", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    if (passwordText.length() > 25) {
+        JOptionPane.showMessageDialog(this, "Password must be no more than 25 characters long.", "Password Too Long", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    boolean hasUpper = passwordText.chars().anyMatch(Character::isUpperCase);
+    if (!hasUpper) {
+        JOptionPane.showMessageDialog(this, "Password must contain at least one uppercase letter.", "Password Missing Uppercase", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    boolean hasLower = passwordText.chars().anyMatch(Character::isLowerCase);
+    if (!hasLower) {
+        JOptionPane.showMessageDialog(this, "Password must contain at least one lowercase letter.", "Password Missing Lowercase", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+    
+    boolean hasDigit = passwordText.chars().anyMatch(Character::isDigit);
+    if (!hasDigit) {
+        JOptionPane.showMessageDialog(this, "Password must contain at least one number.", "Password Missing Number", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
+
+    // Check terms and conditions
     if (!termscondition.isSelected()) {
         JOptionPane.showMessageDialog(this, "Please agree to the Terms and Conditions before registering!", "Terms and Conditions Required", JOptionPane.WARNING_MESSAGE);
         return;
     }
 
-    // Password validation
-    boolean hasUpper = passwordText.chars().anyMatch(Character::isUpperCase);
-    boolean hasLower = passwordText.chars().anyMatch(Character::isLowerCase);
-    boolean hasDigit = passwordText.chars().anyMatch(Character::isDigit);
-    boolean validLength = passwordText.length() >= 8 && passwordText.length() <= 25;
-
-    if (!hasUpper || !hasLower || !hasDigit || !validLength) {
-        JOptionPane.showMessageDialog(this, "Password must contain at least one uppercase letter, one lowercase letter, one number, and be between 8 and 25 characters long.", "Invalid Password", JOptionPane.WARNING_MESSAGE);
-        pass.requestFocusInWindow();
-        return;
-    }
-
     // Call the database method to add the new user
-    if (cephra.Database.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
-        // Registration successful
-        JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+    try {
+        if (cephra.Database.CephraDB.addUser(nameText, lastNameText, usernameText, emailText, passwordText)) {
+            // Registration successful
+            JOptionPane.showMessageDialog(this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
-        // Navigate to User_Login after OK is clicked
-        SwingUtilities.invokeLater(() -> {
-            Window[] windows = Window.getWindows();
-            for (Window window : windows) {
-                if (window instanceof cephra.Frame.Phone) {
-                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
-                    phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
-                    break;
+            // Navigate to User_Login after OK is clicked
+            SwingUtilities.invokeLater(() -> {
+                Window[] windows = Window.getWindows();
+                for (Window window : windows) {
+                    if (window instanceof cephra.Frame.Phone) {
+                        cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                        phoneFrame.switchPanel(new cephra.Phone.UserProfile.User_Login());
+                        break;
+                    }
                 }
-            }
-        });
-    } else {
-        // Username or email already exists
-        JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", JOptionPane.WARNING_MESSAGE);
-        fname.requestFocusInWindow();
+            });
+        } else {
+            // Username or email already exists
+            JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", JOptionPane.WARNING_MESSAGE);
+            fname.requestFocusInWindow();
+        }
+    } catch (Exception e) {
+        // Handle any unexpected database errors
+        JOptionPane.showMessageDialog(this, "Registration failed due to a system error. Please try again.", "System Error", JOptionPane.ERROR_MESSAGE);
+        System.err.println("Registration error: " + e.getMessage());
+        e.printStackTrace();
     }
 }//GEN-LAST:event_registerActionPerformed
 
@@ -688,17 +670,13 @@ public class Register extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
     private javax.swing.JTextField UsernamePhone;
-    private javax.swing.JLabel characters;
     private javax.swing.JTextField email;
     private javax.swing.JTextField fname;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField lname;
     private javax.swing.JButton loginbutton;
-    private javax.swing.JLabel lower;
-    private javax.swing.JLabel number;
     private javax.swing.JPasswordField pass;
     private javax.swing.JButton register;
     private javax.swing.JCheckBox termscondition;
-    private javax.swing.JLabel upper;
     // End of variables declaration//GEN-END:variables
 }

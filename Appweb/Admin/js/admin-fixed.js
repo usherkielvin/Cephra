@@ -1,4 +1,66 @@
 // Fixed Admin Panel JavaScript with Proper API Connections
+
+// Global unauthorized handler: intercept 401 responses and stop auto-refresh
+// This prevents the UI from repeatedly showing "Unauthorized access" notifications
+// when the session expires. It shows a single message and redirects to login.
+window._originalFetch = window.fetch ? window.fetch.bind(window) : null;
+window.__unauthorizedHandled = false;
+
+function handleUnauthorizedGlobal() {
+    if (window.__unauthorizedHandled) return;
+    window.__unauthorizedHandled = true;
+    try {
+        if (window.adminPanel && window.adminPanel.refreshInterval) {
+            clearInterval(window.adminPanel.refreshInterval);
+            window.adminPanel.refreshInterval = null;
+        }
+        if (window.adminPanel && typeof window.adminPanel.showError === 'function') {
+            window.adminPanel.showError('Session expired. Redirecting to login...');
+        } else {
+            // Fallback if adminPanel not initialized yet
+            try { alert('Session expired. Redirecting to login...'); } catch (_) {}
+        }
+    } catch (e) {
+        console.error('Error handling unauthorized state:', e);
+    }
+    // Redirect to login after a short delay so the user can see the message
+    setTimeout(() => { window.location.href = 'index.php'; }, 2200);
+}
+
+// Override global fetch to detect 401 responses. Keep original behavior otherwise.
+if (window._originalFetch) {
+    window.fetch = async function(...args) {
+        try {
+            const res = await window._originalFetch(...args);
+            if (res && res.status === 401) {
+                // Try to parse message for debugging but don't rely on it
+                try {
+                    const txt = await res.clone().text();
+                    console.warn('API returned 401:', txt);
+                } catch (_) {}
+                handleUnauthorizedGlobal();
+            }
+            return res;
+        } catch (err) {
+            // Network or other fetch error - just rethrow
+            throw err;
+        }
+    };
+}
+
+// Helper: safely parse JSON response and log raw response on failure.
+async function safeParseResponse(response, context = '') {
+    const raw = await response.text().catch(() => '');
+    try {
+        return JSON.parse(raw);
+    } catch (err) {
+        console.error(`Failed to parse JSON response${context ? ' (' + context + ')' : ''}:`, err);
+        const preview = raw && raw.length > 800 ? raw.slice(0,800) + '... [truncated]' : raw;
+        console.error('Server response preview:', preview);
+        // Return an error-shaped object to keep callers safe
+        return { success: false, error: 'Invalid server response (not JSON)', _raw: preview };
+    }
+}
 class AdminPanel {
     constructor() {
         this.currentPanel = 'dashboard';
@@ -171,8 +233,8 @@ class AdminPanel {
                 <td><span class="status-badge ${s.status.toLowerCase()}">${s.status}</span></td>
                 <td>${this.formatDateTime(s.created_at)}</td>
                 <td>
-                    <button class="btn btn-secondary btn-sm" onclick="if (adminPanel) adminPanel.toggleStaffStatus('${s.username}', '${s.status === 'Active' ? 'Inactive' : 'Active'}')">
-                        <i class="fas fa-toggle-on"></i> ${s.status === 'Active' ? 'Deactivate' : 'Activate'}
+                    <button class="btn btn-warning btn-sm" onclick="if (adminPanel) adminPanel.resetStaffPassword('${s.username}')">
+                        <i class="fas fa-key"></i> Reset Password
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="if (adminPanel) adminPanel.deleteStaff('${s.username}')">
                         <i class="fas fa-trash"></i> Delete
@@ -180,6 +242,38 @@ class AdminPanel {
                 </td>
             </tr>
         `).join('');
+    }
+
+    async resetStaffPassword(username) {
+        if (!username) return;
+
+        // Show confirmation dialog
+        const confirmed = confirm(`Reset password for staff member: ${username}\n\nA new 6-digit password will be generated.\n\nProceed with password reset?`);
+
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch('api/admin.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=reset-staff-password&username=${encodeURIComponent(username)}`
+            });
+
+            const result = await safeParseResponse(response, 'resetStaffPassword');
+
+            if (result.success) {
+                alert(`Password reset successful!\n\nNew password: ${result.new_password}\n\nPlease inform the staff member of their new password.`);
+                // Refresh the staff table
+                this.loadStaffData();
+            } else {
+                this.showError(result.error || 'Failed to reset password');
+            }
+        } catch (error) {
+            console.error('Error resetting password:', error);
+            this.showError('Failed to reset password');
+        }
     }
 
     // staff activity removed
@@ -192,10 +286,10 @@ class AdminPanel {
 
     async addStaff() {
         const payload = {
-            name: document.getElementById('staff-name')?.value || '',
-            username: document.getElementById('staff-username')?.value || '',
-            email: document.getElementById('staff-email')?.value || '',
-            password: document.getElementById('staff-password')?.value || ''
+            name: (document.getElementById('staff-name')?.value) || '',
+            username: (document.getElementById('staff-username')?.value) || '',
+            email: (document.getElementById('staff-email')?.value) || '',
+            password: (document.getElementById('staff-password')?.value) || ''
         };
         if (!payload.name || !payload.username || !payload.email || !payload.password) {
             this.showError('Please fill in all fields');
@@ -207,7 +301,7 @@ class AdminPanel {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `action=add-staff&${new URLSearchParams(payload).toString()}`
             });
-            const data = await res.json();
+            const data = await safeParseResponse(res, 'addStaff');
             if (data.success) {
                 this.showSuccess('Staff added');
                 this.closeModal('add-staff-modal');
@@ -221,25 +315,6 @@ class AdminPanel {
         }
     }
 
-    async toggleStaffStatus(username, status) {
-        try {
-            const res = await fetch('api/admin.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `action=toggle-staff-status&username=${encodeURIComponent(username)}&status=${encodeURIComponent(status)}`
-            });
-            const data = await res.json();
-            if (data.success) {
-                this.showSuccess('Status updated');
-                this.loadStaffData();
-            } else {
-                this.showError(data.error || 'Failed to update');
-            }
-        } catch (e) {
-            console.error('Error toggling status:', e);
-            this.showError('Failed to update');
-        }
-    }
 
     async deleteStaff(username) {
         if (!confirm(`Delete staff "${username}"?`)) return;
@@ -249,7 +324,7 @@ class AdminPanel {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `action=delete-staff&username=${encodeURIComponent(username)}`
             });
-            const data = await res.json();
+            const data = await safeParseResponse(res, 'deleteStaff');
             if (data.success) {
                 this.showSuccess('Staff deleted');
                 const row = document.getElementById(`staff-row-${username}`);
@@ -266,7 +341,7 @@ class AdminPanel {
     async loadDashboardData() {
         try {
             const response = await fetch('api/admin.php?action=dashboard');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadDashboardData');
 
             if (data.success) {
                 this.updateDashboardStats(data.stats);
@@ -306,7 +381,7 @@ class AdminPanel {
     async loadQueueData() {
         try {
             const response = await fetch('api/admin.php?action=queue');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadQueueData');
 
             if (data.success) {
                 this.updateQueueTable(data.queue);
@@ -370,7 +445,7 @@ class AdminPanel {
     async loadBaysData() {
         try {
             const response = await fetch('api/admin.php?action=bays');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadBaysData');
 
             if (data.success) {
                 this.updateBaysGrid(data.bays);
@@ -432,7 +507,7 @@ class AdminPanel {
     async loadUsersData() {
         try {
             const response = await fetch('api/admin.php?action=users');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadUsersData');
 
             if (data.success) {
                 this.updateUsersTable(data.users);
@@ -481,7 +556,7 @@ class AdminPanel {
                 },
                 body: `action=delete-user&username=${username}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(res, 'deleteUser');
 
             if (data.success) {
                 this.showSuccess('User deleted successfully');
@@ -523,7 +598,7 @@ class AdminPanel {
         try {
             console.log('Loading analytics data for range:', this.analyticsRange);
             const response = await fetch(`api/admin.php?action=analytics&range=${this.analyticsRange}`);
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'processPayment');
 
             console.log('Analytics API response:', data);
 
@@ -839,7 +914,7 @@ class AdminPanel {
     async loadBusinessData() {
         try {
             const response = await fetch('api/admin.php?action=business-settings');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'markAsPaid');
 
             if (data.success) {
                 document.getElementById('min-fee').value = data.settings.min_fee || 0;
@@ -853,7 +928,7 @@ class AdminPanel {
     async viewTicket(ticketId) {
         try {
             const response = await fetch(`api/admin.php?action=ticket-details&ticket_id=${ticketId}`);
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'setBayMaintenance');
 
             if (data.success) {
                 this.showTicketModal(data.ticket);
@@ -909,7 +984,7 @@ class AdminPanel {
                 },
                 body: `action=process-ticket&ticket_id=${ticketId}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'setBayAvailable');
 
             if (data.success) {
                 this.showSuccess('Ticket processed successfully');
@@ -932,7 +1007,7 @@ class AdminPanel {
                 },
                 body: `action=mark-payment-paid&ticket_id=${ticketId}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadBusinessData');
 
             if (data.success) {
                 this.showSuccess('Payment processed successfully');
@@ -955,7 +1030,7 @@ class AdminPanel {
                 },
                 body: `action=mark-payment-paid&ticket_id=${ticketId}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'viewTicket');
 
             if (data.success) {
                 this.showSuccess('Ticket marked as paid successfully');
@@ -1002,10 +1077,26 @@ class AdminPanel {
             });
             
             if (!response.ok) {
+                const text = await response.text().catch(() => '');
+                console.error(`HTTP ${response.status}: ${response.statusText}`, text);
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
-            const data = await response.json();
+
+            // Some server errors return HTML (PHP warnings/notices) which cause
+            // response.json() to throw a SyntaxError. Read text and try to parse
+            // JSON manually so we can log the raw response when parsing fails.
+            const raw = await response.text();
+            let data;
+            try {
+                data = JSON.parse(raw);
+            } catch (parseErr) {
+                console.error('Invalid JSON response while progressing ticket:', parseErr);
+                // Log a truncated preview of the server response for debugging
+                const preview = raw.length > 800 ? raw.slice(0, 800) + '... [truncated]' : raw;
+                console.error('Server response preview:', preview);
+                this.showError('Server returned an unexpected response while progressing the ticket. Check console for details.');
+                return;
+            }
 
             if (data.success) {
                 this.showSuccess(`Ticket ${ticketId} progressed successfully`);
@@ -1030,11 +1121,37 @@ class AdminPanel {
             const rows = tbody.querySelectorAll('tr');
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length >= 5) {
-                    const paymentStatus = cells[4].textContent.trim().toLowerCase();
+                // Payment column is the 6th column (index 5) in the table layout
+                if (cells.length >= 6) {
+                    const paymentStatus = cells[5].textContent.trim().toLowerCase();
                     if (paymentStatus === 'paid') {
-                        console.log('Auto-removing paid ticket row');
-                        row.remove();
+                        // Attempt server-side delete to permanently remove the ticket
+                        const ticketId = (cells[0].textContent || '').trim();
+                        if (!ticketId) { row.remove(); return; }
+
+                        fetch('api/admin.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `action=delete-ticket&ticket_id=${encodeURIComponent(ticketId)}`
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data && data.success) {
+                                console.log(`Deleted ticket ${ticketId} from server`);
+                                row.remove();
+                                this.updateQueueCounters();
+                            } else {
+                                console.warn('Failed to delete ticket on server, removing from UI anyway', data);
+                                row.remove();
+                                this.updateQueueCounters();
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Network error deleting ticket:', err);
+                            // Remove from UI to keep consistent, but log error
+                            row.remove();
+                            this.updateQueueCounters();
+                        });
                     }
                 }
             });
@@ -1089,7 +1206,7 @@ class AdminPanel {
                 },
                 body: `action=set-bay-maintenance&bay_number=${bayNumber}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'addUser');
 
             if (data.success) {
                 this.showSuccess('Bay set to maintenance mode');
@@ -1116,7 +1233,7 @@ class AdminPanel {
                 },
                 body: `action=set-bay-available&bay_number=${bayNumber}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'saveBusinessSettings');
 
             if (data.success) {
                 this.showSuccess('Bay set to available');
@@ -1157,7 +1274,7 @@ class AdminPanel {
                 },
                 body: `action=add-user&${new URLSearchParams(userData).toString()}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadTransactions');
 
             if (data.success) {
                 this.showSuccess('User added successfully');
@@ -1189,7 +1306,7 @@ class AdminPanel {
                 },
                 body: `action=save-business-settings&min_fee=${minFee}&kwh_per_peso=${kwhPerPeso}`
             });
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'filterTransactions');
 
             if (data.success) {
                 this.showSuccess('Business settings updated successfully');
@@ -1238,7 +1355,7 @@ class AdminPanel {
     async loadTransactions() {
         try {
             const response = await fetch('api/admin.php?action=transactions');
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'loadTransactions');
             
             if (data.success) {
                 // Store transaction data for export
@@ -1350,7 +1467,7 @@ class AdminPanel {
             }
 
             const response = await fetch(url);
-            const data = await response.json();
+            const data = await safeParseResponse(response, 'filterTransactions');
             
             if (data.success) {
                 // Store filtered transaction data for export
@@ -1806,7 +1923,10 @@ function autoAssignWaitingTickets() {
             'Content-Type': 'application/x-www-form-urlencoded',
         }
     })
-        .then(response => response.json())
+        .then(async (response) => {
+            const data = await safeParseResponse(response, 'autoAssignWaitingTickets');
+            return data;
+        })
         .then(data => {
             hideLoadingSpinner(overlay);
             if (data.success) {

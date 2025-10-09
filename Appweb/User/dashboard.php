@@ -7,18 +7,38 @@ if (!isset($_SESSION['username'])) {
 require_once 'config/database.php';
 $db = new Database();
 $conn = $db->getConnection();
+
+// Function to calculate charging amount based on service type
+function calculateChargingAmount($serviceType) {
+    // Define pricing based on service type
+    $pricing = [
+        'Fast Charging' => 75.00,
+        'Normal Charging' => 45.00,
+        'Fast' => 75.00,
+        'Normal' => 45.00
+    ];
+    
+    foreach ($pricing as $type => $amount) {
+        if (stripos($serviceType, $type) !== false) {
+            return $amount;
+        }
+    }
+    
+    return 75.00; // Default amount
+}
+
 if ($conn) {
     $username = $_SESSION['username'];
-    $stmt = $conn->prepare("SELECT firstname, car_index, plate_number FROM users WHERE username = :username");
+    $stmt = $conn->prepare("SELECT firstname, car_index, plate_number, profile_picture FROM users WHERE username = :username");
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $firstname = $user ? $user['firstname'] : 'User';
 $car_index = $user ? $user['car_index'] : null;
 $plate_number = $user ? $user['plate_number'] : null;
+$user_profile_picture = $user ? $user['profile_picture'] : null;
 
-// Fetch latest charging status from queue_tickets (current/pending sessions)
-$stmt_charging = $conn->prepare("SELECT ticket_id, service_type, status, payment_status FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+$stmt_charging = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
 $stmt_charging->bindParam(':username', $username);
 $stmt_charging->execute();
 $latest_charging = $stmt_charging->fetch(PDO::FETCH_ASSOC);
@@ -65,12 +85,17 @@ elseif ($queue_ticket) {
         $background_class = 'queue-pending-bg';
         $status_text = 'Pending Payment';
         $button_text = 'Pay Now';
-        $button_href = '../Monitor/index.php';
+        $button_href = 'javascript:void(0)'; // Change to trigger payment popup
     } elseif (strtolower($queue_ticket['status']) === 'waiting') {
         $background_class = 'waiting-bg';
         $status_text = 'Waiting';
         $button_text = 'Check Monitor';
         $button_href = '../Monitor/index.php';
+    } elseif (strtolower($queue_ticket['status']) === 'pending') {
+        $background_class = 'connected-bg';
+        $status_text = 'Connected';
+        $button_text = 'Charge Now';
+        $button_href = 'ChargingPage.php';
     }
 }
 
@@ -85,9 +110,15 @@ if ($current_ticket && in_array(strtolower($current_ticket['status']), ['chargin
 // Determine if Start Charging button should be disabled
 $start_charging_disabled = false;
 $start_charging_disabled_status = '';
-if ($current_ticket && in_array(strtolower($current_ticket['status']), ['waiting', 'charging', 'completed'])) {
-    $start_charging_disabled = true;
-    $start_charging_disabled_status = ucfirst(strtolower($current_ticket['status']));
+// Disable when status is one of: waiting, charging, completed, pending (case-insensitive)
+if ($current_ticket) {
+	$st = strtolower($current_ticket['status']);
+	// normalize some common variants
+	if ($st === 'complete') $st = 'completed';
+	if (in_array($st, ['waiting', 'charging', 'completed', 'pending'])) {
+		$start_charging_disabled = true;
+		$start_charging_disabled_status = ucfirst($st);
+	}
 }
 
 // Fetch battery level from database
@@ -180,7 +211,7 @@ if ($car_index !== null && $car_index >= 0 && $car_index <= 8) {
     $current_range_km = round($max_range_km * ($battery_level_num / 100));
     
     // Check if we should show ticket instead of range (for ALL queue states including charging)
-    if ($current_ticket && in_array(strtolower($current_ticket['status']), ['pending', 'waiting', 'in progress', 'in_progress', 'charging'])) {
+    if ($current_ticket && in_array(strtolower($current_ticket['status']), [ 'waiting', 'in progress', 'in_progress', 'charging'])) {
         $vehicle_data['range_label'] = 'Ticket';
         $vehicle_data['range'] = $current_ticket['ticket_id'];
     } else {
@@ -240,12 +271,20 @@ if ($conn) {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <title>Cephra - Dashboard</title>
     <link rel="icon" type="image/png" href="images/logo.png?v=2" />
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
+    <link rel="apple-touch-icon" sizes="192x192" href="images/logo.png?v=2" />
+    <link rel="apple-touch-icon" sizes="512x512" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#1a1a2e" />
+    
+    <!-- iOS Web App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Cephra" />
+    <meta name="mobile-web-app-capable" content="yes" />
 
     <link rel="stylesheet" href="css/vantage-style.css" />
     <link rel="stylesheet" href="css/modal.css" />
@@ -267,6 +306,86 @@ if ($conn) {
 				--bg-primary: #ffffff;
 				--bg-secondary: #f8fafc;
 				--bg-card: #ffffff;
+
+			/* Payment Modal Styles */
+			.charging-modal-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.7);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 10000;
+			}
+
+			.charging-modal-content {
+				background: white;
+				border-radius: 15px;
+				padding: 2rem;
+				max-width: 500px;
+				width: 90%;
+				max-height: 90vh;
+				overflow-y: auto;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+			}
+
+			.payment-option {
+				cursor: pointer;
+				transition: all 0.3s ease;
+				border: 2px solid #e0e0e0;
+				border-radius: 10px;
+				padding: 1rem;
+				margin: 0.5rem 0;
+				display: flex;
+				align-items: center;
+			}
+
+			.payment-option:hover {
+				border-color: #00c2ce;
+				background-color: #f0f9ff;
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(0, 194, 206, 0.2);
+			}
+
+			.payment-option.selected {
+				border-color: #00c2ce;
+				background-color: #e6f7ff;
+			}
+
+			.payment-icon {
+				margin-right: 1rem;
+				font-size: 1.5rem;
+				color: #00c2ce;
+			}
+
+			.payment-label {
+				font-weight: 600;
+				font-size: 1.1rem;
+			}
+
+
+
+			.wallet-balance {
+				background-color: #f0f9ff;
+				border: 1px solid #00c2ce;
+				border-radius: 8px;
+				padding: 1rem;
+				margin: 1rem 0;
+				text-align: center;
+			}
+
+			.error-message {
+				background-color: #fee;
+				border: 1px solid #fcc;
+				border-radius: 8px;
+				padding: 1rem;
+				margin: 1rem 0;
+				color: #c33;
+				text-align: center;
+			}
 				--border-color: rgba(26, 32, 44, 0.1);
 				--shadow-light: rgba(0, 194, 206, 0.1);
 				--shadow-medium: rgba(0, 194, 206, 0.2);
@@ -560,6 +679,14 @@ if ($conn) {
 			.mobile-menu-overlay.active {
 				opacity: 1;
 				visibility: visible;
+			}
+
+			/* Hide Start Charging button when disabled for clearer UX */
+			#startChargingBtn.disabled,
+			#startChargingBtn[aria-disabled="true"] {
+				display: none !important;
+				visibility: hidden !important;
+				pointer-events: none !important;
 			}
 
 			/* Dashboard Hero Section */
@@ -933,11 +1060,19 @@ if ($conn) {
 				transition: all 0.3s ease;
 				backdrop-filter: blur(10px);
 				text-decoration: none;
+				font-size: 1rem;
+				font-family: inherit;
 			}
 
-			.quick-action-btn:hover {
+			.quick-action-btn:hover:not(:disabled) {
 				background: rgba(255, 255, 255, 0.3);
 				transform: translateY(-2px);
+			}
+
+			.quick-action-btn:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+				background: rgba(255, 255, 255, 0.1);
 			}
 
 			.vehicle-bg-pattern {
@@ -1691,294 +1826,9 @@ if ($conn) {
 		</style>
 	</head>
 	<body>
-		<!-- Header -->
-		<header class="header">
-			<div class="container">
-				<div class="header-content"
-					 style="display: flex;
-							align-items: center;
-							justify-content: space-between;
-							gap: 16px;
-							width: 100%;">
-					<!-- Logo -->
-            <a href="dashboard.php" class="logo"
-               style="display: flex;
-                      align-items: center;
-                      gap: 12px;
-                      margin-right: 16px;
-                      text-decoration: none;">
-                <img src="images/logo.png" alt="Cephra" class="logo-img" />
-                <span class="logo-text">CEPHRA</span>
-            </a>
+			<?php include __DIR__ . '/partials/header.php'; ?>
 
-					<!-- Navigation -->
-					<nav class="nav" style="flex: 1;">
-						<ul class="nav-list"
-							style="display: flex;
-								   gap: 1.25rem;
-								   align-items: center;">
-							<li><a href="dashboard.php" class="nav-link">Home</a></li>
-							<li><a href="link.php" class="nav-link">Link</a></li>
-							<li><a href="history.php" class="nav-link">History</a></li>
-							<li><a href="rewards.php" class="nav-link">Rewards</a></li>
-						</ul>
-					</nav>
 
-					<!-- Header Actions -->
-					<div class="header-actions"
-						 style="display: flex;
-								align-items: center;
-								gap: 24px;
-								margin-left: auto;">
-						<!-- Wallet button -->
-						<a href="wallet.php" class="wallet-link"
-						   title="Wallet"
-						   style="display: inline-flex;
-								  align-items: center;
-								  justify-content: center;
-								  width: auto;
-								  height: auto;
-								  border: none;
-								  background: transparent;
-								  color: inherit;
-								  cursor: pointer;
-								  padding: 4px;">
-							<i class="fas fa-wallet" aria-hidden="true" style="font-size: 18px;"></i>
-						</a>
-                <!-- Notification bell -->
-                <div class="notifications" style="position: relative;">
-                    <button id="notifBtn"
-                            title="Notifications"
-                            style="display: inline-flex;
-                                   align-items: center;
-                                   justify-content: center;
-                                   width: auto;
-                                   height: auto;
-                                   border: none;
-                                   background: transparent;
-                                   color: inherit;
-                                   cursor: pointer;
-                                   padding: 4px;
-                                   position: relative;">
-                        <i class="fas fa-bell" aria-hidden="true" style="font-size: 18px;"></i>
-                        <span class="notification-badge" style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #ff4757; border-radius: 50%; display: block;"></span>
-                    </button>
-                    <div class="notification-dropdown" id="notificationDropdown"
-                         style="display: none;
-                                position: absolute;
-                                top: 100%;
-                                right: 0;
-                                background: white;
-                                border: 1px solid var(--border-color);
-                                border-radius: 8px;
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                                min-width: 280px;
-                                max-width: 320px;
-                                z-index: 1001;
-                                max-height: 300px;
-                                overflow-y: auto;
-                                margin-top: 8px;">
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-info-circle" style="color: var(--primary-color); font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Welcome to Cephra!</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your personalized dashboard is ready to use.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Just now</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-bolt" style="color: #28a745; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Charging Session Complete</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Your EV has finished charging at Station A.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 hours ago</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-gift" style="color: #ff6b6b; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">New Rewards Available</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">You've earned 50 Green Points from your last charge.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">1 day ago</div>
-                            </div>
-                        </div>
-                        <div class="notification-item" style="padding: 12px 16px; cursor: pointer; transition: background 0.2s; display: flex; align-items: flex-start; gap: 10px;">
-                            <i class="fas fa-tools" style="color: #ffa502; font-size: 16px; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">System Maintenance Scheduled</div>
-                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Station B will be under maintenance tomorrow.</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">2 days ago</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-						<!-- Language selector (globe icon only) placed to the right of Download -->
-
-						<?php
-						// Compute avatar source
-						$pfpSrc = 'images/logo.png';
-						if ($conn) {
-							try {
-								$stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
-								$stmt2->bindParam(':u', $username);
-								$stmt2->execute();
-								$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
-								if ($row2 && !empty($row2['profile_picture'])) {
-									$pp = $row2['profile_picture'];
-									if (strpos($pp, 'data:image') === 0) {
-										$pfpSrc = $pp;
-									} elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
-										$pfpSrc = 'data:image/png;base64,' . $pp;
-									} elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
-										$path = 'uploads/profile_pictures/' . $pp;
-										if (file_exists(__DIR__ . '/' . $path)) {
-											$pfpSrc = $path;
-										}
-									}
-								}
-							} catch (Exception $e) { /* ignore */ }
-						}
-						?>
-						<div class="profile-container" style="position: relative;">
-							<button class="profile-btn" id="profileBtn"
-								   title="Profile Menu"
-								   style="display: inline-flex;
-										  width: 38px;
-										  height: 38px;
-										  border-radius: 50%;
-										  overflow: hidden;
-										  border: 2px solid rgba(0, 0, 0, 0.08);
-										  background: transparent;
-										  cursor: pointer;
-										  padding: 0;">
-								<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
-									 alt="Profile"
-									 style="width: 100%;
-											height: 100%;
-											object-fit: cover;
-											display: block;" />
-							</button>
-							<ul class="profile-dropdown" id="profileDropdown"
-								style="position: absolute;
-									   top: 100%;
-									   right: 0;
-									   background: white;
-									   border: 1px solid rgba(0, 0, 0, 0.1);
-									   border-radius: 8px;
-									   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-									   min-width: 120px;
-									   list-style: none;
-									   padding: 0;
-									   margin: 0;
-									   z-index: 1001;
-									   display: none;">
-								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
-									<a href="profile.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Profile</a>
-								</li>
-								<li style="position: relative; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
-									<a href="#" id="languageMenuItem" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Language</a>
-                                    <ul class="language-sub-dropdown" id="languageSubDropdown" style="position: absolute; top: 0; right: 100%; left: auto; background: white; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); min-width: 120px; list-style: none; padding: 0; margin: 0; display: none;">
-										<li><a href="#" onclick="setLanguage('en'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">English</a></li>
-										<li><a href="#" onclick="setLanguage('fil'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Filipino</a></li>
-										<li><a href="#" onclick="setLanguage('ceb'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">Bisaya</a></li>
-										<li><a href="#" onclick="setLanguage('zh'); return false;" style="display: block; padding: 8px 12px; color: #333; text-decoration: none; transition: background 0.2s;">中文</a></li>
-									</ul>
-								</li>
-								<li>
-									<a href="profile_logout.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Logout</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-
-					<!-- Mobile Menu Toggle -->
-					<button class="mobile-menu-toggle" id="mobileMenuToggle">
-						<span></span>
-						<span></span>
-						<span></span>
-					</button>
-				</div>
-			</div>
-
-			<!-- Mobile Menu -->
-                <div class="mobile-menu" id="mobileMenu">
-                    <div class="mobile-menu-content">
-                        <!-- Mobile Navigation -->
-                        <div class="mobile-nav">
-                            <ul class="mobile-nav-list">
-                                <li class="mobile-nav-item">
-                                    <a href="dashboard.php" class="mobile-nav-link">Home</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="../Monitor/index.php" class="mobile-nav-link">Monitor</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="link.php" class="mobile-nav-link">Link</a>
-                                </li>
-                                <li class="mobile-nav-item">
-                                    <a href="wallet.php" class="mobile-nav-link">Wallet</a>
-                                </li>
-								<li class="mobile-nav-item">
-                                    <a href="history.php" class="mobile-nav-link">History</a>
-                                </li>
-								<li class="mobile-nav-item">
-                                    <a href="rewards.php" class="mobile-nav-link">Rewards</a>
-                                </li>
-
-                            </ul>
-                        </div>
-
-                        <!-- Mobile Header Actions -->
-                        <div class="mobile-header-actions" style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
-                            <!-- Mobile Language Selector -->
-                            <div class="mobile-language-selector">
-                                <div class="language-selector">
-                                    <button class="language-btn" id="mobileLanguageBtn">
-                                        <span class="language-text">EN</span>
-                                        <i class="fas fa-chevron-down language-arrow"></i>
-                                    </button>
-                                    <div class="language-dropdown" id="mobileLanguageDropdown">
-                                        <div class="language-option" data-lang="en">English</div>
-                                        <div class="language-option" data-lang="fil">Filipino</div>
-                                        <div class="language-option" data-lang="ceb">Bisaya</div>
-                                        <div class="language-option" data-lang="zh">中文</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Actions row: Download + Logout in one row on small screens -->
-                        <div class="mobile-actions-row" style="display:flex;gap:16px;align-items:center;justify-content:center;margin-top:12px;">
-                            <!-- Mobile Download App -->
-                            <div class="mobile-download-app" style="display:flex;align-items:center;">
-                                <div class="download-app">
-                                    <button class="download-btn" id="mobileDownloadBtn">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                    <div class="qr-popup" id="mobileQrPopup">
-                                        <div class="qr-content">
-                                            <h4>Download Cephra App</h4>
-                                            <div class="qr-code">
-                                                <img src="images/qr.png" alt="QR Code - Download Cephra App" width="120" height="120" style="display: block; border-radius: 8px;" />
-                                            </div>
-                                            <p>Scan to download the Cephra mobile app</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mobile Logout Button -->
-                            <div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;">
-                                <a href="profile_logout.php" class="nav-link auth-link">Logout</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-		</header>
-
-		<!-- Mobile Menu Overlay -->
-		<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
 		<!-- Dashboard Hero Section -->
 		<section class="dashboard-hero">
@@ -2087,7 +1937,7 @@ if ($conn) {
 								</div>
 							</div>
 			<div class="vehicle-actions">
-				<a class="quick-action-btn" href="<?php echo htmlspecialchars($button_href); ?>"><?php echo htmlspecialchars($button_text); ?></a>
+				<button class="quick-action-btn" id="vehicleActionBtn" type="button" <?php echo $vehicle_button_disabled ? 'disabled' : ''; ?>><?php echo htmlspecialchars($button_text); ?></button>
 			</div>
 						</div>
 						<div class="vehicle-bg-pattern"></div>
@@ -2181,7 +2031,7 @@ if ($conn) {
 							Earn points on every charge and unlock exclusive benefits,
 							discounts, and premium features as you charge more.
 						</p>
-						<a href="#" onclick="showGreenPointsPopup(); return false;" class="feature-link">View Rewards →</a>
+						<a href="rewards.php" class="feature-link">View Rewards →</a>
 					</div>
 
 					<!-- Wallet Feature -->
@@ -2438,30 +2288,34 @@ if ($conn) {
 		</div>
 
 		<!-- Payment Completion Modal -->
-		<div id="paymentModal" class="charging-modal-overlay" style="display: none;">
-			<div class="charging-modal-content">
-				<div class="charging-modal-icon completed-icon">
-					<i class="fas fa-check-circle"></i>
+		<div id="paymentModal" class="charging-modal-overlay" style="display: none; align-items: center; justify-content: center;">
+			<div class="charging-modal-content modern-modal-card" role="dialog" aria-labelledby="paymentModalTitle" aria-modal="true">
+				<div class="charging-modal-header">
+					<div class="charging-modal-icon completed-icon modern-icon">
+						<i class="fas fa-check-circle"></i>
+					</div>
+					<div class="charging-modal-headline">
+						<h2 id="paymentModalTitle" class="charging-modal-title">Charging Complete</h2>
+						<p class="charging-modal-description">Your charging session is complete. Please select your payment method.</p>
+					</div>
 				</div>
-				<h2 class="charging-modal-title">Charging Complete</h2>
-				<p class="charging-modal-description">Your charging session is complete. Please select your payment method.</p>
-				
-				<div class="charging-modal-info">
+
+				<div class="charging-modal-info modern-info">
 					<div class="charging-info-item">
-						<span>Session Duration:</span>
-						<span id="sessionDuration">45 minutes</span>
+						<div class="label">Session Duration</div>
+						<div class="value" id="sessionDuration">45 minutes</div>
 					</div>
 					<div class="charging-info-item">
-						<span>Energy Delivered:</span>
-						<span id="energyDelivered">12.5 kWh</span>
+						<div class="label">Energy Delivered</div>
+						<div class="value" id="energyDelivered">12.5 kWh</div>
 					</div>
 					<div class="charging-info-item">
-						<span>Final Battery:</span>
-						<span id="finalBattery">85%</span>
+						<div class="label">Final Battery</div>
+						<div class="value" id="finalBattery">85%</div>
 					</div>
 					<div class="charging-info-item">
-						<span>Total Amount:</span>
-						<span id="totalAmount">₱75.00</span>
+						<div class="label">Total Amount</div>
+						<div class="value total-amount" id="totalAmount">₱75.00</div>
 					</div>
 				</div>
 
@@ -2469,28 +2323,29 @@ if ($conn) {
 					Current Wallet Balance: ₱<span id="currentWalletBalance">150.00</span>
 				</div>
 
-				<div class="error-message" id="errorMessage" style="display: none;">
+				<div class="error-message" id="errorMessage" style="display: none; color: #b00020; font-weight: 600; text-align: center; margin-top: 8px;">
 					Insufficient wallet balance. Please choose cash payment or add funds to your wallet.
 				</div>
 
-				<div class="payment-options">
-					<div class="payment-option" data-method="cash" onclick="selectPaymentMethod('cash')">
-						<div class="payment-icon">
-							<i class="fas fa-money-bill-wave"></i>
-						</div>
-						<div class="payment-label">Cash</div>
-					</div>
-					<div class="payment-option" data-method="ewallet" onclick="selectPaymentMethod('ewallet')">
-						<div class="payment-icon">
-							<i class="fas fa-wallet"></i>
-						</div>
-						<div class="payment-label">E-Wallet</div>
+				<!-- payment option cards removed; action buttons below now carry the same design -->
+
+				<!-- Action buttons - side by side -->
+				<div class="charging-modal-buttons modern-button-row" style="margin-top:18px; display:flex; gap:12px;">
+					<button type="button" id="payWithCashBtn" class="charging-modal-btn btn-secondary modern-btn payment-option" data-method="cash" style="flex:1;">Pay with Cash</button>
+					<button type="button" id="payWithEwalletBtn" class="charging-modal-btn btn-primary modern-btn payment-option" data-method="ewallet" style="flex:1;">Pay with E-Wallet</button>
+				</div>
+
+				<!-- E-Wallet confirmation step (hidden by default) -->
+				<div id="ewalletConfirm" style="display:none; margin-top:14px; text-align:center;">
+					<p style="margin:0 0 10px 0; font-weight:600;">Your wallet has sufficient balance. Confirm payment?</p>
+					<div class="modern-button-row" style="display:flex; gap:12px; justify-content:center; margin-top:8px;">
+						<button id="ewalletProceedBtn" class="charging-modal-btn btn-primary modern-btn" type="button" style="flex:1;">Proceed</button>
+						<button id="ewalletCancelBtn" class="charging-modal-btn btn-secondary modern-btn" type="button" style="flex:1;">Cancel</button>
 					</div>
 				</div>
 
-				<div class="charging-modal-buttons">
-					<button class="charging-modal-btn btn-secondary" onclick="closePaymentModal()">Cancel</button>
-					<button class="charging-modal-btn btn-success" id="confirmPaymentBtn" onclick="confirmPayment()" disabled>Confirm Payment</button>
+				<div style="margin-top:10px; text-align:center;">
+					<button class="charging-modal-btn" onclick="closePaymentModal()" style="background:transparent;border:0;color:#666;">Close</button>
 				</div>
 			</div>
 		</div>
@@ -2554,6 +2409,63 @@ if ($conn) {
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
 			<script>
+				
+				 // Mobile Menu Toggle
+        function initMobileMenu() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.createElement('div');
+            mobileMenuOverlay.className = 'mobile-menu-overlay';
+            mobileMenuOverlay.id = 'mobileMenuOverlay';
+            document.body.appendChild(mobileMenuOverlay);
+
+            function toggleMobileMenu() {
+                const isActive = mobileMenu.classList.contains('active');
+                if (isActive) {
+                    closeMobileMenu();
+                } else {
+                    openMobileMenu();
+                }
+            }
+
+            function openMobileMenu() {
+                mobileMenu.classList.add('active');
+                mobileMenuToggle.classList.add('active');
+                mobileMenuOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+                document.addEventListener('keydown', handleEscapeKey);
+            }
+
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                mobileMenuOverlay.removeEventListener('click', closeMobileMenu);
+                document.removeEventListener('keydown', handleEscapeKey);
+            }
+
+            function handleEscapeKey(e) {
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+            }
+
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileNavLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                        if (mobileMenu.classList.contains('active')) {
+                            closeMobileMenu();
+                        }
+                    }
+                }
+            });
+        }
                 // Pass PHP variables to JavaScript
                 window.chargingStatus = '<?php echo $charging_status; ?>';
                 window.statusText = '<?php echo $status_text; ?>';
@@ -2616,19 +2528,41 @@ if ($conn) {
                 document.addEventListener('DOMContentLoaded', function() {
                     const startBtn = document.getElementById('startChargingBtn');
                     if (startBtn) {
-                        startBtn.addEventListener('click', function(event) {
-                            // Check if current ticket status is charging or completed
-                            const pendingStatuses = ['charging', 'completed'];
-                            const currentStatus = window.currentStatus || '';
+							startBtn.addEventListener('click', function(event) {
+								// Check if current ticket status is one that should block starting a new charge
+								const blockedStatuses = ['charging', 'completed', 'complete', 'pending', 'waiting'];
+								const currentStatus = (window.currentStatus || '').toLowerCase();
 
-                            if (pendingStatuses.includes(currentStatus)) {
-                                event.preventDefault();
-                                showErrorPopup('You already have a pending ticket');
-                            }
-                            // else allow navigation normally
-                        });
+								if (blockedStatuses.includes(currentStatus)) {
+									event.preventDefault();
+									showErrorPopup('You already have a pending ticket or session in progress');
+									return;
+								}
+								// else allow navigation normally
+							});
                     }
                 });
+
+				// Notification dropdown functionality
+(function() {
+    const notifBtn = document.getElementById('notifBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+
+    if (notifBtn && notificationDropdown) {
+        notifBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isVisible = notificationDropdown.style.display === 'block';
+            notificationDropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notifBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.style.display = 'none';
+            }
+        });
+    }
+})();
 
             </script>
 
@@ -2945,12 +2879,21 @@ if ($conn) {
                     setInterval(fetchAndRenderLiveStatus, 3000);
                 }
 
-         // Mobile menu toggle
-        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('mobile-menu-open');
-            this.classList.toggle('active');
-        });
+                // Fix for passive event listeners in jQuery
+                if (typeof jQuery !== 'undefined') {
+                    jQuery.event.special.touchstart = {
+                        setup: function(_, ns, handle) {
+                            this.addEventListener('touchstart', handle, { passive: true });
+                        }
+                    };
+                    jQuery.event.special.touchmove = {
+                        setup: function(_, ns, handle) {
+                            this.addEventListener('touchmove', handle, { passive: true });
+                        }
+                    };
+                }
+
+
                 
 
 
@@ -2990,7 +2933,22 @@ if ($conn) {
                             },
                             body: JSON.stringify({action: 'get_status'})
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text();
+                        })
+                        .then(text => {
+                            try {
+                                const data = JSON.parse(text);
+                                return data;
+                            } catch (e) {
+                                console.error('JSON parse error:', e);
+                                console.error('Response text:', text);
+                                throw new Error('Invalid JSON response');
+                            }
+                        })
                         .then(data => {
                             if (data.success) {
                                 // Update status text
@@ -2999,17 +2957,50 @@ if ($conn) {
                                     statusElement.textContent = data.status_text;
                                 }
 
-                                // Update button text and href
-                                const buttonElement = document.querySelector('.quick-action-btn');
-                                if (buttonElement && data.button_text && data.button_href) {
+                                // Update button text and functionality
+                                const buttonElement = document.getElementById('vehicleActionBtn');
+                                if (buttonElement && data.button_text) {
                                     buttonElement.textContent = data.button_text;
-                                    buttonElement.href = data.button_href;
+                                    buttonElement.disabled = false; // Enable button by default
                                     
-                                    // Add target="_blank" for Monitor links
-                                    if (data.button_href.includes('Monitor')) {
-                                        buttonElement.setAttribute('target', '_blank');
+                                    // Handle Pay Now button click
+                                    if (data.button_text === 'Pay Now') {
+                                        console.log('Setting up Pay Now button click handler');
+                                        buttonElement.onclick = function(e) {
+                                            e.preventDefault();
+                                            console.log('Pay Now button clicked');
+                                            // Set payment data and show modal
+                                            currentTicketId = data.payment_modal ? data.payment_modal.ticket_id : '';
+                                            totalAmount = data.payment_modal ? data.payment_modal.amount : 0;
+                                            
+                                            console.log('Payment data set:', { currentTicketId, totalAmount });
+                                            
+                                            // Update modal with actual data
+                                            const totalAmountEl = document.getElementById('totalAmount');
+                                            const receiptServiceEl = document.getElementById('receiptService');
+                                            
+                                            if (totalAmountEl) {
+                                                totalAmountEl.textContent = '₱' + totalAmount.toFixed(2);
+                                            }
+                                            if (receiptServiceEl) {
+                                                receiptServiceEl.textContent = data.payment_modal ? data.payment_modal.service_type : 'Charging';
+                                            }
+                                            
+											// Show the payment completion modal (user-initiated, force it)
+											showPaymentCompletionModal(true);
+                                        };
                                     } else {
-                                        buttonElement.removeAttribute('target');
+                                        // Handle other button actions (redirect to href)
+                                        buttonElement.onclick = function(e) {
+                                            e.preventDefault();
+                                            if (data.button_href) {
+                                                if (data.button_href.includes('Monitor')) {
+                                                    window.open(data.button_href, '_blank');
+                                                } else {
+                                                    window.location.href = data.button_href;
+                                                }
+                                            }
+                                        };
                                     }
                                 }
 
@@ -3021,6 +3012,48 @@ if ($conn) {
                                     // Add new background class
                                     vehicleCard.classList.add(data.background_class);
                                 }
+
+								// Disable or enable the Start Charging button when status is 'complete'
+								try {
+									const startBtn = document.getElementById('startChargingBtn');
+									const normalizedStatus = (data.status_text || '').toLowerCase();
+									if (startBtn) {
+										// disable for several known blocking status keywords
+										const shouldDisable = ['complete','completed','pending','waiting','charging'].some(k => normalizedStatus.includes(k) || normalizedStatus === k);
+										if (shouldDisable) {
+											// Mark as disabled for both <a> and <button> variants
+											startBtn.classList.add('disabled');
+											startBtn.setAttribute('aria-disabled', 'true');
+											// Anchor handling: remove href and prevent interaction
+											if (startBtn.tagName && startBtn.tagName.toLowerCase() === 'a') {
+												// stash href so we can restore it later
+												if (!startBtn.dataset._hrefBackup) startBtn.dataset._hrefBackup = startBtn.getAttribute('href') || '';
+												startBtn.removeAttribute('href');
+												startBtn.style.pointerEvents = 'none';
+												startBtn.tabIndex = -1;
+											} else {
+												// For buttons/spans, set disabled if supported
+												try { startBtn.disabled = true; } catch(e){}
+											}
+										} else {
+											// Re-enable
+											startBtn.classList.remove('disabled');
+											startBtn.removeAttribute('aria-disabled');
+											if (startBtn.tagName && startBtn.tagName.toLowerCase() === 'a') {
+												if (startBtn.dataset._hrefBackup) {
+													startBtn.setAttribute('href', startBtn.dataset._hrefBackup);
+													delete startBtn.dataset._hrefBackup;
+												}
+												startBtn.style.pointerEvents = '';
+												startBtn.tabIndex = 0;
+											} else {
+												try { startBtn.disabled = false; } catch(e){}
+											}
+										}
+									}
+								} catch (e) {
+									console.warn('startChargingBtn toggle failed', e);
+								}
 
                                 // Update battery level if changed
                                 const batteryElement = $('.feature-description strong').filter(function() {
@@ -3048,8 +3081,17 @@ if ($conn) {
                                 }
 
                                 // New modal logic for pending payment
-                                if (data.status_text.toLowerCase().includes('pending payment') || data.status_text.toLowerCase().includes('queue pending')) {
-                                    showPaymentModal();
+                                if (data.payment_modal && data.payment_modal.show) {
+                                    // Set payment data
+                                    currentTicketId = data.payment_modal.ticket_id;
+                                    totalAmount = data.payment_modal.amount;
+                                    
+                                    // Update modal with actual data
+                                    document.getElementById('totalAmount').textContent = '₱' + totalAmount.toFixed(2);
+                                    document.getElementById('receiptService').textContent = data.payment_modal.service_type || 'Charging';
+                                    
+									// Show the payment completion modal (automated status update - do not force)
+												showPaymentCompletionModal();
                                 }
                             }
                         })
@@ -3273,8 +3315,10 @@ if ($conn) {
                         });
                     }
 
-                    // Update status every 5 seconds
-                    setInterval(updateVehicleStatus, 5000);
+					// Update status every 5 seconds
+					// Call once immediately so the UI reflects the latest state on page load
+					try { updateVehicleStatus(); } catch (e) { console.error('initial updateVehicleStatus call failed', e); }
+					setInterval(updateVehicleStatus, 5000);
 
                     // Also update when page becomes visible (user switches back to tab)
                     document.addEventListener('visibilitychange', function() {
@@ -3282,6 +3326,102 @@ if ($conn) {
                             updateVehicleStatus();
                         }
                     });
+
+					// Handle initial Pay Now button click on page load
+					console.log('setting up payment modal handlers (immediate)');
+
+					// Attach handlers to any element with .payment-option (buttons now)
+					document.querySelectorAll('.payment-option').forEach(el => {
+						el.addEventListener('click', function(e) {
+							// If this is one of the dedicated pay buttons, skip the generic handler
+							if (el.id === 'payWithCashBtn' || el.id === 'payWithEwalletBtn') {
+								// Let the button-specific listeners handle the click
+								return;
+							}
+							const method = el.getAttribute('data-method');
+							console.log('payment-option clicked, method=', method);
+							if (!method) return;
+							selectPaymentMethod(method);
+							try { payNow(method); } catch(e){ console.error('payNow failed', e); }
+						});
+					});
+
+					console.log('Payment option handlers set up (buttons)');
+
+					// Set up direct-pay button handlers (replaces confirm/cancel flow)
+					const payCashBtn = document.getElementById('payWithCashBtn');
+					const payEwalletBtn = document.getElementById('payWithEwalletBtn');
+
+					if (payCashBtn) {
+						payCashBtn.addEventListener('click', function() {
+							console.log('Pay with Cash clicked');
+							payNow('cash');
+						});
+					}
+
+					if (payEwalletBtn) {
+						// Open a confirmation step for e-wallet payments when clicked
+						payEwalletBtn.addEventListener('click', function() {
+							console.log('Pay with E-Wallet clicked');
+							// Start the e-wallet payment flow which checks balance and shows a Proceed/Cancel confirmation
+							try { initiateEwalletPayment(); } catch (e) { console.error('initiateEwalletPayment failed', e); }
+						});
+					}
+
+					console.log('Direct pay button handlers set up');
+
+					const initialButton = document.getElementById('vehicleActionBtn');
+					console.log('Initial button found:', initialButton);
+					console.log('Button text:', initialButton ? initialButton.textContent : 'none');
+
+					if (initialButton && initialButton.textContent === 'Pay Now') {
+						console.log('Setting up initial Pay Now button click handler');
+						initialButton.onclick = function(e) {
+							e.preventDefault();
+							console.log('Initial Pay Now button clicked');
+
+							// Get payment data from PHP variables
+							const ticketId = '<?php echo $queue_ticket ? $queue_ticket['ticket_id'] : ''; ?>';
+							const serviceType = '<?php echo $queue_ticket ? $queue_ticket['service_type'] : ''; ?>';
+							const amount = <?php echo $queue_ticket ? calculateChargingAmount($queue_ticket['service_type']) : 0; ?>;
+
+							console.log('PHP data:', { ticketId, serviceType, amount });
+
+							if (ticketId) {
+								currentTicketId = ticketId;
+								totalAmount = amount;
+
+								// Update modal with actual data
+								const totalAmountEl = document.getElementById('totalAmount');
+								const receiptServiceEl = document.getElementById('receiptService');
+
+								if (totalAmountEl) {
+									totalAmountEl.textContent = '₱' + totalAmount.toFixed(2);
+								}
+								if (receiptServiceEl) {
+									receiptServiceEl.textContent = serviceType || 'Charging';
+								}
+
+								// Show the payment completion modal
+								showPaymentCompletionModal();
+							} else {
+								console.log('No ticket ID found');
+							}
+						};
+					} else if (initialButton && initialButton.textContent !== 'Pay Now') {
+						// Handle other button actions on page load
+						const buttonHref = '<?php echo $button_href; ?>';
+						if (buttonHref) {
+							initialButton.onclick = function(e) {
+								e.preventDefault();
+								if (buttonHref.includes('Monitor')) {
+									window.open(buttonHref, '_blank');
+								} else {
+									window.location.href = buttonHref;
+								}
+							};
+						}
+					}
 
                     // Add click handlers for modal triggers
                     $(document).on('click', function(e) {
@@ -3301,10 +3441,477 @@ if ($conn) {
                             closeSupportModal();
                         }
                     });
+
+                    // Payment method selection - Global variables
+                    let selectedPaymentMethod = null;
+                    let currentTicketId = null;
+                    let totalAmount = 0;
+
+                    // Make functions global
+                    window.selectPaymentMethod = function(method) {
+                        console.log('selectPaymentMethod called with:', method);
+                        
+                        if (!method || (method !== 'cash' && method !== 'ewallet')) {
+                            console.error('Invalid payment method:', method);
+                            return;
+                        }
+                        
+                        selectedPaymentMethod = method;
+                        
+                        // Update UI to show selected method
+                        document.querySelectorAll('.payment-option').forEach(option => {
+                            option.classList.remove('selected');
+                        });
+                        
+                        const selectedOption = document.querySelector(`[data-method="${method}"]`);
+                        if (selectedOption) {
+                            selectedOption.classList.add('selected');
+                        } else {
+                            console.error('Payment option not found for method:', method);
+                            return;
+                        }
+                        
+						// Enable pay buttons (direct pay flow)
+						const payCashBtnEl = document.getElementById('payWithCashBtn');
+						const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+						if (payCashBtnEl) payCashBtnEl.disabled = false;
+						if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
+                        
+                        // Show wallet balance if e-wallet is selected
+                        if (method === 'ewallet') {
+                            console.log('E-wallet selected, fetching balance');
+                            fetchWalletBalance();
+                        } else {
+                            console.log('Cash selected, hiding wallet info');
+                            document.getElementById('walletBalanceDisplay').style.display = 'none';
+                            document.getElementById('errorMessage').style.display = 'none';
+                        }
+                    }
+
+					// Fetch current wallet balance - returns numeric balance or throws
+					window.fetchWalletBalance = async function() {
+						console.log('Fetching wallet balance for amount:', totalAmount);
+						const resp = await fetch('api/mobile.php?action=wallet-balance&username=<?php echo htmlspecialchars($_SESSION['username']); ?>');
+						if (!resp.ok) throw new Error('Network response was not ok');
+						const text = await resp.text();
+						let data;
+						try {
+							data = JSON.parse(text);
+						} catch (e) {
+							console.error('Wallet balance JSON parse error:', e);
+							console.error('Response text:', text);
+							throw new Error('Invalid JSON response from wallet API');
+						}
+						if (!data.success) throw new Error(data.error || 'Wallet API error');
+						const balance = Number(data.balance || 0);
+						document.getElementById('currentWalletBalance').textContent = balance.toFixed(2);
+						document.getElementById('walletBalanceDisplay').style.display = 'block';
+						return balance;
+					}
+
+					// Confirm payment - now callable directly by payNow
+					window.confirmPayment = async function(method) {
+						console.log('confirmPayment called with method:', method);
+						selectedPaymentMethod = method;
+
+						// Validate payment method
+						if (!selectedPaymentMethod || (selectedPaymentMethod !== 'cash' && selectedPaymentMethod !== 'ewallet')) {
+							alert('Invalid payment method.');
+							return;
+						}
+
+
+
+						// Validate ticket ID and amount
+						if (!currentTicketId || currentTicketId.trim() === '') {
+							alert('No ticket ID found. Please refresh the page and try again.');
+							return;
+						}
+						if (!totalAmount || totalAmount <= 0 || isNaN(totalAmount)) {
+							alert('Invalid payment amount. Please refresh the page and try again.');
+							return;
+						}
+
+						// For e-wallet, check balance first
+						if (selectedPaymentMethod === 'ewallet') {
+							try {
+								const balance = await fetchWalletBalance();
+								if (balance < totalAmount) {
+									document.getElementById('errorMessage').style.display = 'block';
+									alert('Insufficient wallet balance. Please add funds or choose cash.');
+									return;
+								}
+							} catch (err) {
+								console.error('Wallet balance check failed:', err);
+								alert('Unable to verify wallet balance. Please try again later.');
+								return;
+							}
+						}
+
+						// Show loading state on the pay buttons
+						const payCashBtnEl = document.getElementById('payWithCashBtn');
+						const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+						if (payCashBtnEl) payCashBtnEl.disabled = true;
+						if (payEwalletBtnEl) payEwalletBtnEl.disabled = true;
+
+						try {
+							const response = await fetch('api/process_payment.php', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ ticket_id: currentTicketId, payment_method: selectedPaymentMethod, amount: totalAmount })
+							});
+							if (!response.ok) throw new Error('Network error');
+							const text = await response.text();
+							let data;
+							try { data = JSON.parse(text); } catch (e) { throw new Error('Invalid JSON from payment API'); }
+
+							if (data.success) {
+								if (selectedPaymentMethod === 'cash') {
+									alert('Cash payment recorded successfully!');
+								} else {
+									const remaining = data.remaining_balance != null ? Number(data.remaining_balance) : null;
+									if (remaining != null) alert(`E-wallet payment processed. Remaining balance: ₱${remaining.toFixed(2)}`);
+									else alert('E-wallet payment processed successfully!');
+								}
+
+								closePaymentModal();
+								setTimeout(() => window.location.reload(), 900);
+							} else {
+								throw new Error(data.error || 'Payment failed');
+							}
+						} catch (err) {
+							console.error('Payment error', err);
+							alert('Payment failed: ' + (err.message || 'Unknown error'));
+						} finally {
+							if (payCashBtnEl) payCashBtnEl.disabled = false;
+							if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
+						}
+					}
+
+					// Pay Now helper - immediately attempts payment with the chosen method
+					window.payNow = function(method) {
+						// Ensure modal ticket data present
+						console.log('payNow triggered for:', method, 'ticket:', currentTicketId, 'amount:', totalAmount);
+						if (!method) return;
+						// Short-circuit client-side UX messages to avoid server errors during development
+						if (method === 'cash') {
+							// Show a friendly instruction to the user
+							showDialog('Cash Payment', 'Please go to the counter to pay.');
+							// Close the payment modal after a short delay
+							setTimeout(() => {
+								closePaymentModal();
+							}, 900);
+							return;
+						}
+
+						if (method === 'ewallet') {
+							// Attempt to fetch balance and provide user-friendly message, but do NOT call server payment API
+							fetchWalletBalance().then(balance => {
+								if (balance >= totalAmount) {
+									showDialog('E-Wallet Payment', 'Your e-wallet has sufficient balance. Please confirm payment from the app.');
+								} else {
+									document.getElementById('errorMessage').style.display = 'block';
+									showDialog('E-Wallet Payment', 'Insufficient wallet balance. Please add funds or choose cash.');
+								}
+							}).catch(err => {
+								console.error('Wallet balance check failed:', err);
+								showDialog('E-Wallet Payment', 'Unable to verify wallet balance. Please try again later.');
+							});
+							return;
+						}
+
+						// Fallback: if other methods are passed, call the original confirm flow
+						confirmPayment(method);
+					}
+
+						// Close payment modal
+						window.closePaymentModal = function() {
+							console.log('closePaymentModal called');
+                        
+							const paymentModal = document.getElementById('paymentModal');
+							if (paymentModal) {
+								paymentModal.style.display = 'none';
+							}
+
+							// Reset payment selection and enable pay buttons
+							selectedPaymentMethod = null;
+							const payCashBtnEl = document.getElementById('payWithCashBtn');
+							const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+							if (payCashBtnEl) payCashBtnEl.disabled = false;
+							if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
+
+							// Clear any selections
+							document.querySelectorAll('.payment-option').forEach(option => {
+								option.classList.remove('selected');
+							});
+
+							// Hide wallet balance and error messages
+							const walletDisplay = document.getElementById('walletBalanceDisplay');
+							const errorDisplay = document.getElementById('errorMessage');
+							if (walletDisplay) walletDisplay.style.display = 'none';
+							if (errorDisplay) errorDisplay.style.display = 'none';
+                        
+							console.log('Payment modal closed and reset');
+						}
+
+						// Global e-wallet confirmation helpers (separate from confirmPayment)
+						window.initiateEwalletPayment = async function() {
+							console.log('initiateEwalletPayment (global) called');
+							if (!currentTicketId || !totalAmount) {
+								alert('Payment data missing. Please refresh and try again.');
+								return;
+							}
+							try {
+								const balance = await fetchWalletBalance();
+								console.log('Wallet balance:', balance, 'Total amount:', totalAmount);
+								if (balance >= totalAmount) {
+									showEwalletConfirmUI(balance);
+								} else {
+									document.getElementById('errorMessage').style.display = 'block';
+									alert('Insufficient wallet balance. Please add funds or choose cash.');
+								}
+							} catch (err) {
+								console.error('Error checking wallet balance for ewallet payment', err);
+								alert('Unable to verify wallet balance. Please try again later.');
+							}
+						}
+
+						window.showEwalletConfirmUI = function(balance) {
+							const confirmEl = document.getElementById('ewalletConfirm');
+							const walletBalanceDisplay = document.getElementById('walletBalanceDisplay');
+							if (walletBalanceDisplay) walletBalanceDisplay.style.display = 'block';
+							if (confirmEl) confirmEl.style.display = 'block';
+							const payCashBtnEl = document.getElementById('payWithCashBtn');
+							const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+							if (payCashBtnEl) payCashBtnEl.disabled = true;
+							if (payEwalletBtnEl) payEwalletBtnEl.disabled = true;
+						}
+
+						window.hideEwalletConfirmUI = function() {
+							const confirmEl = document.getElementById('ewalletConfirm');
+							if (confirmEl) confirmEl.style.display = 'none';
+							const payCashBtnEl = document.getElementById('payWithCashBtn');
+							const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+							if (payCashBtnEl) payCashBtnEl.disabled = false;
+							if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
+						}
+
+						// Proceed / Cancel wiring for the confirm UI
+						document.addEventListener('click', function(e) {
+							if (e.target && e.target.id === 'ewalletProceedBtn') {
+								// Proceed: call the main confirmPayment flow which performs the deduction
+								confirmPayment('ewallet');
+							}
+							if (e.target && e.target.id === 'ewalletCancelBtn') {
+								// Cancel: hide confirm UI and return to modal
+								hideEwalletConfirmUI();
+							}
+						});
+
+					// Show payment completion modal
+					// optional parameter force=true bypasses the per-ticket spam guard (useful for explicit user actions)
+					window.showPaymentCompletionModal = function(force) {
+                        console.log('showPaymentCompletionModal called');
+                        console.log('currentTicketId:', currentTicketId);
+                        console.log('totalAmount:', totalAmount);
+                        
+					// Prevent spamming: show once per ticket using localStorage, and guard against duplicate calls in this session
+						if (!force) {
+							try {
+								const ticketKey = currentTicketId ? ('paymentModalShown_' + currentTicketId) : 'paymentModalShown_global';
+								if (localStorage.getItem(ticketKey) === 'true') {
+									console.log('Payment modal already shown for', ticketKey, '- skipping');
+									return;
+								}
+								// mark as shown
+								localStorage.setItem(ticketKey, 'true');
+							} catch (e) {
+								// localStorage could be unavailable in some privacy modes; fall back to in-memory guard
+								console.warn('localStorage unavailable, using in-memory guard');
+							}
+
+							// in-memory guard to prevent duplicate shows in same page session
+							if (window._paymentModalShowing) {
+								console.log('Payment modal already showing in this session, skipping');
+								return;
+							}
+							window._paymentModalShowing = true;
+						} else {
+							console.log('force=true: bypassing spam guard and showing modal');
+						}
+
+					// Reset payment selection and enable pay buttons
+						selectedPaymentMethod = null;
+						const payCashBtnEl = document.getElementById('payWithCashBtn');
+						const payEwalletBtnEl = document.getElementById('payWithEwalletBtn');
+						if (payCashBtnEl) payCashBtnEl.disabled = false;
+						if (payEwalletBtnEl) payEwalletBtnEl.disabled = false;
+                        
+                        // Remove any existing selection
+                        document.querySelectorAll('.payment-option').forEach(option => {
+                            option.classList.remove('selected');
+                        });
+                        
+                        // Hide wallet balance and error messages initially
+                        const walletDisplay = document.getElementById('walletBalanceDisplay');
+                        const errorDisplay = document.getElementById('errorMessage');
+                        if (walletDisplay) walletDisplay.style.display = 'none';
+                        if (errorDisplay) errorDisplay.style.display = 'none';
+                        
+                        // Show the payment modal
+                        const paymentModal = document.getElementById('paymentModal');
+                        if (paymentModal) {
+                            paymentModal.style.display = 'flex';
+                            console.log('Payment modal shown');
+							// When modal is closed, reset the in-memory guard so it can be shown again in the same session if needed
+							const observer = new MutationObserver(() => {
+								if (paymentModal.style.display === 'none') {
+									window._paymentModalShowing = false;
+									observer.disconnect();
+								}
+							});
+							observer.observe(paymentModal, { attributes: true, attributeFilter: ['style'] });
+                        } else {
+                            console.error('Payment modal element not found');
+                        }
+                    }
+
+                    // Test function to manually show payment modal (for debugging)
+                    window.testPaymentModal = function() {
+                        console.log('Testing payment modal');
+                        currentTicketId = 'TEST123';
+                        totalAmount = 75.00;
+                        showPaymentCompletionModal();
+                    };
+
+                    // Test function to check button functionality
+                    window.testPayNowButton = function() {
+                        const button = document.getElementById('vehicleActionBtn');
+                        console.log('Button element:', button);
+                        console.log('Button text:', button ? button.textContent : 'not found');
+                        console.log('Button disabled:', button ? button.disabled : 'not found');
+                        console.log('Button onclick:', button ? button.onclick : 'not found');
+                        
+                        if (button && button.textContent === 'Pay Now') {
+                            console.log('Triggering Pay Now button click');
+                            button.click();
+                        } else {
+                            console.log('Button is not Pay Now or not found');
+                        }
+                    };
+
+                    // Function to clear all payment modal flags
+                    window.clearPaymentModalFlags = function() {
+                        console.log('Clearing all payment modal flags');
+                        for (let i = localStorage.length - 1; i >= 0; i--) {
+                            const key = localStorage.key(i);
+                            if (key && key.startsWith('paymentModalShown_')) {
+                                localStorage.removeItem(key);
+                                console.log('Removed:', key);
+                            }
+                        }
+                    };
+
+                    // Test function to verify payment modal functionality
+                    window.testPaymentFlow = function() {
+                        console.log('=== Testing Payment Flow ===');
+                        
+                        // Test 1: Check if modal exists
+                        const modal = document.getElementById('paymentModal');
+                        console.log('1. Payment modal exists:', !!modal);
+                        
+						// Test 2: Check if payment option buttons exist
+						const paymentOptions = document.querySelectorAll('.payment-option');
+						console.log('2. Payment option buttons count:', paymentOptions.length);
+                        
+                        // Test 3: Check if buttons exist
+						const payCashBtn = document.getElementById('payWithCashBtn');
+						const payEwalletBtn = document.getElementById('payWithEwalletBtn');
+						console.log('4. Pay with Cash button exists:', !!payCashBtn);
+						console.log('5. Pay with E-Wallet button exists:', !!payEwalletBtn);
+                        
+                        // Test 4: Check if functions are global
+                        console.log('6. selectPaymentMethod function exists:', typeof window.selectPaymentMethod);
+                        console.log('7. confirmPayment function exists:', typeof window.confirmPayment);
+                        console.log('8. closePaymentModal function exists:', typeof window.closePaymentModal);
+                        
+                        // Test 5: Show modal
+                        console.log('9. Showing payment modal...');
+                        currentTicketId = 'TEST123';
+                        totalAmount = 75.00;
+                        showPaymentCompletionModal();
+                        
+                        console.log('=== Test Complete ===');
+                    };
+
+                    // Test function to test payment method selection
+                    window.testPaymentMethods = function() {
+                        console.log('=== Testing Payment Methods ===');
+                        
+                        // Show modal first
+                        currentTicketId = 'TEST123';
+                        totalAmount = 75.00;
+                        showPaymentCompletionModal();
+                        
+                        // Test cash selection
+                        setTimeout(() => {
+                            console.log('Testing cash selection...');
+                            selectPaymentMethod('cash');
+                        }, 1000);
+                        
+                        // Test e-wallet selection
+                        setTimeout(() => {
+                            console.log('Testing e-wallet selection...');
+                            selectPaymentMethod('ewallet');
+                        }, 2000);
+                        
+                        console.log('=== Payment Method Test Started ===');
+                    };
                 });
             </script>
 
 		<!-- Footer -->
+
+		<style>
+		/* Modern payment modal styles */
+		.modern-modal-card{
+			width:100%;
+			max-width:480px;
+			background:var(--bg-card, #fff);
+			border-radius:14px;
+			box-shadow:0 20px 40px rgba(14,58,73,0.12);
+			padding:18px 18px 16px 18px;
+			display:flex;
+			flex-direction:column;
+			gap:8px;
+			border:1px solid rgba(14,58,73,0.06);
+		}
+
+		.charging-modal-header{display:flex;gap:12px;align-items:center}
+		.modern-icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00c2ce 0%, #0e3a49 100%);color:#fff;font-size:20px}
+		.charging-modal-title{margin:0;font-size:1.25rem;color:#0e3a49}
+		.charging-modal-description{margin:0;color:#666;font-size:0.95rem}
+
+		.modern-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+		.charging-info-item{background:rgba(14,58,73,0.02);padding:10px;border-radius:10px;display:flex;flex-direction:column}
+		.charging-info-item .label{font-size:0.85rem;color:#667;}
+		.charging-info-item .value{font-weight:700;color:#0e3a49;margin-top:4px}
+		.total-amount{color:#00aab0}
+
+		/* Apply payment-option card styles to buttons inside the modern button row */
+		.modern-button-row .payment-option{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px;border-radius:10px;border:1px solid rgba(14,58,73,0.06);cursor:pointer;background:#fff;justify-content:center}
+		.payment-option{ /* keep generic class for other uses */ display:inline-flex }
+		.payment-option.selected{border-color:rgba(0,194,206,0.9);box-shadow:0 6px 18px rgba(0,194,206,0.08)}
+		.payment-icon{font-size:20px;color:#0e3a49}
+		.payment-label{font-weight:600;color:#0e3a49}
+
+		.modern-button-row .modern-btn{padding:12px 14px;border-radius:10px;font-weight:700;border:0;cursor:pointer}
+		.modern-button-row .btn-primary{background:linear-gradient(135deg,#00c2ce 0%, #0e3a49 100%);color:#fff}
+		.modern-button-row .btn-secondary{background:#f3f6f7;color:#0e3a49}
+
+		/* Ensure modal overlay centers content when displayed as flex */
+		.charging-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:10000;padding:16px}
+		</style>
 		<footer class="footer">
 			<div class="container">
 				<div class="footer-content">
@@ -3319,16 +3926,16 @@ if ($conn) {
 						</p>
 					</div>
 
-            <div class="footer-section">
-                <h4 class="footer-title">Platform</h4>
-                <ul class="footer-links">
-                    <li><a href="dashboard.php">Home</a></li>
-                    <li><a href=".../appweb/Monitor/index.php">Monitor</a></li>
-                    <li><a href="link.php">Link</a></li>
-                    <li><a href="history.php">History</a></li>
-                    <li><a href="rewards.php">Rewards</a></li>
-                </ul>
-            </div>
+					<div class="footer-section">
+				<h4 class="footer-title">Platform</h4>
+				<ul class="footer-links">
+					<li><a href="dashboard.php">Home</a></li>
+					<li><a href="../Monitor/monitor.php">Monitor</a></li>
+					<li><a href="link.php">Link</a></li>
+					<li><a href="history.php">History</a></li>
+					<li><a href="rewards.php">Rewards</a></li>
+				</ul>
+			</div>
 					<div class="footer-section">
 						<h4 class="footer-title">Support</h4>
 						<ul class="footer-links">

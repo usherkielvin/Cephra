@@ -2,12 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <title>Cephra Login</title>
     <link rel="icon" type="image/png" href="images/logo.png?v=2" />
     <link rel="apple-touch-icon" href="images/logo.png?v=2" />
+    <link rel="apple-touch-icon" sizes="192x192" href="images/logo.png?v=2" />
+    <link rel="apple-touch-icon" sizes="512x512" href="images/logo.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#062635" />
+    
+    <!-- iOS Web App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Cephra" />
+    <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- Open Graph meta tags for social media previews -->
     <meta property="og:title" content="Sign in to Cephra - Your Electric Vehicle Charging Platform" />

@@ -1,4 +1,8 @@
 <?php
+// Disable error display to prevent breaking JSON
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 session_start();
 if (!isset($_SESSION['username'])) {
     http_response_code(401);
@@ -16,6 +20,25 @@ $conn = $db->getConnection();
 if (!$conn) {
     echo json_encode(['success' => false, 'error' => 'Database connection failed']);
     exit();
+}
+
+// Function to calculate charging amount based on service type
+function calculateChargingAmount($serviceType) {
+    // Define pricing based on service type
+    $pricing = [
+        'Fast Charging' => 75.00,
+        'Normal Charging' => 45.00,
+        'Fast' => 75.00,
+        'Normal' => 45.00
+    ];
+    
+    foreach ($pricing as $type => $amount) {
+        if (stripos($serviceType, $type) !== false) {
+            return $amount;
+        }
+    }
+    
+    return 75.00; // Default amount
 }
 
 // Function to ensure user has a plate number (like Java system)
@@ -86,7 +109,7 @@ if ($action === 'test_status') {
     // Test endpoint to check current status for debugging
     $test_username = $_POST['username'] ?? $username;
     
-    $stmt_queue = $conn->prepare("SELECT ticket_id, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_queue = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
     $stmt_queue->bindParam(':username', $test_username);
     $stmt_queue->execute();
     $queue_ticket = $stmt_queue->fetch(PDO::FETCH_ASSOC);
@@ -109,7 +132,7 @@ if ($action === 'test_status') {
 
 if ($action === 'get_status') {
     // Fetch latest charging status from both queue_tickets and active_tickets
-    $stmt_queue = $conn->prepare("SELECT ticket_id, status, payment_status, created_at FROM queue_tickets WHERE username = :username ORDER BY created_at DESC LIMIT 1");
+    $stmt_queue = $conn->prepare("SELECT * FROM queue_tickets WHERE username = :username AND status NOT IN ('complete') ORDER BY created_at DESC LIMIT 1");
     $stmt_queue->bindParam(':username', $username);
     $stmt_queue->execute();
     $queue_ticket = $stmt_queue->fetch(PDO::FETCH_ASSOC);
@@ -218,11 +241,11 @@ if ($action === 'get_status') {
             $button_href = '../Monitor/index.php';
             error_log("Status updated to charging (from queue_tickets) for $username: $status_text");
         } elseif ($queue_status === 'pending') {
-            $background_class = 'queue-pending-bg';
-            $status_text = 'Queue Pending';
-            $button_text = 'Check Monitor';
-            $button_href = '../Monitor/index.php';
-            error_log("Status updated to queue pending for $username: $status_text");
+            $background_class = 'connected-bg';
+            $status_text = 'Connected';
+            $button_text = 'Charge Now';
+            $button_href = 'ChargingPage.php';
+            error_log("Status updated to connected (pending ticket ready) for $username: $status_text");
         } elseif ($queue_status === 'waiting') {
             $background_class = 'waiting-bg';
             $status_text = 'Waiting';
@@ -239,7 +262,16 @@ if ($action === 'get_status') {
             $background_class = 'queue-pending-bg';
             $status_text = 'Pending Payment';
             $button_text = 'Pay Now';
-            $button_href = '../Monitor/index.php';
+            $button_href = 'javascript:void(0)'; // Change to trigger payment popup
+            
+            // Add payment modal trigger
+            $payment_modal = [
+                'show' => true,
+                'ticket_id' => $ticket_id,
+                'service_type' => $queue_ticket['service_type'],
+                'amount' => calculateChargingAmount($queue_ticket['service_type'])
+            ];
+            
             error_log("Status updated to pending payment for $username: $status_text");
         }
 
@@ -282,6 +314,7 @@ if ($action === 'get_status') {
         'battery_level' => $battery_level,
         'notification' => $notification,
         'ticket_info' => $ticket_info ?? null,
+        'payment_modal' => $payment_modal ?? null,
         'timestamp' => time()
     ]);
 } elseif ($action === 'confirm_charging') {

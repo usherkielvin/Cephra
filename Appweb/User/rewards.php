@@ -492,8 +492,11 @@ if ($conn) {
                 position: static;
                 transform: none;
                 right: auto;
-                margin-left: auto;
+                margin: 0 auto;
                 order: 3;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .header-content {
@@ -522,13 +525,50 @@ if ($conn) {
                 padding: 1.5rem;
             }
 
+            /* Ensure modal buttons are centered and touch-friendly on small screens */
             .modal-buttons {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 0.75rem;
+                align-items: center; /* center horizontally */
+                justify-content: center; /* center vertically within modal-buttons */
+                padding: 0 1rem; /* add some horizontal padding so buttons don't touch edges */
             }
 
             .modal-btn {
-                width: 100%;
+                width: 100%; /* full width within padded container */
+                max-width: 360px; /* limit extreme width on larger small screens */
+                box-sizing: border-box; /* include padding in width */
+                margin: 0 auto; /* center if max-width applies */
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        @media (max-width: 370px) {
+            .rewards-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            .reward-card {
+                padding: 0.75rem;
+            }
+            .reward-card h4 {
+                font-size: 0.9rem;
+            }
+            .reward-card p {
+                font-size: 0.75rem;
+            }
+            .redeem-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+            .rewards-section {
+                padding: 50px 0;
+            }
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            .section-header p {
+                font-size: 1rem;
             }
         }
     </style>
@@ -737,6 +777,7 @@ if ($conn) {
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script>
+        
         // Mobile Menu Toggle
         function initMobileMenu() {
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');

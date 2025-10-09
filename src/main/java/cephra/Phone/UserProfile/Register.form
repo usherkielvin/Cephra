@@ -204,46 +204,6 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JLabel" name="upper">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="At least one uppercase letter"/>
-      </Properties>
-      <Constraints>
-        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="100" y="550" width="200" height="-1"/>
-        </Constraint>
-      </Constraints>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lower">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="At least one lowercase letter"/>
-      </Properties>
-      <Constraints>
-        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="100" y="560" width="200" height="-1"/>
-        </Constraint>
-      </Constraints>
-    </Component>
-    <Component class="javax.swing.JLabel" name="number">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="At least one number"/>
-      </Properties>
-      <Constraints>
-        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="100" y="570" width="200" height="-1"/>
-        </Constraint>
-      </Constraints>
-    </Component>
-    <Component class="javax.swing.JLabel" name="characters">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Minimum 8 characters"/>
-      </Properties>
-      <Constraints>
-        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="100" y="580" width="150" height="-1"/>
-        </Constraint>
-      </Constraints>
-    </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">

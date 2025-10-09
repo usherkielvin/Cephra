@@ -498,33 +498,51 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 						<!-- Language selector (globe icon only) placed to the right of Download -->
 
 						<?php
-						// Compute avatar source
-						$pfpSrc = 'images/logo.png';
-						if ($conn) {
+						// Always process profile picture fresh for each page load
+						$pfpSrc = 'images/logo.png'; // Default fallback
+						
+						if (isset($username) && isset($conn) && $conn && !empty($username)) {
 							try {
-								$stmt2 = $conn->prepare("SELECT profile_picture FROM users WHERE username = :u LIMIT 1");
-								$stmt2->bindParam(':u', $username);
-								$stmt2->execute();
-								$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
-								if ($row2 && !empty($row2['profile_picture'])) {
-									$pp = $row2['profile_picture'];
+								$stmt = $conn->prepare("SELECT profile_picture FROM users WHERE username = ? LIMIT 1");
+								$stmt->execute([$username]);
+								$row = $stmt->fetch(PDO::FETCH_ASSOC);
+								
+								if ($row && !empty($row['profile_picture'])) {
+									$pp = $row['profile_picture'];
+									
 									if (strpos($pp, 'data:image') === 0) {
+										// Data URI format (already complete)
 										$pfpSrc = $pp;
 									} elseif (strpos($pp, 'iVBORw0KGgo') === 0) {
+										// Raw Base64 format from Java app - convert to data URI
 										$pfpSrc = 'data:image/png;base64,' . $pp;
 									} elseif (preg_match('/\.(jpg|jpeg|png|gif)$/i', $pp)) {
+										// File upload format
 										$path = 'uploads/profile_pictures/' . $pp;
 										if (file_exists(__DIR__ . '/../' . $path)) {
 											$pfpSrc = $path;
 										}
+									} else {
+										// Any other format - try to display as image
+										$pfpSrc = $pp;
 									}
+								} else {
+									// No profile picture - use user initial
+									$pfpSrc = 'data:image/svg+xml;base64,' . base64_encode('
+										<svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
+											<circle cx="19" cy="19" r="19" fill="#00c2ce"/>
+											<text x="19" y="25" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">' . strtoupper(substr($username, 0, 1)) . '</text>
+										</svg>
+									');
 								}
-							} catch (Exception $e) { /* ignore */ }
+							} catch (Exception $e) { 
+								// Silent fail - use default
+							}
 						}
 						?>
 						<div class="profile-container" style="position: relative;">
 							<button class="profile-btn" id="profileBtn"
-								   title="Profile Menu"
+								   title="Profile Menu - <?php echo htmlspecialchars($username); ?>"
 								   style="display: inline-flex;
 										  width: 38px;
 										  height: 38px;
@@ -534,12 +552,22 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 										  background: transparent;
 										  cursor: pointer;
 										  padding: 0;">
-								<img src="<?php echo htmlspecialchars($pfpSrc); ?>"
-									 alt="Profile"
-									 style="width: 100%;
-											height: 100%;
-											object-fit: cover;
-											display: block;" />
+								<?php if (strpos($pfpSrc, 'data:image/svg+xml') === 0): ?>
+									<!-- SVG Avatar with user initial (fallback when no profile picture) -->
+									<div style="width: 100%; height: 100%; background: #00c2ce; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">
+										<?php echo strtoupper(substr($username, 0, 1)); ?>
+									</div>
+								<?php else: ?>
+									<!-- All other profile pictures (data URI, Base64, uploaded files, default logo) -->
+									<img src="<?php echo htmlspecialchars($pfpSrc); ?>?v=<?php echo time(); ?>&t=<?php echo uniqid(); ?>&r=<?php echo rand(1000,9999); ?>"
+										 alt="Profile - <?php echo htmlspecialchars($username); ?>"
+										 style="width: 100%;
+												height: 100%;
+												object-fit: cover;
+												display: block;" 
+										 onload="console.log('Profile loaded:', this.src);"
+										 onerror="console.log('Profile failed:', this.src);" />
+								<?php endif; ?>
 							</button>
 							<ul class="profile-dropdown" id="profileDropdown"
 								style="position: absolute;
@@ -549,12 +577,15 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 									   border: 1px solid rgba(0, 0, 0, 0.1);
 									   border-radius: 8px;
 									   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-									   min-width: 120px;
+									   min-width: 150px;
 									   list-style: none;
 									   padding: 0;
 									   margin: 0;
-									   z-index: 1001;
+									   z-index: 10001;
 									   display: none;">
+								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05); padding: 8px 16px; background: #f8f9fa; font-weight: bold; color: #333;">
+									<?php echo htmlspecialchars($username); ?>
+								</li>
 								<li style="border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
 									<a href="profile.php" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; transition: background 0.2s;">Profile</a>
 								</li>
@@ -612,26 +643,6 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
                         <!-- Mobile Header Actions -->
                         <div class="mobile-header-actions" style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
-                            <!-- Mobile Language Selector -->
-                            <div class="mobile-language-selector">
-                                <div class="language-selector">
-                                    <button class="language-btn" id="mobileLanguageBtn">
-                                        <span class="language-text">EN</span>
-                                        <i class="fas fa-chevron-down language-arrow"></i>
-                                    </button>
-                                    <div class="language-dropdown" id="mobileLanguageDropdown">
-                                        <div class="language-option" data-lang="en">English</div>
-                                        <div class="language-option" data-lang="fil">Filipino</div>
-                                        <div class="language-option" data-lang="ceb">Bisaya</div>
-                                        <div class="language-option" data-lang="zh">中文</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Actions row: Download + Logout in one row on small screens -->
-                        <div class="mobile-actions-row" style="display:flex;gap:16px;align-items:center;justify-content:center;margin-top:12px;">
-
 
                             <!-- Mobile Logout Button -->
                             <div class="mobile-auth-buttons" style="display:flex;gap:12px;align-items:center;">
@@ -653,6 +664,34 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
             <script>
+                // Force refresh profile picture when switching tabs
+                function forceRefreshProfilePicture() {
+                    const profileImg = document.querySelector('#profileBtn img');
+                    if (profileImg) {
+                        // Get the base source without cache parameters
+                        let baseSrc = profileImg.src.split('?')[0];
+                        
+                        // Add fresh cache-busting parameters
+                        const newSrc = baseSrc + '?v=' + Date.now() + '&t=' + Math.random() + '&r=' + Math.floor(Math.random() * 10000);
+                        
+                        // Force reload the image
+                        profileImg.src = newSrc;
+                        console.log('Profile picture force refreshed:', newSrc);
+                    }
+                }
+                
+                // Refresh on tab switch
+                document.addEventListener('visibilitychange', function() {
+                    if (!document.hidden) {
+                        setTimeout(forceRefreshProfilePicture, 50);
+                    }
+                });
+                
+                // Refresh on window focus
+                window.addEventListener('focus', function() {
+                    setTimeout(forceRefreshProfilePicture, 50);
+                });
+                
                 // Profile dropdown functionality
                 (function() {
                     const profileBtn = document.getElementById('profileBtn');
@@ -1230,12 +1269,11 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 					window.translateDashboard = translateDashboard;
 				})();
 
-				// Initialize dashboard features
+                // Initialize header features (do not auto-start live/dashboard fetches here)
                 $(document).ready(function() {
-                    loadDashboardStats();
-                    updateLiveStatus();
-					// Apply saved language translations
-					setTimeout(() => { try { window.translateDashboard(); } catch(e){} }, 0);
+                    // Defer starting dashboard/live fetches to page-specific scripts to avoid unnecessary network load
+                    // Apply saved language translations
+                    setTimeout(() => { try { window.translateDashboard(); } catch(e){} }, 0);
 
                     // Intersection Observer for animations
                     const observerOptions = {
