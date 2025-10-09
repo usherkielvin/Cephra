@@ -265,40 +265,13 @@ private class CombinedProceedEditor extends AbstractCellEditor implements TableC
                         return;
                     }
                     if ("Charging".equalsIgnoreCase(status)) {
-                        queTab.setValueAt("Complete", rowSnapshot, statusColumnIndex);
-                        
-                        try {
-                            boolean dbUpdated = cephra.Database.CephraDB.updateQueueTicketStatus(ticket, "Complete");
-                            if (!dbUpdated) {
-                                System.err.println("Queue: Failed to update database status for ticket " + ticket);
-                            }
-                        } catch (Exception ex) {
-                            System.err.println("Queue: Error updating database status: " + ex.getMessage());
-                        }
-                        
-                        // Remove from waiting grid if it exists there
-                        try {
-                            cephra.Admin.BayManagement.removeTicketFromWaitingGrid(ticket);
-                        } catch (Exception ex) {
-                            System.err.println("Queue: Error removing ticket from waiting grid: " + ex.getMessage());
-                        }
-                        
-                        try { 
-                            ensurePaymentPending(ticket); 
-                            if (paymentCol >= 0) {
-                                queTab.setValueAt("Pending", rowSnapshot, paymentCol);
-                            }
-                            
-                            // Also update the database to set payment status to Pending
-                            boolean paymentStatusUpdated = cephra.Database.CephraDB.updateQueueTicketPaymentStatus(ticket, "Pending");
-                            if (!paymentStatusUpdated) {
-                                System.err.println("Queue: Failed to update payment status to Pending in database for ticket " + ticket);
-                            }
-                        } catch (Exception ex) { 
-                            System.err.println("Failed to set payment pending: " + ex.getMessage()); 
-                        }
-                        
-                        triggerNotificationForCustomer(customer, "FULL_CHARGE", ticket, null);
+                        // Admin can only view charging status, cannot manually complete it
+                        // Charging completion happens automatically when battery reaches 100%
+                        javax.swing.JOptionPane.showMessageDialog(null, 
+                            "Charging is in progress. Please wait for automatic completion when battery reaches 100%.", 
+                            "Charging in Progress", 
+                            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                        return;
                     }
                     if ("Complete".equalsIgnoreCase(status)) {
                         String payment = paymentCol >= 0 ? String.valueOf(queTab.getValueAt(rowSnapshot, paymentCol)) : "";

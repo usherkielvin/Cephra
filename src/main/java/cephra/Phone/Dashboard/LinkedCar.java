@@ -8,6 +8,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
 public class LinkedCar extends javax.swing.JPanel {
@@ -25,6 +28,15 @@ public class LinkedCar extends javax.swing.JPanel {
         "/cephra/Cephra Images/c9.png",
         "/cephra/Cephra Images/c10.png"
     };
+    
+    // Charging progress tracking (now handled by ChargingManager)
+    // Keep these for compatibility but charging logic moved to background
+    private boolean isCharging = false; // For UI display only
+    private String chargingType = ""; // For UI display only
+    
+    // Auto-refresh timer to detect when admin changes status
+    private Timer statusCheckTimer;
+    private String lastKnownStatus = ""; // Track last status to detect changes
 
     public LinkedCar() {
         initComponents();
@@ -45,11 +57,15 @@ public class LinkedCar extends javax.swing.JPanel {
         // Ensure car positioning follows NetBeans form settings
         ensureCarPositioning();
         
+        // Initialize auto-refresh to detect admin changes
+        initializeStatusChecker();
+        
         // Add a focus listener to refresh battery display when panel becomes visible
         addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent e) {
                 refreshBatteryDisplay();
+                startStatusChecker(); // Start checking when panel gains focus
             }
         });
         
@@ -60,6 +76,11 @@ public class LinkedCar extends javax.swing.JPanel {
                 if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0) {
                     if (isShowing()) {
                         refreshBatteryDisplay();
+                        // Check if user was already charging when panel becomes visible
+                        resumeChargingIfActive();
+                        startStatusChecker(); // Start checking when panel becomes visible
+                    } else {
+                        stopStatusChecker(); // Stop checking when panel is hidden
                     }
                 }
             }
@@ -203,42 +224,57 @@ public class LinkedCar extends javax.swing.JPanel {
                 (ticketStatus.equals("Completed") || ticketStatus.equals("Complete")));
             
             if (isFullyCharged || isChargingCompleted) {
-                // Battery is fully charged or charging completed - show empty label, show "Fully Charged"
+                // Background charging manager handles this now
+                // No need to stop local timers
+                // Don't handle full battery display here - that's handled elsewhere
                 chargingTypeLabel.setText("");
                 chargingTimeLabel.setText(isFullyCharged ? "Fully Charged" : "Ready");
                 
-                // System.out.println("LinkedCar: Charging completed - showing 'Not Charging' status for user " + username + 
-                //                  " (battery: " + batteryLevel + "%, status: " + ticketStatus + ")");
             } else if (currentTicketId != null && ticketStatus != null && 
-                (ticketStatus.equals("Pending") || ticketStatus.equals("Waiting") || ticketStatus.equals("In Progress") || ticketStatus.equals("Charging"))) {
+                (ticketStatus.equals("Charging"))) {
                 
                 // Get ticket details from database
                 String serviceType = getTicketServiceType(currentTicketId);
                 
                 if (serviceType != null) {
-                    // Update charging type label when charging
+                    // Only start real-time charging when admin sets status to "Charging"
+                    if (!cephra.Phone.Utilities.ChargingManager.getInstance().isCharging(username)) {
+                        // Start background charging (independent of UI)
+                        cephra.Phone.Utilities.ChargingManager.getInstance().startCharging(username, serviceType);
+                        System.out.println("LinkedCar: Started background charging for " + username);
+                    }
+                    
+                    // Update display for charging state
                     if (serviceType.toLowerCase().contains("fast")) {
                         chargingTypeLabel.setText("Fast Charging");
                     } else {
                         chargingTypeLabel.setText("Normal Charging");
                     }
-                    
-                    // Calculate estimated charging time based on battery level and service type
-                    int estimatedMinutes = calculateChargingTime(batteryLevel, serviceType);
-                    
-                    // Format time display
-                    String timeDisplay = formatChargingTime(estimatedMinutes);
-                    chargingTimeLabel.setText(timeDisplay);
-                    
-                    // System.out.println("LinkedCar: Updated charging display - Type: " + serviceType + 
-                    //                  ", Time: " + timeDisplay + " for user " + username + " (battery: " + batteryLevel + "%, ticket: " + currentTicketId + ")");
+                    updateChargingTimeDisplay(batteryLevel, serviceType);
                 } else {
                     // No ticket found, show not charging status
                     setNotChargingDisplay();
                 }
             } else {
-                // No active ticket or completed charging, show not charging status
-                setNotChargingDisplay();
+                // Show appropriate status based on ticket status
+                if (ticketStatus != null) {
+                    if (ticketStatus.equals("Pending") || ticketStatus.equals("Waiting")) {
+                        chargingTypeLabel.setText("");
+                        chargingTimeLabel.setText("Waiting");
+                        // Just update UI, no notification
+                    } else if (ticketStatus.equals("In Progress")) {
+                        chargingTypeLabel.setText("");
+                        chargingTimeLabel.setText("Ready to Charge");
+                        // Just update UI, no notification
+                    } else {
+                        setNotChargingDisplay();
+                    }
+                } else {
+                    setNotChargingDisplay();
+                }
+                
+                // Background charging manager handles charging now
+                // No need to stop local timers
             }
         } catch (Exception e) {
             System.err.println("Error updating charging time and type: " + e.getMessage());
@@ -315,10 +351,285 @@ public class LinkedCar extends javax.swing.JPanel {
     }
     
     
+    // Method to show notification based on current status
+    private void showNotificationForStatus(String status, String ticketId) {
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            
+            // Add notification to history first using NotificationManager
+            if (username != null && ticketId != null) {
+                switch (status) {
+                    case "WAITING":
+                        cephra.Phone.Utilities.NotificationManager.addTicketWaitingNotification(username, ticketId);
+                        break;
+                    case "CHARGING":
+                        // For charging status, we can use ticket pending since there's no specific charging method
+                        cephra.Phone.Utilities.NotificationManager.addTicketPendingNotification(username, ticketId);
+                        break;
+                    case "MY_TURN":
+                        // For My Turn notification, bay number is optional
+                        cephra.Phone.Utilities.NotificationManager.addMyTurnNotification(username, ticketId, "");
+                        break;
+                    case "DONE":
+                        // Full charge notification is already handled in completeCharging() method
+                        break;
+                }
+            }
+            
+            // Then show the popup notification at the top
+            java.awt.Window[] windows = java.awt.Window.getWindows();
+            for (java.awt.Window window : windows) {
+                if (window instanceof cephra.Frame.Phone) {
+                    cephra.Frame.Phone phoneFrame = (cephra.Frame.Phone) window;
+                    
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            cephra.Phone.Popups.Notification notification = new cephra.Phone.Popups.Notification();
+                            notification.addToFrame(phoneFrame);
+                            
+                            // Show notification based on status
+                            switch (status) {
+                                case "WAITING":
+                                    notification.updateAndShowNotification(
+                                        cephra.Phone.Popups.Notification.TYPE_WAITING, 
+                                        ticketId, 
+                                        ""
+                                    );
+                                    break;
+                                case "CHARGING":
+                                    notification.updateAndShowNotification(
+                                        cephra.Phone.Popups.Notification.TYPE_CHARGING, 
+                                        ticketId, 
+                                        ""
+                                    );
+                                    break;
+                                case "MY_TURN":
+                                    notification.updateAndShowNotification(
+                                        cephra.Phone.Popups.Notification.TYPE_MY_TURN, 
+                                        ticketId, 
+                                        ""
+                                    );
+                                    break;
+                                case "DONE":
+                                    notification.updateAndShowNotification(
+                                        cephra.Phone.Popups.Notification.TYPE_DONE, 
+                                        ticketId, 
+                                        ""
+                                    );
+                                    break;
+                                default:
+                                    System.out.println("LinkedCar: Unknown notification status: " + status);
+                                    break;
+                            }
+                            
+                            System.out.println("LinkedCar: Showed " + status + " notification for ticket " + ticketId);
+                        } catch (Exception notifEx) {
+                            System.err.println("Error showing " + status + " notification: " + notifEx.getMessage());
+                        }
+                    });
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            System.err.println("Error finding phone frame for notification: " + ex.getMessage());
+        }
+    }
+    
     // Method to set not charging display when charging is completed or no active ticket
     private void setNotChargingDisplay() {
         chargingTypeLabel.setText("");
         chargingTimeLabel.setText("Ready");
+    }
+    
+    /**
+     * Initialize the smart status checker that only acts on actual changes
+     */
+    private void initializeStatusChecker() {
+        // Get initial status to avoid showing notification on first check
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            if (username != null) {
+                lastKnownStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
+                if (lastKnownStatus == null) {
+                    lastKnownStatus = "";
+                }
+            }
+        } catch (Exception e) {
+            lastKnownStatus = "";
+        }
+        
+        statusCheckTimer = new Timer(1000, new ActionListener() { // Check every 1 second for faster battery sync
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                checkForStatusChanges();
+                // Also refresh battery display to show charging progress
+                refreshBatteryDisplayOnly();
+            }
+        });
+        statusCheckTimer.setRepeats(true);
+        
+        // Start if panel is visible
+        if (isShowing()) {
+            startStatusChecker();
+        }
+    }
+    
+    /**
+     * Check for status changes and only refresh/notify if something actually changed
+     */
+    private void checkForStatusChanges() {
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            if (username != null) {
+                String currentStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
+                if (currentStatus == null) {
+                    currentStatus = "";
+                }
+                
+                // Only refresh if status actually changed
+                if (!currentStatus.equals(lastKnownStatus)) {
+                    System.out.println("LinkedCar: Status changed from '" + lastKnownStatus + "' to '" + currentStatus + "' - refreshing!");
+                    lastKnownStatus = currentStatus;
+                    
+                    // Refresh the display which will trigger appropriate notifications
+                    SwingUtilities.invokeLater(() -> {
+                        refreshBatteryDisplay();
+                    });
+                }
+                // If no change, do nothing (no spam!)
+            }
+        } catch (Exception ex) {
+            System.err.println("Error checking status changes: " + ex.getMessage());
+        }
+    }
+    
+    /**
+     * Start the status checker
+     */
+    private void startStatusChecker() {
+        if (statusCheckTimer != null && !statusCheckTimer.isRunning()) {
+            statusCheckTimer.start();
+            System.out.println("LinkedCar: Started smart status checker");
+        }
+    }
+    
+    /**
+     * Stop the status checker
+     */
+    private void stopStatusChecker() {
+        if (statusCheckTimer != null && statusCheckTimer.isRunning()) {
+            statusCheckTimer.stop();
+            System.out.println("LinkedCar: Stopped smart status checker");
+        }
+    }
+    
+    /**
+     * Refresh only the battery display without triggering status change notifications
+     * Used for showing real-time charging progress
+     */
+    private void refreshBatteryDisplayOnly() {
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            if (username != null && !username.isEmpty()) {
+                int batteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                
+                if (batteryLevel != -1) {
+                    // Update battery percentage
+                    batterypercent.setText(batteryLevel + " %");
+                    
+                    // Update range based on battery level
+                    int rangeKm = (int)(batteryLevel * 8);
+                    km.setText(rangeKm + " km");
+                    
+                    // Update car rotation
+                    updateCarRotation(batteryLevel);
+                    
+                    // Update driving mode times
+                    updateDrivingModeTimes(batteryLevel);
+                    
+                    // Update charging display if user is charging
+                    if (cephra.Phone.Utilities.ChargingManager.getInstance().isCharging(username)) {
+                        String chargingType = cephra.Phone.Utilities.ChargingManager.getInstance().getChargingType(username);
+                        if (chargingType != null) {
+                            if (chargingType.toLowerCase().contains("fast")) {
+                                chargingTypeLabel.setText("Fast Charging");
+                            } else {
+                                chargingTypeLabel.setText("Normal Charging");
+                            }
+                            updateChargingTimeDisplay(batteryLevel, chargingType);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error refreshing battery display: " + e.getMessage());
+        }
+    }
+    
+    // Method to check if user was charging and resume if necessary
+    private void resumeChargingIfActive() {
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            if (username != null && !username.isEmpty()) {
+                // Check if user has an active charging ticket (only "Charging" status starts the progress bar)
+                String activeTicketId = cephra.Database.CephraDB.getActiveTicket(username);
+                String queueTicketId = cephra.Database.CephraDB.getQueueTicketForUser(username);
+                String currentTicketId = (activeTicketId != null && !activeTicketId.isEmpty()) ? activeTicketId : queueTicketId;
+                String ticketStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
+                
+                // Only resume if status is specifically "Charging" (admin has started it)
+                if (currentTicketId != null && ticketStatus != null && ticketStatus.equals("Charging")) {
+                    
+                    int currentBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                    if (currentBatteryLevel < 100) {
+                        // Get service type to determine charging speed
+                        String serviceType = getTicketServiceType(currentTicketId);
+                        if (serviceType != null) {
+                            // Use background charging manager instead of local timer
+                            cephra.Phone.Utilities.ChargingManager.getInstance().startCharging(username, serviceType);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error resuming charging: " + e.getMessage());
+        }
+    }
+    
+    // Method to update charging time display
+    private void updateChargingTimeDisplay(int currentBatteryLevel, String serviceType) {
+        try {
+            int batteryRemaining = 100 - currentBatteryLevel;
+            if (batteryRemaining <= 0) {
+                chargingTimeLabel.setText("Fully Charged");
+                return;
+            }
+            
+            // Calculate time remaining based on service type
+            int totalSecondsRemaining;
+            if (serviceType.toLowerCase().contains("fast")) {
+                // Fast charge: 30 seconds total, proportional to remaining battery
+                totalSecondsRemaining = (30 * batteryRemaining) / 100;
+            } else {
+                // Normal charge: 60 seconds total, proportional to remaining battery
+                totalSecondsRemaining = (60 * batteryRemaining) / 100;
+            }
+            
+            // Format time display
+            if (totalSecondsRemaining < 60) {
+                chargingTimeLabel.setText(totalSecondsRemaining + "s");
+            } else {
+                int minutes = totalSecondsRemaining / 60;
+                int seconds = totalSecondsRemaining % 60;
+                if (seconds == 0) {
+                    chargingTimeLabel.setText(minutes + "m");
+                } else {
+                    chargingTimeLabel.setText(minutes + "m " + seconds + "s");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating charging time display: " + e.getMessage());
+        }
     }
     
     // Method to update driving mode times based on battery level
@@ -748,5 +1059,12 @@ public class LinkedCar extends javax.swing.JPanel {
             setUserPlateNumber(); // Also refresh plate number
             ensureCarPositioning(); // Ensure positioning is maintained
         });
+    }
+    
+    @Override
+    public void removeNotify() {
+        // Stop the status checker when panel is removed
+        stopStatusChecker();
+        super.removeNotify();
     }
 }

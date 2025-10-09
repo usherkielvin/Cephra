@@ -14,7 +14,8 @@ public class Notification extends javax.swing.JPanel {
     public static final String TYPE_PENDING = "PENDING";
     public static final String TYPE_MY_TURN = "MY_TURN";
     public static final String TYPE_DONE = "DONE";
-    public static final String TYPE_OTP = "OTP"; 
+    public static final String TYPE_OTP = "OTP";
+    public static final String TYPE_CHARGING = "CHARGING"; 
     private String currentNotificationType = TYPE_WAITING;
     private String ticketId = "";
     private String bayNumber = "";  
@@ -61,6 +62,12 @@ public class Notification extends javax.swing.JPanel {
                 statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/notif.png")));
                 statusLabel.setText("Your verification code: " + ticketId);
                 statusLabel.setForeground(new java.awt.Color(0, 102, 102));
+                break;
+                
+            case TYPE_CHARGING:
+                statusLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/NotifPendingBay.png")));
+                statusLabel.setText("Your ticket \"" + ticketId + "\" is now charging");
+                statusLabel.setForeground(new java.awt.Color(255, 165, 0)); // Orange color for charging
                 break;
                 
             default:

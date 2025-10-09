@@ -8,6 +8,10 @@ public final class Launcher {
 			CephraDB.initializeDatabase();
 			CephraDB.validateDatabaseIntegrity();
 			cephra.Phone.Utilities.QueueFlow.refreshCountersFromDatabase();
+			
+			// Initialize background charging manager for global monitoring
+			cephra.Phone.Utilities.ChargingManager.getInstance();
+			System.out.println("Launcher: Initialized background charging manager");
 		} catch (Exception e) {
 			System.err.println("Database connection failed: " + e.getMessage());
 		}
