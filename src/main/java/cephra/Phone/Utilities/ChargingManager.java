@@ -23,6 +23,7 @@ public class ChargingManager {
     private final ConcurrentHashMap<String, String> lastKnownUserStatus = new ConcurrentHashMap<>();
     
     // Charging session data
+    @SuppressWarnings("unused")
     private static class ChargingSession {
         Timer chargingTimer;
         String chargingType;
