@@ -1,28 +1,16 @@
 package cephra.Phone.Utilities;
-
-import javax.swing.Timer;
-import java.awt.event.ActionEvent;
+import javax.swing.*;
+import java.awt.event.*;
 import java.awt.event.ActionListener;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
-/**
- * Background charging manager that handles charging independently of UI panels
- * Charging continues even when user switches panels or logs out
- * Also monitors for admin-triggered charging starts globally
- */
 public class ChargingManager {
-    
-    // Singleton instance
     private static ChargingManager instance;
-    
-    // Track charging sessions for different users
     private static final ConcurrentHashMap<String, ChargingSession> activeSessions = new ConcurrentHashMap<>();
     
-    // Global monitoring timer to detect admin changes
     private Timer globalMonitorTimer;
     private final ConcurrentHashMap<String, String> lastKnownUserStatus = new ConcurrentHashMap<>();
     
-    // Charging session data
     @SuppressWarnings("unused")
     private static class ChargingSession {
         Timer chargingTimer;
@@ -40,7 +28,6 @@ public class ChargingManager {
     }
     
     private ChargingManager() {
-        // Private constructor for singleton
         startGlobalMonitoring();
     }
     
@@ -51,10 +38,6 @@ public class ChargingManager {
         return instance;
     }
     
-    /**
-     * Start global monitoring for admin changes across all users
-     * This runs independently and checks for admin-triggered charging
-     */
     private void startGlobalMonitoring() {
         globalMonitorTimer = new Timer(2000, new ActionListener() { // Check every 2 seconds
             @Override
@@ -67,12 +50,8 @@ public class ChargingManager {
         System.out.println("ChargingManager: Started global monitoring for admin changes");
     }
     
-    /**
-     * Monitor all users to detect when admin sets status to 'Charging'
-     */
     private void monitorAllUsersForChargingStarts() {
         try {
-            // Get all users from database who have tickets
             java.util.List<String> activeUsers = getActiveUsers();
             
             for (String username : activeUsers) {
