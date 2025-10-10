@@ -28,10 +28,11 @@ public class LinkedCar extends javax.swing.JPanel {
         "/cephra/Cephra Images/c9.png",
         "/cephra/Cephra Images/c10.png"
     };
-    
+    @SuppressWarnings("unused")
     // Charging progress tracking (now handled by ChargingManager)
     // Keep these for compatibility but charging logic moved to background
     private boolean isCharging = false; // For UI display only
+    @SuppressWarnings("unused")
     private String chargingType = ""; // For UI display only
     
     // Auto-refresh timer to detect when admin changes status
@@ -341,7 +342,7 @@ public class LinkedCar extends javax.swing.JPanel {
         }
         return null;
     }
-    
+    @SuppressWarnings("unused")
     // Method to calculate charging time based on battery level and service type
     private int calculateChargingTime(int currentBatteryLevel, String serviceType) {
         // Charging rates from QueueBridge
@@ -363,6 +364,7 @@ public class LinkedCar extends javax.swing.JPanel {
         return (int) Math.round(batteryNeeded * minsPerPercent);
     }
     
+    @SuppressWarnings("unused")
     // Method to format charging time for display
     private String formatChargingTime(int totalMinutes) {
         if (totalMinutes < 60) {
@@ -378,7 +380,7 @@ public class LinkedCar extends javax.swing.JPanel {
         }
     }
     
-    
+    @SuppressWarnings("unused")
     // Method to show notification based on current status
     private void showNotificationForStatus(String status, String ticketId) {
         try {
