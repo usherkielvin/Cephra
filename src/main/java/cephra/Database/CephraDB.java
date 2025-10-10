@@ -1753,7 +1753,20 @@ public class CephraDB {
             }
             conn.setAutoCommit(false); // Start transaction
             
-            // 1. Add to charging history
+            // 1. Get current battery level (what user actually charged to)
+            int finalBatteryLevel = 100; // Default to 100 if we can't get actual level
+            try (PreparedStatement getBatteryStmt = conn.prepareStatement(
+                    "SELECT battery_level FROM battery_levels WHERE username = ?")) {
+                getBatteryStmt.setString(1, username);
+                try (ResultSet rs = getBatteryStmt.executeQuery()) {
+                    if (rs.next()) {
+                        finalBatteryLevel = rs.getInt("battery_level");
+                        System.out.println("CephraDB: User " + username + " stopped charging at " + finalBatteryLevel + "% - using this for payment");
+                    }
+                }
+            }
+            
+            // 2. Add to charging history with ACTUAL final battery level
             try (PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO charging_history (ticket_id, username, service_type, " +
                     "initial_battery_level, final_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, served_by) " +
@@ -1763,7 +1776,7 @@ public class CephraDB {
                 stmt.setString(2, username);
                 stmt.setString(3, serviceType);
                 stmt.setInt(4, initialBatteryLevel);
-                stmt.setInt(5, 100); // Final battery level is always 100% when completed
+                stmt.setInt(5, finalBatteryLevel); // Use ACTUAL battery level user stopped at
                 stmt.setInt(6, chargingTimeMinutes);
                 
                 // Calculate energy used in kWh based on battery levels
@@ -1899,27 +1912,9 @@ public class CephraDB {
                 }
             }
             
-            // 3.7. Update user's battery level to 100% when charging is completed
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "UPDATE battery_levels SET battery_level = 100 WHERE username = ?")) {
-                
-                stmt.setString(1, username);
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
-                } else {
-                    // If no battery level record exists, create one with 100%
-                    try (PreparedStatement insertStmt = conn.prepareStatement(
-                            "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, 100, 100, 40.0)")) {
-                        
-                        insertStmt.setString(1, username);
-                        insertStmt.executeUpdate();
-                        System.out.println("CephraDB: Created battery level record with 100% for user " + username + " after charging completion");
-                    }
-                }
-                
-                // Verify the battery level was updated correctly
-                getUserBatteryLevel(username);
-            }
+            // 3.7. DON'T update battery level - keep it at whatever level user stopped at
+            // User paid for what they actually charged, battery stays at current level
+            System.out.println("CephraDB: Keeping battery at actual level (" + finalBatteryLevel + "%) for user " + username + " - NOT forcing to 100%");
             
             // 4. Add reward points for all payments (1 PHP = 0.05 points)
             if (totalAmount > 0) {
@@ -2064,7 +2059,20 @@ public class CephraDB {
             }
             conn.setAutoCommit(false); // Start transaction
             
-            // 1. Add to charging history
+            // 1. Get current battery level (what user actually charged to)
+            int finalBatteryLevel = 100; // Default to 100 if we can't get actual level
+            try (PreparedStatement getBatteryStmt = conn.prepareStatement(
+                    "SELECT battery_level FROM battery_levels WHERE username = ?")) {
+                getBatteryStmt.setString(1, username);
+                try (ResultSet rs = getBatteryStmt.executeQuery()) {
+                    if (rs.next()) {
+                        finalBatteryLevel = rs.getInt("battery_level");
+                        System.out.println("CephraDB: User " + username + " stopped charging at " + finalBatteryLevel + "% (skip wallet) - using this for payment");
+                    }
+                }
+            }
+            
+            // 2. Add to charging history with ACTUAL final battery level
             try (PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO charging_history (ticket_id, username, service_type, " +
                     "initial_battery_level, final_battery_level, charging_time_minutes, energy_used, total_amount, reference_number, served_by) " +
@@ -2074,7 +2082,7 @@ public class CephraDB {
                 stmt.setString(2, username);
                 stmt.setString(3, serviceType);
                 stmt.setInt(4, initialBatteryLevel);
-                stmt.setInt(5, 100); // Final battery level is always 100% when completed
+                stmt.setInt(5, finalBatteryLevel); // Use ACTUAL battery level user stopped at
                 stmt.setInt(6, chargingTimeMinutes);
                 
                 // Calculate energy used in kWh based on battery levels
@@ -2195,31 +2203,9 @@ public class CephraDB {
                 }
             }
             
-            // 3.3. Update user battery level to 100% in battery_levels table
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "UPDATE battery_levels SET battery_level = 100 WHERE username = ?")) {
-                
-                stmt.setString(1, username);
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
-                } else {
-                    // If no battery level record exists, create one with 100%
-                    try (PreparedStatement insertStmt = conn.prepareStatement(
-                            "INSERT INTO battery_levels (username, battery_level, initial_battery_level, battery_capacity_kwh) VALUES (?, 100, 100, 40.0)")) {
-                        
-                        insertStmt.setString(1, username);
-                        insertStmt.executeUpdate();
-                        System.out.println("CephraDB: Created battery level record with 100% for user " + username + " after charging completion");
-                    }
-                }
-            }
-            
-            // 3.4. Verify the battery level was updated correctly
-            try {
-                getUserBatteryLevel(username);
-            } catch (Exception e) {
-                System.err.println("CephraDB: Error verifying battery level: " + e.getMessage());
-            }
+            // 3.3. DON'T update battery level - keep it at whatever level user stopped at
+            // User paid for what they actually charged, battery stays at current level
+            System.out.println("CephraDB: Keeping battery at actual level (" + finalBatteryLevel + "%) for user " + username + " (skip wallet) - NOT forcing to 100%");
             
             // 4. Add reward points for all payments (1 PHP = 0.05 points)
             if (totalAmount > 0) {

@@ -219,14 +219,25 @@ public final class QueueFlow {
     }
     
     public static boolean hasActiveTicket() {
-        // Validate in-memory ticket with DB status; treat completed/cancelled as not active
+        // Validate in-memory ticket with DB status; treat completed/cancelled as not active UNLESS payment is pending
         try {
             String currentUser = cephra.Database.CephraDB.getCurrentUsername();
             if (currentUser != null && !currentUser.trim().isEmpty()) {
                 String latestStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(currentUser);
                 if (latestStatus != null) {
                     String s = latestStatus.trim().toLowerCase();
+                    // Include "complete" status if payment is still pending
                     boolean isOpen = ("pending".equals(s) || "waiting".equals(s) || "charging".equals(s));
+                    boolean isCompleteWithPendingPayment = "complete".equals(s);
+                    
+                    if (isCompleteWithPendingPayment) {
+                        // Check if payment is still pending for this completed ticket
+                        String paymentStatus = cephra.Database.CephraDB.getUserCurrentTicketPaymentStatus(currentUser);
+                        if ("pending".equalsIgnoreCase(paymentStatus) || paymentStatus == null || paymentStatus.trim().isEmpty()) {
+                            isOpen = true; // Treat as active because payment is needed
+                        }
+                    }
+                    
                     if (!isOpen) {
                         currentTicketId = "";
                     }

@@ -22,6 +22,9 @@ public class ChargingManager {
     private Timer globalMonitorTimer;
     private final ConcurrentHashMap<String, String> lastKnownUserStatus = new ConcurrentHashMap<>();
     
+    // Blacklist users who manually stopped - NEVER auto-restart them
+    private final java.util.Set<String> manualStopBlacklist = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+    
     // Charging session data
     private static class ChargingSession {
         Timer chargingTimer;
@@ -77,13 +80,54 @@ public class ChargingManager {
             for (String username : activeUsers) {
                 if (username == null || username.trim().isEmpty()) continue;
                 
+                // FIRST CHECK: If user is in manual stop blacklist, NEVER restart!
+                if (manualStopBlacklist.contains(username)) {
+                    continue; // Skip - user manually stopped, don't auto-restart
+                }
+                
                 String currentStatus = cephra.Database.CephraDB.getUserCurrentTicketStatus(username);
                 String lastStatus = lastKnownUserStatus.get(username);
+                
+                // IMPORTANT: If lastStatus is "Complete", don't restart even if admin changes to "Charging"
+                // This prevents restart after user manually stopped charging
+                if ("Complete".equals(lastStatus)) {
+                    // Update last known status but don't restart
+                    lastKnownUserStatus.put(username, currentStatus != null ? currentStatus : "");
+                    continue; // Skip this user - they already completed
+                }
+                
+                // EXTRA SAFETY: Also check if currentStatus is "Complete" - don't restart even if lastStatus wasn't set properly
+                if ("Complete".equals(currentStatus)) {
+                    lastKnownUserStatus.put(username, currentStatus);
+                    continue; // Skip this user - they are completed
+                }
                 
                 // Check if admin just changed status to 'Charging'
                 if ("Charging".equals(currentStatus) && !"Charging".equals(lastStatus)) {
                     // Admin just started charging for this user!
                     if (!isCharging(username)) {
+                        // Check if user is already fully charged or completed
+                        try {
+                            int currentBattery = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                            if (currentBattery >= 100) {
+                                System.out.println("ChargingManager: Skipping " + username + " - already at 100% battery");
+                                continue; // Don't restart charging for full battery
+                            }
+                            
+                            // Check if ticket is already complete
+                            String ticketId = getActiveTicketForUser(username);
+                            if (ticketId != null) {
+                                String ticketStatus = getTicketStatusDirect(ticketId);
+                                if ("Complete".equals(ticketStatus)) {
+                                    System.out.println("ChargingManager: Skipping " + username + " - ticket already Complete");
+                                    continue; // Don't restart charging for completed tickets
+                                }
+                            }
+                        } catch (Exception batteryCheck) {
+                            System.err.println("ChargingManager: Error checking battery/ticket for " + username + ": " + batteryCheck.getMessage());
+                            continue; // Skip on error to be safe
+                        }
+                        
                         String ticketId = getActiveTicketForUser(username);
                         String serviceType = getServiceTypeForTicket(ticketId);
                         
@@ -180,6 +224,29 @@ public class ChargingManager {
     }
     
     /**
+     * Get ticket status directly from database
+     */
+    private String getTicketStatusDirect(String ticketId) {
+        if (ticketId == null) return null;
+        
+        try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
+            // Try queue_tickets first (most common)
+            try (java.sql.PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT status FROM queue_tickets WHERE ticket_id = ?")) {
+                stmt.setString(1, ticketId);
+                try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("status");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("ChargingManager: Error getting ticket status: " + e.getMessage());
+        }
+        return null;
+    }
+    
+    /**
      * Start background charging for a user
      */
     public void startCharging(String username, String serviceType) {
@@ -187,13 +254,33 @@ public class ChargingManager {
             return;
         }
         
-        // Stop any existing charging for this user
+        // FIRST CHECK: Don't start if user manually completed recently
+        String lastStatus = lastKnownUserStatus.get(username);
+        if ("Complete".equals(lastStatus)) {
+            // Silently refuse to start - user manually completed
+            return;
+        }
+        
+        // Check if user is already charging - prevent double charging
+        if (isCharging(username)) {
+            System.out.println("ChargingManager: User " + username + " is already charging - skipping duplicate start");
+            return;
+        }
+        
+        // Stop any existing charging for this user (cleanup)
         stopCharging(username);
         
         try {
             int currentBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
             if (currentBatteryLevel >= 100) {
-                System.out.println("ChargingManager: User " + username + " already fully charged");
+                System.out.println("ChargingManager: User " + username + " already fully charged - marking as complete");
+                
+                // Mark ticket as complete if battery is full
+                String ticketId = getActiveTicketForUser(username);
+                if (ticketId != null) {
+                    cephra.Database.CephraDB.updateQueueTicketStatus(ticketId, "Complete");
+                    lastKnownUserStatus.put(username, "Complete");
+                }
                 return;
             }
             
@@ -245,20 +332,24 @@ public class ChargingManager {
         try {
             int currentBattery = cephra.Database.CephraDB.getUserBatteryLevel(username);
             
-            if (currentBattery < 100) {
-                // Increment battery by 1%
-                int newBatteryLevel = currentBattery + 1;
-                cephra.Database.CephraDB.setUserBatteryLevel(username, newBatteryLevel);
-                
-                System.out.println("ChargingManager: " + username + " - Battery: " + newBatteryLevel + "% (" + session.chargingType + ")");
-                
-                // Check if charging is complete
-                if (newBatteryLevel >= 100) {
-                    completeCharging(username);
-                }
-            } else {
+            // Stop immediately if already at 100% (prevent over-charging)
+            if (currentBattery >= 100) {
+                System.out.println("ChargingManager: " + username + " already at 100% - completing charging");
+                completeCharging(username);
+                return;
+            }
+            
+            // Increment battery by 1%
+            int newBatteryLevel = Math.min(100, currentBattery + 1); // Cap at 100%
+            cephra.Database.CephraDB.setUserBatteryLevel(username, newBatteryLevel);
+            
+            System.out.println("ChargingManager: " + username + " - Battery: " + newBatteryLevel + "% (" + session.chargingType + ")");
+            
+            // Check if charging is complete (exactly 100%)
+            if (newBatteryLevel >= 100) {
                 completeCharging(username);
             }
+            
         } catch (Exception e) {
             System.err.println("ChargingManager: Error updating charging for " + username + ": " + e.getMessage());
             completeCharging(username);
@@ -271,13 +362,24 @@ public class ChargingManager {
     private void completeCharging(String username) {
         ChargingSession session = activeSessions.get(username);
         if (session == null) {
-            return;
+            return; // Already completed or removed
         }
         
         try {
-            // Stop timer
+            // IMMEDIATELY stop timer and remove session to prevent double execution
             if (session.chargingTimer != null && session.chargingTimer.isRunning()) {
                 session.chargingTimer.stop();
+                System.out.println("ChargingManager: Stopped charging timer for " + username);
+            }
+            
+            // Remove session immediately to prevent race conditions
+            activeSessions.remove(username);
+            
+            // Ensure battery is exactly 100% (never over)
+            int currentBattery = cephra.Database.CephraDB.getUserBatteryLevel(username);
+            if (currentBattery != 100) {
+                cephra.Database.CephraDB.setUserBatteryLevel(username, 100);
+                System.out.println("ChargingManager: Corrected battery to 100% for " + username);
             }
             
             // Update database ticket status to Complete
@@ -301,23 +403,92 @@ public class ChargingManager {
             
         } catch (Exception e) {
             System.err.println("ChargingManager: Error completing charging for " + username + ": " + e.getMessage());
-        } finally {
-            // Remove session
+            // Ensure session is removed even on error
             activeSessions.remove(username);
         }
     }
     
     /**
-     * Stop charging for a user
+     * Stop charging for a user (manual stop or automatic completion)
      */
     public void stopCharging(String username) {
+        stopCharging(username, false); // Default to not manual stop
+    }
+    
+    /**
+     * Stop charging for a user with option to specify if it's a manual stop
+     * @param username The user to stop charging for
+     * @param isManualStop True if user manually stopped, false if automatic completion
+     */
+    public void stopCharging(String username, boolean isManualStop) {
         ChargingSession session = activeSessions.get(username);
         if (session != null) {
-            if (session.chargingTimer != null && session.chargingTimer.isRunning()) {
-                session.chargingTimer.stop();
+            try {
+                // IMMEDIATELY stop the charging timer and remove session to prevent restart
+                if (session.chargingTimer != null && session.chargingTimer.isRunning()) {
+                    session.chargingTimer.stop();
+                    System.out.println("ChargingManager: Stopped charging timer for " + username);
+                }
+                
+                // Remove session IMMEDIATELY to prevent global monitor from restarting
+                activeSessions.remove(username);
+                
+                // If manual stop, add to blacklist to PERMANENTLY prevent auto-restart
+                if (isManualStop) {
+                    manualStopBlacklist.add(username);
+                    System.out.println("ChargingManager: Added " + username + " to manual stop blacklist - will not auto-restart");
+                }
+                
+                // Get current battery level for payment calculation
+                int currentBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(username);
+                int chargedAmount = Math.max(0, currentBatteryLevel - session.startingBatteryLevel);
+                
+                // Update ticket status based on how charging was stopped
+                String activeTicketId = cephra.Database.CephraDB.getActiveTicket(username);
+                String queueTicketId = cephra.Database.CephraDB.getQueueTicketForUser(username);
+                String currentTicketId = (activeTicketId != null && !activeTicketId.isEmpty()) ? activeTicketId : queueTicketId;
+                
+                if (currentTicketId != null) {
+                    if (isManualStop) {
+                        // Treat manual stop as completion (just like 100% charge)
+                        cephra.Database.CephraDB.updateQueueTicketStatus(currentTicketId, "Complete");
+                        System.out.println("ChargingManager: User " + username + " manually stopped charging at " + currentBatteryLevel + "% - marked as Complete (charged " + chargedAmount + "%)");
+                        
+                        // Send same "Done" notification as full charge
+                        if (!session.completionNotificationSent) {
+                            cephra.Phone.Utilities.NotificationManager.addFullChargeNotification(username, currentTicketId);
+                            session.completionNotificationSent = true;
+                            System.out.println("ChargingManager: Sent 'Done' notification for manual stop - " + username + " at " + currentBatteryLevel + "%");
+                        }
+                    } else {
+                        // Automatic completion (100%)
+                        cephra.Database.CephraDB.updateQueueTicketStatus(currentTicketId, "Complete");
+                        System.out.println("ChargingManager: Charging completed automatically for " + username + " - Battery: 100%");
+                        
+                        // Send completion notification (only once)
+                        if (!session.completionNotificationSent) {
+                            cephra.Phone.Utilities.NotificationManager.addFullChargeNotification(username, currentTicketId);
+                            session.completionNotificationSent = true;
+                        }
+                    }
+                    
+                    // Also update the last known status to prevent global monitor restart
+                    lastKnownUserStatus.put(username, "Complete");
+                }
+                
+                System.out.println("ChargingManager: Stopped charging for " + username + 
+                                 " - Final battery: " + currentBatteryLevel + "% (charged " + chargedAmount + "%)");
+                
+            } catch (Exception e) {
+                System.err.println("ChargingManager: Error stopping charging for " + username + ": " + e.getMessage());
+                // Ensure session is removed even on error
+                activeSessions.remove(username);
+                if (isManualStop) {
+                    manualStopBlacklist.add(username); // Still add to blacklist on error
+                }
             }
-            activeSessions.remove(username);
-            System.out.println("ChargingManager: Stopped charging for " + username);
+        } else {
+            System.out.println("ChargingManager: No active charging session found for " + username + " - already stopped");
         }
     }
     

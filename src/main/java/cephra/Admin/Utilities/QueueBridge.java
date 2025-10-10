@@ -235,13 +235,27 @@ public final class QueueBridge {
     public static double computeAmountDue(String ticket) {
         BatteryInfo info = ticketBattery.get(ticket);
         if (info == null) {
-            // Get actual user battery level from the ticket customer
+            // Get actual battery levels from the ticket and user
             String customer = getTicketCustomer(ticket);
             if (customer != null && !customer.isEmpty()) {
-                int userBatteryLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
-                info = new BatteryInfo(userBatteryLevel, 40.0);
+                // Get INITIAL battery level from ticket (where charging started)
+                int initialBatteryLevel = getTicketInitialBatteryLevel(ticket);
+                if (initialBatteryLevel == -1) {
+                    initialBatteryLevel = 18; // fallback default
+                }
+                info = new BatteryInfo(initialBatteryLevel, 40.0);
             } else {
                 info = new BatteryInfo(18, 40.0); // fallback default
+            }
+        }
+        
+        // Get current battery level (where charging stopped)
+        String customer = getTicketCustomer(ticket);
+        int currentBatteryLevel = 100; // Default to 100 if can't get current level
+        if (customer != null && !customer.isEmpty()) {
+            int userCurrentLevel = cephra.Database.CephraDB.getUserBatteryLevel(customer);
+            if (userCurrentLevel != -1) {
+                currentBatteryLevel = userCurrentLevel;
             }
         }
         
@@ -253,10 +267,18 @@ public final class QueueBridge {
             multiplier = FAST_MULTIPLIER; // Apply fast charging premium
         }
         
-        int start = Math.max(0, Math.min(100, info.initialPercent));
-        double usedFraction = (100.0 - start) / 100.0;
+        // CORRECT CALCULATION: Only charge for what was actually used
+        int initialLevel = Math.max(0, Math.min(100, info.initialPercent));
+        int finalLevel = Math.max(0, Math.min(100, currentBatteryLevel));
+        int actualChargedPercent = Math.max(0, finalLevel - initialLevel);
+        
+        // Calculate energy based on actual charged amount
+        double usedFraction = actualChargedPercent / 100.0;
         double energyKWh = usedFraction * info.capacityKWh;
         double gross = energyKWh * RATE_PER_KWH * multiplier; // Apply service multiplier
+        
+        System.out.println("QueueBridge: Billing for ticket " + ticket + " - Initial: " + initialLevel + "%, Final: " + finalLevel + "%, Charged: " + actualChargedPercent + "%, Amount: ₱" + String.format("%.2f", Math.max(gross, MINIMUM_FEE * multiplier)));
+        
         return Math.max(gross, MINIMUM_FEE * multiplier); // Apply multiplier to minimum fee too
     }
     
@@ -289,6 +311,30 @@ public final class QueueBridge {
         }
         
         return null;
+    }
+    
+    /** Helper method to get initial battery level from ticket */
+    private static int getTicketInitialBatteryLevel(String ticket) {
+        if (ticket == null) return -1;
+        
+        // Try database to get initial battery level from ticket
+        try {
+            try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+                 java.sql.PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT initial_battery_level FROM queue_tickets WHERE ticket_id = ?")) {
+                
+                stmt.setString(1, ticket);
+                try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("initial_battery_level");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting initial battery level from database for ticket " + ticket + ": " + e.getMessage());
+        }
+        
+        return -1; // Not found
     }
 
     public static double computePlatformCommission(double grossAmount) {

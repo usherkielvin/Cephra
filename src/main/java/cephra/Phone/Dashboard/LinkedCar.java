@@ -282,6 +282,34 @@ public class LinkedCar extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * Set display for when user is not charging
+     */
+    private void setNotChargingDisplay() {
+        chargingTypeLabel.setText("");
+        chargingTimeLabel.setText("Not Charging");
+        chargingTypeLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        
+        // Remove click listeners
+        for (java.awt.event.MouseListener ml : chargingTypeLabel.getMouseListeners()) {
+            chargingTypeLabel.removeMouseListener(ml);
+        }
+    }
+    
+    /**
+     * Set display for when charging is completed (manual or automatic)
+     */
+    private void setChargingCompleteDisplay() {
+        chargingTypeLabel.setText("");
+        chargingTimeLabel.setText("Charging Complete");
+        chargingTypeLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        
+        // Remove click listeners
+        for (java.awt.event.MouseListener ml : chargingTypeLabel.getMouseListeners()) {
+            chargingTypeLabel.removeMouseListener(ml);
+        }
+    }
+    
     // Method to get service type from ticket ID
     private String getTicketServiceType(String ticketId) {
         try (java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection()) {
@@ -435,10 +463,25 @@ public class LinkedCar extends javax.swing.JPanel {
         }
     }
     
-    // Method to set not charging display when charging is completed or no active ticket
-    private void setNotChargingDisplay() {
-        chargingTypeLabel.setText("");
-        chargingTimeLabel.setText("Ready");
+    /**
+     * Stop charging manually when user clicks the stop button
+     */
+    private void stopChargingManually() {
+        try {
+            String username = cephra.Database.CephraDB.getCurrentUsername();
+            if (username != null && cephra.Phone.Utilities.ChargingManager.getInstance().isCharging(username)) {
+                
+                // Stop charging immediately - no popups, no confirmation
+                cephra.Phone.Utilities.ChargingManager.getInstance().stopCharging(username, true);
+                
+                // Update UI to show completion
+                setChargingCompleteDisplay();
+                
+                System.out.println("LinkedCar: User manually stopped charging");
+            }
+        } catch (Exception e) {
+            System.err.println("LinkedCar: Error stopping charging manually: " + e.getMessage());
+        }
     }
     
     /**
@@ -552,11 +595,33 @@ public class LinkedCar extends javax.swing.JPanel {
                         String chargingType = cephra.Phone.Utilities.ChargingManager.getInstance().getChargingType(username);
                         if (chargingType != null) {
                             if (chargingType.toLowerCase().contains("fast")) {
-                                chargingTypeLabel.setText("Fast Charging");
+                                chargingTypeLabel.setText("Fast Charging - Click to Complete");
                             } else {
-                                chargingTypeLabel.setText("Normal Charging");
+                                chargingTypeLabel.setText("Normal Charging - Click to Complete");
                             }
                             updateChargingTimeDisplay(batteryLevel, chargingType);
+                            
+                            // Make the charging type label clickable to complete charging
+                            chargingTypeLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                            
+                            // Add click listener for complete charging (remove existing listeners first)
+                            for (java.awt.event.MouseListener ml : chargingTypeLabel.getMouseListeners()) {
+                                chargingTypeLabel.removeMouseListener(ml);
+                            }
+                            
+                            chargingTypeLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+                                @Override
+                                public void mouseClicked(java.awt.event.MouseEvent e) {
+                                    stopChargingManually();
+                                }
+                            });
+                        }
+                    } else {
+                        // Reset charging type label if not charging
+                        chargingTypeLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+                        // Remove click listeners
+                        for (java.awt.event.MouseListener ml : chargingTypeLabel.getMouseListeners()) {
+                            chargingTypeLabel.removeMouseListener(ml);
                         }
                     }
                 }
@@ -694,6 +759,7 @@ public class LinkedCar extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        StopCharge = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         plateNumber = new javax.swing.JLabel();
         car = new javax.swing.JLabel();
@@ -715,6 +781,15 @@ public class LinkedCar extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         setLayout(null);
+
+        StopCharge.setText("Stop");
+        StopCharge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                StopChargeActionPerformed(evt);
+            }
+        });
+        add(StopCharge);
+        StopCharge.setBounds(130, 310, 72, 23);
 
         jLabel2.setBackground(new java.awt.Color(204, 204, 204));
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -924,8 +999,12 @@ public class LinkedCar extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_chargeActionPerformed
 
+    private void StopChargeActionPerformed(java.awt.event.ActionEvent evt) {
+        stopChargingManually();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton StopCharge;
     private javax.swing.JLabel bar;
     private javax.swing.JLabel batterypercent;
     private javax.swing.JLabel car;

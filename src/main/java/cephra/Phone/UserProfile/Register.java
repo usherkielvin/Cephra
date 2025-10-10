@@ -3,6 +3,8 @@ package cephra.Phone.UserProfile;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class Register extends javax.swing.JPanel {
 
@@ -13,6 +15,7 @@ public class Register extends javax.swing.JPanel {
      
         setupButtons(); // Setup button hover effects
         setupTextFields(); // Setup text field properties
+        setupRealtimeValidation(); // Setup real-time validation
         makeDraggable(); // Make the panel draggable
         setupLabelPosition(); // fit Label Position
         
@@ -63,6 +66,11 @@ public class Register extends javax.swing.JPanel {
     private void initComponents() {
 
         See = new javax.swing.JButton();
+        fnamevalid = new javax.swing.JLabel();
+        Unamevalid1 = new javax.swing.JLabel();
+        snamevalid = new javax.swing.JLabel();
+        gmailvalid = new javax.swing.JLabel();
+        passvalid = new javax.swing.JLabel();
         pass = new javax.swing.JPasswordField();
         email = new javax.swing.JTextField();
         fname = new javax.swing.JTextField();
@@ -89,6 +97,31 @@ public class Register extends javax.swing.JPanel {
         });
         add(See);
         See.setBounds(285, 520, 50, 20);
+
+        fnamevalid.setForeground(new java.awt.Color(255, 0, 0));
+        fnamevalid.setText("jLabel2");
+        add(fnamevalid);
+        fnamevalid.setBounds(30, 320, 150, 16);
+
+        Unamevalid1.setForeground(new java.awt.Color(255, 0, 0));
+        Unamevalid1.setText("jLabel2");
+        add(Unamevalid1);
+        Unamevalid1.setBounds(37, 400, 290, 16);
+
+        snamevalid.setForeground(new java.awt.Color(255, 0, 0));
+        snamevalid.setText("jLabel2");
+        add(snamevalid);
+        snamevalid.setBounds(187, 320, 150, 16);
+
+        gmailvalid.setForeground(new java.awt.Color(255, 0, 0));
+        gmailvalid.setText("jLabel2");
+        add(gmailvalid);
+        gmailvalid.setBounds(37, 470, 290, 16);
+
+        passvalid.setForeground(new java.awt.Color(255, 0, 0));
+        passvalid.setText("jLabel2");
+        add(passvalid);
+        passvalid.setBounds(37, 550, 290, 16);
 
         pass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         pass.setBorder(null);
@@ -180,7 +213,6 @@ public class Register extends javax.swing.JPanel {
         });
         add(lname);
         lname.setBounds(200, 282, 120, 32);
-
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cephra/Cephra Images/Register1.png"))); // NOI18N
         add(jLabel1);
@@ -326,8 +358,258 @@ public class Register extends javax.swing.JPanel {
         });
     }
     
-
+    // Setup real-time validation for all input fields
+    private void setupRealtimeValidation() {
+        // Hide all validation labels initially
+        fnamevalid.setVisible(false);
+        snamevalid.setVisible(false);
+        Unamevalid1.setVisible(false);
+        gmailvalid.setVisible(false);
+        passvalid.setVisible(false);
+        
+        // First Name validation
+        fname.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) { validateFirstName(); }
+            public void removeUpdate(DocumentEvent e) { validateFirstName(); }
+            public void insertUpdate(DocumentEvent e) { validateFirstName(); }
+        });
+        
+        // Last Name validation
+        lname.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) { validateLastName(); }
+            public void removeUpdate(DocumentEvent e) { validateLastName(); }
+            public void insertUpdate(DocumentEvent e) { validateLastName(); }
+        });
+        
+        // Username validation
+        UsernamePhone.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) { validateUsername(); }
+            public void removeUpdate(DocumentEvent e) { validateUsername(); }
+            public void insertUpdate(DocumentEvent e) { validateUsername(); }
+        });
+        
+        // Email validation
+        email.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) { validateEmail(); }
+            public void removeUpdate(DocumentEvent e) { validateEmail(); }
+            public void insertUpdate(DocumentEvent e) { validateEmail(); }
+        });
+        
+        // Password validation
+        pass.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) { validatePassword(); }
+            public void removeUpdate(DocumentEvent e) { validatePassword(); }
+            public void insertUpdate(DocumentEvent e) { validatePassword(); }
+        });
+    }
     
+    // Validate first name field
+    private void validateFirstName() {
+        String text = fname.getText().trim();
+        
+        if (text.isEmpty()) {
+            fnamevalid.setVisible(false);
+            return;
+        }
+        
+        if (text.length() < 2) {
+            fnamevalid.setText("Min 2 chars");
+            fnamevalid.setForeground(new Color(255, 0, 0));
+            fnamevalid.setVisible(true);
+        } else if (!text.matches("^[a-zA-Z\\s]+$")) {
+            fnamevalid.setText("Letters only");
+            fnamevalid.setForeground(new Color(255, 0, 0));
+            fnamevalid.setVisible(true);
+        } else {
+            fnamevalid.setText("✓");
+            fnamevalid.setForeground(new Color(0, 200, 0));
+            fnamevalid.setVisible(true);
+        }
+    }
+    
+    // Validate last name field
+    private void validateLastName() {
+        String text = lname.getText().trim();
+        
+        if (text.isEmpty()) {
+            snamevalid.setVisible(false);
+            return;
+        }
+        
+        if (text.length() < 2) {
+            snamevalid.setText("Min 2 chars");
+            snamevalid.setForeground(new Color(255, 0, 0));
+            snamevalid.setVisible(true);
+        } else if (!text.matches("^[a-zA-Z\\s]+$")) {
+            snamevalid.setText("Letters only");
+            snamevalid.setForeground(new Color(255, 0, 0));
+            snamevalid.setVisible(true);
+        } else {
+            snamevalid.setText("✓");
+            snamevalid.setForeground(new Color(0, 200, 0));
+            snamevalid.setVisible(true);
+        }
+    }
+    
+    // Validate username field
+    private void validateUsername() {
+        String text = UsernamePhone.getText().trim();
+        
+        if (text.isEmpty()) {
+            Unamevalid1.setVisible(false);
+            return;
+        }
+        
+        if (text.length() < 3) {
+            Unamevalid1.setText("Min 3 chars");
+            Unamevalid1.setForeground(new Color(255, 0, 0));
+            Unamevalid1.setVisible(true);
+        } else if (!text.matches("^[a-zA-Z0-9_]+$")) {
+            Unamevalid1.setText("Alphanumeric + _");
+            Unamevalid1.setForeground(new Color(255, 0, 0));
+            Unamevalid1.setVisible(true);
+        } else {
+            // Check if username already exists in database
+            if (isUsernameExists(text)) {
+                Unamevalid1.setText("Already taken");
+                Unamevalid1.setForeground(new Color(255, 0, 0));
+                Unamevalid1.setVisible(true);
+            } else {
+                Unamevalid1.setText("✓ Available");
+                Unamevalid1.setForeground(new Color(0, 200, 0));
+                Unamevalid1.setVisible(true);
+            }
+        }
+    }
+    
+    // Check if username already exists in database
+    private boolean isUsernameExists(String username) {
+        try {
+            java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+            String query = "SELECT COUNT(*) FROM users WHERE username = ?";
+            java.sql.PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, username);
+            java.sql.ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                rs.close();
+                stmt.close();
+                conn.close();
+                return count > 0; // Returns true if username exists
+            }
+            
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("Error checking username: " + e.getMessage());
+        }
+        return false; // If error occurs, assume username doesn't exist
+    }
+    
+    // Validate email field
+    private void validateEmail() {
+        String text = email.getText().trim();
+        
+        if (text.isEmpty()) {
+            gmailvalid.setVisible(false);
+            return;
+        }
+        
+        if (!text.contains("@")) {
+            gmailvalid.setText("Need @");
+            gmailvalid.setForeground(new Color(255, 0, 0));
+            gmailvalid.setVisible(true);
+        } else if (!text.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            gmailvalid.setText("Invalid format");
+            gmailvalid.setForeground(new Color(255, 0, 0));
+            gmailvalid.setVisible(true);
+        } else {
+            // Check if email already exists in database
+            if (isEmailExists(text)) {
+                gmailvalid.setText("Already registered");
+                gmailvalid.setForeground(new Color(255, 0, 0));
+                gmailvalid.setVisible(true);
+            } else {
+                gmailvalid.setText("✓ Available");
+                gmailvalid.setForeground(new Color(0, 200, 0));
+                gmailvalid.setVisible(true);
+            }
+        }
+    }
+    
+    // Check if email already exists in database
+    private boolean isEmailExists(String email) {
+        try {
+            java.sql.Connection conn = cephra.Database.DatabaseConnection.getConnection();
+            String query = "SELECT COUNT(*) FROM users WHERE email = ?";
+            java.sql.PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, email);
+            java.sql.ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                rs.close();
+                stmt.close();
+                conn.close();
+                return count > 0; // Returns true if email exists
+            }
+            
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("Error checking email: " + e.getMessage());
+        }
+        return false; // If error occurs, assume email doesn't exist
+    }
+    
+    // Validate password field
+    private void validatePassword() {
+        String text = new String(pass.getPassword()).trim();
+        
+        if (text.isEmpty()) {
+            passvalid.setVisible(false);
+            return;
+        }
+        
+        boolean hasUpper = text.chars().anyMatch(Character::isUpperCase);
+        boolean hasLower = text.chars().anyMatch(Character::isLowerCase);
+        boolean hasDigit = text.chars().anyMatch(Character::isDigit);
+        boolean hasSymbol = text.chars().anyMatch(ch -> "!@#$%^&*()_+-=[]{}|;:',.<>?/~`\"\\".indexOf(ch) >= 0);
+        
+        if (text.length() < 8) {
+            passvalid.setText("Min 8 chars");
+            passvalid.setForeground(new Color(255, 0, 0));
+            passvalid.setVisible(true);
+        } else if (text.length() > 25) {
+            passvalid.setText("Max 25 chars");
+            passvalid.setForeground(new Color(255, 0, 0));
+            passvalid.setVisible(true);
+        } else if (!hasUpper) {
+            passvalid.setText("Need uppercase");
+            passvalid.setForeground(new Color(255, 0, 0));
+            passvalid.setVisible(true);
+        } else if (!hasLower) {
+            passvalid.setText("Need lowercase");
+            passvalid.setForeground(new Color(255, 0, 0));
+            passvalid.setVisible(true);
+        } else if (!hasDigit) {
+            passvalid.setText("Need number");
+            passvalid.setForeground(new Color(255, 0, 0));
+            passvalid.setVisible(true);
+        } else if (!hasSymbol) {
+            passvalid.setText("Need symbol");
+            passvalid.setForeground(new Color(255, 0, 0));
+            passvalid.setVisible(true);
+        } else {
+            passvalid.setText("✓");
+            passvalid.setForeground(new Color(0, 200, 0));
+            passvalid.setVisible(true);
+        }
+    }
+
     // Ensure the background label (PNG) stays positioned correctly
     private void setupLabelPosition() {
         if (jLabel1 != null) {
@@ -384,6 +666,12 @@ public class Register extends javax.swing.JPanel {
         return;
     }
     
+    if (!nameText.matches("^[a-zA-Z\\s]+$")) {
+        JOptionPane.showMessageDialog(this, "First name can only contain letters.", "Invalid First Name", JOptionPane.WARNING_MESSAGE);
+        fname.requestFocusInWindow();
+        return;
+    }
+    
     // Check last name
     if (lastNameText.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Please enter your last name.", "Last Name Required", JOptionPane.WARNING_MESSAGE);
@@ -393,6 +681,12 @@ public class Register extends javax.swing.JPanel {
     
     if (lastNameText.length() < 2) {
         JOptionPane.showMessageDialog(this, "Last name must be at least 2 characters long.", "Invalid Last Name", JOptionPane.WARNING_MESSAGE);
+        lname.requestFocusInWindow();
+        return;
+    }
+    
+    if (!lastNameText.matches("^[a-zA-Z\\s]+$")) {
+        JOptionPane.showMessageDialog(this, "Last name can only contain letters.", "Invalid Last Name", JOptionPane.WARNING_MESSAGE);
         lname.requestFocusInWindow();
         return;
     }
@@ -415,6 +709,13 @@ public class Register extends javax.swing.JPanel {
         UsernamePhone.requestFocusInWindow();
         return;
     }
+    
+    // Check if username already exists (must match real-time validation)
+    if (isUsernameExists(usernameText)) {
+        JOptionPane.showMessageDialog(this, "This username is already taken. Please choose a different one.", "Username Taken", JOptionPane.WARNING_MESSAGE);
+        UsernamePhone.requestFocusInWindow();
+        return;
+    }
 
     // Check email
     if (emailText.isEmpty()) {
@@ -425,6 +726,13 @@ public class Register extends javax.swing.JPanel {
     
     if (!emailText.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
         JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Email", JOptionPane.WARNING_MESSAGE);
+        email.requestFocusInWindow();
+        return;
+    }
+    
+    // Check if email already exists (must match real-time validation)
+    if (isEmailExists(emailText)) {
+        JOptionPane.showMessageDialog(this, "This email is already registered. Please use a different email.", "Email Already Exists", JOptionPane.WARNING_MESSAGE);
         email.requestFocusInWindow();
         return;
     }
@@ -469,6 +777,13 @@ public class Register extends javax.swing.JPanel {
         pass.requestFocusInWindow();
         return;
     }
+    
+    boolean hasSymbol = passwordText.chars().anyMatch(ch -> "!@#$%^&*()_+-=[]{}|;:',.<>?/~`\"\\".indexOf(ch) >= 0);
+    if (!hasSymbol) {
+        JOptionPane.showMessageDialog(this, "Password must contain at least one special symbol (!@#$%^&* etc).", "Password Missing Symbol", JOptionPane.WARNING_MESSAGE);
+        pass.requestFocusInWindow();
+        return;
+    }
 
     // Check terms and conditions
     if (!termscondition.isSelected()) {
@@ -494,9 +809,9 @@ public class Register extends javax.swing.JPanel {
                 }
             });
         } else {
-            // Username or email already exists
-            JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose a different one.", "Registration Failed", JOptionPane.WARNING_MESSAGE);
-            fname.requestFocusInWindow();
+            // Since we already checked username, this must be email duplicate
+            JOptionPane.showMessageDialog(this, "This email is already registered. Please use a different email.", "Email Already Exists", JOptionPane.WARNING_MESSAGE);
+            email.requestFocusInWindow();
         }
     } catch (Exception e) {
         // Handle any unexpected database errors
@@ -669,14 +984,19 @@ public class Register extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton See;
+    private javax.swing.JLabel Unamevalid1;
     private javax.swing.JTextField UsernamePhone;
     private javax.swing.JTextField email;
     private javax.swing.JTextField fname;
+    private javax.swing.JLabel fnamevalid;
+    private javax.swing.JLabel gmailvalid;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField lname;
     private javax.swing.JButton loginbutton;
     private javax.swing.JPasswordField pass;
+    private javax.swing.JLabel passvalid;
     private javax.swing.JButton register;
+    private javax.swing.JLabel snamevalid;
     private javax.swing.JCheckBox termscondition;
     // End of variables declaration//GEN-END:variables
 }
